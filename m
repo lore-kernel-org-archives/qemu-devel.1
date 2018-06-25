@@ -1,47 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fXSQN-00008Z-Cc
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:25:00 -0400
+	(envelope-from <groug@kaod.org>) id 1fXST1-0001zt-Sz
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fXSQI-000171-EY
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:24:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57200
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fXSQI-00016p-8T
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:24:54 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5PEOkDj129312
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:24:53 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ju0ruc07s-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:24:49 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 25 Jun 2018 10:23:42 -0400
-References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
-	<20180621115530.11069-5-marcandre.lureau@redhat.com>
-	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
-	<20180622110312.275b5d59@redhat.com>
-	<aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
-	<20180622155642.3f05423b@redhat.com>
-	<da031edd-af7d-d51a-616a-1b231becd4c9@linux.vnet.ibm.com>
-	<20180625113128.3a8a546b@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 25 Jun 2018 10:23:36 -0400
+	(envelope-from <groug@kaod.org>) id 1fXSSy-0002Jk-KJ
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:27:43 -0400
+Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:41822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXSSy-0002JM-Ay
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:27:40 -0400
+Received: from player793.ha.ovh.net (unknown [10.109.122.16])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A9CF81C4B28
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 16:27:38 +0200 (CEST)
+Date: Mon, 25 Jun 2018 16:27:33 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180625162733.41cd605b@bahia.lan>
+In-Reply-To: <603b0ffda828e4c6a7ac9799853df0d6a5be3822.1529196703.git.keno@juliacomputing.com>
+References: <cover.1529196703.git.keno@juliacomputing.com>
+	<603b0ffda828e4c6a7ac9799853df0d6a5be3822.1529196703.git.keno@juliacomputing.com>
 MIME-Version: 1.0
-In-Reply-To: <20180625113128.3a8a546b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <daf1b7a5-9d05-0da7-a31e-5bd7cc863639@linux.vnet.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
- interface
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/13] 9p: linux: Fix a couple Linux
+ assumptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,127 +31,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
 
-ZGlmZiAtLWdpdCBhL2RvY3Mvc3BlY3MvdHBtLnR4dCBiL2RvY3Mvc3BlY3MvdHBtLnR4dA0K
-aW5kZXggYzIzMGM0YzkzZS4uOTBmOTZjNTNjYiAxMDA2NDQNCi0tLSBhL2RvY3Mvc3BlY3Mv
-dHBtLnR4dA0KKysrIGIvZG9jcy9zcGVjcy90cG0udHh0DQpAQCAtNDIsNiArNDIsODUgQEAg
-VVJMOg0KDQogwqBodHRwczovL3RydXN0ZWRjb21wdXRpbmdncm91cC5vcmcvdGNnLWFjcGkt
-c3BlY2lmaWNhdGlvbi8NCg0KKz09IEFDUEkgUFBJIEludGVyZmFjZSA9PQ0KKw0KK1FFTVUg
-c3VwcG9ydHMgdGhlIFBoeXNpY2FsIFByZXNlbmNlIEludGVyZmFjZSAoUFBJKSBmb3IgVFBN
-IDEuMiBhbmQgVFBNIA0KMi4gVGhpcw0KK2ludGVyZmFjZSByZXF1aXJlcyBBQ1BJIGFuZCBm
-aXJtd2FyZSBzdXBwb3J0LiBUaGUgc3BlY2lmaWNhdGlvbiBjYW4gYmUgDQpmb3VuZCBhdA0K
-K3RoZSBmb2xsb3dpbmcgVVJMOg0KKw0KK2h0dHBzOi8vdHJ1c3RlZGNvbXB1dGluZ2dyb3Vw
-Lm9yZy9yZXNvdXJjZS90Y2ctcGh5c2ljYWwtcHJlc2VuY2UtaW50ZXJmYWNlLXNwZWNpZmlj
-YXRpb24vDQorDQorUFBJIGVuYWJsZXMgYSBzeXN0ZW0gYWRtaW5pc3RyYXRvciAocm9vdCkg
-dG8gcmVxdWVzdCBhIG1vZGlmaWNhdGlvbiB0byB0aGUNCitUUE0gdXBvbiByZWJvb3QuIFRo
-ZSBQUEkgc3BlY2lmaWNhdGlvbiBkZWZpbmVzIHRoZSBvcGVyYXRpb24gcmVxdWVzdHMgDQph
-bmQgdGhlDQorYWN0aW9ucyB0aGUgZmlybXdhcmUgaGFzIHRvIHRha2UuIFRoZSBzeXN0ZW0g
-YWRtaW5pc3RyYXRvciBwYXNzZXMgdGhlIA0Kb3BlcmF0aW9uDQorcmVxdWVzdCBudW1iZXIg
-dG8gdGhlIGZpcm13YXJlIHRocm91Z2ggYW4gQUNQSSBpbnRlcmZhY2Ugd2hpY2ggd3JpdGVz
-IHRoaXMNCitudW1iZXIgdG8gYSBtZW1vcnkgbG9jYXRpb24gdGhhdCB0aGUgZmlybXdhcmUg
-a25vd3MuIFVwb24gcmVib290LCB0aGUgDQpmaXJtd2FyZQ0KK2ZpbmRzIHRoZSBudW1iZXIg
-YW5kIHNlbmRzIGNvbW1hbmRzIHRvIHRoZSB0aGUgVFBNLiBUaGUgZmlybXdhcmUgd3JpdGVz
-IA0KdGhlIFRQTQ0KK3Jlc3VsdCBjb2RlIGFuZCB0aGUgb3BlcmF0aW9uIHJlcXVlc3QgbnVt
-YmVyIHRvIGEgbWVtb3J5IGxvY2F0aW9uIHRoYXQgDQpBQ1BJIGNhbg0KK3JlYWQgZnJvbSBh
-bmQgcGFzcyB0aGUgcmVzdWx0IG9uIHRvIHRoZSBhZG1pbmlzdHJhdG9yLg0KKw0KK1RoZSBQ
-UEkgc3BlY2lmaWNhdGlvbiBkZWZpbmVzIGEgc2V0IG9mIG1hbmRhdG9yeSBhbmQgb3B0aW9u
-YWwgDQpvcGVyYXRpb25zIGZvcg0KK3RoZSBmaXJtd2FyZSB0byBpbXBsZW1lbnQuIFRoZSBB
-Q1BJIGludGVyZmFjZSBhbHNvIGFsbG93cyBhbiANCmFkbWluaXN0cmF0b3IgdG8NCitsaXN0
-IHRoZSBzdXBwb3J0ZWQgb3BlcmF0aW9ucy4gSW4gUUVNVSB0aGUgQUNQSSBjb2RlIGlzIGdl
-bmVyYXRlZCBieSANClFFTVUsIHlldA0KK3RoZSBmaXJtd2FyZSBuZWVkcyB0byBpbXBsZW1l
-bnQgc3VwcG9ydCBvbiBhIHBlci1vcGVyYXRpb25zIGJhc2lzLCBhbmQNCitkaWZmZXJlbnQg
-ZmlybXdhcmVzIG1heSBzdXBwb3J0IGEgZGlmZmVyZW50IHN1YnNldC4gVGhlcmVmb3JlLCBR
-RU1VIA0KaW50cm9kdWNlcw0KK3RoZSB2aXJ0dWFsIG1lbW9yeSBkZXZpY2UgZm9yIFBQSSB3
-aGVyZSB0aGUgZmlybXdhcmUgY2FuIGluZGljYXRlIHdoaWNoDQorb3BlcmF0aW9ucyBpdCBz
-dXBwb3J0cyBhbmQgQUNQSSBjYW4gZW5hYmxlIHRoZSBvbmVzIHRoYXQgYXJlIHN1cHBvcnRl
-ZCBhbmQNCitkaXNhYmxlIGFsbCBvdGhlcnMuIFRoaXMgaW50ZXJmYWNlIGxpZXMgaW4gbWFp
-biBtZW1vcnkgYW5kIGhhcyB0aGUgDQpmb2xsb3dpbmcNCitsYXlvdXQ6DQorDQorICstLS0t
-LS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8wqAgRmllbGTCoMKgIHwgTGVuZ3RoIHwgT2Zmc2V0
-IHwgRGVzY3JpcHRpb27CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisgKy0tLS0t
-LS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLSsNCivCoMKgIHwgZnVuY8KgwqDCoMKgIHzCoCAweDEwMCB8wqAgMHgw
-MDAgfCBGaXJtd2FyZSBzZXRzIHZhbHVlcyBmb3IgZWFjaCANCnN1cHBvcnRlZMKgwqAgfA0K
-K8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDC
-oMKgIHwgb3BlcmF0aW9uLiBTZWUgZGVmaW5lZCB2YWx1ZXMgDQpiZWxvdy7CoMKgwqDCoMKg
-IHwNCisgKy0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCivCoMKgIHwgcHBpbsKgwqDCoMKgIHzCoMKg
-IDB4McKgIHzCoCAweDEwMCB8IFNNSSBpbnRlcnJ1cHQgdG8gdXNlLiBTZXQgYnkgDQpmaXJt
-d2FyZS7CoMKgwqAgfA0KK8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKg
-wqAgfMKgwqDCoMKgwqDCoMKgIHwgTm90IA0Kc3VwcG9ydGVkLsKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8DQorICstLS0tLS0tLS0t
-Ky0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0rDQorwqDCoCB8IHBwaXDCoMKgwqDCoCB8wqDCoCAweDTCoCB8wqAgMHgxMDEg
-fCBBQ1BJIGZ1bmN0aW9uIGluZGV4IHRvIHBhc3MgdG8gU01NIA0KY29kZS7CoCB8DQorwqDC
-oCB8wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAg
-fCBTZXQgYnkgQUNQSS4gTm90IA0Kc3VwcG9ydGVkLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgfA0KKyArLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KK8KgwqAgfCBwcHJwwqDCoMKgwqAg
-fMKgwqAgMHg0wqAgfMKgIDB4MTA1IHwgUmVzdWx0IG9mIGxhc3QgZXhlY3V0ZWQgb3BlcmF0
-aW9uLiANClNldCBieSB8DQorwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKg
-wqDCoCB8wqDCoMKgwqDCoMKgwqAgfCBmaXJtd2FyZS4gU2VlIGZ1bmN0aW9uIGluZGV4IDUg
-Zm9yIA0KdmFsdWVzLnwNCisgKy0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCivCoMKgIHwgcHByccKg
-wqDCoMKgIHzCoMKgIDB4NMKgIHzCoCAweDEwOSB8IE9wZXJhdGlvbiByZXF1ZXN0IG51bWJl
-ciB0byBleGVjdXRlLiANClNlZcKgIHwNCivCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqAgfMKg
-wqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8ICdQaHlzaWNhbCBQcmVzZW5jZSBJbnRl
-cmZhY2UgDQpPcGVyYXRpb27CoMKgwqAgfA0KK8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8
-wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwgU3VtbWFyeScgdGFibGVzIGluIHNw
-ZWNzLiBTZXQgYnkgDQpBQ1BJLsKgwqDCoCB8DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0t
-LS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQor
-wqDCoCB8IHBwcm3CoMKgwqDCoCB8wqDCoCAweDTCoCB8wqAgMHgxMGQgfCBPcGVyYXRpb24g
-cmVxdWVzdCBvcHRpb25hbCANCnBhcmFtZXRlci7CoMKgwqDCoCB8DQorwqDCoCB8wqDCoMKg
-wqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfCBWYWx1ZXMg
-ZGVwZW5kIG9uIG9wZXJhdGlvbi4gU2V0IGJ5IA0KQUNQSS7CoCB8DQorICstLS0tLS0tLS0t
-Ky0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0rDQorwqDCoCB8IGxwcHLCoMKgwqDCoCB8wqDCoCAweDTCoCB8wqAgMHgxMTEg
-fCBMYXN0IGV4ZWN1dGVkIG9wZXJhdGlvbiByZXF1ZXN0IA0KbnVtYmVyLsKgwqAgfA0KK8Kg
-wqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKg
-IHwgQ29waWVkIGZyb20gcHBycSBmaWVsZCBieSANCmZpcm13YXJlLsKgwqDCoMKgwqDCoCB8
-DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IGZyZXTCoMKgwqDCoCB8wqDCoCAw
-eDTCoCB8wqAgMHgxMTUgfCBSZXN1bHQgY29kZSBmcm9tIFNNTSANCmZ1bmN0aW9uLsKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgfA0KK8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKg
-wqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwgTm90IA0Kc3VwcG9ydGVkLsKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8DQorICstLS0t
-LS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IHJlczHCoMKgwqDCoCB8wqAgMHg0MMKgIHzCoCAw
-eDExOSB8IFJlc2VydmVkIGZvciBmdXR1cmUgDQp1c2XCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgfA0KKyArLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KK8KgwqAgfCBuZXh0
-X3N0ZXB8wqDCoCAweDHCoCB8wqAgMHgxNTkgfCBPcGVyYXRpb24gdG8gZXhlY3V0ZSBhZnRl
-ciByZWJvb3QgDQpiecKgwqDCoMKgwqAgfA0KK8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8
-wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwgZmlybXdhcmUuIFVzZWQgYnkgDQpm
-aXJtd2FyZS7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisgKy0tLS0tLS0tLS0r
-LS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLSsNCisNCivCoMKgIFRoZSBmb2xsb3dpbmcgdmFsdWVzIGFyZSBzdXBwb3J0ZWQg
-Zm9yIHRoZSAnZnVuYycgZmllbGQuIFRoZXkgY29ycmVzcG9uZA0KK8KgwqAgdG8gdGhlIHZh
-bHVlcyB1c2VkIGJ5IEFDUEkgZnVuY3Rpb24gaW5kZXggOC4NCisNCisgKy0tLS0tLS0tLS0r
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLSsNCivCoMKgIHwgdmFsdWXCoMKgwqAgfCANCkRlc2NyaXB0aW9uwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisgKy0tLS0tLS0tLS0rLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLSsNCivCoMKgIHwgMMKgwqDCoMKgwqDCoMKgIHwgT3BlcmF0aW9uIGlzIG5vdCANCmlt
-cGxlbWVudGVkLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCB8DQorICstLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IDHC
-oMKgwqDCoMKgwqDCoCB8IE9wZXJhdGlvbiBpcyBvbmx5IGFjY2Vzc2libGUgdGhyb3VnaCAN
-CmZpcm13YXJlLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisgKy0tLS0tLS0tLS0r
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLSsNCivCoMKgIHwgMsKgwqDCoMKgwqDCoMKgIHwgT3BlcmF0aW9uIGlzIGJsb2Nr
-ZWQgZm9yIE9TIGJ5IGZpcm13YXJlIA0KY29uZmlndXJhdGlvbi7CoMKgwqDCoMKgIHwNCisg
-Ky0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLSsNCivCoMKgIHwgM8KgwqDCoMKgwqDCoMKgIHwgT3BlcmF0
-aW9uIGlzIGFsbG93ZWQgYW5kIHBoeXNpY2FsbHkgcHJlc2VudCB1c2VyIA0KcmVxdWlyZWQu
-wqAgfA0KKyArLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KK8KgwqAgfCA0wqDCoMKgwqDCoMKgwqAg
-fCBPcGVyYXRpb24gaXMgYWxsb3dlZCBhbmQgcGh5c2ljYWxseSBwcmVzZW50IHVzZXIgaXMg
-DQpub3TCoMKgwqDCoCB8DQorwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHwgDQpyZXF1aXJl
-ZC7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisg
-Ky0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLSsNCisNCg0KIMKgUUVNVSBmaWxlcyByZWxhdGVkIHRvIFRQ
-TSBBQ1BJIHRhYmxlczoNCiDCoCAtIGh3L2kzODYvYWNwaS1idWlsZC5jDQoNCg==
+On Sat, 16 Jun 2018 20:56:45 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
+
+> From: Keno Fischer <keno@alumni.harvard.edu>
+>=20
+>  - Guard Linux only headers.
+>  - Add qemu/statfs.h header to abstract over the which
+>    headers are needed for struct statfs
+
+I've suggested in some other mail that you introduce a QEMU type
+for struct statfs with per-OS helpers. I guess this would cover
+this part as well.
+
+>  - Define `ENOATTR` only if not only defined
+>    (it's defined in system headers on Darwin).
+>=20
+
+The ENOATTR part is independent from the others. Please move it
+to its own patch.
+
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+>  fsdev/file-op-9p.h          |  2 +-
+>  fsdev/virtfs-proxy-helper.c |  4 +++-
+>  hw/9pfs/9p-local.c          |  2 ++
+>  include/qemu/statfs.h       | 19 +++++++++++++++++++
+>  include/qemu/xattr.h        |  4 +++-
+>  5 files changed, 28 insertions(+), 3 deletions(-)
+>  create mode 100644 include/qemu/statfs.h
+>=20
+> diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
+> index 3fa062b..111f804 100644
+> --- a/fsdev/file-op-9p.h
+> +++ b/fsdev/file-op-9p.h
+> @@ -16,7 +16,7 @@
+> =20
+>  #include <dirent.h>
+>  #include <utime.h>
+> -#include <sys/vfs.h>
+> +#include "qemu/statfs.h"
+>  #include "qemu-fsdev-throttle.h"
+> =20
+>  #define SM_LOCAL_MODE_BITS    0600
+> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+> index 6f132c5..94fb069 100644
+> --- a/fsdev/virtfs-proxy-helper.c
+> +++ b/fsdev/virtfs-proxy-helper.c
+> @@ -13,17 +13,19 @@
+>  #include <sys/resource.h>
+>  #include <getopt.h>
+>  #include <syslog.h>
+> +#ifdef CONFIG_LINUX
+>  #include <sys/capability.h>
+
+I'd rather leave this to the other patch where you implement the
+setuid logic for Darwin.
+
+>  #include <sys/fsuid.h>
+
+=46rom the setfsuid(2) manual page:
+
+Thus, setfsuid() is nowadays unneeded and should be avoided in new
+applications (likewise for setfsgid(2)).
+
+So this header can be safely dropped, along with the big "from man7
+capabilities" which is basically explaining why we don't use setfsuid(),
+and should rather appear in a commit message, than in the code.
+
+> -#include <sys/vfs.h>
+>  #include <sys/ioctl.h>
+
+This is needed for ioctl(), which is used for FS_IOC_GETVERSION,
+so this should rather be guarded by FS_IOC_GETVERSION than by
+CONFIG_LINUX... or maybe not guarded at all if Darwin has this
+header, for the sake of simplicity.
+
+>  #include <linux/fs.h>
+>  #ifdef CONFIG_LINUX_MAGIC_H
+>  #include <linux/magic.h>
+>  #endif
+> +#endif
+>  #include "qemu-common.h"
+>  #include "qemu/sockets.h"
+>  #include "qemu/xattr.h"
+> +#include "qemu/statfs.h"
+>  #include "9p-iov-marshal.h"
+>  #include "hw/9pfs/9p-proxy.h"
+>  #include "fsdev/9p-iov-marshal.h"
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index 828e8d6..d713983 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -27,10 +27,12 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/option.h"
+>  #include <libgen.h>
+> +#ifdef CONFIG_LINUX
+>  #include <linux/fs.h>
+>  #ifdef CONFIG_LINUX_MAGIC_H
+>  #include <linux/magic.h>
+>  #endif
+> +#endif
+>  #include <sys/ioctl.h>
+> =20
+>  #ifndef XFS_SUPER_MAGIC
+> diff --git a/include/qemu/statfs.h b/include/qemu/statfs.h
+> new file mode 100644
+> index 0000000..dde289f
+> --- /dev/null
+> +++ b/include/qemu/statfs.h
+> @@ -0,0 +1,19 @@
+> +/*
+> + * Host statfs header abstraction
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2, or a=
+ny
+> + * later version.  See the COPYING file in the top-level directory.
+> + *
+> + */
+> +#ifndef QEMU_STATFS_H
+> +#define QEMU_STATFS_H
+> +
+> +#ifdef CONFIG_LINUX
+> +# include <sys/vfs.h>
+> +#endif
+> +#ifdef CONFIG_DARWIN
+> +# include <sys/param.h>
+> +# include <sys/mount.h>
+> +#endif
+> +
+> +#endif
+> diff --git a/include/qemu/xattr.h b/include/qemu/xattr.h
+> index a83fe8e..f1d0f7b 100644
+> --- a/include/qemu/xattr.h
+> +++ b/include/qemu/xattr.h
+> @@ -22,7 +22,9 @@
+>  #ifdef CONFIG_LIBATTR
+>  #  include <attr/xattr.h>
+>  #else
+> -#  define ENOATTR ENODATA
+> +#  if !defined(ENOATTR)
+> +#    define ENOATTR ENODATA
+> +#  endif
+>  #  include <sys/xattr.h>
+>  #endif
+> =20
