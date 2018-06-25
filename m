@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fXKfY-0007vX-53
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXKfl-00080I-7M
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fXKfU-0005YD-SQ
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:08 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:38170)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fXKfU-0005Xh-Fe
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:04 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
-	<b2f04223-f52d-44e6-95a6-6ed91d021dad@ispras.ru>
-	<87in6yd146.fsf@linaro.org> <001201d3fc8d$e8a06390$b9e12ab0$@ru>
-	<87fu21d3gh.fsf@linaro.org> <001c01d3fcae$f0443fb0$d0ccbf10$@ru>
-	<87bmcpcmfa.fsf@linaro.org>
-In-Reply-To: <87bmcpcmfa.fsf@linaro.org>
-Date: Mon, 25 Jun 2018 09:08:02 +0300
-Message-ID: <007f01d40c4a$e070d070$a1527150$@ru>
+	(envelope-from <thuth@redhat.com>) id 1fXKfk-0005hJ-49
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:21 -0400
+References: <20180622134036.23182-1-f4bug@amsat.org>
+	<20180622134036.23182-8-f4bug@amsat.org>
+	<e98bac2c-ce0b-e226-3d96-004e46478f2f@redhat.com>
+	<8256c2d4-722c-299f-e8e3-42c1a7f68e1d@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0bf443e6-fd49-9aaf-43fb-f171edf5fd38@redhat.com>
+Date: Mon, 25 Jun 2018 08:08:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+In-Reply-To: <8256c2d4-722c-299f-e8e3-42c1a7f68e1d@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v4 00/19] reverse debugging
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] hw/i2c/omap_i2c: Use
+ qemu_log_mask(UNIMP) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+On 22.06.2018 22:10, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 06/22/2018 04:38 PM, Thomas Huth wrote:
+>> On 22.06.2018 15:40, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> ---
+>>>  hw/i2c/omap_i2c.c | 20 ++++++++++++--------
+>>>  1 file changed, 12 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
+>>> index 26e3e5ebf6..690876e43e 100644
+>>> --- a/hw/i2c/omap_i2c.c
+>>> +++ b/hw/i2c/omap_i2c.c
+>>> @@ -17,6 +17,7 @@
+>>>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>>>   */
+>>>  #include "qemu/osdep.h"
+>>> +#include "qemu/log.h"
+>>>  #include "hw/hw.h"
+>>>  #include "hw/i2c/i2c.h"
+>>>  #include "hw/arm/omap.h"
+>>> @@ -339,14 +340,15 @@ static void omap_i2c_write(void *opaque, hwaddr=
+ addr,
+>>>              }
+>>>              break;
+>>>          }
+>>> -        if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MST */
+>>> -            fprintf(stderr, "%s: I^2C slave mode not supported\n",
+>>> -                            __func__);
+>>> +        if ((value & (1 << 15)) && !(value & (1 << 10))) { /* MST */
+>>
+>> Please keep the white spaces before the comment if you don't change
+>> anything else.
 >=20
-> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-> >>
-> >> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> >> Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru> writes:
-> >> >>
-> >> >> > Ping?
-> >> >>
-> >> >> I started having a look but I ran into this straight away. First =
-I
-> >> >> recorded a boot of the kernel:
-> >> >>
-> >> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine =
-virt,graphics=3Don,gic-
-> >> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial =
-mon:stdio -display none -kernel
-> >> >> ../images/aarch64-current-linux-initrd-guest.img -icount
-> >> shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin
-> >> >>
-> >> >> Then played back:
-> >> >>
-> >> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine =
-virt,graphics=3Don,gic-
-> >> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial =
-mon:stdio -display none -kernel
-> >> >> ../images/aarch64-current-linux-initrd-guest.img -icount
-> >> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin -
-> >> >> s -S
-> >> >
-> >> > This looks ok, but...
-> >> >
-> >> >> And did the following on gdb:
-> >> >>
-> >> >> (gdb) i
-> >> >> 0x0000000040000004 in ?? ()
-> >> >> =3D> 0x40000004:  mov     x1, xzr
-> >> >>    0x40000008:  mov     x2, xzr
-> >> >>    0x4000000c:  mov     x3, xzr
-> >> >> (gdb)
-> >> >> 0x0000000040000008 in ?? ()
-> >> >> =3D> 0x40000008:  mov     x2, xzr
-> >> >>    0x4000000c:  mov     x3, xzr
-> >> >>    0x40000010:  ldr     x4, 0x40000020
-> >> >> (gdb)
-> >> >> 0x000000004000000c in ?? ()
-> >> >> =3D> 0x4000000c:  mov     x3, xzr
-> >> >>    0x40000010:  ldr     x4, 0x40000020
-> >> >>    0x40000014:  br      x4
-> >> >> (gdb)
-> >> >> 0x0000000040000010 in ?? ()
-> >> >> =3D> 0x40000010:  ldr     x4, 0x40000020
-> >> >>    0x40000014:  br      x4
-> >> >>    0x40000018:  .inst   0x44000000 ; undefined
-> >> >> (gdb)
-> >> >> 0x0000000040000014 in ?? ()
-> >> >> =3D> 0x40000014:  br      x4
-> >> >>    0x40000018:  .inst   0x44000000 ; undefined
-> >> >>    0x4000001c:  .inst   0x00000000 ; undefined
-> >> >> (gdb) p/x $x4
-> >> >> $1 =3D 0x40080000
-> >> >> (gdb) reverse-stepi
-> >> >> warning: Remote failure reply: E14
-> >> >>
-> >> >> Surely this is the simple case and doesn't require any snapshots =
-for
-> >> >> block devices as there are none. Am I missing something?
-> >> >
-> >> > Reverse debugging requires the snapshotting. QEMU can't revert =
-the VM state without the
-> >> snapshots.
-> >> > You can try adding an empty qcow2 image to allow snapshotting =
-there.
-> >>
-> >> I suspect a recent patch has broken locking again:
-> >>
-> >> Starting program: =
-/home/alex/lsrc/qemu/qemu.git/aarch64-softmmu/qemu-system-aarch64 -
-> machine
-> >> virt,graphics=3Don,gic-version=3D3,virtualization=3Don -cpu =
-cortex-a53 --serial mon:stdio -
-> display
-> >> none -kernel ../images/aarch64-current-linux-initrd-guest.img =
--icount
-> >> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin,rrsnapshot=3Ddebug -drive
-> >> file=3Drr.qcow2,if=3Dnone,snapshot,id=3Drr -s -S
-> >> [Thread debugging using libthread_db enabled]
-> >> Using host libthread_db library =
-"/lib/x86_64-linux-gnu/libthread_db.so.1".
-> >> [New Thread 0x7fffd8536700 (LWP 32452)]
-> >> [New Thread 0x7fffd5bb3700 (LWP 32453)]
-> >> [New Thread 0x7fffd4eab700 (LWP 32454)]
-> >> **
-> >> ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: =
-(replay_file &&
-> >> replay_mutex_locked())
-> >
-> > Have you recorded it with the attached disk before replaying?
+> This is a <tab> and checkpatch complains...
 >=20
-> Yes. I assume the -drive doesn't actually have to be visible to the
-> guest, it's just the mechanism rr needs for saving snapshots?
->=20
-> > Are you using the latest version?
-> > If the both answers are 'yes', then can you share the kernel? My =
-i386
-> > runs work normally.
->=20
-> I'll have a go with x86 first as aarch64 hasn't been proven yet.
+> I can use 4 spaces for this tab. I tried to align with other tab-aligne=
+d
+> comments I didn't modify, but the result is messier. Thus a simple spac=
+e.
 
-Any news about that?
+Oh, sorry, I didn't notice that you've replaced a TAB here. I guess it's
+ok then. But why does checkpatch complain if it is just in the context
+of your modification? That's weird.
 
-
-Pavel Dovgalyuk
+ Thomas
