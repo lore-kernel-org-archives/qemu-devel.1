@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXMuq-0005OX-99
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:32:05 -0400
+	(envelope-from <quintela@redhat.com>) id 1fXN7p-0007RE-WE
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXMup-00069V-Go
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:32:04 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1529056145-6404-1-git-send-email-thuth@redhat.com>
-Message-ID: <93f1dae5-e071-41f2-a1b7-1fbfdbe7917a@redhat.com>
-Date: Mon, 25 Jun 2018 10:31:52 +0200
+	(envelope-from <quintela@redhat.com>) id 1fXN7l-0003Ma-To
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:45:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32942 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fXN7l-0003LI-Mj
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:45:25 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180622190936.177827-2-mst@redhat.com> (Michael S. Tsirkin's
+	message of "Fri, 22 Jun 2018 22:09:42 +0300")
+References: <20180622190936.177827-1-mst@redhat.com>
+	<20180622190936.177827-2-mst@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 25 Jun 2018 10:48:47 +0200
+Message-ID: <87wounjlow.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <1529056145-6404-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] loader: Check access size when calling
- rom_ptr() to avoid crashes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] kvm: support -overcommit
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 15.06.2018 11:49, Thomas Huth wrote:
-> The rom_ptr() function allows direct access to the ROM blobs that we
-> load during startup. However, there are currently no checks for the
-> size of the accesses, so it's currently possible to crash QEMU for
-> example with:
-> 
-> $ echo "Insane in the mainframe" > /tmp/test.txt
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
-> Segmentation fault (core dumped)
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
-> Segmentation fault (core dumped)
-> $ echo -n HdrS > /tmp/hdr.txt
-> $ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/hdr.txt -initrd /tmp/hdr.txt
-> Segmentation fault (core dumped)
-> 
-> We need a possibility to check the size of the ROM area that we want
-> to access, thus let's add a size parameter to the rom_ptr() function
-> to avoid these problems.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+> With this flag, kvm allows guest to control host CPU power state.  This
+> increases latency for other processes using same host CPU in an
+> unpredictable way, but if decreases idle entry/exit times for the
+> running VCPU, so to use it QEMU needs a hint about whether host CPU is
+> overcommitted, hence the flag name.
+>
+> Follow-up patches will expose this capability to guest
+> (using mwait leaf).
+>
+> Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Ping!
+[...]
 
-Could anybody please pick this patch up? Qemu-trivial seems to be pretty
-dormant these days (?), so maybe Paolo via misc? Or either the s390x or
-Sparc tree, since it fixes a crash on these machines?
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 1e99ec9b7e..e468b50c4f 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -45,6 +45,7 @@
+>  #include "migration/colo.h"
+>  #include "hw/boards.h"
+>  #include "monitor/monitor.h"
+> +#include "qemu/ptr_ring.h"
+>  
+>  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+>  
 
- Thanks,
-  Thomas
+Why is this chuck needed?  I can't see a reason.
+
+
+Thanks, Juan.
