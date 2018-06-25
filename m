@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXU6m-0006u7-PN
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:12:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXU8D-0008Gd-IX
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXU6i-0003LM-Po
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:12:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40514 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fXU6i-0003KA-Jt
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:12:48 -0400
-References: <20180622022035.18490-1-f4bug@amsat.org>
-	<20180622061513-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0439f4a8-f989-ead4-5338-a58845b6ecc7@redhat.com>
-Date: Mon, 25 Jun 2018 18:12:38 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fXU8C-0004Bx-JB
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:14:21 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:39614)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXU8C-0004Bk-Cz
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:14:20 -0400
+Received: by mail-ot0-x243.google.com with SMTP id l15-v6so15663448oth.6
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 09:14:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180622061513-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] Makefile: Enable synchronized parallel
- output when possible
+In-Reply-To: <20180621015359.12018-12-richard.henderson@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-12-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Jun 2018 17:13:59 +0100
+Message-ID: <CAFEAcA_2eVmEB_7u+zGiT_kdHPOWHPANdShV4hUxVCt_DxdMpw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 11/35] target/arm: Implement SVE scatter
+ stores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 22/06/2018 05:22, Michael S. Tsirkin wrote:
-> On Thu, Jun 21, 2018 at 11:20:35PM -0300, Philippe Mathieu-Daud=C3=A9 w=
-rote:
->> The '--output-sync' option is available since GNU make 4.0.
->>
->>   5.4.1 Output During Parallel Execution
->>
->>   When running several recipes in parallel the output from each
->>   recipe appears as soon as it is generated, with the result that
->>   messages from different recipes may be interspersed, sometimes
->>   even appearing on the same line. This can make reading the output
->>   very difficult.
->>
->>   To avoid this you can use the =E2=80=98--output-sync=E2=80=99 (=E2=80=
-=98-O=E2=80=99) option. This
->>   option instructs make to save the output from the commands it
->>   invokes and print it all once the commands are completed.
->>   Additionally, if there are multiple recursive make invocations
->>   running in parallel, they will communicate so that only one of
->>   them is generating output at a time.
->>
->>   There are four levels of granularity when synchronizing output,
->>   specified by giving an argument to the option (e.g., =E2=80=98-Oline=
-=E2=80=99
->>   or =E2=80=98--output-sync=3Drecurse=E2=80=99).
->>
->>     none
->>       This is the default: all output is sent directly as it is
->>       generated and no synchronization is performed.
->>
->>     line
->>       Output from each individual line of the recipe is grouped
->>       and printed as soon as that line is complete. If a recipe
->>       consists of multiple lines, they may be interspersed with
->>       lines from other recipes.
->>
->>     target
->>       Output from the entire recipe for each target is grouped and
->>       printed once the target is complete. This is the default if
->>       the --output-sync or -O option is given with no argument.
->>
->>     recurse
->>       Output from each recursive invocation of make is grouped and
->>       printed once the recursive invocation is complete.
->>
->>   Regardless of the mode chosen, the total build time will be the
->>   same. The only difference is in how the output appears.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> Maybe 'line' is better for workstation and 'target/recurse' for
->> unattended builds.
+On 21 June 2018 at 02:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    | 41 +++++++++++++++++++++
+>  target/arm/sve_helper.c    | 62 ++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 74 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      | 39 ++++++++++++++++++++
+>  4 files changed, 216 insertions(+)
+> +/* Stores with a vector index.  */
+> +
+> +#define DO_ST1_ZPZ_S(NAME, TYPEI, FN)                                   \
+> +void HELPER(NAME)(CPUARMState *env, void *vd, void *vg, void *vm,       \
+> +                  target_ulong base, uint32_t desc)                     \
+> +{                                                                       \
+> +    intptr_t i, oprsz = simd_oprsz(desc) / 8;                           \
+> +    unsigned scale = simd_data(desc);                                   \
+> +    uintptr_t ra = GETPC();                                             \
+> +    uint32_t *d = vd; TYPEI *m = vm; uint8_t *pg = vg;                  \
+> +    for (i = 0; i < oprsz; i++) {                                       \
+> +        uint8_t pp = pg[H1(i)];                                         \
+> +        if (pp & 0x01) {                                                \
+> +            target_ulong off = (target_ulong)m[H4(i * 2)] << scale;     \
+> +            FN(env, base + off, d[H4(i * 2)], ra);                      \
+> +        }                                                               \
+> +        if (pp & 0x10) {                                                \
+> +            target_ulong off = (target_ulong)m[H4(i * 2 + 1)] << scale; \
+> +            FN(env, base + off, d[H4(i * 2 + 1)], ra);                  \
+> +        }                                                               \
+> +    }                                                                   \
+> +}
 
-For long-running tasks, such as Docker builds or unit tests, -Otarget
-might make it harder to find out what's going on?  Maybe "-Oline" is
-better overall, but before you send v2, what if the user is specifying
--O him/herself?
-
-(Now that I've been taught, I'm adding "export GNUMAKEFLAGS=3D-Oline" to
-my bash config file. :))
-
-Paolo
+Why do we do two operations per loop here? Generally
+we seem to do one operation per loop elsewhere.
 
 
->> doc: https://www.gnu.org/software/make/manual/html_node/Parallel-Outpu=
-t.html
->> ---
->>  Makefile | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/Makefile b/Makefile
->> index e46f2b625a..e94c687afe 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -367,6 +367,10 @@ DOCS=3D
->>  endif
->> =20
->>  SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory --quiet) BUILD_DIR=
-=3D$(BUILD_DIR)
->> +ifeq ($(shell test $(firstword $(subst ., ,$(MAKE_VERSION))) -ge 4; e=
-cho $$?),0)
->> +SUBDIR_MAKEFLAGS+=3D--output-sync=3Dtarget
->> +endif
->> +
->>  SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_LIS=
-T))
->>  SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARG=
-ET_LIST))
->=20
-> I'd probably just use -O. If they change the default it will probably b=
-e
-> to a better one.
+> +static bool trans_ST1_zprz(DisasContext *s, arg_ST1_zprz *a, uint32_t insn)
+> +{
+> +    /* Indexed by [xs][msz].  */
+> +    static gen_helper_gvec_mem_scatter * const fn32[2][3] = {
+> +        { gen_helper_sve_stbs_zsu,
+> +          gen_helper_sve_sths_zsu,
+> +          gen_helper_sve_stss_zsu, },
+> +        { gen_helper_sve_stbs_zss,
+> +          gen_helper_sve_sths_zss,
+> +          gen_helper_sve_stss_zss, },
+> +    };
+> +    static gen_helper_gvec_mem_scatter * const fn64[3][4] = {
+
+In the pseudocode xs is either 0 (zero-extend offset) or
+1 (sign-extend offset), but here it can also be 2. A
+comment noting that we've overloaded it to also indicate
+whether we're dealing with a 32-bit or 64-bit offset might
+help (at least I think that's what we're doing).
+
+> +        { gen_helper_sve_stbd_zsu,
+> +          gen_helper_sve_sthd_zsu,
+> +          gen_helper_sve_stsd_zsu,
+> +          gen_helper_sve_stdd_zsu, },
+> +        { gen_helper_sve_stbd_zss,
+> +          gen_helper_sve_sthd_zss,
+> +          gen_helper_sve_stsd_zss,
+> +          gen_helper_sve_stdd_zss, },
+> +        { gen_helper_sve_stbd_zd,
+> +          gen_helper_sve_sthd_zd,
+> +          gen_helper_sve_stsd_zd,
+> +          gen_helper_sve_stdd_zd, },
+> +    };
+> +    gen_helper_gvec_mem_scatter *fn;
+> +
+> +    if (a->esz < a->msz || (a->msz == 0 && a->scale)) {
+> +        return false;
+> +    }
+> +    if (!sve_access_check(s)) {
+> +        return true;
+> +    }
+> +    switch (a->esz) {
+> +    case MO_32:
+> +        fn = fn32[a->xs][a->msz];
+> +        break;
+> +    case MO_64:
+> +        fn = fn64[a->xs][a->msz];
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +    do_mem_zpz(s, a->rd, a->pg, a->rm, a->scale * a->msz,
+> +               cpu_reg_sp(s, a->rn), fn);
+> +    return true;
+> +}
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
