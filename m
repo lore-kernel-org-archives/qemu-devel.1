@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fXLjs-0006Yz-3B
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:16:41 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fXLv1-0000TF-J9
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fXLjr-0007b1-2C
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:16:40 -0400
-Date: Mon, 25 Jun 2018 09:16:10 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20180625071610.GH16514@angien.pipo.sk>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
+	(envelope-from <borntraeger@de.ibm.com>) id 1fXLuy-00049C-Ft
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:28:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49710
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fXLuy-00048t-AA
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:28:08 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5P7Oiup068892
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:28:07 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jtsvddd3x-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:28:07 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 25 Jun 2018 08:28:04 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20180622194736.GA5794@roeck-us.net>
+	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
+Date: Mon, 25 Jun 2018 09:27:59 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AXxEqdD4tcVTjWte"
-Content-Disposition: inline
-In-Reply-To: <20180622125502.GF4366@localhost.localdomain>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+In-Reply-To: <126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
+Content-Language: en-US
+Message-Id: <88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +43,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
+Also adding QEMU.
 
---AXxEqdD4tcVTjWte
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 06/25/2018 09:10 AM, Christian Borntraeger wrote:
+> 
+> 
+> On 06/22/2018 09:47 PM, Guenter Roeck wrote:
+>> Hi,
+>>
+>> starting with commit 's390/boot: make head.S and als.c be part of the
+>> decompressor only' in -next, s390 immages no longer boot in qemu.
+>> As far as I can see, the reason is that the command line is no longer
+>> passed from qemu to the kernel, which results in a panic because the
+>> root file system can not be mounted.
+>>
+>> Was this change made on purpose ? If so, is there a way to get qemu
+>> back to working ?
+> 
+> Certainly not on purpose.
+> 
+> Vasily, I can reproduce this with KVM and an external kernel boot of the vmlinux file (the elf file)
+> 
+> e.g.
+> 
+> qemu-system-s390 -enable-kvm -nographic -kernel vmlinux -append "this string no longer is command line"
+> 
+> The compressed image (bzImage) seems to work fine though.
+> 
+> This seems to be an unfortunate side effect of QEMUs ways to "guess" its Linux (checking for start
+> address 0x10000, which is no longer true for the vmlinux file). With the pure vmlinux elf file
+> the load address is 0x100000 as there is no unpacker.
+> 
+> Guenter, can you check if arch/s390/boot/bzImage works for you as a workaround?
 
-On Fri, Jun 22, 2018 at 14:55:02 +0200, Kevin Wolf wrote:
-> Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> >=20
-> > On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> > > The -drive option serial was deprecated in QEMU 2.10. It's time to
-> > > remove it.
-> > >=20
-> > > Tests need to be updated to set the serial number with -global instead
-> > > of using the -drive option.
-> >=20
-> > libvirt 4.5 still creates those (at least on s390x)
-> >=20
-> >     <disk type=3D'file' device=3D'disk'>
-> >       <driver name=3D'qemu' type=3D'qcow2' cache=3D'none' io=3D'native'=
- iothread=3D'1'/>
-> >       <source file=3D'/var/lib/libvirt/qemu/image.zhyp137'/>
-> >       <target dev=3D'hda' bus=3D'virtio'/>
-> >       <serial>skel</serial>
-> >       <boot order=3D'1'/>
-> >       <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0000=
-'/>
-> >     </disk>
-> >=20
-> >=20
-> > ->=20
-> > [...]
-> > -drive file=3D/var/lib/libvirt/qemu/image.zhyp137,format=3Dqcow2,if=3Dn=
-one,id=3Ddrive-virtio-disk0,serial=3Dskel,cache=3Dnone,aio=3Dnative -device=
- virtio-blk-ccw,iothread=3Diothread1,scsi=3Doff,devno=3Dfe.0.0000,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don=20
-> > [...]
-> >=20
-> > 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=3D/var/lib/l=
-ibvirt/qemu/image.zhyp137,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,=
-serial=3Dskel,cache=3Dnone,aio=3Dnative: Block format 'qcow2' does not supp=
-ort the option 'serial'
-> > 2018-06-22 11:25:21.098+0000: shutting down, reason=3Dfailed
-> >=20
-> > So it seems that this breaks s390x.
->=20
-> Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> released.
+Something like this in QEMU 
 
-So, I already extracted the code that formats the attributes which
-should be actually done for the frontend few months ago, but did not
-swithc to it since I did not want to check when everything was added.
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index f278036fa7..14153ce880 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -187,11 +187,13 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+          */
+         if (pentry == KERN_IMAGE_START || pentry == 0x800) {
+             ipl->start_addr = KERN_IMAGE_START;
+-            /* Overwrite parameters in the kernel image, which are "rom" */
+-            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
+         } else {
+             ipl->start_addr = pentry;
+         }
++       if (ipl->cmdline) {
++            /* If there is a command line, put it in the right place */
++            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
++       }
+ 
+         if (ipl->initrd) {
+             ram_addr_t initrd_offset;
 
-The fix will be rather simple if we are certain that the disk serial,
-geometry and error policies were supported in qemu 1.5. In that case we
-can switch unconditionally to the new format.
-
---AXxEqdD4tcVTjWte
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlswlrgACgkQHGwCByjY
-1GpfSw//fLoYzDiwYxDvSY+3PrGK/NV5bJ3YFxClqeiyo3EpSmQcrnkBOltfxVsM
-pdAsT87fsFgzDRdxDD9XZEnaRbAdUc07z34J6qUbex8ARkJ6aMryUpl2dDklFaAi
-UqS5MXu1ewEa2F382/UMAlJhORT4RSuYJDq25GBdyw4V57+0vPkC7DepkC6P2tQc
-y28FX5dv1Wo0+qYXNqU4uO/uaf3pXnLKBXiLkfxrCwI1vlP9I9S7llphiGla0ITL
-txIVHzUT0nVhxGwg6jOp6CV2hgmnzd6UILE9ExWOpP6DzckD8+rdtuiZU1hvoaF2
-Qrbhzv8obfvee5RwCKx+gbbiWoIpL43kSLKOA3666TXjvz9zE5Ae7whrsI0qvEMM
-3sR9pyg04Y+F25DIlDvZRIdf+mCzzYKAqRQmGB+1+bl9aigHcws0kyoRCVleiwZS
-ZuCYaMeKu6jRJdIrIbndptLWgOy+4/xUijmKOj2C2dpUX4h4fGvyeTGLmGS/vnl7
-GcfVeFW0B87OxFplFopgMZ8RiHV6PRf1+Shvy3nMHblU2hMctTUB3SaZwMPvnRrd
-AZ2jshBRZkvH3EabtjnEb9e2fuJoLz3tz7aTfa8JJP328dBy1eZnN1RCjte8ytds
-6x8o7h271DOFgu2edrlNhBKBsQxNwh5zDz36rOd92RHO37fHL94=
-=rEng
------END PGP SIGNATURE-----
-
---AXxEqdD4tcVTjWte--
+would put the command line in no matter what the start address is.
