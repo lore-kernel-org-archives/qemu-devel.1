@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXSQG-0008UA-74
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:24:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fXSQN-00009G-M1
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXSQF-000162-AZ
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:24:52 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:37698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXSQF-00015m-4J
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:24:51 -0400
-Received: by mail-ot0-x244.google.com with SMTP id u6-v6so7063967otk.4
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 07:24:51 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1fXSQM-00018B-P6
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:24:59 -0400
+References: <20180621170657.27542-1-kwolf@redhat.com>
+	<20180621170657.27542-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c206c1db-0fb4-0297-8b41-51d89235d8d0@redhat.com>
+Date: Mon, 25 Jun 2018 16:24:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <b254316e-72e7-10a4-8822-67d197c35445@amsat.org>
-References: <1529346580-25537-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<33eb9ed9-fab0-faec-ef3d-57e4efa564b6@mips.com>
-	<b254316e-72e7-10a4-8822-67d197c35445@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 15:24:30 +0100
-Message-ID: <CAFEAcA_76wJqTFQ58adNdOZQ3eMtr2KUxfEU4ExrPRq33ywE-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update target-mips maintainers
+In-Reply-To: <20180621170657.27542-3-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nbdvQiSi4AOm7koq9xNy2wTGR14EJtt43"
+Subject: Re: [Qemu-devel] [PATCH 2/2] file-posix: Make .bdrv_co_truncate
+ asynchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <aleksandar.markovic@mips.com>, rich.fuhler@mips.com, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <petar.jovanovic@mips.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, qemu-devel@nongnu.org
 
-On 25 June 2018 at 14:14, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Hi Peter,
-> I suggest to apply this patch as a build fix to avoid more email bounces:
->
->   ** Message not delivered **
->
-> Your message couldn't be delivered to yongbok.kim@mips.com because the
-> remote server is misconfigured. See technical details below for more
-> information.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nbdvQiSi4AOm7koq9xNy2wTGR14EJtt43
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, qemu-devel@nongnu.org
+Message-ID: <c206c1db-0fb4-0297-8b41-51d89235d8d0@redhat.com>
+Subject: Re: [PATCH 2/2] file-posix: Make .bdrv_co_truncate asynchronous
+References: <20180621170657.27542-1-kwolf@redhat.com>
+ <20180621170657.27542-3-kwolf@redhat.com>
+In-Reply-To: <20180621170657.27542-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Aleksandar said he was going to do a target-mips pull request,
-so I suggested he put it in that.
+On 2018-06-21 19:06, Kevin Wolf wrote:
+> This moves the code to resize an image file to the thread pool to avoid=
 
-thanks
--- PMM
+> blocking.
+>=20
+> Creating large images with preallocation with blockdev-create is now
+> actually a background job instead of blocking the monitor (and most
+> other things) until the preallocation has completed.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/raw-aio.h |   4 +-
+>  block/file-posix.c      | 265 +++++++++++++++++++++++++++-------------=
+--------
+>  2 files changed, 153 insertions(+), 116 deletions(-)
+
+[...]
+
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 6223a8bccc..fa918f2bdb 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -188,8 +188,16 @@ typedef struct RawPosixAIOData {
+>  #define aio_ioctl_cmd   aio_nbytes /* for QEMU_AIO_IOCTL */
+>      off_t aio_offset;
+>      int aio_type;
+> -    int aio_fd2;
+> -    off_t aio_offset2;
+> +    union {
+> +        struct {
+> +            int aio_fd2;
+> +            off_t aio_offset2;
+> +        };
+> +        struct {
+> +            PreallocMode prealloc;
+> +            Error **errp;
+> +        };
+> +    };
+
+Comments might help (that the first struct is for *_COPY_RANGE and the
+second one is for *_TRUNCATE).
+
+But in general (without having actual knowledge of file-posix's AIO pool)=
+:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+>  } RawPosixAIOData;
+> =20
+>  #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+
+
+--nbdvQiSi4AOm7koq9xNy2wTGR14EJtt43
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsw+zEACgkQ9AfbAGHV
+z0Cr9QgArATJ3cC5ViyOOjrHJ4Ee5drZ3vND1h7pZ39PwXLs/z5tCRh4iNaJCMlO
+r6aepAvKCKBfMCxNAn1aNepPTs4+qabSCfqWJWr2CZamwOoc/khsyP2Ko5lbbrAD
+njik1zoPBdLC8kn73wqc+eTCdLJDEe4YaTI0YsTBj2mDZyya8yLERJLxt1uOtdy9
+GAVNKMgteM2bmpq7tbQK0iGfbunPrrARbGcEdZ6gT7Fvs8ib1togqQN6hrnN7dSj
+k8T0rdlWqm4BFCxjHgxwxUIJRS3T63xJfecG2Azn7S34QVkgUTvhEEri6XXvqGVO
+6yuIHn6ZG8UuAsNzEC2hMnHQbe2WoQ==
+=OHhR
+-----END PGP SIGNATURE-----
+
+--nbdvQiSi4AOm7koq9xNy2wTGR14EJtt43--
