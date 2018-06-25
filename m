@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXTm2-0000Ig-S4
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:51:27 -0400
+	(envelope-from <david@redhat.com>) id 1fXTpI-0001XO-MI
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXTm1-00013u-W8
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:51:26 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXTm1-00013g-Qf
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:51:25 -0400
-Received: by mail-ot0-x243.google.com with SMTP id i17-v6so4717470otl.1
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:51:25 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fXTpE-0002R4-PT
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:54:48 -0400
+References: <20180625115352.6889-1-david@redhat.com>
+	<20180625115352.6889-3-david@redhat.com>
+	<20180625175029.69643252.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1dd2ef76-311a-64f0-4c2c-2f80738ff8a7@redhat.com>
+Date: Mon, 25 Jun 2018 17:54:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180621015359.12018-11-richard.henderson@linaro.org>
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-11-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 16:51:04 +0100
-Message-ID: <CAFEAcA8iD6mqimB5T4jfstfqWpUp8Pv=CtH3GwvM1mNaS0bQiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 10/35] target/arm: Implement SVE store
- vector/predicate register
+In-Reply-To: <20180625175029.69643252.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] s390x/kvm: pass values instead of
+ pointers to kvm_s390_set_clock_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 21 June 2018 at 02:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-sve.c | 103 +++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      |   6 +++
->  2 files changed, 109 insertions(+)
->
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index 954d6653d3..50f1ff75ef 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -3762,6 +3762,89 @@ static void do_ldr(DisasContext *s, uint32_t vofs, uint32_t len,
->      tcg_temp_free_i64(t0);
->  }
->
-> +/* Similarly for stores.  */
-> +static void do_str(DisasContext *s, uint32_t vofs, uint32_t len,
-> +                   int rn, int imm)
-> +{
+On 25.06.2018 17:50, Cornelia Huck wrote:
+> On Mon, 25 Jun 2018 13:53:45 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> We are going to factor out the TOD into a separate device and use const
+>> pointers for device class functions where possible. We are passing right
+>> now ordinary pointers that should never be touched when setting the TOD.
+>> Let's just pass the values directly.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/cpu.c       |  4 ++--
+>>  target/s390x/kvm-stub.c  |  4 ++--
+>>  target/s390x/kvm.c       | 12 ++++++------
+>>  target/s390x/kvm_s390x.h |  4 ++--
+>>  4 files changed, 12 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>> index c268065887..68512e3e54 100644
+>> --- a/target/s390x/cpu.c
+>> +++ b/target/s390x/cpu.c
+>> @@ -413,9 +413,9 @@ int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low)
+> 
+> Any reason why you keep the pointers here?
+> 
+>>      int r = 0;
+>>  
+>>      if (kvm_enabled()) {
+>> -        r = kvm_s390_set_clock_ext(tod_high, tod_low);
+>> +        r = kvm_s390_set_clock_ext(*tod_high, *tod_low);
+>>          if (r == -ENXIO) {
+>> -            return kvm_s390_set_clock(tod_high, tod_low);
+>> +            return kvm_s390_set_clock(*tod_high, *tod_low);
+> 
+> Especially as it would be more clean to check for !NULL before
+> dereferencing...
+
+See the next patch :)
+
+(I assume that refactoring code in order to rip it out does not make sense)
+
+> 
+>>          }
+>>      }
+>>      /* Fixme TCG */
 
 
-> +    /* Predicate register stores can be any multiple of 2.  */
-> +    if (len_remain) {
-> +        tcg_gen_ld_i64(t0, cpu_env, vofs + len_align);
-> +        tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + len_align);
-> +
-> +        switch (len_remain) {
-> +        case 2:
-> +        case 4:
-> +        case 8:
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LE | ctz32(len_remain));
-> +            break;
-> +
-> +        case 6:
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUL);
-> +            tcg_gen_addi_i64(addr, addr, 4);
-> +            tcg_gen_shri_i64(addr, addr, 32);
+-- 
 
-Shouldn't this be shifting t0 rather than addr ?
+Thanks,
 
-> +            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUW);
-> +            break;
-> +
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +    }
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+David / dhildenb
