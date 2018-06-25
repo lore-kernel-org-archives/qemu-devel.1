@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXU5W-0005ls-Ss
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:11:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fXU5s-00064e-PJ
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXU5T-0002gY-Fr
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:11:34 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180621114015.9207-1-f4bug@amsat.org>
-	<20180621114015.9207-3-f4bug@amsat.org>
-	<988a6d50-a911-6ac0-2955-0f99292d8a15@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c1e03b95-e883-ca93-19b8-86cf37e71bcc@amsat.org>
-Date: Mon, 25 Jun 2018 13:11:25 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1fXU5p-0002uQ-II
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:11:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36824 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXU5p-0002uE-A7
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:11:53 -0400
+Date: Mon, 25 Jun 2018 17:11:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180625161147.GH2390@work-vm>
+References: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
+	<20180625151803.GA2393@work-vm>
+	<ad36fd83-8de6-1e9e-db51-1ceaf0f0269a@linux.vnet.ibm.com>
+	<20180625152916.GG2390@work-vm>
+	<0bddd044-c9bf-37b9-814b-8eeaf13c9f64@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <988a6d50-a911-6ac0-2955-0f99292d8a15@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 2/3] hw/arm/sysbus-fdt:
- Replace error_setg(&error_fatal) by error_report() + exit()
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <0bddd044-c9bf-37b9-814b-8eeaf13c9f64@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Choosing PCR banks for swtpm's TPM 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,159 +31,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: tpm2@lists.01.org, Kenneth Goldman <kgoldman@us.ibm.com>, Chris Friesen <chris.friesen@windriver.com>, "Qi, Yadong" <yadong.qi@intel.com>, qemu-devel <qemu-devel@nongnu.org>, "Xu, Quan" <quan.xu@intel.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-Hi Eric,
+* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+> On 06/25/2018 11:29 AM, Dr. David Alan Gilbert wrote:
+> > * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+> > > On 06/25/2018 11:18 AM, Dr. David Alan Gilbert wrote:
+> > > > * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+> > > > > Hi!
+> > > > >=20
+> > > > >   =A0I am sending this email to solicit input on the choice of =
+the PCR banks to
+> > > > > enable for swtpm's TPM 2. I have currently enabled 4 PCR banks =
+for
+> > > > > SHA{1,256,384,512}. The downside of this is that running the TP=
+M 2 with so
+> > > > > many PCR banks has a performance impact when the Linux integrit=
+y measurement
+> > > > > architecture is used and has to extend measurements into all PC=
+R banks,
+> > > > > which Linux does already.
+> > > > >=20
+> > > > > TPM 2 has the PCR_Allocate() command for a user to select the P=
+CR banks to
+> > > > > use. This command allows to make some PCR banks invisible. The =
+change has to
+> > > > > be done through the firmware and has the downside that the TPM2=
+ does not
+> > > > > support TPM2_Shutdown(SU_STATE) after this command was used. Th=
+is prevents
+> > > > > suspend/resume from working properly. So, it seems that one sho=
+uldn't have
+> > > > > to use this command, which in turn means the number of PCR bank=
+s should be
+> > > > > small.
+> > > > >=20
+> > > > > Another complication with the swtpm is the upgrade path. Suspen=
+ded VMs will
+> > > > > expect that the PCR banks that were available before the suspen=
+d will be
+> > > > > available after the resume and a possible swtpm upgrade. This i=
+n turn means
+> > > > > that the PCR banks should be chosen now and we'll have to stick=
+ with them.
+> > > > >=20
+> > > > > That said, my suggestion would be to enable only PCR banks for =
+SHA256 for
+> > > > > 'now' and SHA512 for the future. Having two PCR banks should en=
+able decent
+> > > > > performance. If someone wants to have better performance he wil=
+l have to go
+> > > > > through the firmware to select the PCR banks at the expense of =
+loosing
+> > > > > suspend/resume support.
+> > > > >=20
+> > > > > The change of PCR banks for the current 4 PCR banks will break =
+the state of
+> > > > > all swtpms.
+> > > > >=20
+> > > > > If you have suggestions, please let me know.
+> > > > Is this something that has to be set at compile time or could it =
+be
+> > > > something chosen at run time (as options to the swtpm command lin=
+e?)
+> > > It is a compile-time option...
+> > Hmm, that's a shame - I was hoping you'd be able to switch them at
+> > runtime (or at least hide them?) then you can solve the upgrade probl=
+em
+> > by running the new swtpm with a flag telling it to hide the new banks=
+.
+> > I hope the ondisk formats for suspend/resume/migration are descriptiv=
+e
+> > enough to be able to spot an error if you try and load one configured
+> > differently.4
+>=20
+> The disk format does detect it and refuses to take the state if either =
+there
+> are too many PCR banks or not enough.
 
-On 06/21/2018 10:02 AM, Auger Eric wrote:
-> Hi Philippe,
-> On 06/21/2018 01:40 PM, Philippe Mathieu-Daudé wrote:
->> Use error_report() + exit() instead of error_setg(&error_fatal),
->> as suggested by the "qapi/error.h" documentation:
->>
->>    Please don't error_setg(&error_fatal, ...), use error_report() and
->>    exit(), because that's more obvious.
->>
->> This fixes CID 1352173:
->>     "Passing null pointer dt_name to qemu_fdt_node_path, which dereferences it."
->>
->> And this also fixes:
->>
->>     hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node_path') results in a null pointer dereference
->>         if (node_path[1]) {
->>             ^~~~~~~~~~~~
->>
->> Fixes: Coverity CID 1352173 (Dereference after null check)
->> Suggested-by: Eric Blake <eblake@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/arm/sysbus-fdt.c | 45 ++++++++++++++++++++++++++-------------------
->>  1 file changed, 26 insertions(+), 19 deletions(-)
->>
->> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
->> index 277ed872e7..63b74a353e 100644
->> --- a/hw/arm/sysbus-fdt.c
->> +++ b/hw/arm/sysbus-fdt.c
->> @@ -92,7 +92,7 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
->>          r = qemu_fdt_getprop(host_fdt, node_path,
->>                               props[i].name,
->>                               &prop_len,
->> -                             props[i].optional ? &err : &error_fatal);
->> +                             &err);
->>          if (r) {
->>              qemu_fdt_setprop(guest_fdt, nodename,
->>                               props[i].name, r, prop_len);
->> @@ -103,6 +103,10 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
->>              } else {
->>                  error_free(err);
->>              }
->> +            if (!props[i].optional) {
->> +                /* mandatory property not found: bail out */
->> +                exit(1);
-> reading that code again, I am not sure this does the same thing as
-> before. In case case the property is tagged not optional and is not
-> found in the host dt, qemu_fdt_getprop will fill err with error_setg.
-> However prop_len == -FDT_ERR_NOTFOUND so we are going to call error_free
-> and no trace will be output to the user. Before the
-> error_setg(&error_fatal) printed the cause of error error and exited. Do
-> I miss something?
+What happens if there are the right number just the wrong type?
 
-You are correct something is wrong here, I'll respin.
+> For the initial version of swtpm we would need to define a default set =
+of
+> PCR banks since the TPM 2 code uses compile time options to build in th=
+at
+> set of PCR banks.
 
-Thanks for your review!
+You talk of PCR_Allocate() above as a spec-defined command to hide PCRs
+but with the downside of breaking TPM2_Shutdown - could you implement
+something from the commandline without that downside (I don't know how
+PCR banks work).
 
-> 
-> Thanks
-> 
-> Eric
->> +            }
->>          }
->>      }
->>  }
->> @@ -138,9 +142,9 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
->>  
->>      node_offset = fdt_node_offset_by_phandle(host_fdt, host_phandle);
->>      if (node_offset <= 0) {
->> -        error_setg(&error_fatal,
->> -                   "not able to locate clock handle %d in host device tree",
->> -                   host_phandle);
->> +        error_report("not able to locate clock handle %d in host device tree",
->> +                     host_phandle);
->> +        exit(1);
->>      }
->>      node_path = g_malloc(path_len);
->>      while ((ret = fdt_get_path(host_fdt, node_offset, node_path, path_len))
->> @@ -149,16 +153,16 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
->>          node_path = g_realloc(node_path, path_len);
->>      }
->>      if (ret < 0) {
->> -        error_setg(&error_fatal,
->> -                   "not able to retrieve node path for clock handle %d",
->> -                   host_phandle);
->> +        error_report("not able to retrieve node path for clock handle %d",
->> +                     host_phandle);
->> +        exit(1);
->>      }
->>  
->>      r = qemu_fdt_getprop(host_fdt, node_path, "compatible", &prop_len,
->>                           &error_fatal);
->>      if (strcmp(r, "fixed-clock")) {
->> -        error_setg(&error_fatal,
->> -                   "clock handle %d is not a fixed clock", host_phandle);
->> +        error_report("clock handle %d is not a fixed clock", host_phandle);
->> +        exit(1);
->>      }
->>  
->>      nodename = strrchr(node_path, '/');
->> @@ -301,34 +305,37 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
->>  
->>      dt_name = sysfs_to_dt_name(vbasedev->name);
->>      if (!dt_name) {
->> -        error_setg(&error_fatal, "%s incorrect sysfs device name %s",
->> -                    __func__, vbasedev->name);
->> +        error_report("%s incorrect sysfs device name %s",
->> +                     __func__, vbasedev->name);
->> +        exit(1);
->>      }
->>      node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
->>                                     &error_fatal);
->>      if (!node_path || !node_path[0]) {
->> -        error_setg(&error_fatal, "%s unable to retrieve node path for %s/%s",
->> -                   __func__, dt_name, vdev->compat);
->> +        error_report("%s unable to retrieve node path for %s/%s",
->> +                     __func__, dt_name, vdev->compat);
->> +        exit(1);
->>      }
->>  
->>      if (node_path[1]) {
->> -        error_setg(&error_fatal, "%s more than one node matching %s/%s!",
->> -                   __func__, dt_name, vdev->compat);
->> +        error_report("%s more than one node matching %s/%s!",
->> +                     __func__, dt_name, vdev->compat);
->> +        exit(1);
->>      }
->>  
->>      g_free(dt_name);
->>  
->>      if (vbasedev->num_regions != 5) {
->> -        error_setg(&error_fatal, "%s Does the host dt node combine XGBE/PHY?",
->> -                   __func__);
->> +        error_report("%s Does the host dt node combine XGBE/PHY?", __func__);
->> +        exit(1);
->>      }
->>  
->>      /* generate nodes for DMA_CLK and PTP_CLK */
->>      r = qemu_fdt_getprop(host_fdt, node_path[0], "clocks",
->>                           &prop_len, &error_fatal);
->>      if (prop_len != 8) {
->> -        error_setg(&error_fatal, "%s clocks property should contain 2 handles",
->> -                   __func__);
->> +        error_report("%s clocks property should contain 2 handles", __func__);
->> +        exit(1);
->>      }
->>      host_clock_phandles = (uint32_t *)r;
->>      guest_clock_phandles[0] = qemu_fdt_alloc_phandle(guest_fdt);
->>
-> 
+> A future version of swtpm could expose command line options for selecti=
+ng
+> the PCR banks an instance of swtpm is to run with. libtpms would be com=
+piled
+> with support for all of them and only the chosen subset would be active
+> starting with the initial creation of a particular instance of swtpm.
+
+Right, that would solve the upgrade half of the problem.
+
+Dave
+
+> =A0=A0=A0 Stefan
+>=20
+> >=20
+> > Dave
+> >=20
+> > >  =A0=A0 Stefan
+> > >=20
+> > > > Dave
+> > > > > Regards,
+> > > > >=20
+> > > > >   =A0=A0 Stefan
+> > > > >=20
+> > > > >=20
+> > > > >=20
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > >=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
