@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fXZvT-0001hM-0o
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 18:25:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fXZvV-0001jM-9f
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 18:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fXZvR-00036Q-UI
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 18:25:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36920)
+	(envelope-from <ehabkost@redhat.com>) id 1fXZvT-00037u-MZ
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 18:25:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fXZvR-00035a-DI
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 18:25:33 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fXZvT-000372-7a
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 18:25:35 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 25 Jun 2018 19:25:15 -0300
-Message-Id: <20180625222524.382-4-ehabkost@redhat.com>
+Date: Mon, 25 Jun 2018 19:25:16 -0300
+Message-Id: <20180625222524.382-5-ehabkost@redhat.com>
 In-Reply-To: <20180625222524.382-1-ehabkost@redhat.com>
 References: <20180625222524.382-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/12] i386: improve sorting of CPU model names
+Subject: [Qemu-devel] [PULL 04/12] i386: display known CPUID features
+ linewrapped, in alphabetical order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,104 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-The current list of CPU model names output by "-cpu help" is sorted
-alphabetically based on the internal QOM class name. The text that is
-displayed, however, uses the CPU model name, which is equivalent to the
-QOM class name, minus a suffix. Unfortunately that suffix has an effect
-on the sort ordering, for example, causing the various Broadwell
-variants to appear reversed:
+When using '-cpu help' the list of CPUID features is grouped according
+to the internal low level CPUID grouping. The data printed results in
+very long lines too.
 
-  x86 486
-  x86 Broadwell-IBRS        Intel Core Processor (Broadwell, IBRS)
-  x86 Broadwell-noTSX-IBRS  Intel Core Processor (Broadwell, no TSX, IBRS
-  x86 Broadwell-noTSX       Intel Core Processor (Broadwell, no TSX)
-  x86 Broadwell             Intel Core Processor (Broadwell)
-  x86 Conroe                Intel Celeron_4x0 (Conroe/Merom Class Core 2)
+This combines to make it hard for users to read the output and identify
+if QEMU knows about the feature they wish to use.
 
-By sorting on the actual CPU model name text that is displayed, the
-result is
-
-  x86 486
-  x86 Broadwell             Intel Core Processor (Broadwell)
-  x86 Broadwell-IBRS        Intel Core Processor (Broadwell, IBRS)
-  x86 Broadwell-noTSX       Intel Core Processor (Broadwell, no TSX)
-  x86 Broadwell-noTSX-IBRS  Intel Core Processor (Broadwell, no TSX, IBRS=
-)
-  x86 Conroe                Intel Celeron_4x0 (Conroe/Merom Class Core 2)
-
-This requires extra string allocations during sorting, but this is not a
-concern given the usage scenario and the number of CPU models that exist.
+This change gets rid of the grouping of features and treats all flags as
+single list. The list is sorted into alphabetical order and the printing
+with line wrapping at the 77th column.
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20180606165527.17365-3-berrange@redhat.com>
+Message-Id: <20180606165527.17365-4-berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ target/i386/cpu.c | 41 +++++++++++++++++++++++++++--------------
+ 1 file changed, 27 insertions(+), 14 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e1d7157d8c..19ac1e6569 100644
+index 19ac1e6569..9da4920421 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -3351,15 +3351,19 @@ static gint x86_cpu_list_compare(gconstpointer a,=
- gconstpointer b)
-     ObjectClass *class_b =3D (ObjectClass *)b;
-     X86CPUClass *cc_a =3D X86_CPU_CLASS(class_a);
-     X86CPUClass *cc_b =3D X86_CPU_CLASS(class_b);
--    const char *name_a, *name_b;
-+    char *name_a, *name_b;
-+    int ret;
+@@ -3331,17 +3331,21 @@ static void x86_cpu_class_check_missing_features(=
+X86CPUClass *xcc,
 =20
-     if (cc_a->ordering !=3D cc_b->ordering) {
--        return cc_a->ordering - cc_b->ordering;
-+        ret =3D cc_a->ordering - cc_b->ordering;
-     } else {
--        name_a =3D object_class_get_name(class_a);
--        name_b =3D object_class_get_name(class_b);
--        return strcmp(name_a, name_b);
-+        name_a =3D x86_cpu_class_get_model_name(cc_a);
-+        name_b =3D x86_cpu_class_get_model_name(cc_b);
-+        ret =3D strcmp(name_a, name_b);
-+        g_free(name_a);
-+        g_free(name_b);
+ /* Print all cpuid feature names in featureset
+  */
+-static void listflags(FILE *f, fprintf_function print, const char **feat=
+ureset)
++static void listflags(FILE *f, fprintf_function print, GList *features)
+ {
+-    int bit;
+-    bool first =3D true;
+-
+-    for (bit =3D 0; bit < 32; bit++) {
+-        if (featureset[bit]) {
+-            print(f, "%s%s", first ? "" : " ", featureset[bit]);
+-            first =3D false;
++    size_t len =3D 0;
++    GList *tmp;
++
++    for (tmp =3D features; tmp; tmp =3D tmp->next) {
++        const char *name =3D tmp->data;
++        if ((len + strlen(name) + 1) >=3D 75) {
++            print(f, "\n");
++            len =3D 0;
+         }
++        print(f, "%s%s", len =3D=3D 0 ? "  " : " ", name);
++        len +=3D strlen(name) + 1;
      }
-+    return ret;
++    print(f, "\n");
  }
 =20
- static GSList *get_sorted_cpu_model_list(void)
+ /* Sort alphabetically by type name, respecting X86CPUClass::ordering. *=
+/
+@@ -3392,26 +3396,35 @@ static void x86_cpu_list_entry(gpointer data, gpo=
+inter user_data)
+ /* list available CPU models and flags */
+ void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+-    int i;
++    int i, j;
+     CPUListState s =3D {
+         .file =3D f,
+         .cpu_fprintf =3D cpu_fprintf,
+     };
+     GSList *list;
++    GList *names =3D NULL;
+=20
+     (*cpu_fprintf)(f, "Available CPUs:\n");
+     list =3D get_sorted_cpu_model_list();
+     g_slist_foreach(list, x86_cpu_list_entry, &s);
+     g_slist_free(list);
+=20
+-    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
++    names =3D NULL;
+     for (i =3D 0; i < ARRAY_SIZE(feature_word_info); i++) {
+         FeatureWordInfo *fw =3D &feature_word_info[i];
+-
+-        (*cpu_fprintf)(f, "  ");
+-        listflags(f, cpu_fprintf, fw->feat_names);
+-        (*cpu_fprintf)(f, "\n");
++        for (j =3D 0; j < 32; j++) {
++            if (fw->feat_names[j]) {
++                names =3D g_list_append(names, (gpointer)fw->feat_names[=
+j]);
++            }
++        }
+     }
++
++    names =3D g_list_sort(names, (GCompareFunc)strcmp);
++
++    (*cpu_fprintf)(f, "\nRecognized CPUID flags:\n");
++    listflags(f, cpu_fprintf, names);
++    (*cpu_fprintf)(f, "\n");
++    g_list_free(names);
+ }
+=20
+ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
 --=20
 2.18.0.rc1.1.g3f1ff2140
