@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fXNmu-0004Y9-Pc
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:27:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fXNqV-0006DB-Ob
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fXNmr-0006MI-Fz
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:27:56 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:53888)
+	(envelope-from <imammedo@redhat.com>) id 1fXNqS-0007sT-Iv
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:31:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34398 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fXNmr-0006LU-4M
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:27:53 -0400
-Received: from player760.ha.ovh.net (unknown [10.109.105.47])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 7D7B1197F2
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 11:27:51 +0200 (CEST)
-References: <cover.1529839203.git.balaton@eik.bme.hu>
-	<61b9cf7d09f0f12a86f036b828665c3fc91c3ce9.1529839203.git.balaton@eik.bme.hu>
-	<51f8a2ca-0b35-dd1b-33a5-1fca51ef7a9c@kaod.org>
-	<alpine.BSF.2.21.1806242200550.67254@zero.eik.bme.hu>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e407d067-bf23-4281-fc56-496cdbda35c4@kaod.org>
-Date: Mon, 25 Jun 2018 11:27:41 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fXNqS-0007rp-CU
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:31:36 -0400
+Date: Mon, 25 Jun 2018 11:31:28 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180625113128.3a8a546b@redhat.com>
+In-Reply-To: <da031edd-af7d-d51a-616a-1b231becd4c9@linux.vnet.ibm.com>
+References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
+	<20180621115530.11069-5-marcandre.lureau@redhat.com>
+	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
+	<20180622110312.275b5d59@redhat.com>
+	<aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
+	<20180622155642.3f05423b@redhat.com>
+	<da031edd-af7d-d51a-616a-1b231becd4c9@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1806242200550.67254@zero.eik.bme.hu>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 1/4] ppc4xx_i2c: Rewrite to
- model hardware more closely
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,584 +33,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 06/24/2018 10:37 PM, BALATON Zoltan wrote:
-> Hello,
+On Fri, 22 Jun 2018 10:23:05 -0400
+Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+
+> On 06/22/2018 09:56 AM, Igor Mammedov wrote:
+> > On Fri, 22 Jun 2018 09:26:45 -0400
+> > Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+> > =20
+> >> On 06/22/2018 05:03 AM, Igor Mammedov wrote: =20
+> >>> I'd prefer a table format to describe layout, like in
+> >>> docs/specs/acpi_nvdimm.txt or docs/specs/acpi_mem_hotplug.txt =20
+> >> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> >> index c230c4c93e..5bf4e892a0 100644
+> >> --- a/docs/specs/tpm.txt
+> >> +++ b/docs/specs/tpm.txt
+> >> @@ -42,6 +42,76 @@ URL:
+> >>
+> >>   =C2=A0https://trustedcomputinggroup.org/tcg-acpi-specification/
+> >>
+> >> +=3D=3D ACPI PPI Interface =3D=3D
+> >> +
+> >> +QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and T=
+PM
+> >> 2. This
+> >> +interface requires ACPI and firmware support. The specification can be
+> >> found at
+> >> +the following URL:
+> >> +
+> >> +https://trustedcomputinggroup.org/resource/tcg-physical-presence-inte=
+rface-specification/
+> >> +
+> >> +PPI enables a system administrator (root) to request a modification t=
+o the
+> >> +TPM upon reboot. The PPI specification defines the operation requests
+> >> and the
+> >> +actions the firmware has to take. The system administrator passes the
+> >> operation
+> >> +request number to the firmware through an ACPI interface which writes=
+ this
+> >> +number to a memory location that the firmware knows. Upon reboot, the
+> >> firmware
+> >> +finds the number and sends commands to the the TPM. The firmware writ=
+es
+> >> the TPM
+> >> +result code and the operation request number to a memory location that
+> >> ACPI can
+> >> +read from and pass the result on to the administrator.
+> >> +
+> >> +The PPI specification defines a set of mandatory and optional
+> >> operations for
+> >> +the firmware to implement. The ACPI interface also allows an
+> >> administrator to
+> >> +list the supported operations. In QEMU the ACPI code is generated by
+> >> QEMU, yet
+> >> +the firmware needs to implement support on a per-operations basis, and
+> >> +different firmwares may support a different subset. Therefore, QEMU
+> >> introduces
+> >> +the virtual memory device for PPI where the firmware can indicate whi=
+ch
+> >> +operations it supports and ACPI can enable the ones that are supporte=
+d and
+> >> +disable all others. This interface lies in main memory and has the
+> >> following =20
+> > what about usecase when it's mapped in isa address space?
+> >    tpm_tis_realizefn() ->
+> >         tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev)) =20
 >=20
-> On Sun, 24 Jun 2018, C=E9dric Le Goater wrote:
->> On 06/24/2018 01:20 PM, BALATON Zoltan wrote:
->>> Rewrite to make it closer to how real device works so that guest OS
->>> drivers can access I2C devices. Previously this was only a hack to
->>> allow U-Boot to get past accessing SPD EEPROMs but to support other
->>> I2C devices and allow guests to access them we need to model real
->>> device more properly.
->>
->> ppc4xx support was dropped from u-boot but there is some work being do=
-ne
->> to re-add at least ppc-460x. These models should be of interest to emu=
-late
->> BMC like boards and, in some near future, they could even run OpenBMC.
->>
->> I understand that you are adding extended status support, multi transf=
-er
->> support, better interrupt support. Having some comments on the bit
->> definitions and register names would help a lot.
->>
->> Is there a public datasheet for the I2C controller of the Sam460ex boa=
-rd ?
->> and a simple boot image we could use to test ?
+> The use case for PPI is 'administrator wants to reconfigure the TPM on=20
+> next reboot.' I am not sure what else to add?!
 >=20
-> I don't have the manual of this SoC but some of the devices including t=
-his i2c controller is similar to the 440EP for which there's a manual onl=
-ine. That's the best reference I know of even if not always applicable fo=
-r 460ex.
-
-I could not find one. Can you provide an URL ? I would to take a look=20
-at the register and bit definitions of the I2C controller of the SoC.
-
-Thanks,
-
-C.=20
+> > =20
+> >> +layout:
+> >> +
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 |=C2=A0 Field=C2=A0=C2=A0 | Length | Offset | Descriptio=
+n=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | func=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x100 |=C2=A0 0x0=
+00 | Firmware sets values for each
+> >> supported=C2=A0=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | operation. See defined values
+> >> below.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | ppin=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x1=C2=A0 |=
+=C2=A0 0x100 | SMI interrupt to use. Set by
+> >> firmware.=C2=A0=C2=A0=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | Not
+> >> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | ppip=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
+=C2=A0 0x101 | ACPI function index to pass to SMM
+> >> code.=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | Set by ACPI. Not
+> >> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | pprp=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
+=C2=A0 0x105 | Result of last executed operation.
+> >> Set by |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |
+> >> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | pprq=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
+=C2=A0 0x109 | Operation request number to execute.
+> >> Set=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | by
+> >> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | pprm=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
+=C2=A0 0x10d | Operation request optional parameter.
+> >> Set |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | by
+> >> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | lppr=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
+=C2=A0 0x111 | Last execute request number. Set
+> >> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |
+> >> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | fret=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
+=C2=A0 0x115 | Result code from SMM
+> >> function.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | Not
+> >> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | res1=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x40=C2=A0 |=C2=
+=A0 0x119 | Reserved for future
+> >> use=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +=C2=A0=C2=A0 | next_step|=C2=A0=C2=A0 0x1=C2=A0 |=C2=A0 0x159 | Opera=
+tion to execute after reboot
+> >> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | firmware. Used by
+> >> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+ =20
+> > if there is relevant match/description in PPI spec for above fields
+> > it would be better to put reference to it in description fields and
+> > as field name that could be easily grepped for in PPI spec,
+> > like we we do with ACPI primitives:
+> >
+> >    "ACPI 1.0b: 16.2.5.1 Namespace Modifier Objects Encoding: DefScope"
+> >
+> > so reader could easily match spec with parts he/she is interested in. =
 =20
 >=20
->> Some comments below,
->>
->>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> ---
->>> =A0hw/i2c/ppc4xx_i2c.c=A0=A0=A0=A0=A0=A0=A0=A0 | 222 ++++++++++++++++=
-+++++-----------------------
->>> =A0include/hw/i2c/ppc4xx_i2c.h |=A0=A0 3 +-
->>> =A02 files changed, 110 insertions(+), 115 deletions(-)
->>>
->>> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
->>> index fca80d6..3ebce17 100644
->>> --- a/hw/i2c/ppc4xx_i2c.c
->>> +++ b/hw/i2c/ppc4xx_i2c.c
->>> @@ -38,13 +38,26 @@
->>> =A0#define IIC_CNTL_READ=A0=A0=A0=A0=A0=A0 (1 << 1)
->>> =A0#define IIC_CNTL_CHT=A0=A0=A0=A0=A0=A0=A0 (1 << 2)
->>> =A0#define IIC_CNTL_RPST=A0=A0=A0=A0=A0=A0 (1 << 3)
->>> +#define IIC_CNTL_AMD=A0=A0=A0=A0=A0=A0=A0 (1 << 6)
->>> +#define IIC_CNTL_HMT=A0=A0=A0=A0=A0=A0=A0 (1 << 7)
->>> +
->>> +#define IIC_MDCNTL_EINT=A0=A0=A0=A0 (1 << 2)
->>> +#define IIC_MDCNTL_ESM=A0=A0=A0=A0=A0 (1 << 3)
->>> +#define IIC_MDCNTL_FMDB=A0=A0=A0=A0 (1 << 6)
->>>
->>> =A0#define IIC_STS_PT=A0=A0=A0=A0=A0=A0=A0=A0=A0 (1 << 0)
->>> +#define IIC_STS_IRQA=A0=A0=A0=A0=A0=A0=A0 (1 << 1)
->>> =A0#define IIC_STS_ERR=A0=A0=A0=A0=A0=A0=A0=A0 (1 << 2)
->>> +#define IIC_STS_MDBF=A0=A0=A0=A0=A0=A0=A0 (1 << 4)
->>> =A0#define IIC_STS_MDBS=A0=A0=A0=A0=A0=A0=A0 (1 << 5)
->>>
->>> =A0#define IIC_EXTSTS_XFRA=A0=A0=A0=A0 (1 << 0)
->>>
->>> +#define IIC_INTRMSK_EIMTC=A0=A0 (1 << 0)
->>> +#define IIC_INTRMSK_EITA=A0=A0=A0 (1 << 1)
->>> +#define IIC_INTRMSK_EIIC=A0=A0=A0 (1 << 2)
->>> +#define IIC_INTRMSK_EIHE=A0=A0=A0 (1 << 3)
->>> +
->>> =A0#define IIC_XTCNTLSS_SRST=A0=A0 (1 << 0)
->>>
->>> =A0#define IIC_DIRECTCNTL_SDAC (1 << 3)
->>> @@ -56,21 +69,13 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->>> =A0{
->>> =A0=A0=A0=A0 PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
->>>
->>> -=A0=A0=A0 /* FIXME: Should also reset bus?
->>> -=A0=A0=A0=A0 *if (s->address !=3D ADDR_RESET) {
->>> -=A0=A0=A0=A0 *=A0=A0=A0 i2c_end_transfer(s->bus);
->>> -=A0=A0=A0=A0 *}
->>> -=A0=A0=A0=A0 */> -
->>> -=A0=A0=A0 i2c->mdata =3D 0;
->>> -=A0=A0=A0 i2c->lmadr =3D 0;
->>> -=A0=A0=A0 i2c->hmadr =3D 0;
->>> +=A0=A0=A0 i2c->mdidx =3D -1;
->>> +=A0=A0=A0 memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
->>> +=A0=A0=A0 /* [hl][ms]addr are not affected by reset */
->>> =A0=A0=A0=A0 i2c->cntl =3D 0;
->>> =A0=A0=A0=A0 i2c->mdcntl =3D 0;
->>> =A0=A0=A0=A0 i2c->sts =3D 0;
->>> -=A0=A0=A0 i2c->extsts =3D 0x8f;
->>> -=A0=A0=A0 i2c->lsadr =3D 0;
->>> -=A0=A0=A0 i2c->hsadr =3D 0;
->>> +=A0=A0=A0 i2c->extsts =3D (1 << 6);
->>
->> #define=A0=A0 EXTSTS_BCS_FREE=A0 0x40 ?
+> The ACPI spec does not go to the level of the implementation let alone=20
+> the necessary fields. The names of the fields stem from edk2.
+
+my understanding was that values returned in above fields (or some of them)
+are standardized in spec since they are an interface defined by functions
+implemented in _DSM method.
+
+It would be excessive to describe them here, but sending reader to
+a relevant part/term of TPM spec would be helpful.
+(that's what we do with ACPI code, so it would be nice to it in this case
+as well if possible)
+=20
 >=20
-> I guess this could be defined but I did not bother as this is not fully=
- emulated. If you think it's worth to add it without the other states I c=
-an do in next version.
+> > =20
+> >> +
+> >> +=C2=A0=C2=A0 The following values are supported for the 'func' field.=
+ They correspond
+> >> +=C2=A0=C2=A0 to the values used by ACPI function index 8.
+> >> +
+> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_NOT_IMPLEMENTED=C2=A0=C2=A0=
+=C2=A0=C2=A0 (0 << 0)
+> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BIOS_ONLY=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1 << 0)
+> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BLOCKED=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (2 << 0)
+> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_REQ=C2=A0=C2=A0=
+=C2=A0=C2=A0 (3 << 0)
+> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
+> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_MASK=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (7 << 0)
+> >> + =20
+> > looks good to me
+> > PS:
+> > maybe drop #define part and make a table from it too so reader
+> > won't have to do shift on his own, like
+> >
+> >    0x0  | function is not implemented
+> >    0x1  | ...
+> >    ...
+> >
+> > =20
+> >>   =C2=A0QEMU files related to TPM ACPI tables:
+> >>   =C2=A0 - hw/i386/acpi-build.c
+> >> =20
 >=20
->>> =A0=A0=A0=A0 i2c->clkdiv =3D 0;
->>> =A0=A0=A0=A0 i2c->intrmsk =3D 0;
->>> =A0=A0=A0=A0 i2c->xfrcnt =3D 0;
->>> @@ -78,69 +83,29 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->>> =A0=A0=A0=A0 i2c->directcntl =3D 0xf;
->>> =A0}
->>>
->>> -static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
->>> -{
->>> -=A0=A0=A0 return true;
->>> -}
->>> -
->>> =A0static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsign=
-ed int size)
->>> =A0{
->>> =A0=A0=A0=A0 PPC4xxI2CState *i2c =3D PPC4xx_I2C(opaque);
->>> =A0=A0=A0=A0 uint64_t ret;
->>> +=A0=A0=A0 int i;
->>>
->>> =A0=A0=A0=A0 switch (addr) {
->>> =A0=A0=A0=A0 case 0:
->>> -=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->mdata;
->>> -=A0=A0=A0=A0=A0=A0=A0 if (ppc4xx_i2c_is_master(i2c)) {
->>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx < 0) {
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D 0xff;
->>> -
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!(i2c->sts & IIC_STS_MDBS)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_GUES=
-T_ERROR, "[%s]%s: Trying to read "
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0 "without starting transfer\n",
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0 TYPE_PPC4xx_I2C, __func__);
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int pending =3D (i2c->=
-cntl >> 4) & 3;
->>> -
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* get the next byte *=
-/
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int byte =3D i2c_recv(=
-i2c->bus);
->>> -
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (byte < 0) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_m=
-ask(LOG_GUEST_ERROR, "[%s]%s: read failed "
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "for device 0x%02x\n", TYPE_PPC4xx_I2C,
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __func__, i2c->lmadr);
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D 0x=
-ff;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D by=
-te;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* Raise i=
-nterrupt if enabled */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*ppc4xx_i=
-2c_raise_interrupt(i2c)*/;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!pending) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
-=3D ~IIC_STS_MDBS;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*i2c_end_=
-transfer(i2c->bus);*/
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*} else if (i2c->cntl=
- & (IIC_CNTL_RPST | IIC_CNTL_CHT)) {*/
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else if (pending) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* current=
- smbus implementation doesn't like
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 m=
-ultibyte xfer repeated start */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_tr=
-ansfer(i2c->bus);
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_st=
-art_transfer(i2c->bus, i2c->lmadr >> 1, 1)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- /* if non zero is returned, the adress is not valid */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts &=3D ~IIC_STS_PT;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts |=3D IIC_STS_ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->extsts |=3D IIC_EXTSTS_XFRA;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- /*i2c->sts |=3D IIC_STS_PT;*/
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts |=3D IIC_STS_MDBS;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts &=3D ~IIC_STS_ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->extsts =3D 0;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pending--;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->cntl =3D (i2c->cn=
-tl & 0xcf) | (pending << 4);
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_UNIMP, "[%s]%s: =
-slave mode not implemented\n",
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 TYPE_PPC4xx_I2C, __func__);
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->mdata[0];
->>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx =3D=3D 3) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS_MDBF;
->>> +=A0=A0=A0=A0=A0=A0=A0 } else if (i2c->mdidx =3D=3D 0) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS_MDBS;
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 for (i =3D 0; i < i2c->mdidx; i++) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdata[i] =3D i2c->mdata[i + 1=
-];
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx >=3D 0) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdidx--;
->>> =A0=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 4:
->>> @@ -160,6 +125,7 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hw=
-addr addr, unsigned int size)
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 9:
->>> =A0=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->extsts;
->>> +=A0=A0=A0=A0=A0=A0=A0 ret |=3D !!i2c_bus_busy(i2c->bus) << 4;
->>
->> Don't we have a bit definition for this ?
->=20
-> No, like I said above not all states in extsts are emulated, just the b=
-its needed for the guests I've tested, because I don't know how real hard=
-ware works. So extsts is mostly a placeholder if it ever needs to be emul=
-ated more closely at which points appropriate defines could also be added=
-.
->=20
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 10:
->>> =A0=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->lsadr;
->>> @@ -203,70 +169,98 @@ static void ppc4xx_i2c_writeb(void *opaque, hwa=
-ddr addr, uint64_t value,
->>>
->>> =A0=A0=A0=A0 switch (addr) {
->>> =A0=A0=A0=A0 case 0:
->>> -=A0=A0=A0=A0=A0=A0=A0 i2c->mdata =3D value;
->>> -=A0=A0=A0=A0=A0=A0=A0 if (!i2c_bus_busy(i2c->bus)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* assume we start a write transfe=
-r */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_start_transfer(i2c->bus, i=
-2c->lmadr >> 1, 0)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* if non zero is retu=
-rned, the adress is not valid */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
-_PT;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
-ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts |=3D IIC_E=
-XTSTS_XFRA;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
-PT;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
-_ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts =3D 0;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx >=3D 3) {
->>
->> can mdidx go above 3 ?
->=20
-> No, it shouldn't, the > is just to make sure no buffer overrun is possi=
-ble.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0 if (i2c_bus_busy(i2c->bus)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_send(i2c->bus, i2c->mdata)=
-) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* if the target retur=
-n non zero then end the transfer */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
-_PT;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
-ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts |=3D IIC_E=
-XTSTS_XFRA;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_transfer(i2c->=
-bus);
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 i2c->mdata[++i2c->mdidx] =3D value;
->>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx =3D=3D 3) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_MDBF;
->>
->> MDBF sounds like a 'M ... Data Buffer Full' status
->=20
-> Master Data Buffer Full
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0 } else if (i2c->mdidx =3D=3D 0) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_MDBS;
->>
->> what about MDBS ?
->=20
-> Master Data Buffer Status, shows if buffer has data or not.
->=20
->>> =A0=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 4:
->>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->lmadr =3D value;
->>> -=A0=A0=A0=A0=A0=A0=A0 if (i2c_bus_busy(i2c->bus)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_transfer(i2c->bus);
->>> -=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 5:
->>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->hmadr =3D value;
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 6:
->>> -=A0=A0=A0=A0=A0=A0=A0 i2c->cntl =3D value;
->>> -=A0=A0=A0=A0=A0=A0=A0 if (i2c->cntl & IIC_CNTL_PT) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c->cntl & IIC_CNTL_READ) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_bus_busy(i2c->=
-bus)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* end pre=
-vious transfer */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
-=3D ~IIC_STS_PT;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_tr=
-ansfer(i2c->bus);
->>> +=A0=A0=A0=A0=A0=A0=A0 i2c->cntl =3D value & 0xfe;
->>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_CNTL_AMD) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_UNIMP, "%s: only=
- 7 bit addresses supported\n",
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 __func__);
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_CNTL_HMT && i2c_bus_busy(i2c->=
-bus)) {
->>
->> That's an abort ? correct ?
->=20
-> HMT: Halt Master Transfer, issue stop to halt master transfer.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_transfer(i2c->bus);
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdcntl & IIC_MDCNTL_EINT =
-&&
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->intrmsk & IIC_INT=
-RMSK_EIHE) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=
-=3D IIC_STS_IRQA;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_irq_r=
-aise(i2c->irq);
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 } else if (value & IIC_CNTL_PT) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int recv =3D (value & IIC_CNTL_REA=
-D) >> 1;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int tct =3D value >> 4 & 3;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int i;
->>> +
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (recv && (i2c->lmadr >> 1) >=3D=
- 0x50 && (i2c->lmadr >> 1) < 0x58) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* smbus emulation doe=
-s not like multi byte reads w/o restart */
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D IIC_CNTL_RP=
-ST;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 for (i =3D 0; i <=3D tct; i++) {
->>
->> ok. i is used for mdata, but the tct definition should not exceed 3
->=20
-> TCT: Transfer Count, mdata FIFO is 4 bytes so max index is 3, TCT has 2=
- bits so it should also not be higher than 3.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!i2c_bus_busy(i2c-=
->bus)) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extst=
-s =3D (1 << 6);
->>
->> please add a definition for this bit.
->=20
-> See above, this basically resets extsts to initial value which may not =
-match what real hardware does but enough for tested guests.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_st=
-art_transfer(i2c->bus, i2c->lmadr >> 1, recv)) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts |=3D IIC_STS_ERR;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->extsts |=3D IIC_EXTSTS_XFRA;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- break;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts &=3D ~IIC_STS_ERR;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>
->> do we need to start the transfer in the loop ? The device address
->> does not change if I am correct. We would not need to test sts against
->> IIC_STS_ERR.
->=20
-> I have no idea. This works with all guests I tested, that's U-Boot, ARO=
-S, AmigaOS, Linux. Don't know if it matches what real hardware does thoug=
-h. But there are some modes where repeated start is used so I think this =
-needs to be within the loop to allow that.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!(i2c->sts & IIC_S=
-TS_ERR) &&
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_send_r=
-ecv(i2c->bus, &i2c->mdata[i], !recv)) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->sts |=3D IIC_STS_ERR;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- i2c->extsts |=3D IIC_EXTSTS_XFRA;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- break;
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_start_transfer=
-(i2c->bus, i2c->lmadr >> 1, 1)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* if non =
-zero is returned, the adress is not valid */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
-=3D ~IIC_STS_PT;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=
-=3D IIC_STS_ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extst=
-s |=3D IIC_EXTSTS_XFRA;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*i2c->sts=
- |=3D IIC_STS_PT;*/
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=
-=3D IIC_STS_MDBS;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
-=3D ~IIC_STS_ERR;
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extst=
-s =3D 0;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_CNTL_R=
-PST || !(value & IIC_CNTL_CHT)) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_tr=
-ansfer(i2c->bus);
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* we actually already=
- did the write transfer... */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
-_PT;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>
->> That's the end of the loop I suppose ?
->>
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->xfrcnt =3D i;
->>
->> what is that xfrcnt field/reg for ?
->=20
-> Transfer count, number of bytes transmitted.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdidx =3D i - 1;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (recv && i2c->mdidx >=3D 0) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
-MDBS;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (recv && i2c->mdidx =3D=3D 3) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
-MDBF;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i && i2c->mdcntl & IIC_MDCNTL_=
-EINT &&
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->intrmsk & IIC_INT=
-RMSK_EIMTC) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
-IRQA;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_irq_raise(i2c->ir=
-q);
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 7:
->>
->> So that seems to be 'control' register of the=A0 I2C controller.
->=20
-> Yes.
->=20
->>> -=A0=A0=A0=A0=A0=A0=A0 i2c->mdcntl =3D value & 0xdf;
->>> +=A0=A0=A0=A0=A0=A0=A0 i2c->mdcntl =3D value & 0x3d;
->>
->> Could we use a mask built from the bits instead of raw hex value ?
->=20
-> Probably, I don't remember the details any more.
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_MDCNTL_ESM) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_UNIMP, "%s: slav=
-e mode not implemented\n",
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 __func__);
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_MDCNTL_FMDB) {
->>
->> that's a flush ?
->=20
-> FMDB: Flush Master Data Buffer
->=20
-> All these names are in the documentation, you should consult that inste=
-ad of using this emulation as documentation which it's not just approxima=
-te emulation of hardware to satisfy guests.
->=20
-> Do we need a new version with more constants added or is this acceptabl=
-e now?
->=20
-> Thanks you,
-> BALATON Zoltan
->=20
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdidx =3D -1;
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 memset(i2c->mdata, 0, ARRAY_SIZE(i=
-2c->mdata));
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~(IIC_STS_MDBF | IIC=
-_STS_MDBS);
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 8:
->>> -=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~(value & 0xa);
->>> +=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~(value & 0x0a);
->>
->> ditto for the mask.
->>
->> Thanks,
->>
->> C.
->>
->>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_STS_IRQA && i2c->mdcntl & IIC_=
-MDCNTL_EINT) {
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_irq_lower(i2c->irq);
->>> +=A0=A0=A0=A0=A0=A0=A0 }
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 9:
->>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts &=3D ~(value & 0x8f);
->>> @@ -287,12 +281,12 @@ static void ppc4xx_i2c_writeb(void *opaque, hwa=
-ddr addr, uint64_t value,
->>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->xfrcnt =3D value & 0x77;
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 15:
->>> +=A0=A0=A0=A0=A0=A0=A0 i2c->xtcntlss &=3D ~(value & 0xf0);
->>> =A0=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_XTCNTLSS_SRST) {
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* Is it actually a full reset? =
-U-Boot sets some regs before */
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ppc4xx_i2c_reset(DEVICE(i2c));
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0=A0=A0=A0=A0 }
->>> -=A0=A0=A0=A0=A0=A0=A0 i2c->xtcntlss =3D value;
->>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
->>> =A0=A0=A0=A0 case 16:
->>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->directcntl =3D value & (IIC_DIRECTCNTL_=
-SDAC & IIC_DIRECTCNTL_SCLC);
->>> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.=
-h
->>> index ea6c8e1..0891a9c 100644
->>> --- a/include/hw/i2c/ppc4xx_i2c.h
->>> +++ b/include/hw/i2c/ppc4xx_i2c.h
->>> @@ -46,7 +46,8 @@ typedef struct PPC4xxI2CState {
->>> =A0=A0=A0=A0 qemu_irq irq;
->>> =A0=A0=A0=A0 MemoryRegion iomem;
->>> =A0=A0=A0=A0 bitbang_i2c_interface *bitbang;
->>> -=A0=A0=A0 uint8_t mdata;
->>> +=A0=A0=A0 int mdidx;
->>> +=A0=A0=A0 uint8_t mdata[4];
->>> =A0=A0=A0=A0 uint8_t lmadr;
->>> =A0=A0=A0=A0 uint8_t hmadr;
->>> =A0=A0=A0=A0 uint8_t cntl;
->>>
->>
->>
->>
