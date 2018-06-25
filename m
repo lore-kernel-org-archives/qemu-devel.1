@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gor@linux.ibm.com>) id 1fXMzP-0006ZD-4z
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:36:48 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fXRIh-0008Q4-Mk
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 09:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gor@linux.ibm.com>) id 1fXMzK-0007zf-Lj
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:36:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gor@linux.ibm.com>) id 1fXMzK-0007zM-Ci
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:36:42 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5P8ZLwI046162
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 04:36:41 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jtus5tyqu-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 04:36:40 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <gor@linux.ibm.com>;
-	Mon, 25 Jun 2018 09:36:38 +0100
-Date: Mon, 25 Jun 2018 10:36:33 +0200
-From: Vasily Gorbik <gor@linux.ibm.com>
-References: <20180622194736.GA5794@roeck-us.net>
-	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
-	<88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
-	<20180625100548.64222dad.cohuck@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1fXRId-0001Wl-Mr
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 09:12:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40010 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXRId-0001UI-Gk
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 09:12:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B4E04001388
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 13:12:54 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 25 Jun 2018 15:12:47 +0200
+Message-Id: <20180625131253.11218-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180625100548.64222dad.cohuck@redhat.com>
-Message-Id: <your-ad-here.call-01529915788-ext-6027@work.hours>
-Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] Audio 20180625 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,94 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This change has been done on purpose. Uncompressed image is not going
-to be bootable any more. In future the decompressor phase would get
-more function (early memory detection as an example) and there is no
-chance to duplicate that code in uncompressed image as well (to keep it
-bootable on its own). The patch series commit messages contain more
-technical details.
+The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a9=
+3b:
 
-For qemu either bzImage or arch/s390/boot/compressed/vmlinux should be
-used, which are bootable images.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into =
+staging (2018-06-20 09:51:30 +0100)
 
-But that's really confusing that uncompressed vmlinux is still kind
-of booting. May be we should discuss how to avoid this confusion
-(may be change uncompressed image enty point to a function doing
-disabled wait with badb007 or smth) and how to encourage people to use
-arch/s390/boot/compressed/vmlinux instead.
+are available in the git repository at:
 
-On Mon, Jun 25, 2018 at 10:05:48AM +0200, Cornelia Huck wrote:
-> On Mon, 25 Jun 2018 09:27:59 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
-> > Also adding QEMU.
-> > 
-> > On 06/25/2018 09:10 AM, Christian Borntraeger wrote:
-> > > 
-> > > 
-> > > On 06/22/2018 09:47 PM, Guenter Roeck wrote:  
-> > >> Hi,
-> > >>
-> > >> starting with commit 's390/boot: make head.S and als.c be part of the
-> > >> decompressor only' in -next, s390 immages no longer boot in qemu.
-> > >> As far as I can see, the reason is that the command line is no longer
-> > >> passed from qemu to the kernel, which results in a panic because the
-> > >> root file system can not be mounted.
-> > >>
-> > >> Was this change made on purpose ? If so, is there a way to get qemu
-> > >> back to working ?  
-> > > 
-> > > Certainly not on purpose.
-> > > 
-> > > Vasily, I can reproduce this with KVM and an external kernel boot of the vmlinux file (the elf file)
-> > > 
-> > > e.g.
-> > > 
-> > > qemu-system-s390 -enable-kvm -nographic -kernel vmlinux -append "this string no longer is command line"
-> > > 
-> > > The compressed image (bzImage) seems to work fine though.
-> > > 
-> > > This seems to be an unfortunate side effect of QEMUs ways to "guess" its Linux (checking for start
-> > > address 0x10000, which is no longer true for the vmlinux file). With the pure vmlinux elf file
-> > > the load address is 0x100000 as there is no unpacker.
-> 
-> Do we consider these locations to be an exported interface, or is it
-> just QEMU guessing?
-> 
-> > > 
-> > > Guenter, can you check if arch/s390/boot/bzImage works for you as a workaround?  
-> > 
-> > Something like this in QEMU 
-> > 
-> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > index f278036fa7..14153ce880 100644
-> > --- a/hw/s390x/ipl.c
-> > +++ b/hw/s390x/ipl.c
-> > @@ -187,11 +187,13 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-> >           */
-> >          if (pentry == KERN_IMAGE_START || pentry == 0x800) {
-> >              ipl->start_addr = KERN_IMAGE_START;
-> > -            /* Overwrite parameters in the kernel image, which are "rom" */
-> > -            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
-> >          } else {
-> >              ipl->start_addr = pentry;
-> >          }
-> > +       if (ipl->cmdline) {
-> > +            /* If there is a command line, put it in the right place */
-> > +            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
-> > +       }
-> 
-> Check for the magic Linux string (like in the non-elf case) first?
-> 
-> >  
-> >          if (ipl->initrd) {
-> >              ram_addr_t initrd_offset;
-> > 
-> > would put the command line in no matter what the start address is.
-> 
-> I'm for putting that one in (and backporting it to qemu-stable). It's a
-> bit worrying, though, that our ipl code is so fragile...
-> 
+  git://git.kraxel.org/qemu tags/audio-20180625-pull-request
+
+for you to fetch changes up to 441b345313f1355fb2464f3b37a07a1ded85b61a:
+
+  audio: Convert use of atoi to qemu_strtoi (2018-06-25 14:03:30 +0200)
+
+----------------------------------------------------------------
+audio: new timer code for hda codec, fix audio_get_conf_int
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (5):
+  audio/hda: create millisecond timers that handle IO
+  audio/hda: turn some dprintfs into trace points
+  audio/hda: tweak timer adjust logic
+  audio/hda: detect output buffer overruns
+  audio/hda: enable new timer code by default.
+
+Nia Alarie (1):
+  audio: Convert use of atoi to qemu_strtoi
+
+ include/hw/compat.h   |   4 +
+ audio/audio.c         |   3 +-
+ hw/audio/hda-codec.c  | 287 ++++++++++++++++++++++++++++++++++++++++++++=
+------
+ hw/audio/intel-hda.c  |   7 --
+ hw/audio/trace-events |   6 ++
+ 5 files changed, 267 insertions(+), 40 deletions(-)
+
+--=20
+2.9.3
