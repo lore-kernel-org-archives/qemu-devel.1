@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1fXQ9d-0004Bp-8Q
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:59:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXQFD-0008Ve-Oi
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1fXQ9c-00046Q-D6
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:59:33 -0400
-Message-Id: <1529927965.3221404.1419429536.7B0D907A@webmail.messagingengine.com>
-From: Andrew Jeffery <andrew@aj.id.au>
+	(envelope-from <thuth@redhat.com>) id 1fXQFC-0007Kw-FL
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:05:19 -0400
+References: <20180624040609.17572-1-f4bug@amsat.org>
+	<20180624040609.17572-10-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e8083908-85c8-6d86-3f53-ed22e0dd934e@redhat.com>
+Date: Mon, 25 Jun 2018 14:05:08 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180624040609.17572-10-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-References: <20180625110721.22485-1-joel@jms.id.au>
-	<0627e87c-6d3c-a64a-6d6d-2a632c73ebf7@amsat.org>
-Date: Mon, 25 Jun 2018 21:29:25 +0930
-In-Reply-To: <0627e87c-6d3c-a64a-6d6d-2a632c73ebf7@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add ASPEED BMCs
+Subject: Re: [Qemu-devel] [PATCH v3 09/16] hw/arm/omap: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Joel Stanley <joel@jms.id.au>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-On Mon, 25 Jun 2018, at 20:43, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Joel,
+On 24.06.2018 06:06, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/arm/omap.h | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 >=20
-> On 06/25/2018 08:07 AM, Joel Stanley wrote:
-> > This adds Cedric as the maintainer, with Andrew and I as reviewers, for
-> > the ASPEED boards and the peripherals we use.
+> diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+> index 39abba753d..e7fbd340f3 100644
+> --- a/include/hw/arm/omap.h
+> +++ b/include/hw/arm/omap.h
+> @@ -21,6 +21,7 @@
+>  # define hw_omap_h		"omap.h"
+>  #include "hw/irq.h"
+>  #include "target/arm/cpu-qom.h"
+> +#include "qemu/log.h"
+> =20
+>  # define OMAP_EMIFS_BASE	0x00000000
+>  # define OMAP2_Q0_BASE		0x00000000
+> @@ -944,8 +945,6 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRe=
+gion *sysmem,
+>                  unsigned long sdram_size,
+>                  const char *core);
+> =20
+> -#define OMAP_FMT_plx "%#08" HWADDR_PRIx
+> -
+>  uint32_t omap_badwidth_read8(void *opaque, hwaddr addr);
+>  void omap_badwidth_write8(void *opaque, hwaddr addr,
+>                  uint32_t value);
+> @@ -959,11 +958,12 @@ void omap_badwidth_write32(void *opaque, hwaddr a=
+ddr,
+>  void omap_mpu_wakeup(void *opaque, int irq, int req);
+> =20
+>  # define OMAP_BAD_REG(paddr)		\
+> -        fprintf(stderr, "%s: Bad register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad register %#08"HWADDR_P=
+RIx"\n", \
+> +                      __func__, paddr)
+>  # define OMAP_RO_REG(paddr)		\
+> -        fprintf(stderr, "%s: Read-only register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Read-only register %#08" \
+> +                                       HWADDR_PRIx "\n", \
+> +                      __func__, paddr)
+> =20
+>  /* OMAP-specific Linux bootloader tags for the ATAG_BOARD area
+>     (Board-specifc tags are not here)  */
 >=20
-> Good idea, this should speed up ASPEED reviews.
->=20
-> >=20
-> > Signed-off-by: Joel Stanley <joel@jms.id.au>
-> > ---
-> >  MAINTAINERS | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >=20
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 2874ddce6097..14bcf2ed3e3d 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -644,6 +644,17 @@ M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >  S: Maintained
-> >  F: hw/arm/msf2-som.c
-> >=20=20
-> > +ASPEED BMCs
-> > +M: C=C3=A9dric Le Goater <clg@kaod.org>
-> > +R: Andrew Jeffery <andrew@aj.id.au>
-> > +R: Joel Stanley <joel@jms.id.au>
-> > +L: qemu-arm@nongnu.org
-> > +S: Maintained
-> > +F: hw/*/*aspeed*
-> > +F: include/*/*aspeed*
->=20
-> This line does not match, however include/hw/*/*aspeed* does.
->=20
-> With that fixed:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Similarly:
-
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-
->=20
-> > +F: hw/net/ftgmac100.c
-> > +F: include/hw/net/ftgmac100.h
-> > +
-> >  CRIS Machines
-> >  -------------
-> >  Axis Dev88
-> >=20
+Reviewed-by: Thomas Huth <thuth@redhat.com>
