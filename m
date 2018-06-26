@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHH-00027T-RT
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHE-00023N-73
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHH-0007Gn-21
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:15 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43040)
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHD-0007DJ-4k
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:12 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fXrHG-0007GJ-Qn
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:14 -0400
+	id 1fXrHC-00079F-OY
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:11 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHF-00009a-P2
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:13 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrH7-0008Vo-Qw
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:05 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 17:56:45 +0100
-Message-Id: <20180626165658.31394-20-peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:56:34 +0100
+Message-Id: <20180626165658.31394-9-peter.maydell@linaro.org>
 In-Reply-To: <20180626165658.31394-1-peter.maydell@linaro.org>
 References: <20180626165658.31394-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/32] hw/net/smc91c111: Use
- qemu_log_mask(GUEST_ERROR) instead of hw_error
+Subject: [Qemu-devel] [PULL 08/32] hw/input/tsc2005: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +35,50 @@ To: qemu-devel@nongnu.org
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-hw_error() finally calls abort(), but there is no need to abort here.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20180624040609.17572-14-f4bug@amsat.org
+Message-id: 20180624040609.17572-3-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/net/smc91c111.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/input/tsc2005.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-index c8cc5379b78..9094c0b47ca 100644
---- a/hw/net/smc91c111.c
-+++ b/hw/net/smc91c111.c
-@@ -11,6 +11,7 @@
- #include "hw/sysbus.h"
- #include "net/net.h"
- #include "hw/devices.h"
+diff --git a/hw/input/tsc2005.c b/hw/input/tsc2005.c
+index 7990954b6cd..4dd95596ab7 100644
+--- a/hw/input/tsc2005.c
++++ b/hw/input/tsc2005.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
 +#include "qemu/log.h"
- /* For crc32 */
- #include <zlib.h>
- 
-@@ -478,7 +479,9 @@ static void smc91c111_writeb(void *opaque, hwaddr offset,
+ #include "hw/hw.h"
+ #include "qemu/timer.h"
+ #include "ui/console.h"
+@@ -208,9 +209,10 @@ static void tsc2005_write(TSC2005State *s, int reg, uint16_t data)
          }
+         s->nextprecision = (data >> 13) & 1;
+         s->timing[0] = data & 0x1fff;
+-        if ((s->timing[0] >> 11) == 3)
+-            fprintf(stderr, "%s: illegal conversion clock setting\n",
+-                            __func__);
++        if ((s->timing[0] >> 11) == 3) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "tsc2005_write: illegal conversion clock setting\n");
++        }
          break;
-     }
--    hw_error("smc91c111_write: Bad reg %d:%x\n", s->bank, (int)offset);
-+    qemu_log_mask(LOG_GUEST_ERROR, "smc91c111_write(bank:%d) Illegal register"
-+                                   " 0x%" HWADDR_PRIx " = 0x%x\n",
-+                  s->bank, offset, value);
- }
+     case 0xd:	/* CFR1 */
+         s->timing[1] = data & 0xf07;
+@@ -221,8 +223,9 @@ static void tsc2005_write(TSC2005State *s, int reg, uint16_t data)
+         break;
  
- static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
-@@ -621,7 +624,9 @@ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
-         }
-         break;
+     default:
+-        fprintf(stderr, "%s: write into read-only register %x\n",
+-                        __func__, reg);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: write into read-only register 0x%x\n",
++                      __func__, reg);
      }
--    hw_error("smc91c111_read: Bad reg %d:%x\n", s->bank, (int)offset);
-+    qemu_log_mask(LOG_GUEST_ERROR, "smc91c111_read(bank:%d) Illegal register"
-+                                   " 0x%" HWADDR_PRIx "\n",
-+                  s->bank, offset);
-     return 0;
  }
  
 -- 
