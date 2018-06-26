@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXjNl-0001TG-1W
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:31:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXjS3-0002Se-CF
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:35:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXjNh-0003vK-Pr
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:31:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39922 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXjNh-0003v5-LN
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:31:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4360E83207
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 08:31:21 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 26 Jun 2018 10:31:19 +0200
-Message-Id: <20180626083120.19515-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] ramfb: fix overflow
+	(envelope-from <armbru@redhat.com>) id 1fXjS2-000631-7l
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:35:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180625164239.13794-1-kwolf@redhat.com>
+Date: Tue, 26 Jun 2018 10:35:38 +0200
+In-Reply-To: <20180625164239.13794-1-kwolf@redhat.com> (Kevin Wolf's message
+	of "Mon, 25 Jun 2018 18:42:39 +0200")
+Message-ID: <87h8lqkkrp.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] usb-storage: Add rerror/werror properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +22,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-> CID 1393621:    (OVERFLOW_BEFORE_WIDEN)
-> Potentially overflowing expression "stride * s->height" with type "unsigned
-> int" (32 bits, unsigned) is evaluated using +32-bit arithmetic, and then used
-> in a context that expects an expression of type "hwaddr" (64 bits, unsigned).
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Fix by changing stride from uint32_t to hwaddr.
+> The error handling policy was traditionally set with -drive, but with
+> -blockdev it is no longer possible to set frontend options. scsi-disk
+> (and other block devices) have long supported qdev properties to
+> configure the error handling policy, so let's add these options to
+> usb-storage as well and just forward them to the internal scsi-disk
+> instance.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/ramfb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Let's see whether I remember / figure out how this stuff works.
 
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 6867bce8ae..30f5c8da20 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -36,8 +36,8 @@ static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
- {
-     RAMFBState *s = dev;
-     void *framebuffer;
--    uint32_t stride, fourcc, format;
--    hwaddr addr, length;
-+    uint32_t fourcc, format;
-+    hwaddr stride, addr, length;
- 
-     s->width  = be32_to_cpu(s->cfg.width);
-     s->height = be32_to_cpu(s->cfg.height);
--- 
-2.9.3
+Not all devices support error handling policy, but scsi-disk does.
+
+The preferred way to configure error handling policy is with qdev
+properties rerror, werror.  blkconf_apply_backend_options() propagates
+them to the associated BlockBackend.
+
+The outmoded way is with -drive parameters rerror, werror.
+blockdev_init() propagates them to the BlockBackend.
+
+If you use both ways, qdev properties win.
+
+usb-storage is a hack: it tries to look like a block device, but it's
+really a SCSI controller that can serve only a single scsi-disk device,
+which it creates automatically.
+
+We want to deprecate -drive.  We also want to deprecate usb-storage, but
+I guess we're still not ready for that (it's a complicated story).
+
+To deprecate -drive without also deprecating usb-storage, we need to
+preserve features.
+
+The outmoded way works with usb-storage: the automatically created
+scsi-disk is associated with the BlockBackend that got its error
+handling policy from -drive.
+
+The preferred way doesn't, because usb-storage lacks the qdev
+properties.  This patch adds them.
+
+Kind of sad, but it's either that or deprecating usb-storage.
+
+Patch looks good to me, thus
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Feel free to work whatever parts of my ramblings you find useful into
+your commit message.
