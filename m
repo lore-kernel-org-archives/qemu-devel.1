@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fXotp-0001vm-Eb
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:54 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fXots-0001zW-1q
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fXotm-0003Pq-GR
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fXotq-0003mX-1c
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:56 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Jun 2018 16:24:33 +0200
-Message-Id: <20180626142434.22090-6-kwolf@redhat.com>
+Date: Tue, 26 Jun 2018 16:24:34 +0200
+Message-Id: <20180626142434.22090-7-kwolf@redhat.com>
 In-Reply-To: <20180626142434.22090-1-kwolf@redhat.com>
 References: <20180626142434.22090-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] block: Use tracked request for truncate
+Subject: [Qemu-devel] [PATCH v2 6/6] file-posix: Make .bdrv_co_truncate
+ asynchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,88 +23,368 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-When growing an image, block drivers (especially protocol drivers) may
-initialise the newly added area. I/O requests to the same area need to
-wait for this initialisation to be completed so that data writes don't
-get overwritten and reads don't read uninitialised data.
+This moves the code to resize an image file to the thread pool to avoid
+blocking.
 
-To avoid overhead in the fast I/O path by adding new locking in the
-protocol drivers and to restrict the impact to requests that actually
-touch the new area, reuse the existing tracked request infrastructure in
-block/io.c and mark all discard requests as serialising.
-
-With this change, it is safe for protocol drivers to make
-.bdrv_co_truncate actually asynchronous.
+Creating large images with preallocation with blockdev-create is now
+actually a background job instead of blocking the monitor (and most
+other things) until the preallocation has completed.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h |  1 +
- block/io.c                | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ include/block/raw-aio.h |   4 +-
+ block/file-posix.c      | 265 +++++++++++++++++++++++++++---------------------
+ 2 files changed, 153 insertions(+), 116 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 740166a996..af71b414be 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -63,6 +63,7 @@ enum BdrvTrackedRequestType {
-     BDRV_TRACKED_READ,
-     BDRV_TRACKED_WRITE,
-     BDRV_TRACKED_DISCARD,
-+    BDRV_TRACKED_TRUNCATE,
- };
+diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
+index 0e717fd475..e496ae31b2 100644
+--- a/include/block/raw-aio.h
++++ b/include/block/raw-aio.h
+@@ -26,6 +26,7 @@
+ #define QEMU_AIO_DISCARD      0x0010
+ #define QEMU_AIO_WRITE_ZEROES 0x0020
+ #define QEMU_AIO_COPY_RANGE   0x0040
++#define QEMU_AIO_TRUNCATE     0x0080
+ #define QEMU_AIO_TYPE_MASK \
+         (QEMU_AIO_READ | \
+          QEMU_AIO_WRITE | \
+@@ -33,7 +34,8 @@
+          QEMU_AIO_FLUSH | \
+          QEMU_AIO_DISCARD | \
+          QEMU_AIO_WRITE_ZEROES | \
+-         QEMU_AIO_COPY_RANGE)
++         QEMU_AIO_COPY_RANGE | \
++         QEMU_AIO_TRUNCATE)
  
- typedef struct BdrvTrackedRequest {
-diff --git a/block/io.c b/block/io.c
-index 7e87a42b8e..01a3c4eac5 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -3039,6 +3039,8 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
- {
-     BlockDriverState *bs = child->bs;
-     BlockDriver *drv = bs->drv;
-+    BdrvTrackedRequest req;
-+    int64_t old_size, new_bytes;
-     int ret;
+ /* AIO flags */
+ #define QEMU_AIO_MISALIGNED   0x1000
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 6223a8bccc..fa918f2bdb 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -188,8 +188,16 @@ typedef struct RawPosixAIOData {
+ #define aio_ioctl_cmd   aio_nbytes /* for QEMU_AIO_IOCTL */
+     off_t aio_offset;
+     int aio_type;
+-    int aio_fd2;
+-    off_t aio_offset2;
++    union {
++        struct {
++            int aio_fd2;
++            off_t aio_offset2;
++        };
++        struct {
++            PreallocMode prealloc;
++            Error **errp;
++        };
++    };
+ } RawPosixAIOData;
  
-     assert(child->perm & BLK_PERM_RESIZE);
-@@ -3053,7 +3055,28 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
-         return -EINVAL;
-     }
- 
-+    old_size = bdrv_getlength(bs);
-+    if (old_size < 0) {
-+        error_setg_errno(errp, -old_size, "Failed to get old image size");
-+        return old_size;
-+    }
-+
-+    if (offset > old_size) {
-+        new_bytes = offset - old_size;
-+    } else {
-+        new_bytes = 0;
-+    }
-+
-     bdrv_inc_in_flight(bs);
-+    tracked_request_begin(&req, bs, offset, new_bytes, BDRV_TRACKED_TRUNCATE);
-+
-+    /* If we are growing the image and potentially using preallocation for the
-+     * new area, we need to make sure that no write requests are made to it
-+     * concurrently or they might be overwritten by preallocation. */
-+    if (new_bytes) {
-+        mark_request_serialising(&req, 1);
-+        wait_serialising_requests(&req);
-+    }
- 
-     if (!drv->bdrv_co_truncate) {
-         if (bs->file && drv->is_filter) {
-@@ -3087,7 +3110,9 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
-     atomic_inc(&bs->write_gen);
- 
- out:
-+    tracked_request_end(&req);
-     bdrv_dec_in_flight(bs);
-+
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+@@ -1533,6 +1541,121 @@ static ssize_t handle_aiocb_discard(RawPosixAIOData *aiocb)
      return ret;
  }
  
++static int handle_aiocb_truncate(RawPosixAIOData *aiocb)
++{
++    int result = 0;
++    int64_t current_length = 0;
++    char *buf = NULL;
++    struct stat st;
++    int fd = aiocb->aio_fildes;
++    int64_t offset = aiocb->aio_offset;
++    Error **errp = aiocb->errp;
++
++    if (fstat(fd, &st) < 0) {
++        result = -errno;
++        error_setg_errno(errp, -result, "Could not stat file");
++        return result;
++    }
++
++    current_length = st.st_size;
++    if (current_length > offset && aiocb->prealloc != PREALLOC_MODE_OFF) {
++        error_setg(errp, "Cannot use preallocation for shrinking files");
++        return -ENOTSUP;
++    }
++
++    switch (aiocb->prealloc) {
++#ifdef CONFIG_POSIX_FALLOCATE
++    case PREALLOC_MODE_FALLOC:
++        /*
++         * Truncating before posix_fallocate() makes it about twice slower on
++         * file systems that do not support fallocate(), trying to check if a
++         * block is allocated before allocating it, so don't do that here.
++         */
++        if (offset != current_length) {
++            result = -posix_fallocate(fd, current_length, offset - current_length);
++            if (result != 0) {
++                /* posix_fallocate() doesn't set errno. */
++                error_setg_errno(errp, -result,
++                                 "Could not preallocate new data");
++            }
++        } else {
++            result = 0;
++        }
++        goto out;
++#endif
++    case PREALLOC_MODE_FULL:
++    {
++        int64_t num = 0, left = offset - current_length;
++        off_t seek_result;
++
++        /*
++         * Knowing the final size from the beginning could allow the file
++         * system driver to do less allocations and possibly avoid
++         * fragmentation of the file.
++         */
++        if (ftruncate(fd, offset) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++            goto out;
++        }
++
++        buf = g_malloc0(65536);
++
++        seek_result = lseek(fd, current_length, SEEK_SET);
++        if (seek_result < 0) {
++            result = -errno;
++            error_setg_errno(errp, -result,
++                             "Failed to seek to the old end of file");
++            goto out;
++        }
++
++        while (left > 0) {
++            num = MIN(left, 65536);
++            result = write(fd, buf, num);
++            if (result < 0) {
++                result = -errno;
++                error_setg_errno(errp, -result,
++                                 "Could not write zeros for preallocation");
++                goto out;
++            }
++            left -= result;
++        }
++        if (result >= 0) {
++            result = fsync(fd);
++            if (result < 0) {
++                result = -errno;
++                error_setg_errno(errp, -result,
++                                 "Could not flush file to disk");
++                goto out;
++            }
++        }
++        goto out;
++    }
++    case PREALLOC_MODE_OFF:
++        if (ftruncate(fd, offset) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++        }
++        return result;
++    default:
++        result = -ENOTSUP;
++        error_setg(errp, "Unsupported preallocation mode: %s",
++                   PreallocMode_str(aiocb->prealloc));
++        return result;
++    }
++
++out:
++    if (result < 0) {
++        if (ftruncate(fd, current_length) < 0) {
++            error_report("Failed to restore old file length: %s",
++                         strerror(errno));
++        }
++    }
++
++    g_free(buf);
++    return result;
++}
++
+ static int aio_worker(void *arg)
+ {
+     RawPosixAIOData *aiocb = arg;
+@@ -1576,6 +1699,9 @@ static int aio_worker(void *arg)
+     case QEMU_AIO_COPY_RANGE:
+         ret = handle_aiocb_copy_range(aiocb);
+         break;
++    case QEMU_AIO_TRUNCATE:
++        ret = handle_aiocb_truncate(aiocb);
++        break;
+     default:
+         fprintf(stderr, "invalid aio request (0x%x)\n", aiocb->aio_type);
+         ret = -EINVAL;
+@@ -1743,117 +1869,25 @@ static void raw_close(BlockDriverState *bs)
+  *
+  * Returns: 0 on success, -errno on failure.
+  */
+-static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
+-                                Error **errp)
++static int coroutine_fn
++raw_regular_truncate(BlockDriverState *bs, int fd, int64_t offset,
++                     PreallocMode prealloc, Error **errp)
+ {
+-    int result = 0;
+-    int64_t current_length = 0;
+-    char *buf = NULL;
+-    struct stat st;
+-
+-    if (fstat(fd, &st) < 0) {
+-        result = -errno;
+-        error_setg_errno(errp, -result, "Could not stat file");
+-        return result;
+-    }
+-
+-    current_length = st.st_size;
+-    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
+-        error_setg(errp, "Cannot use preallocation for shrinking files");
+-        return -ENOTSUP;
+-    }
+-
+-    switch (prealloc) {
+-#ifdef CONFIG_POSIX_FALLOCATE
+-    case PREALLOC_MODE_FALLOC:
+-        /*
+-         * Truncating before posix_fallocate() makes it about twice slower on
+-         * file systems that do not support fallocate(), trying to check if a
+-         * block is allocated before allocating it, so don't do that here.
+-         */
+-        if (offset != current_length) {
+-            result = -posix_fallocate(fd, current_length, offset - current_length);
+-            if (result != 0) {
+-                /* posix_fallocate() doesn't set errno. */
+-                error_setg_errno(errp, -result,
+-                                 "Could not preallocate new data");
+-            }
+-        } else {
+-            result = 0;
+-        }
+-        goto out;
+-#endif
+-    case PREALLOC_MODE_FULL:
+-    {
+-        int64_t num = 0, left = offset - current_length;
+-        off_t seek_result;
+-
+-        /*
+-         * Knowing the final size from the beginning could allow the file
+-         * system driver to do less allocations and possibly avoid
+-         * fragmentation of the file.
+-         */
+-        if (ftruncate(fd, offset) != 0) {
+-            result = -errno;
+-            error_setg_errno(errp, -result, "Could not resize file");
+-            goto out;
+-        }
+-
+-        buf = g_malloc0(65536);
+-
+-        seek_result = lseek(fd, current_length, SEEK_SET);
+-        if (seek_result < 0) {
+-            result = -errno;
+-            error_setg_errno(errp, -result,
+-                             "Failed to seek to the old end of file");
+-            goto out;
+-        }
+-
+-        while (left > 0) {
+-            num = MIN(left, 65536);
+-            result = write(fd, buf, num);
+-            if (result < 0) {
+-                result = -errno;
+-                error_setg_errno(errp, -result,
+-                                 "Could not write zeros for preallocation");
+-                goto out;
+-            }
+-            left -= result;
+-        }
+-        if (result >= 0) {
+-            result = fsync(fd);
+-            if (result < 0) {
+-                result = -errno;
+-                error_setg_errno(errp, -result,
+-                                 "Could not flush file to disk");
+-                goto out;
+-            }
+-        }
+-        goto out;
+-    }
+-    case PREALLOC_MODE_OFF:
+-        if (ftruncate(fd, offset) != 0) {
+-            result = -errno;
+-            error_setg_errno(errp, -result, "Could not resize file");
+-        }
+-        return result;
+-    default:
+-        result = -ENOTSUP;
+-        error_setg(errp, "Unsupported preallocation mode: %s",
+-                   PreallocMode_str(prealloc));
+-        return result;
+-    }
++    RawPosixAIOData *acb = g_new(RawPosixAIOData, 1);
++    ThreadPool *pool;
+ 
+-out:
+-    if (result < 0) {
+-        if (ftruncate(fd, current_length) < 0) {
+-            error_report("Failed to restore old file length: %s",
+-                         strerror(errno));
+-        }
+-    }
++    *acb = (RawPosixAIOData) {
++        .bs             = bs,
++        .aio_fildes     = fd,
++        .aio_type       = QEMU_AIO_TRUNCATE,
++        .aio_offset     = offset,
++        .prealloc       = prealloc,
++        .errp           = errp,
++    };
+ 
+-    g_free(buf);
+-    return result;
++    /* @bs can be NULL, bdrv_get_aio_context() returns the main context then */
++    pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
++    return thread_pool_submit_co(pool, aio_worker, acb);
+ }
+ 
+ static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
+@@ -1870,7 +1904,7 @@ static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
+     }
+ 
+     if (S_ISREG(st.st_mode)) {
+-        return raw_regular_truncate(s->fd, offset, prealloc, errp);
++        return raw_regular_truncate(bs, s->fd, offset, prealloc, errp);
+     }
+ 
+     if (prealloc != PREALLOC_MODE_OFF) {
+@@ -2072,7 +2106,8 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
+     return (int64_t)st.st_blocks * 512;
+ }
+ 
+-static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
++static int coroutine_fn
++raw_co_create(BlockdevCreateOptions *options, Error **errp)
+ {
+     BlockdevCreateOptionsFile *file_opts;
+     int fd;
+@@ -2124,7 +2159,7 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+     }
+ 
+     /* Clear the file by truncating it to 0 */
+-    result = raw_regular_truncate(fd, 0, PREALLOC_MODE_OFF, errp);
++    result = raw_regular_truncate(NULL, fd, 0, PREALLOC_MODE_OFF, errp);
+     if (result < 0) {
+         goto out_close;
+     }
+@@ -2146,8 +2181,8 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+ 
+     /* Resize and potentially preallocate the file to the desired
+      * final size */
+-    result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
+-                                  errp);
++    result = raw_regular_truncate(NULL, fd, file_opts->size,
++                                  file_opts->preallocation, errp);
+     if (result < 0) {
+         goto out_close;
+     }
 -- 
 2.13.6
