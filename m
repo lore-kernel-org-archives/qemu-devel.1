@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fXdlm-0000FE-1P
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 22:31:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fXdlo-0000GV-Vn
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 22:31:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fXdlk-0004n4-Rg
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 22:31:50 -0400
-Date: Tue, 26 Jun 2018 12:30:42 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fXdlk-0004my-Qv
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 22:31:52 -0400
+Date: Tue, 26 Jun 2018 12:25:46 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180626023042.GB14434@umbus.fritz.box>
+Message-ID: <20180626022546.GA14434@umbus.fritz.box>
 References: <20180625091718.18544-1-clg@kaod.org>
-	<20180625091718.18544-5-clg@kaod.org>
+	<20180625091718.18544-4-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="KFztAG8eRSV9hGtP"
+	protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
 Content-Disposition: inline
-In-Reply-To: <20180625091718.18544-5-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] ppc/xics: move the vmstate
- structures under the ics-base class
+In-Reply-To: <20180625091718.18544-4-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] ppx/xics: introduce a parent_reset
+ in ICSStateClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,167 +29,188 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---KFztAG8eRSV9hGtP
+--UlVJffcvxoiEqYs2
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 25, 2018 at 11:17:17AM +0200, C=E9dric Le Goater wrote:
+On Mon, Jun 25, 2018 at 11:17:16AM +0200, C=E9dric Le Goater wrote:
+> Just like for the realize handlers, this makes possible to move the
+> common ICSState code of the reset handlers in the ics-base class.
+>=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
 Applied, thanks.
 
 > ---
->  hw/intc/xics.c | 112 ++++++++++++++++++++++++++++-----------------------=
-------
->  1 file changed, 56 insertions(+), 56 deletions(-)
+>  include/hw/ppc/xics.h |  1 +
+>  hw/intc/xics.c        | 45 ++++++++++++++++++++++++++++++---------------
+>  hw/intc/xics_kvm.c    | 26 ++++++++++----------------
+>  3 files changed, 41 insertions(+), 31 deletions(-)
 >=20
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 44e96e640070..6ac8a9392da6 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -116,6 +116,7 @@ struct ICSStateClass {
+>      DeviceClass parent_class;
+> =20
+>      DeviceRealize parent_realize;
+> +    DeviceReset parent_reset;
+> =20
+>      void (*pre_save)(ICSState *s);
+>      int (*post_load)(ICSState *s, int version_id);
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 8cfe2231531e..b9f1a3c97214 100644
+> index 83340770f7c0..8cfe2231531e 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -549,61 +549,6 @@ static void ics_simple_reset_handler(void *dev)
->      ics_simple_reset(dev);
+> @@ -537,23 +537,16 @@ static void ics_simple_eoi(ICSState *ics, uint32_t =
+nr)
+>      }
 >  }
 > =20
-> -static int ics_simple_dispatch_pre_save(void *opaque)
-> -{
-> -    ICSState *ics =3D opaque;
-> -    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
-> -
-> -    if (info->pre_save) {
-> -        info->pre_save(ics);
-> -    }
-> -
-> -    return 0;
-> -}
-> -
-> -static int ics_simple_dispatch_post_load(void *opaque, int version_id)
-> -{
-> -    ICSState *ics =3D opaque;
-> -    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
-> -
-> -    if (info->post_load) {
-> -        return info->post_load(ics, version_id);
-> -    }
-> -
-> -    return 0;
-> -}
-> -
-> -static const VMStateDescription vmstate_ics_simple_irq =3D {
-> -    .name =3D "ics/irq",
-> -    .version_id =3D 2,
-> -    .minimum_version_id =3D 1,
-> -    .fields =3D (VMStateField[]) {
-> -        VMSTATE_UINT32(server, ICSIRQState),
-> -        VMSTATE_UINT8(priority, ICSIRQState),
-> -        VMSTATE_UINT8(saved_priority, ICSIRQState),
-> -        VMSTATE_UINT8(status, ICSIRQState),
-> -        VMSTATE_UINT8(flags, ICSIRQState),
-> -        VMSTATE_END_OF_LIST()
-> -    },
-> -};
-> -
-> -static const VMStateDescription vmstate_ics_simple =3D {
-> -    .name =3D "ics",
-> -    .version_id =3D 1,
-> -    .minimum_version_id =3D 1,
-> -    .pre_save =3D ics_simple_dispatch_pre_save,
-> -    .post_load =3D ics_simple_dispatch_post_load,
-> -    .fields =3D (VMStateField[]) {
-> -        /* Sanity check */
-> -        VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
-> -
-> -        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
-> -                                             vmstate_ics_simple_irq,
-> -                                             ICSIRQState),
-> -        VMSTATE_END_OF_LIST()
-> -    },
-> -};
-> -
->  static void ics_simple_realize(DeviceState *dev, Error **errp)
+> -static void ics_simple_reset(void *dev)
+> +static void ics_simple_reset(DeviceState *dev)
 >  {
->      ICSState *ics =3D ICS_SIMPLE(dev);
-> @@ -631,7 +576,6 @@ static void ics_simple_class_init(ObjectClass *klass,=
- void *data)
->      device_class_set_parent_reset(dc, ics_simple_reset,
->                                    &isc->parent_reset);
+> -    ICSState *ics =3D ICS_SIMPLE(dev);
+> -    int i;
+> -    uint8_t flags[ics->nr_irqs];
+> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
 > =20
-> -    dc->vmsd =3D &vmstate_ics_simple;
->      isc->reject =3D ics_simple_reject;
->      isc->resend =3D ics_simple_resend;
->      isc->eoi =3D ics_simple_eoi;
-> @@ -692,6 +636,61 @@ static void ics_base_instance_init(Object *obj)
->      ics->offset =3D XICS_IRQ_BASE;
+> -    for (i =3D 0; i < ics->nr_irqs; i++) {
+> -        flags[i] =3D ics->irqs[i].flags;
+> -    }
+> -
+> -    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
+> +    icsc->parent_reset(dev);
+> +}
+> =20
+> -    for (i =3D 0; i < ics->nr_irqs; i++) {
+> -        ics->irqs[i].priority =3D 0xff;
+> -        ics->irqs[i].saved_priority =3D 0xff;
+> -        ics->irqs[i].flags =3D flags[i];
+> -    }
+> +static void ics_simple_reset_handler(void *dev)
+> +{
+> +    ics_simple_reset(dev);
 >  }
 > =20
-> +static int ics_base_dispatch_pre_save(void *opaque)
+>  static int ics_simple_dispatch_pre_save(void *opaque)
+> @@ -625,7 +618,7 @@ static void ics_simple_realize(DeviceState *dev, Erro=
+r **errp)
+> =20
+>      ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
+rqs);
+> =20
+> -    qemu_register_reset(ics_simple_reset, ics);
+> +    qemu_register_reset(ics_simple_reset_handler, ics);
+>  }
+> =20
+>  static void ics_simple_class_init(ObjectClass *klass, void *data)
+> @@ -635,6 +628,8 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+> =20
+>      device_class_set_parent_realize(dc, ics_simple_realize,
+>                                      &isc->parent_realize);
+> +    device_class_set_parent_reset(dc, ics_simple_reset,
+> +                                  &isc->parent_reset);
+> =20
+>      dc->vmsd =3D &vmstate_ics_simple;
+>      isc->reject =3D ics_simple_reject;
+> @@ -650,6 +645,25 @@ static const TypeInfo ics_simple_info =3D {
+>      .class_size =3D sizeof(ICSStateClass),
+>  };
+> =20
+> +static void ics_base_reset(DeviceState *dev)
 > +{
-> +    ICSState *ics =3D opaque;
-> +    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
+> +    ICSState *ics =3D ICS_BASE(dev);
+> +    int i;
+> +    uint8_t flags[ics->nr_irqs];
 > +
-> +    if (info->pre_save) {
-> +        info->pre_save(ics);
+> +    for (i =3D 0; i < ics->nr_irqs; i++) {
+> +        flags[i] =3D ics->irqs[i].flags;
 > +    }
 > +
-> +    return 0;
-> +}
+> +    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
 > +
-> +static int ics_base_dispatch_post_load(void *opaque, int version_id)
-> +{
-> +    ICSState *ics =3D opaque;
-> +    ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
-> +
-> +    if (info->post_load) {
-> +        return info->post_load(ics, version_id);
+> +    for (i =3D 0; i < ics->nr_irqs; i++) {
+> +        ics->irqs[i].priority =3D 0xff;
+> +        ics->irqs[i].saved_priority =3D 0xff;
+> +        ics->irqs[i].flags =3D flags[i];
 > +    }
-> +
-> +    return 0;
 > +}
 > +
-> +static const VMStateDescription vmstate_ics_base_irq =3D {
-> +    .name =3D "ics/irq",
-> +    .version_id =3D 2,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT32(server, ICSIRQState),
-> +        VMSTATE_UINT8(priority, ICSIRQState),
-> +        VMSTATE_UINT8(saved_priority, ICSIRQState),
-> +        VMSTATE_UINT8(status, ICSIRQState),
-> +        VMSTATE_UINT8(flags, ICSIRQState),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static const VMStateDescription vmstate_ics_base =3D {
-> +    .name =3D "ics",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .pre_save =3D ics_base_dispatch_pre_save,
-> +    .post_load =3D ics_base_dispatch_post_load,
-> +    .fields =3D (VMStateField[]) {
-> +        /* Sanity check */
-> +        VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
-> +
-> +        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
-> +                                             vmstate_ics_base_irq,
-> +                                             ICSIRQState),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static Property ics_base_properties[] =3D {
->      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
->      DEFINE_PROP_END_OF_LIST(),
-> @@ -704,6 +703,7 @@ static void ics_base_class_init(ObjectClass *klass, v=
+>  static void ics_base_realize(DeviceState *dev, Error **errp)
+>  {
+>      ICSState *ics =3D ICS_BASE(dev);
+> @@ -689,6 +703,7 @@ static void ics_base_class_init(ObjectClass *klass, v=
 oid *data)
+> =20
 >      dc->realize =3D ics_base_realize;
 >      dc->props =3D ics_base_properties;
->      dc->reset =3D ics_base_reset;
-> +    dc->vmsd =3D &vmstate_ics_base;
+> +    dc->reset =3D ics_base_reset;
 >  }
 > =20
 >  static const TypeInfo ics_base_info =3D {
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 1f27eb497981..b314eb7d1607 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -324,25 +324,18 @@ static void ics_kvm_set_irq(void *opaque, int srcno=
+, int val)
+>      }
+>  }
+> =20
+> -static void ics_kvm_reset(void *dev)
+> +static void ics_kvm_reset(DeviceState *dev)
+>  {
+> -    ICSState *ics =3D ICS_SIMPLE(dev);
+> -    int i;
+> -    uint8_t flags[ics->nr_irqs];
+> -
+> -    for (i =3D 0; i < ics->nr_irqs; i++) {
+> -        flags[i] =3D ics->irqs[i].flags;
+> -    }
+> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
+> =20
+> -    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
+> +    icsc->parent_reset(dev);
+> =20
+> -    for (i =3D 0; i < ics->nr_irqs; i++) {
+> -        ics->irqs[i].priority =3D 0xff;
+> -        ics->irqs[i].saved_priority =3D 0xff;
+> -        ics->irqs[i].flags =3D flags[i];
+> -    }
+> +    ics_set_kvm_state(ICS_KVM(dev), 1);
+> +}
+> =20
+> -    ics_set_kvm_state(ics, 1);
+> +static void ics_kvm_reset_handler(void *dev)
+> +{
+> +    ics_kvm_reset(dev);
+>  }
+> =20
+>  static void ics_kvm_realize(DeviceState *dev, Error **errp)
+> @@ -358,7 +351,7 @@ static void ics_kvm_realize(DeviceState *dev, Error *=
+*errp)
+>      }
+>      ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_irqs=
+);
+> =20
+> -    qemu_register_reset(ics_kvm_reset, ics);
+> +    qemu_register_reset(ics_kvm_reset_handler, ics);
+>  }
+> =20
+>  static void ics_kvm_class_init(ObjectClass *klass, void *data)
+> @@ -371,6 +364,7 @@ static void ics_kvm_class_init(ObjectClass *klass, vo=
+id *data)
+>       * directly from ics-base and not from ics-simple anymore.
+>       */
+>      dc->realize =3D ics_kvm_realize;
+> +    dc->reset =3D ics_kvm_reset;
+> =20
+>      icsc->pre_save =3D ics_get_kvm_state;
+>      icsc->post_load =3D ics_set_kvm_state;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -197,24 +218,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---KFztAG8eRSV9hGtP
+--UlVJffcvxoiEqYs2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsxpVIACgkQbDjKyiDZ
-s5JvYg/+Kj5+h9+HIvD9frYUhw8/v7nAwJK5EBi64lYBrebt9WGV7bpX3/1Pp++T
-/RalkqM4SQVtpS1VGcDTLgm3oV37R5o0kAyQJprf1wW800+gukViTZmdgocD8/Le
-wPgSlHqaVjHQ6+QZNUuQBfAmG2d4+zaWdIhjL/BHgVbJelSN69IDzG6430XrcA+x
-bObxsHGmW1QRqEwe9mxwOjUkrCbi8zwwDLL6On+uJioya7kW3y6bHxWH4uz4+PVk
-k1jlIH6p2xt2fXnwpOXJszZJM9T/G8NeQzEsjmdwyDTf272YDwQoSXxiHfu70EA+
-bNZNDs5FOTNcz7X+VoJsFg52MK1VIEgPPrM9i4jFqbweROVD5ruaQzdXougKje4v
-5VkzAGr84mmNQVAXzF9EtcYdOLtd+cP6Uw1SEZSVdDr5o5q6Mc9nAGSlvZFq0hEc
-ATClzmbId+f+Ln0uOIrKod7d9VSL0uh9Rr0TjcWF4YCIcAFMG1M79e6ITANYBG9I
-ZzTlKZaYwXMOjLv6vc2EWqWNGmg5YQWn3a7tnBCiq4fAo/ACx1KwVQWi7nNEjKeS
-fRckCBieHU+DM1xDaGZM9zU5RDn3MtuXm51b9z0RrMV0CORrcocOdtq7tlaWDv3N
-qqt7/sUQCHTUD+1oACFkQdIg7Y10GqR8HIM8PFLsD7WYd9oOYNk=
-=mFcu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsxpCoACgkQbDjKyiDZ
+s5I6mA//QpI0L9kxLgUxIrMo01YdYHp5DBv9dMdxj840Z2Pg845OrxQvQcAwI/7Q
+unVjj7FbZuSu+JaOS8ED5CcHnILk5R2CufW7kwHjWDO70iZtqdUfK8nI3gdqkMY1
+BTLRSYrJHAZxb88Jr1X2QL+B2bCLioqADHJpQmEr+QUhpG2/7C8Ciy+doIYj1NZt
+6sSZzpHj8XpWyAYNEpMORz84pFjG9I0H/oDSH2awNny8/HUVyOyvPeJxYDPkVXZD
+hduvYZIGruzWhbYYWDvcst9deoeeC/37oPMXs/xMUvIL48QmB1qzxYUv/LgIQD9W
+epNo8NzpScA+R7hyNW9mpZTp1VDd8D6Lp+h3aKFmFclzvYbi9pBlSMJM/85L5gg2
+9Ohp+ZQEWfsP+0qkb0a411DiX6I81VYd4Y8UaGWAsm4N5KR2pN6xxzQZiPiqSp9O
+ox1cN23T2v9JhIokttAy1nzZeHxH8N9kvAe16y4pKF3lJxp43x9ToEve3YSuxEPI
+7gk4YD4x9iQqkJPLfCVvrISV0Yss4oa+gsxi2t1Fir41OgEpfNV02ScKHH9+lGh/
+L4dX8CdghJ5GdPTy8azEn6wGsj/BlrjRK3DbvlrLAYe/mzyCYgzMDXq9QzpvuiXd
+sLNu5nizLh2HhrQpN3aTSJrBhAiHVy1pSXtz5S4YcTRsRILtQPg=
+=6IEL
 -----END PGP SIGNATURE-----
 
---KFztAG8eRSV9hGtP--
+--UlVJffcvxoiEqYs2--
