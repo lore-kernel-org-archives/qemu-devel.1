@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXryQ-0006cu-1B
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:41:50 -0400
+	(envelope-from <mst@redhat.com>) id 1fXrzY-0007QV-Tb
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXryP-000394-94
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:41:50 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180614142944.10084-1-armbru@redhat.com>
-	<20180626144659.GC3964@dhcp-200-186.str.redhat.com>
-Date: Tue, 26 Jun 2018 19:41:41 +0200
-In-Reply-To: <20180626144659.GC3964@dhcp-200-186.str.redhat.com> (Kevin Wolf's
-	message of "Tue, 26 Jun 2018 16:46:59 +0200")
-Message-ID: <87tvppcune.fsf@dusky.pond.sub.org>
+	(envelope-from <mst@redhat.com>) id 1fXrzU-0003jW-2R
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:43:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33830 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fXrzT-0003jQ-Tb
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:42:55 -0400
+Date: Tue, 26 Jun 2018 20:42:53 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180626204237-mutt-send-email-mst@kernel.org>
+References: <20180623002628-mutt-send-email-mst@kernel.org>
+	<CADGSJ20td7b6He6S1PBSJjCq=bNvgqMGbOjiho2eeQm2pgpK3g@mail.gmail.com>
+	<20180623012406-mutt-send-email-mst@kernel.org>
+	<CADGSJ211pWKYnuuzcgUqJZiHU+=7H3oQSpp1TnE=+EBjkdmCSQ@mail.gmail.com>
+	<CADGSJ22DX8=rNPY+gNS_q=LCYLR5ieoE7oD8p4+8AnpzQsWSCg@mail.gmail.com>
+	<da144f8f-65cd-45d9-3c81-6c8ca1fb25fe@intel.com>
+	<20180626044650-mutt-send-email-mst@kernel.org>
+	<20180626171732.5038f53f.cohuck@redhat.com>
+	<20180626183706-mutt-send-email-mst@kernel.org>
+	<20180626180316.3723422f.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] block/crypto: Simplify block_crypto_{open,
- create}_opts_init()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180626180316.3723422f.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,21 +36,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Siwei Liu <loseweigh@gmail.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Tue, Jun 26, 2018 at 06:03:16PM +0200, Cornelia Huck wrote:
+> Ok, that makes me conclude that we definitely need to involve the
+> libvirt folks before we proceed further with defining QEMU interfaces.
 
-> Am 14.06.2018 um 16:29 hat Markus Armbruster geschrieben:
->> block_crypto_open_opts_init() and block_crypto_create_opts_init()
->> contain a virtual visit of QCryptoBlockOptions and
->> QCryptoBlockCreateOptions less member "format", respectively.
->> 
->> Change their callers to put member "format" in the QDict, so they can
->> use the generated visitors for these types instead.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> This doesn't seem to apply cleanly any more. Can you rebase?
+That's always a wise thing to do.
 
-v2 sent.
+-- 
+MST
