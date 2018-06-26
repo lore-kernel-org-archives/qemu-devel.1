@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXqgq-0000xh-TC
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqgs-0000zd-KY
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXqgo-0005vM-25
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:36 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:32893)
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqgm-0005ud-Ks
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:38 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:46409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fXqgn-0005v2-TK
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:34 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id e11-v6so7849502pgq.0
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:19:33 -0700 (PDT)
+	id 1fXqgm-0005uA-Ce
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:32 -0400
+Received: by mail-pl0-x244.google.com with SMTP id 30-v6so8763634pld.13
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:19:32 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 09:19:14 -0700
-Message-Id: <20180626161921.27941-7-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 09:19:13 -0700
+Message-Id: <20180626161921.27941-6-richard.henderson@linaro.org>
 In-Reply-To: <20180626161921.27941-1-richard.henderson@linaro.org>
 References: <20180626161921.27941-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 06/13] target/ppc: Tidy gen_conditional_store
+Subject: [Qemu-devel] [PATCH 05/13] target/ppc: Remove POWERPC_EXCP_STCX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +29,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Leave only the minimal amount of code within the STCX macro,
-moving the rest of the code into gen_conditional_store.
-Remove the explicit call to gen_check_align; the matching LDAX will
-have already checked alignment, and we verify the same address.
+Always use the gen_conditional_store implementation that uses
+atomic_cmpxchg.  Make sure and clear reserve_addr across most
+interrupts crossing the cpu_loop.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/translate.c | 28 +++++++++++-----------------
- 1 file changed, 11 insertions(+), 17 deletions(-)
+ target/ppc/cpu.h          |   5 --
+ linux-user/ppc/cpu_loop.c | 123 +++++++-------------------------------
+ target/ppc/translate.c    |  14 -----
+ 3 files changed, 23 insertions(+), 119 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 973cf44cda..4edcf62cf7 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -196,7 +196,6 @@ enum {
+     /* QEMU exceptions: special cases we want to stop translation            */
+     POWERPC_EXCP_SYNC         = 0x202, /* context synchronizing instruction  */
+     POWERPC_EXCP_SYSCALL_USER = 0x203, /* System call in user mode only      */
+-    POWERPC_EXCP_STCX         = 0x204 /* Conditional stores in user mode     */
+ };
+ 
+ /* Exceptions error codes                                                    */
+@@ -994,10 +993,6 @@ struct CPUPPCState {
+     /* Reservation value */
+     target_ulong reserve_val;
+     target_ulong reserve_val2;
+-    /* Reservation store address */
+-    target_ulong reserve_ea;
+-    /* Reserved store source register and size */
+-    target_ulong reserve_info;
+ 
+     /* Those ones are used in supervisor mode only */
+     /* machine state register */
+diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
+index 2fb516cb00..133a87f349 100644
+--- a/linux-user/ppc/cpu_loop.c
++++ b/linux-user/ppc/cpu_loop.c
+@@ -65,99 +65,23 @@ int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val)
+     return -1;
+ }
+ 
+-static int do_store_exclusive(CPUPPCState *env)
+-{
+-    target_ulong addr;
+-    target_ulong page_addr;
+-    target_ulong val, val2 __attribute__((unused)) = 0;
+-    int flags;
+-    int segv = 0;
+-
+-    addr = env->reserve_ea;
+-    page_addr = addr & TARGET_PAGE_MASK;
+-    start_exclusive();
+-    mmap_lock();
+-    flags = page_get_flags(page_addr);
+-    if ((flags & PAGE_READ) == 0) {
+-        segv = 1;
+-    } else {
+-        int reg = env->reserve_info & 0x1f;
+-        int size = env->reserve_info >> 5;
+-        int stored = 0;
+-
+-        if (addr == env->reserve_addr) {
+-            switch (size) {
+-            case 1: segv = get_user_u8(val, addr); break;
+-            case 2: segv = get_user_u16(val, addr); break;
+-            case 4: segv = get_user_u32(val, addr); break;
+-#if defined(TARGET_PPC64)
+-            case 8: segv = get_user_u64(val, addr); break;
+-            case 16: {
+-                segv = get_user_u64(val, addr);
+-                if (!segv) {
+-                    segv = get_user_u64(val2, addr + 8);
+-                }
+-                break;
+-            }
+-#endif
+-            default: abort();
+-            }
+-            if (!segv && val == env->reserve_val) {
+-                val = env->gpr[reg];
+-                switch (size) {
+-                case 1: segv = put_user_u8(val, addr); break;
+-                case 2: segv = put_user_u16(val, addr); break;
+-                case 4: segv = put_user_u32(val, addr); break;
+-#if defined(TARGET_PPC64)
+-                case 8: segv = put_user_u64(val, addr); break;
+-                case 16: {
+-                    if (val2 == env->reserve_val2) {
+-                        if (msr_le) {
+-                            val2 = val;
+-                            val = env->gpr[reg+1];
+-                        } else {
+-                            val2 = env->gpr[reg+1];
+-                        }
+-                        segv = put_user_u64(val, addr);
+-                        if (!segv) {
+-                            segv = put_user_u64(val2, addr + 8);
+-                        }
+-                    }
+-                    break;
+-                }
+-#endif
+-                default: abort();
+-                }
+-                if (!segv) {
+-                    stored = 1;
+-                }
+-            }
+-        }
+-        env->crf[0] = (stored << 1) | xer_so;
+-        env->reserve_addr = (target_ulong)-1;
+-    }
+-    if (!segv) {
+-        env->nip += 4;
+-    }
+-    mmap_unlock();
+-    end_exclusive();
+-    return segv;
+-}
+-
+ void cpu_loop(CPUPPCState *env)
+ {
+     CPUState *cs = CPU(ppc_env_get_cpu(env));
+     target_siginfo_t info;
+-    int trapnr;
++    int trapnr, sig;
+     target_ulong ret;
+ 
+     for(;;) {
++        bool arch_interrupt;
++
+         cpu_exec_start(cs);
+         trapnr = cpu_exec(cs);
+         cpu_exec_end(cs);
+         process_queued_cpu_work(cs);
+ 
+-        switch(trapnr) {
++        arch_interrupt = true;
++        switch (trapnr) {
+         case POWERPC_EXCP_NONE:
+             /* Just go on */
+             break;
+@@ -524,26 +448,15 @@ void cpu_loop(CPUPPCState *env)
+             }
+             env->gpr[3] = ret;
+             break;
+-        case POWERPC_EXCP_STCX:
+-            if (do_store_exclusive(env)) {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SEGV_MAPERR;
+-                info._sifields._sigfault._addr = env->nip;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            }
+-            break;
+         case EXCP_DEBUG:
+-            {
+-                int sig;
+-
+-                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+-                if (sig) {
+-                    info.si_signo = sig;
+-                    info.si_errno = 0;
+-                    info.si_code = TARGET_TRAP_BRKPT;
+-                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                  }
++            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
++            if (sig) {
++                info.si_signo = sig;
++                info.si_errno = 0;
++                info.si_code = TARGET_TRAP_BRKPT;
++                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            } else {
++                arch_interrupt = false;
+             }
+             break;
+         case EXCP_INTERRUPT:
+@@ -551,12 +464,22 @@ void cpu_loop(CPUPPCState *env)
+             break;
+         case EXCP_ATOMIC:
+             cpu_exec_step_atomic(cs);
++            arch_interrupt = false;
+             break;
+         default:
+             cpu_abort(cs, "Unknown exception 0x%x. Aborting\n", trapnr);
+             break;
+         }
+         process_pending_signals(env);
++
++        /* Most of the traps imply a transition through kernel mode,
++         * which implies an REI instruction has been executed.  Which
++         * means that RX and LOCK_ADDR should be cleared.  But there
++         * are a few exceptions for traps internal to QEMU.
++         */
++        if (arch_interrupt) {
++            env->reserve_addr = -1;
++        }
+     }
+ }
+ 
 diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 03e8c5df03..e751072404 100644
+index c7b9d226eb..03e8c5df03 100644
 --- a/target/ppc/translate.c
 +++ b/target/ppc/translate.c
-@@ -3201,14 +3201,17 @@ ST_ATOMIC(stwat, DEF_MEMOP(MO_UL), i32, trunc_tl_i32)
+@@ -3201,19 +3201,6 @@ ST_ATOMIC(stwat, DEF_MEMOP(MO_UL), i32, trunc_tl_i32)
  ST_ATOMIC(stdat, DEF_MEMOP(MO_Q), i64, mov_i64)
  #endif
  
+-#if defined(CONFIG_USER_ONLY)
 -static void gen_conditional_store(DisasContext *ctx, TCGv EA,
 -                                  int reg, int memop)
-+static void gen_conditional_store(DisasContext *ctx, TCGMemOp memop)
+-{
+-    TCGv t0 = tcg_temp_new();
+-
+-    tcg_gen_st_tl(EA, cpu_env, offsetof(CPUPPCState, reserve_ea));
+-    tcg_gen_movi_tl(t0, (MEMOP_GET_SIZE(memop) << 5) | reg);
+-    tcg_gen_st_tl(t0, cpu_env, offsetof(CPUPPCState, reserve_info));
+-    tcg_temp_free(t0);
+-    gen_exception_err(ctx, POWERPC_EXCP_STCX, 0);
+-}
+-#else
+ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+                                   int reg, int memop)
  {
-     TCGLabel *l1 = gen_new_label();
-     TCGLabel *l2 = gen_new_label();
--    TCGv t0;
-+    TCGv t0 = tcg_temp_new();
-+    int reg = rS(ctx->opcode);
- 
--    tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
-+    gen_set_access_type(ctx, ACCESS_RES);
-+    gen_addr_reg_index(ctx, t0);
-+    tcg_gen_brcond_tl(TCG_COND_NE, t0, cpu_reserve, l1);
-+    tcg_temp_free(t0);
- 
-     t0 = tcg_temp_new();
-     tcg_gen_atomic_cmpxchg_tl(t0, cpu_reserve, cpu_reserve_val,
-@@ -3232,19 +3235,10 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+@@ -3244,7 +3231,6 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+     gen_set_label(l2);
      tcg_gen_movi_tl(cpu_reserve, -1);
  }
+-#endif
  
--#define STCX(name, memop)                                   \
--static void gen_##name(DisasContext *ctx)                   \
--{                                                           \
--    TCGv t0;                                                \
--    int len = MEMOP_GET_SIZE(memop);                        \
--    gen_set_access_type(ctx, ACCESS_RES);                   \
--    t0 = tcg_temp_local_new();                              \
--    gen_addr_reg_index(ctx, t0);                            \
--    if (len > 1) {                                          \
--        gen_check_align(ctx, t0, (len) - 1);                \
--    }                                                       \
--    gen_conditional_store(ctx, t0, rS(ctx->opcode), memop); \
--    tcg_temp_free(t0);                                      \
-+#define STCX(name, memop)                  \
-+static void gen_##name(DisasContext *ctx)  \
-+{                                          \
-+    gen_conditional_store(ctx, memop);     \
- }
- 
- STCX(stbcx_, DEF_MEMOP(MO_UB))
+ #define STCX(name, memop)                                   \
+ static void gen_##name(DisasContext *ctx)                   \
 -- 
 2.17.1
