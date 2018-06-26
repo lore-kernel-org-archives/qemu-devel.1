@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXjS3-0002Se-CF
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:35:54 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXjWG-0003ue-Kk
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:40:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXjS2-000631-7l
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:35:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180625164239.13794-1-kwolf@redhat.com>
-Date: Tue, 26 Jun 2018 10:35:38 +0200
-In-Reply-To: <20180625164239.13794-1-kwolf@redhat.com> (Kevin Wolf's message
-	of "Mon, 25 Jun 2018 18:42:39 +0200")
-Message-ID: <87h8lqkkrp.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1fXjWF-00009F-Oy
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:40:12 -0400
+Date: Tue, 26 Jun 2018 10:40:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180626104001.617d4ea9.cohuck@redhat.com>
+In-Reply-To: <1529056145-6404-1-git-send-email-thuth@redhat.com>
+References: <1529056145-6404-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] usb-storage: Add rerror/werror properties
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] loader: Check access size when calling
+ rom_ptr() to avoid crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Fri, 15 Jun 2018 11:49:05 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> The error handling policy was traditionally set with -drive, but with
-> -blockdev it is no longer possible to set frontend options. scsi-disk
-> (and other block devices) have long supported qdev properties to
-> configure the error handling policy, so let's add these options to
-> usb-storage as well and just forward them to the internal scsi-disk
-> instance.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> The rom_ptr() function allows direct access to the ROM blobs that we
+> load during startup. However, there are currently no checks for the
+> size of the accesses, so it's currently possible to crash QEMU for
+> example with:
+> 
+> $ echo "Insane in the mainframe" > /tmp/test.txt
+> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
+> Segmentation fault (core dumped)
+> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
+> Segmentation fault (core dumped)
+> $ echo -n HdrS > /tmp/hdr.txt
+> $ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/hdr.txt -initrd /tmp/hdr.txt
+> Segmentation fault (core dumped)
+> 
+> We need a possibility to check the size of the ROM area that we want
+> to access, thus let's add a size parameter to the rom_ptr() function
+> to avoid these problems.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Let's see whether I remember / figure out how this stuff works.
+Grmpf, this conflicts with "s390/ipl: fix ipl with -no-reboot" in
+s390-next... do you want to rebase it?
 
-Not all devices support error handling policy, but scsi-disk does.
-
-The preferred way to configure error handling policy is with qdev
-properties rerror, werror.  blkconf_apply_backend_options() propagates
-them to the associated BlockBackend.
-
-The outmoded way is with -drive parameters rerror, werror.
-blockdev_init() propagates them to the BlockBackend.
-
-If you use both ways, qdev properties win.
-
-usb-storage is a hack: it tries to look like a block device, but it's
-really a SCSI controller that can serve only a single scsi-disk device,
-which it creates automatically.
-
-We want to deprecate -drive.  We also want to deprecate usb-storage, but
-I guess we're still not ready for that (it's a complicated story).
-
-To deprecate -drive without also deprecating usb-storage, we need to
-preserve features.
-
-The outmoded way works with usb-storage: the automatically created
-scsi-disk is associated with the BlockBackend that got its error
-handling policy from -drive.
-
-The preferred way doesn't, because usb-storage lacks the qdev
-properties.  This patch adds them.
-
-Kind of sad, but it's either that or deprecating usb-storage.
-
-Patch looks good to me, thus
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Feel free to work whatever parts of my ramblings you find useful into
-your commit message.
+> ---
+>  v3: Fix the check in find_rom()
+> 
+>  hw/core/loader.c     | 10 +++++-----
+>  hw/mips/mips_malta.c |  6 ++++--
+>  hw/s390x/ipl.c       | 13 ++++++++++---
+>  hw/sparc/sun4m.c     |  4 ++--
+>  hw/sparc64/sun4u.c   |  4 ++--
+>  include/hw/loader.h  |  2 +-
+>  target/arm/cpu.c     |  2 +-
+>  7 files changed, 25 insertions(+), 16 deletions(-)
