@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fXqfB-0008N1-PI
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:17:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqfI-0008TT-Mr
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:18:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fXqf8-0005HY-K4
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:17:53 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:52038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXqf8-0005Gv-Dr
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:17:50 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.122.112])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id CD17313C173
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 18:17:48 +0200 (CEST)
-Date: Tue, 26 Jun 2018 18:17:42 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180626181742.248b129f@bahia.lan>
-In-Reply-To: <20180626142214.27801-1-clg@kaod.org>
-References: <20180626142214.27801-1-clg@kaod.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqfF-0005Jm-Hg
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:18:00 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36025)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fXqfF-0005Ja-B4
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:17:57 -0400
+Received: by mail-pg0-x241.google.com with SMTP id m5-v6so7843216pgd.3
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:17:57 -0700 (PDT)
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-34-richard.henderson@linaro.org>
+	<CAFEAcA_-39brD_S6SiDfaQRO16bE1pw79JDywnPfzybbPc_hCg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d778b758-6041-aa19-ed48-09749ba572fc@linaro.org>
+Date: Tue, 26 Jun 2018 09:17:52 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc/pnv: fix pnv_core_realize()
- error handling
+In-Reply-To: <CAFEAcA_-39brD_S6SiDfaQRO16bE1pw79JDywnPfzybbPc_hCg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 33/35] target/arm: Implement SVE dot
+ product (indexed)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +33,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 26 Jun 2018 16:22:14 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 06/26/2018 08:30 AM, Peter Maydell wrote:
+> On 21 June 2018 at 02:53, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/helper.h        |  5 ++
+>>  target/arm/translate-sve.c | 18 +++++++
+>>  target/arm/vec_helper.c    | 96 ++++++++++++++++++++++++++++++++++++++
+>>  target/arm/sve.decode      |  8 +++-
+>>  4 files changed, 126 insertions(+), 1 deletion(-)
+>>
+> 
+>> +void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
+>> +{
+>> +    intptr_t i, j, opr_sz = simd_oprsz(desc), opr_sz_4 = opr_sz / 4;
+>> +    intptr_t index = simd_data(desc);
+>> +    uint32_t *d = vd;
+>> +    int8_t *n = vn, *m = vm;
+>> +
+>> +    for (i = 0; i < opr_sz_4; i = j) {
+>> +        int8_t m0 = m[(i + index) * 4 + 0];
+>> +        int8_t m1 = m[(i + index) * 4 + 1];
+>> +        int8_t m2 = m[(i + index) * 4 + 2];
+>> +        int8_t m3 = m[(i + index) * 4 + 3];
+>> +
+>> +        j = i;
+>> +        do {
+>> +            d[j] += n[j * 4 + 0] * m0
+>> +                  + n[j * 4 + 1] * m1
+>> +                  + n[j * 4 + 2] * m2
+>> +                  + n[j * 4 + 3] * m3;
+>> +        } while (++j < MIN(i + 4, opr_sz_4));
+>> +    }
+>> +    clear_tail(d, opr_sz, simd_maxsz(desc));
+>> +}
+> 
+> Maybe I'm just half asleep this afternoon, but this is pretty
+> confusing -- nested loops where the outer loop's increment
+> uses the inner loop's index, and the inner loop's conditions
+> depend on the outer loop index...
 
-> commit d35aefa9ae15 ("ppc/pnv: introduce a new intc_create() operation
-> to the chip model") changed the object link in the pnv_core_realize()
-> routine but a return was forgotten in case of error, which can lead to
-> more problems afterwards (segv)
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+Yeah, well.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+There is an edge case of aa64 advsimd, reusing this same helper,
 
->  hw/ppc/pnv_core.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index a9f129fc2c5f..9750464bf4a1 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -150,6 +150,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
->      if (!chip) {
->          error_propagate(errp, local_err);
->          error_prepend(errp, "required link 'chip' not found: ");
-> +        return;
->      }
-> =20
->      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+	sdot	v0.2s, v1.8b, v0.4b[0]
+
+where m values must be read (and held) before writing d results,
+and there are not 16/4=4 elements to process but only 2.
+
+I suppose I could special-case oprsz == 8 in order to simplify
+iteration of what is otherwise a multiple of 16.
+
+I thought iterating J from I to I+4 was easier to read than
+writing out I+J everywhere.  Perhaps not.
+
+
+>> -DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5
+>> +DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5      ra=%reg_movprfx
+> 
+> Should this have been in the previous patch ?
+
+Yes, thanks.
+
+
+r~
