@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1fXwLb-0005D7-2E
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:22:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fXwM7-0005Qx-32
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1fXwLX-0007Mz-UP
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:22:03 -0400
-Message-ID: <d9b29eaa9f4fb261bf74777a07f4a54b3b456eb3.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Wed, 27 Jun 2018 08:21:30 +1000
-In-Reply-To: <7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
-References: <20180626135928.23950-1-clg@kaod.org>
-	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+	(envelope-from <jsnow@redhat.com>) id 1fXwM6-0007ou-8k
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:22:35 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Tue, 26 Jun 2018 18:22:25 -0400
+Message-Id: <20180626222226.27620-2-jsnow@redhat.com>
+In-Reply-To: <20180626222226.27620-1-jsnow@redhat.com>
+References: <20180626222226.27620-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 1/2] block: allow blockdev-backup from any
+ source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +20,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, 2018-06-26 at 17:57 +0200, Andrea Bolognani wrote:
-> On Tue, 2018-06-26 at 15:59 +0200, C=C3=A9dric Le Goater wrote:
-> > This is a model of the PCIe host bridge found on Power8 chips,
-> > including PowerBus logic interface, IOMMU support, PCIe root complex,
-> > XICS MSI and LSI interrupt sources.
-> >=20
-> > 4 PHBs are provisioned under the Power8 chip model to fit hardware bu=
-t
-> > only one is currently initialized.
->=20
-> What's the advantage in creating 4 PHBs instead of a single one,
-> like we already do for pSeries guests? As it is, this will confuse
-> the heck out of libvirt's PCI address allocation algorithm :)
+In the case of image fleecing, the node we choose as the source
+for a blockdev-backup is going to be both a root node AND the
+backing node for the exported image. It does not qualify as a root
+image in this case.
 
-This matches the actual HW. POWER9 will have 6 per chip :-)
+Loosen the restriction.
 
-The goal of the "powernv" platform in qemu is to closely match the
-actual HW.
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Note that pseries guests can (and will under some cirscumstances) have
-multiple PHBs as well.
-
-Cheers,
-Ben.
+diff --git a/blockdev.c b/blockdev.c
+index 58d7570932..526f8b60be 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3517,7 +3517,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+         backup->compress = false;
+     }
+ 
+-    bs = qmp_get_root_bs(backup->device, errp);
++    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
+         return NULL;
+     }
+-- 
+2.14.4
