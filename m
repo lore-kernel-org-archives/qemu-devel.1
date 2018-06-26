@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fXkTl-00031O-Cz
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:41:42 -0400
+	(envelope-from <david@redhat.com>) id 1fXkgK-0007yh-0S
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fXkTg-0001fo-B8
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:41:41 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fXkTg-0001fV-2j
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:41:36 -0400
-Received: by mail-wr0-x241.google.com with SMTP id g18-v6so16517748wro.7
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 02:41:35 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180621015359.12018-1-richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 10:41:33 +0100
-Message-ID: <87po0dx4tu.fsf@linaro.org>
+	(envelope-from <david@redhat.com>) id 1fXkgG-0007R2-4N
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:54:40 -0400
+References: <20180625115352.6889-1-david@redhat.com>
+	<20180625115352.6889-3-david@redhat.com>
+	<20180625175029.69643252.cohuck@redhat.com>
+	<1dd2ef76-311a-64f0-4c2c-2f80738ff8a7@redhat.com>
+	<20180625180341.5a5b9fb7.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <314001d8-64ea-f78e-e462-11bd5a18c730@redhat.com>
+Date: Tue, 26 Jun 2018 11:54:32 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180625180341.5a5b9fb7.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/arm SVE patches
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 2/9] s390x/kvm: pass values
+ instead of pointers to kvm_s390_set_clock_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
+On 25.06.2018 18:03, Cornelia Huck wrote:
+> On Mon, 25 Jun 2018 17:54:42 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 25.06.2018 17:50, Cornelia Huck wrote:
+>>> On Mon, 25 Jun 2018 13:53:45 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> We are going to factor out the TOD into a separate device and use const
+>>>> pointers for device class functions where possible. We are passing right
+>>>> now ordinary pointers that should never be touched when setting the TOD.
+>>>> Let's just pass the values directly.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  target/s390x/cpu.c       |  4 ++--
+>>>>  target/s390x/kvm-stub.c  |  4 ++--
+>>>>  target/s390x/kvm.c       | 12 ++++++------
+>>>>  target/s390x/kvm_s390x.h |  4 ++--
+>>>>  4 files changed, 12 insertions(+), 12 deletions(-)
+>>>>
+>>>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>>>> index c268065887..68512e3e54 100644
+>>>> --- a/target/s390x/cpu.c
+>>>> +++ b/target/s390x/cpu.c
+>>>> @@ -413,9 +413,9 @@ int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low)  
+>>>
+>>> Any reason why you keep the pointers here?
+>>>   
+>>>>      int r = 0;
+>>>>  
+>>>>      if (kvm_enabled()) {
+>>>> -        r = kvm_s390_set_clock_ext(tod_high, tod_low);
+>>>> +        r = kvm_s390_set_clock_ext(*tod_high, *tod_low);
+>>>>          if (r == -ENXIO) {
+>>>> -            return kvm_s390_set_clock(tod_high, tod_low);
+>>>> +            return kvm_s390_set_clock(*tod_high, *tod_low);  
+>>>
+>>> Especially as it would be more clean to check for !NULL before
+>>> dereferencing...  
+>>
+>> See the next patch :)
+>>
+>> (I assume that refactoring code in order to rip it out does not make sense)
+> 
+> Add a comment in the commit message?
+> 
+> "Note that s390_set_clock() will be removed in a follow-on patch and
+> therefore its calling convention is not changed."
+> 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Sure I can do that. Thanks!
 
-> This is the remainder of the SVE enablement patches,
-> with an extra bonus patch to enable ARMv8.2-DotProd.
+-- 
 
-Have a:
+Thanks,
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Passes the whole sve-all-short test set with this series applied.
-
->
->
-> r~
->
->
-> Richard Henderson (35):
->   target/arm: Implement SVE Memory Contiguous Load Group
->   target/arm: Implement SVE Contiguous Load, first-fault and no-fault
->   target/arm: Implement SVE Memory Contiguous Store Group
->   target/arm: Implement SVE load and broadcast quadword
->   target/arm: Implement SVE integer convert to floating-point
->   target/arm: Implement SVE floating-point arithmetic (predicated)
->   target/arm: Implement SVE FP Multiply-Add Group
->   target/arm: Implement SVE Floating Point Accumulating Reduction Group
->   target/arm: Implement SVE load and broadcast element
->   target/arm: Implement SVE store vector/predicate register
->   target/arm: Implement SVE scatter stores
->   target/arm: Implement SVE prefetches
->   target/arm: Implement SVE gather loads
->   target/arm: Implement SVE first-fault gather loads
->   target/arm: Implement SVE scatter store vector immediate
->   target/arm: Implement SVE floating-point compare vectors
->   target/arm: Implement SVE floating-point arithmetic with immediate
->   target/arm: Implement SVE Floating Point Multiply Indexed Group
->   target/arm: Implement SVE FP Fast Reduction Group
->   target/arm: Implement SVE Floating Point Unary Operations-Unpredicated =
-Group
->   target/arm: Implement SVE FP Compare with Zero Group
->   target/arm: Implement SVE floating-point trig multiply-add coefficient
->   target/arm: Implement SVE floating-point convert precision
->   target/arm: Implement SVE floating-point convert to integer
->   target/arm: Implement SVE floating-point round to integral value
->   target/arm: Implement SVE floating-point unary operations
->   target/arm: Implement SVE MOVPRFX
->   target/arm: Implement SVE floating-point complex add
->   target/arm: Implement SVE fp complex multiply add
->   target/arm: Pass index to AdvSIMD FCMLA (indexed)
->   target/arm: Implement SVE fp complex multiply add (indexed)
->   target/arm: Implement SVE dot product (vectors)
->   target/arm: Implement SVE dot product (indexed)
->   target/arm: Enable SVE for aarch64-linux-user
->   target/arm: Implement ARMv8.2-DotProd
->
->  target/arm/cpu.h           |    1 +
->  target/arm/helper-sve.h    |  682 ++++++++++++++
->  target/arm/helper.h        |   44 +-
->  linux-user/elfload.c       |    1 +
->  target/arm/cpu.c           |    8 +
->  target/arm/cpu64.c         |    2 +
->  target/arm/helper.c        |    2 +-
->  target/arm/sve_helper.c    | 1827 ++++++++++++++++++++++++++++++++++++
->  target/arm/translate-a64.c |   57 +-
->  target/arm/translate-sve.c | 1691 ++++++++++++++++++++++++++++++++-
->  target/arm/translate.c     |   81 +-
->  target/arm/vec_helper.c    |  283 +++++-
->  target/arm/sve.decode      |  422 +++++++++
->  13 files changed, 5039 insertions(+), 62 deletions(-)
-
-
---
-Alex Benn=C3=A9e
+David / dhildenb
