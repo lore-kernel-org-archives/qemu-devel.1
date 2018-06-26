@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXpZu-0002Yo-ID
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:08:23 -0400
+	(envelope-from <sameeh@daynix.com>) id 1fXpcK-0003lP-71
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXpZq-00075y-Ou
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:08:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fXpZq-00075m-KN
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:08:18 -0400
-Date: Tue, 26 Jun 2018 17:08:13 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180626170813.4db094a1.cohuck@redhat.com>
-In-Reply-To: <CADGSJ21HNd4VYNcCt4H0gJ_CCx1GUFpHrDof2N=4WqhD24Zc2A@mail.gmail.com>
-References: <20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<20180621211712-mutt-send-email-mst@kernel.org>
-	<20180622170955.298900c1.cohuck@redhat.com>
-	<20180622214259-mutt-send-email-mst@kernel.org>
-	<CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
-	<20180623003022-mutt-send-email-mst@kernel.org>
-	<CADGSJ22oFhP955cuTmMWeSt0UOsG5K1A--c34QUSMx5z3Up2SA@mail.gmail.com>
-	<20180623012934-mutt-send-email-mst@kernel.org>
-	<CADGSJ21HNd4VYNcCt4H0gJ_CCx1GUFpHrDof2N=4WqhD24Zc2A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+	(envelope-from <sameeh@daynix.com>) id 1fXpcI-00089h-0N
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:10:52 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34899)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fXpcH-00089U-Pg
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:10:49 -0400
+Received: by mail-wm0-x242.google.com with SMTP id z137-v6so2266299wmc.0
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 08:10:49 -0700 (PDT)
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 26 Jun 2018 18:10:37 +0300
+Message-Id: <20180626151038.24771-2-sameeh@daynix.com>
+In-Reply-To: <20180626151038.24771-1-sameeh@daynix.com>
+References: <20180626151038.24771-1-sameeh@daynix.com>
+Subject: [Qemu-devel] [PATCH 1/2] qga-win: prevent crash when executing
+ fsinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,22 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Siwei Liu <loseweigh@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: qemu-devel@nongnu.org
+Cc: Yan Vugenfirer <yan@daynix.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, 22 Jun 2018 17:05:04 -0700
-Siwei Liu <loseweigh@gmail.com> wrote:
+From: Sameeh Jubran <sjubran@redhat.com>
 
-> On Fri, Jun 22, 2018 at 3:33 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > I suspect the diveregence will be lost on most users though
-> > simply because they don't even care about vfio. They just
-> > want things to go fast.  
-> 
-> Like Jason said, VF isn't faster than virtio-net in all cases. It
-> depends on the workload and performance metrics: throughput, latency,
-> or packet per second.
+The fsinfo command is currently implemented for Windows only and it's disk
+parameter can be enabled by adding the define "CONFIG_QGA_NTDDSCSI" to the qga
+code. When enabled and executed the qemu-ga crashed with the following message:
 
-So, will it be guest/admin-controllable then where the traffic flows
-through? Just because we do have a vf available after negotiation of
-the feature bit, it does not necessarily mean we want to use it? Do we
-(the guest) even want to make it visible in that case?
+------------------------------------------------
+File qapi/qapi-visit-core.c, Line 49
+
+Expression: !(v->type & VISITOR_OUTPUT) || *obj)
+------------------------------------------------
+
+After some digging, turns out that the GuestPCIAddress is null and the
+qapi visitor doesn't like that, so we can always allocate it instead and
+initiate all it's members to -1.
+
+Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+---
+ qga/commands-win32.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 2d48394748..c5f1c884e1 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -485,6 +485,11 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+     char *buffer = NULL;
+     GuestPCIAddress *pci = NULL;
+     char *name = g_strdup(&guid[4]);
++    pci = g_malloc0(sizeof(*pci));
++    pci->domain = -1;
++    pci->slot = -1;
++    pci->function = -1;
++    pci->bus = -1;
+ 
+     if (!QueryDosDevice(name, dev_name, ARRAY_SIZE(dev_name))) {
+         error_setg_win32(errp, GetLastError(), "failed to get dos device name");
+@@ -556,7 +561,6 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+ 
+         func = addr & 0x0000FFFF;
+         dev = (addr >> 16) & 0x0000FFFF;
+-        pci = g_malloc0(sizeof(*pci));
+         pci->domain = dev;
+         pci->slot = slot;
+         pci->function = func;
+-- 
+2.13.6
