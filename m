@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXqok-0007cy-4f
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXqrJ-0001ZR-Iq
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:30:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXqof-0000Q7-EQ
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59512 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXqof-0000Px-9k
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2FCF7A7E8
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:27:40 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 26 Jun 2018 18:27:35 +0200
-Message-Id: <20180626162736.9749-3-kraxel@redhat.com>
-In-Reply-To: <20180626162736.9749-1-kraxel@redhat.com>
-References: <20180626162736.9749-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] ramfb: fix overflow
+	(envelope-from <peter.maydell@linaro.org>) id 1fXqrI-0001ZS-80
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:30:25 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:38448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXqrH-0001ZF-RM
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:30:24 -0400
+Received: by mail-ot0-x242.google.com with SMTP id w22-v6so531536otk.5
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:30:23 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <d778b758-6041-aa19-ed48-09749ba572fc@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-34-richard.henderson@linaro.org>
+	<CAFEAcA_-39brD_S6SiDfaQRO16bE1pw79JDywnPfzybbPc_hCg@mail.gmail.com>
+	<d778b758-6041-aa19-ed48-09749ba572fc@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:30:02 +0100
+Message-ID: <CAFEAcA-BV4pE5SG1ggrHJHNngC5YJe14oJaHS-o3n4pALkMjFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 33/35] target/arm: Implement SVE dot
+ product (indexed)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-> CID 1393621:    (OVERFLOW_BEFORE_WIDEN)
-> Potentially overflowing expression "stride * s->height" with type "unsigned
-> int" (32 bits, unsigned) is evaluated using +32-bit arithmetic, and then used
-> in a context that expects an expression of type "hwaddr" (64 bits, unsigned).
+On 26 June 2018 at 17:17, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 06/26/2018 08:30 AM, Peter Maydell wrote:
+>> On 21 June 2018 at 02:53, Richard Henderson
+>> <richard.henderson@linaro.org> wrote:
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  target/arm/helper.h        |  5 ++
+>>>  target/arm/translate-sve.c | 18 +++++++
+>>>  target/arm/vec_helper.c    | 96 ++++++++++++++++++++++++++++++++++++++
+>>>  target/arm/sve.decode      |  8 +++-
+>>>  4 files changed, 126 insertions(+), 1 deletion(-)
+>>>
+>>
+>>> +void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
+>>> +{
+>>> +    intptr_t i, j, opr_sz = simd_oprsz(desc), opr_sz_4 = opr_sz / 4;
+>>> +    intptr_t index = simd_data(desc);
+>>> +    uint32_t *d = vd;
+>>> +    int8_t *n = vn, *m = vm;
+>>> +
+>>> +    for (i = 0; i < opr_sz_4; i = j) {
+>>> +        int8_t m0 = m[(i + index) * 4 + 0];
+>>> +        int8_t m1 = m[(i + index) * 4 + 1];
+>>> +        int8_t m2 = m[(i + index) * 4 + 2];
+>>> +        int8_t m3 = m[(i + index) * 4 + 3];
+>>> +
+>>> +        j = i;
+>>> +        do {
+>>> +            d[j] += n[j * 4 + 0] * m0
+>>> +                  + n[j * 4 + 1] * m1
+>>> +                  + n[j * 4 + 2] * m2
+>>> +                  + n[j * 4 + 3] * m3;
+>>> +        } while (++j < MIN(i + 4, opr_sz_4));
+>>> +    }
+>>> +    clear_tail(d, opr_sz, simd_maxsz(desc));
+>>> +}
+>>
+>> Maybe I'm just half asleep this afternoon, but this is pretty
+>> confusing -- nested loops where the outer loop's increment
+>> uses the inner loop's index, and the inner loop's conditions
+>> depend on the outer loop index...
+>
+> Yeah, well.
+>
+> There is an edge case of aa64 advsimd, reusing this same helper,
+>
+>         sdot    v0.2s, v1.8b, v0.4b[0]
+>
+> where m values must be read (and held) before writing d results,
+> and there are not 16/4=4 elements to process but only 2.
+>
+> I suppose I could special-case oprsz == 8 in order to simplify
+> iteration of what is otherwise a multiple of 16.
+>
+> I thought iterating J from I to I+4 was easier to read than
+> writing out I+J everywhere.  Perhaps not.
 
-Fix by changing stride from uint32_t to hwaddr.
+Mmm. I did indeed fail to notice the symmetry between the
+indexes into m[] and those into n[].
+The other bit that threw me is where the outer loop on i
+updates using j.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180626083120.19515-1-kraxel@redhat.com
----
- hw/display/ramfb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+A comment describing the intent might assist ?
 
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 6867bce8ae..30f5c8da20 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -36,8 +36,8 @@ static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
- {
-     RAMFBState *s = dev;
-     void *framebuffer;
--    uint32_t stride, fourcc, format;
--    hwaddr addr, length;
-+    uint32_t fourcc, format;
-+    hwaddr stride, addr, length;
- 
-     s->width  = be32_to_cpu(s->cfg.width);
-     s->height = be32_to_cpu(s->cfg.height);
--- 
-2.9.3
+thanks
+-- PMM
