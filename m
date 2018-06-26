@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXiGy-00036N-Ks
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 03:20:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXiOO-0004ti-PP
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 03:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXiGt-000651-Ks
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 03:20:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37814 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fXiOJ-0001EW-Qz
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 03:28:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38074 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fXiGt-00064R-F2
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 03:20:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A9A083207
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 07:20:14 +0000 (UTC)
-References: <20180626060941.8326-1-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a5d044c3-a7c9-73c4-ab78-75ccc814518f@redhat.com>
-Date: Tue, 26 Jun 2018 09:20:12 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fXiOJ-0001EO-Lz
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 03:27:55 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180514141218.28438-1-pbonzini@redhat.com>
+Date: Tue, 26 Jun 2018 09:27:53 +0200
+In-Reply-To: <20180514141218.28438-1-pbonzini@redhat.com> (Paolo Bonzini's
+	message of "Mon, 14 May 2018 16:12:18 +0200")
+Message-ID: <87a7riovly.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180626060941.8326-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vga: set owner for mmio regions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] coverity-model: replay data is considered
+ trusted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-On 26.06.2018 08:09, Gerd Hoffmann wrote:
-> This makes sure the regions are properly cleaned when unplugging -device
-> seconday-vga.
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> Replay data is not considered a possible attack vector; add a model that
+> does not use getc so that "tainted data" warnings are suppressed.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hw/display/vga_int.h    |  1 +
->  hw/display/vga-pci.c    | 11 ++++++-----
->  hw/display/virtio-vga.c |  2 +-
->  3 files changed, 8 insertions(+), 6 deletions(-)
+>  scripts/coverity-model.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
+> index c702804f41..576f48de33 100644
+> --- a/scripts/coverity-model.c
+> +++ b/scripts/coverity-model.c
+> @@ -103,6 +103,19 @@ static int get_keysym(const name2keysym_t *table,
+>      }
+>  }
+>  
+> +
+> +/* Replay data is considered trusted.  */
+> +uint8_t replay_get_byte(void)
+> +{
+> +     uint8_t byte = 0;
+> +     if (replay_file) {
+> +         uint8_t c;
+> +         byte = c;
+> +     }
+> +     return byte;
+> +}
+> +
+> +
+>  /*
+>   * GLib memory allocation functions.
+>   *
 
-Thanks, this fixes the issue indeed! Without this patch:
+Coverity 2018.06 chokes on this:
 
-$ valgrind mips-softmmu/qemu-system-mips -accel qtest -monitor stdio
-[...]
-(qemu) device_add secondary-vga
-Unsupported bus. Bus doesn't have property 'acpi-pcihp-bsel' set
-(qemu) dump-guest-memory /dev/null 0 4096
-==8407== Invalid read of size 8
-==8407==    at 0x6B0DA5: object_dynamic_cast (object.c:613)
-==8407==    by 0x6B0DA5: object_resolve_abs_path (object.c:1721)
-==8407==    by 0x6B0E00: object_resolve_partial_path (object.c:1745)
-==8407==    by 0x6B0E62: object_resolve_partial_path (object.c:1755)
-[...]
+    $ cov-make-library -of scripts/coverity-model.xmldb scripts/coverity-model.c 
+    output file: scripts/coverity-model.xmldb
+    Compiling scripts/coverity-model.c with command /opt/cov-sa-2018.06/bin/cov-emit --dir /tmp/cov-armbru/930a6fb31e5f464fc1a53354b2deb66b/cov-make-library-emit -w --no_error_recovery --emit_header_functions --no_implicit_decl --preinclude /opt/cov-sa-2018.06/library/decls.h --c scripts/coverity-model.c
+    "scripts/coverity-model.c", line 110: error #20: identifier "replay_file" is
+              undefined
+           if (replay_file) {
+               ^
 
-With this patch applied, the problem is gone.
+    Emit for file '/work/armbru/qemu/scripts/coverity-model.c' complete.
+    [ERROR] 1 error detected in the compilation of "scripts/coverity-model.c".
+    ERROR: cov-emit returned with code 1
 
-Tested-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Minimal fix:
+
+    diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
+    index 48b112393b..f987ce53b8 100644
+    --- a/scripts/coverity-model.c
+    +++ b/scripts/coverity-model.c
+    @@ -106,6 +106,7 @@ static int get_keysym(const name2keysym_t *table,
+     /* Replay data is considered trusted.  */
+     uint8_t replay_get_byte(void)
+     {
+    +    void *replay_file;
+          uint8_t byte = 0;
+          if (replay_file) {
+              uint8_t c;
+
+Alternatively, dumb down to:
+
+    /* Replay data is considered trusted.  */
+    uint8_t replay_get_byte(void)
+    {
+        uint8_t byte;
+        return byte;
+    }
+
+Got a preference?
