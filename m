@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXqog-0007Zo-KR
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:44 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fXqog-0007Zt-Ms
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXqoc-0000Oj-En
+	(envelope-from <kraxel@redhat.com>) id 1fXqoc-0000Ox-RH
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46928 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59508 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXqoc-0000OZ-9w
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXqoc-0000Of-Lw
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:27:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8D02401EF11
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:27:37 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 26 Jun 2018 18:27:34 +0200
-Message-Id: <20180626162736.9749-2-kraxel@redhat.com>
+Date: Tue, 26 Jun 2018 18:27:36 +0200
+Message-Id: <20180626162736.9749-4-kraxel@redhat.com>
 In-Reply-To: <20180626162736.9749-1-kraxel@redhat.com>
 References: <20180626162736.9749-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/3] vga: set owner for mmio regions
+Subject: [Qemu-devel] [PULL 3/3] virtio-gpu-3d: Drop workaround for
+ VIRTIO_GPU_CAPSET_VIRGL2 define
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +25,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-This makes sure the regions are properly cleaned when unplugging -device
-seconday-vga.
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Reported-by: Thomas Huth <thuth@redhat.com>
+In commit a8bff79e9f27df we added a definition to hw/virtio/virtio-gpu.h
+for VIRTIO_GPU_CAPSET_VIRGL2, as a workaround for it not yet being
+in the Linux kernel headers. In commit 77d361b13c19 we updated our
+kernel headers to a version which does define the macro, so we can
+now remove our workaround.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180622173249.29963-1-peter.maydell@linaro.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20180626060941.8326-1-kraxel@redhat.com
 ---
- hw/display/vga_int.h    |  1 +
- hw/display/vga-pci.c    | 11 ++++++-----
- hw/display/virtio-vga.c |  2 +-
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ include/hw/virtio/virtio-gpu.h | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-index 313cff84fc..f8fcf62a56 100644
---- a/hw/display/vga_int.h
-+++ b/hw/display/vga_int.h
-@@ -193,6 +193,7 @@ extern const MemoryRegionOps vga_mem_ops;
-=20
- /* vga-pci.c */
- void pci_std_vga_mmio_region_init(VGACommonState *s,
-+                                  Object *owner,
-                                   MemoryRegion *parent,
-                                   MemoryRegion *subs,
-                                   bool qext);
-diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
-index 700ac58c69..1ea559762a 100644
---- a/hw/display/vga-pci.c
-+++ b/hw/display/vga-pci.c
-@@ -192,22 +192,23 @@ static const MemoryRegionOps pci_vga_qext_ops =3D {
- };
-=20
- void pci_std_vga_mmio_region_init(VGACommonState *s,
-+                                  Object *owner,
-                                   MemoryRegion *parent,
-                                   MemoryRegion *subs,
-                                   bool qext)
- {
--    memory_region_init_io(&subs[0], NULL, &pci_vga_ioport_ops, s,
-+    memory_region_init_io(&subs[0], owner, &pci_vga_ioport_ops, s,
-                           "vga ioports remapped", PCI_VGA_IOPORT_SIZE);
-     memory_region_add_subregion(parent, PCI_VGA_IOPORT_OFFSET,
-                                 &subs[0]);
-=20
--    memory_region_init_io(&subs[1], NULL, &pci_vga_bochs_ops, s,
-+    memory_region_init_io(&subs[1], owner, &pci_vga_bochs_ops, s,
-                           "bochs dispi interface", PCI_VGA_BOCHS_SIZE);
-     memory_region_add_subregion(parent, PCI_VGA_BOCHS_OFFSET,
-                                 &subs[1]);
-=20
-     if (qext) {
--        memory_region_init_io(&subs[2], NULL, &pci_vga_qext_ops, s,
-+        memory_region_init_io(&subs[2], owner, &pci_vga_qext_ops, s,
-                               "qemu extended regs", PCI_VGA_QEXT_SIZE);
-         memory_region_add_subregion(parent, PCI_VGA_QEXT_OFFSET,
-                                     &subs[2]);
-@@ -239,7 +240,7 @@ static void pci_std_vga_realize(PCIDevice *dev, Error=
- **errp)
-             qext =3D true;
-             pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-         }
--        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
-+        pci_std_vga_mmio_region_init(s, OBJECT(dev), &d->mmio, d->mrs, q=
-ext);
-=20
-         pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->=
-mmio);
-     }
-@@ -275,7 +276,7 @@ static void pci_secondary_vga_realize(PCIDevice *dev,=
- Error **errp)
-         qext =3D true;
-         pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-     }
--    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
-+    pci_std_vga_mmio_region_init(s, OBJECT(dev), &d->mmio, d->mrs, qext)=
-;
-=20
-     pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram=
-);
-     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio=
-);
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index baa74ba82c..97db6c3372 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -152,7 +152,7 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_d=
-ev, Error **errp)
-     }
-=20
-     /* add stdvga mmio regions */
--    pci_std_vga_mmio_region_init(vga, &vpci_dev->modern_bar,
-+    pci_std_vga_mmio_region_init(vga, OBJECT(vvga), &vpci_dev->modern_ba=
-r,
-                                  vvga->vga_mrs, true);
-=20
-     vga->con =3D g->scanout[0].con;
---=20
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+index d6ba61f2f1..9780f755ef 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -22,11 +22,6 @@
+ 
+ #include "standard-headers/linux/virtio_gpu.h"
+ 
+-/* Not yet(?) defined in standard-headers, remove when possible */
+-#ifndef VIRTIO_GPU_CAPSET_VIRGL2
+-#define VIRTIO_GPU_CAPSET_VIRGL2 2
+-#endif
+-
+ #define TYPE_VIRTIO_GPU "virtio-gpu-device"
+ #define VIRTIO_GPU(obj)                                        \
+         OBJECT_CHECK(VirtIOGPU, (obj), TYPE_VIRTIO_GPU)
+-- 
 2.9.3
