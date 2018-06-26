@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fXrrL-00047a-8S
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:34:32 -0400
+	(envelope-from <alexandro@phi.nz>) id 1fXrwF-0005Tl-OS
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fXrrK-0000NJ-4L
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:34:31 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20180205151835.20812-1-mreitz@redhat.com>
-	<20180205151835.20812-4-mreitz@redhat.com>
-	<20180222133956.GG4147@localhost.localdomain>
-	<a28d1832-cdf2-3413-a0f3-a885dfaa2375@redhat.com>
-	<20180222151210.GK4147@localhost.localdomain>
-	<c5a34045-7c8f-f37b-8fc6-a5338cedc2bf@redhat.com>
-	<20180222162147.GL4147@localhost.localdomain>
-	<26a949be-bc67-7fef-3e66-59e9d7268cad@redhat.com>
-Message-ID: <e2b18fb9-af9e-c3b7-7def-0c13b3690d00@redhat.com>
-Date: Tue, 26 Jun 2018 19:34:20 +0200
+	(envelope-from <alexandro@phi.nz>) id 1fXrwA-0001uK-Sy
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:39:35 -0400
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:52749)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alexandro@phi.nz>) id 1fXrwA-0001tb-Lr
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:39:30 -0400
+From: "Alexandro Sanchez Bach" <alexandro@phi.nz>
+References: 
+In-Reply-To: 
+Date: Tue, 26 Jun 2018 19:39:25 +0200
+Message-ID: <002201d40d74$a1b4b8d0$e51e2a70$@phi.nz>
 MIME-Version: 1.0
-In-Reply-To: <26a949be-bc67-7fef-3e66-59e9d7268cad@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ekU32hp2jUIu1SY2UCdSUJbiviV77vLFA"
-Subject: Re: [Qemu-devel] [PATCH v8 03/26] block: Add BDS.backing_overridden
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-us
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Fixed CR0.TS check in gen_sse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org, 'Paolo Bonzini' <pbonzini@redhat.com>, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ekU32hp2jUIu1SY2UCdSUJbiviV77vLFA
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Alberto Garcia <berto@igalia.com>
-Message-ID: <e2b18fb9-af9e-c3b7-7def-0c13b3690d00@redhat.com>
-Subject: Re: [PATCH v8 03/26] block: Add BDS.backing_overridden
-References: <20180205151835.20812-1-mreitz@redhat.com>
- <20180205151835.20812-4-mreitz@redhat.com>
- <20180222133956.GG4147@localhost.localdomain>
- <a28d1832-cdf2-3413-a0f3-a885dfaa2375@redhat.com>
- <20180222151210.GK4147@localhost.localdomain>
- <c5a34045-7c8f-f37b-8fc6-a5338cedc2bf@redhat.com>
- <20180222162147.GL4147@localhost.localdomain>
- <26a949be-bc67-7fef-3e66-59e9d7268cad@redhat.com>
-In-Reply-To: <26a949be-bc67-7fef-3e66-59e9d7268cad@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Ping.
 
-So, while tackling this once more, this is the current state, in short.
+-----Original Message-----
+From: Alexandro Sanchez Bach <alexandro@phi.nz> 
+Sent: Tuesday, May 29, 2018 12:20
+To: 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>
+Subject: [PATCH] target/i386: Fixed CR0.TS check in gen_sse
 
-I wanted to add a new field BDS.backing_file_canonical which basically
-gets set to bs->backing->bs->filename whenever we know that bs->backing
-was opened through bs->backing_file.  That is,
-bs->backing_file_canonical would be bs->backing_file, but after going
-through the whole hoop of bdrv_open() and bdrv_refresh_filename().
+The function `gen_sse` assumes all of its instructions require CR0.TS=0.
+However, integer extensions at `0F 38 F[0-F]` and `0F 3A F[0-F]` such as
+CRC32, MOVBE, ADX, BMI1, BMI2 that are handled by `gen_sse` are not supposed
+to throw an exception in this scenario. This causes issues while booting
+some FreeBSD-based guests.
 
-With such a field, we could compare bs->backing->bs->filename against
-bs->backing_file_canonical, and thus see whether the backing BDS matches
-the image header filename.  I hope this would do the right thing
-whenever qemu tries to figure out backing filenames on its own; it will
-break, though, when the user just uses some filename and that doesn't
-happen to coincide with qemu's generated filenames.
-
-(For instance, if you create a new overlay manually, give it some
-backing filename, and that backing filename isn't 1:1 what qemu would
-reconstruct; and then you open that file with backing=3Dnull, and do a
-blockdev-snapshot; then qemu will give you a json:{} filename for the
-overlay because due to backing=3Dnull, it didn't open the overlay's
-backing_file and thus doesn't know how it would look reconstructed.  But
-I think that's something we could live with.)
-
-((The only real way to fix this I can imagine is to clone the whole
-bdrv_parse_filename()/bdrv_open()/bdrv_refresh_filename()
-infrastructure, but just for filenames instead of real BDSs.  Yeah, no,
-I won't do that.))
-
-OK, so that was an idea, but now it turns out that bs->backing_file
-actually isn't that image header's idea of the backing file.  It appears
-to mostly be a clone of bs->backing->bs->filename, but not really.
-Honestly, I have no idea what it is, but as a matter of fact, it is
-modified by bdrv_backing_attach(), so it will probably usually match
-bs->backing->bs->filename (unless there is no bs->backing, in which case
-it just retains its old value?).  So it pretty much is completely
-useless for any comparison here.
-
-So I suppose I'll rename my BDS.backing_file_canonical attempt to
-BDS.auto_backing_file, and this will be what the image header contains
-(unless we have opened a BDS from it, in which case it will be that
-BDS's filename, so it is canonicalized).
-
-Well, or I could just go with backing_overridden, because honestly that
-didn't seem so bad.
-
-Max
-
-
-PS: Or, we could argue that nobody needs filenames anyway and that
-they're just for show and debugging nowadays, so nobody actually needs
-backing chain information in them.  May sound a bit stupid, but then
-again nobody has ever complained that that's in fact the current state.
-
-
---ekU32hp2jUIu1SY2UCdSUJbiviV77vLFA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsyeRwACgkQ9AfbAGHV
-z0DkewgAlWCg5mHKj7yqvQHtHdVUFXCd7+APaVUwwF6gh2mGzdfaIAtjKLzJDYed
-j0OJWgjhlrO+bLgFD0UcSr4JS3XulZMI8AzSeuvXotT1z3Q/uYEFyzedECf31tA8
-RAcnRJMUIRvb6+V1foTBAiW8jh9VSOKsfjsXOm7TlrfhO3/Rj26xbO72VAdCYAE7
-/TPHOg+BpTtn43APsKPs0J2ev7jLgWlvgQp73xVvKVPEAjNz7+IcaN6h7OztX5kq
-SbDk4+tU9s+83Uyd8KuU6elo1wWClrbjzDx/qucyx//9t0xCAl3+2HJMRQxKjS7g
-CE7CRuRjpJ+SsUkD8gustiHfZHbaJQ==
-=Cuxo
------END PGP SIGNATURE-----
-
---ekU32hp2jUIu1SY2UCdSUJbiviV77vLFA--
+Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
+Signed-off-by: Alexandro Sanchez Bach <alexandro@phi.nz>
+Cc: qemu-stable@nongnu.org
+diff --git a/target/i386/translate.c b/target/i386/translate.c index
+7c21814676..079ab7afef 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -3049,8 +3049,16 @@ static void gen_sse(CPUX86State *env, DisasContext
+*s, int b,
+             is_xmm = 1;
+         }
+     }
++
++    modrm = x86_ldub_code(env, s);
++    reg = ((modrm >> 3) & 7);
++    if (is_xmm)
++        reg |= rex_r;
++    mod = (modrm >> 6) & 3;
++
+     /* simple MMX/SSE operation */
+-    if (s->flags & HF_TS_MASK) {
++    if (s->flags & HF_TS_MASK
++        && ((b != 0x38 && b != 0x3A) || !(modrm & 0xF0))) {
+         gen_exception(s, EXCP07_PREX, pc_start - s->cs_base);
+         return;
+     }
+@@ -3084,11 +3092,6 @@ static void gen_sse(CPUX86State *env, DisasContext
+*s, int b,
+         gen_helper_enter_mmx(cpu_env);
+     }
+ 
+-    modrm = x86_ldub_code(env, s);
+-    reg = ((modrm >> 3) & 7);
+-    if (is_xmm)
+-        reg |= rex_r;
+-    mod = (modrm >> 6) & 3;
+     if (sse_fn_epp == SSE_SPECIAL) {
+         b |= (b1 << 8);
+         switch(b) {
