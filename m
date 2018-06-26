@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXmZ9-00046N-5W
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:24 -0400
+	(envelope-from <bounces@canonical.com>) id 1fXmZB-000488-Rc
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXmZ4-0004wU-7d
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37272 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fXmZ3-0004wF-Ru
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:18 -0400
-Date: Tue, 26 Jun 2018 13:55:09 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180626135509.23154723.cohuck@redhat.com>
-In-Reply-To: <20180626043839-mutt-send-email-mst@kernel.org>
-References: <20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<20180621211712-mutt-send-email-mst@kernel.org>
-	<20180622170955.298900c1.cohuck@redhat.com>
-	<20180622214259-mutt-send-email-mst@kernel.org>
-	<20180625115512.2f29844e.cohuck@redhat.com>
-	<20180626043839-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1fXmZ6-0004x0-H3
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fXmZ6-0004we-0G
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fXmZ3-0004nm-4e
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:55:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E0BE12E80DE
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:55:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 26 Jun 2018 11:39:19 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1587065@bugs.launchpad.net>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <153001315945.7019.16340469592483086806.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,122 +38,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: qemu-devel@nongnu.org
 
-On Tue, 26 Jun 2018 04:46:03 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Fix is known and seems backportable, marking as server-next and subscribing=
+ for somebody to take a look.
+Also as mentioned it is in 2.9, so newer releases are already fixed.
 
-> On Mon, Jun 25, 2018 at 11:55:12AM +0200, Cornelia Huck wrote:
-> > On Fri, 22 Jun 2018 22:05:50 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:  
-> > > > On Thu, 21 Jun 2018 21:20:13 +0300
-> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > >     
-> > > > > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:    
-> > > > > > OK, so what about the following:
-> > > > > > 
-> > > > > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
-> > > > > >   that we have a new uuid field in the virtio-net config space
-> > > > > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
-> > > > > >   offer VIRTIO_NET_F_STANDBY_UUID if set
-> > > > > > - when configuring, set the property to the group UUID of the vfio-pci
-> > > > > >   device
-> > > > > > - in the guest, use the uuid from the virtio-net device's config space
-> > > > > >   if applicable; else, fall back to matching by MAC as done today
-> > > > > > 
-> > > > > > That should work for all virtio transports.      
-> > > > > 
-> > > > > True. I'm a bit unhappy that it's virtio net specific though
-> > > > > since down the road I expect we'll have a very similar feature
-> > > > > for scsi (and maybe others).
-> > > > > 
-> > > > > But we do not have a way to have fields that are portable
-> > > > > both across devices and transports, and I think it would
-> > > > > be a useful addition. How would this work though? Any idea?    
-> > > > 
-> > > > Can we introduce some kind of device-independent config space area?
-> > > > Pushing back the device-specific config space by a certain value if the
-> > > > appropriate feature is negotiated and use that for things like the uuid?    
-> > > 
-> > > So config moves back and forth?
-> > > Reminds me of the msi vector mess we had with pci.  
-> > 
-> > Yes, that would be a bit unfortunate.
-> >   
-> > > I'd rather have every transport add a new config.  
-> > 
-> > You mean via different mechanisms?  
-> 
-> I guess so.
+** Also affects: qemu (Ubuntu Xenial)
+   Importance: Undecided
+       Status: New
 
-Is there an alternate mechanism for pci to use? (Not so familiar with
-it.)
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Fix Released
 
-For ccw, this needs more thought. We already introduced two commands
-for reading/writing the config space (a concept that does not really
-exist on s390). There's the generic read configuration data command,
-but the data returned by it is not really generic enough. So we would
-need one new command (or two, if we need to write as well). I'm not
-sure about that yet.
+** Changed in: qemu (Ubuntu Xenial)
+       Status: New =3D> Confirmed
 
-> 
-> > >   
-> > > > But regardless of that, I'm not sure whether extending this approach to
-> > > > other device types is the way to go. Tying together two different
-> > > > devices is creating complicated situations at least in the hypervisor
-> > > > (even if it's fairly straightforward in the guest). [I have not come
-> > > > around again to look at the "how to handle visibility in QEMU"
-> > > > questions due to lack of cycles, sorry about that.]
-> > > > 
-> > > > So, what's the goal of this approach? Only to allow migration with
-> > > > vfio-pci, or also to plug in a faster device and use it instead of an
-> > > > already attached paravirtualized device?    
-> > > 
-> > > These are two sides of the same coin, I think the second approach
-> > > is closer to what we are doing here.  
-> > 
-> > Thinking about it, do we need any knob to keep the vfio device
-> > invisible if the virtio device is not present? IOW, how does the
-> > hypervisor know that the vfio device is supposed to be paired with a
-> > virtio device? It seems we need an explicit tie-in.  
-> 
-> If we are going the way of the bridge, both bridge and
-> virtio would have some kind of id.
+** Tags added: server-next
 
-So the presence of the id would indicate "this is one part of a pair"?
+-- =
 
-> 
-> When pairing using mac, I'm less sure. PAss vfio device mac to qemu
-> as a property?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
 
-That feels a bit odd. "This is the vfio device's mac, use this instead
-of your usual mac property"? As we have not designed the QEMU interface
-yet, just go with the id in any case? The guest can still match by mac.
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
 
-> > > > What about migration of vfio devices that are not easily replaced by a
-> > > > paravirtualized device? I'm thinking of vfio-ccw, where our main (and
-> > > > currently only) supported device is dasd (disks) -- which can do a lot
-> > > > of specialized things that virtio-blk does not support (and should not
-> > > > or even cannot support).    
-> > > 
-> > > But maybe virtio-scsi can?  
-> > 
-> > I don't think so. Dasds have some channel commands that don't map
-> > easily to scsi commands.  
-> 
-> There's always a choice of adding these to the spec.
-> E.g. FC extensions were proposed, I don't remember why they
-> are still stuck.
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Confirmed
 
-FC extensions are a completely different kind of enhancements, though.
-For a start, they are not unique to a certain transport.
+Bug description:
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
 
-Also, we have a whole list of special dasd issues. Weird disk layout
-for eckd, low-level disk formatting, etc. (See the list of commands in
-drivers/s390/block/dasd_eckd.h for an idea. There's also no public
-documentation AFAICS; https://en.wikipedia.org/wiki/ECKD does not link
-to anything interesting.) I don't think we want to cram stuff like this
-into a completely different framework.
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  =
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+   may have bind-mounts that let a device appear multiple times in the moun=
+t list. Unfortunately the guest agent is not smart enough to consider a dev=
+ice that has been frozen as succesfull and keep going. This causes this spe=
+cific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
