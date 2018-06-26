@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXrGB-0001X8-W5
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:56:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHC-000226-Dj
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXrG8-0006UJ-Rr
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:56:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fXrG8-0006SR-Km
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:56:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fXrG7-0006bF-5E
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:56:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00A142E80CB
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:56:03 +0000 (UTC)
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHB-0007CA-58
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:10 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fXrHA-00079F-Rw
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:09 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrH9-00004z-8T
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:07 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:56:36 +0100
+Message-Id: <20180626165658.31394-11-peter.maydell@linaro.org>
+In-Reply-To: <20180626165658.31394-1-peter.maydell@linaro.org>
+References: <20180626165658.31394-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 26 Jun 2018 16:43:03 -0000
-From: Thomas Huth <1471904@bugs.launchpad.net>
-Reply-To: Bug 1471904 <1471904@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150706172738.3886.69660.malonedeb@wampee.canonical.com>
-Message-Id: <153003138461.9629.7236047865255174728.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1471904] Re: qemu fails under NeXTStep 3.3 when
- accessing ROM in SCSI-Adapter am53c974
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 10/32] hw/dma/omap_dma: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,111 +33,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: Incomplete =3D> Triaged
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
--- =
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20180624040609.17572-5-f4bug@amsat.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/dma/omap_dma.c | 64 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 40 insertions(+), 24 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1471904
-
-Title:
-  qemu fails under NeXTStep 3.3 when accessing ROM in SCSI-Adapter
-  am53c974
-
-Status in QEMU:
-  Triaged
-
-Bug description:
-  I try to do a fresh install of NeXTStep 3.3 on qemu. After all install
-  floppies are successfully read in, the installation shall start, but
-  aborts right away. During installation process the SCSI host adapter
-  is correctly detected. I don't know, if these adapter where equipped
-  with some special ROM. I thought of installing NeXTStep on a SCSI
-  system due to the IDE problems already known under #1276879. If
-  necessary I would use gdb to track more into this.
-
-  System info:
-  Linux prerow 3.11.10-29-desktop #1 SMP PREEMPT Thu Mar 5 16:24:00 UTC 201=
-5 (338c513) x86_64 x86_64 x86_64 GNU/Linux
-  NAME=3DopenSUSE
-  VERSION=3D"13.1 (Bottle)"
-  VERSION_ID=3D"13.1"
-  PRETTY_NAME=3D"openSUSE 13.1 (Bottle) (x86_64)"
-
-  qemu commandline parameter:
-  /usr/bin/qemu-system-i386 \
-      -cpu pentium \
-      -monitor stdio \
-      -k de \
-      -vga cirrus \
-      -m 128 \
-      -localtime \
-      -drive \
-           file=3D.qemu/floppy/3.3_Boot_Disk.floppyimage,format=3Draw,if=3D=
-floppy,index=3D0 \
-       -drive \
-           file=3D.qemu/disk/scsihd-2G.qcow2,format=3Dqcow2,id=3Dscsihd0,if=
-=3Dnone \
-       -drive \
-           file=3D.qemu/cdrom/3.3_InstallCD-NeXTIntel.cdromimage,format=3Dr=
-aw,id=3Dscsicd0,if=3Dnone \
-       -net \
-           none \
-       -device \
-           am53c974,id=3DAMD0 \
-       -device \
-           scsi-cd,drive=3Dscsicd0,bus=3DAMD0.0,lun=3D0,scsi-id=3D1,physica=
-l_block_size=3D512,logical_block_size=3D512 \
-       -device \
-           scsi-hd,drive=3Dscsihd0,bus=3DAMD0.0,lun=3D0,scsi-id=3D0,removab=
-le=3Doff,secs=3D125,heads=3D8,cyls=3D4176,product=3D"ST32151N        ",vend=
-or=3D"Seagate ",serial=3D"89683587",ver=3D"2356",physical_block_size=3D512,=
-logical_block_size=3D512,dpofua=3Doff
-
-  qemu error message:
-  qemu: fatal: Trying to execute code outside RAM or ROM at 0xc01754a8
-
-  EAX=3D000000ff EBX=3D0000fffb ECX=3D000000ff EDX=3D000000a1
-  ESI=3D00000009 EDI=3D00011010 EBP=3D0000ff84 ESP=3D0000ff6c
-  EIP=3D001754a8 EFL=3D00000007 [-----PC] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
-  CS =3D0008 c0000000 3fffffff 00c39a00 DPL=3D0 CS32 [-R-]
-  SS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
-  DS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
-  FS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
-  GS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
-  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
-  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
-  GDT=3D     001c9a58 000000ff
-  IDT=3D     001c9bac 000007ff
-  CR0=3D00000033 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000              =
-                                                                       =
-
-  DR0=3D00000000 DR1=3D00000000 DR2=3D00000000 DR3=3D00000000              =
-                                                                       =
-
-  DR6=3Dffff0ff0 DR7=3D00000400                                            =
-                                                                   =
-
-  CCS=3D00000001 CCD=3D0000000c CCO=3DINCL    =
-
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1471904/+subscriptions
+diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
+index ab3a1b04515..cbb920f31d3 100644
+--- a/hw/dma/omap_dma.c
++++ b/hw/dma/omap_dma.c
+@@ -879,15 +879,18 @@ static int omap_dma_ch_reg_write(struct omap_dma_s *s,
+         ch->burst[0] = (value & 0x0180) >> 7;
+         ch->pack[0] = (value & 0x0040) >> 6;
+         ch->port[0] = (enum omap_dma_port) ((value & 0x003c) >> 2);
+-        if (ch->port[0] >= __omap_dma_port_last)
+-            printf("%s: invalid DMA port %i\n", __func__,
+-                            ch->port[0]);
+-        if (ch->port[1] >= __omap_dma_port_last)
+-            printf("%s: invalid DMA port %i\n", __func__,
+-                            ch->port[1]);
++        if (ch->port[0] >= __omap_dma_port_last) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid DMA port %i\n",
++                          __func__, ch->port[0]);
++        }
++        if (ch->port[1] >= __omap_dma_port_last) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid DMA port %i\n",
++                          __func__, ch->port[1]);
++        }
+         ch->data_type = 1 << (value & 3);
+         if ((value & 3) == 3) {
+-            printf("%s: bad data_type for DMA channel\n", __func__);
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: bad data_type for DMA channel\n", __func__);
+             ch->data_type >>= 1;
+         }
+         break;
+@@ -1899,14 +1902,18 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         if (value & 2)						/* SOFTRESET */
+             omap_dma_reset(s->dma);
+         s->ocp = value & 0x3321;
+-        if (((s->ocp >> 12) & 3) == 3)				/* MIDLEMODE */
+-            fprintf(stderr, "%s: invalid DMA power mode\n", __func__);
++        if (((s->ocp >> 12) & 3) == 3) { /* MIDLEMODE */
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid DMA power mode\n",
++                          __func__);
++        }
+         return;
+ 
+     case 0x78:	/* DMA4_GCR */
+         s->gcr = value & 0x00ff00ff;
+-	if ((value & 0xff) == 0x00)		/* MAX_CHANNEL_FIFO_DEPTH */
+-            fprintf(stderr, "%s: wrong FIFO depth in GCR\n", __func__);
++        if ((value & 0xff) == 0x00) { /* MAX_CHANNEL_FIFO_DEPTH */
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: wrong FIFO depth in GCR\n",
++                          __func__);
++        }
+         return;
+ 
+     case 0x80 ... 0xfff:
+@@ -1935,9 +1942,11 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+     case 0x00:	/* DMA4_CCR */
+         ch->buf_disable = (value >> 25) & 1;
+         ch->src_sync = (value >> 24) & 1;	/* XXX For CamDMA must be 1 */
+-        if (ch->buf_disable && !ch->src_sync)
+-            fprintf(stderr, "%s: Buffering disable is not allowed in "
+-                            "destination synchronised mode\n", __func__);
++        if (ch->buf_disable && !ch->src_sync) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: Buffering disable is not allowed in "
++                          "destination synchronised mode\n", __func__);
++        }
+         ch->prefetch = (value >> 23) & 1;
+         ch->bs = (value >> 18) & 1;
+         ch->transparent_copy = (value >> 17) & 1;
+@@ -1947,9 +1956,11 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->suspend = (value & 0x0100) >> 8;
+         ch->priority = (value & 0x0040) >> 6;
+         ch->fs = (value & 0x0020) >> 5;
+-        if (ch->fs && ch->bs && ch->mode[0] && ch->mode[1])
+-            fprintf(stderr, "%s: For a packet transfer at least one port "
+-                            "must be constant-addressed\n", __func__);
++        if (ch->fs && ch->bs && ch->mode[0] && ch->mode[1]) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: For a packet transfer at least one port "
++                          "must be constant-addressed\n", __func__);
++        }
+         ch->sync = (value & 0x001f) | ((value >> 14) & 0x0060);
+         /* XXX must be 0x01 for CamDMA */
+ 
+@@ -1978,9 +1989,11 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->endian_lock[0] =(value >> 20) & 1;
+         ch->endian[1] =(value >> 19) & 1;
+         ch->endian_lock[1] =(value >> 18) & 1;
+-        if (ch->endian[0] != ch->endian[1])
+-            fprintf(stderr, "%s: DMA endianness conversion enable attempt\n",
+-                            __func__);
++        if (ch->endian[0] != ch->endian[1]) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: DMA endianness conversion enable attempt\n",
++                          __func__);
++        }
+         ch->write_mode = (value >> 16) & 3;
+         ch->burst[1] = (value & 0xc000) >> 14;
+         ch->pack[1] = (value & 0x2000) >> 13;
+@@ -1988,12 +2001,15 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->burst[0] = (value & 0x0180) >> 7;
+         ch->pack[0] = (value & 0x0040) >> 6;
+         ch->translate[0] = (value & 0x003c) >> 2;
+-        if (ch->translate[0] | ch->translate[1])
+-            fprintf(stderr, "%s: bad MReqAddressTranslate sideband signal\n",
+-                            __func__);
++        if (ch->translate[0] | ch->translate[1]) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: bad MReqAddressTranslate sideband signal\n",
++                          __func__);
++        }
+         ch->data_type = 1 << (value & 3);
+         if ((value & 3) == 3) {
+-            printf("%s: bad data_type for DMA channel\n", __func__);
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: bad data_type for DMA channel\n", __func__);
+             ch->data_type >>= 1;
+         }
+         break;
+-- 
+2.17.1
