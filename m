@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1fXw0l-00049c-Et
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:00:32 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1fXw0g-0002mk-UE
+	(envelope-from <jcd@tribudubois.net>) id 1fXw0h-00045z-9N
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:00:31 -0400
-Received: from relay12.mail.gandi.net ([217.70.178.232]:44437)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jcd@tribudubois.net>) id 1fXw0c-0002lR-NW
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:00:27 -0400
+Received: from relay12.mail.gandi.net ([217.70.178.232]:53083)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1fXw0g-0002ma-Lt
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:00:26 -0400
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1fXw0c-0002kJ-Hk
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:00:22 -0400
 From: Jean-Christophe Dubois <jcd@tribudubois.net>
-Date: Wed, 27 Jun 2018 00:00:22 +0200
-Message-Id: <20180626220022.19037-1-jcd@tribudubois.net>
-Subject: [Qemu-devel] [PATCH 2/3] i.mx7d: Change SRC unimpleted device name
- from sdma to src
+Date: Wed, 27 Jun 2018 00:00:14 +0200
+Message-Id: <20180626220014.18986-1-jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH 1/3] i.mx7d: Remove unused header files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +26,23 @@ Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 
 Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 ---
- hw/arm/fsl-imx7.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/arm/mcimx7d-sabre.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 26c1d27f7c..e15aadb587 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -459,7 +459,7 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-     /*
-      * SRC
-      */
--    create_unimplemented_device("sdma", FSL_IMX7_SRC_ADDR, FSL_IMX7_SRC_SIZE);
-+    create_unimplemented_device("src", FSL_IMX7_SRC_ADDR, FSL_IMX7_SRC_SIZE);
+diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+index 95fb409d9c..9c5f0e70c3 100644
+--- a/hw/arm/mcimx7d-sabre.c
++++ b/hw/arm/mcimx7d-sabre.c
+@@ -18,10 +18,8 @@
+ #include "hw/arm/fsl-imx7.h"
+ #include "hw/boards.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/device_tree.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+-#include "net/net.h"
  
-     /*
-      * Watchdog
+ typedef struct {
+     FslIMX7State soc;
 -- 
 2.17.1
