@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXk3N-0000k9-LF
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:14:26 -0400
+	(envelope-from <groug@kaod.org>) id 1fXk4c-0001Vg-2R
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXk3M-0007JL-NZ
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:14:25 -0400
-References: <20180625164239.13794-1-kwolf@redhat.com>
-	<87h8lqkkrp.fsf@dusky.pond.sub.org>
-	<424bb91d-a202-5c3b-1264-254cad0709d0@redhat.com>
-	<20180626085324.GB32319@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2c966f0-22e9-1803-6a74-34d23851e704@redhat.com>
-Date: Tue, 26 Jun 2018 11:14:13 +0200
+	(envelope-from <groug@kaod.org>) id 1fXk4Y-0007gw-SZ
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:15:42 -0400
+Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:40356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXk4Y-0007g4-Hs
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:15:38 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.105.20])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id B39901BF368
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:15:36 +0200 (CEST)
+Date: Tue, 26 Jun 2018 11:15:33 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180626111533.38b27521@bahia.lan>
+In-Reply-To: <823a49a8771e3214dc953ed9d7facd02df3060e4.1529196703.git.keno@juliacomputing.com>
+References: <cover.1529196703.git.keno@juliacomputing.com>
+	<823a49a8771e3214dc953ed9d7facd02df3060e4.1529196703.git.keno@juliacomputing.com>
 MIME-Version: 1.0
-In-Reply-To: <20180626085324.GB32319@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] usb-storage: Add rerror/werror properties
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 06/13] 9p: darwin: Ignore O_{NOATIME,
+ DIRECT}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, kraxel@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org
 
-On 26/06/2018 10:53, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Jun 26, 2018 at 10:48:10AM +0200, Paolo Bonzini wrote:
->> On 26/06/2018 10:35, Markus Armbruster wrote:
->>> We also want to deprecate usb-storage, but
->>> I guess we're still not ready for that (it's a complicated story).
->>>
->>> To deprecate -drive without also deprecating usb-storage, we need to
->>> preserve features.
->>
->> Patch looks good to me too, but indeed why can't we deprecate
->> usb-storage in favor of usb-bot + scsi-disk?
->=20
-> Presumably the migration state of usb-storage is different from the
-> migration state of usb-bot + scsi-disk, so not a case where libvirt
-> could silently switch from one to the other. It would need to be an
-> explicit config change by apps/users.
+On Sat, 16 Jun 2018 20:56:50 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
 
->From a quick test, migrating
+> Darwin doesn't have either of these flags. Darwin does have
+> F_NOCACHE, which is similar to O_DIRECT, but has different
+> enough semantics that other projects don't generally map
+> them automatically. In any case, we don't support O_DIRECT
+> on Linux at the moment either.
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
 
-  qemu-kvm \
-     -drive if=3Dnone,id=3Dusb,file=3D$HOME/chipsec.img,snapshot=3Don \
-     -usb -device usb-storage,drive=3Dusb -M q35
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-into
-
-  qemu-kvm \
-     -drive if=3Dnone,id=3Dusb,file=3D$HOME/chipsec.img,snapshot=3Don \
-     -usb -device usb-bot -device scsi-disk,drive=3Dusb -M q35
-
-seems to work.  Both of them indeed use vmstate_usb_msd for
-migration.
-
-Paolo
+>  hw/9pfs/9p.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 06139c9..e650459 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -123,11 +123,18 @@ static int dotl_to_open_flags(int flags)
+>          { P9_DOTL_NONBLOCK, O_NONBLOCK } ,
+>          { P9_DOTL_DSYNC, O_DSYNC },
+>          { P9_DOTL_FASYNC, FASYNC },
+> +#ifndef CONFIG_DARWIN
+> +        { P9_DOTL_NOATIME, O_NOATIME },
+> +        /* On Darwin, we could map to F_NOCACHE, which is
+> +           similar, but doesn't quite have the same
+> +           semantics. However, we don't support O_DIRECT
+> +           even on linux at the moment, so we just ignore
+> +           it here. */
+>          { P9_DOTL_DIRECT, O_DIRECT },
+> +#endif
+>          { P9_DOTL_LARGEFILE, O_LARGEFILE },
+>          { P9_DOTL_DIRECTORY, O_DIRECTORY },
+>          { P9_DOTL_NOFOLLOW, O_NOFOLLOW },
+> -        { P9_DOTL_NOATIME, O_NOATIME },
+>          { P9_DOTL_SYNC, O_SYNC },
+>      };
+>  
+> @@ -156,10 +163,12 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
+>       */
+>      flags = dotl_to_open_flags(oflags);
+>      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
+> +#ifndef CONFIG_DARWIN
+>      /*
+>       * Ignore direct disk access hint until the server supports it.
+>       */
+>      flags &= ~O_DIRECT;
+> +#endif
+>      return flags;
+>  }
+>  
