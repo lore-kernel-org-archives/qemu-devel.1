@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fXsFB-0004Yj-Ap
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:59:10 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXsJN-0006Kv-IW
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fXsFA-0002fv-HW
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:59:09 -0400
-Date: Tue, 26 Jun 2018 10:59:00 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180626175900.GA4307@roeck-us.net>
-References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
-	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
- identify and set one-shot mode
+	(envelope-from <pm215@archaic.org.uk>) id 1fXsJM-0004lM-IX
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:03:29 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fXsJM-0004ks-Bf
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:03:28 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 19:03:24 +0100
+Message-Id: <20180626180324.5537-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] sd: Don't trace SDRequest crc field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +22,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Tue, Jun 26, 2018 at 06:17:44PM +0100, Peter Maydell wrote:
-> On 19 June 2018 at 03:08, Guenter Roeck <linux@roeck-us.net> wrote:
-> > The CMSDK APB timer is currently always configured as periodic timer.
-> > This results in the following messages when trying to boot Linux.
-> >
-> > Timer with delta zero, disabling
-> >
-> > If the timer limit set with the RELOAD command is 0, the timer
-> > needs to be enabled as one-shot timer.
-> >
-> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> > ---
-> >  hw/timer/cmsdk-apb-timer.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/hw/timer/cmsdk-apb-timer.c b/hw/timer/cmsdk-apb-timer.c
-> > index 9878746..79c1b49 100644
-> > --- a/hw/timer/cmsdk-apb-timer.c
-> > +++ b/hw/timer/cmsdk-apb-timer.c
-> > @@ -119,7 +119,7 @@ static void cmsdk_apb_timer_write(void *opaque, hwaddr offset, uint64_t value,
-> >          }
-> >          s->ctrl = value & 0xf;
-> >          if (s->ctrl & R_CTRL_EN_MASK) {
-> > -            ptimer_run(s->timer, 0);
-> > +            ptimer_run(s->timer, ptimer_get_limit(s->timer) == 0);
-> >          } else {
-> >              ptimer_stop(s->timer);
-> >          }
-> > --
-> > 2.7.4
-> 
-> Thanks for this patch. I was wondering whether it would be better
-> just to remove the fprintf message instead. I'll either apply
-> this or send a patch to do that before 3.0, anyway.
-> 
+We don't actually implement SD command CRC checking, because
+for almost all of our SD controllers the CRC generation is
+done in hardware, and so modelling CRC generation and checking
+would be a bit pointless. (The exception is that milkymist-memcard
+makes the guest software compute the CRC.)
 
-If I recall correctly, I tried that, and it did not help.
-The messages don't happen too often, and the message itself
-does not cause a problem. Issue is that the interrupts happen
-at the wrong time or not at all (after a while, ie after the
-configured one-shot time expires), and the kernel really doesn't
-like that.
+As a result almost all of our SD controller models don't bother
+to set the SDRequest crc field, and the SD card model doesn't
+check it. So the tracing of it in sdbus_do_command() provokes
+Coverity warnings about use of uninitialized data.
 
-I think the underlying problem was that the periodic timer counts
-the period down (based on the time set for the one-shot timer),
-stops with the "Timer with delta zero, disabling" message once
-the period reaches 0, and does not fire anymore afterwards.
-As a result, the kernel fails to boot maybe 90% of the time.
-I should probably have mentioned that in more detail in the
-commit log.
+Drop the CRC field from the trace; we can always add it back
+if and when we do anything useful with the CRC.
 
-> I think we also want to make sure we convert back to a
-> periodic timer if the reload register is written with a nonzero
-> value before the timer expires (and that if that happens after
-> the timer expired that we restart the timer). Thinking about
-> this is also on my todo list.
-> 
+Fixes Coverity issues 1386072, 1386074, 1386076, 1390571.
 
-I thought that was handled in the Linux driver by disabling
-the timer, updating the period, and then re-enabling it in
-periodic mode, but I may have misinterpreted the code.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+We might also want to try to improve our CRC handling
+(eg so that the controller can say "I have not set the CRC,
+don't bother checking it" or "I have set the CRC, do check
+it because it's come from the guest software"), but let's
+put in the simple tweak to make Coverity happy for the moment.
+---
+ hw/sd/core.c       | 2 +-
+ hw/sd/trace-events | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Guenter
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index 820345f704b..107e6d71ddb 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -91,7 +91,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint8_t *response)
+ {
+     SDState *card = get_card(sdbus);
+ 
+-    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc);
++    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg);
+     if (card) {
+         SDCardClass *sc = SD_CARD_GET_CLASS(card);
+ 
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index bfd1d62efcb..43cffab8b17 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -7,7 +7,7 @@ bcm2835_sdhost_edm_change(const char *why, uint32_t edm) "(%s) EDM now 0x%x"
+ bcm2835_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%x\n"
+ 
+ # hw/sd/core.c
+-sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t crc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
++sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg) "@%s CMD%02d arg 0x%08x"
+ sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+ sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+ sdbus_set_voltage(const char *bus_name, uint16_t millivolts) "@%s %u (mV)"
+-- 
+2.17.1
