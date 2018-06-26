@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXqrJ-0001ZR-Iq
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:30:26 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1fXqsH-0002Lj-AK
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXqrI-0001ZS-80
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:30:25 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:38448)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXqrH-0001ZF-RM
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:30:24 -0400
-Received: by mail-ot0-x242.google.com with SMTP id w22-v6so531536otk.5
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:30:23 -0700 (PDT)
+	(envelope-from <mprivozn@redhat.com>) id 1fXqsA-0001uX-WC
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:31:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44620 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1fXqsA-0001tm-QF
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:31:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4AEA181A4EAD
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:31:18 +0000 (UTC)
+References: <20180626154028.11133-1-pbonzini@redhat.com>
+	<20180626154028.11133-5-pbonzini@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <6f643a0b-71f4-4034-d8ec-c5a0a2f84ba6@redhat.com>
+Date: Tue, 26 Jun 2018 18:31:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <d778b758-6041-aa19-ed48-09749ba572fc@linaro.org>
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-34-richard.henderson@linaro.org>
-	<CAFEAcA_-39brD_S6SiDfaQRO16bE1pw79JDywnPfzybbPc_hCg@mail.gmail.com>
-	<d778b758-6041-aa19-ed48-09749ba572fc@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 17:30:02 +0100
-Message-ID: <CAFEAcA-BV4pE5SG1ggrHJHNngC5YJe14oJaHS-o3n4pALkMjFQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 33/35] target/arm: Implement SVE dot
- product (indexed)
+In-Reply-To: <20180626154028.11133-5-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] pr-manager: add query-pr-managers QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +35,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 26 June 2018 at 17:17, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 06/26/2018 08:30 AM, Peter Maydell wrote:
->> On 21 June 2018 at 02:53, Richard Henderson
->> <richard.henderson@linaro.org> wrote:
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  target/arm/helper.h        |  5 ++
->>>  target/arm/translate-sve.c | 18 +++++++
->>>  target/arm/vec_helper.c    | 96 ++++++++++++++++++++++++++++++++++++++
->>>  target/arm/sve.decode      |  8 +++-
->>>  4 files changed, 126 insertions(+), 1 deletion(-)
->>>
->>
->>> +void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
->>> +{
->>> +    intptr_t i, j, opr_sz = simd_oprsz(desc), opr_sz_4 = opr_sz / 4;
->>> +    intptr_t index = simd_data(desc);
->>> +    uint32_t *d = vd;
->>> +    int8_t *n = vn, *m = vm;
->>> +
->>> +    for (i = 0; i < opr_sz_4; i = j) {
->>> +        int8_t m0 = m[(i + index) * 4 + 0];
->>> +        int8_t m1 = m[(i + index) * 4 + 1];
->>> +        int8_t m2 = m[(i + index) * 4 + 2];
->>> +        int8_t m3 = m[(i + index) * 4 + 3];
->>> +
->>> +        j = i;
->>> +        do {
->>> +            d[j] += n[j * 4 + 0] * m0
->>> +                  + n[j * 4 + 1] * m1
->>> +                  + n[j * 4 + 2] * m2
->>> +                  + n[j * 4 + 3] * m3;
->>> +        } while (++j < MIN(i + 4, opr_sz_4));
->>> +    }
->>> +    clear_tail(d, opr_sz, simd_maxsz(desc));
->>> +}
->>
->> Maybe I'm just half asleep this afternoon, but this is pretty
->> confusing -- nested loops where the outer loop's increment
->> uses the inner loop's index, and the inner loop's conditions
->> depend on the outer loop index...
->
-> Yeah, well.
->
-> There is an edge case of aa64 advsimd, reusing this same helper,
->
->         sdot    v0.2s, v1.8b, v0.4b[0]
->
-> where m values must be read (and held) before writing d results,
-> and there are not 16/4=4 elements to process but only 2.
->
-> I suppose I could special-case oprsz == 8 in order to simplify
-> iteration of what is otherwise a multiple of 16.
->
-> I thought iterating J from I to I+4 was easier to read than
-> writing out I+J everywhere.  Perhaps not.
+On 06/26/2018 05:40 PM, Paolo Bonzini wrote:
+> This command lets you query the connection status of each pr-manager-helper
+> object.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/scsi/pr-manager.h |  2 ++
+>  qapi/block.json           | 27 +++++++++++++++++++++++
+>  scsi/pr-manager-helper.c  | 13 +++++++++++
+>  scsi/pr-manager.c         | 45 +++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 87 insertions(+)
+> 
+> diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
+> index 5d2f13a5e4..adadca7954 100644
+> --- a/include/scsi/pr-manager.h
+> +++ b/include/scsi/pr-manager.h
+> @@ -33,8 +33,10 @@ typedef struct PRManagerClass {
+>  
+>      /* <public> */
+>      int (*run)(PRManager *pr_mgr, int fd, struct sg_io_hdr *hdr);
+> +    bool (*is_connected)(PRManager *pr_mgr);
+>  } PRManagerClass;
+>  
+> +bool pr_manager_is_connected(PRManager *pr_mgr);
+>  BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
+>                                 AioContext *ctx, int fd,
+>                                 struct sg_io_hdr *hdr,
+> diff --git a/qapi/block.json b/qapi/block.json
+> index c694524002..dc3323c954 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -77,6 +77,33 @@
+>  { 'struct': 'BlockdevSnapshotInternal',
+>    'data': { 'device': 'str', 'name': 'str' } }
+>  
+> +##
+> +# @PRManagerInfo:
+> +#
+> +# Information about a persistent reservation manager
+> +#
+> +# @id: the identifier of the persistent reservation manager
+> +#
+> +# @is-connected: whether the persistent reservation manager is connected to
+> +#                the underlying storage or helper
+> +#
+> +# Since: 3.0
+> +##
+> +{ 'struct': 'PRManagerInfo',
+> +  'data': {'id': 'str', 'is-connected': 'bool'} }
+> +
+> +##
+> +# @query-pr-managers:
+> +#
+> +# Returns a list of information about each persistent reservation manager.
+> +#
+> +# Returns: a list of @PRManagerInfo for each persistent reservation manager
+> +#
+> +# Since: 3.0
+> +##
+> +{ 'command': 'query-pr-managers', 'returns': ['PRManagerInfo'] }
+> +
+> +
+>  ##
+>  # @blockdev-snapshot-internal-sync:
+>  #
+> diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
+> index 0c0fe389b7..b11481be9e 100644
+> --- a/scsi/pr-manager-helper.c
+> +++ b/scsi/pr-manager-helper.c
+> @@ -235,6 +235,18 @@ out:
+>      return ret;
+>  }
+>  
+> +static bool pr_manager_helper_is_connected(PRManager *p)
+> +{
+> +    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(p);
+> +    bool result;
+> +
+> +    qemu_mutex_lock(&pr_mgr->lock);
+> +    result = (pr_mgr->ioc != NULL);
 
-Mmm. I did indeed fail to notice the symmetry between the
-indexes into m[] and those into n[].
-The other bit that threw me is where the outer loop on i
-updates using j.
+I worry it is not that easy. pr_mgr->ioc is unset only when there's
+PR_IN/PR_OUT command coming from the guest (in pr_manager_helper_run ->
+pr_manager_helper_write). In fact, after 5/5 that is also the time when
+the event is delivered. But that might be too late for mgmt app to
+restart the helper process (although pr_manager_helper_run() tries to
+reconnect for 5 seconds before giving up).
 
-A comment describing the intent might assist ?
+The patch is good code-wise though.
 
-thanks
--- PMM
+Michal
