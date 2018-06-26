@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fXoQt-0007RV-G5
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:55:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fXoSM-0000Ez-FX
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fXoQq-0008IT-AW
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:54:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52952 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fXoSJ-0000sO-8U
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:56:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38766 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fXoQq-0008I3-08
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:54:56 -0400
-Date: Tue, 26 Jun 2018 16:54:51 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180626161154-mutt-send-email-mst@kernel.org>
-References: <20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<20180621211712-mutt-send-email-mst@kernel.org>
-	<20180622170955.298900c1.cohuck@redhat.com>
-	<20180622214259-mutt-send-email-mst@kernel.org>
-	<20180625115512.2f29844e.cohuck@redhat.com>
-	<20180626043839-mutt-send-email-mst@kernel.org>
-	<20180626135509.23154723.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180626135509.23154723.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXoSJ-0000rb-4a
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:56:27 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 26 Jun 2018 15:56:24 +0200
+Message-Id: <20180626135625.7078-3-kraxel@redhat.com>
+In-Reply-To: <20180626135625.7078-1-kraxel@redhat.com>
+References: <20180626135625.7078-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 2/3] sdl2: fix copypaste issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,130 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Maria Klimushenkova <maria.klimushenkova@ispras.ru>
 
-On Tue, Jun 26, 2018 at 01:55:09PM +0200, Cornelia Huck wrote:
-> On Tue, 26 Jun 2018 04:46:03 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Jun 25, 2018 at 11:55:12AM +0200, Cornelia Huck wrote:
-> > > On Fri, 22 Jun 2018 22:05:50 +0300
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >   
-> > > > On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:  
-> > > > > On Thu, 21 Jun 2018 21:20:13 +0300
-> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > >     
-> > > > > > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:    
-> > > > > > > OK, so what about the following:
-> > > > > > > 
-> > > > > > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
-> > > > > > >   that we have a new uuid field in the virtio-net config space
-> > > > > > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
-> > > > > > >   offer VIRTIO_NET_F_STANDBY_UUID if set
-> > > > > > > - when configuring, set the property to the group UUID of the vfio-pci
-> > > > > > >   device
-> > > > > > > - in the guest, use the uuid from the virtio-net device's config space
-> > > > > > >   if applicable; else, fall back to matching by MAC as done today
-> > > > > > > 
-> > > > > > > That should work for all virtio transports.      
-> > > > > > 
-> > > > > > True. I'm a bit unhappy that it's virtio net specific though
-> > > > > > since down the road I expect we'll have a very similar feature
-> > > > > > for scsi (and maybe others).
-> > > > > > 
-> > > > > > But we do not have a way to have fields that are portable
-> > > > > > both across devices and transports, and I think it would
-> > > > > > be a useful addition. How would this work though? Any idea?    
-> > > > > 
-> > > > > Can we introduce some kind of device-independent config space area?
-> > > > > Pushing back the device-specific config space by a certain value if the
-> > > > > appropriate feature is negotiated and use that for things like the uuid?    
-> > > > 
-> > > > So config moves back and forth?
-> > > > Reminds me of the msi vector mess we had with pci.  
-> > > 
-> > > Yes, that would be a bit unfortunate.
-> > >   
-> > > > I'd rather have every transport add a new config.  
-> > > 
-> > > You mean via different mechanisms?  
-> > 
-> > I guess so.
-> 
-> Is there an alternate mechanism for pci to use? (Not so familiar with
-> it.)
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-We have a device and transport config capability.
-We could add a generic config capability too.
+This patch fixes text and mouse event processing. These functions used
+'key' field of the event instead of appropriate 'text', 'motion', 'button',
+or 'wheel'.
 
-> For ccw, this needs more thought. We already introduced two commands
-> for reading/writing the config space (a concept that does not really
-> exist on s390). There's the generic read configuration data command,
-> but the data returned by it is not really generic enough. So we would
-> need one new command (or two, if we need to write as well). I'm not
-> sure about that yet.
-> 
-> > 
-> > > >   
-> > > > > But regardless of that, I'm not sure whether extending this approach to
-> > > > > other device types is the way to go. Tying together two different
-> > > > > devices is creating complicated situations at least in the hypervisor
-> > > > > (even if it's fairly straightforward in the guest). [I have not come
-> > > > > around again to look at the "how to handle visibility in QEMU"
-> > > > > questions due to lack of cycles, sorry about that.]
-> > > > > 
-> > > > > So, what's the goal of this approach? Only to allow migration with
-> > > > > vfio-pci, or also to plug in a faster device and use it instead of an
-> > > > > already attached paravirtualized device?    
-> > > > 
-> > > > These are two sides of the same coin, I think the second approach
-> > > > is closer to what we are doing here.  
-> > > 
-> > > Thinking about it, do we need any knob to keep the vfio device
-> > > invisible if the virtio device is not present? IOW, how does the
-> > > hypervisor know that the vfio device is supposed to be paired with a
-> > > virtio device? It seems we need an explicit tie-in.  
-> > 
-> > If we are going the way of the bridge, both bridge and
-> > virtio would have some kind of id.
-> 
-> So the presence of the id would indicate "this is one part of a pair"?
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+Message-id: 20180626064017.17031.47954.stgit@pasha-VirtualBox
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/sdl2.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I guess so, yes.
-
-> > 
-> > When pairing using mac, I'm less sure. PAss vfio device mac to qemu
-> > as a property?
-> 
-> That feels a bit odd. "This is the vfio device's mac, use this instead
-> of your usual mac property"? As we have not designed the QEMU interface
-> yet, just go with the id in any case? The guest can still match by mac.
-
-OK
-
-> > > > > What about migration of vfio devices that are not easily replaced by a
-> > > > > paravirtualized device? I'm thinking of vfio-ccw, where our main (and
-> > > > > currently only) supported device is dasd (disks) -- which can do a lot
-> > > > > of specialized things that virtio-blk does not support (and should not
-> > > > > or even cannot support).    
-> > > > 
-> > > > But maybe virtio-scsi can?  
-> > > 
-> > > I don't think so. Dasds have some channel commands that don't map
-> > > easily to scsi commands.  
-> > 
-> > There's always a choice of adding these to the spec.
-> > E.g. FC extensions were proposed, I don't remember why they
-> > are still stuck.
-> 
-> FC extensions are a completely different kind of enhancements, though.
-> For a start, they are not unique to a certain transport.
-> 
-> Also, we have a whole list of special dasd issues. Weird disk layout
-> for eckd, low-level disk formatting, etc. (See the list of commands in
-> drivers/s390/block/dasd_eckd.h for an idea. There's also no public
-> documentation AFAICS; https://en.wikipedia.org/wiki/ECKD does not link
-> to anything interesting.) I don't think we want to cram stuff like this
-> into a completely different framework.
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 3ae4719c32..3fff9f5b63 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -424,7 +424,7 @@ static void handle_keyup(SDL_Event *ev)
+ 
+ static void handle_textinput(SDL_Event *ev)
+ {
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->text.windowID);
+     QemuConsole *con = scon ? scon->dcl.con : NULL;
+ 
+     if (qemu_console_is_graphic(con)) {
+@@ -436,7 +436,7 @@ static void handle_textinput(SDL_Event *ev)
+ static void handle_mousemotion(SDL_Event *ev)
+ {
+     int max_x, max_y;
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->motion.windowID);
+ 
+     if (!qemu_console_is_graphic(scon->dcl.con)) {
+         return;
+@@ -468,7 +468,7 @@ static void handle_mousebutton(SDL_Event *ev)
+ {
+     int buttonstate = SDL_GetMouseState(NULL, NULL);
+     SDL_MouseButtonEvent *bev;
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->button.windowID);
+ 
+     if (!qemu_console_is_graphic(scon->dcl.con)) {
+         return;
+@@ -492,7 +492,7 @@ static void handle_mousebutton(SDL_Event *ev)
+ 
+ static void handle_mousewheel(SDL_Event *ev)
+ {
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->wheel.windowID);
+     SDL_MouseWheelEvent *wev = &ev->wheel;
+     InputButton btn;
+ 
+-- 
+2.9.3
