@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexandro@phi.nz>) id 1fXrwF-0005Tl-OS
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:39:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXry4-0006Qv-Uq
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexandro@phi.nz>) id 1fXrwA-0001uK-Sy
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:39:35 -0400
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:52749)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alexandro@phi.nz>) id 1fXrwA-0001tb-Lr
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:39:30 -0400
-From: "Alexandro Sanchez Bach" <alexandro@phi.nz>
-References: 
-In-Reply-To: 
-Date: Tue, 26 Jun 2018 19:39:25 +0200
-Message-ID: <002201d40d74$a1b4b8d0$e51e2a70$@phi.nz>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-us
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Fixed CR0.TS check in gen_sse
+	(envelope-from <armbru@redhat.com>) id 1fXry3-0002uB-Pt
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:41:29 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 26 Jun 2018 19:41:19 +0200
+Message-Id: <20180626174119.25778-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] block/crypto: Simplify block_crypto_{open,
+ create}_opts_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +18,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, 'Paolo Bonzini' <pbonzini@redhat.com>, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-Ping.
+block_crypto_open_opts_init() and block_crypto_create_opts_init()
+contain a virtual visit of QCryptoBlockOptions and
+QCryptoBlockCreateOptions less member "format", respectively.
 
------Original Message-----
-From: Alexandro Sanchez Bach <alexandro@phi.nz> 
-Sent: Tuesday, May 29, 2018 12:20
-To: 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>
-Subject: [PATCH] target/i386: Fixed CR0.TS check in gen_sse
+Change their callers to put member "format" in the QDict, so they can
+use the generated visitors for these types instead.
 
-The function `gen_sse` assumes all of its instructions require CR0.TS=0.
-However, integer extensions at `0F 38 F[0-F]` and `0F 3A F[0-F]` such as
-CRC32, MOVBE, ADX, BMI1, BMI2 that are handled by `gen_sse` are not supposed
-to throw an exception in this scenario. This causes issues while booting
-some FreeBSD-based guests.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+v2: Rebased
 
-Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
-Signed-off-by: Alexandro Sanchez Bach <alexandro@phi.nz>
-Cc: qemu-stable@nongnu.org
-diff --git a/target/i386/translate.c b/target/i386/translate.c index
-7c21814676..079ab7afef 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -3049,8 +3049,16 @@ static void gen_sse(CPUX86State *env, DisasContext
-*s, int b,
-             is_xmm = 1;
-         }
-     }
-+
-+    modrm = x86_ldub_code(env, s);
-+    reg = ((modrm >> 3) & 7);
-+    if (is_xmm)
-+        reg |= rex_r;
-+    mod = (modrm >> 6) & 3;
-+
-     /* simple MMX/SSE operation */
--    if (s->flags & HF_TS_MASK) {
-+    if (s->flags & HF_TS_MASK
-+        && ((b != 0x38 && b != 0x3A) || !(modrm & 0xF0))) {
-         gen_exception(s, EXCP07_PREX, pc_start - s->cs_base);
-         return;
-     }
-@@ -3084,11 +3092,6 @@ static void gen_sse(CPUX86State *env, DisasContext
-*s, int b,
-         gen_helper_enter_mmx(cpu_env);
+Based-on: <20180626080546.3626-1-armbru@redhat.com>
+
+ block/crypto.c | 99 +++++++-------------------------------------------
+ block/crypto.h |  8 +---
+ block/qcow.c   |  5 +--
+ block/qcow2.c  | 10 ++---
+ 4 files changed, 22 insertions(+), 100 deletions(-)
+
+diff --git a/block/crypto.c b/block/crypto.c
+index aaa8fb7530..38d01d1ded 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -148,108 +148,36 @@ static QemuOptsList block_crypto_create_opts_luks = {
+ 
+ 
+ QCryptoBlockOpenOptions *
+-block_crypto_open_opts_init(QCryptoBlockFormat format,
+-                            QDict *opts,
+-                            Error **errp)
++block_crypto_open_opts_init(QDict *opts, Error **errp)
+ {
+     Visitor *v;
+-    QCryptoBlockOpenOptions *ret = NULL;
+-    Error *local_err = NULL;
++    QCryptoBlockOpenOptions *ret;
+ 
+-    ret = g_new0(QCryptoBlockOpenOptions, 1);
+-    ret->format = format;
+-
+-    v = qobject_input_visitor_new_flat_confused(opts, &local_err);
++    v = qobject_input_visitor_new_flat_confused(opts, errp);
+     if (!v) {
+-        goto out;
++        return NULL;
      }
  
--    modrm = x86_ldub_code(env, s);
--    reg = ((modrm >> 3) & 7);
--    if (is_xmm)
--        reg |= rex_r;
--    mod = (modrm >> 6) & 3;
-     if (sse_fn_epp == SSE_SPECIAL) {
-         b |= (b1 << 8);
-         switch(b) {
+-    visit_start_struct(v, NULL, NULL, 0, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+-    switch (format) {
+-    case Q_CRYPTO_BLOCK_FORMAT_LUKS:
+-        visit_type_QCryptoBlockOptionsLUKS_members(
+-            v, &ret->u.luks, &local_err);
+-        break;
+-
+-    case Q_CRYPTO_BLOCK_FORMAT_QCOW:
+-        visit_type_QCryptoBlockOptionsQCow_members(
+-            v, &ret->u.qcow, &local_err);
+-        break;
+-
+-    default:
+-        error_setg(&local_err, "Unsupported block format %d", format);
+-        break;
+-    }
+-    if (!local_err) {
+-        visit_check_struct(v, &local_err);
+-    }
++    visit_type_QCryptoBlockOpenOptions(v, NULL, &ret, errp);
+ 
+-    visit_end_struct(v, NULL);
+-
+- out:
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        qapi_free_QCryptoBlockOpenOptions(ret);
+-        ret = NULL;
+-    }
+     visit_free(v);
+     return ret;
+ }
+ 
+ 
+ QCryptoBlockCreateOptions *
+-block_crypto_create_opts_init(QCryptoBlockFormat format,
+-                              QDict *opts,
+-                              Error **errp)
++block_crypto_create_opts_init(QDict *opts, Error **errp)
+ {
+     Visitor *v;
+-    QCryptoBlockCreateOptions *ret = NULL;
+-    Error *local_err = NULL;
++    QCryptoBlockCreateOptions *ret;
+ 
+-    ret = g_new0(QCryptoBlockCreateOptions, 1);
+-    ret->format = format;
+-
+-    v = qobject_input_visitor_new_flat_confused(opts, &local_err);
++    v = qobject_input_visitor_new_flat_confused(opts, errp);
+     if (!v) {
+-        goto out;
++        return NULL;
+     }
+ 
+-    visit_start_struct(v, NULL, NULL, 0, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+-    switch (format) {
+-    case Q_CRYPTO_BLOCK_FORMAT_LUKS:
+-        visit_type_QCryptoBlockCreateOptionsLUKS_members(
+-            v, &ret->u.luks, &local_err);
+-        break;
+-
+-    case Q_CRYPTO_BLOCK_FORMAT_QCOW:
+-        visit_type_QCryptoBlockOptionsQCow_members(
+-            v, &ret->u.qcow, &local_err);
+-        break;
+-
+-    default:
+-        error_setg(&local_err, "Unsupported block format %d", format);
+-        break;
+-    }
+-    if (!local_err) {
+-        visit_check_struct(v, &local_err);
+-    }
++    visit_type_QCryptoBlockCreateOptions(v, NULL, &ret, errp);
+ 
+-    visit_end_struct(v, NULL);
+-
+- out:
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        qapi_free_QCryptoBlockCreateOptions(ret);
+-        ret = NULL;
+-    }
+     visit_free(v);
+     return ret;
+ }
+@@ -287,8 +215,9 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+     }
+ 
+     cryptoopts = qemu_opts_to_qdict(opts, NULL);
++    qdict_put_str(cryptoopts, "format", QCryptoBlockFormat_str(format));
+ 
+-    open_opts = block_crypto_open_opts_init(format, cryptoopts, errp);
++    open_opts = block_crypto_open_opts_init(cryptoopts, errp);
+     if (!open_opts) {
+         goto cleanup;
+     }
+@@ -611,8 +540,8 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+                                              &block_crypto_create_opts_luks,
+                                              true);
+ 
+-    create_opts = block_crypto_create_opts_init(Q_CRYPTO_BLOCK_FORMAT_LUKS,
+-                                                cryptoopts, errp);
++    qdict_put_str(cryptoopts, "format", "luks");
++    create_opts = block_crypto_create_opts_init(cryptoopts, errp);
+     if (!create_opts) {
+         ret = -EINVAL;
+         goto fail;
+diff --git a/block/crypto.h b/block/crypto.h
+index 0f985ea4e2..dd7d47903c 100644
+--- a/block/crypto.h
++++ b/block/crypto.h
+@@ -89,13 +89,9 @@
+     }
+ 
+ QCryptoBlockCreateOptions *
+-block_crypto_create_opts_init(QCryptoBlockFormat format,
+-                              QDict *opts,
+-                              Error **errp);
++block_crypto_create_opts_init(QDict *opts, Error **errp);
+ 
+ QCryptoBlockOpenOptions *
+-block_crypto_open_opts_init(QCryptoBlockFormat format,
+-                            QDict *opts,
+-                            Error **errp);
++block_crypto_open_opts_init(QDict *opts, Error **errp);
+ 
+ #endif /* BLOCK_CRYPTO_H__ */
+diff --git a/block/qcow.c b/block/qcow.c
+index 5532731b9f..8546fe5bb7 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -203,9 +203,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+                 ret = -EINVAL;
+                 goto fail;
+             }
+-            qdict_del(encryptopts, "format");
+-            crypto_opts = block_crypto_open_opts_init(
+-                Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
++            qdict_put_str(encryptopts, "format", "qcow");
++            crypto_opts = block_crypto_open_opts_init(encryptopts, errp);
+             if (!crypto_opts) {
+                 ret = -EINVAL;
+                 goto fail;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a3a3aa2a97..056ca50650 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1040,9 +1040,8 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+             ret = -EINVAL;
+             goto fail;
+         }
+-        qdict_del(encryptopts, "format");
+-        r->crypto_opts = block_crypto_open_opts_init(
+-            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
++        qdict_put_str(encryptopts, "format", "qcow");
++        r->crypto_opts = block_crypto_open_opts_init(encryptopts, errp);
+         break;
+ 
+     case QCOW_CRYPT_LUKS:
+@@ -1053,9 +1052,8 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+             ret = -EINVAL;
+             goto fail;
+         }
+-        qdict_del(encryptopts, "format");
+-        r->crypto_opts = block_crypto_open_opts_init(
+-            Q_CRYPTO_BLOCK_FORMAT_LUKS, encryptopts, errp);
++        qdict_put_str(encryptopts, "format", "luks");
++        r->crypto_opts = block_crypto_open_opts_init(encryptopts, errp);
+         break;
+ 
+     default:
+-- 
+2.17.1
