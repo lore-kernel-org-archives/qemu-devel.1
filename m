@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXfmq-0005TE-VN
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:41:05 -0400
+	(envelope-from <root@localhost.localdomain>) id 1fXfo1-00060u-1Z
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXfmn-0007rd-SR
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:41:05 -0400
-References: <20180613151942.GC19901@redhat.com>
-	<87k1r24quk.fsf@dusky.pond.sub.org>
-	<20180619171539.0adc90d6.cohuck@redhat.com>
-	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
-	<20180622181108.GY7451@localhost.localdomain>
-	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
-	<20180622193522.GI7451@localhost.localdomain>
-	<743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
-	<87lgb3xsv8.fsf@dusky.pond.sub.org>
-	<4292432f-5f26-6925-4c14-ad1370e36e5b@redhat.com>
-	<20180625173056.GM7451@localhost.localdomain>
-	<97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <54dfe708-cccf-c628-753f-692c83391ec4@redhat.com>
-Date: Tue, 26 Jun 2018 06:40:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+	(envelope-from <root@localhost.localdomain>) id 1fXfo0-0008W7-7i
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:42:17 -0400
+From: 13466399134@163.com
+Date: Tue, 26 Jun 2018 12:41:57 +0800
+Message-Id: <20180626044157.8612-1-13466399134@163.com>
+Subject: [Qemu-devel] [PATCH 1/1] block/dirty-bitmap: Useless bitmaps in
+ image can be removed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +18,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, Yao Xu <13466399134@163.com>
 
-On 25.06.2018 20:26, Paolo Bonzini wrote:
-> On 25/06/2018 19:30, Eduardo Habkost wrote:
->>>> Attentive distros could even replace the wrapper script by a link.
->>> If they are okay with replacing the "KVM only" semantics with "KVM or
->>> TCG", which I think is generally worse.
->>
->> If we can't get agreement on what's the right default for each
->> QEMU binary, I think that's yet another reason to document that
->> upstream QEMU won't guarantee ABI compatibility if -accel is
->> omitted.
->=20
-> Before that we should ask what the benefit is in changing the default
-> for qemu-system-*.  Nobody is using it in practice to start QEMU with
-> KVM enabled...
+From: Yao Xu <13466399134@163.com>
 
-That's certainly not true. I've seen a couple of times already that
-people ask on IRC why their guests are running so slow, and if you ask
-them about their command line, it's obvious that they simply were not
-aware of "-accel" / "-enable-kvm" yet.
+If qemu-kvm quit without saving bitmaps to image(coredump, host kernel panic,
+or host pooweroff), bitmaps in image can not be safely used anymore, and also
+can not be removed. Useless bitmaps should be removed.
 
-<semi-sarcastic>
-Maybe we simply should add a "--verbose" command line option that people
-can use to diagnose their problems:
+"block-dirty-bitmap-remove" failed, because block_dirty_bitmap_lookup return NULL
+"block-dirty-bitmap-add" failed, because qcow2_remove_persistent_dirty_bitmap 
+can find the same name bitmap in image. As a result, the bitmap can never be 
+used, neither can be removed.
 
-$ qemu-system-x86_64 --verbose
-QEMU emulator version 2.12.50
-Using 'tcg' accelerator. Use '-accel kvm' to speed things up.
-Machine type is 'pc-i440fx-3.0'. Use 'q35' for a more modern machine.
-....
-</semi-sarcastic>
-
- Cheers,
-  Thomas
+Signed-off-by: Yao Xu <13466399134@163.com>
+---
+diff --git a/blockdev.c b/blockdev.c
+index 58d7570932..d2403f4b7f 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2837,31 +2837,38 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     Error *local_err = NULL;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
+-    if (!bitmap || !bs) {
++    if (!bs) {
+         return;
+     }
+ 
+-    if (bdrv_dirty_bitmap_frozen(bitmap)) {
+-        error_setg(errp,
+-                   "Bitmap '%s' is currently frozen and cannot be removed",
+-                   name);
+-        return;
+-    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
+-        error_setg(errp,
+-                   "Bitmap '%s' is currently locked and cannot be removed",
+-                   name);
++    if (bitmap) {
++        if (bdrv_dirty_bitmap_frozen(bitmap)) {
++            error_setg(errp,
++                       "Bitmap '%s' is currently frozen and cannot be removed",
++                       name);
++            return;
++        } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
++            error_setg(errp,
++                       "Bitmap '%s' is currently locked and cannot be removed",
++                       name);
++            return;
++        }
++    }
++
++    bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
+         return;
+     }
+ 
+-    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+-        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+-        if (local_err != NULL) {
+-            error_propagate(errp, local_err);
+-            return;
+-        }
++    if (bitmap) {
++        bdrv_release_dirty_bitmap(bs, bitmap);
+     }
+ 
+-    bdrv_release_dirty_bitmap(bs, bitmap);
++    if (*errp) {
++        error_free(*errp);
++        *errp = NULL;
++    }
+ }
+ 
+ /**
