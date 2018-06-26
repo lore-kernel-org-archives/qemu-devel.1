@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXqYI-0005gw-Mb
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:10:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXqZE-0006Az-5z
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXqYG-0001CL-07
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:10:46 -0400
-Date: Tue, 26 Jun 2018 17:10:38 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180626161038.GF32319@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
-	<87lgb3xsv8.fsf@dusky.pond.sub.org>
-	<4292432f-5f26-6925-4c14-ad1370e36e5b@redhat.com>
-	<20180625173056.GM7451@localhost.localdomain>
-	<97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
-	<20180625195126.GN7451@localhost.localdomain>
-	<a931e759-879b-6f6b-3524-4b5a78fed323@redhat.com>
-	<20180626122908.GQ7451@localhost.localdomain>
-	<577768c0-5205-2fb4-209f-845332fe158d@redhat.com>
-	<20180626160623.GT7451@localhost.localdomain>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXqZB-000279-EP
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:11:44 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36104)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXqZB-00026j-8b
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:11:41 -0400
+Received: by mail-qt0-x241.google.com with SMTP id o9-v6so15636629qtp.3
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:11:41 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180626151038.24771-1-sameeh@daynix.com>
+	<20180626151038.24771-2-sameeh@daynix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f1e2bb36-2be0-ea46-3aff-471a0f527bc1@amsat.org>
+Date: Tue, 26 Jun 2018 13:11:35 -0300
 MIME-Version: 1.0
+In-Reply-To: <20180626151038.24771-2-sameeh@daynix.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180626160623.GT7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qga-win: prevent crash when executing
+ fsinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Sameeh Jubran <sameeh@daynix.com>
+Cc: qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Tue, Jun 26, 2018 at 01:06:23PM -0300, Eduardo Habkost wrote:
-> On Tue, Jun 26, 2018 at 03:05:33PM +0200, Paolo Bonzini wrote:
-> > On 26/06/2018 14:29, Eduardo Habkost wrote:
-> > > On Tue, Jun 26, 2018 at 07:57:18AM +0200, Paolo Bonzini wrote:
-> > >> On 25/06/2018 21:51, Eduardo Habkost wrote:
-> > >>> In either case, I'm not arguing (yet) for changing the default
-> > >>> upstream.  I'm just arguing for upstream QEMU to not make any
-> > >>> promises about the default.
-> > >>
-> > >> It would be a guest ABI breakage for TCG guests, so it would only apply
-> > >> to new machine types.  I don't think it's worth the complication.
-> > > 
-> > > That's exactly the point: I want to stop promising a stable guest
-> > > ABI when the accelerator is omitted, because I see no benefit in
-> > > wasting energy on this.
-> > 
-> > On the other hand I see no benefit in changing a default that people are
-> > obviously not using (since most people use KVM, not TCG).  Distros will
-> > keep shipping, and people will keep using qemu-kvm even if we change the
-> > default.
+On 06/26/2018 12:10 PM, Sameeh Jubran wrote:
+> From: Sameeh Jubran <sjubran@redhat.com>
 > 
-> Not changing the default is different from promising we will keep
-> ABI compatibility if the accelerator is omitted.  I just want to
-> get rid of the latter.
+> The fsinfo command is currently implemented for Windows only and it's disk
+> parameter can be enabled by adding the define "CONFIG_QGA_NTDDSCSI" to the qga
+> code. When enabled and executed the qemu-ga crashed with the following message:
+> 
+> ------------------------------------------------
+> File qapi/qapi-visit-core.c, Line 49
+> 
+> Expression: !(v->type & VISITOR_OUTPUT) || *obj)
+> ------------------------------------------------
 
-I guess the key question is what is the risk of causing problems if we
-switch from tcg to kvm:tcg when accelerator is omitted ?
+Due to these multiple lines starting with '---', this patch confuses
+Thunderbird + colorediffs extension in a funny way...
 
-Based on what I've seen the likely troublespot would be people who are
-using QEMU inside a guest with nested-virt enabled. Some nested-virt
-impls are buggy and will cause L2 guest hangs, or worse L1 host crashes.
-Then again we're not causing that brokenness - just revealing what
-already exists.
+> 
+> After some digging, turns out that the GuestPCIAddress is null and the
+> qapi visitor doesn't like that, so we can always allocate it instead and
+> initiate all it's members to -1.
+> 
+> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>  qga/commands-win32.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 2d48394748..c5f1c884e1 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -485,6 +485,11 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+>      char *buffer = NULL;
+>      GuestPCIAddress *pci = NULL;
+>      char *name = g_strdup(&guid[4]);
+> +    pci = g_malloc0(sizeof(*pci));
+> +    pci->domain = -1;
+> +    pci->slot = -1;
+> +    pci->function = -1;
+> +    pci->bus = -1;
+>  
+>      if (!QueryDosDevice(name, dev_name, ARRAY_SIZE(dev_name))) {
+>          error_setg_win32(errp, GetLastError(), "failed to get dos device name");
+> @@ -556,7 +561,6 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
+>  
+>          func = addr & 0x0000FFFF;
+>          dev = (addr >> 16) & 0x0000FFFF;
+> -        pci = g_malloc0(sizeof(*pci));
+>          pci->domain = dev;
+>          pci->slot = slot;
+>          pci->function = func;
+> 
