@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXoSM-0000F5-Jc
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:56:32 -0400
+	(envelope-from <groug@kaod.org>) id 1fXoTg-0001DB-7P
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:57:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXoSK-0000vQ-RY
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:56:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53300 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fXoTc-00047o-Vu
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:57:52 -0400
+Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:41092)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXoSK-0000ue-Jx
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:56:28 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 26 Jun 2018 15:56:23 +0200
-Message-Id: <20180626135625.7078-2-kraxel@redhat.com>
-In-Reply-To: <20180626135625.7078-1-kraxel@redhat.com>
-References: <20180626135625.7078-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/3] Add gles support to egl-helpers,
- wire up in egl-headless and gtk.
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXoTc-0003vl-Ln
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:57:48 -0400
+Received: from player168.ha.ovh.net (unknown [10.109.108.34])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id F28271BF496
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 15:57:46 +0200 (CEST)
+Date: Tue, 26 Jun 2018 15:57:43 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180626155743.0c4472e3@bahia.lan>
+In-Reply-To: <7cdeccb2d0f1b5543c07f40bb053769744ae9777.1529196703.git.keno@juliacomputing.com>
+References: <cover.1529196703.git.keno@juliacomputing.com>
+	<7cdeccb2d0f1b5543c07f40bb053769744ae9777.1529196703.git.keno@juliacomputing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 09/13] 9p: darwin: Compatibility for
+ f/l*xattr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,319 +31,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Tomeu Vizoso <tomeu.vizoso@collabora.com>
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org
 
-Add support for OpenGL ES to egl-helpers.  Wire up the new option for
-egl-headless and gtk UIs.  egl-headless actually works fine.  gtk hits a
-not-yet implemented code path in libEGL when trying to use gles mode:
+On Sat, 16 Jun 2018 20:56:53 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
 
-  libEGL warning: FIXME: egl/x11 doesn't support front buffer rendering.
+> On darwin `fgetxattr` takes two extra optional arguments,
+> and the l* variants are not defined (in favor of an extra
+> flag to the regular variants.
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
 
-(This is mesa 17.2.3).
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Cc: Tomeu Vizoso <tomeu.vizoso@collabora.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Tomeu Vizoso <tomeu.vizoso@collabora.com>
-Tested-by: Tomeu Vizoso <tomeu.vizoso@collabora.com>
-Message-id: 20180618112141.23398-1-kraxel@redhat.com
----
- include/ui/egl-helpers.h |  7 +++---
- include/ui/gtk.h         |  2 +-
- ui/egl-context.c         | 11 ++++++++--
- ui/egl-headless.c        |  3 ++-
- ui/egl-helpers.c         | 55 ++++++++++++++++++++++++++++++++++--------------
- ui/gtk-egl.c             |  4 ++--
- ui/gtk.c                 |  7 ++----
- ui/spice-core.c          |  3 ++-
- 8 files changed, 61 insertions(+), 31 deletions(-)
-
-diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-index 747233ce58..9db7293bdb 100644
---- a/include/ui/egl-helpers.h
-+++ b/include/ui/egl-helpers.h
-@@ -7,6 +7,7 @@
- 
- extern EGLDisplay *qemu_egl_display;
- extern EGLConfig qemu_egl_config;
-+extern DisplayGLMode qemu_egl_mode;
- 
- typedef struct egl_fb {
-     int width;
-@@ -34,7 +35,7 @@ extern int qemu_egl_rn_fd;
- extern struct gbm_device *qemu_egl_rn_gbm_dev;
- extern EGLContext qemu_egl_rn_ctx;
- 
--int egl_rendernode_init(const char *rendernode);
-+int egl_rendernode_init(const char *rendernode, DisplayGLMode mode);
- int egl_get_fd_for_texture(uint32_t tex_id, EGLint *stride, EGLint *fourcc);
- 
- void egl_dmabuf_import_texture(QemuDmaBuf *dmabuf);
-@@ -44,8 +45,8 @@ void egl_dmabuf_release_texture(QemuDmaBuf *dmabuf);
- 
- EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
- 
--int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy);
--int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy);
-+int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy, DisplayGLMode mode);
-+int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, DisplayGLMode mode);
- EGLContext qemu_egl_init_ctx(void);
- 
- #endif /* EGL_HELPERS_H */
-diff --git a/include/ui/gtk.h b/include/ui/gtk.h
-index 2922fc64b2..a79780afc7 100644
---- a/include/ui/gtk.h
-+++ b/include/ui/gtk.h
-@@ -127,7 +127,7 @@ void gd_egl_release_dmabuf(DisplayChangeListener *dcl,
-                            QemuDmaBuf *dmabuf);
- void gd_egl_scanout_flush(DisplayChangeListener *dcl,
-                           uint32_t x, uint32_t y, uint32_t w, uint32_t h);
--void gtk_egl_init(void);
-+void gtk_egl_init(DisplayGLMode mode);
- int gd_egl_make_current(DisplayChangeListener *dcl,
-                         QEMUGLContext ctx);
- 
-diff --git a/ui/egl-context.c b/ui/egl-context.c
-index 2161969abe..78e6c7ab7c 100644
---- a/ui/egl-context.c
-+++ b/ui/egl-context.c
-@@ -6,15 +6,22 @@ QEMUGLContext qemu_egl_create_context(DisplayChangeListener *dcl,
-                                       QEMUGLParams *params)
- {
-    EGLContext ctx;
--   EGLint ctx_att[] = {
-+   EGLint ctx_att_core[] = {
-        EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
-        EGL_CONTEXT_CLIENT_VERSION, params->major_ver,
-        EGL_CONTEXT_MINOR_VERSION_KHR, params->minor_ver,
-        EGL_NONE
-    };
-+   EGLint ctx_att_gles[] = {
-+       EGL_CONTEXT_CLIENT_VERSION, params->major_ver,
-+       EGL_CONTEXT_MINOR_VERSION_KHR, params->minor_ver,
-+       EGL_NONE
-+   };
-+   bool gles = (qemu_egl_mode == DISPLAYGL_MODE_ES);
- 
-    ctx = eglCreateContext(qemu_egl_display, qemu_egl_config,
--                          eglGetCurrentContext(), ctx_att);
-+                          eglGetCurrentContext(),
-+                          gles ? ctx_att_gles : ctx_att_core);
-    return ctx;
- }
- 
-diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-index 7c877122d3..42a41310b0 100644
---- a/ui/egl-headless.c
-+++ b/ui/egl-headless.c
-@@ -171,11 +171,12 @@ static void early_egl_headless_init(DisplayOptions *opts)
- 
- static void egl_headless_init(DisplayState *ds, DisplayOptions *opts)
- {
-+    DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAYGL_MODE_ON;
-     QemuConsole *con;
-     egl_dpy *edpy;
-     int idx;
- 
--    if (egl_rendernode_init(NULL) < 0) {
-+    if (egl_rendernode_init(NULL, mode) < 0) {
-         error_report("egl: render node init failed");
-         exit(1);
-     }
-diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-index 16dc3ded36..71b6a97bd1 100644
---- a/ui/egl-helpers.c
-+++ b/ui/egl-helpers.c
-@@ -24,6 +24,7 @@
- 
- EGLDisplay *qemu_egl_display;
- EGLConfig qemu_egl_config;
-+DisplayGLMode qemu_egl_mode;
- 
- /* ------------------------------------------------------------------ */
- 
-@@ -191,7 +192,7 @@ static int qemu_egl_rendernode_open(const char *rendernode)
-     return fd;
- }
- 
--int egl_rendernode_init(const char *rendernode)
-+int egl_rendernode_init(const char *rendernode, DisplayGLMode mode)
- {
-     qemu_egl_rn_fd = -1;
-     int rc;
-@@ -208,7 +209,8 @@ int egl_rendernode_init(const char *rendernode)
-         goto err;
-     }
- 
--    rc = qemu_egl_init_dpy_mesa((EGLNativeDisplayType)qemu_egl_rn_gbm_dev);
-+    rc = qemu_egl_init_dpy_mesa((EGLNativeDisplayType)qemu_egl_rn_gbm_dev,
-+                                mode);
-     if (rc != 0) {
-         /* qemu_egl_init_dpy_mesa reports error */
-         goto err;
-@@ -392,9 +394,10 @@ static EGLDisplay qemu_egl_get_display(EGLNativeDisplayType native,
- }
- 
- static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
--                             EGLenum platform)
-+                             EGLenum platform,
-+                             DisplayGLMode mode)
- {
--    static const EGLint conf_att_gl[] = {
-+    static const EGLint conf_att_core[] = {
-         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-         EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-         EGL_RED_SIZE,   5,
-@@ -403,9 +406,19 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
-         EGL_ALPHA_SIZE, 0,
-         EGL_NONE,
-     };
-+    static const EGLint conf_att_gles[] = {
-+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-+        EGL_RED_SIZE,   5,
-+        EGL_GREEN_SIZE, 5,
-+        EGL_BLUE_SIZE,  5,
-+        EGL_ALPHA_SIZE, 0,
-+        EGL_NONE,
-+    };
-     EGLint major, minor;
-     EGLBoolean b;
-     EGLint n;
-+    bool gles = (mode == DISPLAYGL_MODE_ES);
- 
-     qemu_egl_display = qemu_egl_get_display(dpy, platform);
-     if (qemu_egl_display == EGL_NO_DISPLAY) {
-@@ -419,50 +432,60 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
-         return -1;
-     }
- 
--    b = eglBindAPI(EGL_OPENGL_API);
-+    b = eglBindAPI(gles ?  EGL_OPENGL_ES_API : EGL_OPENGL_API);
-     if (b == EGL_FALSE) {
--        error_report("egl: eglBindAPI failed");
-+        error_report("egl: eglBindAPI failed (%s mode)",
-+                     gles ? "gles" : "core");
-         return -1;
-     }
- 
--    b = eglChooseConfig(qemu_egl_display, conf_att_gl,
-+    b = eglChooseConfig(qemu_egl_display,
-+                        gles ? conf_att_gles : conf_att_core,
-                         &qemu_egl_config, 1, &n);
-     if (b == EGL_FALSE || n != 1) {
--        error_report("egl: eglChooseConfig failed");
-+        error_report("egl: eglChooseConfig failed (%s mode)",
-+                     gles ? "gles" : "core");
-         return -1;
-     }
-+
-+    qemu_egl_mode = gles ? DISPLAYGL_MODE_ES : DISPLAYGL_MODE_CORE;
-     return 0;
- }
- 
--int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy)
-+int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy, DisplayGLMode mode)
- {
- #ifdef EGL_KHR_platform_x11
--    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_X11_KHR);
-+    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_X11_KHR, mode);
- #else
--    return qemu_egl_init_dpy(dpy, 0);
-+    return qemu_egl_init_dpy(dpy, 0, mode);
- #endif
- }
- 
--int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy)
-+int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, DisplayGLMode mode)
- {
- #ifdef EGL_MESA_platform_gbm
--    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_GBM_MESA);
-+    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_GBM_MESA, mode);
- #else
--    return qemu_egl_init_dpy(dpy, 0);
-+    return qemu_egl_init_dpy(dpy, 0, mode);
- #endif
- }
- 
- EGLContext qemu_egl_init_ctx(void)
- {
--    static const EGLint ctx_att_gl[] = {
-+    static const EGLint ctx_att_core[] = {
-         EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
-         EGL_NONE
-     };
-+    static const EGLint ctx_att_gles[] = {
-+        EGL_CONTEXT_CLIENT_VERSION, 2,
-+        EGL_NONE
-+    };
-+    bool gles = (qemu_egl_mode == DISPLAYGL_MODE_ES);
-     EGLContext ectx;
-     EGLBoolean b;
- 
-     ectx = eglCreateContext(qemu_egl_display, qemu_egl_config, EGL_NO_CONTEXT,
--                            ctx_att_gl);
-+                            gles ? ctx_att_gles : ctx_att_core);
-     if (ectx == EGL_NO_CONTEXT) {
-         error_report("egl: eglCreateContext failed");
-         return NULL;
-diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-index 9390c6762e..fb00ad12ec 100644
---- a/ui/gtk-egl.c
-+++ b/ui/gtk-egl.c
-@@ -280,12 +280,12 @@ void gd_egl_scanout_flush(DisplayChangeListener *dcl,
-     eglSwapBuffers(qemu_egl_display, vc->gfx.esurface);
- }
- 
--void gtk_egl_init(void)
-+void gtk_egl_init(DisplayGLMode mode)
- {
-     GdkDisplay *gdk_display = gdk_display_get_default();
-     Display *x11_display = gdk_x11_display_get_xdisplay(gdk_display);
- 
--    if (qemu_egl_init_dpy_x11(x11_display) < 0) {
-+    if (qemu_egl_init_dpy_x11(x11_display, mode) < 0) {
-         return;
-     }
- 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 903f136b8f..5cce6ed42d 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2485,10 +2485,6 @@ static void early_gtk_display_init(DisplayOptions *opts)
- 
-     assert(opts->type == DISPLAY_TYPE_GTK);
-     if (opts->has_gl && opts->gl != DISPLAYGL_MODE_OFF) {
--        if (opts->gl == DISPLAYGL_MODE_ES) {
--            error_report("gtk: opengl es not supported");
--            return;
--        }
- #if defined(CONFIG_OPENGL)
- #if defined(CONFIG_GTK_GL) && defined(GDK_WINDOWING_WAYLAND)
-         if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
-@@ -2497,7 +2493,8 @@ static void early_gtk_display_init(DisplayOptions *opts)
-         } else
- #endif
-         {
--            gtk_egl_init();
-+            DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAYGL_MODE_ON;
-+            gtk_egl_init(mode);
-         }
- #endif
-     }
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index ae8921a201..f8c0878529 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -829,7 +829,8 @@ void qemu_spice_init(void)
-                          "incompatible with -spice port/tls-port");
-             exit(1);
-         }
--        if (egl_rendernode_init(qemu_opt_get(opts, "rendernode")) != 0) {
-+        if (egl_rendernode_init(qemu_opt_get(opts, "rendernode"),
-+                                DISPLAYGL_MODE_ON) != 0) {
-             error_report("Failed to initialize EGL render node for SPICE GL");
-             exit(1);
-         }
--- 
-2.9.3
+>  Makefile                    |  6 ++++++
+>  fsdev/virtfs-proxy-helper.c |  9 +++++----
+>  hw/9pfs/9p-local.c          | 12 ++++++++----
+>  hw/9pfs/9p-util.h           | 17 +++++++++++++++++
+>  4 files changed, 36 insertions(+), 8 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index e46f2b6..046e553 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -545,7 +545,13 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+>  qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
+>  
+>  fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+> +ifdef CONFIG_DARWIN
+> +fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-darwin.o
+> +endif
+> +ifdef CONFIG_LINUX
+> +fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-linux.o
+>  fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
+> +endif
+>  
+>  scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+>  ifdef CONFIG_MPATH
+> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+> index 3bc1269..a26f8b8 100644
+> --- a/fsdev/virtfs-proxy-helper.c
+> +++ b/fsdev/virtfs-proxy-helper.c
+> @@ -28,6 +28,7 @@
+>  #include "qemu/statfs.h"
+>  #include "9p-iov-marshal.h"
+>  #include "hw/9pfs/9p-proxy.h"
+> +#include "hw/9pfs/9p-util.h"
+>  #include "fsdev/9p-iov-marshal.h"
+>  
+>  #define PROGNAME "virtfs-proxy-helper"
+> @@ -459,7 +460,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
+>          v9fs_string_init(&name);
+>          retval = proxy_unmarshal(iovec, offset, "s", &name);
+>          if (retval > 0) {
+> -            retval = lgetxattr(path.data, name.data, xattr.data, size);
+> +            retval = qemu_lgetxattr(path.data, name.data, xattr.data, size);
+>              if (retval < 0) {
+>                  retval = -errno;
+>              } else {
+> @@ -469,7 +470,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
+>          v9fs_string_free(&name);
+>          break;
+>      case T_LLISTXATTR:
+> -        retval = llistxattr(path.data, xattr.data, size);
+> +        retval = qemu_llistxattr(path.data, xattr.data, size);
+>          if (retval < 0) {
+>              retval = -errno;
+>          } else {
+> @@ -1000,7 +1001,7 @@ static int process_requests(int sock)
+>              retval = proxy_unmarshal(&in_iovec, PROXY_HDR_SZ, "sssdd", &path,
+>                                       &name, &value, &size, &flags);
+>              if (retval > 0) {
+> -                retval = lsetxattr(path.data,
+> +                retval = qemu_lsetxattr(path.data,
+>                                     name.data, value.data, size, flags);
+>                  if (retval < 0) {
+>                      retval = -errno;
+> @@ -1016,7 +1017,7 @@ static int process_requests(int sock)
+>              retval = proxy_unmarshal(&in_iovec,
+>                                       PROXY_HDR_SZ, "ss", &path, &name);
+>              if (retval > 0) {
+> -                retval = lremovexattr(path.data, name.data);
+> +                retval = qemu_lremovexattr(path.data, name.data);
+>                  if (retval < 0) {
+>                      retval = -errno;
+>                  }
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index 98d4073..768ef6f 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -776,16 +776,20 @@ static int local_fstat(FsContext *fs_ctx, int fid_type,
+>          mode_t tmp_mode;
+>          dev_t tmp_dev;
+>  
+> -        if (fgetxattr(fd, "user.virtfs.uid", &tmp_uid, sizeof(uid_t)) > 0) {
+> +        if (qemu_fgetxattr(fd, "user.virtfs.uid",
+> +                           &tmp_uid, sizeof(uid_t)) > 0) {
+>              stbuf->st_uid = le32_to_cpu(tmp_uid);
+>          }
+> -        if (fgetxattr(fd, "user.virtfs.gid", &tmp_gid, sizeof(gid_t)) > 0) {
+> +        if (qemu_fgetxattr(fd, "user.virtfs.gid",
+> +                           &tmp_gid, sizeof(gid_t)) > 0) {
+>              stbuf->st_gid = le32_to_cpu(tmp_gid);
+>          }
+> -        if (fgetxattr(fd, "user.virtfs.mode", &tmp_mode, sizeof(mode_t)) > 0) {
+> +        if (qemu_fgetxattr(fd, "user.virtfs.mode",
+> +                           &tmp_mode, sizeof(mode_t)) > 0) {
+>              stbuf->st_mode = le32_to_cpu(tmp_mode);
+>          }
+> -        if (fgetxattr(fd, "user.virtfs.rdev", &tmp_dev, sizeof(dev_t)) > 0) {
+> +        if (qemu_fgetxattr(fd, "user.virtfs.rdev",
+> +                           &tmp_dev, sizeof(dev_t)) > 0) {
+>              stbuf->st_rdev = le64_to_cpu(tmp_dev);
+>          }
+>      } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+> index 79ed6b2..50a03c7 100644
+> --- a/hw/9pfs/9p-util.h
+> +++ b/hw/9pfs/9p-util.h
+> @@ -19,6 +19,23 @@
+>  #define O_PATH_9P_UTIL 0
+>  #endif
+>  
+> +#ifdef CONFIG_DARWIN
+> +#define qemu_fgetxattr(...) fgetxattr(__VA_ARGS__, 0, 0)
+> +#define qemu_lgetxattr(...) getxattr(__VA_ARGS__, 0, XATTR_NOFOLLOW)
+> +#define qemu_llistxattr(...) listxattr(__VA_ARGS__, XATTR_NOFOLLOW)
+> +#define qemu_lremovexattr(...) removexattr(__VA_ARGS__, XATTR_NOFOLLOW)
+> +static inline int qemu_lsetxattr(const char *path, const char *name,
+> +                                 const void *value, size_t size, int flags) {
+> +    return setxattr(path, name, value, size, 0, flags | XATTR_NOFOLLOW);
+> +}
+> +#else
+> +#define qemu_fgetxattr fgetxattr
+> +#define qemu_lgetxattr lgetxattr
+> +#define qemu_llistxattr llistxattr
+> +#define qemu_lremovexattr lremovexattr
+> +#define qemu_lsetxattr lsetxattr
+> +#endif
+> +
+>  static inline void close_preserve_errno(int fd)
+>  {
+>      int serrno = errno;
