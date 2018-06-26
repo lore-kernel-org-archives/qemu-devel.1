@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXqfI-0008TT-Mr
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:18:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqgh-0000sB-MB
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXqfF-0005Jm-Hg
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:18:00 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36025)
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqge-0005qi-Pw
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:27 -0400
+Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:35742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fXqfF-0005Ja-B4
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:17:57 -0400
-Received: by mail-pg0-x241.google.com with SMTP id m5-v6so7843216pgd.3
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:17:57 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-34-richard.henderson@linaro.org>
-	<CAFEAcA_-39brD_S6SiDfaQRO16bE1pw79JDywnPfzybbPc_hCg@mail.gmail.com>
+	id 1fXqge-0005qQ-Js
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:24 -0400
+Received: by mail-pf0-x232.google.com with SMTP id c22-v6so8321771pfi.2
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:19:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d778b758-6041-aa19-ed48-09749ba572fc@linaro.org>
-Date: Tue, 26 Jun 2018 09:17:52 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_-39brD_S6SiDfaQRO16bE1pw79JDywnPfzybbPc_hCg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 33/35] target/arm: Implement SVE dot
- product (indexed)
+Date: Tue, 26 Jun 2018 09:19:08 -0700
+Message-Id: <20180626161921.27941-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 00/13] target/ppc improve atomic operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 06/26/2018 08:30 AM, Peter Maydell wrote:
-> On 21 June 2018 at 02:53, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/helper.h        |  5 ++
->>  target/arm/translate-sve.c | 18 +++++++
->>  target/arm/vec_helper.c    | 96 ++++++++++++++++++++++++++++++++++++++
->>  target/arm/sve.decode      |  8 +++-
->>  4 files changed, 126 insertions(+), 1 deletion(-)
->>
-> 
->> +void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
->> +{
->> +    intptr_t i, j, opr_sz = simd_oprsz(desc), opr_sz_4 = opr_sz / 4;
->> +    intptr_t index = simd_data(desc);
->> +    uint32_t *d = vd;
->> +    int8_t *n = vn, *m = vm;
->> +
->> +    for (i = 0; i < opr_sz_4; i = j) {
->> +        int8_t m0 = m[(i + index) * 4 + 0];
->> +        int8_t m1 = m[(i + index) * 4 + 1];
->> +        int8_t m2 = m[(i + index) * 4 + 2];
->> +        int8_t m3 = m[(i + index) * 4 + 3];
->> +
->> +        j = i;
->> +        do {
->> +            d[j] += n[j * 4 + 0] * m0
->> +                  + n[j * 4 + 1] * m1
->> +                  + n[j * 4 + 2] * m2
->> +                  + n[j * 4 + 3] * m3;
->> +        } while (++j < MIN(i + 4, opr_sz_4));
->> +    }
->> +    clear_tail(d, opr_sz, simd_maxsz(desc));
->> +}
-> 
-> Maybe I'm just half asleep this afternoon, but this is pretty
-> confusing -- nested loops where the outer loop's increment
-> uses the inner loop's index, and the inner loop's conditions
-> depend on the outer loop index...
+In another patch set this week, I had noticed the old linux-user
+do_store_exclusive code was still present.  I had thought that was
+dead code that simply hadn't been removed, but it turned out that
+we had not completed the transition to tcg atomics for linux-user.
 
-Yeah, well.
+In the process, I discovered that we weren't using atomic operations
+for the 128-bit lq, lqarx, and stqcx insns.  These would have simply
+produced incorrect results for -smp in system mode.
 
-There is an edge case of aa64 advsimd, reusing this same helper,
+I tidy the code a bit by making use of MO_ALIGN, which means that
+we don't need a separate explicit alignment check.
 
-	sdot	v0.2s, v1.8b, v0.4b[0]
+I use the new min/max atomic operations I added recently for
+ARMv8.2-Atomics and RISC-V.
 
-where m values must be read (and held) before writing d results,
-and there are not 16/4=4 elements to process but only 2.
+Finally, Power9 has some *really* odd atomic operations in its
+l[wd]at and st[wd]at instructions.  We were generating illegal
+instruction for these.  I implement them for serial context and
+force parallel context to grab the exclusive lock and try again.
 
-I suppose I could special-case oprsz == 8 in order to simplify
-iteration of what is otherwise a multiple of 16.
-
-I thought iterating J from I to I+4 was easier to read than
-writing out I+J everywhere.  Perhaps not.
-
-
->> -DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5
->> +DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5      ra=%reg_movprfx
-> 
-> Should this have been in the previous patch ?
-
-Yes, thanks.
+Except for the trivial linux-user ll/sc case, I do not have any
+code that exercises these instructions.  Perhaps the IBM folk
+have something that can test the others?
 
 
 r~
+
+
+Richard Henderson (13):
+  target/ppc: Add do_unaligned_access hook
+  target/ppc: Use atomic load for LQ and LQARX
+  target/ppc: Use atomic store for STQ
+  target/ppc: Use atomic cmpxchg for STQCX
+  target/ppc: Remove POWERPC_EXCP_STCX
+  target/ppc: Tidy gen_conditional_store
+  target/ppc: Split out gen_load_locked
+  target/ppc: Split out gen_ld_atomic
+  target/ppc: Split out gen_st_atomic
+  target/ppc: Use MO_ALIGN for EXIWX and ECOWX
+  target/ppc: Use atomic min/max helpers
+  target/ppc: Implement the rest of gen_ld_atomic
+  target/ppc: Implement the rest of gen_st_atomic
+
+ target/ppc/cpu.h                |   8 +-
+ target/ppc/helper.h             |  11 +
+ target/ppc/internal.h           |   5 +
+ linux-user/ppc/cpu_loop.c       | 123 ++----
+ target/ppc/excp_helper.c        |  18 +-
+ target/ppc/mem_helper.c         |  72 +++-
+ target/ppc/translate.c          | 648 ++++++++++++++++++++------------
+ target/ppc/translate_init.inc.c |   1 +
+ 8 files changed, 539 insertions(+), 347 deletions(-)
+
+-- 
+2.17.1
