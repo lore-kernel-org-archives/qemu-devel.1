@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHQ-0002H5-6Q
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:25 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHR-0002I5-1y
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHO-0007Kf-KS
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:24 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43050)
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHQ-0007LO-2e
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:25 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fXrHO-0007K8-9J
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:22 -0400
+	id 1fXrHP-0007L2-QU
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:24 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHN-0000Dy-60
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:21 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHO-0000Er-Nt
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:22 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 17:56:55 +0100
-Message-Id: <20180626165658.31394-30-peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:56:57 +0100
+Message-Id: <20180626165658.31394-32-peter.maydell@linaro.org>
 In-Reply-To: <20180626165658.31394-1-peter.maydell@linaro.org>
 References: <20180626165658.31394-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 29/32] hw/arm/smmuv3: Add notifications on
- invalidation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 31/32] aspeed: initialize the SCU controller
+ first
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,250 +33,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Cédric Le Goater <clg@kaod.org>
 
-On TLB invalidation commands, let's call registered
-IOMMU notifiers. Those can only be UNMAP notifiers.
-SMMUv3 does not support notification on MAP (VFIO).
+The System Control Unit should be initialized first as it drives all
+the configuration of the SoC and other device models.
 
-This patch allows vhost use case where IOTLB API is notified
-on each guest IOTLB invalidation.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 1529653501-15358-5-git-send-email-eric.auger@redhat.com
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Acked-by: Andrew Jeffery <andrew@aj.id.au>
+Message-id: 20180622075700.5923-3-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/smmu-common.h |  6 +++
- hw/arm/smmu-common.c         | 34 +++++++++++++
- hw/arm/smmuv3.c              | 99 +++++++++++++++++++++++++++++++++++-
- hw/arm/trace-events          |  5 ++
- 4 files changed, 142 insertions(+), 2 deletions(-)
+ hw/arm/aspeed_soc.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index d173806f1a3..50e2912a95e 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -160,4 +160,10 @@ void smmu_iotlb_inv_all(SMMUState *s);
- void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
- void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 1955a892f4a..7cc05ee27ea 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -109,18 +109,6 @@ static void aspeed_soc_init(Object *obj)
+     object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
+     object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
  
-+/* Unmap the range of all the notifiers registered to any IOMMU mr */
-+void smmu_inv_notifiers_all(SMMUState *s);
-+
-+/* Unmap the range of all the notifiers registered to @mr */
-+void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
-+
- #endif  /* HW_ARM_SMMU_COMMON */
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index f66e444f6f4..3098915d07c 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -385,6 +385,40 @@ static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
-     return (k1->asid == k2->asid) && (k1->iova == k2->iova);
- }
+-    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
+-    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
+-
+-    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
+-    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
+-
+-    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
+-    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
+-
+     object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
+     object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
+     qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
+@@ -133,6 +121,18 @@ static void aspeed_soc_init(Object *obj)
+     object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
+                               "hw-prot-key", &error_abort);
  
-+/* Unmap the whole notifier's range */
-+static void smmu_unmap_notifier_range(IOMMUNotifier *n)
-+{
-+    IOMMUTLBEntry entry;
++    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
++    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
++    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
 +
-+    entry.target_as = &address_space_memory;
-+    entry.iova = n->start;
-+    entry.perm = IOMMU_NONE;
-+    entry.addr_mask = n->end - n->start;
++    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
++    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), NULL);
++    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
 +
-+    memory_region_notify_one(n, &entry);
-+}
++    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
++    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
++    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
 +
-+/* Unmap all notifiers attached to @mr */
-+inline void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr)
-+{
-+    IOMMUNotifier *n;
-+
-+    trace_smmu_inv_notifiers_mr(mr->parent_obj.name);
-+    IOMMU_NOTIFIER_FOREACH(n, mr) {
-+        smmu_unmap_notifier_range(n);
-+    }
-+}
-+
-+/* Unmap all notifiers of all mr's */
-+void smmu_inv_notifiers_all(SMMUState *s)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        smmu_inv_notifiers_mr(&node->sdev->iommu);
-+    }
-+}
-+
- static void smmu_base_realize(DeviceState *dev, Error **errp)
- {
-     SMMUState *s = ARM_SMMU(dev);
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index b6dc7ed6de6..39fbcbf577c 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -780,6 +780,68 @@ epilogue:
-     return entry;
- }
+     object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
+     object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
+     qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
+@@ -195,6 +195,14 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(get_system_memory(), ASPEED_SOC_SRAM_BASE,
+                                 &s->sram);
  
-+/**
-+ * smmuv3_notify_iova - call the notifier @n for a given
-+ * @asid and @iova tuple.
-+ *
-+ * @mr: IOMMU mr region handle
-+ * @n: notifier to be called
-+ * @asid: address space ID or negative value if we don't care
-+ * @iova: iova
-+ */
-+static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
-+                               IOMMUNotifier *n,
-+                               int asid,
-+                               dma_addr_t iova)
-+{
-+    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-+    SMMUEventInfo event = {};
-+    SMMUTransTableInfo *tt;
-+    SMMUTransCfg *cfg;
-+    IOMMUTLBEntry entry;
-+
-+    cfg = smmuv3_get_config(sdev, &event);
-+    if (!cfg) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s error decoding the configuration for iommu mr=%s\n",
-+                      __func__, mr->parent_obj.name);
++    /* SCU */
++    object_property_set_bool(OBJECT(&s->scu), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
 +        return;
 +    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, ASPEED_SOC_SCU_BASE);
 +
-+    if (asid >= 0 && cfg->asid != asid) {
-+        return;
-+    }
-+
-+    tt = select_tt(cfg, iova);
-+    if (!tt) {
-+        return;
-+    }
-+
-+    entry.target_as = &address_space_memory;
-+    entry.iova = iova;
-+    entry.addr_mask = (1 << tt->granule_sz) - 1;
-+    entry.perm = IOMMU_NONE;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* invalidate an asid/iova tuple in all mr's */
-+static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        IOMMUMemoryRegion *mr = &node->sdev->iommu;
-+        IOMMUNotifier *n;
-+
-+        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
-+
-+        IOMMU_NOTIFIER_FOREACH(n, mr) {
-+            smmuv3_notify_iova(mr, n, asid, iova);
-+        }
-+    }
-+}
-+
- static int smmuv3_cmdq_consume(SMMUv3State *s)
- {
-     SMMUState *bs = ARM_SMMU(s);
-@@ -899,12 +961,14 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t asid = CMD_ASID(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_asid(asid);
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_asid(bs, asid);
-             break;
-         }
-         case SMMU_CMD_TLBI_NH_ALL:
-         case SMMU_CMD_TLBI_NSNH_ALL:
-             trace_smmuv3_cmdq_tlbi_nh();
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_all(bs);
-             break;
-         case SMMU_CMD_TLBI_NH_VAA:
-@@ -913,6 +977,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t vmid = CMD_VMID(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
-+            smmuv3_inv_notifiers_iova(bs, -1, addr);
-             smmu_iotlb_inv_all(bs);
-             break;
-         }
-@@ -924,6 +989,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             bool leaf = CMD_LEAF(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
-+            smmuv3_inv_notifiers_iova(bs, asid, addr);
-             smmu_iotlb_inv_iova(bs, asid, addr);
-             break;
-         }
-@@ -1402,9 +1468,38 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
-                                        IOMMUNotifierFlag old,
-                                        IOMMUNotifierFlag new)
- {
-+    SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
-+    SMMUv3State *s3 = sdev->smmu;
-+    SMMUState *s = &(s3->smmu_state);
-+    SMMUNotifierNode *node = NULL;
-+    SMMUNotifierNode *next_node = NULL;
-+
-+    if (new & IOMMU_NOTIFIER_MAP) {
-+        int bus_num = pci_bus_num(sdev->bus);
-+        PCIDevice *pcidev = pci_find_device(sdev->bus, bus_num, sdev->devfn);
-+
-+        warn_report("SMMUv3 does not support notification on MAP: "
-+                     "device %s will not function properly", pcidev->name);
-+    }
-+
-     if (old == IOMMU_NOTIFIER_NONE) {
--        warn_report("SMMUV3 does not support vhost/vfio integration yet: "
--                    "devices of those types will not function properly");
-+        trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
-+        node = g_malloc0(sizeof(*node));
-+        node->sdev = sdev;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
-+    }
-+
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->sdev == sdev) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
+     /* VIC */
+     object_property_set_bool(OBJECT(&s->vic), true, "realized", &err);
+     if (err) {
+@@ -219,14 +227,6 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->timerctrl), i, irq);
      }
- }
  
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index be69c5ddfe4..27b11d655df 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -17,6 +17,7 @@ smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss,
- smmu_iotlb_inv_all(void) "IOTLB invalidate all"
- smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
- smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
-+smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
- 
- #hw/arm/smmuv3.c
- smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
-@@ -55,3 +56,7 @@ smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
- smmuv3_cmdq_tlbi_nh(void) ""
- smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
- smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
-+smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
-+smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
-+smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova) "iommu mr=%s asid=%d iova=0x%"PRIx64
-+
+-    /* SCU */
+-    object_property_set_bool(OBJECT(&s->scu), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, ASPEED_SOC_SCU_BASE);
+-
+     /* UART - attach an 8250 to the IO space as our UART5 */
+     if (serial_hd(0)) {
+         qemu_irq uart5 = qdev_get_gpio_in(DEVICE(&s->vic), uart_irqs[4]);
 -- 
 2.17.1
