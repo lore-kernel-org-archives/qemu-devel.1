@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXoZp-0007gt-2Z
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:04:16 -0400
+	(envelope-from <mst@redhat.com>) id 1fXobs-0000pA-MU
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXoZj-0003DK-DH
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:04:13 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:40456)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fXoZj-0003A3-6H
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:04:07 -0400
-Received: by mail-pf0-x243.google.com with SMTP id z24-v6so8131257pfe.7
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 07:04:07 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-2-richard.henderson@linaro.org>
-	<87o9fxx46d.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <373aa8a7-9bff-4eba-2452-a9df0ac53c61@linaro.org>
-Date: Tue, 26 Jun 2018 07:04:03 -0700
+	(envelope-from <mst@redhat.com>) id 1fXobm-0007y8-JG
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:06:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53642 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fXobm-0007xy-D4
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:06:14 -0400
+Date: Tue, 26 Jun 2018 17:06:12 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180626170212-mutt-send-email-mst@kernel.org>
+References: <20180622192148.178309-1-mst@redhat.com>
+	<20180622192148.178309-2-mst@redhat.com>
+	<20180625114012.138c0416@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87o9fxx46d.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 01/35] target/arm: Implement SVE Memory
- Contiguous Load Group
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180625114012.138c0416@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] kvm: support -overcommit
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +29,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
 
-On 06/26/2018 02:55 AM, Alex Bennée wrote:
->> +/* Convert a 2-bit memory size (msz) to a 4-bit data type (dtype)
->> + * with unsigned data.  C.f. SVE Memory Contiguous Load Group.
->> + */
->> +static inline int msz_dtype(int msz)
->> +{
->> +    static const uint8_t dtype[4] = { 0, 5, 10, 15 };
->> +    return dtype[msz];
->> +}
-> I'm a little confused by the magic numbers in dtype[4], do they map
-> directly to dtype_mop[]?
+On Mon, Jun 25, 2018 at 11:40:12AM +0200, Igor Mammedov wrote:
+> On Fri, 22 Jun 2018 22:22:05 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
+> > With this flag, kvm allows guest to control host CPU power state.  This
+> > increases latency for other processes using same host CPU in an
+> > unpredictable way, but if decreases idle entry/exit times for the
+> > running VCPU, so to use it QEMU needs a hint about whether host CPU is
+> > overcommitted, hence the flag name.
+> > 
+> > Follow-up patches will expose this capability to guest
+> > (using mwait leaf).
+> > 
+> > Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/sysemu/sysemu.h |  1 +
+> >  target/i386/kvm.c       | 23 +++++++++++++++++++++++
+> >  vl.c                    | 32 +++++++++++++++++++++++++++++++-
+> >  qemu-options.hx         | 27 +++++++++++++++++++++++++--
+> >  4 files changed, 80 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > index e893f72f3b..b921c6f3b7 100644
+> > --- a/include/sysemu/sysemu.h
+> > +++ b/include/sysemu/sysemu.h
+> > @@ -128,6 +128,7 @@ extern bool boot_strict;
+> >  extern uint8_t *boot_splash_filedata;
+> >  extern size_t boot_splash_filedata_size;
+> >  extern bool enable_mlock;
+> > +extern bool enable_cpu_pm;
+> >  extern uint8_t qemu_extra_params_fw[2];
+> >  extern QEMUClockType rtc_clock;
+> >  extern const char *mem_path;
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index 44f70733e7..cf9107be4b 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -1357,6 +1357,29 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >          smram_machine_done.notify = register_smram_listener;
+> >          qemu_add_machine_init_done_notifier(&smram_machine_done);
+> >      }
+> > +
+> > +    if (enable_cpu_pm) {
+> > +        int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
+> > +        int ret;
+> > +
+> > +/* Work around for kernel header with a typo. TODO: fix header and drop. */
+> > +#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
+> > +#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
+> > +#endif
+> > +        if (disable_exits) {
+> > +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> > +                              KVM_X86_DISABLE_EXITS_HLT |
+> > +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> > +        }
+> > +
+> > +        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
+> > +                                disable_exits);
+> > +        if (ret < 0) {
+> > +            error_report("kvm: guest stopping CPU not supported: %s",
+> > +                         strerror(-ret));
+> > +        }
+> > +    }
+> > +
+> >      return 0;
+> >  }
+> >  
+> > diff --git a/vl.c b/vl.c
+> > index 06031715ac..c9530efed5 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -142,6 +142,7 @@ ram_addr_t ram_size;
+> >  const char *mem_path = NULL;
+> >  int mem_prealloc = 0; /* force preallocation of physical target memory */
+> >  bool enable_mlock = false;
+> > +bool enable_cpu_pm = false;
+> >  int nb_nics;
+> >  NICInfo nd_table[MAX_NICS];
+> >  int autostart;
+> > @@ -390,6 +391,22 @@ static QemuOptsList qemu_realtime_opts = {
+> >      },
+> >  };
+> >  
+> > +static QemuOptsList qemu_overcommit_opts = {
+> > +    .name = "overcommit",
+> > +    .head = QTAILQ_HEAD_INITIALIZER(qemu_overcommit_opts.head),
+> > +    .desc = {
+> > +        {
+> > +            .name = "mem-lock",
+> > +            .type = QEMU_OPT_BOOL,
+> > +        },
+> > +        {
+> > +            .name = "cpu-pm",
+> > +            .type = QEMU_OPT_BOOL,
+> > +        },
+> > +        { /* end of list */ }
+> > +    },
+> > +};
+> > +
+> >  static QemuOptsList qemu_msg_opts = {
+> >      .name = "msg",
+> >      .head = QTAILQ_HEAD_INITIALIZER(qemu_msg_opts.head),
+> > @@ -3903,7 +3920,20 @@ int main(int argc, char **argv, char **envp)
+> >                  if (!opts) {
+> >                      exit(1);
+> >                  }
+> > -                enable_mlock = qemu_opt_get_bool(opts, "mlock", true);
+> > +                /* Don't override the -overcommit option if set */
+> > +                enable_mlock = enable_mlock ||
+> > +                    qemu_opt_get_bool(opts, "mlock", true);
+> > +                break;
+> > +            case QEMU_OPTION_overcommit:
+> > +                opts = qemu_opts_parse_noisily(qemu_find_opts("overcommit"),
+> > +                                               optarg, false);
+> > +                if (!opts) {
+> > +                    exit(1);
+> > +                }
+> > +                /* Don't override the -realtime option if set */
+> > +                enable_mlock = enable_mlock ||
+> > +                    qemu_opt_get_bool(opts, "mem-lock", false);
+> > +                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
+> should we error out or complain if the option can't be used
+> /i.e. in case of non kvm accelerator/
+> instead of silently ignoring it
+> and making user wonder why it doesn't work?
 
-Well, yes, this would sort of be the inverse of dtype_mop.
 
-My intent with the comment was to point you to the table within
-the SVE Memory - Contiguous Load Group section of
-the Index by Encoding page:
+Well it also only applies with -cpu host right now.
+And guest works fine, even if it's somewhat slower.
 
-DDI0584A_d_SVE/SVE_xml/xhtml/encodingindex.html#sve_memcld
+As there's no interface to discover which configurations
+work, I *suspect* it's easier for management if we keep guest
+running rather than fail and make it guess.
 
-and that I'm picking out the unsigned loads of size 1, 2, 4, 8.
-
-Do you have a suggested re-wording?
-
-I should note that *most* load operations use a 4-bit dtype field, except for
-the non-temporal loads, which use a 2-bit msz field.  Since qemu does not care
-about the memory hierarchy, by mapping msz back into dtype I can forward the
-implementation directly to the normal load routines.
-
-
-r~
+> >                  break;
+> >              case QEMU_OPTION_msg:
+> >                  opts = qemu_opts_parse_noisily(qemu_find_opts("msg"), optarg,
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index c0d3951e9f..1bba3d258b 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -3328,8 +3328,7 @@ DEF("realtime", HAS_ARG, QEMU_OPTION_realtime,
+> >      "-realtime [mlock=on|off]\n"
+> >      "                run qemu with realtime features\n"
+> >      "                mlock=on|off controls mlock support (default: on)\n",
+> > -    QEMU_ARCH_ALL)
+> > -STEXI
+> > +    QEMU_ARCH_ALL) STEXI
+> >  @item -realtime mlock=on|off
+> >  @findex -realtime
+> >  Run qemu with realtime features.
+> > @@ -3337,6 +3336,30 @@ mlocking qemu and guest memory can be enabled via @option{mlock=on}
+> >  (enabled by default).
+> >  ETEXI
+> >  
+> > +DEF("overcommit", HAS_ARG, QEMU_OPTION_overcommit,
+> > +    "--overcommit [mem-lock=on|off][cpu-pm=on|off]\n"
+> > +    "                run qemu with overcommit hints\n"
+> > +    "                mem-lock=on|off controls memory lock support (default: off)\n"
+> > +    "                cpu-pm=on|off controls cpu power management (default: off)\n",
+> > +    QEMU_ARCH_ALL)
+> > +STEXI
+> > +@item -overcommit mem-lock=on|off
+> > +@item -overcommit cpu-pm=on|off
+> > +@findex -overcommit
+> > +Run qemu with hints about host resource overcommit. The default is
+> > +to assume that host overcommits all resources.
+> > +
+> > +Locking qemu and guest memory can be enabled via @option{mem-lock=on} (disabled
+> > +by default).  This works when host memory is not overcommitted and reduces the
+> > +worst-case latency for guest.  This is equivalent to @option{realtime}.
+> > +
+> > +Guest ability to manage power state of host cpus (increasing latency for other
+> > +processes on the same host cpu, but decreasing latency for guest) can be
+> > +enabled via @option{cpu-pm=on} (disabled by default).  This works best when
+> > +host CPU is not overcommitted. When used, host estimates of CPU cycle and power
+> > +utilization will be incorrect, not taking into account guest idle time.
+> > +ETEXI
+> > +
+> >  DEF("gdb", HAS_ARG, QEMU_OPTION_gdb, \
+> >      "-gdb dev        wait for gdb connection on 'dev'\n", QEMU_ARCH_ALL)
+> >  STEXI
