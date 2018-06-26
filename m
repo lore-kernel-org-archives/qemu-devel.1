@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fXoMy-00049p-BU
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:50:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fXoN9-0004MD-SL
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fXoMv-0006KQ-3z
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:50:56 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fXoN6-0006Qj-KC
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:51:07 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 26 Jun 2018 16:50:32 +0300
-Message-Id: <20180626135035.133432-4-vsementsov@virtuozzo.com>
+Date: Tue, 26 Jun 2018 16:50:35 +0300
+Message-Id: <20180626135035.133432-7-vsementsov@virtuozzo.com>
 In-Reply-To: <20180626135035.133432-1-vsementsov@virtuozzo.com>
 References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/6] bloc/qcow2: drop dirty_bitmaps_loaded
- state variable
+Subject: [Qemu-devel] [PATCH 6/6] iotests: 169: add cases for source vm
+ resuming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +23,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: dgilbert@redhat.com, quintela@redhat.com, stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-This variable doesn't work as it should, because it is actually cleared
-in qcow2_co_invalidate_cache() by memset(). Drop it, as the following
-patch will introduce new behavior.
+Test that we can resume source vm after [failed] migration, and bitmaps
+are ok.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.h |  1 -
- block/qcow2.c | 19 ++-----------------
- 2 files changed, 2 insertions(+), 18 deletions(-)
+ tests/qemu-iotests/169     | 60 +++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/169.out |  4 ++--
+ 2 files changed, 61 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 01b5250415..c9df19b6e6 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -294,7 +294,6 @@ typedef struct BDRVQcow2State {
-     uint32_t nb_bitmaps;
-     uint64_t bitmap_directory_size;
-     uint64_t bitmap_directory_offset;
--    bool dirty_bitmaps_loaded;
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index 8b7947d650..69850c4c67 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -77,6 +77,58 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+             self.assert_qmp(result, 'error/desc',
+                             "Dirty bitmap 'bitmap0' not found");
  
-     int flags;
-     int qcow_version;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 46194a33ca..0044ff58e7 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1149,7 +1149,6 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     uint64_t ext_end;
-     uint64_t l1_vm_state_index;
-     bool update_header = false;
--    bool header_updated = false;
++    def do_test_migration_resume_source(self, persistent, migrate_bitmaps):
++        granularity = 512
++
++        # regions = ((start, count), ...)
++        regions = ((0, 0x10000),
++                   (0xf0000, 0x10000),
++                   (0xa0201, 0x1000))
++
++        mig_caps = [{'capability': 'events', 'state': True}]
++        if migrate_bitmaps:
++            mig_caps.append({'capability': 'dirty-bitmaps', 'state': True})
++
++        result = self.vm_a.qmp('migrate-set-capabilities',
++                               capabilities=mig_caps)
++        self.assert_qmp(result, 'return', {})
++
++        self.add_bitmap(self.vm_a, granularity, persistent)
++        for r in regions:
++            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
++        sha256 = self.get_bitmap_hash(self.vm_a)
++
++        result = self.vm_a.qmp('migrate', uri=mig_cmd)
++        while True:
++            event = self.vm_a.event_wait('MIGRATION')
++            if event['data']['status'] == 'completed':
++                break
++
++        # test that bitmap is still here
++        removed = (not migrate_bitmaps) and persistent
++        self.check_bitmap(self.vm_a, False if removed else sha256)
++
++        self.vm_a.qmp('cont')
++
++        # test that bitmap is still here after invalidation
++        self.check_bitmap(self.vm_a, sha256)
++
++        # shutdown and check that invalidation didn't fail
++        self.vm_a.shutdown()
++
++        # catch 'Could not reopen qcow2 layer: Bitmap already exists'
++        # possible error
++        log = self.vm_a.get_log()
++        log = re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
++        log = re.sub(r'^(wrote .* bytes at offset .*\n.*KiB.*ops.*sec.*\n){3}',
++                     '', log)
++        log = re.sub(r'\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
++        self.assertEqual(log, '')
++
++        # test that bitmap is still persistent
++        self.vm_a.launch()
++        self.check_bitmap(self.vm_a, sha256 if persistent else False)
++
+     def do_test_migration(self, persistent, migrate_bitmaps, online,
+                           shared_storage):
+         granularity = 512
+@@ -152,7 +204,7 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
  
-     ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
-     if (ret < 0) {
-@@ -1488,23 +1487,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
-     }
+ def inject_test_case(klass, name, method, *args, **kwargs):
+     mc = operator.methodcaller(method, *args, **kwargs)
+-    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
++    setattr(klass, 'test_' + method + name, new.instancemethod(mc, None, klass))
  
--    if (s->dirty_bitmaps_loaded) {
--        /* It's some kind of reopen. There are no known cases where we need to
--         * reload bitmaps in such a situation, so it's safer to skip them.
--         *
--         * Moreover, if we have some readonly bitmaps and we are reopening for
--         * rw we should reopen bitmaps correspondingly.
--         */
--        if (bdrv_has_readonly_bitmaps(bs) &&
--            !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
--        {
--            qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
--        }
--    } else {
--        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
--        s->dirty_bitmaps_loaded = true;
-+    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
-+        update_header = false;
-     }
--    update_header = update_header && !header_updated;
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-         ret = -EINVAL;
+ for cmb in list(itertools.product((True, False), repeat=4)):
+     name = ('_' if cmb[0] else '_not_') + 'persistent_'
+@@ -163,6 +215,12 @@ for cmb in list(itertools.product((True, False), repeat=4)):
+     inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration',
+                      *list(cmb))
+ 
++for cmb in list(itertools.product((True, False), repeat=2)):
++    name = ('_' if cmb[0] else '_not_') + 'persistent_'
++    name += ('_' if cmb[1] else '_not_') + 'migbitmap'
++
++    inject_test_case(TestDirtyBitmapMigration, name,
++                     'do_test_migration_resume_source', *list(cmb))
+ 
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
+index b6f257674e..3a89159833 100644
+--- a/tests/qemu-iotests/169.out
++++ b/tests/qemu-iotests/169.out
+@@ -1,5 +1,5 @@
+-................
++....................
+ ----------------------------------------------------------------------
+-Ran 16 tests
++Ran 20 tests
+ 
+ OK
 -- 
 2.11.1
