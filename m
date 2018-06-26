@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXsYg-0002l2-Mc
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:19:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXsYw-00031F-35
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXsYf-0001cx-TW
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:19:18 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:38789)
+	(envelope-from <peter.maydell@linaro.org>) id 1fXsYv-0001gF-7a
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:19:34 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:41898)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXsYf-0001cg-NB
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:19:17 -0400
-Received: by mail-oi0-x243.google.com with SMTP id v8-v6so1236423oie.5
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:19:17 -0700 (PDT)
+	id 1fXsYv-0001g6-1s
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:19:33 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id d19-v6so20068333oti.8
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:19:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a49d3e03-a6aa-b627-c2e3-2b3c4bddf74d@redhat.com>
-References: <1529673765-16627-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA9Pg3C+XD7WuLyNr5RfifRCvXB6t01YuLiK9Cs15v-Dpg@mail.gmail.com>
-	<a49d3e03-a6aa-b627-c2e3-2b3c4bddf74d@redhat.com>
+In-Reply-To: <20180626165658.31394-1-peter.maydell@linaro.org>
+References: <20180626165658.31394-1-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 19:18:56 +0100
-Message-ID: <CAFEAcA9GViOphcM6jarzyOwU3gjSp-BfgR5J-krqUXcP2czgZw@mail.gmail.com>
+Date: Tue, 26 Jun 2018 19:19:11 +0100
+Message-ID: <CAFEAcA8vm341HSotwYEjOdib90i8stOq46U1W+S_cepvVPWJfA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] ARM virt: Silence dtc warnings
+Subject: Re: [Qemu-devel] [PULL 00/32] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On 26 June 2018 at 18:15, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Peter,
+On 26 June 2018 at 17:56, Peter Maydell <peter.maydell@linaro.org> wrote:
+> target-arm queue: mostly smallish stuff. I expect to send
+> out another pullreq at the end of this week, but since this
+> is up to 32 patches already I'd rather send it out now
+> than accumulate a monster sized patchset.
 >
-> On 06/26/2018 07:06 PM, Peter Maydell wrote:
->> On 22 June 2018 at 14:22, Eric Auger <eric.auger@redhat.com> wrote:
->>> When running dtc on the guest /proc/device-tree, we get the
->>> following warnings: "Warning (unit_address_vs_reg): Node <name>
->>> has a reg or ranges property, but no unit name", with name:
->>> /intc, /intc/its, /intc/v2m, /memory.
->>>
->>> This series removes those warnings by adding the unit address to
->>> the corresponding node names.
->>
->> This didn't apply to my target-arm.next tree. Once I've
->> applied my on-list arm pullreq to master, could you
->> rebase it, please?
+> thanks
+> -- PMM
 >
-> Sure
+>
+> The following changes since commit 0ab4c574a55448a37b9f616259b82950742c9427:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180626-pull-request' into staging (2018-06-26 16:44:57 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180626
+>
+> for you to fetch changes up to 9b945a9ee36a34eaeca412ef9ef35fbfe33c2c85:
+>
+>   aspeed/timer: use the APB frequency from the SCU (2018-06-26 17:50:42 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * aspeed: set APB clocks correctly (fixes slowdown on palmetto)
+>  * smmuv3: cache config data and TLB entries
+>  * v7m/v8m: support read/write from MPU regions smaller than 1K
+>  * various: clean up logging/debug messages
+>  * xilinx_spips: Make dma transactions as per dma_burst_size
+>
+> ----------------------------------------------------------------
 
-Thanks. I'm being a bit lazy because the fixup probably isn't
-very complicated. The pullreq is now in master, so you can
-just rebase on that.
+Applied, thanks.
 
-thanks
 -- PMM
