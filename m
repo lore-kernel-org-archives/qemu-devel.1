@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fXotr-0001z4-GA
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:59 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fXp4N-0000qN-55
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fXotn-0003VB-Dn
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:55 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Jun 2018 16:24:30 +0200
-Message-Id: <20180626142434.22090-3-kwolf@redhat.com>
-In-Reply-To: <20180626142434.22090-1-kwolf@redhat.com>
-References: <20180626142434.22090-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/6] block: Convert .bdrv_truncate callback
- to coroutine_fn
+	(envelope-from <alex.bennee@linaro.org>) id 1fXp4J-0005nG-94
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:35:47 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:39968)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fXp4I-0005mm-Kp
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:35:43 -0400
+Received: by mail-wr0-x235.google.com with SMTP id g18-v6so17510795wro.7
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 07:35:42 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 26 Jun 2018 15:35:38 +0100
+Message-Id: <20180626143538.5390-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] blogposts: add post about the new check-tcg
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,851 +28,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-bdrv_truncate() is an operation that can block (even for a quite long
-time, depending on the PreallocMode) in I/O paths that shouldn't block.
-Convert it to a coroutine_fn so that we have the infrastructure for
-drivers to make their .bdrv_co_truncate implementation asynchronous.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-This change could potentially introduce new race conditions because
-bdrv_truncate() isn't necessarily executed atomically any more. Whether
-this is a problem needs to be evaluated for each block driver that
-supports truncate:
-
-* file-posix/win32, gluster, iscsi, nfs, rbd, ssh, sheepdog: The
-  protocol drivers are trivially safe because they don't actually yield
-  yet, so there is no change in behaviour.
-
-* copy-on-read, crypto, raw-format: Essentially just filter drivers that
-  pass the request to a child node, no problem.
-
-* qcow2: The implementation modifies metadata, so it needs to hold
-  s->lock to be safe with concurrent I/O requests. In order to avoid
-  double locking, this requires pulling the locking out into
-  preallocate_co() and using qcow2_write_caches() instead of
-  bdrv_flush().
-
-* qed: Does a single header update, this is fine without locking.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block.h     |  4 +++
- include/block/block_int.h |  4 +--
- block.c                   | 63 ++++++++++++++++++++++++++++++++++------
- block/copy-on-read.c      |  8 +++---
- block/crypto.c            |  9 +++---
- block/file-posix.c        | 12 ++++----
- block/file-win32.c        |  6 ++--
- block/gluster.c           | 14 +++++----
- block/iscsi.c             |  8 +++---
- block/nfs.c               |  7 +++--
- block/qcow2.c             | 73 ++++++++++++++++++++++++++++-------------------
- block/qed.c               |  8 ++++--
- block/raw-format.c        |  8 +++---
- block/rbd.c               |  8 ++++--
- block/sheepdog.c          | 12 ++++----
- block/ssh.c               |  6 ++--
- 16 files changed, 161 insertions(+), 89 deletions(-)
+v2
+  - changes to the language for the lesser known architectures
+---
+ _posts/2018-06-21-tcg-testing.md | 139 +++++++++++++++++++++++++++++++
+ 1 file changed, 139 insertions(+)
+ create mode 100644 _posts/2018-06-21-tcg-testing.md
 
-diff --git a/include/block/block.h b/include/block/block.h
-index b1d6fdb97a..42e59ff585 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -300,8 +300,12 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
- BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-     const char *backing_file);
- void bdrv_refresh_filename(BlockDriverState *bs);
+diff --git a/_posts/2018-06-21-tcg-testing.md b/_posts/2018-06-21-tcg-testing.md
+new file mode 100644
+index 0000000..dfc504c
+--- /dev/null
++++ b/_posts/2018-06-21-tcg-testing.md
+@@ -0,0 +1,139 @@
++---
++layout: post
++title:  "QEMU TCG Tests"
++date:   2018-06-21 10:30:00:00 +0000
++last_modified_at: 2018-06-21 10:30:00:00 +0000
++author: Alex Bennée
++categories: [testing, docker, compilation, tcg]
++---
 +
-+int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
-+                                  PreallocMode prealloc, Error **errp);
- int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
-                   Error **errp);
++Ever since I started working on QEMU there was a small directory
++called tests/tcg that was in a perpetually broken state. It contains
++tests that exercise QEMU's ability to work across architectures using
++the power of the Tiny Code Generator. However as these tests needed to
++be compiled for the *guest* architectures and not the *host*
++architecture - known as cross-compiling - most developers never ran
++them. As the tests were hardly ever built inevitably a certain amount
++of bit-rot set in.
 +
- int64_t bdrv_nb_sectors(BlockDriverState *bs);
- int64_t bdrv_getlength(BlockDriverState *bs);
- int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 74646ed722..c653ee663a 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -289,8 +289,8 @@ struct BlockDriver {
-      * bdrv_parse_filename.
-      */
-     const char *protocol_name;
--    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset,
--                         PreallocMode prealloc, Error **errp);
-+    int coroutine_fn (*bdrv_co_truncate)(BlockDriverState *bs, int64_t offset,
-+                                         PreallocMode prealloc, Error **errp);
- 
-     int64_t (*bdrv_getlength)(BlockDriverState *bs);
-     bool has_variable_length;
-diff --git a/block.c b/block.c
-index 1b8147c1b3..f761bc85d5 100644
---- a/block.c
-+++ b/block.c
-@@ -3788,8 +3788,8 @@ exit:
- /**
-  * Truncate file to 'offset' bytes (needed only for file protocols)
-  */
--int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
--                  Error **errp)
-+int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
-+                                  PreallocMode prealloc, Error **errp)
- {
-     BlockDriverState *bs = child->bs;
-     BlockDriver *drv = bs->drv;
-@@ -3807,23 +3807,28 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
-         return -EINVAL;
-     }
- 
--    if (!drv->bdrv_truncate) {
-+    bdrv_inc_in_flight(bs);
++# Cross Compilers
 +
-+    if (!drv->bdrv_co_truncate) {
-         if (bs->file && drv->is_filter) {
--            return bdrv_truncate(bs->file, offset, prealloc, errp);
-+            ret = bdrv_co_truncate(bs->file, offset, prealloc, errp);
-+            goto out;
-         }
-         error_setg(errp, "Image format driver does not support resize");
--        return -ENOTSUP;
-+        ret = -ENOTSUP;
-+        goto out;
-     }
-     if (bs->read_only) {
-         error_setg(errp, "Image is read-only");
--        return -EACCES;
-+        ret = -EACCES;
-+        goto out;
-     }
- 
-     assert(!(bs->open_flags & BDRV_O_INACTIVE));
- 
--    ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
-+    ret = drv->bdrv_co_truncate(bs, offset, prealloc, errp);
-     if (ret < 0) {
--        return ret;
-+        goto out;
-     }
-     ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-     if (ret < 0) {
-@@ -3834,9 +3839,51 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
-     bdrv_dirty_bitmap_truncate(bs, offset);
-     bdrv_parent_cb_resize(bs);
-     atomic_inc(&bs->write_gen);
++In the old days cross-compilation setups were almost all hand-crafted
++affairs which involved building versions of binutils, gcc and a basic
++libc. If you couldn't get someone to give you a pre-built tarball it
++was something you laboured through once and hopefully never had to
++touch again. There were even dedicated scripts like crosstool-ng which
++attempted to make the process of patching and configuring your
++toolchain easier.
 +
-+out:
-+    bdrv_dec_in_flight(bs);
-     return ret;
- }
- 
-+typedef struct TruncateCo {
-+    BdrvChild *child;
-+    int64_t offset;
-+    PreallocMode prealloc;
-+    Error **errp;
-+    int ret;
-+} TruncateCo;
++While the distributions have improved their support for cross
++compilers over the years there are still plenty of variations in how
++they are deployed. It is hard for a project like QEMU which has to
++build on a wide range of operating systems and architectures to
++seamlessly use any given distributions compiler setup. However for
++those with cross compilers to hand `configure` now accepts two
++additional flags:
 +
-+static void coroutine_fn bdrv_truncate_co_entry(void *opaque)
-+{
-+    TruncateCo *tco = opaque;
-+    tco->ret = bdrv_co_truncate(tco->child, tco->offset, tco->prealloc,
-+                                tco->errp);
-+}
++    --cross-cc-$(ARCH)
++    --cross-cc-flags-$(ARCH)
 +
-+int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
-+                  Error **errp)
-+{
-+    Coroutine *co;
-+    TruncateCo tco = {
-+        .child      = child,
-+        .offset     = offset,
-+        .prealloc   = prealloc,
-+        .errp       = errp,
-+        .ret        = NOT_DONE,
-+    };
++With a compiler specified for each guest architecture you want to test
++the build system can now build and run the tests. However for
++developers that don't have cross compilers around they can now take
++advantage of QEMU's docker images.
 +
-+    if (qemu_in_coroutine()) {
-+        /* Fast-path if already in coroutine context */
-+        bdrv_truncate_co_entry(&tco);
-+    } else {
-+        co = qemu_coroutine_create(bdrv_truncate_co_entry, &tco);
-+        qemu_coroutine_enter(co);
-+        BDRV_POLL_WHILE(child->bs, tco.ret == NOT_DONE);
-+    }
++# Enter Docker Containers
 +
-+    return tco.ret;
-+}
++If you work in IT you would be hard pressed not to have noticed the
++hype around Docker and the concept of containerisation over the last
++few years. Put simply containers allow you to define a known working
++set of software that gets run in an isolated environment for a given
++task. While this has many uses for QEMU it allows us to define build
++environments that any developer can run without having to mess around
++with their preferred host setup.
 +
- /**
-  * Length of a allocated file in bytes. Sparse files are counted by actual
-  * allocated space. Return < 0 if error or unknown.
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 6a97208888..1dcdaeed69 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -80,10 +80,10 @@ static int64_t cor_getlength(BlockDriverState *bs)
- }
- 
- 
--static int cor_truncate(BlockDriverState *bs, int64_t offset,
--                        PreallocMode prealloc, Error **errp)
-+static int coroutine_fn cor_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                        PreallocMode prealloc, Error **errp)
- {
--    return bdrv_truncate(bs->file, offset, prealloc, errp);
-+    return bdrv_co_truncate(bs->file, offset, prealloc, errp);
- }
- 
- 
-@@ -147,7 +147,7 @@ BlockDriver bdrv_copy_on_read = {
-     .bdrv_child_perm                    = cor_child_perm,
- 
-     .bdrv_getlength                     = cor_getlength,
--    .bdrv_truncate                      = cor_truncate,
-+    .bdrv_co_truncate                   = cor_co_truncate,
- 
-     .bdrv_co_preadv                     = cor_co_preadv,
-     .bdrv_co_pwritev                    = cor_co_pwritev,
-diff --git a/block/crypto.c b/block/crypto.c
-index aaa8fb7530..210c80d5c7 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -357,8 +357,9 @@ static int block_crypto_co_create_generic(BlockDriverState *bs,
-     return ret;
- }
- 
--static int block_crypto_truncate(BlockDriverState *bs, int64_t offset,
--                                 PreallocMode prealloc, Error **errp)
-+static int coroutine_fn
-+block_crypto_co_truncate(BlockDriverState *bs, int64_t offset,
-+                         PreallocMode prealloc, Error **errp)
- {
-     BlockCrypto *crypto = bs->opaque;
-     uint64_t payload_offset =
-@@ -371,7 +372,7 @@ static int block_crypto_truncate(BlockDriverState *bs, int64_t offset,
- 
-     offset += payload_offset;
- 
--    return bdrv_truncate(bs->file, offset, prealloc, errp);
-+    return bdrv_co_truncate(bs->file, offset, prealloc, errp);
- }
- 
- static void block_crypto_close(BlockDriverState *bs)
-@@ -700,7 +701,7 @@ BlockDriver bdrv_crypto_luks = {
-     .bdrv_child_perm    = bdrv_format_default_perms,
-     .bdrv_co_create     = block_crypto_co_create_luks,
-     .bdrv_co_create_opts = block_crypto_co_create_opts_luks,
--    .bdrv_truncate      = block_crypto_truncate,
-+    .bdrv_co_truncate   = block_crypto_co_truncate,
-     .create_opts        = &block_crypto_create_opts_luks,
- 
-     .bdrv_reopen_prepare = block_crypto_reopen_prepare,
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 07bb061fe4..6223a8bccc 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1856,8 +1856,8 @@ out:
-     return result;
- }
- 
--static int raw_truncate(BlockDriverState *bs, int64_t offset,
--                        PreallocMode prealloc, Error **errp)
-+static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                        PreallocMode prealloc, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-     struct stat st;
-@@ -2602,7 +2602,7 @@ BlockDriver bdrv_file = {
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
- 
--    .bdrv_truncate = raw_truncate,
-+    .bdrv_co_truncate = raw_co_truncate,
-     .bdrv_getlength = raw_getlength,
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-@@ -3082,7 +3082,7 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
- 
--    .bdrv_truncate      = raw_truncate,
-+    .bdrv_co_truncate       = raw_co_truncate,
-     .bdrv_getlength	= raw_getlength,
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-@@ -3204,7 +3204,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
- 
--    .bdrv_truncate      = raw_truncate,
-+    .bdrv_co_truncate    = raw_co_truncate,
-     .bdrv_getlength      = raw_getlength,
-     .has_variable_length = true,
-     .bdrv_get_allocated_file_size
-@@ -3334,7 +3334,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
- 
--    .bdrv_truncate      = raw_truncate,
-+    .bdrv_co_truncate    = raw_co_truncate,
-     .bdrv_getlength      = raw_getlength,
-     .has_variable_length = true,
-     .bdrv_get_allocated_file_size
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 3c67db4336..0411fe80fd 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -467,8 +467,8 @@ static void raw_close(BlockDriverState *bs)
-     }
- }
- 
--static int raw_truncate(BlockDriverState *bs, int64_t offset,
--                        PreallocMode prealloc, Error **errp)
-+static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                        PreallocMode prealloc, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-     LONG low, high;
-@@ -640,7 +640,7 @@ BlockDriver bdrv_file = {
-     .bdrv_aio_pwritev   = raw_aio_pwritev,
-     .bdrv_aio_flush     = raw_aio_flush,
- 
--    .bdrv_truncate	= raw_truncate,
-+    .bdrv_co_truncate   = raw_co_truncate,
-     .bdrv_getlength	= raw_getlength,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
-diff --git a/block/gluster.c b/block/gluster.c
-index b5fe7f3e87..a4e1c8ecd8 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1177,8 +1177,10 @@ static coroutine_fn int qemu_gluster_co_rw(BlockDriverState *bs,
-     return acb.ret;
- }
- 
--static int qemu_gluster_truncate(BlockDriverState *bs, int64_t offset,
--                                 PreallocMode prealloc, Error **errp)
-+static coroutine_fn int qemu_gluster_co_truncate(BlockDriverState *bs,
-+                                                 int64_t offset,
-+                                                 PreallocMode prealloc,
-+                                                 Error **errp)
- {
-     BDRVGlusterState *s = bs->opaque;
-     return qemu_gluster_do_truncate(s->fd, offset, prealloc, errp);
-@@ -1499,7 +1501,7 @@ static BlockDriver bdrv_gluster = {
-     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
--    .bdrv_truncate                = qemu_gluster_truncate,
-+    .bdrv_co_truncate             = qemu_gluster_co_truncate,
-     .bdrv_co_readv                = qemu_gluster_co_readv,
-     .bdrv_co_writev               = qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
-@@ -1528,7 +1530,7 @@ static BlockDriver bdrv_gluster_tcp = {
-     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
--    .bdrv_truncate                = qemu_gluster_truncate,
-+    .bdrv_co_truncate             = qemu_gluster_co_truncate,
-     .bdrv_co_readv                = qemu_gluster_co_readv,
-     .bdrv_co_writev               = qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
-@@ -1557,7 +1559,7 @@ static BlockDriver bdrv_gluster_unix = {
-     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
--    .bdrv_truncate                = qemu_gluster_truncate,
-+    .bdrv_co_truncate             = qemu_gluster_co_truncate,
-     .bdrv_co_readv                = qemu_gluster_co_readv,
-     .bdrv_co_writev               = qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
-@@ -1592,7 +1594,7 @@ static BlockDriver bdrv_gluster_rdma = {
-     .bdrv_co_create_opts          = qemu_gluster_co_create_opts,
-     .bdrv_getlength               = qemu_gluster_getlength,
-     .bdrv_get_allocated_file_size = qemu_gluster_allocated_file_size,
--    .bdrv_truncate                = qemu_gluster_truncate,
-+    .bdrv_co_truncate             = qemu_gluster_co_truncate,
-     .bdrv_co_readv                = qemu_gluster_co_readv,
-     .bdrv_co_writev               = qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 9f00fb47a5..bc84b14e20 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2085,8 +2085,8 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
-     }
- }
- 
--static int iscsi_truncate(BlockDriverState *bs, int64_t offset,
--                          PreallocMode prealloc, Error **errp)
-+static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                          PreallocMode prealloc, Error **errp)
- {
-     IscsiLun *iscsilun = bs->opaque;
-     Error *local_err = NULL;
-@@ -2431,7 +2431,7 @@ static BlockDriver bdrv_iscsi = {
- 
-     .bdrv_getlength  = iscsi_getlength,
-     .bdrv_get_info   = iscsi_get_info,
--    .bdrv_truncate   = iscsi_truncate,
-+    .bdrv_co_truncate    = iscsi_co_truncate,
-     .bdrv_refresh_limits = iscsi_refresh_limits,
- 
-     .bdrv_co_block_status  = iscsi_co_block_status,
-@@ -2468,7 +2468,7 @@ static BlockDriver bdrv_iser = {
- 
-     .bdrv_getlength  = iscsi_getlength,
-     .bdrv_get_info   = iscsi_get_info,
--    .bdrv_truncate   = iscsi_truncate,
-+    .bdrv_co_truncate    = iscsi_co_truncate,
-     .bdrv_refresh_limits = iscsi_refresh_limits,
- 
-     .bdrv_co_block_status  = iscsi_co_block_status,
-diff --git a/block/nfs.c b/block/nfs.c
-index 743ca0450e..eab1a2c408 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -743,8 +743,9 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
-     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
- }
- 
--static int nfs_file_truncate(BlockDriverState *bs, int64_t offset,
--                             PreallocMode prealloc, Error **errp)
-+static int coroutine_fn
-+nfs_file_co_truncate(BlockDriverState *bs, int64_t offset,
-+                     PreallocMode prealloc, Error **errp)
- {
-     NFSClient *client = bs->opaque;
-     int ret;
-@@ -873,7 +874,7 @@ static BlockDriver bdrv_nfs = {
- 
-     .bdrv_has_zero_init             = nfs_has_zero_init,
-     .bdrv_get_allocated_file_size   = nfs_get_allocated_file_size,
--    .bdrv_truncate                  = nfs_file_truncate,
-+    .bdrv_co_truncate               = nfs_file_co_truncate,
- 
-     .bdrv_file_open                 = nfs_file_open,
-     .bdrv_close                     = nfs_file_close,
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6b2e1e1058..cd1836bc5b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2543,15 +2543,12 @@ static void coroutine_fn preallocate_co(void *opaque)
-     BlockDriverState *bs = params->bs;
-     uint64_t offset = params->offset;
-     uint64_t new_length = params->new_length;
--    BDRVQcow2State *s = bs->opaque;
-     uint64_t bytes;
-     uint64_t host_offset = 0;
-     unsigned int cur_bytes;
-     int ret;
-     QCowL2Meta *meta;
- 
--    qemu_co_mutex_lock(&s->lock);
--
-     assert(offset <= new_length);
-     bytes = new_length - offset;
- 
-@@ -2604,7 +2601,6 @@ static void coroutine_fn preallocate_co(void *opaque)
-     ret = 0;
- 
- done:
--    qemu_co_mutex_unlock(&s->lock);
-     params->ret = ret;
- }
- 
-@@ -3041,7 +3037,11 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
- 
-     /* And if we're supposed to preallocate metadata, do that now */
-     if (qcow2_opts->preallocation != PREALLOC_MODE_OFF) {
-+        BDRVQcow2State *s = blk_bs(blk)->opaque;
-+        qemu_co_mutex_lock(&s->lock);
-         ret = preallocate(blk_bs(blk), 0, qcow2_opts->size);
-+        qemu_co_mutex_unlock(&s->lock);
++Over the last few years QEMU's build system has been expanding the
++number of docker images it supports. Most of this has been in service
++of our CI testing such as [Patchew](https://patchew.org/QEMU/) and
++[Shippable](https://app.shippable.com/github/qemu/qemu/dashboard) but
++any developer with a docker setup can run the exact same images. For
++example if you want to check your patches won't break when compiled on
++a 32 bit ARM system you can run:
 +
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Could not preallocate metadata");
-             goto out;
-@@ -3437,8 +3437,8 @@ fail:
-     return ret;
- }
- 
--static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
--                          PreallocMode prealloc, Error **errp)
-+static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                          PreallocMode prealloc, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t old_length;
-@@ -3458,17 +3458,21 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         return -EINVAL;
-     }
- 
-+    qemu_co_mutex_lock(&s->lock);
++    make docker-test-build@debian-armhf-cross J=n
 +
-     /* cannot proceed if image has snapshots */
-     if (s->nb_snapshots) {
-         error_setg(errp, "Can't resize an image which has snapshots");
--        return -ENOTSUP;
-+        ret = -ENOTSUP;
-+        goto fail;
-     }
- 
-     /* cannot proceed if image has bitmaps */
-     if (s->nb_bitmaps) {
-         /* TODO: resize bitmaps in the image */
-         error_setg(errp, "Can't resize an image which has bitmaps");
--        return -ENOTSUP;
-+        ret = -ENOTSUP;
-+        goto fail;
-     }
- 
-     old_length = bs->total_sectors * 512;
-@@ -3479,7 +3483,8 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         if (prealloc != PREALLOC_MODE_OFF) {
-             error_setg(errp,
-                        "Preallocation can't be used for shrinking an image");
--            return -EINVAL;
-+            ret = -EINVAL;
-+            goto fail;
-         }
- 
-         ret = qcow2_cluster_discard(bs, ROUND_UP(offset, s->cluster_size),
-@@ -3488,40 +3493,42 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                                     QCOW2_DISCARD_ALWAYS, true);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Failed to discard cropped clusters");
--            return ret;
-+            goto fail;
-         }
- 
-         ret = qcow2_shrink_l1_table(bs, new_l1_size);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "Failed to reduce the number of L2 tables");
--            return ret;
-+            goto fail;
-         }
- 
-         ret = qcow2_shrink_reftable(bs);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "Failed to discard unused refblocks");
--            return ret;
-+            goto fail;
-         }
- 
-         old_file_size = bdrv_getlength(bs->file->bs);
-         if (old_file_size < 0) {
-             error_setg_errno(errp, -old_file_size,
-                              "Failed to inquire current file length");
--            return old_file_size;
-+            ret = old_file_size;
-+            goto fail;
-         }
-         last_cluster = qcow2_get_last_cluster(bs, old_file_size);
-         if (last_cluster < 0) {
-             error_setg_errno(errp, -last_cluster,
-                              "Failed to find the last cluster");
--            return last_cluster;
-+            ret = last_cluster;
-+            goto fail;
-         }
-         if ((last_cluster + 1) * s->cluster_size < old_file_size) {
-             Error *local_err = NULL;
- 
--            bdrv_truncate(bs->file, (last_cluster + 1) * s->cluster_size,
--                          PREALLOC_MODE_OFF, &local_err);
-+            bdrv_co_truncate(bs->file, (last_cluster + 1) * s->cluster_size,
-+                             PREALLOC_MODE_OFF, &local_err);
-             if (local_err) {
-                 warn_reportf_err(local_err,
-                                  "Failed to truncate the tail of the image: ");
-@@ -3531,7 +3538,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         ret = qcow2_grow_l1_table(bs, new_l1_size, true);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Failed to grow the L1 table");
--            return ret;
-+            goto fail;
-         }
-     }
- 
-@@ -3543,7 +3550,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         ret = preallocate(bs, old_length, offset);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Preallocation failed");
--            return ret;
-+            goto fail;
-         }
-         break;
- 
-@@ -3559,7 +3566,8 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         if (old_file_size < 0) {
-             error_setg_errno(errp, -old_file_size,
-                              "Failed to inquire current file length");
--            return old_file_size;
-+            ret = old_file_size;
-+            goto fail;
-         }
-         old_file_size = ROUND_UP(old_file_size, s->cluster_size);
- 
-@@ -3589,7 +3597,8 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         if (allocation_start < 0) {
-             error_setg_errno(errp, -allocation_start,
-                              "Failed to resize refcount structures");
--            return allocation_start;
-+            ret = allocation_start;
-+            goto fail;
-         }
- 
-         clusters_allocated = qcow2_alloc_clusters_at(bs, allocation_start,
-@@ -3597,7 +3606,8 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         if (clusters_allocated < 0) {
-             error_setg_errno(errp, -clusters_allocated,
-                              "Failed to allocate data clusters");
--            return clusters_allocated;
-+            ret = clusters_allocated;
-+            goto fail;
-         }
- 
-         assert(clusters_allocated == nb_new_data_clusters);
-@@ -3605,13 +3615,13 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         /* Allocate the data area */
-         new_file_size = allocation_start +
-                         nb_new_data_clusters * s->cluster_size;
--        ret = bdrv_truncate(bs->file, new_file_size, prealloc, errp);
-+        ret = bdrv_co_truncate(bs->file, new_file_size, prealloc, errp);
-         if (ret < 0) {
-             error_prepend(errp, "Failed to resize underlying file: ");
-             qcow2_free_clusters(bs, allocation_start,
-                                 nb_new_data_clusters * s->cluster_size,
-                                 QCOW2_DISCARD_OTHER);
--            return ret;
-+            goto fail;
-         }
- 
-         /* Create the necessary L2 entries */
-@@ -3634,7 +3644,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                 qcow2_free_clusters(bs, host_offset,
-                                     nb_new_data_clusters * s->cluster_size,
-                                     QCOW2_DISCARD_OTHER);
--                return ret;
-+                goto fail;
-             }
- 
-             guest_offset += nb_clusters * s->cluster_size;
-@@ -3650,11 +3660,11 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
- 
-     if (prealloc != PREALLOC_MODE_OFF) {
-         /* Flush metadata before actually changing the image size */
--        ret = bdrv_flush(bs);
-+        ret = qcow2_write_caches(bs);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "Failed to flush the preallocated area to disk");
--            return ret;
-+            goto fail;
-         }
-     }
- 
-@@ -3664,11 +3674,14 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                            &offset, sizeof(uint64_t));
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Failed to update the image size");
--        return ret;
-+        goto fail;
-     }
- 
-     s->l1_vm_state_index = new_l1_size;
--    return 0;
-+    ret = 0;
-+fail:
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
- }
- 
- /* XXX: put compressed sectors first, then all the cluster aligned
-@@ -3692,7 +3705,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-         if (cluster_offset < 0) {
-             return cluster_offset;
-         }
--        return bdrv_truncate(bs->file, cluster_offset, PREALLOC_MODE_OFF, NULL);
-+        return bdrv_co_truncate(bs->file, cluster_offset, PREALLOC_MODE_OFF, NULL);
-     }
- 
-     if (offset_into_cluster(s, offset)) {
-@@ -4696,7 +4709,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_co_pdiscard       = qcow2_co_pdiscard,
-     .bdrv_co_copy_range_from = qcow2_co_copy_range_from,
-     .bdrv_co_copy_range_to  = qcow2_co_copy_range_to,
--    .bdrv_truncate          = qcow2_truncate,
-+    .bdrv_co_truncate       = qcow2_co_truncate,
-     .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
-     .bdrv_make_empty        = qcow2_make_empty,
- 
-diff --git a/block/qed.c b/block/qed.c
-index 2363814538..689ea9d4d5 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1467,8 +1467,10 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-                           QED_AIOCB_WRITE | QED_AIOCB_ZERO);
- }
- 
--static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset,
--                             PreallocMode prealloc, Error **errp)
-+static int coroutine_fn bdrv_qed_co_truncate(BlockDriverState *bs,
-+                                             int64_t offset,
-+                                             PreallocMode prealloc,
-+                                             Error **errp)
- {
-     BDRVQEDState *s = bs->opaque;
-     uint64_t old_image_size;
-@@ -1678,7 +1680,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_co_readv            = bdrv_qed_co_readv,
-     .bdrv_co_writev           = bdrv_qed_co_writev,
-     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
--    .bdrv_truncate            = bdrv_qed_truncate,
-+    .bdrv_co_truncate         = bdrv_qed_co_truncate,
-     .bdrv_getlength           = bdrv_qed_getlength,
-     .bdrv_get_info            = bdrv_qed_get_info,
-     .bdrv_refresh_limits      = bdrv_qed_refresh_limits,
-diff --git a/block/raw-format.c b/block/raw-format.c
-index f2e468df6f..b78da564d4 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -366,8 +366,8 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-     }
- }
- 
--static int raw_truncate(BlockDriverState *bs, int64_t offset,
--                        PreallocMode prealloc, Error **errp)
-+static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                        PreallocMode prealloc, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
- 
-@@ -383,7 +383,7 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
- 
-     s->size = offset;
-     offset += s->offset;
--    return bdrv_truncate(bs->file, offset, prealloc, errp);
-+    return bdrv_co_truncate(bs->file, offset, prealloc, errp);
- }
- 
- static void raw_eject(BlockDriverState *bs, bool eject_flag)
-@@ -545,7 +545,7 @@ BlockDriver bdrv_raw = {
-     .bdrv_co_block_status = &raw_co_block_status,
-     .bdrv_co_copy_range_from = &raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = &raw_co_copy_range_to,
--    .bdrv_truncate        = &raw_truncate,
-+    .bdrv_co_truncate     = &raw_co_truncate,
-     .bdrv_getlength       = &raw_getlength,
-     .has_variable_length  = true,
-     .bdrv_measure         = &raw_measure,
-diff --git a/block/rbd.c b/block/rbd.c
-index f2c6965418..ca8e5bbace 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -990,8 +990,10 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-     return info.size;
- }
- 
--static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset,
--                             PreallocMode prealloc, Error **errp)
-+static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
-+                                             int64_t offset,
-+                                             PreallocMode prealloc,
-+                                             Error **errp)
- {
-     BDRVRBDState *s = bs->opaque;
-     int r;
-@@ -1184,7 +1186,7 @@ static BlockDriver bdrv_rbd = {
-     .bdrv_get_info          = qemu_rbd_getinfo,
-     .create_opts            = &qemu_rbd_create_opts,
-     .bdrv_getlength         = qemu_rbd_getlength,
--    .bdrv_truncate          = qemu_rbd_truncate,
-+    .bdrv_co_truncate       = qemu_rbd_co_truncate,
-     .protocol_name          = "rbd",
- 
-     .bdrv_aio_preadv        = qemu_rbd_aio_preadv,
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 665b1763eb..b229a664d9 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2292,8 +2292,8 @@ static int64_t sd_getlength(BlockDriverState *bs)
-     return s->inode.vdi_size;
- }
- 
--static int sd_truncate(BlockDriverState *bs, int64_t offset,
--                       PreallocMode prealloc, Error **errp)
-+static int coroutine_fn sd_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                       PreallocMode prealloc, Error **errp)
- {
-     BDRVSheepdogState *s = bs->opaque;
-     int ret, fd;
-@@ -2609,7 +2609,7 @@ static coroutine_fn int sd_co_writev(BlockDriverState *bs, int64_t sector_num,
- 
-     assert(!flags);
-     if (offset > s->inode.vdi_size) {
--        ret = sd_truncate(bs, offset, PREALLOC_MODE_OFF, NULL);
-+        ret = sd_co_truncate(bs, offset, PREALLOC_MODE_OFF, NULL);
-         if (ret < 0) {
-             return ret;
-         }
-@@ -3231,7 +3231,7 @@ static BlockDriver bdrv_sheepdog = {
-     .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-     .bdrv_getlength               = sd_getlength,
-     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
--    .bdrv_truncate                = sd_truncate,
-+    .bdrv_co_truncate             = sd_co_truncate,
- 
-     .bdrv_co_readv                = sd_co_readv,
-     .bdrv_co_writev               = sd_co_writev,
-@@ -3268,7 +3268,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
-     .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-     .bdrv_getlength               = sd_getlength,
-     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
--    .bdrv_truncate                = sd_truncate,
-+    .bdrv_co_truncate             = sd_co_truncate,
- 
-     .bdrv_co_readv                = sd_co_readv,
-     .bdrv_co_writev               = sd_co_writev,
-@@ -3305,7 +3305,7 @@ static BlockDriver bdrv_sheepdog_unix = {
-     .bdrv_has_zero_init           = bdrv_has_zero_init_1,
-     .bdrv_getlength               = sd_getlength,
-     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
--    .bdrv_truncate                = sd_truncate,
-+    .bdrv_co_truncate             = sd_co_truncate,
- 
-     .bdrv_co_readv                = sd_co_readv,
-     .bdrv_co_writev               = sd_co_writev,
-diff --git a/block/ssh.c b/block/ssh.c
-index da7bbf73e2..7fbc27abdf 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -1243,8 +1243,8 @@ static int64_t ssh_getlength(BlockDriverState *bs)
-     return length;
- }
- 
--static int ssh_truncate(BlockDriverState *bs, int64_t offset,
--                        PreallocMode prealloc, Error **errp)
-+static int coroutine_fn ssh_co_truncate(BlockDriverState *bs, int64_t offset,
-+                                        PreallocMode prealloc, Error **errp)
- {
-     BDRVSSHState *s = bs->opaque;
- 
-@@ -1279,7 +1279,7 @@ static BlockDriver bdrv_ssh = {
-     .bdrv_co_readv                = ssh_co_readv,
-     .bdrv_co_writev               = ssh_co_writev,
-     .bdrv_getlength               = ssh_getlength,
--    .bdrv_truncate                = ssh_truncate,
-+    .bdrv_co_truncate             = ssh_co_truncate,
-     .bdrv_co_flush_to_disk        = ssh_co_flush,
-     .create_opts                  = &ssh_create_opts,
- };
++instead of tracking down a piece of ARM hardware to actually build on.
++Run `make docker` in your source tree to see the range of builds and
++tests it can support.
++
++# make check-tcg
++
++With the latest work [merged into
++master](https://git.qemu.org/?p=qemu.git;a=commit;h=de44c044420d1139480fa50c2d5be19223391218) we can now
++take advantage of both hand configured and docker based cross
++compilers to build test cases for TCG again. To run the TCG tests
++after you have built QEMU:
++
++    make check-tcg
++
++and the build system will build and run all the tests it can for your
++configured targets.
++
++# Rules for tests/tcg
++
++So now we have the infrastructure in place to add new tests what rules
++need to be followed to add new tests? 
++
++Well the first thing to note is currently all the tests are for
++linux-user versions of QEMU. This means the tests are all currently
++user-space tests that have access to the Linux syscall ABI.
++
++Another thing to note is the tests are standalone from the rest of the
++QEMU test infrastructure. To keep things simple they are compiled as
++standalone "static" binaries. As the cross-compilation setup can be
++quite rudimentary for some of the rarer architectures we only compile
++against a standard libc. There is no support for linking to other
++libraries like for example glib. Thread and maths support is part of
++glibc so shouldn't be a problem.
++
++Finally when writing new tests consider if it really is architecture
++specific or can be added to `tests/tcg/multiarch`. The multiarch tests
++are re-built for every supported architecture and should be the
++default place for anything explicitly testing syscalls and other
++common parts of the code base.
++
++# What's Next
++
++My hope with this work is we can start adding more tests to
++systematically defend functionality in linux-user. In fact I hope the
++first port of call to reproducing a crash would be writing a test case
++that can be added to our growing library of tests.
++
++Another thing that needs sorting out is getting toolchains for all of
++the less common architectures. The current work relies heavily on the
++excellent work of the Debian toolchain team in making multiarch
++aware cross compilers available in their distribution. However QEMU
++supports a lot more architectures than QEMU, some only as system
++emulations. In principle supporting them is as easy as adding another
++docker recipe but it might be these recipes end up having to compile
++the compilers from source.
++
++The `tests/tcg` directory still contains a number of source files we
++don't build. 
++
++The cris and openrisc directories contain user-space tests which just
++need the support of a toolchain and the relevant Makefile plumbing to
++be added.
++
++The lm32, mips and xtensa targets have a set of tests that need a
++system emulator. Aside from adding the compilers as docker images some
++additional work is needed to handle the differences between plain
++linux-user tests which can simply return an exit code to getting the
++results from a qemu-system emulation. Some architectures have
++semi-hosting support already for this while others report their test
++status over a simple serial link which will need to be parsed and
++handled in custom versions of the
++[`run-%:`](https://git.qemu.org/?p=qemu.git;a=blob;f=tests/tcg/Makefile;h=bf064153900a438e4ad8e2d79eaaac8a27d66062;hb=HEAD#l95)
++rule.
++
++
 -- 
-2.13.6
+2.17.1
