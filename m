@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fXs6k-0001ki-Uj
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:50:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXs80-0002I4-5d
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fXs6h-0006rS-0r
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:50:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49458 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fXs6g-0006qy-Gs
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:50:22 -0400
-Date: Tue, 26 Jun 2018 20:50:20 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180626204312-mutt-send-email-mst@kernel.org>
-References: <20180621165913.7e3f4faa.cohuck@redhat.com>
-	<20180621211712-mutt-send-email-mst@kernel.org>
-	<20180622170955.298900c1.cohuck@redhat.com>
-	<20180622214259-mutt-send-email-mst@kernel.org>
-	<CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
-	<20180623003022-mutt-send-email-mst@kernel.org>
-	<CADGSJ22oFhP955cuTmMWeSt0UOsG5K1A--c34QUSMx5z3Up2SA@mail.gmail.com>
-	<20180623012934-mutt-send-email-mst@kernel.org>
-	<CADGSJ21HNd4VYNcCt4H0gJ_CCx1GUFpHrDof2N=4WqhD24Zc2A@mail.gmail.com>
-	<20180626170813.4db094a1.cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fXs7z-00089u-69
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:51:44 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43509)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXs7y-00089K-Tj
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 13:51:43 -0400
+Received: by mail-oi0-x242.google.com with SMTP id x18-v6so7434831oie.10
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 10:51:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180626170813.4db094a1.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+In-Reply-To: <002201d40d74$a1b4b8d0$e51e2a70$@phi.nz>
+References: <002201d40d74$a1b4b8d0$e51e2a70$@phi.nz>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 18:51:21 +0100
+Message-ID: <CAFEAcA-sT28yye6xpoMauLNNJzTok5e4Qbb_mzPOKQmgPeDneQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Fixed CR0.TS check in gen_sse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: Alexandro Sanchez Bach <alexandro@phi.nz>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Tue, Jun 26, 2018 at 05:08:13PM +0200, Cornelia Huck wrote:
-> On Fri, 22 Jun 2018 17:05:04 -0700
-> Siwei Liu <loseweigh@gmail.com> wrote:
-> 
-> > On Fri, Jun 22, 2018 at 3:33 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > I suspect the diveregence will be lost on most users though
-> > > simply because they don't even care about vfio. They just
-> > > want things to go fast.  
-> > 
-> > Like Jason said, VF isn't faster than virtio-net in all cases. It
-> > depends on the workload and performance metrics: throughput, latency,
-> > or packet per second.
-> 
-> So, will it be guest/admin-controllable then where the traffic flows
-> through? Just because we do have a vf available after negotiation of
-> the feature bit, it does not necessarily mean we want to use it? Do we
-> (the guest) even want to make it visible in that case?
+Ccing the target/i386 maintainers...
 
-I think these ideas belong to what Alex Duyck wanted to do:
-some kind of advanced device that isn't tied to
-any network interfaces and allows workload and performance
-specific tuning.
+thanks
+-- PMM
 
-Way out of scope for a simple failover, and more importantly,
-no one is looking at even enumerating the problems involved,
-much less solving them.
-
--- 
-MST
+On 26 June 2018 at 18:39, Alexandro Sanchez Bach <alexandro@phi.nz> wrote:
+> Ping.
+>
+> -----Original Message-----
+> From: Alexandro Sanchez Bach <alexandro@phi.nz>
+> Sent: Tuesday, May 29, 2018 12:20
+> To: 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>
+> Subject: [PATCH] target/i386: Fixed CR0.TS check in gen_sse
+>
+> The function `gen_sse` assumes all of its instructions require CR0.TS=0.
+> However, integer extensions at `0F 38 F[0-F]` and `0F 3A F[0-F]` such as
+> CRC32, MOVBE, ADX, BMI1, BMI2 that are handled by `gen_sse` are not supposed
+> to throw an exception in this scenario. This causes issues while booting
+> some FreeBSD-based guests.
+>
+> Reported-by: Alexandro Sanchez Bach <alexandro@phi.nz>
+> Signed-off-by: Alexandro Sanchez Bach <alexandro@phi.nz>
+> Cc: qemu-stable@nongnu.org
+> diff --git a/target/i386/translate.c b/target/i386/translate.c index
+> 7c21814676..079ab7afef 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -3049,8 +3049,16 @@ static void gen_sse(CPUX86State *env, DisasContext
+> *s, int b,
+>              is_xmm = 1;
+>          }
+>      }
+> +
+> +    modrm = x86_ldub_code(env, s);
+> +    reg = ((modrm >> 3) & 7);
+> +    if (is_xmm)
+> +        reg |= rex_r;
+> +    mod = (modrm >> 6) & 3;
+> +
+>      /* simple MMX/SSE operation */
+> -    if (s->flags & HF_TS_MASK) {
+> +    if (s->flags & HF_TS_MASK
+> +        && ((b != 0x38 && b != 0x3A) || !(modrm & 0xF0))) {
+>          gen_exception(s, EXCP07_PREX, pc_start - s->cs_base);
+>          return;
+>      }
+> @@ -3084,11 +3092,6 @@ static void gen_sse(CPUX86State *env, DisasContext
+> *s, int b,
+>          gen_helper_enter_mmx(cpu_env);
+>      }
+>
+> -    modrm = x86_ldub_code(env, s);
+> -    reg = ((modrm >> 3) & 7);
+> -    if (is_xmm)
+> -        reg |= rex_r;
+> -    mod = (modrm >> 6) & 3;
+>      if (sse_fn_epp == SSE_SPECIAL) {
+>          b |= (b1 << 8);
+>          switch(b) {
+>
+>
