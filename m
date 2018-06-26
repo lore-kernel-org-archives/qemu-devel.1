@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXqRB-0001nQ-32
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:03:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXqRs-0002Fg-5x
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:04:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXqR8-0006ex-Fw
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:03:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58662 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fXqR8-0006ei-CG
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:03:22 -0400
-Date: Tue, 26 Jun 2018 18:03:16 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180626180316.3723422f.cohuck@redhat.com>
-In-Reply-To: <20180626183706-mutt-send-email-mst@kernel.org>
-References: <CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
-	<CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
-	<20180623002628-mutt-send-email-mst@kernel.org>
-	<CADGSJ20td7b6He6S1PBSJjCq=bNvgqMGbOjiho2eeQm2pgpK3g@mail.gmail.com>
-	<20180623012406-mutt-send-email-mst@kernel.org>
-	<CADGSJ211pWKYnuuzcgUqJZiHU+=7H3oQSpp1TnE=+EBjkdmCSQ@mail.gmail.com>
-	<CADGSJ22DX8=rNPY+gNS_q=LCYLR5ieoE7oD8p4+8AnpzQsWSCg@mail.gmail.com>
-	<da144f8f-65cd-45d9-3c81-6c8ca1fb25fe@intel.com>
-	<20180626044650-mutt-send-email-mst@kernel.org>
-	<20180626171732.5038f53f.cohuck@redhat.com>
-	<20180626183706-mutt-send-email-mst@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fXqRr-0006wg-6u
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:04:08 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXqRr-0006wQ-0j
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:04:07 -0400
+Received: by mail-ot0-x244.google.com with SMTP id i17-v6so8741132otl.1
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:04:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+In-Reply-To: <1529653501-15358-1-git-send-email-eric.auger@redhat.com>
+References: <1529653501-15358-1-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:03:45 +0100
+Message-ID: <CAFEAcA9CNTF9xsfcKyCpEDX-meb6JyqbicWpZdqGPc8YAU4b8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] ARM SMMUv3: IOTLB Emulation and
+ VHOST Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Siwei Liu <loseweigh@gmail.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, jia.he@hxt-semitech.com, Jia He <hejianet@gmail.com>
 
-On Tue, 26 Jun 2018 18:38:51 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 22 June 2018 at 08:44, Eric Auger <eric.auger@redhat.com> wrote:
+> This series brings translation configuration caching and IOTLB
+> emulation.  The last patch implements VHOST integration and
+> allows to run VSMMUv3 along with VHOST emulated end points.
+>
+> The first patch fixes the passthrough mode bug reported by Jia.
+> It reworks the translate function and this series needed to be
+> rebased on it.
+>
+> Best Regards
+>
+> Eric
+>
+> This series can be found at:
+> https://github.com/eauger/qemu/tree/v2.12.0-vsmmu-optim-v4
+> Previous version at:
+> https://github.com/eauger/qemu/tree/v2.12.0-vsmmu-optim-v3
+>
+> History:
+>
+> v3 -> v4:
+> - (new == IOMMU_NOTIFIER_MAP) replaced by (new & IOMMU_NOTIFIER_MAP)
+>   in smmuv3_notify_flag_changed
+>
+> v2 -> v3:
+> - collected Peter's R-b
+> - do not use float in trace points anymore
+>
+> v1 -> v2:
+> - addition of the 1st patch (including addr_mask fix)
+> - addition of the per device mutex as on intel iommu
+>
+> v1: [1] v12 last 3 patches resent in this series
+> [1] [PATCH v12 00/17] ARM SMMUv3 Emulation Support
+> https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg04344.html
 
-> On Tue, Jun 26, 2018 at 05:17:32PM +0200, Cornelia Huck wrote:
-> > On Tue, 26 Jun 2018 04:50:25 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >  =20
-> > > On Mon, Jun 25, 2018 at 10:54:09AM -0700, Samudrala, Sridhar wrote: =
-=20
-> > > > > > > > Might not neccessarily be something wrong, but it's very li=
-mited to
-> > > > > > > > prohibit the MAC of VF from changing when enslaved by failo=
-ver.   =20
-> > > > > > > You mean guest changing MAC? I'm not sure why we prohibit tha=
-t.   =20
-> > > > > > I think Sridhar and Jiri might be better person to answer it. My
-> > > > > > impression was that sync'ing the MAC address change between all=
- 3
-> > > > > > devices is challenging, as the failover driver uses MAC address=
- to
-> > > > > > match net_device internally.   =20
-> > > >=20
-> > > > Yes. The MAC address is assigned by the hypervisor and it needs to =
-manage the movement
-> > > > of the MAC between the PF and VF.=C2=A0 Allowing the guest to chang=
-e the MAC will require
-> > > > synchronization between the hypervisor and the PF/VF drivers. Most =
-of the VF drivers
-> > > > don't allow changing guest MAC unless it is a trusted VF.   =20
-> > >=20
-> > > OK but it's a policy thing. Maybe it's a trusted VF. Who knows?
-> > > For example I can see host just
-> > > failing VIRTIO_NET_CTRL_MAC_ADDR_SET if it wants to block it.
-> > > I'm not sure why VIRTIO_NET_F_STANDBY has to block it in the guest.
-> > >  =20
-> >=20
-> > So, what I get from this is that QEMU needs to be able to control all
-> > of standby, uuid, and mac to accommodate the different setups
-> > (respectively have libvirt/management software set it up). Is the host
-> > able to find out respectively define whether a VF is trusted? =20
->=20
-> You do it with ip link I think but QEMU doesn't normally do this,
-> it relies on libvirt to poke at host kernel and supply the info.
->=20
 
-Ok, that makes me conclude that we definitely need to involve the
-libvirt folks before we proceed further with defining QEMU interfaces.
+
+Applied to target-arm.next, thanks.
+
+-- PMM
