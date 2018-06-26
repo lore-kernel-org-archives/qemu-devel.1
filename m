@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHE-00023V-Kr
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:13 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHF-000241-0v
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHD-0007Di-L7
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:12 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43034)
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHE-0007E6-1d
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:13 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fXrHD-0007CU-DU
+	id 1fXrHD-00079F-Qx
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:11 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHC-00006T-45
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:10 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrH5-0008UW-Nw
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:03 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 17:56:40 +0100
-Message-Id: <20180626165658.31394-15-peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:56:31 +0100
+Message-Id: <20180626165658.31394-6-peter.maydell@linaro.org>
 In-Reply-To: <20180626165658.31394-1-peter.maydell@linaro.org>
 References: <20180626165658.31394-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/32] hw/arm/omap1: Use
- qemu_log_mask(GUEST_ERROR) instead of fprintf
+Subject: [Qemu-devel] [PULL 05/32] xilinx_spips: Make dma transactions as
+ per dma_burst_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +30,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Sai Pavan Boddu <saipava@xilinx.com>
 
-TCMI_VERBOSE is no more used, drop the OMAP_8/16/32B_REG macros.
+Qspi dma has a burst length of 64 bytes, So limit the transactions w.r.t
+dma-burst-size property.
 
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20180624040609.17572-9-f4bug@amsat.org
+Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 1529660880-30376-1-git-send-email-sai.pavan.boddu@xilinx.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/omap.h | 18 ------------------
- hw/arm/omap1.c        | 18 ++++++++++++------
- 2 files changed, 12 insertions(+), 24 deletions(-)
+ include/hw/ssi/xilinx_spips.h |  5 ++++-
+ hw/ssi/xilinx_spips.c         | 23 ++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
-index b398607b06c..39abba753d4 100644
---- a/include/hw/arm/omap.h
-+++ b/include/hw/arm/omap.h
-@@ -993,24 +993,6 @@ enum {
- #define OMAP_GPIOSW_INVERTED	0x0001
- #define OMAP_GPIOSW_OUTPUT	0x0002
+diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+index d398a4e81c3..a0a0ae7584a 100644
+--- a/include/hw/ssi/xilinx_spips.h
++++ b/include/hw/ssi/xilinx_spips.h
+@@ -37,6 +37,8 @@ typedef struct XilinxSPIPS XilinxSPIPS;
+ /* Bite off 4k chunks at a time */
+ #define LQSPI_CACHE_SIZE 1024
  
--# define TCMI_VERBOSE			1
--
--# ifdef TCMI_VERBOSE
--#  define OMAP_8B_REG(paddr)		\
--        fprintf(stderr, "%s: 8-bit register " OMAP_FMT_plx "\n",	\
--                        __func__, paddr)
--#  define OMAP_16B_REG(paddr)		\
--        fprintf(stderr, "%s: 16-bit register " OMAP_FMT_plx "\n",	\
--                        __func__, paddr)
--#  define OMAP_32B_REG(paddr)		\
--        fprintf(stderr, "%s: 32-bit register " OMAP_FMT_plx "\n",	\
--                        __func__, paddr)
--# else
--#  define OMAP_8B_REG(paddr)
--#  define OMAP_16B_REG(paddr)
--#  define OMAP_32B_REG(paddr)
--# endif
--
- # define OMAP_MPUI_REG_MASK		0x000007ff
- 
- #endif /* hw_omap_h */
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 9af04728e39..539d29ef9ce 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -34,12 +34,18 @@
- #include "qemu/cutils.h"
- #include "qemu/bcd.h"
- 
-+static inline void omap_log_badwidth(const char *funcname, hwaddr addr, int sz)
-+{
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: %d-bit register %#08" HWADDR_PRIx "\n",
-+                  funcname, 8 * sz, addr);
-+}
++#define QSPI_DMA_MAX_BURST_SIZE 2048
 +
- /* Should signal the TCMI/GPMC */
- uint32_t omap_badwidth_read8(void *opaque, hwaddr addr)
- {
-     uint8_t ret;
+ typedef enum {
+     READ = 0x3,         READ_4 = 0x13,
+     FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
+@@ -95,7 +97,6 @@ typedef struct {
+     XilinxQSPIPS parent_obj;
  
--    OMAP_8B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 1);
-     cpu_physical_memory_read(addr, &ret, 1);
-     return ret;
+     StreamSlave *dma;
+-    uint8_t dma_buf[4];
+     int gqspi_irqline;
+ 
+     uint32_t regs[XLNX_ZYNQMP_SPIPS_R_MAX];
+@@ -113,6 +114,8 @@ typedef struct {
+     uint8_t rx_fifo_g_align;
+     uint8_t tx_fifo_g_align;
+     bool man_start_com_g;
++    uint32_t dma_burst_size;
++    uint8_t dma_buf[QSPI_DMA_MAX_BURST_SIZE];
+ } XlnxZynqMPQSPIPS;
+ 
+ typedef struct XilinxSPIPSClass {
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index f599025956d..c052bfc4b3c 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -851,12 +851,17 @@ static void xlnx_zynqmp_qspips_notify(void *opaque)
+     {
+         size_t ret;
+         uint32_t num;
+-        const void *rxd = pop_buf(recv_fifo, 4, &num);
++        const void *rxd;
++        int len;
++
++        len = recv_fifo->num >= rq->dma_burst_size ? rq->dma_burst_size :
++                                                   recv_fifo->num;
++        rxd = pop_buf(recv_fifo, len, &num);
+ 
+         memcpy(rq->dma_buf, rxd, num);
+ 
+-        ret = stream_push(rq->dma, rq->dma_buf, 4);
+-        assert(ret == 4);
++        ret = stream_push(rq->dma, rq->dma_buf, num);
++        assert(ret == num);
+         xlnx_zynqmp_qspips_check_flush(rq);
+     }
  }
-@@ -49,7 +55,7 @@ void omap_badwidth_write8(void *opaque, hwaddr addr,
- {
-     uint8_t val8 = value;
+@@ -1333,6 +1338,12 @@ static void xlnx_zynqmp_qspips_realize(DeviceState *dev, Error **errp)
+     XlnxZynqMPQSPIPS *s = XLNX_ZYNQMP_QSPIPS(dev);
+     XilinxSPIPSClass *xsc = XILINX_SPIPS_GET_CLASS(s);
  
--    OMAP_8B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 1);
-     cpu_physical_memory_write(addr, &val8, 1);
- }
++    if (s->dma_burst_size > QSPI_DMA_MAX_BURST_SIZE) {
++        error_setg(errp,
++                   "qspi dma burst size %u exceeds maximum limit %d",
++                   s->dma_burst_size, QSPI_DMA_MAX_BURST_SIZE);
++        return;
++    }
+     xilinx_qspips_realize(dev, errp);
+     fifo8_create(&s->rx_fifo_g, xsc->rx_fifo_size);
+     fifo8_create(&s->tx_fifo_g, xsc->tx_fifo_size);
+@@ -1411,6 +1422,11 @@ static const VMStateDescription vmstate_xlnx_zynqmp_qspips = {
+     }
+ };
  
-@@ -57,7 +63,7 @@ uint32_t omap_badwidth_read16(void *opaque, hwaddr addr)
- {
-     uint16_t ret;
- 
--    OMAP_16B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 2);
-     cpu_physical_memory_read(addr, &ret, 2);
-     return ret;
- }
-@@ -67,7 +73,7 @@ void omap_badwidth_write16(void *opaque, hwaddr addr,
- {
-     uint16_t val16 = value;
- 
--    OMAP_16B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 2);
-     cpu_physical_memory_write(addr, &val16, 2);
- }
- 
-@@ -75,7 +81,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
- {
-     uint32_t ret;
- 
--    OMAP_32B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 4);
-     cpu_physical_memory_read(addr, &ret, 4);
-     return ret;
- }
-@@ -83,7 +89,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
- void omap_badwidth_write32(void *opaque, hwaddr addr,
-                 uint32_t value)
- {
--    OMAP_32B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 4);
-     cpu_physical_memory_write(addr, &value, 4);
- }
- 
++static Property xilinx_zynqmp_qspips_properties[] = {
++    DEFINE_PROP_UINT32("dma-burst-size", XlnxZynqMPQSPIPS, dma_burst_size, 64),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static Property xilinx_qspips_properties[] = {
+     /* We had to turn this off for 2.10 as it is not compatible with migration.
+      * It can be enabled but will prevent the device to be migrated.
+@@ -1463,6 +1479,7 @@ static void xlnx_zynqmp_qspips_class_init(ObjectClass *klass, void * data)
+     dc->realize = xlnx_zynqmp_qspips_realize;
+     dc->reset = xlnx_zynqmp_qspips_reset;
+     dc->vmsd = &vmstate_xlnx_zynqmp_qspips;
++    dc->props = xilinx_zynqmp_qspips_properties;
+     xsc->reg_ops = &xlnx_zynqmp_qspips_ops;
+     xsc->rx_fifo_size = RXFF_A_Q;
+     xsc->tx_fifo_size = TXFF_A_Q;
 -- 
 2.17.1
