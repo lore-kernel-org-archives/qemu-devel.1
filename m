@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fXlp8-0001iD-Gd
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:07:51 -0400
+	(envelope-from <groug@kaod.org>) id 1fXlrM-0002Wm-Lk
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:10:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fXlp3-0002vk-Li
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:07:50 -0400
-Received: from mga18.intel.com ([134.134.136.126]:52597)
+	(envelope-from <groug@kaod.org>) id 1fXlrH-0003Ju-MO
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:10:08 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:60577)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fXlp3-0002vX-BC
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:07:45 -0400
-Message-ID: <1530011262.22880.6.camel@linux.intel.com>
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Tue, 26 Jun 2018 19:07:42 +0800
-In-Reply-To: <58ec011e-0f19-f882-abca-dd73bda95fe5@redhat.com>
-References: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
-	<1529897961-134132-3-git-send-email-robert.hu@linux.intel.com>
-	<58ec011e-0f19-f882-abca-dd73bda95fe5@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXlrH-0003Ie-FK
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:10:03 -0400
+Received: from player729.ha.ovh.net (unknown [10.109.120.49])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 539A81A7F0
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 13:10:00 +0200 (CEST)
+Date: Tue, 26 Jun 2018 13:09:54 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180626130954.658ec4f1@bahia.lan>
+In-Reply-To: <d2e05ff145f160cb99454f98821dc0250247f1f8.1529196703.git.keno@juliacomputing.com>
+References: <cover.1529196703.git.keno@juliacomputing.com>
+	<d2e05ff145f160cb99454f98821dc0250247f1f8.1529196703.git.keno@juliacomputing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] i386: Add CPUID bit and feature words
- for IA32_ARCH_CAPABILITIES MSR
+Subject: Re: [Qemu-devel] [PATCH v3 08/13] 9p: darwin: *xattr_nofollow
+ implementations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 2018-06-25 at 14:06 +0200, Paolo Bonzini wrote:
-> On 25/06/2018 05:39, Robert Hoo wrote:
-> > Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
-> > SPEC_CTRL.
-> > 
-> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > ---
-> >  target/i386/cpu.c | 2 +-
-> >  target/i386/cpu.h | 1 +
-> >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 1e69e68..3134af4 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -896,7 +896,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, "spec-ctrl", NULL,
-> > -            NULL, NULL, NULL, "ssbd",
-> > +            NULL, "arch-capabilities", NULL, "ssbd",
-> >          },
-> >          .cpuid_eax = 7,
-> >          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 734a73e..1ef2040 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -688,6 +688,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> >  #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
-> >  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
-> >  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
-> > +#define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities of RDCL_NO and IBRS_ALL*/
-> >  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
-> >  
-> >  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
-> > 
+On Sat, 16 Jun 2018 20:56:52 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
+
+> This implements the darwin equivalent of the functions that were
+> moved to 9p-util(-linux) earlier in this series in the new
+> 9p-util-darwin file.
 > 
-> For migration to work, you need to add new "features" corresponding to
-> the bits in the MSR, and include them in the Icelake-Server and
-> Icelake-Client models.  Unfortunately there is no code for this in QEMU
-> yet, though the API is there in KVM.
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+>  hw/9pfs/9p-util-darwin.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/9pfs/Makefile.objs    |  1 +
+>  2 files changed, 65 insertions(+)
+>  create mode 100644 hw/9pfs/9p-util-darwin.c
 > 
-> I have just sent the KVM patch to pass the MSR value down to QEMU ("KVM:
-> VMX: support MSR_IA32_ARCH_CAPABILITIES as a feature MSR").
-> 
-Thanks Paolo.
-> Paolo
+> diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
+> new file mode 100644
+> index 0000000..cdb4c9e
+> --- /dev/null
+> +++ b/hw/9pfs/9p-util-darwin.c
+> @@ -0,0 +1,64 @@
+> +/*
+> + * 9p utilities (Darwin Implementation)
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/xattr.h"
+> +#include "9p-util.h"
+> +
+> +ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+> +                             void *value, size_t size)
+> +{
+> +    int ret;
+> +    int fd = openat_file(dirfd, filename,
+> +                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1) {
+> +        return -1;
+> +    }
+> +    ret = fgetxattr(fd, name, value, size, 0, 0);
+
+Hmm... I had said it looked good, but not that good actually. This isn't
+strictly equivalent of what we have with Linux, because it requires the
+file to have appropriate access rights.
+
+Why not just use the magic sycall from patch 11 and call getxattr() ?
+
+> +    close_preserve_errno(fd);
+> +    return ret;
+> +}
+> +
+> +ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+> +                              char *list, size_t size)
+> +{
+> +    int ret;
+> +    int fd = openat_file(dirfd, filename,
+> +                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1) {
+> +        return -1;
+> +    }
+> +    ret = flistxattr(fd, list, size, 0);
+> +    close_preserve_errno(fd);
+> +    return ret;
+> +}
+> +
+> +ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+> +                                const char *name)
+> +{
+> +    int ret;
+> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1) {
+> +        return -1;
+> +    }
+> +    ret = fremovexattr(fd, name, 0);
+> +    close_preserve_errno(fd);
+> +    return ret;
+> +}
+> +
+> +int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+> +                         void *value, size_t size, int flags)
+> +{
+> +    int ret;
+> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1) {
+> +        return -1;
+> +    }
+> +    ret = fsetxattr(fd, name, value, size, 0, flags);
+> +    close_preserve_errno(fd);
+> +    return ret;
+> +}
+> diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+> index 95e3bc0..0de39af 100644
+> --- a/hw/9pfs/Makefile.objs
+> +++ b/hw/9pfs/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  ifeq ($(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN)),y)
+>  common-obj-y  = 9p.o
+>  common-obj-$(CONFIG_LINUX) += 9p-util-linux.o
+> +common-obj-$(CONFIG_DARWIN) += 9p-util-darwin.o
+>  common-obj-y += 9p-local.o 9p-xattr.o
+>  common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+>  common-obj-y += coth.o cofs.o codir.o cofile.o
