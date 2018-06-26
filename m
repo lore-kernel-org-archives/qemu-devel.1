@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fXu3t-0001al-Oq
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:55:38 -0400
+	(envelope-from <linux@roeck-us.net>) id 1fXu8Z-00036u-JJ
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 16:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fXu3q-000256-OK
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:55:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36612 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1fXu3q-00024y-Bp
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:55:34 -0400
-References: <20180625131253.11218-1-kraxel@redhat.com>
-	<20180625131253.11218-2-kraxel@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
-Date: Tue, 26 Jun 2018 21:55:29 +0200
+	(envelope-from <linux@roeck-us.net>) id 1fXu8Y-0004sv-D0
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 16:00:27 -0400
+Date: Tue, 26 Jun 2018 13:00:08 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180626200008.GA680@roeck-us.net>
+References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
+	<20180626175900.GA4307@roeck-us.net>
+	<CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180625131253.11218-2-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="G8Ef4azFXpxJqt5eytGEAP99ZdvPffwhU"
-Subject: Re: [Qemu-devel] [PULL 1/6] audio/hda: create millisecond timers
- that handle IO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
+ identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Martin Schrodt <martin@schrodt.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---G8Ef4azFXpxJqt5eytGEAP99ZdvPffwhU
-From: Max Reitz <mreitz@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Martin Schrodt <martin@schrodt.org>
-Message-ID: <6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 1/6] audio/hda: create millisecond timers that
- handle IO
-References: <20180625131253.11218-1-kraxel@redhat.com>
- <20180625131253.11218-2-kraxel@redhat.com>
-In-Reply-To: <20180625131253.11218-2-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jun 26, 2018 at 07:10:45PM +0100, Peter Maydell wrote:
+> On 26 June 2018 at 18:59, Guenter Roeck <linux@roeck-us.net> wrote:
+> > On Tue, Jun 26, 2018 at 06:17:44PM +0100, Peter Maydell wrote:
+> >> Thanks for this patch. I was wondering whether it would be better
+> >> just to remove the fprintf message instead. I'll either apply
+> >> this or send a patch to do that before 3.0, anyway.
+> >>
+> >
+> > If I recall correctly, I tried that, and it did not help.
+> > The messages don't happen too often, and the message itself
+> > does not cause a problem. Issue is that the interrupts happen
+> > at the wrong time or not at all (after a while, ie after the
+> > configured one-shot time expires), and the kernel really doesn't
+> > like that.
+> >
+> > I think the underlying problem was that the periodic timer counts
+> > the period down (based on the time set for the one-shot timer),
+> > stops with the "Timer with delta zero, disabling" message once
+> > the period reaches 0, and does not fire anymore afterwards.
+> > As a result, the kernel fails to boot maybe 90% of the time.
+> > I should probably have mentioned that in more detail in the
+> > commit log.
+> 
+> Hmm, that's odd, because I don't really see what the difference
+> between the two is. If you set the thing as a one-shot then we
+> won't reenable the timer later either with this patch.
+> 
+> Can you provide an image/QEMU command line that repros this,
+> and I'll see if I can find time to investigate it? (We have
+> a softfreeze deadline next Tuesday, so I probably won't be
+> able to get to it until after that, but since this is a bugfix
+> it doesn't have to be done before freeze.)
+> 
 
-On 2018-06-25 15:12, Gerd Hoffmann wrote:
-> Currently, the HDA device tries to sync itself with the QEMU audio
-> backend by waiting for the guest driver to handle buffer completion
-> interrupts. This causes the backend to often read too much data from th=
-e
-> device, as well as running out of data whenever the guest takes too lon=
-g
-> to handle the interrupt.
->=20
-> According to the HDA specification, the guest is also not required to
-> use interrupts, but can also sync itself by polling the LPIB registers.=
+Here is a log, with debug messages added to ptimer code.
 
->=20
-> This patch will introduce high frequency (1000Hz) timers that interface=
+Without my patch:
 
-> with the device and allow for much smoother emulation of the LPIB
-> registers. Since the timing is now provided by these timers, the need
-> to wait for buffer completion interrupts also ceases.
->=20
-> Signed-off-by: Martin Schrodt <martin@schrodt.org>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Message-id: 20180622111200.30561-2-kraxel@redhat.com
-> Message-id: 20171015184033.2951-3-martin@schrodt.org
->=20
-> [ kraxel: keep old code for compatibility with older qemu versions,
->           add property to switch code paths at runtime ]
-> [ kraxel: new code is disabled by default, use-timer=3Don enables it ]
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/audio/hda-codec.c | 263 +++++++++++++++++++++++++++++++++++++++++++=
-+++-----
->  hw/audio/intel-hda.c |   7 --
->  2 files changed, 237 insertions(+), 33 deletions(-)
+ptimer_tick(0x555556edac70): enabled=1 delta=250000 limit=250000
+ptimer_reload(555556edac70): frac=0 period=40 delta=250000 limit=250000 adjust=1
+ptimer_tick(0x555556edac70): enabled=1 delta=250000 limit=250000
+ptimer_reload(555556edac70): frac=0 period=40 delta=250000 limit=250000 adjust=1
+[    0.497942] clocksource: Switched to clocksource mps2-clksrc^M
+ptimer_tick(0x555556edac70): enabled=1 delta=250000 limit=250000
+ptimer_reload(555556edac70): frac=0 period=40 delta=250000 limit=250000 adjust=1
 
-This patch breaks compilation on clang with -m32 for me, because I
-apparently I don't have 64 bit atomics there.  Should there be
-CONFIG_ATOMIC64 guards and handling for when that isn't defined?
+# up to here timer is in periodic mode and fires on a regular basis
 
-Max
+# prepare to switch to one-shot mode
+ptimer_reload(555556edac70): frac=0 period=40 delta=0 limit=0 adjust=0
 
+# set timer for one-shot mode, start
+ptimer_set_count(0x555556edac70, 92004
+ptimer_reload(555556edac70): frac=0 period=40 delta=92004 limit=0 adjust=0
 
---G8Ef4azFXpxJqt5eytGEAP99ZdvPffwhU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+# one-shot mode fires
+ptimer_tick(0x555556edac70): enabled=1 delta=92004 limit=0
 
------BEGIN PGP SIGNATURE-----
+# timer is in periodic mode, limit is 0 (from one-shot mode)
+# reload propagates limit -> delta, making it 0
+ptimer_reload(555556edac70): frac=0 period=40 delta=0 limit=0 adjust=-1
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsymjEACgkQ9AfbAGHV
-z0Dm5QgArLQlyV4wmEk+eGty+D0kL4T1hIOWkyzA/JaCE6pbc9IAilwUswtfTz2G
-0g2SCaMNrMaIpvbiTqoiRw51NNPpFUC0x9ETHZpxn4+9Rs2g4zHz0w6P7gLJRGpS
-thQ9k1TkkW5qOYp5s04bK+GD7BALJngHcebryXMbHpYo6F/NOkO5vJlBB8TJOklh
-b8/DZZAkboynM2xo0JDUE/EqVsUYaMnHSr6qzPUNgR5e9wOLcPsSnTzN0TNiu0h5
-buMk9W2kbyI7YUptzbsE6bWWy4FBweo4yzjMKntX6TmvyVQ92QJD78Z3CHJ4GFeL
-5WPuR87sxa0rWsjJkdt4wGupyP/Mmg==
-=VOBN
------END PGP SIGNATURE-----
+# and the timer is disabled as result.
+0x555556edac70: Timer with delta zero, disabling
 
---G8Ef4azFXpxJqt5eytGEAP99ZdvPffwhU--
+ptimer_set_count(0x555556edac70, 199340
+ptimer_reload(555556edac70): frac=0 period=40 delta=199340 limit=0 adjust=0
+[    0.514458] NET: Registered protocol family 2^M
+ptimer_tick(0x555556edac70): enabled=1 delta=199340 limit=0
+ptimer_reload(555556edac70): frac=0 period=40 delta=0 limit=0 adjust=-1
+0x555556edac70: Timer with delta zero, disabling
+ptimer_set_count(0x555556edac70, 240488
+ptimer_reload(555556edac70): frac=0 period=40 delta=240488 limit=0 adjust=0
+[    0.526096] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096
+bytes)^M
+[    0.526533] TCP established hash table entries: 1024 (order: 0, 4096 bytes)^M
+[    0.526943] TCP bind hash table entries: 1024 (order: 0, 4096 bytes)^M
+ptimer_tick(0x555556edac70): enabled=1 delta=240488 limit=0
+ptimer_reload(555556edac70): frac=0 period=40 delta=0 limit=0 adjust=-1
+0x555556edac70: Timer with delta zero, disabling
+
+And so on. The system may finish booting or lock up. Which one it is seems
+to be random.
+
+Same log with my patch applied:
+
+ptimer_tick(0x555556edac70): enabled=1 delta=250000 limit=250000
+ptimer_reload(555556edac70): frac=0 period=40 delta=250000 limit=250000 adjust=1
+
+# switch to one-shot mode
+ptimer_reload(555556edac70): frac=0 period=40 delta=0 limit=0 adjust=0
+
+@ set counter, start
+ptimer_set_count(0x555556edac70, 24
+ptimer_reload(555556edac70): frac=0 period=40 delta=24 limit=0 adjust=0
+
+# tick
+ptimer_tick(0x555556edac70): enabled=2 delta=24 limit=0
+
+# update counter, restart
+ptimer_set_count(0x555556edac70, 209498
+ptimer_reload(555556edac70): frac=0 period=40 delta=209498 limit=0 adjust=0
+[    0.509883] NET: Registered protocol family 2^M
+
+# tick
+ptimer_tick(0x555556edac70): enabled=2 delta=209498 limit=0
+
+# update counter, restart
+ptimer_set_count(0x555556edac70, 217500
+ptimer_reload(555556edac70): frac=0 period=40 delta=217500 limit=0 adjust=0
+
+# tick
+ptimer_tick(0x555556edac70): enabled=2 delta=217500 limit=0
+
+# update counter, restart
+ptimer_set_count(0x555556edac70, 236941
+ptimer_reload(555556edac70): frac=0 period=40 delta=236941 limit=0 adjust=0
+[    0.529228] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes)^M
+[    0.529661] TCP established hash table entries: 1024 (order: 0, 4096 bytes)^M
+[    0.530059] TCP bind hash table entries: 1024 (order: 0, 4096 bytes)^M
+[    0.530535] TCP: Hash tables configured (established 1024 bind 1024)^M
+
+# tick
+ptimer_tick(0x555556edac70): enabled=2 delta=236941 limit=0
+
+# update counter, restart
+ptimer_set_count(0x555556edac70, 245934
+ptimer_reload(555556edac70): frac=0 period=40 delta=245934 limit=0 adjust=0
+
+and so on.
+
+Hope this helps,
+
+Guenter
