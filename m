@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@localhost.localdomain>) id 1fXfo1-00060u-1Z
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:42:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXgic-0004TB-4D
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 01:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <root@localhost.localdomain>) id 1fXfo0-0008W7-7i
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:42:17 -0400
-From: 13466399134@163.com
-Date: Tue, 26 Jun 2018 12:41:57 +0800
-Message-Id: <20180626044157.8612-1-13466399134@163.com>
-Subject: [Qemu-devel] [PATCH 1/1] block/dirty-bitmap: Useless bitmaps in
- image can be removed
+	(envelope-from <thuth@redhat.com>) id 1fXgiZ-0007NP-1l
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 01:40:46 -0400
+References: <20180622194736.GA5794@roeck-us.net>
+	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
+	<88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
+	<20180626053246.6kyvrj7jbuhgdkgv@sivokote.iziade.m$>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f6c25172-573e-a7d2-8264-f44f0a5a0a27@redhat.com>
+Date: Tue, 26 Jun 2018 07:40:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180626053246.6kyvrj7jbuhgdkgv@sivokote.iziade.m$>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,79 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, Yao Xu <13466399134@163.com>
+To: Georgi Guninski <guninski@guninski.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
 
-From: Yao Xu <13466399134@163.com>
+On 26.06.2018 07:32, Georgi Guninski wrote:
+> On Mon, Jun 25, 2018 at 09:27:59AM +0200, Christian Borntraeger wrote:
+>> -            /* Overwrite parameters in the kernel image, which are "rom" */
+>> -            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
+> 
+>> +            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
+> 
+> Why not replace strcpy() with strncpy() or snprintf()?
+> strcpy() may overflow.
 
-If qemu-kvm quit without saving bitmaps to image(coredump, host kernel panic,
-or host pooweroff), bitmaps in image can not be safely used anymore, and also
-can not be removed. Useless bitmaps should be removed.
+This will be fixed by
+https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg04227.html by
+adding a check for a valid size.
 
-"block-dirty-bitmap-remove" failed, because block_dirty_bitmap_lookup return NULL
-"block-dirty-bitmap-add" failed, because qcow2_remove_persistent_dirty_bitmap 
-can find the same name bitmap in image. As a result, the bitmap can never be 
-used, neither can be removed.
-
-Signed-off-by: Yao Xu <13466399134@163.com>
----
-diff --git a/blockdev.c b/blockdev.c
-index 58d7570932..d2403f4b7f 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2837,31 +2837,38 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-     Error *local_err = NULL;
- 
-     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
--    if (!bitmap || !bs) {
-+    if (!bs) {
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_frozen(bitmap)) {
--        error_setg(errp,
--                   "Bitmap '%s' is currently frozen and cannot be removed",
--                   name);
--        return;
--    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
--        error_setg(errp,
--                   "Bitmap '%s' is currently locked and cannot be removed",
--                   name);
-+    if (bitmap) {
-+        if (bdrv_dirty_bitmap_frozen(bitmap)) {
-+            error_setg(errp,
-+                       "Bitmap '%s' is currently frozen and cannot be removed",
-+                       name);
-+            return;
-+        } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
-+            error_setg(errp,
-+                       "Bitmap '%s' is currently locked and cannot be removed",
-+                       name);
-+            return;
-+        }
-+    }
-+
-+    bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
--        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
--        if (local_err != NULL) {
--            error_propagate(errp, local_err);
--            return;
--        }
-+    if (bitmap) {
-+        bdrv_release_dirty_bitmap(bs, bitmap);
-     }
- 
--    bdrv_release_dirty_bitmap(bs, bitmap);
-+    if (*errp) {
-+        error_free(*errp);
-+        *errp = NULL;
-+    }
- }
- 
- /**
+ Thomas
