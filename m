@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXoha-0005J6-Hv
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:12:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fXoqf-0008QH-OL
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXohZ-0004Yu-Mo
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:12:14 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35630)
+	(envelope-from <richard.henderson@linaro.org>) id 1fXoqc-0001u5-If
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:21:37 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:38694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXohZ-0004Xx-Gf
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:12:13 -0400
-Received: by mail-oi0-x242.google.com with SMTP id e8-v6so16138883oii.2
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 07:12:13 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <295286d3-603d-ff13-e2e8-76d4d92ffde6@linaro.org>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fXoqc-0001of-CG
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:21:34 -0400
+Received: by mail-pl0-x243.google.com with SMTP id d10-v6so8630249plo.5
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 07:21:34 -0700 (PDT)
 References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-8-richard.henderson@linaro.org>
-	<CAFEAcA-n1fcCk9LfgZPnphHpft+iYXH3t1+2-7RtdmjH2jRksw@mail.gmail.com>
-	<295286d3-603d-ff13-e2e8-76d4d92ffde6@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 15:11:52 +0100
-Message-ID: <CAFEAcA8DhFhP4KYH9n=RGwD6HcGa=SX21FxSvm-4KYwOyJ5g3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 07/35] target/arm: Implement SVE FP
- Multiply-Add Group
+	<20180621015359.12018-12-richard.henderson@linaro.org>
+	<CAFEAcA_2eVmEB_7u+zGiT_kdHPOWHPANdShV4hUxVCt_DxdMpw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ed1f8b63-fd45-6435-198f-4b1c93f2905f@linaro.org>
+Date: Tue, 26 Jun 2018 07:21:30 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_2eVmEB_7u+zGiT_kdHPOWHPANdShV4hUxVCt_DxdMpw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 11/35] target/arm: Implement SVE scatter
+ stores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 26 June 2018 at 15:08, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 06/25/2018 08:32 AM, Peter Maydell wrote:
->>> +# SVE floating-point multiply-accumulate writing addend
->>> +FMLA_zpzzz      01100101 .. 1 ..... 000 ... ..... .....         @rda_pg_rn_rm
->>> +FMLS_zpzzz      01100101 .. 1 ..... 001 ... ..... .....         @rda_pg_rn_rm
->>> +FNMLA_zpzzz     01100101 .. 1 ..... 010 ... ..... .....         @rda_pg_rn_rm
->>> +FNMLS_zpzzz     01100101 .. 1 ..... 011 ... ..... .....         @rda_pg_rn_rm
->>> +
->>> +# SVE floating-point multiply-accumulate writing multiplicand
->>> +# FMAD, FMSB, FNMAD, FNMS
->>> +FMLA_zpzzz      01100101 .. 1 ..... 100 ... ..... .....         @rdn_pg_rm_ra
->>> +FMLS_zpzzz      01100101 .. 1 ..... 101 ... ..... .....         @rdn_pg_rm_ra
->>> +FNMLA_zpzzz     01100101 .. 1 ..... 110 ... ..... .....         @rdn_pg_rm_ra
->>> +FNMLS_zpzzz     01100101 .. 1 ..... 111 ... ..... .....         @rdn_pg_rm_ra
->> It's not clear to me how we can implement both of these groups
->> with the same functions. Some commentary might help.
->
-> Note the different decode: @rda_pg_rn_rm vs @rdn_pg_rm_ra.
-> The same sets of arguments are filled in from different fields
-> in the instruction.
+On 06/25/2018 09:13 AM, Peter Maydell wrote:
+> On 21 June 2018 at 02:53, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  target/arm/helper-sve.h    | 41 +++++++++++++++++++++
+>>  target/arm/sve_helper.c    | 62 ++++++++++++++++++++++++++++++++
+>>  target/arm/translate-sve.c | 74 ++++++++++++++++++++++++++++++++++++++
+>>  target/arm/sve.decode      | 39 ++++++++++++++++++++
+>>  4 files changed, 216 insertions(+)
+>> +/* Stores with a vector index.  */
+>> +
+>> +#define DO_ST1_ZPZ_S(NAME, TYPEI, FN)                                   \
+>> +void HELPER(NAME)(CPUARMState *env, void *vd, void *vg, void *vm,       \
+>> +                  target_ulong base, uint32_t desc)                     \
+>> +{                                                                       \
+>> +    intptr_t i, oprsz = simd_oprsz(desc) / 8;                           \
+>> +    unsigned scale = simd_data(desc);                                   \
+>> +    uintptr_t ra = GETPC();                                             \
+>> +    uint32_t *d = vd; TYPEI *m = vm; uint8_t *pg = vg;                  \
+>> +    for (i = 0; i < oprsz; i++) {                                       \
+>> +        uint8_t pp = pg[H1(i)];                                         \
+>> +        if (pp & 0x01) {                                                \
+>> +            target_ulong off = (target_ulong)m[H4(i * 2)] << scale;     \
+>> +            FN(env, base + off, d[H4(i * 2)], ra);                      \
+>> +        }                                                               \
+>> +        if (pp & 0x10) {                                                \
+>> +            target_ulong off = (target_ulong)m[H4(i * 2 + 1)] << scale; \
+>> +            FN(env, base + off, d[H4(i * 2 + 1)], ra);                  \
+>> +        }                                                               \
+>> +    }                                                                   \
+>> +}
+> 
+> Why do we do two operations per loop here? Generally
+> we seem to do one operation per loop elsewhere.
 
-Yeah, I figured that was the basic idea, but it was too confusing
-to actually work out if that was being done correctly from the
-patch.
+I'm not sure why I wrote this one in this way.
+There doesn't seem to be a good reason.
 
-thanks
--- PMM
+
+>> +static bool trans_ST1_zprz(DisasContext *s, arg_ST1_zprz *a, uint32_t insn)
+>> +{
+>> +    /* Indexed by [xs][msz].  */
+>> +    static gen_helper_gvec_mem_scatter * const fn32[2][3] = {
+>> +        { gen_helper_sve_stbs_zsu,
+>> +          gen_helper_sve_sths_zsu,
+>> +          gen_helper_sve_stss_zsu, },
+>> +        { gen_helper_sve_stbs_zss,
+>> +          gen_helper_sve_sths_zss,
+>> +          gen_helper_sve_stss_zss, },
+>> +    };
+>> +    static gen_helper_gvec_mem_scatter * const fn64[3][4] = {
+> 
+> In the pseudocode xs is either 0 (zero-extend offset) or
+> 1 (sign-extend offset), but here it can also be 2. A
+> comment noting that we've overloaded it to also indicate
+> whether we're dealing with a 32-bit or 64-bit offset might
+> help (at least I think that's what we're doing).
+
+Yes, xs=2 is overloaded to mean 64-bit offset.
+I'll add comments.
+
+
+r~
