@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXqgp-0000vb-7p
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqgo-0000vU-EW
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXqgl-0005tp-12
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:35 -0400
-Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:39942)
+	(envelope-from <richard.henderson@linaro.org>) id 1fXqgh-0005s1-M8
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:34 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:32934)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fXqgk-0005tU-Of
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:30 -0400
-Received: by mail-pl0-x22d.google.com with SMTP id t6-v6so3431722plo.7
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:19:30 -0700 (PDT)
+	id 1fXqgh-0005rX-Dl
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:19:27 -0400
+Received: by mail-pl0-x243.google.com with SMTP id 6-v6so8787020plb.0
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:19:27 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 09:19:12 -0700
-Message-Id: <20180626161921.27941-5-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 09:19:10 -0700
+Message-Id: <20180626161921.27941-3-richard.henderson@linaro.org>
 In-Reply-To: <20180626161921.27941-1-richard.henderson@linaro.org>
 References: <20180626161921.27941-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/13] target/ppc: Use atomic cmpxchg for STQCX
+Subject: [Qemu-devel] [PATCH 02/13] target/ppc: Use atomic load for LQ and
+ LQARX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +30,221 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-When running in a parallel context, we must use a helper in order
-to perform the 128-bit atomic operation.  When running in a serial
-context, do the compare before the store.
+Section 1.4 of the Power ISA v3.0B states that both of these
+instructions are single-copy atomic.  As we cannot (yet) issue
+128-bit loads within TCG, use the generic helpers provided.
+
+Since TCG cannot (yet) return a 128-bit value, add a slot within
+CPUPPCState for returning the high half of a 128-bit return value.
+This solution is preferred to the helper assigning to architectural
+registers directly, as it avoids clobbering all TCG live values.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/helper.h     |  2 +
- target/ppc/mem_helper.c | 38 +++++++++++++++++
- target/ppc/translate.c  | 95 ++++++++++++++++++++++++++---------------
- 3 files changed, 101 insertions(+), 34 deletions(-)
+ target/ppc/cpu.h        |  3 ++
+ target/ppc/helper.h     |  5 +++
+ target/ppc/mem_helper.c | 20 ++++++++-
+ target/ppc/translate.c  | 93 ++++++++++++++++++++++++++++++-----------
+ 4 files changed, 95 insertions(+), 26 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c7f3fb6b73..973cf44cda 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1015,6 +1015,9 @@ struct CPUPPCState {
+     /* Next instruction pointer */
+     target_ulong nip;
+ 
++    /* High part of 128-bit helper return.  */
++    uint64_t retxh;
++
+     int access_type; /* when a memory exception occurs, the access
+                         type is stored here */
+ 
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index cbc1228570..5706c2497f 100644
+index d751f0e219..3f451a5d7e 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -807,4 +807,6 @@ DEF_HELPER_FLAGS_5(stq_le_parallel, TCG_CALL_NO_WG,
-                    void, env, tl, i64, i64, i32)
- DEF_HELPER_FLAGS_5(stq_be_parallel, TCG_CALL_NO_WG,
-                    void, env, tl, i64, i64, i32)
-+DEF_HELPER_5(stqcx_le_parallel, i32, env, tl, i64, i64, i32)
-+DEF_HELPER_5(stqcx_be_parallel, i32, env, tl, i64, i64, i32)
- #endif
+@@ -799,3 +799,8 @@ DEF_HELPER_4(dscliq, void, env, fprp, fprp, i32)
+ 
+ DEF_HELPER_1(tbegin, void, env)
+ DEF_HELPER_FLAGS_1(fixup_thrm, TCG_CALL_NO_RWG, void, env)
++
++#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
++DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
++DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
++#endif
 diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index 57e301edc3..8f0d86d104 100644
+index a34e604db3..44a8f3445a 100644
 --- a/target/ppc/mem_helper.c
 +++ b/target/ppc/mem_helper.c
-@@ -245,6 +245,44 @@ void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
-     Int128 val = int128_make128(lo, hi);
-     helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
- }
-+
-+uint32_t helper_stqcx_le_parallel(CPUPPCState *env, target_ulong addr,
-+                                  uint64_t new_lo, uint64_t new_hi,
-+                                  uint32_t opidx)
-+{
-+    bool success = false;
-+
-+    if (likely(addr == env->reserve_addr)) {
-+        Int128 oldv, cmpv, newv;
-+
-+        cmpv = int128_make128(env->reserve_val2, env->reserve_val);
-+        newv = int128_make128(new_lo, new_hi);
-+        oldv = helper_atomic_cmpxchgo_le_mmu(env, addr, cmpv, newv,
-+                                             opidx, GETPC());
-+        success = int128_eq(oldv, cmpv);
-+    }
-+    env->reserve_addr = -1;
-+    return env->so + success * CRF_EQ_BIT;
-+}
-+
-+uint32_t helper_stqcx_be_parallel(CPUPPCState *env, target_ulong addr,
-+                                  uint64_t new_lo, uint64_t new_hi,
-+                                  uint32_t opidx)
-+{
-+    bool success = false;
-+
-+    if (likely(addr == env->reserve_addr)) {
-+        Int128 oldv, cmpv, newv;
-+
-+        cmpv = int128_make128(env->reserve_val2, env->reserve_val);
-+        newv = int128_make128(new_lo, new_hi);
-+        oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv,
-+                                             opidx, GETPC());
-+        success = int128_eq(oldv, cmpv);
-+    }
-+    env->reserve_addr = -1;
-+    return env->so + success * CRF_EQ_BIT;
-+}
- #endif
+@@ -21,9 +21,9 @@
+ #include "exec/exec-all.h"
+ #include "qemu/host-utils.h"
+ #include "exec/helper-proto.h"
+-
+ #include "helper_regs.h"
+ #include "exec/cpu_ldst.h"
++#include "tcg.h"
+ #include "internal.h"
  
+ //#define DEBUG_OP
+@@ -215,6 +215,24 @@ target_ulong helper_lscbx(CPUPPCState *env, target_ulong addr, uint32_t reg,
+     return i;
+ }
+ 
++#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
++uint64_t helper_lq_le_parallel(CPUPPCState *env, target_ulong addr,
++                               uint32_t opidx)
++{
++    Int128 ret = helper_atomic_ldo_le_mmu(env, addr, opidx, GETPC());
++    env->retxh = int128_gethi(ret);
++    return int128_getlo(ret);
++}
++
++uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
++                               uint32_t opidx)
++{
++    Int128 ret = helper_atomic_ldo_be_mmu(env, addr, opidx, GETPC());
++    env->retxh = int128_gethi(ret);
++    return int128_getlo(ret);
++}
++#endif
++
  /*****************************************************************************/
+ /* Altivec extension helpers */
+ #if defined(HOST_WORDS_BIGENDIAN)
 diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 3d63a62269..c7b9d226eb 100644
+index 3a215a1dc6..0923cc24e3 100644
 --- a/target/ppc/translate.c
 +++ b/target/ppc/translate.c
-@@ -3332,50 +3332,77 @@ static void gen_lqarx(DisasContext *ctx)
- /* stqcx. */
- static void gen_stqcx_(DisasContext *ctx)
+@@ -2607,7 +2607,7 @@ static void gen_ld(DisasContext *ctx)
+ static void gen_lq(DisasContext *ctx)
  {
+     int ra, rd;
 -    TCGv EA;
--    int reg = rS(ctx->opcode);
--    int len = 16;
--#if !defined(CONFIG_USER_ONLY)
--    TCGLabel *l1;
--    TCGv gpr1, gpr2;
--#endif
-+    int rs = rS(ctx->opcode);
 +    TCGv EA, hi, lo;
  
--    if (unlikely((rD(ctx->opcode) & 1))) {
-+    if (unlikely(rs & 1)) {
-         gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
-         return;
-     }
+     /* lq is a legal user mode instruction starting in ISA 2.07 */
+     bool legal_in_user_mode = (ctx->insns_flags2 & PPC2_LSQ_ISA207) != 0;
+@@ -2633,16 +2633,35 @@ static void gen_lq(DisasContext *ctx)
+     EA = tcg_temp_new();
+     gen_addr_imm_index(ctx, EA, 0x0F);
+ 
+-    /* We only need to swap high and low halves. gen_qemu_ld64_i64 does
+-       necessary 64-bit byteswap already. */
+-    if (unlikely(ctx->le_mode)) {
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd + 1], EA);
++    /* Note that the low part is always in RD+1, even in LE mode.  */
++    lo = cpu_gpr[rd + 1];
++    hi = cpu_gpr[rd];
 +
++    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++#ifdef CONFIG_ATOMIC128
++        TCGv_i32 oi = tcg_temp_new_i32();
++        if (ctx->le_mode) {
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
++            gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
++        } else {
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
++            gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
++        }
++        tcg_temp_free_i32(oi);
++        tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
++#else
++        /* Restart with exclusive lock.  */
++        gen_helper_exit_atomic(cpu_env);
++        ctx->base.is_jmp = DISAS_NORETURN;
++#endif
++    } else if (ctx->le_mode) {
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ);
+         gen_addr_add(ctx, EA, EA, 8);
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd], EA);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_LEQ);
+     } else {
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd], EA);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_BEQ);
+         gen_addr_add(ctx, EA, EA, 8);
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd + 1], EA);
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_BEQ);
+     }
+     tcg_temp_free(EA);
+ }
+@@ -3236,9 +3255,8 @@ STCX(stdcx_, DEF_MEMOP(MO_Q))
+ /* lqarx */
+ static void gen_lqarx(DisasContext *ctx)
+ {
+-    TCGv EA;
+     int rd = rD(ctx->opcode);
+-    TCGv gpr1, gpr2;
++    TCGv EA, hi, lo;
+ 
+     if (unlikely((rd & 1) || (rd == rA(ctx->opcode)) ||
+                  (rd == rB(ctx->opcode)))) {
+@@ -3247,24 +3265,49 @@ static void gen_lqarx(DisasContext *ctx)
+     }
+ 
      gen_set_access_type(ctx, ACCESS_RES);
 -    EA = tcg_temp_local_new();
 +    EA = tcg_temp_new();
      gen_addr_reg_index(ctx, EA);
--    if (len > 1) {
--        gen_check_align(ctx, EA, (len) - 1);
+-    gen_check_align(ctx, EA, 15);
+-    if (unlikely(ctx->le_mode)) {
+-        gpr1 = cpu_gpr[rd+1];
+-        gpr2 = cpu_gpr[rd];
+-    } else {
+-        gpr1 = cpu_gpr[rd];
+-        gpr2 = cpu_gpr[rd+1];
 -    }
+-    tcg_gen_qemu_ld_i64(gpr1, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
+-    tcg_gen_mov_tl(cpu_reserve, EA);
+-    gen_addr_add(ctx, EA, EA, 8);
+-    tcg_gen_qemu_ld_i64(gpr2, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
  
--#if defined(CONFIG_USER_ONLY)
--    gen_conditional_store(ctx, EA, reg, 16);
-+    /* Note that the low part is always in RS+1, even in LE mode.  */
-+    lo = cpu_gpr[rs + 1];
-+    hi = cpu_gpr[rs];
+-    tcg_gen_st_tl(gpr1, cpu_env, offsetof(CPUPPCState, reserve_val));
+-    tcg_gen_st_tl(gpr2, cpu_env, offsetof(CPUPPCState, reserve_val2));
++    /* Note that the low part is always in RD+1, even in LE mode.  */
++    lo = cpu_gpr[rd + 1];
++    hi = cpu_gpr[rd];
 +
 +    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
-+        TCGv_i32 oi = tcg_const_i32(DEF_MEMOP(MO_Q) | MO_ALIGN_16);
 +#ifdef CONFIG_ATOMIC128
++        TCGv_i32 oi = tcg_temp_new_i32();
 +        if (ctx->le_mode) {
-+            gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env, EA, lo, hi, oi);
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ | MO_ALIGN_16,
++                                                ctx->mem_idx));
++            gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
 +        } else {
-+            gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env, EA, lo, hi, oi);
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ | MO_ALIGN_16,
++                                                ctx->mem_idx));
++            gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
 +        }
- #else
--    tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
--    l1 = gen_new_label();
--    tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
--    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
--
--    if (unlikely(ctx->le_mode)) {
--        gpr1 = cpu_gpr[reg + 1];
--        gpr2 = cpu_gpr[reg];
--    } else {
--        gpr1 = cpu_gpr[reg];
--        gpr2 = cpu_gpr[reg + 1];
--    }
--    tcg_gen_qemu_st_tl(gpr1, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
--    gen_addr_add(ctx, EA, EA, 8);
--    tcg_gen_qemu_st_tl(gpr2, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
--
--    gen_set_label(l1);
--    tcg_gen_movi_tl(cpu_reserve, -1);
++        tcg_temp_free_i32(oi);
++        tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
++#else
 +        /* Restart with exclusive lock.  */
 +        gen_helper_exit_atomic(cpu_env);
 +        ctx->base.is_jmp = DISAS_NORETURN;
- #endif
--    tcg_temp_free(EA);
--}
 +        tcg_temp_free(EA);
-+        tcg_temp_free_i32(oi);
++        return;
++#endif
++    } else if (ctx->le_mode) {
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ | MO_ALIGN_16);
++        tcg_gen_mov_tl(cpu_reserve, EA);
++        gen_addr_add(ctx, EA, EA, 8);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_LEQ);
 +    } else {
-+        TCGLabel *lab_fail = gen_new_label();
-+        TCGLabel *lab_over = gen_new_label();
-+        TCGv_i64 t0 = tcg_temp_new_i64();
-+        TCGv_i64 t1 = tcg_temp_new_i64();
- 
-+        tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, lab_fail);
-+        tcg_temp_free(EA);
-+
-+        gen_qemu_ld64_i64(ctx, t0, cpu_reserve);
-+        tcg_gen_ld_i64(t1, cpu_env, (ctx->le_mode
-+                                     ? offsetof(CPUPPCState, reserve_val2)
-+                                     : offsetof(CPUPPCState, reserve_val)));
-+        tcg_gen_brcond_i64(TCG_COND_NE, t0, t1, lab_fail);
-+
-+        tcg_gen_addi_i64(t0, cpu_reserve, 8);
-+        gen_qemu_ld64_i64(ctx, t0, t0);
-+        tcg_gen_ld_i64(t1, cpu_env, (ctx->le_mode
-+                                     ? offsetof(CPUPPCState, reserve_val)
-+                                     : offsetof(CPUPPCState, reserve_val2)));
-+        tcg_gen_brcond_i64(TCG_COND_NE, t0, t1, lab_fail);
-+
-+        /* Success */
-+        gen_qemu_st64_i64(ctx, ctx->le_mode ? lo : hi, cpu_reserve);
-+        tcg_gen_addi_i64(t0, cpu_reserve, 8);
-+        gen_qemu_st64_i64(ctx, ctx->le_mode ? hi : lo, t0);
-+
-+        tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
-+        tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
-+        tcg_gen_br(lab_over);
-+
-+        gen_set_label(lab_fail);
-+        tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
-+
-+        gen_set_label(lab_over);
-+        tcg_gen_movi_tl(cpu_reserve, -1);
-+        tcg_temp_free_i64(t0);
-+        tcg_temp_free_i64(t1);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_BEQ | MO_ALIGN_16);
++        tcg_gen_mov_tl(cpu_reserve, EA);
++        gen_addr_add(ctx, EA, EA, 8);
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_BEQ);
 +    }
-+}
- #endif /* defined(TARGET_PPC64) */
+     tcg_temp_free(EA);
++
++    tcg_gen_st_tl(hi, cpu_env, offsetof(CPUPPCState, reserve_val));
++    tcg_gen_st_tl(lo, cpu_env, offsetof(CPUPPCState, reserve_val2));
+ }
  
- /* sync */
+ /* stqcx. */
 -- 
 2.17.1
