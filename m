@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXmZB-000488-Rc
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:27 -0400
+	(envelope-from <david@redhat.com>) id 1fXmjc-0006zP-6f
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXmZ6-0004x0-H3
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:25 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fXmZ6-0004we-0G
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:55:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fXmZ3-0004nm-4e
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:55:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E0BE12E80DE
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:55:16 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1fXmjW-0001hk-7X
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:06:12 -0400
+References: <20180625115352.6889-1-david@redhat.com>
+	<20180625115352.6889-6-david@redhat.com>
+	<70637e9f-6fd6-a92e-0d2e-878f23460ac3@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <384da416-9ce3-30aa-7bff-0ff0652cb8f4@redhat.com>
+Date: Tue, 26 Jun 2018 14:06:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 26 Jun 2018 11:39:19 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1587065@bugs.launchpad.net>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153001315945.7019.16340469592483086806.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+In-Reply-To: <70637e9f-6fd6-a92e-0d2e-878f23460ac3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 5/9] s390x/tcg: properly
+ implement the TOD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,111 +26,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-Fix is known and seems backportable, marking as server-next and subscribing=
- for somebody to take a look.
-Also as mentioned it is in 2.9, so newer releases are already fixed.
+>> +    td->base = *tod;
+>> +
+>> +    td->base.low -= time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+>> +    if (tod->low < td->base.low) {
+> 
+> Just a matter of taste, but I'd rather use "td->base.low > tod->low"
+> here instead (since the operations before and after the if-statement are
+> related to td->base).
 
-** Also affects: qemu (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
+Changed.
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Fix Released
+> 
+>> +        td->base.high--;
+>> +    }
+>> +
+>> +    /*
+>> +     * The TOD has been changed and we have to recalculate the CKC values
+>> +     * for all CPUs. We do this asynchronously, as "SET CLOCK should be
+>> +     * issued only while all other activity on all CPUs .. has been
+>> +     * suspended".
+>> +     */
+>> +    CPU_FOREACH(cpu) {
+>> +        async_run_on_cpu(cpu, tcg_s390_tod_updated, RUN_ON_CPU_NULL);
+>> +    }
+>>  }
+>>  
+>>  static void qemu_s390_tod_class_init(ObjectClass *oc, void *data)
+>> @@ -34,10 +58,24 @@ static void qemu_s390_tod_class_init(ObjectClass *oc, void *data)
+>>      tdc->set = qemu_s390_tod_set;
+>>  }
+>>  
+>> +static void qemu_s390_tod_init(Object *obj)
+>> +{
+>> +    S390TODState *td = S390_TOD(obj);
+>> +    struct tm tm;
+>> +
+>> +    qemu_get_timedate(&tm, 0);
+>> +    td->base.high = 0;
+>> +    td->base.low = TOD_UNIX_EPOCH + (time2tod(mktimegm(&tm)) * 1000000000ULL);
+>> +    if (td->base.low < TOD_UNIX_EPOCH) {
+>> +        td->base.high += 1;
+>> +    }
+>> +}
+> 
+> Nit: It would be sufficient to do this in the realize() function instead.
 
-** Changed in: qemu (Ubuntu Xenial)
-       Status: New =3D> Confirmed
+Then I'll have to overwrite the realize function and store the
+parent_realize function - something that I want to avoid if not really
+necessary.
 
-** Tags added: server-next
+(for now it was also done in the cpu initfn, so that should be fine)
 
--- =
+> 
+>>  static TypeInfo qemu_s390_tod_info = {
+>>      .name = TYPE_QEMU_S390_TOD,
+>>      .parent = TYPE_S390_TOD,
+>>      .instance_size = sizeof(S390TODState),
+>> +    .instance_init = qemu_s390_tod_init,
+>>      .class_init = qemu_s390_tod_class_init,
+>>      .class_size = sizeof(S390TODClass),
+>>  };
+> [...]
+>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+>> index dd5273949b..be341b5295 100644
+>> --- a/target/s390x/misc_helper.c
+>> +++ b/target/s390x/misc_helper.c
+>> @@ -28,6 +28,8 @@
+>>  #include "qemu/timer.h"
+>>  #include "exec/exec-all.h"
+>>  #include "exec/cpu_ldst.h"
+>> +#include "qapi/error.h"
+>> +#include "tcg_s390x.h"
+>>  
+>>  #if !defined(CONFIG_USER_ONLY)
+>>  #include "sysemu/cpus.h"
+>> @@ -39,6 +41,7 @@
+>>  #include "hw/s390x/ioinst.h"
+>>  #include "hw/s390x/s390-pci-inst.h"
+>>  #include "hw/boards.h"
+>> +#include "hw/s390x/tod.h"
+>>  #endif
+>>  
+>>  /* #define DEBUG_HELPER */
+>> @@ -138,25 +141,32 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
+>>  /* Store Clock */
+>>  uint64_t HELPER(stck)(CPUS390XState *env)
+>>  {
+>> -    uint64_t time;
+>> +    S390TODState *td = s390_get_todstate();
+>> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+>> +    S390TOD tod;
+>>  
+>> -    time = env->tod_offset +
+>> -        time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+>> -
+>> -    return time;
+>> +    tdc->get(td, &tod, &error_abort);
+>> +    return tod.low;
+>>  }
+>>  
+>>  /* Set Clock Comparator */
+>>  void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+>>  {
+>> +    S390TODState *td = s390_get_todstate();
+>> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+>> +    S390TOD tod_base;
+>> +
+>>      if (time == -1ULL) {
+>>          return;
+>>      }
+>>  
+>>      env->ckc = time;
+>>  
+>> +    tdc->get(td, &tod_base, &error_abort);
+>> +    tod_base.low -= time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+> 
+> So the tdc->get first adds the time2tod, and then you subtract it here
+> again? Can't you simply use td->base.low directly instead?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
+That might be a good idea, previously I had tdc->get_base(), but dropped
+it because it cannot be implemented for KVM.
 
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
+Simply accessing the member here should be fine. Thanks!
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
+> 
+>>      /* difference between origins */
+>> -    time -= env->tod_offset;
+>> +    time -= tod_base.low;
+>>  
+>>      /* nanoseconds */
+>>      time = tod2time(time);
+>> @@ -164,6 +174,14 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+>>      timer_mod(env->tod_timer, time);
+>>  }
+> 
+> ... I found only nits, so with or without my suggested modifications:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
 
-Bug description:
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
 
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
+-- 
 
-  =
+Thanks,
 
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-   may have bind-mounts that let a device appear multiple times in the moun=
-t list. Unfortunately the guest agent is not smart enough to consider a dev=
-ice that has been frozen as succesfull and keep going. This causes this spe=
-cific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+David / dhildenb
