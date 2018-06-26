@@ -1,13 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fXnWf-0002oE-Ti
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:56:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fXnfF-0005gA-HL
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:05:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fXnWc-0005jL-1k
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:56:53 -0400
-Date: Tue, 26 Jun 2018 09:56:44 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180626125644.GS7451@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1fXnf9-00038t-Lh
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:05:45 -0400
 References: <20180622181108.GY7451@localhost.localdomain>
 	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
 	<20180622193522.GI7451@localhost.localdomain>
@@ -16,12 +13,17 @@ References: <20180622181108.GY7451@localhost.localdomain>
 	<4292432f-5f26-6925-4c14-ad1370e36e5b@redhat.com>
 	<20180625173056.GM7451@localhost.localdomain>
 	<97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
-	<54dfe708-cccf-c628-753f-692c83391ec4@redhat.com>
-	<20180626095004.7e92fdaa.cohuck@redhat.com>
+	<20180625195126.GN7451@localhost.localdomain>
+	<a931e759-879b-6f6b-3524-4b5a78fed323@redhat.com>
+	<20180626122908.GQ7451@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <577768c0-5205-2fb4-209f-845332fe158d@redhat.com>
+Date: Tue, 26 Jun 2018 15:05:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180626095004.7e92fdaa.cohuck@redhat.com>
+In-Reply-To: <20180626122908.GQ7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
  -enable-kvm and -enable-hax in the docs anymore
 List-Id: <qemu-devel.nongnu.org>
@@ -32,48 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, Jun 26, 2018 at 09:50:04AM +0200, Cornelia Huck wrote:
-> On Tue, 26 Jun 2018 06:40:56 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+On 26/06/2018 14:29, Eduardo Habkost wrote:
+> On Tue, Jun 26, 2018 at 07:57:18AM +0200, Paolo Bonzini wrote:
+>> On 25/06/2018 21:51, Eduardo Habkost wrote:
+>>> In either case, I'm not arguing (yet) for changing the default
+>>> upstream.  I'm just arguing for upstream QEMU to not make any
+>>> promises about the default.
+>>
+>> It would be a guest ABI breakage for TCG guests, so it would only apply
+>> to new machine types.  I don't think it's worth the complication.
 > 
-> > On 25.06.2018 20:26, Paolo Bonzini wrote:
-> > > On 25/06/2018 19:30, Eduardo Habkost wrote:  
-> > >>>> Attentive distros could even replace the wrapper script by a link.  
-> > >>> If they are okay with replacing the "KVM only" semantics with "KVM or
-> > >>> TCG", which I think is generally worse.  
-> > >>
-> > >> If we can't get agreement on what's the right default for each
-> > >> QEMU binary, I think that's yet another reason to document that
-> > >> upstream QEMU won't guarantee ABI compatibility if -accel is
-> > >> omitted.  
-> > > 
-> > > Before that we should ask what the benefit is in changing the default
-> > > for qemu-system-*.  Nobody is using it in practice to start QEMU with
-> > > KVM enabled...  
-> > 
-> > That's certainly not true. I've seen a couple of times already that
-> > people ask on IRC why their guests are running so slow, and if you ask
-> > them about their command line, it's obvious that they simply were not
-> > aware of "-accel" / "-enable-kvm" yet.
-> > 
-> > <semi-sarcastic>
-> > Maybe we simply should add a "--verbose" command line option that people
-> > can use to diagnose their problems:
-> > 
-> > $ qemu-system-x86_64 --verbose
-> > QEMU emulator version 2.12.50
-> > Using 'tcg' accelerator. Use '-accel kvm' to speed things up.
-> > Machine type is 'pc-i440fx-3.0'. Use 'q35' for a more modern machine.
-> > ....
-> > </semi-sarcastic>
-> 
-> Not sure how serious you meant that, but I actually quite like the
-> idea :)
+> That's exactly the point: I want to stop promising a stable guest
+> ABI when the accelerator is omitted, because I see no benefit in
+> wasting energy on this.
 
-Also, this mode could be enabled by default if stderr is a tty.
+On the other hand I see no benefit in changing a default that people are
+obviously not using (since most people use KVM, not TCG).  Distros will
+keep shipping, and people will keep using qemu-kvm even if we change the
+default.
 
--- 
-Eduardo
+> (I don't think we ever kept the guest ABI correctly with TCG, by
+> the way.)
+
+It would not be any different from KVM.  Less tested and likely to be
+more buggy, yes, but not particularly harder.
+
+Paolo
