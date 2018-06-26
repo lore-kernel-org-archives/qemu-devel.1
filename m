@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fXw3E-0005kU-Fy
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:03:06 -0400
+	(envelope-from <shorne@gmail.com>) id 1fXw7Q-0000ik-L0
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fXw3C-0003ze-B7
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:03:04 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fXw3B-0003z4-Og
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:03:02 -0400
-Message-Id: <5891c3b9e3f878407dc5e9b2284eb68f4ee8cf55.1530047900.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1530047900.git.balaton@eik.bme.hu>
-References: <cover.1530047900.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Tue, 26 Jun 2018 23:18:20 +0200
-Subject: [Qemu-devel] [PATCH v2 1/7] sm501: Implement i2c part for reading
- monitor EDID
+	(envelope-from <shorne@gmail.com>) id 1fXw7P-0005Vn-59
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:07:24 -0400
+Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:46528)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fXw7O-0005VJ-Ty
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 18:07:23 -0400
+Received: by mail-ua0-x242.google.com with SMTP id r18-v6so5931478ual.13
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 15:07:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	<20180618184046.6270-14-richard.henderson@linaro.org>
+	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
+In-Reply-To: <CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
+From: Stafford Horne <shorne@gmail.com>
+Date: Wed, 27 Jun 2018 07:07:10 +0900
+Message-ID: <CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,318 +29,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Sebastian Bauer <mail@sebastianbauer.info>, Philippe Mathieu-Daude <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Emulate the i2c part of SM501 which is used to access the EDID info
-from a monitor.
+Hello,
 
-The vmstate structure is changed and its version is increased but
-SM501 is only used on SH and PPC sam460ex machines that don't support
-cross-version migration.
+I think I found out something.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
-v2:
-- added constants for register bits
-- fix clearing error bit in reset reg
-- set max access size to 1
-v1: fixed build with SH
+in: target/openrisc/sys_helper.c:92
 
- default-configs/ppc-softmmu.mak    |   1 +
- default-configs/ppcemb-softmmu.mak |   1 +
- default-configs/sh4-softmmu.mak    |   2 +
- default-configs/sh4eb-softmmu.mak  |   2 +
- hw/display/sm501.c                 | 146 ++++++++++++++++++++++++++++++++++++-
- 5 files changed, 148 insertions(+), 4 deletions(-)
+When we write to `env->tlb.dtlb[idx].tr`  in helper_mtspr():
+  93          case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1):
+/* DTLBW0TR 0-127 */
+  94              idx = spr - TO_SPR(1, 640);
+  95              env->tlb.dtlb[idx].tr = rb;
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index b8b0526..e131e24 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -24,6 +24,7 @@ CONFIG_ETSEC=y
- # For Sam460ex
- CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
-+CONFIG_DDC=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
- CONFIG_BITBANG_I2C=y
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 37af193..ac44f15 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -17,6 +17,7 @@ CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
- CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
-+CONFIG_DDC=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
- CONFIG_BITBANG_I2C=y
-diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index 546d855..caeccd5 100644
---- a/default-configs/sh4-softmmu.mak
-+++ b/default-configs/sh4-softmmu.mak
-@@ -9,6 +9,8 @@ CONFIG_PFLASH_CFI02=y
- CONFIG_SH4=y
- CONFIG_IDE_MMIO=y
- CONFIG_SM501=y
-+CONFIG_I2C=y
-+CONFIG_DDC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_I82378=y
- CONFIG_I8259=y
-diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index 2d3fd49..53b9cd7 100644
---- a/default-configs/sh4eb-softmmu.mak
-+++ b/default-configs/sh4eb-softmmu.mak
-@@ -9,6 +9,8 @@ CONFIG_PFLASH_CFI02=y
- CONFIG_SH4=y
- CONFIG_IDE_MMIO=y
- CONFIG_SM501=y
-+CONFIG_I2C=y
-+CONFIG_DDC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_I82378=y
- CONFIG_I8259=y
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 8206ae8..273495e 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
- #include "qapi/error.h"
-+#include "qemu/log.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/hw.h"
-@@ -34,6 +35,8 @@
- #include "hw/devices.h"
- #include "hw/sysbus.h"
- #include "hw/pci/pci.h"
-+#include "hw/i2c/i2c.h"
-+#include "hw/i2c/i2c-ddc.h"
- #include "qemu/range.h"
- #include "ui/pixel_ops.h"
- 
-@@ -216,6 +219,14 @@
- #define SM501_I2C_SLAVE_ADDRESS         (0x03)
- #define SM501_I2C_DATA                  (0x04)
- 
-+#define SM501_I2C_CONTROL_START         (1 << 2)
-+#define SM501_I2C_CONTROL_ENABLE        (1 << 0)
-+
-+#define SM501_I2C_STATUS_COMPLETE       (1 << 3)
-+#define SM501_I2C_STATUS_ERROR          (1 << 2)
-+
-+#define SM501_I2C_RESET_ERROR           (1 << 2)
-+
- /* SSP base */
- #define SM501_SSP                       (0x020000)
- 
-@@ -471,10 +482,12 @@ typedef struct SM501State {
-     MemoryRegion local_mem_region;
-     MemoryRegion mmio_region;
-     MemoryRegion system_config_region;
-+    MemoryRegion i2c_region;
-     MemoryRegion disp_ctrl_region;
-     MemoryRegion twoD_engine_region;
-     uint32_t last_width;
-     uint32_t last_height;
-+    I2CBus *i2c_bus;
- 
-     /* mmio registers */
-     uint32_t system_control;
-@@ -487,6 +500,11 @@ typedef struct SM501State {
-     uint32_t misc_timing;
-     uint32_t power_mode_control;
- 
-+    uint8_t i2c_byte_count;
-+    uint8_t i2c_status;
-+    uint8_t i2c_addr;
-+    uint8_t i2c_data[16];
-+
-     uint32_t uart0_ier;
-     uint32_t uart0_lcr;
-     uint32_t uart0_mcr;
-@@ -897,6 +915,109 @@ static const MemoryRegionOps sm501_system_config_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
-+static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    SM501State *s = (SM501State *)opaque;
-+    uint8_t ret = 0;
-+
-+    switch (addr) {
-+    case SM501_I2C_BYTE_COUNT:
-+        ret = s->i2c_byte_count;
-+        break;
-+    case SM501_I2C_STATUS:
-+        ret = s->i2c_status;
-+        break;
-+    case SM501_I2C_SLAVE_ADDRESS:
-+        ret = s->i2c_addr;
-+        break;
-+    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
-+        ret = s->i2c_data[addr - SM501_I2C_DATA];
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register read."
-+                      " addr=0x%" HWADDR_PRIx "\n", addr);
-+    }
-+
-+    SM501_DPRINTF("sm501 i2c regs : read addr=%" HWADDR_PRIx " val=%x\n",
-+                  addr, ret);
-+    return ret;
-+}
-+
-+static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-+                            unsigned size)
-+{
-+    SM501State *s = (SM501State *)opaque;
-+    SM501_DPRINTF("sm501 i2c regs : write addr=%" HWADDR_PRIx
-+                  " val=%" PRIx64 "\n", addr, value);
-+
-+    switch (addr) {
-+    case SM501_I2C_BYTE_COUNT:
-+        s->i2c_byte_count = value & 0xf;
-+        break;
-+    case SM501_I2C_CONTROL:
-+        if (value & SM501_I2C_CONTROL_ENABLE) {
-+            if (value & SM501_I2C_CONTROL_START) {
-+                int res = i2c_start_transfer(s->i2c_bus,
-+                                             s->i2c_addr >> 1,
-+                                             s->i2c_addr & 1);
-+                s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-+                if (!res) {
-+                    int i;
-+                    SM501_DPRINTF("sm501 i2c : transferring %d bytes to 0x%x\n",
-+                                  s->i2c_byte_count + 1, s->i2c_addr >> 1);
-+                    for (i = 0; i <= s->i2c_byte_count; i++) {
-+                        res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-+                                            !(s->i2c_addr & 1));
-+                        if (res) {
-+                            SM501_DPRINTF("sm501 i2c : transfer failed"
-+                                          " i=%d, res=%d\n", i, res);
-+                            s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-+                            return;
-+                        }
-+                    }
-+                    if (i) {
-+                        SM501_DPRINTF("sm501 i2c : transferred %d bytes\n", i);
-+                        s->i2c_status = SM501_I2C_STATUS_COMPLETE;
-+                    }
-+                }
-+            } else {
-+                SM501_DPRINTF("sm501 i2c : end transfer\n");
-+                i2c_end_transfer(s->i2c_bus);
-+                s->i2c_status &= ~SM501_I2C_STATUS_ERROR;
-+            }
-+        }
-+        break;
-+    case SM501_I2C_RESET:
-+        if ((value & SM501_I2C_RESET_ERROR) == 0) {
-+            s->i2c_status &= SM501_I2C_STATUS_ERROR;
-+        }
-+        break;
-+    case SM501_I2C_SLAVE_ADDRESS:
-+        s->i2c_addr = value & 0xff;
-+        break;
-+    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
-+        s->i2c_data[addr - SM501_I2C_DATA] = value & 0xff;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register write. "
-+                      "addr=0x%" HWADDR_PRIx " val=%" PRIx64 "\n", addr, value);
-+    }
-+}
-+
-+static const MemoryRegionOps sm501_i2c_ops = {
-+    .read = sm501_i2c_read,
-+    .write = sm501_i2c_write,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
- static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
- {
-     SM501State *s = (SM501State *)opaque;
-@@ -1577,6 +1698,10 @@ static void sm501_reset(SM501State *s)
-     s->irq_mask = 0;
-     s->misc_timing = 0;
-     s->power_mode_control = 0;
-+    s->i2c_byte_count = 0;
-+    s->i2c_status = 0;
-+    s->i2c_addr = 0;
-+    memset(s->i2c_data, 0, 16);
-     s->dc_panel_control = 0x00010000; /* FIFO level 3 */
-     s->dc_video_control = 0;
-     s->dc_crt_control = 0x00010000;
-@@ -1615,6 +1740,11 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-     memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
-     s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
- 
-+    /* i2c */
-+    s->i2c_bus = i2c_init_bus(dev, "sm501.i2c");
-+    I2CDDCState *ddc = I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2CDDC));
-+    i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
-+
-     /* mmio */
-     memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
-     memory_region_init_io(&s->system_config_region, OBJECT(dev),
-@@ -1622,6 +1752,9 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-                           "sm501-system-config", 0x6c);
-     memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
-                                 &s->system_config_region);
-+    memory_region_init_io(&s->i2c_region, OBJECT(dev), &sm501_i2c_ops, s,
-+                          "sm501-i2c", 0x14);
-+    memory_region_add_subregion(&s->mmio_region, SM501_I2C, &s->i2c_region);
-     memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
-                           &sm501_disp_ctrl_ops, s,
-                           "sm501-disp-ctrl", 0x1000);
-@@ -1705,6 +1838,11 @@ static const VMStateDescription vmstate_sm501_state = {
-         VMSTATE_UINT32(twoD_destination_base, SM501State),
-         VMSTATE_UINT32(twoD_alpha, SM501State),
-         VMSTATE_UINT32(twoD_wrap, SM501State),
-+        /* Added in version 2 */
-+        VMSTATE_UINT8(i2c_byte_count, SM501State),
-+        VMSTATE_UINT8(i2c_status, SM501State),
-+        VMSTATE_UINT8(i2c_addr, SM501State),
-+        VMSTATE_UINT8_ARRAY(i2c_data, SM501State, 16),
-         VMSTATE_END_OF_LIST()
-      }
- };
-@@ -1770,8 +1908,8 @@ static void sm501_reset_sysbus(DeviceState *dev)
- 
- static const VMStateDescription vmstate_sm501_sysbus = {
-     .name = TYPE_SYSBUS_SM501,
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_STRUCT(state, SM501SysBusState, 1,
-                        vmstate_sm501_state, SM501State),
-@@ -1843,8 +1981,8 @@ static void sm501_reset_pci(DeviceState *dev)
- 
- static const VMStateDescription vmstate_sm501_pci = {
-     .name = TYPE_PCI_SM501,
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, SM501PCIState),
-         VMSTATE_STRUCT(state, SM501PCIState, 1,
--- 
-2.7.6
+
+Somehow we are overlapping with `cpu->tb_jmp_cache`,  these are both
+pointing to the same spot in memory.
+
+(gdb) p &cs->tb_jmp_cache[3014]
+$9 = (struct TranslationBlock **) 0x55555608b300
+(gdb) p &env->tlb.dtlb[idx].tr
+$10 = (uint32_t *) 0x55555608b304
+
+
+I can't see why yet, but it should be something simple.  Still looking.
+
+-Stafford
+On Sun, Jun 24, 2018 at 12:44 PM Stafford Horne <shorne@gmail.com> wrote:
+>
+> On Tue, Jun 19, 2018 at 3:41 AM Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+> >
+> > The code in cpu_mmu_index does not properly honor SR_DME.
+> > This bug has workarounds elsewhere in that we flush the
+> > tlb more often than necessary, on the state changes that
+> > should be reflected in a change of mmu_index.
+> >
+> > Fixing this means that we can respect the mmu_index that
+> > is given to tlb_flush.
+> >
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > ---
+> >  target/openrisc/cpu.h              | 23 +++++++++++++--------
+> >  target/openrisc/interrupt.c        |  4 ----
+> >  target/openrisc/interrupt_helper.c | 15 +++-----------
+> >  target/openrisc/mmu.c              | 33 +++++++++++++++++++++++++++---
+> >  target/openrisc/sys_helper.c       |  4 ----
+> >  target/openrisc/translate.c        |  2 +-
+> >  6 files changed, 49 insertions(+), 32 deletions(-)
+>
+>
+> Hello,
+>
+> I am trying to test these patches running a linux kernel.
+>
+> For some reason this is causing a strange failure with SMP but not
+> single core, I see an OpenRISC target pointer is making its way into
+> the tb_jmp_cache.  I don't think this is right and I am trying to
+> figure out why this happens and why this patch triggers it.
+>
+> When bisecting to this commit I get:
+>
+> [New Thread 0x7fffe9f11700 (LWP 4210)]
+>
+> [    0.000000] Compiled-in FDT at (ptrval)
+> [    0.000000] Linux version
+> 4.18.0-rc1-simple-smp-00006-gd5d0782e3db9-dirty
+> (shorne@lianli.shorne-pla.net) (gcc version 9.0.0 20180426
+> (experimental) (GCC)) #1013 SMP Sat Jun 23 17:11:42 JST 2018
+> [    0.000000] CPU: OpenRISC-0 (revision 0) @20 MHz
+> [    0.000000] -- dcache disabled
+> [    0.000000] -- icache disabled
+> [    0.000000] -- dmmu:   64 entries, 1 way(s)
+> [    0.000000] -- immu:   64 entries, 1 way(s)
+> [    0.000000] -- additional features:
+> [    0.000000] -- power management
+> [    0.000000] -- PIC
+> [    0.000000] -- timer
+> [    0.000000] setup_memory: Memory: 0x0-0x2000000
+> [    0.000000] Setting up paging and PTEs.
+> [    0.000000] map_ram: Memory: 0x0-0x2000000
+> [    0.000000] itlb_miss_handler (ptrval)
+> [    0.000000] dtlb_miss_handler (ptrval)
+> [    0.000000] OpenRISC Linux -- http://openrisc.io
+> [    0.000000] percpu: Embedded 6 pages/cpu @(ptrval) s18880 r8192 d22080 u49152
+> [    0.000000] Built 1 zonelists, mobility grouping off.  Total pages: 4080
+> [    0.000000] Kernel command line: earlycon
+> [    0.000000] earlycon: ns16550a0 at MMIO 0x90000000 (options '115200')
+> [    0.000000] bootconsole [ns16550a0] enabled
+> [    0.000000] Dentry cache hash table entries: 4096 (order: 1, 16384 bytes)
+> [    0.000000] Inode-cache hash table entries: 2048 (order: 0, 8192 bytes)
+> [    0.000000] Sorting __ex_table...
+> [    0.000000] Memory: 22336K/32768K available (3309K kernel code, 96K
+> rwdata, 736K rodata, 5898K init, 91K bss, 10432K reserved, 0K
+> cma-reserved)
+> [    0.000000] mem_init_done ...........................................
+> [    0.000000] Hierarchical RCU implementation.
+> [    0.000000] NR_IRQS: 32, nr_irqs: 32, preallocated irqs: 0
+> [    0.000000] clocksource: openrisc_timer: mask: 0xffffffff
+> max_cycles: 0xffffffff, max_idle_ns: 95563022313 ns
+> [    0.000000] 40.00 BogoMIPS (lpj=200000)
+> [    0.000000] pid_max: default: 32768 minimum: 301
+> [    0.000000] Mount-cache hash table entries: 2048 (order: 0, 8192 bytes)
+> [    0.000000] Mountpoint-cache hash table entries: 2048 (order: 0, 8192 bytes)
+>
+>
+> (gdb) bt
+> #0  0x00005555556d3e59 in tb_lookup__cpu_state (cf_mask=0,
+> flags=<synthetic pointer>, cs_base=<synthetic pointer>, pc=<synthetic
+> pointer>, cpu=0x555555f81300)
+>     at /home/shorne/work/openrisc/qemu/include/exec/tb-lookup.h:31
+> #1  0x00005555556d3e59 in tb_find (cf_mask=0, tb_exit=0,
+> last_tb=0x7fffe223ff00 <code_gen_buffer+2358995>, cpu=0x555555f81300)
+> at /home/shorne/work/openrisc/qemu/accel/tcg/cpu-exec.c:390
+> #2  0x00005555556d3e59 in cpu_exec (cpu=cpu@entry=0x555555f81300) at
+> /home/shorne/work/openrisc/qemu/accel/tcg/cpu-exec.c:735
+> #3  0x00005555556a0d2b in tcg_cpu_exec (cpu=cpu@entry=0x555555f81300)
+> at /home/shorne/work/openrisc/qemu/cpus.c:1362
+> #4  0x00005555556a238e in qemu_tcg_rr_cpu_thread_fn (arg=<optimized
+> out>) at /home/shorne/work/openrisc/qemu/cpus.c:1461
+> #5  0x0000555555886005 in qemu_thread_start (args=0x555555f93ef0) at
+> /home/shorne/work/openrisc/qemu/util/qemu-thread-posix.c:507
+> #6  0x00007ffff2a18564 in start_thread () at /lib64/libpthread.so.0
+> #7  0x00007ffff274c31f in clone () at /lib64/libc.so.6
+> (gdb) l
+> 26          uint32_t hash;
+> 27
+> 28          cpu_get_tb_cpu_state(env, pc, cs_base, flags);
+> 29          hash = tb_jmp_cache_hash_func(*pc);
+> 30          tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
+> 31          if (likely(tb &&
+> 32                     tb->pc == *pc &&
+> 33                     tb->cs_base == *cs_base &&
+> 34                     tb->flags == *flags &&
+> 35                     tb->trace_vcpu_dstate == *cpu->trace_dstate &&
+> (gdb) p tb
+> $1 = (TranslationBlock *) 0xc03c90a8
+>
+>
+> To reproduce I am running qemu with:
+>   qemu-system-or1k -cpu or1200 -M or1k-sim -kernel
+> or1k-linux-4.18-rc1-smp -serial stdio -nographic -monitor none -smp
+> cpus=2 -m 128
+>
+> Kernel (need to gunzip):
+>   SMP - http://shorne.noip.me/downloads/or1k-linux-4.18-rc1-smp.gz
+>   Single - http://shorne.noip.me/downloads/or1k-linux-4.18-rc1.gz
+>
+> I will continue to investigate, I just figured out SMP triggers it so
+> maybe that will uncover something more.
+>
+> Sorry, if this mail gets clobbered I am using the gmail web interface.
+>
+> -Stafford
