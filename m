@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fXorV-0000Qa-Ml
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:22:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fXoti-0001op-IK
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fXorS-0004xu-JI
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:22:29 -0400
-Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:49268)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fXorS-0004tY-D9
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:22:26 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.105.47])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id BAB821C835
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:22:24 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 26 Jun 2018 16:22:14 +0200
-Message-Id: <20180626142214.27801-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ppc/pnv: fix pnv_core_realize() error handling
+	(envelope-from <kwolf@redhat.com>) id 1fXoth-00031a-Jp
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 10:24:46 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 26 Jun 2018 16:24:29 +0200
+Message-Id: <20180626142434.22090-2-kwolf@redhat.com>
+In-Reply-To: <20180626142434.22090-1-kwolf@redhat.com>
+References: <20180626142434.22090-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/6] qcow2: Fix qcow2_truncate() error
+ return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +20,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-commit d35aefa9ae15 ("ppc/pnv: introduce a new intc_create() operation
-to the chip model") changed the object link in the pnv_core_realize()
-routine but a return was forgotten in case of error, which can lead to
-more problems afterwards (segv)
+If qcow2_alloc_clusters_at() returns an error, we do need to negate it
+to get back the positive errno code for error_setg_errno(), but we still
+need to return the negative error code.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Fixes: 772d1f973f87269f6a4a4ea4b880680f3779bbdf
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/ppc/pnv_core.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/qcow2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index a9f129fc2c5f..9750464bf4a1 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -150,6 +150,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     if (!chip) {
-         error_propagate(errp, local_err);
-         error_prepend(errp, "required link 'chip' not found: ");
-+        return;
-     }
-=20
-     pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
---=20
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a3a3aa2a97..6b2e1e1058 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3597,7 +3597,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+         if (clusters_allocated < 0) {
+             error_setg_errno(errp, -clusters_allocated,
+                              "Failed to allocate data clusters");
+-            return -clusters_allocated;
++            return clusters_allocated;
+         }
+ 
+         assert(clusters_allocated == nb_new_data_clusters);
+-- 
 2.13.6
