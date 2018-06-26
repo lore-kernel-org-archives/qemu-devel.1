@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1fXqsH-0002Lj-AK
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:31:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1fXqwg-0005qu-SI
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1fXqsA-0001uX-WC
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:31:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44620 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1fXqsA-0001tm-QF
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:31:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AEA181A4EAD
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:31:18 +0000 (UTC)
-References: <20180626154028.11133-1-pbonzini@redhat.com>
-	<20180626154028.11133-5-pbonzini@redhat.com>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <6f643a0b-71f4-4034-d8ec-c5a0a2f84ba6@redhat.com>
-Date: Tue, 26 Jun 2018 18:31:16 +0200
+	(envelope-from <bounces@canonical.com>) id 1fXqwb-0003gj-Si
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:35:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fXqwb-0003gH-JQ
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:35:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fXqwa-0001wX-Ez
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:35:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 624482E80CB
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 16:35:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180626154028.11133-5-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] pr-manager: add query-pr-managers QMP
- command
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 26 Jun 2018 16:23:22 -0000
+From: Uwe Lienig <uwe.lienig@t-online.de>
+Reply-To: Bug 1471904 <1471904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150706172738.3886.69660.malonedeb@wampee.canonical.com>
+	<152959184007.27230.621946142209363986.malone@gac.canonical.com>
+Message-Id: <f60449f0-0544-5f6f-76e5-38d4f416de13@t-online.de>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1471904] Re: qemu fails under NeXTStep 3.3
+ when accessing ROM in SCSI-Adapter am53c974
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,96 +38,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 06/26/2018 05:40 PM, Paolo Bonzini wrote:
-> This command lets you query the connection status of each pr-manager-helper
-> object.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  include/scsi/pr-manager.h |  2 ++
->  qapi/block.json           | 27 +++++++++++++++++++++++
->  scsi/pr-manager-helper.c  | 13 +++++++++++
->  scsi/pr-manager.c         | 45 +++++++++++++++++++++++++++++++++++++++
->  4 files changed, 87 insertions(+)
-> 
-> diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
-> index 5d2f13a5e4..adadca7954 100644
-> --- a/include/scsi/pr-manager.h
-> +++ b/include/scsi/pr-manager.h
-> @@ -33,8 +33,10 @@ typedef struct PRManagerClass {
->  
->      /* <public> */
->      int (*run)(PRManager *pr_mgr, int fd, struct sg_io_hdr *hdr);
-> +    bool (*is_connected)(PRManager *pr_mgr);
->  } PRManagerClass;
->  
-> +bool pr_manager_is_connected(PRManager *pr_mgr);
->  BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
->                                 AioContext *ctx, int fd,
->                                 struct sg_io_hdr *hdr,
-> diff --git a/qapi/block.json b/qapi/block.json
-> index c694524002..dc3323c954 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -77,6 +77,33 @@
->  { 'struct': 'BlockdevSnapshotInternal',
->    'data': { 'device': 'str', 'name': 'str' } }
->  
-> +##
-> +# @PRManagerInfo:
-> +#
-> +# Information about a persistent reservation manager
-> +#
-> +# @id: the identifier of the persistent reservation manager
-> +#
-> +# @is-connected: whether the persistent reservation manager is connected to
-> +#                the underlying storage or helper
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'struct': 'PRManagerInfo',
-> +  'data': {'id': 'str', 'is-connected': 'bool'} }
-> +
-> +##
-> +# @query-pr-managers:
-> +#
-> +# Returns a list of information about each persistent reservation manager.
-> +#
-> +# Returns: a list of @PRManagerInfo for each persistent reservation manager
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'command': 'query-pr-managers', 'returns': ['PRManagerInfo'] }
-> +
-> +
->  ##
->  # @blockdev-snapshot-internal-sync:
->  #
-> diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-> index 0c0fe389b7..b11481be9e 100644
-> --- a/scsi/pr-manager-helper.c
-> +++ b/scsi/pr-manager-helper.c
-> @@ -235,6 +235,18 @@ out:
->      return ret;
->  }
->  
-> +static bool pr_manager_helper_is_connected(PRManager *p)
-> +{
-> +    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(p);
-> +    bool result;
-> +
-> +    qemu_mutex_lock(&pr_mgr->lock);
-> +    result = (pr_mgr->ioc != NULL);
+Am 21.06.2018 um 16:37 schrieb Thomas Huth:
+Dear Thomas,
 
-I worry it is not that easy. pr_mgr->ioc is unset only when there's
-PR_IN/PR_OUT command coming from the guest (in pr_manager_helper_run ->
-pr_manager_helper_write). In fact, after 5/5 that is also the time when
-the event is delivered. But that might be too late for mgmt app to
-restart the helper process (although pr_manager_helper_run() tries to
-reconnect for 5 seconds before giving up).
+the issue is still reproducible. I'm still eager to run this old beast
+because of an old database application that has not been converted to
+our new platform. There is an old NeXTStep Black Hardware that is
+running the sybase database. The frontend runs under NeXTStep intel.
+Using qemu would allow to remove some old i486 NeXTStep systems.
 
-The patch is good code-wise though.
+The error looks like:
 
-Michal
+qemu-system-i386: Trying to execute code outside RAM or ROM at 0xc01754a8
+This usually means one of the following happened:
+
+(1) You told QEMU to execute a kernel for the wrong machine type, and it
+crashed on startup (eg trying to run a raspberry pi kernel on a
+versatilepb QEMU machine)
+(2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU
+executed a ROM full of no-op instructions until it fell off the end
+(3) Your guest kernel has a bug and crashed by jumping off into nowhere
+
+This is almost always one of the first two, so check your command line
+and that you are using the right type of kernel for this machine.
+If you think option (3) is likely then you can try debugging your guest
+with the -d debug options; in particular -d guest_errors will cause the
+log to include a dump of the guest register state at this point.
+
+Execution cannot continue; stopping here.
+
+Best regards
+
+
+Uwe
+> Looking through old bug tickets... can you still reproduce this issue
+> with the latest version of QEMU? Or could we close this ticket nowadays?
+> =
+
+> =
+
+> ** Changed in: qemu
+>        Status: New =3D> Incomplete
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1471904
+
+Title:
+  qemu fails under NeXTStep 3.3 when accessing ROM in SCSI-Adapter
+  am53c974
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I try to do a fresh install of NeXTStep 3.3 on qemu. After all install
+  floppies are successfully read in, the installation shall start, but
+  aborts right away. During installation process the SCSI host adapter
+  is correctly detected. I don't know, if these adapter where equipped
+  with some special ROM. I thought of installing NeXTStep on a SCSI
+  system due to the IDE problems already known under #1276879. If
+  necessary I would use gdb to track more into this.
+
+  System info:
+  Linux prerow 3.11.10-29-desktop #1 SMP PREEMPT Thu Mar 5 16:24:00 UTC 201=
+5 (338c513) x86_64 x86_64 x86_64 GNU/Linux
+  NAME=3DopenSUSE
+  VERSION=3D"13.1 (Bottle)"
+  VERSION_ID=3D"13.1"
+  PRETTY_NAME=3D"openSUSE 13.1 (Bottle) (x86_64)"
+
+  qemu commandline parameter:
+  /usr/bin/qemu-system-i386 \
+      -cpu pentium \
+      -monitor stdio \
+      -k de \
+      -vga cirrus \
+      -m 128 \
+      -localtime \
+      -drive \
+           file=3D.qemu/floppy/3.3_Boot_Disk.floppyimage,format=3Draw,if=3D=
+floppy,index=3D0 \
+       -drive \
+           file=3D.qemu/disk/scsihd-2G.qcow2,format=3Dqcow2,id=3Dscsihd0,if=
+=3Dnone \
+       -drive \
+           file=3D.qemu/cdrom/3.3_InstallCD-NeXTIntel.cdromimage,format=3Dr=
+aw,id=3Dscsicd0,if=3Dnone \
+       -net \
+           none \
+       -device \
+           am53c974,id=3DAMD0 \
+       -device \
+           scsi-cd,drive=3Dscsicd0,bus=3DAMD0.0,lun=3D0,scsi-id=3D1,physica=
+l_block_size=3D512,logical_block_size=3D512 \
+       -device \
+           scsi-hd,drive=3Dscsihd0,bus=3DAMD0.0,lun=3D0,scsi-id=3D0,removab=
+le=3Doff,secs=3D125,heads=3D8,cyls=3D4176,product=3D"ST32151N        ",vend=
+or=3D"Seagate ",serial=3D"89683587",ver=3D"2356",physical_block_size=3D512,=
+logical_block_size=3D512,dpofua=3Doff
+
+  qemu error message:
+  qemu: fatal: Trying to execute code outside RAM or ROM at 0xc01754a8
+
+  EAX=3D000000ff EBX=3D0000fffb ECX=3D000000ff EDX=3D000000a1
+  ESI=3D00000009 EDI=3D00011010 EBP=3D0000ff84 ESP=3D0000ff6c
+  EIP=3D001754a8 EFL=3D00000007 [-----PC] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  CS =3D0008 c0000000 3fffffff 00c39a00 DPL=3D0 CS32 [-R-]
+  SS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  DS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  FS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  GS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
+  GDT=3D     001c9a58 000000ff
+  IDT=3D     001c9bac 000007ff
+  CR0=3D00000033 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000              =
+                                                                       =
+
+  DR0=3D00000000 DR1=3D00000000 DR2=3D00000000 DR3=3D00000000              =
+                                                                       =
+
+  DR6=3Dffff0ff0 DR7=3D00000400                                            =
+                                                                   =
+
+  CCS=3D00000001 CCD=3D0000000c CCO=3DINCL    =
+
+  EFER=3D0000000000000000
+  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
+  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
+  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
+  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
+  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
+  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
+00000000
+  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
+00000000
+  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
+00000000
+  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
+00000000
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1471904/+subscriptions
