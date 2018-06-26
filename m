@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fXlrM-0002Wm-Lk
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:10:09 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fXlso-0003Mb-1j
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fXlrH-0003Ju-MO
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:10:08 -0400
-Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:60577)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXlrH-0003Ie-FK
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:10:03 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.120.49])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 539A81A7F0
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 13:10:00 +0200 (CEST)
-Date: Tue, 26 Jun 2018 13:09:54 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180626130954.658ec4f1@bahia.lan>
-In-Reply-To: <d2e05ff145f160cb99454f98821dc0250247f1f8.1529196703.git.keno@juliacomputing.com>
-References: <cover.1529196703.git.keno@juliacomputing.com>
-	<d2e05ff145f160cb99454f98821dc0250247f1f8.1529196703.git.keno@juliacomputing.com>
+	(envelope-from <kraxel@redhat.com>) id 1fXlsn-00049P-3q
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 07:11:37 -0400
+Date: Tue, 26 Jun 2018 13:11:29 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180626111129.tkpu73y4bam3jddz@sirius.home.kraxel.org>
+References: <20180625164239.13794-1-kwolf@redhat.com>
+	<87h8lqkkrp.fsf@dusky.pond.sub.org>
+	<424bb91d-a202-5c3b-1264-254cad0709d0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/13] 9p: darwin: *xattr_nofollow
- implementations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <424bb91d-a202-5c3b-1264-254cad0709d0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] usb-storage: Add rerror/werror properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Sat, 16 Jun 2018 20:56:52 -0400
-Keno Fischer <keno@juliacomputing.com> wrote:
-
-> This implements the darwin equivalent of the functions that were
-> moved to 9p-util(-linux) earlier in this series in the new
-> 9p-util-darwin file.
+On Tue, Jun 26, 2018 at 10:48:10AM +0200, Paolo Bonzini wrote:
+> On 26/06/2018 10:35, Markus Armbruster wrote:
+> > We also want to deprecate usb-storage, but
+> > I guess we're still not ready for that (it's a complicated story).
+> > 
+> > To deprecate -drive without also deprecating usb-storage, we need to
+> > preserve features.
 > 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> ---
->  hw/9pfs/9p-util-darwin.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/9pfs/Makefile.objs    |  1 +
->  2 files changed, 65 insertions(+)
->  create mode 100644 hw/9pfs/9p-util-darwin.c
-> 
-> diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
-> new file mode 100644
-> index 0000000..cdb4c9e
-> --- /dev/null
-> +++ b/hw/9pfs/9p-util-darwin.c
-> @@ -0,0 +1,64 @@
-> +/*
-> + * 9p utilities (Darwin Implementation)
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/xattr.h"
-> +#include "9p-util.h"
-> +
-> +ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> +                             void *value, size_t size)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename,
-> +                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = fgetxattr(fd, name, value, size, 0, 0);
+> Patch looks good to me too, but indeed why can't we deprecate
+> usb-storage in favor of usb-bot + scsi-disk?
 
-Hmm... I had said it looked good, but not that good actually. This isn't
-strictly equivalent of what we have with Linux, because it requires the
-file to have appropriate access rights.
+I think we can.  One blocking issue was hotplug support, but that got fixed a
+while ago, and I'm not aware of any other issue ...
 
-Why not just use the magic sycall from patch 11 and call getxattr() ?
+cheers,
+  Gerd
 
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> +
-> +ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
-> +                              char *list, size_t size)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename,
-> +                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = flistxattr(fd, list, size, 0);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> +
-> +ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
-> +                                const char *name)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = fremovexattr(fd, name, 0);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> +
-> +int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> +                         void *value, size_t size, int flags)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = fsetxattr(fd, name, value, size, 0, flags);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-> index 95e3bc0..0de39af 100644
-> --- a/hw/9pfs/Makefile.objs
-> +++ b/hw/9pfs/Makefile.objs
-> @@ -1,6 +1,7 @@
->  ifeq ($(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN)),y)
->  common-obj-y  = 9p.o
->  common-obj-$(CONFIG_LINUX) += 9p-util-linux.o
-> +common-obj-$(CONFIG_DARWIN) += 9p-util-darwin.o
->  common-obj-y += 9p-local.o 9p-xattr.o
->  common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
->  common-obj-y += coth.o cofs.o codir.o cofile.o
+commit b78ecd0998094a8b7e0f14c4888f3a6b525d14ff
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Wed Jun 15 11:46:58 2016 +0200
+
+    usb-bot: hotplug support
+    
+    This patch marks usb-bot as hot-pluggable device, makes attached
+    property settable and turns off auto-attach in case the device
+    was hotplugged.
+    
+    Hot-plugging a usb-bot device with one or more scsi devices can be
+    done this way now:
+    
+      (1) device-add usb-bot,id=foo
+      (2) device-add scsi-{hd,cd},bus=foo.0,lun=0
+      (2b) optionally add more devices (luns 0 ... 15).
+      (3) qom-set foo.attached = true
+    
+    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+    Reviewed-by: Markus Armbruster <armbru@redhat.com>
+    Message-id: 1465984019-28963-5-git-send-email-kraxel@redhat.com
