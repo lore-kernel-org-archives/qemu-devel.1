@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXfcR-0003st-Fw
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:30:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXfmq-0005TE-VN
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXfcP-0004S6-3F
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:30:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fXfcO-0004Rm-IY
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:30:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fXfcN-0000qR-QS
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 04:30:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 93C422E80D3
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 04:30:15 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1fXfmn-0007rd-SR
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 00:41:05 -0400
+References: <20180613151942.GC19901@redhat.com>
+	<87k1r24quk.fsf@dusky.pond.sub.org>
+	<20180619171539.0adc90d6.cohuck@redhat.com>
+	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
+	<20180622181108.GY7451@localhost.localdomain>
+	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
+	<20180622193522.GI7451@localhost.localdomain>
+	<743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
+	<87lgb3xsv8.fsf@dusky.pond.sub.org>
+	<4292432f-5f26-6925-4c14-ad1370e36e5b@redhat.com>
+	<20180625173056.GM7451@localhost.localdomain>
+	<97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <54dfe708-cccf-c628-753f-692c83391ec4@redhat.com>
+Date: Tue, 26 Jun 2018 06:40:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 26 Jun 2018 04:17:29 -0000
-From: Launchpad Bug Tracker <628082@bugs.launchpad.net>
-Reply-To: Bug 628082 <628082@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100901133500.26711.95342.malonedeb@wampee.canonical.com>
-Message-Id: <152998664996.19339.2444265663671873970.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 628082] Re: nl-be keymap is wrong
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
+ -enable-kvm and -enable-hax in the docs anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 25.06.2018 20:26, Paolo Bonzini wrote:
+> On 25/06/2018 19:30, Eduardo Habkost wrote:
+>>>> Attentive distros could even replace the wrapper script by a link.
+>>> If they are okay with replacing the "KVM only" semantics with "KVM or
+>>> TCG", which I think is generally worse.
+>>
+>> If we can't get agreement on what's the right default for each
+>> QEMU binary, I think that's yet another reason to document that
+>> upstream QEMU won't guarantee ABI compatibility if -accel is
+>> omitted.
+>=20
+> Before that we should ask what the benefit is in changing the default
+> for qemu-system-*.  Nobody is using it in practice to start QEMU with
+> KVM enabled...
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+That's certainly not true. I've seen a couple of times already that
+people ask on IRC why their guests are running so slow, and if you ask
+them about their command line, it's obvious that they simply were not
+aware of "-accel" / "-enable-kvm" yet.
 
--- =
+<semi-sarcastic>
+Maybe we simply should add a "--verbose" command line option that people
+can use to diagnose their problems:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/628082
+$ qemu-system-x86_64 --verbose
+QEMU emulator version 2.12.50
+Using 'tcg' accelerator. Use '-accel kvm' to speed things up.
+Machine type is 'pc-i440fx-3.0'. Use 'q35' for a more modern machine.
+....
+</semi-sarcastic>
 
-Title:
-  nl-be keymap is wrong
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  As mentioned on
-  https://bugs.launchpad.net/ubuntu/+source/kvm/+bug/429965 as well as
-  the kvm mailinglist
-  (http://thread.gmane.org/gmane.comp.emulators.kvm.devel/14413), the
-  nl-be keymap does not work. The number keys above the regular keys
-  (non-numeric keypad numbers) as well as vital keys such as slash,
-  backslash, dash, ... are not working.
-
-  The nl-be keymap that is presented in the above URLs (and also
-  attached to this bug) does work properly.
-
-  Would it be possible to include this keymap rather than the current
-  one?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/628082/+subscriptions
+ Cheers,
+  Thomas
