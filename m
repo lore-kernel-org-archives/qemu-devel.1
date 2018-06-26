@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXk9a-0003dZ-5t
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:20:51 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fXkBB-0004th-Rw
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXk9X-0000tq-2h
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:20:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42894 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fXk9W-0000tk-Tl
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:20:47 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 93EFB7A7ED
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:20:46 +0000 (UTC)
-References: <20180626085642.4973-1-armbru@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dc1a212f-5208-309a-6ec4-ccc0e5ffdaa1@redhat.com>
-Date: Tue, 26 Jun 2018 11:20:40 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fXkBA-00022A-UO
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:22:29 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fXkBA-00021w-L1
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:22:28 -0400
+Received: by mail-wm0-x243.google.com with SMTP id w137-v6so1041612wmw.1
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 02:22:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180626085642.4973-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] coverity-model: Fix replay_get_byte()
+In-Reply-To: <20180621163335.19010217@redhat.com>
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-5-marcandre.lureau@redhat.com>
+	<20180621150203.2c985ed2@redhat.com>
+	<CAJ+F1CJHraqeM2q5G-ooVfp771r_K4g=osJG=J6PTH4aV0BprQ@mail.gmail.com>
+	<20180621163335.19010217@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 26 Jun 2018 11:22:26 +0200
+Message-ID: <CAJ+F1C+pYQ-7e-8KqNNwRb4Jtq_HmZUowtiGPjFWV7AE3JL_TA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] tpm: add a fake ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 26/06/2018 10:56, Markus Armbruster wrote:
-> Coverity 2018.06 chokes on replay_get_byte():
-> 
->     $ cov-make-library -of scripts/coverity-model.xmldb scripts/coverity-model.c
->     output file: scripts/coverity-model.xmldb
->     Compiling scripts/coverity-model.c with command /opt/cov-sa-2018.06/bin/cov-emit --dir /tmp/cov-armbru/930a6fb31e5f464fc1a53354b2deb66b/cov-make-library-emit -w --no_error_recovery --emit_header_functions --no_implicit_decl --preinclude /opt/cov-sa-2018.06/library/decls.h --c scripts/coverity-model.c
->     "scripts/coverity-model.c", line 110: error #20: identifier "replay_file" is
->               undefined
->            if (replay_file) {
->                ^
-> 
->     Emit for file '/work/armbru/qemu/scripts/coverity-model.c' complete.
->     [ERROR] 1 error detected in the compilation of "scripts/coverity-model.c".
->     ERROR: cov-emit returned with code 1
-> 
-> Broken in commit 04a0afe5285.  Fix by dumbing down.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/coverity-model.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
-> index 48b112393b..2c0346ff25 100644
-> --- a/scripts/coverity-model.c
-> +++ b/scripts/coverity-model.c
-> @@ -106,12 +106,8 @@ static int get_keysym(const name2keysym_t *table,
->  /* Replay data is considered trusted.  */
->  uint8_t replay_get_byte(void)
->  {
-> -     uint8_t byte = 0;
-> -     if (replay_file) {
-> -         uint8_t c;
-> -         byte = c;
-> -     }
-> -     return byte;
-> +    uint8_t byte;
-> +    return byte;
->  }
->  
->  
-> 
+On Thu, Jun 21, 2018 at 4:33 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 21 Jun 2018 15:24:44 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>
+>> Hi
+>>
+>> On Thu, Jun 21, 2018 at 3:02 PM, Igor Mammedov <imammedo@redhat.com> wro=
+te:
+>> > On Tue, 15 May 2018 14:14:33 +0200
+>> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>> >
+>> >> This allows to pass the last failing test from the Windows HLK TPM 2.=
+0
+>> >> TCG PPI 1.3 tests.
+>> >>
+>> >> The interface is described in the "TCG Platform Reset Attack
+>> >> Mitigation Specification", chapter 6 "ACPI _DSM Function". Whether or
+>> >> not we should have a real implementation remains an open question to =
+me.
+>> > might it cause security issues?
+>>
+>> Good question. If the guest assumes success of this operation perhaps.
+>> I'll check the spec.
+>>
+>> > What are implications of faking it and how hard it's to implement thin=
+g
+>> > per spec?
+>>
+>> Laszlo answerd that in "[Qemu-devel] investigating TPM for
+>> OVMF-on-QEMU"  2f2b) TCG Memory Clear Interface
+> I get that it's optional, but we probably shouldn't advertise/fake
+> feature if it's not supported.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+As said in the commit message, the objective was to pass the Windows
+HLK test. If we don't want to advertize a fake interface, I am fine
+droping this patch. We'll have to revisit with Laszlo the work needed
+in the firmware to support it.
+
+>
+>>
+>> >
+>> >
+>> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> >> ---
+>> >>  hw/i386/acpi-build.c | 9 +++++++++
+>> >>  1 file changed, 9 insertions(+)
+>> >>
+>> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> >> index 95be4f0710..392a1e50bd 100644
+>> >> --- a/hw/i386/acpi-build.c
+>> >> +++ b/hw/i386/acpi-build.c
+>> >> @@ -2072,6 +2072,15 @@ build_tpm_ppi(Aml *dev)
+>> >>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+>> >>          }
+>> >>          aml_append(method, ifctx);
+>> >> +
+>> >> +       /* dummy MOR Memory Clear for the sake of WLK PPI test */
+>> >> +        ifctx =3D aml_if(
+>> >> +            aml_equal(aml_arg(0),
+>> >> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D4=
+5D")));
+>> >> +        {
+>> >> +            aml_append(ifctx, aml_return(aml_int(0)));
+>> >> +        }
+>> >> +        aml_append(method, ifctx);
+>> >>      }
+>> >>      aml_append(dev, method);
+>> >>  }
+>> >
+>> >
+>>
+>>
+>>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
