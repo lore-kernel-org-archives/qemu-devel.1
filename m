@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXjkt-00030Z-PZ
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:55:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXjlE-0003Go-Oq
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXjks-0006fj-Tl
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:55:19 -0400
-References: <1529056145-6404-1-git-send-email-thuth@redhat.com>
-	<20180626104001.617d4ea9.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <79c0775f-49b5-1d79-a4f9-234941854e4f@redhat.com>
-Date: Tue, 26 Jun 2018 10:55:09 +0200
+	(envelope-from <armbru@redhat.com>) id 1fXjlC-0006oj-6K
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:55:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40970 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fXjlC-0006oQ-0w
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 04:55:38 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180514141218.28438-1-pbonzini@redhat.com>
+	<87a7riovly.fsf@dusky.pond.sub.org>
+	<7826b2c7-4cbf-6090-415d-d7866b6c9a89@redhat.com>
+Date: Tue, 26 Jun 2018 10:55:36 +0200
+In-Reply-To: <7826b2c7-4cbf-6090-415d-d7866b6c9a89@redhat.com> (Paolo
+	Bonzini's message of "Tue, 26 Jun 2018 09:55:39 +0200")
+Message-ID: <8736xakjuf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180626104001.617d4ea9.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3] loader: Check access size
- when calling rom_ptr() to avoid crashes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] coverity-model: replay data is considered
+ trusted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-On 26.06.2018 10:40, Cornelia Huck wrote:
-> On Fri, 15 Jun 2018 11:49:05 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> The rom_ptr() function allows direct access to the ROM blobs that we
->> load during startup. However, there are currently no checks for the
->> size of the accesses, so it's currently possible to crash QEMU for
->> example with:
->>
->> $ echo "Insane in the mainframe" > /tmp/test.txt
->> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
->> Segmentation fault (core dumped)
->> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
->> Segmentation fault (core dumped)
->> $ echo -n HdrS > /tmp/hdr.txt
->> $ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/hdr.txt -initrd /tmp/hdr.txt
->> Segmentation fault (core dumped)
->>
->> We need a possibility to check the size of the ROM area that we want
->> to access, thus let's add a size parameter to the rom_ptr() function
->> to avoid these problems.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> 
-> Grmpf, this conflicts with "s390/ipl: fix ipl with -no-reboot" in
-> s390-next... do you want to rebase it?
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Really? Where is the conflict? I can rebase my patch to your s390-next
-branch, but the patch looks identical after that rebase. As far as I can
-see, the patches only change different parts of the ipl.c file.
+> On 26/06/2018 09:27, Markus Armbruster wrote:
+>> 
+>> Minimal fix:
+>> 
+>>     diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
+>>     index 48b112393b..f987ce53b8 100644
+>>     --- a/scripts/coverity-model.c
+>>     +++ b/scripts/coverity-model.c
+>>     @@ -106,6 +106,7 @@ static int get_keysym(const name2keysym_t *table,
+>>      /* Replay data is considered trusted.  */
+>>      uint8_t replay_get_byte(void)
+>>      {
+>>     +    void *replay_file;
+>>           uint8_t byte = 0;
+>>           if (replay_file) {
+>>               uint8_t c;
+>> 
+>> Alternatively, dumb down to:
+>> 
+>>     /* Replay data is considered trusted.  */
+>>     uint8_t replay_get_byte(void)
+>>     {
+>>         uint8_t byte;
+>>         return byte;
+>>     }
+>
+> I wonder why the online service didn't complain.
 
- Thomas
+Me too.  Of course, I should've run cov-make-library myself.  Next
+time...
+
+>                                                   I guess the dumber
+> version is more than enough!
+
+I'll post it as a proper patch.  Thanks!
