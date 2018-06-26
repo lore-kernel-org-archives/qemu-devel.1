@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXpZI-0002E3-1A
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:07:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXpZu-0002Yo-ID
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXpZE-0006vM-Q8
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:07:44 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:43180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fXpZE-0006v7-Is
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:07:40 -0400
-Received: by mail-pf0-x244.google.com with SMTP id y8-v6so8218867pfm.10
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 08:07:40 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-31-richard.henderson@linaro.org>
-	<CAFEAcA8jwqotqyGHSA5BFniRa9XttAebQgwpsWgL68WArZkJHQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <459b4639-7d79-7ab6-4a9c-77797658ea92@linaro.org>
-Date: Tue, 26 Jun 2018 08:07:36 -0700
+	(envelope-from <cohuck@redhat.com>) id 1fXpZq-00075y-Ou
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:08:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57308 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fXpZq-00075m-KN
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 11:08:18 -0400
+Date: Tue, 26 Jun 2018 17:08:13 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180626170813.4db094a1.cohuck@redhat.com>
+In-Reply-To: <CADGSJ21HNd4VYNcCt4H0gJ_CCx1GUFpHrDof2N=4WqhD24Zc2A@mail.gmail.com>
+References: <20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
+	<CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
+	<20180623003022-mutt-send-email-mst@kernel.org>
+	<CADGSJ22oFhP955cuTmMWeSt0UOsG5K1A--c34QUSMx5z3Up2SA@mail.gmail.com>
+	<20180623012934-mutt-send-email-mst@kernel.org>
+	<CADGSJ21HNd4VYNcCt4H0gJ_CCx1GUFpHrDof2N=4WqhD24Zc2A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8jwqotqyGHSA5BFniRa9XttAebQgwpsWgL68WArZkJHQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 30/35] target/arm: Pass index to AdvSIMD
- FCMLA (indexed)
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +38,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Siwei Liu <loseweigh@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On 06/26/2018 06:38 AM, Peter Maydell wrote:
-> On 21 June 2018 at 02:53, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> The original commit failed to pass, or use, the index.
->>
->> Fixes: d17b7cdcf4ea
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/translate-a64.c | 21 ++++++++++++---------
->>  target/arm/vec_helper.c    | 10 ++++++----
->>  2 files changed, 18 insertions(+), 13 deletions(-)
->>
->> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
->> index 8d8a4cecb0..038e48278f 100644
->> --- a/target/arm/translate-a64.c
->> +++ b/target/arm/translate-a64.c
->> @@ -12669,15 +12669,18 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->>      case 0x13: /* FCMLA #90 */
->>      case 0x15: /* FCMLA #180 */
->>      case 0x17: /* FCMLA #270 */
->> -        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
->> -                           vec_full_reg_offset(s, rn),
->> -                           vec_reg_offset(s, rm, index, size), fpst,
->> -                           is_q ? 16 : 8, vec_full_reg_size(s),
->> -                           extract32(insn, 13, 2), /* rot */
->> -                           size == MO_64
->> -                           ? gen_helper_gvec_fcmlas_idx
->> -                           : gen_helper_gvec_fcmlah_idx);
->> -        tcg_temp_free_ptr(fpst);
->> +        {
->> +            int rot = extract32(insn, 13, 2);
->> +            int data = index * 4 + rot;
+On Fri, 22 Jun 2018 17:05:04 -0700
+Siwei Liu <loseweigh@gmail.com> wrote:
+
+> On Fri, Jun 22, 2018 at 3:33 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > I suspect the diveregence will be lost on most users though
+> > simply because they don't even care about vfio. They just
+> > want things to go fast.  
 > 
-> Using arithmetic to do bit operations again.
-> 
->> +            tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
->> +                               vec_full_reg_offset(s, rn),
->> +                               vec_reg_offset(s, rm, index, size), fpst,
->> +                               is_q ? 16 : 8, vec_full_reg_size(s), data,
->> +                               size == MO_64
->> +                               ? gen_helper_gvec_fcmlas_idx
->> +                               : gen_helper_gvec_fcmlah_idx);
-> 
-> We're already using vec_reg_offset() to pass the helper the address
-> of the index'th element in Vm -- why do we need to also add
-> 2*index when we use that pointer as an array base in the helper?
+> Like Jason said, VF isn't faster than virtio-net in all cases. It
+> depends on the workload and performance metrics: throughput, latency,
+> or packet per second.
 
-Ah, bug.  Because of SVE, we must pass index (since it applies per 128-bit
-segment), and we should pass the full_reg as the pointer.
-
-
-r~
+So, will it be guest/admin-controllable then where the traffic flows
+through? Just because we do have a vf available after negotiation of
+the feature bit, it does not necessarily mean we want to use it? Do we
+(the guest) even want to make it visible in that case?
