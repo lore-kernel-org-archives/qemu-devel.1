@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXkEk-0007zF-Ew
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:26:11 -0400
+	(envelope-from <clg@kaod.org>) id 1fXkJt-0003kd-6S
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXkEh-0003Fb-2t
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:26:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fXkEg-0003Ec-SL
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:26:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fXkEd-0001UE-IA
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:26:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C9F0D2E80EA
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 09:25:55 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1fXkJo-0005mE-9s
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:31:29 -0400
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:52282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fXkJo-0005ho-1s
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:31:24 -0400
+Received: from player770.ha.ovh.net (unknown [10.109.122.108])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id B57BC1A9C1
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:31:15 +0200 (CEST)
+References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_qv=PEzDOh8FB5F-uhbbtHrr7nRWPjXehyjkmj_cJ-AQ@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0826a256-5c9d-5b7d-7ec2-fcba748e2124@kaod.org>
+Date: Tue, 26 Jun 2018 11:31:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_qv=PEzDOh8FB5F-uhbbtHrr7nRWPjXehyjkmj_cJ-AQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 26 Jun 2018 09:13:12 -0000
-From: navicrej <1778350@bugs.launchpad.net>
-Reply-To: Bug 1778350 <1778350@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152976906812.26719.4060539263907295716.malonedeb@gac.canonical.com>
-Message-Id: <153000439210.6815.3824890774185490224.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1778350] Re: Android-x86 4.4-r5 won't boot on
- QEMU since v2.11.0-rc2
+Subject: Re: [Qemu-devel] [PATCH 01/23] ppc/pnv: introduce a new
+ intc_create() operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-Nevermind that, just found out how to run:
+On 06/26/2018 11:07 AM, Peter Maydell wrote:
+> On 22 June 2018 at 05:24, David Gibson <david@gibson.dropbear.id.au> wr=
+ote:
+>> From: C=C3=A9dric Le Goater <clg@kaod.org>
+>>
+>> On Power9, the thread interrupt presenter has a different type and is
+>> linked to the chip owning the cores.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>> ---
+>>  hw/ppc/pnv.c         | 21 +++++++++++++++++++--
+>>  hw/ppc/pnv_core.c    | 18 +++++++++---------
+>>  include/hw/ppc/pnv.h |  1 +
+>>  3 files changed, 29 insertions(+), 11 deletions(-)
+>=20
+> Hi; Coverity points out a bug (CID 1393617) in this patch
+> (which is commit d35aefa9ae150a):
+>=20
+>> @@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, E=
+rror **errp)
+>>      void *obj;
+>>      int i, j;
+>>      char name[32];
+>> -    Object *xi;
+>> +    Object *chip;
+>>
+>> -    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
+>> -    if (!xi) {
+>> -        error_setg(errp, "%s: required link 'xics' not found: %s",
+>> -                   __func__, error_get_pretty(local_err));
+>> -        return;
+>> +    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err=
+);
+>> +    if (!chip) {
+>> +        error_propagate(errp, local_err);
+>> +        error_prepend(errp, "required link 'chip' not found: ");
+>>      }
+>=20
+> We check for a NULL 'chip' pointer, but forget the 'return', so
+> execution will plough on through to the code below and eventually
+> dereference the NULL pointer and segfault.
 
-qemu-system-x86_64 -cdrom android-x86-4.4-r5.iso -m 1024 -global i440FX-
-pcihost.x-pci-hole64-fix=3Doff -global q35-pcihost.x-pci-hole64-fix=3Doff
+arg. My fault. I will send a fix.
 
--- =
+Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1778350
-
-Title:
-  Android-x86 4.4-r5 won't boot on QEMU since v2.11.0-rc2
-
-Status in QEMU:
-  New
-
-Bug description:
-  Try to boot from the Android-x86 4.4-r5 ISO won't boot in QEMU after 2.11=
-.0-rc2. The last known version it works is 2.11.0-rc1.
-  It also works on the 2.10.x-line, even the 2.10.2 which was released afte=
-r 2.11.0-rc2!
-
-  How to reproduce:
-  Download the ISO from
-  http://www.android-x86.org/releases/releasenote-4-4-r5 or directly https:=
-//www.fosshub.com/Android-x86.html/android-x86-4.4-r5.iso
-
-  Start QEMU with this command-line: qemu-system-x86_64 -cdrom
-  android-x86-4.4-r5.iso -m 1024
-
-  On 2.11.0-rc1 and 2.10.2 after selecting to boot from CD it shows the And=
-roid splash after a short while ...
-  On 2.11.0-rc2 through the latest 2.12 line it goes to black screen shortl=
-y right after selecting to boot from CD
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1778350/+subscriptions
+C.=20
