@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXtNf-0000DT-4O
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:12:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fXtfb-0003EN-7S
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:30:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXtNc-0006uT-Fy
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:11:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36700 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXtNc-0006uH-AC
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:11:56 -0400
-Date: Tue, 26 Jun 2018 20:11:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180626191151.GD2505@work-vm>
-References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
-	<20180615120649.GC2615@work-vm>
-	<f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
-	<20180625171447.GJ2390@work-vm> <20180625175039.GK2390@work-vm>
-	<40eea991-4e7f-c06b-dee4-334a245721cf@redhat.com>
-	<7b6640d1-9e93-4692-500b-f1bce22852ab@virtuozzo.com>
+	(envelope-from <mreitz@redhat.com>) id 1fXtfY-00057k-3K
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 15:30:31 -0400
+References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ac4381db-2953-de6a-c5bf-27d81f68d418@redhat.com>
+Date: Tue, 26 Jun 2018 21:30:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <7b6640d1-9e93-4692-500b-f1bce22852ab@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
- start
+In-Reply-To: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IhCwCn1CIpGolDPt8y0LIs5wl84P0RP4g"
+Subject: Re: [Qemu-devel] [PATCH v4] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,110 +24,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> 25.06.2018 21:03, John Snow wrote:
-> >=20
-> > On 06/25/2018 01:50 PM, Dr. David Alan Gilbert wrote:
-> > > * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> > > > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> > > > > 15.06.2018 15:06, Dr. David Alan Gilbert wrote:
-> > > > > > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wro=
-te:
-> > > > > > > Invalidate cache before source start in case of failed migr=
-ation.
-> > > > > > >=20
-> > > > > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@vir=
-tuozzo.com>
-> > > > > > Why doesn't the code at the bottom of migration_completion,
-> > > > > > fail_invalidate:   and the code in migrate_fd_cancel   handle=
- this?
-> > > > > >=20
-> > > > > > What case did you see it in that those didn't handle?
-> > > > > > (Also I guess it probably should set s->block_inactive =3D fa=
-lse)
-> > > > > on source I see:
-> > > > >=20
-> > > > > 81392@1529065750.766289:migrate_set_state new state 7
-> > > > > 81392@1529065750.766330:migration_thread_file_err
-> > > > > 81392@1529065750.766332:migration_thread_after_loop
-> > > > >=20
-> > > > > so, we are leaving loop on
-> > > > >  =A0=A0=A0=A0=A0=A0=A0 if (qemu_file_get_error(s->to_dst_file))=
- {
-> > > > >  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 migrate_set_state(&s->state,=
- current_active_state,
-> > > > > MIGRATION_STATUS_FAILED);
-> > > > > trace_migration_thread_file_err();
-> > > > > break;
-> > > > >  =A0=A0=A0=A0=A0=A0=A0 }
-> > > > >=20
-> > > > > and skip migration_completion()
-> > > > Yeh, OK; I'd seen soemthing else a few days ago, where a cancella=
-tion
-> > > > test that had previously ended with a 'cancelled' state has now e=
-nded up
-> > > > in 'failed' (which is the state 7 you have above).
-> > > > I suspect there's something else going on as well; I think what i=
-s
-> > > > supposed to happen in the case of 'cancel' is that it spins in 'c=
-ancelling' for
-> > > > a while in migrate_fd_cancel and then at the bottom of migrate_fd=
-_cancel
-> > > > it does the recovery, but because it's going to failed instead, t=
-hen
-> > > > it's jumping over that recovery.
-> > > Going back and actually looking at the patch again;
-> > > can I ask for 1 small change;
-> > >     Can you set s->block_inactive =3D false   in the case where you
-> > > don't get the local_err (Like we do at the bottom of migrate_fd_can=
-cel)
-> > >=20
-> > >=20
-> > > Does that make sense?
-> > >=20
-> > > Thanks,
-> > >=20
-> > > Dave
-> > >=20
-> > Vladimir, one more question for you because I'm not as familiar with
-> > this code:
-> >=20
-> > In the normal case we need to invalidate the qcow2 cache as a way to
-> > re-engage the disk (yes?) when we have failed during the late-migrati=
-on
-> > steps.
-> >=20
-> > In this case, we seem to be observing a failure during the bulk trans=
-fer
-> > loop. Why is it important to invalidate the cache at this step -- wou=
-ld
-> > the disk have been inactivated yet? It shouldn't, because it's in the
-> > bulk transfer phase -- or am I missing something?
-> >=20
-> > I feel like this code is behaving in a way that's fairly surprising f=
-or
-> > a casual reader so I was hoping you could elaborate for me.
-> >=20
-> > --js
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IhCwCn1CIpGolDPt8y0LIs5wl84P0RP4g
+From: Max Reitz <mreitz@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
+Message-ID: <ac4381db-2953-de6a-c5bf-27d81f68d418@redhat.com>
+Subject: Re: [PATCH v4] block: fix QEMU crash with scsi-hd and drive_del
+References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+In-Reply-To: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-05-28 14:03, Greg Kurz wrote:
+> Removing a drive with drive_del while it is being used to run an I/O
+> intensive workload can cause QEMU to crash.
 >=20
-> In my case, source is already in postcopy state, when error occured, so=
- it
-> is inactivated.
-
-Ah, that explains why I couldn't understand the path that got you there;
-I never think about restarting the source once we're in postcopy -
-because once the destination is running all is lost.
-But, you might be in the gap efore management has actually started
-the destination so it does need fixing.
-
-Dave
-
-> --=20
-> Best regards,
-> Vladimir
+> An AIO flush can yield at some point:
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> blk_aio_flush_entry()
+>  blk_co_flush(blk)
+>   bdrv_co_flush(blk->root->bs)
+>    ...
+>     qemu_coroutine_yield()
+>=20
+> and let the HMP command to run, free blk->root and give control
+> back to the AIO flush:
+>=20
+>     hmp_drive_del()
+>      blk_remove_bs()
+>       bdrv_root_unref_child(blk->root)
+>        child_bs =3D blk->root->bs
+>        bdrv_detach_child(blk->root)
+>         bdrv_replace_child(blk->root, NULL)
+>          blk->root->bs =3D NULL
+>         g_free(blk->root) <=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D b=
+lk->root becomes stale
+>        bdrv_unref(child_bs)
+>         bdrv_delete(child_bs)
+>          bdrv_close()
+>           bdrv_drained_begin()
+>            bdrv_do_drained_begin()
+>             bdrv_drain_recurse()
+>              aio_poll()
+>               ...
+>               qemu_coroutine_switch()
+>=20
+> and the AIO flush completion ends up dereferencing blk->root:
+>=20
+>   blk_aio_complete()
+>    scsi_aio_complete()
+>     blk_get_aio_context(blk)
+>      bs =3D blk_bs(blk)
+>  ie, bs =3D blk->root ? blk->root->bs : NULL
+>             ^^^^^
+>             stale
+>=20
+> The problem is that we should avoid making block driver graph
+> changes while we have in-flight requests. Let's drain all I/O
+> for this BB before calling bdrv_root_unref_child().
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v4: - call blk_drain() in blk_remove_bs() (Kevin)
+>=20
+> v3: - start drained section before modifying the graph (Stefan)
+>=20
+> v2: - drain I/O requests when detaching the BDS (Stefan, Paolo)
+> ---
+>  block/block-backend.c |    5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 89f47b00ea24..bee1f0e41461 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -768,6 +768,11 @@ void blk_remove_bs(BlockBackend *blk)
+> =20
+>      blk_update_root_state(blk);
+> =20
+> +    /* bdrv_root_unref_child() will cause blk->root to become stale an=
+d may
+> +     * switch to a completion coroutine later on. Let's drain all I/O =
+here
+> +     * to avoid that and a potential QEMU crash.
+> +     */
+> +    blk_drain(blk);
+>      bdrv_root_unref_child(blk->root);
+>      blk->root =3D NULL;
+>  }
+
+For some reason, this patch breaks iotest 083 (with -nbd) on tmpfs for me=
+=2E
+
+Only on tmpfs, though, so it's probably not going to be just a simple
+reference output fix.
+
+Max
+
+
+--IhCwCn1CIpGolDPt8y0LIs5wl84P0RP4g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsylFAACgkQ9AfbAGHV
+z0Cb8AgAjMmYJOq+0/6BBXzyYxPwYl1ccXip6QMe0/IgBsHtRbFQEMg+ZgIYZFC1
+HgXJx6JN23WHeot0nYTbtClwv1Ble3WEAds1zc+q1FMkMzW8X7sKfUxBOAk0O4VR
+Y+F7AGkMa9yHyczUeyD/MhXoSStEs4TseBTsK6OmiAZpCQ7rf7MaPF6+a+AFYJLB
+44h1BAK2vfLBfgFdnARwYh01EfWcL3u6vuweIwaMYSPhnaCfbaTqE/nQCoud4gG8
+r3TgiLkF/3bTyevuB8FbzCm4I5HDUrckbiOgxRdDRBh3quHBZjE1q2kwylI2+STX
+tuyxxNvpLS8BcyMbrSwJlwqYL6vNTQ==
+=tLwt
+-----END PGP SIGNATURE-----
+
+--IhCwCn1CIpGolDPt8y0LIs5wl84P0RP4g--
