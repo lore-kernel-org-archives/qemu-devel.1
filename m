@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHM-0002Dm-VQ
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:22 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHO-0002Ew-33
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHL-0007J0-Gv
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:21 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHM-0007JW-H8
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:22 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43046)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fXrHL-0007IZ-6B
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:19 -0400
+	id 1fXrHM-0007IZ-79
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 12:57:20 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fXrHK-0000CC-5O
+	(envelope-from <pm215@archaic.org.uk>) id 1fXrHK-0000CT-U2
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 17:57:18 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 26 Jun 2018 17:56:51 +0100
-Message-Id: <20180626165658.31394-26-peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 17:56:52 +0100
+Message-Id: <20180626165658.31394-27-peter.maydell@linaro.org>
 In-Reply-To: <20180626165658.31394-1-peter.maydell@linaro.org>
 References: <20180626165658.31394-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 25/32] target/arm: Handle small regions in
- get_phys_addr_pmsav8()
+Subject: [Qemu-devel] [PULL 26/32] hw/arm/smmuv3: Fix translate error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,238 +30,280 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Allow ARMv8M to handle small MPU and SAU region sizes, by making
-get_phys_add_pmsav8() set the page size to the 1 if the MPU or
-SAU region covers less than a TARGET_PAGE_SIZE.
+From: Jia He <hejianet@gmail.com>
 
-We choose to use a size of 1 because it makes no difference to
-the core code, and avoids having to track both the base and
-limit for SAU and MPU and then convert into an artificially
-restricted "page size" that the core code will then ignore.
+In case the STE's config is "Bypass" we currently don't set the
+IOMMUTLBEntry perm flags and the access does not succeed. Also
+if the config is 0b0xx (Aborted/Reserved), decode_ste and
+smmuv3_decode_config currently returns -EINVAL and we don't enter
+the expected code path: we record an event whereas we should not.
 
-Since the core TCG code can't handle execution from small
-MPU regions, we strip the exec permission from them so that
-any execution attempts will cause an MPU exception, rather
-than allowing it to end up with a cpu_abort() in
-get_page_addr_code().
+This patch fixes those bugs and simplifies the error handling.
+decode_ste and smmuv3_decode_config now return 0 if aborted or
+bypassed config was found. Only bad config info produces negative
+error values. In smmuv3_translate we more clearly differentiate
+errors, bypass/smmu disabled, aborted and success cases. Also
+trace points are differentiated.
 
-(The previous code's intention was to make any small page be
-treated as having no permissions, but unfortunately errors
-in the implementation meant that it didn't behave that way.
-It's possible that some binaries using small regions were
-accidentally working with our old behaviour and won't now.)
-
-We also retain an existing bug, where we ignored the possibility
-that the SAU region might not cover the entire page, in the
-case of executable regions. This is necessary because some
-currently-working guest code images rely on being able to
-execute from addresses which are covered by a page-sized
-MPU region but a smaller SAU region. We can remove this
-workaround if we ever support execution from small regions.
-
+Fixes: 9bde7f0674fe ("hw/arm/smmuv3: Implement translate callback")
+Reported-by: jia.he@hxt-semitech.com
+Signed-off-by: jia.he@hxt-semitech.com
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1529653501-15358-2-git-send-email-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180620130619.11362-4-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 78 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 55 insertions(+), 23 deletions(-)
+ hw/arm/smmuv3-internal.h | 12 ++++-
+ hw/arm/smmuv3.c          | 96 +++++++++++++++++++++++++++-------------
+ hw/arm/trace-events      |  7 +--
+ 3 files changed, 80 insertions(+), 35 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a7edeb66633..3c6a4c565b1 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -41,6 +41,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index a9d714b56e6..bab25d640eb 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -23,6 +23,14 @@
  
- /* Security attributes for an address, as returned by v8m_security_lookup. */
- typedef struct V8M_SAttributes {
-+    bool subpage; /* true if these attrs don't cover the whole TARGET_PAGE */
-     bool ns;
-     bool nsc;
-     uint8_t sregion;
-@@ -9804,6 +9805,8 @@ static void v8m_security_lookup(CPUARMState *env, uint32_t address,
-     int r;
-     bool idau_exempt = false, idau_ns = true, idau_nsc = true;
-     int idau_region = IREGION_NOTVALID;
-+    uint32_t addr_page_base = address & TARGET_PAGE_MASK;
-+    uint32_t addr_page_limit = addr_page_base + (TARGET_PAGE_SIZE - 1);
+ #include "hw/arm/smmu-common.h"
  
-     if (cpu->idau) {
-         IDAUInterfaceClass *iic = IDAU_INTERFACE_GET_CLASS(cpu->idau);
-@@ -9841,6 +9844,9 @@ static void v8m_security_lookup(CPUARMState *env, uint32_t address,
-                 uint32_t limit = env->sau.rlar[r] | 0x1f;
- 
-                 if (base <= address && limit >= address) {
-+                    if (base > addr_page_base || limit < addr_page_limit) {
-+                        sattrs->subpage = true;
-+                    }
-                     if (sattrs->srvalid) {
-                         /* If we hit in more than one region then we must report
-                          * as Secure, not NS-Callable, with no valid region
-@@ -9880,13 +9886,16 @@ static void v8m_security_lookup(CPUARMState *env, uint32_t address,
- static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
-                               MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                               hwaddr *phys_ptr, MemTxAttrs *txattrs,
--                              int *prot, ARMMMUFaultInfo *fi, uint32_t *mregion)
-+                              int *prot, bool *is_subpage,
-+                              ARMMMUFaultInfo *fi, uint32_t *mregion)
- {
-     /* Perform a PMSAv8 MPU lookup (without also doing the SAU check
-      * that a full phys-to-virt translation does).
-      * mregion is (if not NULL) set to the region number which matched,
-      * or -1 if no region number is returned (MPU off, address did not
-      * hit a region, address hit in multiple regions).
-+     * We set is_subpage to true if the region hit doesn't cover the
-+     * entire TARGET_PAGE the address is within.
-      */
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     bool is_user = regime_is_user(env, mmu_idx);
-@@ -9894,7 +9903,10 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
-     int n;
-     int matchregion = -1;
-     bool hit = false;
-+    uint32_t addr_page_base = address & TARGET_PAGE_MASK;
-+    uint32_t addr_page_limit = addr_page_base + (TARGET_PAGE_SIZE - 1);
- 
-+    *is_subpage = false;
-     *phys_ptr = address;
-     *prot = 0;
-     if (mregion) {
-@@ -9932,6 +9944,10 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
-                 continue;
-             }
- 
-+            if (base > addr_page_base || limit < addr_page_limit) {
-+                *is_subpage = true;
-+            }
++typedef enum SMMUTranslationStatus {
++    SMMU_TRANS_DISABLE,
++    SMMU_TRANS_ABORT,
++    SMMU_TRANS_BYPASS,
++    SMMU_TRANS_ERROR,
++    SMMU_TRANS_SUCCESS,
++} SMMUTranslationStatus;
 +
-             if (hit) {
-                 /* Multiple regions match -- always a failure (unlike
-                  * PMSAv7 where highest-numbered-region wins)
-@@ -9943,23 +9959,6 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
+ /* MMIO Registers */
  
-             matchregion = n;
-             hit = true;
--
--            if (base & ~TARGET_PAGE_MASK) {
--                qemu_log_mask(LOG_UNIMP,
--                              "MPU_RBAR[%d]: No support for MPU region base"
--                              "address of 0x%" PRIx32 ". Minimum alignment is "
--                              "%d\n",
--                              n, base, TARGET_PAGE_BITS);
--                continue;
--            }
--            if ((limit + 1) & ~TARGET_PAGE_MASK) {
--                qemu_log_mask(LOG_UNIMP,
--                              "MPU_RBAR[%d]: No support for MPU region limit"
--                              "address of 0x%" PRIx32 ". Minimum alignment is "
--                              "%d\n",
--                              n, limit, TARGET_PAGE_BITS);
--                continue;
--            }
-         }
-     }
+ REG32(IDR0,                0x0)
+@@ -315,7 +323,7 @@ enum { /* Command completion notification */
+ /* Events */
  
-@@ -9995,6 +9994,18 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
+ typedef enum SMMUEventType {
+-    SMMU_EVT_OK                 = 0x00,
++    SMMU_EVT_NONE               = 0x00,
+     SMMU_EVT_F_UUT                    ,
+     SMMU_EVT_C_BAD_STREAMID           ,
+     SMMU_EVT_F_STE_FETCH              ,
+@@ -337,7 +345,7 @@ typedef enum SMMUEventType {
+ } SMMUEventType;
  
-     fi->type = ARMFault_Permission;
-     fi->level = 1;
-+    /*
-+     * Core QEMU code can't handle execution from small pages yet, so
-+     * don't try it. This means any attempted execution will generate
-+     * an MPU exception, rather than eventually causing QEMU to exit in
-+     * get_page_addr_code().
-+     */
-+    if (*is_subpage && (*prot & PAGE_EXEC)) {
-+        qemu_log_mask(LOG_UNIMP,
-+                      "MPU: No support for execution from regions "
-+                      "smaller than 1K\n");
-+        *prot &= ~PAGE_EXEC;
-+    }
-     return !(*prot & (1 << access_type));
+ static const char *event_stringify[] = {
+-    [SMMU_EVT_OK]                       = "SMMU_EVT_OK",
++    [SMMU_EVT_NONE]                     = "no recorded event",
+     [SMMU_EVT_F_UUT]                    = "SMMU_EVT_F_UUT",
+     [SMMU_EVT_C_BAD_STREAMID]           = "SMMU_EVT_C_BAD_STREAMID",
+     [SMMU_EVT_F_STE_FETCH]              = "SMMU_EVT_F_STE_FETCH",
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 978330900d5..70b8f295aa9 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -23,6 +23,7 @@
+ #include "hw/qdev-core.h"
+ #include "hw/pci/pci.h"
+ #include "exec/address-spaces.h"
++#include "cpu.h"
+ #include "trace.h"
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+@@ -154,7 +155,7 @@ void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *info)
+     EVT_SET_SID(&evt, info->sid);
+ 
+     switch (info->type) {
+-    case SMMU_EVT_OK:
++    case SMMU_EVT_NONE:
+         return;
+     case SMMU_EVT_F_UUT:
+         EVT_SET_SSID(&evt, info->u.f_uut.ssid);
+@@ -312,12 +313,11 @@ static int smmu_get_cd(SMMUv3State *s, STE *ste, uint32_t ssid,
+     return 0;
  }
  
-@@ -10002,10 +10013,13 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
- static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-                                  MMUAccessType access_type, ARMMMUIdx mmu_idx,
-                                  hwaddr *phys_ptr, MemTxAttrs *txattrs,
--                                 int *prot, ARMMMUFaultInfo *fi)
-+                                 int *prot, target_ulong *page_size,
-+                                 ARMMMUFaultInfo *fi)
+-/* Returns <0 if the caller has no need to continue the translation */
++/* Returns < 0 in case of invalid STE, 0 otherwise */
+ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
+                       STE *ste, SMMUEventInfo *event)
  {
-     uint32_t secure = regime_is_secure(env, mmu_idx);
-     V8M_SAttributes sattrs = {};
-+    bool ret;
-+    bool mpu_is_subpage;
+     uint32_t config;
+-    int ret = -EINVAL;
  
-     if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-         v8m_security_lookup(env, address, access_type, mmu_idx, &sattrs);
-@@ -10033,6 +10047,7 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-                 } else {
-                     fi->type = ARMFault_QEMU_SFault;
-                 }
-+                *page_size = sattrs.subpage ? 1 : TARGET_PAGE_SIZE;
-                 *phys_ptr = address;
-                 *prot = 0;
-                 return true;
-@@ -10055,6 +10070,7 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-                  * for M_FAKE_FSR_SFAULT in arm_v7m_cpu_do_interrupt().
-                  */
-                 fi->type = ARMFault_QEMU_SFault;
-+                *page_size = sattrs.subpage ? 1 : TARGET_PAGE_SIZE;
-                 *phys_ptr = address;
-                 *prot = 0;
-                 return true;
-@@ -10062,8 +10078,22 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-         }
+     if (!STE_VALID(ste)) {
+         goto bad_ste;
+@@ -326,13 +326,13 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
+     config = STE_CONFIG(ste);
+ 
+     if (STE_CFG_ABORT(config)) {
+-        cfg->aborted = true; /* abort but don't record any event */
+-        return ret;
++        cfg->aborted = true;
++        return 0;
      }
  
--    return pmsav8_mpu_lookup(env, address, access_type, mmu_idx, phys_ptr,
--                             txattrs, prot, fi, NULL);
-+    ret = pmsav8_mpu_lookup(env, address, access_type, mmu_idx, phys_ptr,
-+                            txattrs, prot, &mpu_is_subpage, fi, NULL);
-+    /*
-+     * TODO: this is a temporary hack to ignore the fact that the SAU region
-+     * is smaller than a page if this is an executable region. We never
-+     * supported small MPU regions, but we did (accidentally) allow small
-+     * SAU regions, and if we now made small SAU regions not be executable
-+     * then this would break previously working guest code. We can't
-+     * remove this until/unless we implement support for execution from
-+     * small regions.
-+     */
-+    if (*prot & PAGE_EXEC) {
-+        sattrs.subpage = false;
+     if (STE_CFG_BYPASS(config)) {
+         cfg->bypassed = true;
+-        return ret;
++        return 0;
+     }
+ 
+     if (STE_CFG_S2_ENABLED(config)) {
+@@ -509,7 +509,7 @@ bad_cd:
+  *       the different configuration decoding steps
+  * @event: must be zero'ed by the caller
+  *
+- * return < 0 if the translation needs to be aborted (@event is filled
++ * return < 0 in case of config decoding error (@event is filled
+  * accordingly). Return 0 otherwise.
+  */
+ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
+@@ -518,19 +518,26 @@ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+     uint32_t sid = smmu_get_sid(sdev);
+     SMMUv3State *s = sdev->smmu;
+-    int ret = -EINVAL;
++    int ret;
+     STE ste;
+     CD cd;
+ 
+-    if (smmu_find_ste(s, sid, &ste, event)) {
++    ret = smmu_find_ste(s, sid, &ste, event);
++    if (ret) {
+         return ret;
+     }
+ 
+-    if (decode_ste(s, cfg, &ste, event)) {
++    ret = decode_ste(s, cfg, &ste, event);
++    if (ret) {
+         return ret;
+     }
+ 
+-    if (smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event)) {
++    if (cfg->aborted || cfg->bypassed) {
++        return 0;
 +    }
-+    *page_size = sattrs.subpage || mpu_is_subpage ? 1 : TARGET_PAGE_SIZE;
-+    return ret;
- }
++
++    ret = smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event);
++    if (ret) {
+         return ret;
+     }
  
- static bool get_phys_addr_pmsav5(CPUARMState *env, uint32_t address,
-@@ -10339,7 +10369,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
-         if (arm_feature(env, ARM_FEATURE_V8)) {
-             /* PMSAv8 */
-             ret = get_phys_addr_pmsav8(env, address, access_type, mmu_idx,
--                                       phys_ptr, attrs, prot, fi);
-+                                       phys_ptr, attrs, prot, page_size, fi);
-         } else if (arm_feature(env, ARM_FEATURE_V7)) {
-             /* PMSAv7 */
-             ret = get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
-@@ -10757,6 +10787,7 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
-     uint32_t mregion;
-     bool targetpriv;
-     bool targetsec = env->v7m.secure;
-+    bool is_subpage;
+@@ -543,8 +550,9 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+     SMMUv3State *s = sdev->smmu;
+     uint32_t sid = smmu_get_sid(sdev);
+-    SMMUEventInfo event = {.type = SMMU_EVT_OK, .sid = sid};
++    SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
+     SMMUPTWEventInfo ptw_info = {};
++    SMMUTranslationStatus status;
+     SMMUTransCfg cfg = {};
+     IOMMUTLBEntry entry = {
+         .target_as = &address_space_memory,
+@@ -553,23 +561,28 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         .addr_mask = ~(hwaddr)0,
+         .perm = IOMMU_NONE,
+     };
+-    int ret = 0;
  
-     /* Work out what the security state and privilege level we're
-      * interested in is...
-@@ -10786,7 +10817,8 @@ uint32_t HELPER(v7m_tt)(CPUARMState *env, uint32_t addr, uint32_t op)
-     if (arm_current_el(env) != 0 || alt) {
-         /* We can ignore the return value as prot is always set */
-         pmsav8_mpu_lookup(env, addr, MMU_DATA_LOAD, mmu_idx,
--                          &phys_addr, &attrs, &prot, &fi, &mregion);
-+                          &phys_addr, &attrs, &prot, &is_subpage,
-+                          &fi, &mregion);
-         if (mregion == -1) {
-             mrvalid = false;
-             mregion = 0;
+     if (!smmu_enabled(s)) {
+-        goto out;
++        status = SMMU_TRANS_DISABLE;
++        goto epilogue;
+     }
+ 
+-    ret = smmuv3_decode_config(mr, &cfg, &event);
+-    if (ret) {
+-        goto out;
++    if (smmuv3_decode_config(mr, &cfg, &event)) {
++        status = SMMU_TRANS_ERROR;
++        goto epilogue;
+     }
+ 
+     if (cfg.aborted) {
+-        goto out;
++        status = SMMU_TRANS_ABORT;
++        goto epilogue;
+     }
+ 
+-    ret = smmu_ptw(&cfg, addr, flag, &entry, &ptw_info);
+-    if (ret) {
++    if (cfg.bypassed) {
++        status = SMMU_TRANS_BYPASS;
++        goto epilogue;
++    }
++
++    if (smmu_ptw(&cfg, addr, flag, &entry, &ptw_info)) {
+         switch (ptw_info.type) {
+         case SMMU_PTW_ERR_WALK_EABT:
+             event.type = SMMU_EVT_F_WALK_EABT;
+@@ -609,18 +622,41 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         default:
+             g_assert_not_reached();
+         }
++        status = SMMU_TRANS_ERROR;
++    } else {
++        status = SMMU_TRANS_SUCCESS;
+     }
+-out:
+-    if (ret) {
+-        qemu_log_mask(LOG_GUEST_ERROR,
+-                      "%s translation failed for iova=0x%"PRIx64"(%d)\n",
+-                      mr->parent_obj.name, addr, ret);
+-        entry.perm = IOMMU_NONE;
+-        smmuv3_record_event(s, &event);
+-    } else if (!cfg.aborted) {
++
++epilogue:
++    switch (status) {
++    case SMMU_TRANS_SUCCESS:
+         entry.perm = flag;
+-        trace_smmuv3_translate(mr->parent_obj.name, sid, addr,
+-                               entry.translated_addr, entry.perm);
++        trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
++                                       entry.translated_addr, entry.perm);
++        break;
++    case SMMU_TRANS_DISABLE:
++        entry.perm = flag;
++        entry.addr_mask = ~TARGET_PAGE_MASK;
++        trace_smmuv3_translate_disable(mr->parent_obj.name, sid, addr,
++                                      entry.perm);
++        break;
++    case SMMU_TRANS_BYPASS:
++        entry.perm = flag;
++        entry.addr_mask = ~TARGET_PAGE_MASK;
++        trace_smmuv3_translate_bypass(mr->parent_obj.name, sid, addr,
++                                      entry.perm);
++        break;
++    case SMMU_TRANS_ABORT:
++        /* no event is recorded on abort */
++        trace_smmuv3_translate_abort(mr->parent_obj.name, sid, addr,
++                                     entry.perm);
++        break;
++    case SMMU_TRANS_ERROR:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s translation failed for iova=0x%"PRIx64"(%s)\n",
++                      mr->parent_obj.name, addr, smmu_event_string(event.type));
++        smmuv3_record_event(s, &event);
++        break;
+     }
+ 
+     return entry;
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index 2d927276021..0ab66bb4a86 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -33,9 +33,10 @@ smmuv3_record_event(const char *type, uint32_t sid) "%s sid=%d"
+ smmuv3_find_ste(uint16_t sid, uint32_t features, uint16_t sid_split) "SID:0x%x features:0x%x, sid_split:0x%x"
+ smmuv3_find_ste_2lvl(uint64_t strtab_base, uint64_t l1ptr, int l1_ste_offset, uint64_t l2ptr, int l2_ste_offset, int max_l2_ste) "strtab_base:0x%"PRIx64" l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64" l2_off:0x%x max_l2_ste:%d"
+ smmuv3_get_ste(uint64_t addr) "STE addr: 0x%"PRIx64
+-smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass iova:0x%"PRIx64" is_write=%d"
+-smmuv3_translate_in(uint16_t sid, int pci_bus_num, uint64_t strtab_base) "SID:0x%x bus:%d strtab_base:0x%"PRIx64
++smmuv3_translate_disable(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass (smmu disabled) iova:0x%"PRIx64" is_write=%d"
++smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d STE bypass iova:0x%"PRIx64" is_write=%d"
++smmuv3_translate_abort(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d abort on iova:0x%"PRIx64" is_write=%d"
++smmuv3_translate_success(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
+ smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
+-smmuv3_translate(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
+ smmuv3_decode_cd(uint32_t oas) "oas=%d"
+ smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
 -- 
 2.17.1
