@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXlJ9-0000oq-Q4
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:34:48 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fXlMP-0001nJ-5y
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXlJ5-0002Yp-N2
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:34:47 -0400
-References: <20180625115352.6889-1-david@redhat.com>
-	<20180625115352.6889-6-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <70637e9f-6fd6-a92e-0d2e-878f23460ac3@redhat.com>
-Date: Tue, 26 Jun 2018 12:34:39 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fXlMN-0005GJ-Ou
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:38:09 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54877)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fXlMN-0005FT-Ck
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:38:07 -0400
+Received: by mail-wm0-x243.google.com with SMTP id i139-v6so1299607wmf.4
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 03:38:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180625115352.6889-6-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <da0df342-5408-b7a8-497b-560d523a7aa6@redhat.com>
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-3-marcandre.lureau@redhat.com>
+	<20180621120056.663f7f25@redhat.com>
+	<CAJ+F1CLYvrddKXdVfqa-Jiw-jr2LrxUbznW4Tn6kDK+O3J-M9Q@mail.gmail.com>
+	<da0df342-5408-b7a8-497b-560d523a7aa6@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 26 Jun 2018 12:38:05 +0200
+Message-ID: <CAJ+F1CLSw9At=ivywgFRtXjWzwZj9HOv2FdobiDFqyx+Z8H9fg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 5/9] s390x/tcg: properly
- implement the TOD
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] acpi: add fw_cfg file for TPM and
+ PPI virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,193 +34,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 25.06.2018 13:53, David Hildenbrand wrote:
-> Right now, each CPU has its own TOD. Especially, the TOD will differ
-> based on creation time of a CPU - e.g. when hotplugging a CPU the times
-> will differ quite a lot, resulting in stall warnings in the guest.
->=20
-> Let's use a single TOD by implementing our new TOD device. Prepare it
-> for TOD-clock epoch extension.
->=20
-> Most importantly, whenever we set the TOD, we have to update the CKC
-> timer.
->=20
-> Introduce "tcg_s390x.h" just like "kvm_s390x.h" for tcg specific
-> function declarations that should not go into cpu.h.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/tod-qemu.c        | 46 ++++++++++++++++++++++++++++++++++----
->  hw/s390x/tod.c             | 11 +++++++++
->  include/hw/s390x/tod.h     | 19 ++++++++++++++++
->  target/s390x/cpu.c         |  7 ------
->  target/s390x/cpu.h         |  1 -
->  target/s390x/internal.h    | 16 -------------
->  target/s390x/misc_helper.c | 30 ++++++++++++++++++++-----
->  target/s390x/tcg_s390x.h   | 18 +++++++++++++++
->  8 files changed, 114 insertions(+), 34 deletions(-)
->  create mode 100644 target/s390x/tcg_s390x.h
->=20
-> diff --git a/hw/s390x/tod-qemu.c b/hw/s390x/tod-qemu.c
-> index 03ea1ce4e8..941e84693e 100644
-> --- a/hw/s390x/tod-qemu.c
-> +++ b/hw/s390x/tod-qemu.c
-> @@ -11,19 +11,43 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "hw/s390x/tod.h"
-> +#include "qemu/timer.h"
-> +#include "qemu/cutils.h"
-> +#include "cpu.h"
-> +#include "tcg_s390x.h"
-> =20
->  static void qemu_s390_tod_get(const S390TODState *td, S390TOD *tod,
->                                Error **errp)
->  {
-> -    /* FIXME */
-> -    tod->high =3D 0;
-> -    tod->low =3D 0;
-> +    *tod =3D td->base;
-> +
-> +    tod->low +=3D time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-> +    if (tod->low < td->base.low) {
-> +        tod->high++;
-> +    }
->  }
-> =20
->  static void qemu_s390_tod_set(S390TODState *td, const S390TOD *tod,
->                                Error **errp)
->  {
-> -    /* FIXME */
-> +    CPUState *cpu;
-> +
-> +    td->base =3D *tod;
-> +
-> +    td->base.low -=3D time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-> +    if (tod->low < td->base.low) {
+Hi
 
-Just a matter of taste, but I'd rather use "td->base.low > tod->low"
-here instead (since the operations before and after the if-statement are
-related to td->base).
+On Mon, Jun 25, 2018 at 5:20 PM, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 06/21/18 12:10, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi
+>>
+>> On Thu, Jun 21, 2018 at 12:00 PM, Igor Mammedov <imammedo@redhat.com> wr=
+ote:
+>>> On Tue, 15 May 2018 14:14:31 +0200
+>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>>>
+>>>> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>>>
+>>>> To avoid having to hard code the base address of the PPI virtual
+>>>> memory device we introduce a fw_cfg file etc/tpm/config that holds the
+>>>> base address of the PPI device, the version of the PPI interface and
+>>>> the version of the attached TPM.
+>>> is it related to TPM_PPI_ADDR_BASE added in previous patch?
+>>>
+>>>>
+>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>>> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document=
+ it ]
+>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>> ---
+>>>>  include/hw/acpi/tpm.h |  3 +++
+>>>>  hw/i386/acpi-build.c  | 17 +++++++++++++++++
+>>>>  docs/specs/tpm.txt    | 20 ++++++++++++++++++++
+>>>>  3 files changed, 40 insertions(+)
+>>>>
+>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>>>> index c082df7d1d..f79d68a77a 100644
+>>>> --- a/include/hw/acpi/tpm.h
+>>>> +++ b/include/hw/acpi/tpm.h
+>>>> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>>>>  #define TPM_PPI_ADDR_SIZE           0x400
+>>>>  #define TPM_PPI_ADDR_BASE           0xFED45000
+>>>>
+>>>> +#define TPM_PPI_VERSION_NONE        0
+>>>> +#define TPM_PPI_VERSION_1_30        1
+>>>> +
+>>>>  #endif /* HW_ACPI_TPM_H */
+>>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>>> index 9bc6d97ea1..f6d447f03a 100644
+>>>> --- a/hw/i386/acpi-build.c
+>>>> +++ b/hw/i386/acpi-build.c
+>>>> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+>>>>      bool pcihp_bridge_en;
+>>>>  } AcpiBuildPciBusHotplugState;
+>>>>
+>>>> +typedef struct FWCfgTPMConfig {
+>>>> +    uint32_t tpmppi_address;
+>>>> +    uint8_t tpm_version;
+>>>> +    uint8_t tpmppi_version;
+>>>> +} QEMU_PACKED FWCfgTPMConfig;
+>>>> +
+>>>>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>>>>  {
+>>>>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BA=
+SE, NULL);
+>>>> @@ -2873,6 +2879,7 @@ void acpi_setup(void)
+>>>>      AcpiBuildTables tables;
+>>>>      AcpiBuildState *build_state;
+>>>>      Object *vmgenid_dev;
+>>>> +    static FWCfgTPMConfig tpm_config;
+>>>>
+>>>>      if (!pcms->fw_cfg) {
+>>>>          ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+>>>> @@ -2907,6 +2914,16 @@ void acpi_setup(void)
+>>>>      fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+>>>>                      tables.tcpalog->data, acpi_data_len(tables.tcpalo=
+g));
+>>>>
+>>>> +    if (tpm_find()) {
+>>>> +        tpm_config =3D (FWCfgTPMConfig) {
+>>>> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+>>>> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find()))=
+,
+>>>> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
+>>>> +        };
+>>>> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+>>>> +                        &tpm_config, sizeof tpm_config);
+>>>> +    }
+>>> why it's in ACPI part of the code, shouldn't it be a part of device,
+>>> could TPM be used without ACPI at all (-noacpi CLI option)?
+>>>
+>>> Wouldn't adding fwcfg entry unconditionally break migration?
+>>
+>> Because of unstable entry IDs? that could be problematic. (especially
+>> during boot time) What do you think Laszlo?
+>>
+>> I guess we could have a "ppi" device property, that would imply having
+>> the etc/tpm/config fw_cfg entry. We would enable it by default in
+>> newer machine types (3.0?)
+>
+> Can we perhaps draw a parallel with "-device vmcoreinfo" here? For that
+> device model, fw_cfg_add_file_callback() is called in the realize
+> function, vmcoreinfo_realize(). If libvirt generates the identical
+> cmdline on both ends of the migration, and uses the same machine type, I
+> think the fw_cfg selectors should end up the same on both sides.
 
-> +        td->base.high--;
-> +    }
-> +
-> +    /*
-> +     * The TOD has been changed and we have to recalculate the CKC val=
-ues
-> +     * for all CPUs. We do this asynchronously, as "SET CLOCK should b=
-e
-> +     * issued only while all other activity on all CPUs .. has been
-> +     * suspended".
-> +     */
-> +    CPU_FOREACH(cpu) {
-> +        async_run_on_cpu(cpu, tcg_s390_tod_updated, RUN_ON_CPU_NULL);
-> +    }
->  }
-> =20
->  static void qemu_s390_tod_class_init(ObjectClass *oc, void *data)
-> @@ -34,10 +58,24 @@ static void qemu_s390_tod_class_init(ObjectClass *o=
-c, void *data)
->      tdc->set =3D qemu_s390_tod_set;
->  }
-> =20
-> +static void qemu_s390_tod_init(Object *obj)
-> +{
-> +    S390TODState *td =3D S390_TOD(obj);
-> +    struct tm tm;
-> +
-> +    qemu_get_timedate(&tm, 0);
-> +    td->base.high =3D 0;
-> +    td->base.low =3D TOD_UNIX_EPOCH + (time2tod(mktimegm(&tm)) * 10000=
-00000ULL);
-> +    if (td->base.low < TOD_UNIX_EPOCH) {
-> +        td->base.high +=3D 1;
-> +    }
-> +}
+-device vmcoreinfo is a  standalone fw-cfg entry. PPI is tied to a
+TPM, the fw-cfg entry is an implementation detail between qemu and
+firmware. So I prefer the "ppi" device property. Wrt to migration,
+that should be equivalent to -device vmcoreinfo (except that -device
+vmcoreinfo is not enabled by default in newer machine types)
 
-Nit: It would be sufficient to do this in the realize() function instead.
+> Thanks
+> Laszlo
+>
+>>>
+>>>> +
+>>>>      vmgenid_dev =3D find_vmgenid_dev();
+>>>>      if (vmgenid_dev) {
+>>>>          vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+>>>> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+>>>> index c230c4c93e..2ddb768084 100644
+>>>> --- a/docs/specs/tpm.txt
+>>>> +++ b/docs/specs/tpm.txt
+>>>> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
+>>>>   - hw/tpm/tpm_tis.h
+>>>>
+>>>>
+>>>> +=3D fw_cfg interface =3D
+>>>> +
+>>>> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
+>>>> +configuring the guest appropriately.
+>>>> +
+>>>> +The entry of 6 bytes has the following content, in little-endian:
+>>>> +
+>>>> +    #define TPM_VERSION_UNSPEC          0
+>>>> +    #define TPM_VERSION_1_2             1
+>>>> +    #define TPM_VERSION_2_0             2
+>>>> +
+>>>> +    #define TPM_PPI_VERSION_NONE        0
+>>>> +    #define TPM_PPI_VERSION_1_30        1
+>>>> +
+>>>> +    struct FWCfgTPMConfig {
+>>>> +        uint32_t tpmppi_address;         /* PPI memory location */
+>>>> +        uint8_t tpm_version;             /* TPM version */
+>>>> +        uint8_t tpmppi_version;          /* PPI version */
+>>>> +    };
+>>>> +
+>>>>  =3D ACPI Interface =3D
+>>>>
+>>>>  The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT =
+and passes
+>>>
+>>>
+>>
+>>
+>>
+>
 
->  static TypeInfo qemu_s390_tod_info =3D {
->      .name =3D TYPE_QEMU_S390_TOD,
->      .parent =3D TYPE_S390_TOD,
->      .instance_size =3D sizeof(S390TODState),
-> +    .instance_init =3D qemu_s390_tod_init,
->      .class_init =3D qemu_s390_tod_class_init,
->      .class_size =3D sizeof(S390TODClass),
->  };
-[...]
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index dd5273949b..be341b5295 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -28,6 +28,8 @@
->  #include "qemu/timer.h"
->  #include "exec/exec-all.h"
->  #include "exec/cpu_ldst.h"
-> +#include "qapi/error.h"
-> +#include "tcg_s390x.h"
-> =20
->  #if !defined(CONFIG_USER_ONLY)
->  #include "sysemu/cpus.h"
-> @@ -39,6 +41,7 @@
->  #include "hw/s390x/ioinst.h"
->  #include "hw/s390x/s390-pci-inst.h"
->  #include "hw/boards.h"
-> +#include "hw/s390x/tod.h"
->  #endif
-> =20
->  /* #define DEBUG_HELPER */
-> @@ -138,25 +141,32 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
->  /* Store Clock */
->  uint64_t HELPER(stck)(CPUS390XState *env)
->  {
-> -    uint64_t time;
-> +    S390TODState *td =3D s390_get_todstate();
-> +    S390TODClass *tdc =3D S390_TOD_GET_CLASS(td);
-> +    S390TOD tod;
-> =20
-> -    time =3D env->tod_offset +
-> -        time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-> -
-> -    return time;
-> +    tdc->get(td, &tod, &error_abort);
-> +    return tod.low;
->  }
-> =20
->  /* Set Clock Comparator */
->  void HELPER(sckc)(CPUS390XState *env, uint64_t time)
->  {
-> +    S390TODState *td =3D s390_get_todstate();
-> +    S390TODClass *tdc =3D S390_TOD_GET_CLASS(td);
-> +    S390TOD tod_base;
-> +
->      if (time =3D=3D -1ULL) {
->          return;
->      }
-> =20
->      env->ckc =3D time;
-> =20
-> +    tdc->get(td, &tod_base, &error_abort);
-> +    tod_base.low -=3D time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
 
-So the tdc->get first adds the time2tod, and then you subtract it here
-again? Can't you simply use td->base.low directly instead?
 
->      /* difference between origins */
-> -    time -=3D env->tod_offset;
-> +    time -=3D tod_base.low;
-> =20
->      /* nanoseconds */
->      time =3D tod2time(time);
-> @@ -164,6 +174,14 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t tim=
-e)
->      timer_mod(env->tod_timer, time);
->  }
-
-... I found only nits, so with or without my suggested modifications:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+--=20
+Marc-Andr=C3=A9 Lureau
