@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fXsMY-0007jQ-OX
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:06:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXsQl-0000He-W4
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fXsMX-0005pf-EI
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:06:46 -0400
-References: <1529415820-7750-1-git-send-email-ari@tuxera.com>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <7ed63423-ae9f-b993-416b-832d08b6d894@tuxera.com>
-Date: Tue, 26 Jun 2018 21:06:33 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1fXsQk-0007Ap-QA
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:11:07 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41251)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXsQk-00079X-BK
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 14:11:06 -0400
+Received: by mail-ot0-x242.google.com with SMTP id d19-v6so20040922oti.8
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 11:11:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1529415820-7750-1-git-send-email-ari@tuxera.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/8] New block driver: blklogwrites
+In-Reply-To: <20180626175900.GA4307@roeck-us.net>
+References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
+	<20180626175900.GA4307@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 19:10:45 +0100
+Message-ID: <CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
+ identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Just a weekly ping. Any comments appreciated.
+On 26 June 2018 at 18:59, Guenter Roeck <linux@roeck-us.net> wrote:
+> On Tue, Jun 26, 2018 at 06:17:44PM +0100, Peter Maydell wrote:
+>> Thanks for this patch. I was wondering whether it would be better
+>> just to remove the fprintf message instead. I'll either apply
+>> this or send a patch to do that before 3.0, anyway.
+>>
+>
+> If I recall correctly, I tried that, and it did not help.
+> The messages don't happen too often, and the message itself
+> does not cause a problem. Issue is that the interrupts happen
+> at the wrong time or not at all (after a while, ie after the
+> configured one-shot time expires), and the kernel really doesn't
+> like that.
+>
+> I think the underlying problem was that the periodic timer counts
+> the period down (based on the time set for the one-shot timer),
+> stops with the "Timer with delta zero, disabling" message once
+> the period reaches 0, and does not fire anymore afterwards.
+> As a result, the kernel fails to boot maybe 90% of the time.
+> I should probably have mentioned that in more detail in the
+> commit log.
 
-On 06/19/2018 04:43 PM, Ari Sundholm wrote:
-> This patch series adds a new block driver, blklogwrites, to QEMU. The
-> driver is given two block devices: a raw device backed by an image or a
-> host block device, and a log device, typically backed by a file, on
-> which writes to the raw device are logged.
-> 
-> The logging format used is the same as in the dm-log-writes target of
-> the Linux kernel device mapper. The log reflects the writes that have
-> been performed on the guest block device and flushed. To be strict, the
-> log may contain writes that have not been flushed yet, but they are
-> technically outside the bounds of the log until the next flush updates
-> the metadata in the log superblock. We believe these semantics to be
-> useful even though they may not be completely identical to those of
-> dm-log-writes.
-> 
-> This functionality can be used for crash consistency and fs consistency
-> testing in filesystem drivers, including on non-Linux guests and older
-> guests running Linux versions without support for dm-log-writes. This
-> is simple and useful. Admittedly this and more advanced things could
-> perhaps be done by extending the quorum driver, but this approach would
-> require re-engineering the functionality and involve a more complicated
-> setup, so we offer this simple solution which we have found useful
-> internally.
-> 
-> In the first patch of this series, two block permission constants are
-> moved from block.c to include/block/block.h to make them available
-> outside of block.c. The next patch uses these constants.
-> 
-> In patches 2-7, a mechanism to pass the block configuration of a block
-> backend to a block driver is introduced, and this mechanism is
-> integrated in various hw/block drivers.
-> 
-> In patch 8, the blklogwrites driver is introduced. The driver uses the
-> mechanism from the previous patches to align all requests to the
-> logical sector size of the underlying block backend of the guest block
-> device being logged and use that size as a basis for offsets and sizes
-> in the log entries. This means that the sector size in the log metadata
-> will be set to the logical sector size, and offsets and sizes of writes
-> will be expressed as a multiple of that.
-> 
-> v5:
->    - Reorder patches and squash blklogwrites driver patches together
->    - Rebase on current upstream master
->    - No functional changes
-> 
-> v4:
->    - Check return value of snprintf() (flagged by patchew)
->    - Don't use C99 for loop initial declaration (flagged by patchew, but
->      wasn't QEMU supposed to be C99? Oh well.)
->    - Add proper "Since" fields for blklogwrites in block-core.json
->    - Rebase on current upstream master
-> 
-> v3:
->    - Rebase on current upstream master
-> 
-> v2:
->    - Incorporate review feedback
->    - Add patches to apply block configurations in more block device
->      drivers
-> 
-> 
-> *** BLURB HERE ***
-> 
-> Aapo Vienamo (1):
->    block: Add blklogwrites
-> 
-> Ari Sundholm (7):
->    block: Move two block permission constants to the relevant enum
->    block: Add a mechanism for passing a block driver a block
->      configuration
->    hw/scsi/scsi-disk: Always apply block configuration to block driver
->    hw/ide/qdev: Always apply block configuration to block driver
->    hw/block/virtio-blk: Always apply block configuration to block driver
->    hw/block/nvme: Always apply block configuration to block driver
->    hw/block/fdc: Always apply block configuration to block driver
-> 
->   MAINTAINERS               |   6 +
->   block.c                   |   6 -
->   block/Makefile.objs       |   1 +
->   block/blklogwrites.c      | 426 ++++++++++++++++++++++++++++++++++++++++++++++
->   block/io.c                |  22 +++
->   hw/block/block.c          |  12 +-
->   hw/block/fdc.c            |   4 +
->   hw/block/nvme.c           |   1 +
->   hw/block/virtio-blk.c     |   1 +
->   hw/ide/qdev.c             |   2 +
->   hw/scsi/scsi-disk.c       |   1 +
->   include/block/block.h     |  17 ++
->   include/block/block_int.h |   9 +
->   include/hw/block/block.h  |   1 +
->   qapi/block-core.json      |  30 +++-
->   15 files changed, 526 insertions(+), 13 deletions(-)
->   create mode 100644 block/blklogwrites.c
-> 
+Hmm, that's odd, because I don't really see what the difference
+between the two is. If you set the thing as a one-shot then we
+won't reenable the timer later either with this patch.
+
+Can you provide an image/QEMU command line that repros this,
+and I'll see if I can find time to investigate it? (We have
+a softfreeze deadline next Tuesday, so I probably won't be
+able to get to it until after that, but since this is a bugfix
+it doesn't have to be done before freeze.)
+
+>> periodic timer if the reload register is written with a nonzero
+>> value before the timer expires (and that if that happens after
+>> the timer expired that we restart the timer). Thinking about
+>> this is also on my todo list.
+>>
+>
+> I thought that was handled in the Linux driver by disabling
+> the timer, updating the period, and then re-enabling it in
+> periodic mode, but I may have misinterpreted the code.
+
+Yeah, it would depend what the guest does whether it's affected,
+but my reading of the data sheet is that messing with the reload
+register with the timer still active isn't prohibited.
+
+thanks
+-- PMM
