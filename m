@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fXcmh-0007c2-HE
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 21:28:44 -0400
+	(envelope-from <mst@redhat.com>) id 1fXd3c-0001Px-6W
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 21:46:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fXcme-0007ds-B5
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 21:28:43 -0400
-Date: Tue, 26 Jun 2018 07:00:52 +0530
-From: Amol Surati <suratiamol@gmail.com>
-Message-ID: <20180626013050.GA13519@arch>
-References: <20180620042930.24208-1-suratiamol@gmail.com>
-	<20180620042930.24208-2-suratiamol@gmail.com>
-	<4049a376-e991-91ab-a1ea-037ee7c0a5b5@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1fXd3X-0002bu-9B
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 21:46:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58666 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fXd3X-0002Zk-1w
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 21:46:07 -0400
+Date: Tue, 26 Jun 2018 04:46:03 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180626043839-mutt-send-email-mst@kernel.org>
+References: <20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
+	<20180625115512.2f29844e.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4049a376-e991-91ab-a1ea-037ee7c0a5b5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] ide/hw/core: fix crash on processing a
- partial-sector-size DMA xfer
+In-Reply-To: <20180625115512.2f29844e.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +36,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On Mon, Jun 25, 2018 at 05:10:23PM -0400, John Snow wrote:
+On Mon, Jun 25, 2018 at 11:55:12AM +0200, Cornelia Huck wrote:
+> On Fri, 22 Jun 2018 22:05:50 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
+> > On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+> > > On Thu, 21 Jun 2018 21:20:13 +0300
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:  
+> > > > > OK, so what about the following:
+> > > > > 
+> > > > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+> > > > >   that we have a new uuid field in the virtio-net config space
+> > > > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+> > > > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+> > > > > - when configuring, set the property to the group UUID of the vfio-pci
+> > > > >   device
+> > > > > - in the guest, use the uuid from the virtio-net device's config space
+> > > > >   if applicable; else, fall back to matching by MAC as done today
+> > > > > 
+> > > > > That should work for all virtio transports.    
+> > > > 
+> > > > True. I'm a bit unhappy that it's virtio net specific though
+> > > > since down the road I expect we'll have a very similar feature
+> > > > for scsi (and maybe others).
+> > > > 
+> > > > But we do not have a way to have fields that are portable
+> > > > both across devices and transports, and I think it would
+> > > > be a useful addition. How would this work though? Any idea?  
+> > > 
+> > > Can we introduce some kind of device-independent config space area?
+> > > Pushing back the device-specific config space by a certain value if the
+> > > appropriate feature is negotiated and use that for things like the uuid?  
+> > 
+> > So config moves back and forth?
+> > Reminds me of the msi vector mess we had with pci.
 > 
-> On 06/20/2018 12:29 AM, Amol Surati wrote:
-> > Fixes: https://bugs.launchpad.net/qemu/+bug/1777315
-> > 
-> > QEMU's short PRD policy applies to a DMA transfer of size < 512 bytes.
-> > But it fails to consider transfers which are >= 512 bytes, but are
-> > not a multiple of 512 bytes.
-> > 
-> > Such transfers are not subject to the short PRD policy. They end up
-> > violating the assumptions about the granularity of the IO sizes,
-> > upon which depend the verification of the completion of the previous
-> > transfer, and the advancement of the offset in preparation of the next.
-> > 
-> > Those violations result in the crash.
-> > 
-> > By forcing each transfer to be a multiple of sector size, such
-> > transfers are subjected to the policy, and therefore culled before they
-> > cause the crash.
-> > 
+> Yes, that would be a bit unfortunate.
 > 
-> So now even if the PRDT we get is greater than a sector is not an even
-> multiple of 512, we reject it as too short.
-
-Yes. 
-
-When PRDT is greater than a sector but non an even multiple of 512,
-we used to crash. Now we do not.
-
-The reason for this patch is to maintain backward compatibility with the
-current split-completion design that QEMU adopts, while still avoiding the
-crash. The cover letter has the reasons for this patch.
-
-
+> > I'd rather have every transport add a new config.
 > 
-> That doesn't seem correct to me.
+> You mean via different mechanisms?
 
-https://github.com/asurati/1777315/blob/master/v2.diff has a different
-patch, which aligns with what Kevin had suggested. It allows the
-IO which you described above, but then it completes the command
-as soon as it detects a partial transfer which is larger than 512.
+I guess so.
 
-The patch where s->sg.size is used as the offset to start the next
-IO would require the dma IOs to be misaligned and of non-512 sizes.
-Will that be okay? 
-
-Else, one needs to change each implementation
-of prepare_buf to ensure that it always ALIGNS_UP to the sector
-size any partial read/write/trim, in anticipation of the next PRDT
-which can cover the difference.
-
-
-> 
-> > Signed-off-by: Amol Surati <suratiamol@gmail.com>
-> > ---
-> >  hw/ide/core.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/hw/ide/core.c b/hw/ide/core.c
-> > index 2c62efc536..14d135224b 100644
-> > --- a/hw/ide/core.c
-> > +++ b/hw/ide/core.c
-> > @@ -836,6 +836,7 @@ static void ide_dma_cb(void *opaque, int ret)
-> >  {
-> >      IDEState *s = opaque;
-> >      int n;
-> > +    int32_t size_prepared;
-> >      int64_t sector_num;
-> >      uint64_t offset;
-> >      bool stay_active = false;
-> > @@ -886,7 +887,9 @@ static void ide_dma_cb(void *opaque, int ret)
-> >      n = s->nsector;
-> >      s->io_buffer_index = 0;
-> >      s->io_buffer_size = n * 512;
-> > -    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512) {
-> > +    size_prepared = s->bus->dma->ops->prepare_buf(s->bus->dma,
-> > +                                                  s->io_buffer_size);
-> > +    if (size_prepared <= 0 || size_prepared % 512) {
-> >          /* The PRDs were too short. Reset the Active bit, but don't raise an
-> >           * interrupt. */
-> >          s->status = READY_STAT | SEEK_STAT;
+> > > But regardless of that, I'm not sure whether extending this approach to
+> > > other device types is the way to go. Tying together two different
+> > > devices is creating complicated situations at least in the hypervisor
+> > > (even if it's fairly straightforward in the guest). [I have not come
+> > > around again to look at the "how to handle visibility in QEMU"
+> > > questions due to lack of cycles, sorry about that.]
+> > > 
+> > > So, what's the goal of this approach? Only to allow migration with
+> > > vfio-pci, or also to plug in a faster device and use it instead of an
+> > > already attached paravirtualized device?  
 > > 
+> > These are two sides of the same coin, I think the second approach
+> > is closer to what we are doing here.
 > 
-> -- 
-> —js
+> Thinking about it, do we need any knob to keep the vfio device
+> invisible if the virtio device is not present? IOW, how does the
+> hypervisor know that the vfio device is supposed to be paired with a
+> virtio device? It seems we need an explicit tie-in.
+
+If we are going the way of the bridge, both bridge and
+virtio would have some kind of id.
+
+When pairing using mac, I'm less sure. PAss vfio device mac to qemu
+as a property?
+
+
+> > 
+> > > What about migration of vfio devices that are not easily replaced by a
+> > > paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+> > > currently only) supported device is dasd (disks) -- which can do a lot
+> > > of specialized things that virtio-blk does not support (and should not
+> > > or even cannot support).  
+> > 
+> > But maybe virtio-scsi can?
+> 
+> I don't think so. Dasds have some channel commands that don't map
+> easily to scsi commands.
+
+There's always a choice of adding these to the spec.
+E.g. FC extensions were proposed, I don't remember why they
+are still stuck.
+
+> > 
+> > > Would it be more helpful to focus on generic
+> > > migration support for vfio instead of going about it device by device?
+> > > 
+> > > This network device approach already seems far along, so it makes sense
+> > > to continue with it. But I'm not sure whether we want to spend time and
+> > > energy on that for other device types rather than working on a general
+> > > solution for vfio migration.  
+> > 
+> > I'm inclined to say finalizing this feature would be a good first step
+> > and will teach us how we can move forward.
+> 
+> I'm not opposed to figuring out this one, but I'm not sure whether we
+> want to extend it to more device types.
+> 
+> Are people looking into generic migration support? I have it on my
+> things-to-look-at list (figuring out what needs to be device specific
+> and what can be generic, figuring out how we can support vfio-ccw,
+> etc.).
+
+I expect to see more of it if SPDK makes progress.
+
+-- 
+MST
