@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fXjrc-00070i-Pt
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:02:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXnqg-00025m-Co
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:17:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fXjrT-0001kN-D0
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:02:16 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:50992)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1fXjrT-0001jZ-5f
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:02:07 -0400
-References: <20180626081743.22097-1-contrib@steffen-goertz.de>
-	<ebb85873-2440-5047-73a1-81c793a39f6d@redhat.com>
-From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <9a57463e-8165-1fb7-0516-3451ff131e2d@steffen-goertz.de>
-Date: Tue, 26 Jun 2018 11:02:01 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fXnqf-00006h-Kl
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:17:34 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33007)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXnqf-00006S-En
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 09:17:33 -0400
+Received: by mail-ot0-x244.google.com with SMTP id h6-v6so19000133otj.0
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 06:17:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ebb85873-2440-5047-73a1-81c793a39f6d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] arm: Add NRF51 SOC non-volatile memory
- controller
+In-Reply-To: <20180621015359.12018-29-richard.henderson@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-29-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 14:17:12 +0100
+Message-ID: <CAFEAcA8FK_a3kdTtqQhebcwkXj2hyBOKJbU9v-p6N-eRSMfYrA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 28/35] target/arm: Implement SVE
+ floating-point complex add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Thomas,
+On 21 June 2018 at 02:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    |   7 +++
+>  target/arm/sve_helper.c    | 100 +++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c |  24 +++++++++
+>  target/arm/sve.decode      |   4 ++
+>  4 files changed, 135 insertions(+)
+>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 26.06.2018 10:45, Thomas Huth wrote:
-> On 26.06.2018 10:17, Steffen G=C3=B6rtz wrote:
-> [...]
->> +static const MemoryRegionOps io_ops =3D { .read =3D io_read, .write =3D=
- io_write,
->> +        .endianness =3D DEVICE_LITTLE_ENDIAN, };
->=20
-> Could you please put the entries on a separate line each? That would be
-> better readable.
-done
->=20
->> +static void nrf51_nvmc_init(Object *obj)
->> +{
->> +    Nrf51NVMCState *s =3D NRF51_NVMC(obj);
->> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
->> +
->> +    memory_region_init_io(&s->mmio, obj, &io_ops, s,
->> +    TYPE_NRF51_NVMC, NRF51_NVMC_SIZE);
-> Please indent the second line of the memory_region_init_io statement.
-done
->=20
->> +    sysbus_init_mmio(sbd, &s->mmio);
-
->> +#include "hw/sysbus.h"
->> +#include "qemu/timer.h"
->=20
-> Any reason for including timer.h here? If not, please drop that line.
-
-No it was a left over, removed.
-
-Best regards,
-Steffen
+thanks
+-- PMM
