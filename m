@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fXn17-0003QE-LJ
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:24:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXn1K-0003Xq-1X
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:24:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fXn16-0000GY-Ol
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:24:17 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34716)
+	(envelope-from <peter.maydell@linaro.org>) id 1fXn1J-0000Kz-4k
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:24:30 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40171)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fXn16-0000G7-HH
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:24:16 -0400
-Received: by mail-wr0-x244.google.com with SMTP id a12-v6so17068563wro.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 05:24:16 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXn1I-0000Ki-NF
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 08:24:29 -0400
+Received: by mail-oi0-x242.google.com with SMTP id f79-v6so15787354oib.7
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 05:24:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180621132730.GA3345@debian>
-References: <20180618161729.334-1-marcandre.lureau@redhat.com>
-	<20180618161729.334-5-marcandre.lureau@redhat.com>
-	<20180621123320.GA19274@debian>
-	<CAJ+F1CKPbdXx5sAA1ershQ_YeSOupocjfZsFWqha8-7ObkvUTg@mail.gmail.com>
-	<20180621132730.GA3345@debian>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 26 Jun 2018 14:24:14 +0200
-Message-ID: <CAJ+F1CL8nVijdSvJK5dNtBgFGq-iXXgmgbM09fbF0a-WFVae5w@mail.gmail.com>
+In-Reply-To: <20180621015359.12018-28-richard.henderson@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-28-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Jun 2018 13:24:07 +0100
+Message-ID: <CAFEAcA90Wp1N8e25SXLmnJOHPeQNZMvd_Xd1G-oJmtzHDaepgw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/26] vhost-user: simplify
- vhost_user_init/vhost_user_cleanup
+Subject: Re: [Qemu-devel] [PATCH v5 27/35] target/arm: Implement SVE MOVPRFX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi
+On 21 June 2018 at 02:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-sve.c | 60 +++++++++++++++++++++++++++++++++++++-
+>  target/arm/sve.decode      |  7 +++++
+>  2 files changed, 66 insertions(+), 1 deletion(-)
 
-On Thu, Jun 21, 2018 at 3:27 PM, Tiwei Bie <tiwei.bie@intel.com> wrote:
-> On Thu, Jun 21, 2018 at 02:48:08PM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> On Thu, Jun 21, 2018 at 2:33 PM, Tiwei Bie <tiwei.bie@intel.com> wrote:
->> > On Mon, Jun 18, 2018 at 06:17:07PM +0200, Marc-Andr=C3=A9 Lureau wrote=
-:
->> > [...]
->> >> diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
->> >> index 049089b5e2..323dfcc46a 100644
->> >> --- a/hw/virtio/vhost-stub.c
->> >> +++ b/hw/virtio/vhost-stub.c
->> >> @@ -7,7 +7,7 @@ bool vhost_has_free_slot(void)
->> >>      return true;
->> >>  }
->> >>
->> >> -VhostUserState *vhost_user_init(void)
->> >> +bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error *=
-*errp)
->> >>  {
->> >>      return NULL;
->> >
->> > It would be better to return false.
->> >
->>
->> Good catch, fixed.
->>
->> Except that, would you give a reviewed-by?
->
-> Sorry, I missed something previously. In below diff:
->
-> diff --git a/net/vhost-user.c b/net/vhost-user.c
-> index a39f9c9974..5e5b8f3fc9 100644
-> --- a/net/vhost-user.c
-> +++ b/net/vhost-user.c
-> @@ -291,14 +291,14 @@ static int net_vhost_user_init(NetClientState *peer=
-, const char *device,
->  {
->      Error *err =3D NULL;
->      NetClientState *nc, *nc0 =3D NULL;
-> -    VhostUserState *user =3D NULL;
->      NetVhostUserState *s =3D NULL;
-> +    VhostUserState *user;
->      int i;
->
->      assert(name);
->      assert(queues > 0);
->
-> -    user =3D vhost_user_init();
-> +    user =3D g_new0(struct VhostUserState, 1);
->      if (!user) {
->          error_report("failed to init vhost_user");
->          goto err;
->
-> It might be better to change the error message
-> to something like:
->
-> "failed to allocate vhost-user state".
->
-> Except that, it looks good to me and you can add
-> my reviewed-by.
+> +/*
+> + * Move Prefix
+> + *
+> + * TODO: The implementation so far could handle predicated merging movprfx.
+> + * The helper functions as written take an extra source register to
+> + * use in the operation, but the result is only written when predication
+> + * succeeds.  For unpredicated movprfx, we need to rearrange the helpers
+> + * to allow the final write back to the destination to be unconditional.
+> + * For predicated zering movprfz, we need to rearrange the helpers to
 
-Good point, g_new() aborts on failure, so we can simply remove the error re=
-port.
+"zeroing". Should that be "movprfx" or is "movprfz" a thing? (the SVE
+spec doesn't mention it.)
 
-Thanks
+> + * allow the final write back to zero inactives.
+> + *
+> + * In the meantime, just emit the moves.
+> + */
+> +
+> +static bool trans_MOVPRFX(DisasContext *s, arg_MOVPRFX *a, uint32_t insn)
+> +{
+> +    return do_mov_z(s, a->rd, a->rn);
+> +}
 
->
-> Best regards,
-> Tiwei Bie
->
->>
->> > Best regards,
->> > Tiwei Bie
->> >
->> >>  }
->> > [...]
->> >
->>
->>
->>
->> --
->> Marc-Andr=C3=A9 Lureau
+A bit confusing that do_mov_z() does the sve_access_check() for us
+but do_sel_z() and do_movz_zpz() do not...
 
+> +
+> +static bool trans_MOVPRFX_m(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+> +{
+> +    if (sve_access_check(s)) {
+> +        do_sel_z(s, a->rd, a->rn, a->rd, a->pg, a->esz);
+> +    }
+> +    return true;
+> +}
+> +
+> +static bool trans_MOVPRFX_z(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+> +{
+> +    if (sve_access_check(s)) {
+> +        do_movz_zpz(s, a->rd, a->rn, a->pg, a->esz);
+> +    }
+> +    return true;
+> +}
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
---=20
-Marc-Andr=C3=A9 Lureau
+thanks
+-- PMM
