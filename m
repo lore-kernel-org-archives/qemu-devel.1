@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fXgyj-0007uC-C9
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 01:57:26 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fXhAj-0001GE-VE
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:09:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fXgyg-0006VN-6s
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 01:57:25 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180619171539.0adc90d6.cohuck@redhat.com>
-	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
-	<20180622181108.GY7451@localhost.localdomain>
-	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
-	<20180622193522.GI7451@localhost.localdomain>
-	<743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
-	<87lgb3xsv8.fsf@dusky.pond.sub.org>
-	<4292432f-5f26-6925-4c14-ad1370e36e5b@redhat.com>
-	<20180625173056.GM7451@localhost.localdomain>
-	<97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
-	<20180625195126.GN7451@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a931e759-879b-6f6b-3524-4b5a78fed323@redhat.com>
-Date: Tue, 26 Jun 2018 07:57:18 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180625195126.GN7451@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+	(envelope-from <kraxel@redhat.com>) id 1fXhAg-0002uo-PB
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:09:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39508 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXhAg-0002ua-JE
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:09:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E091406E81E
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 06:09:46 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 26 Jun 2018 08:09:41 +0200
+Message-Id: <20180626060941.8326-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vga: set owner for mmio regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 25/06/2018 21:51, Eduardo Habkost wrote:
->> Before that we should ask what the benefit is in changing the default
->> for qemu-system-*.  Nobody is using it in practice to start QEMU with
->> KVM enabled...
->
-> How can you be sure?  If qemu-system-* is installed with KVM
-> compiled in, libvirt will probe it using
-> "-machine none,accel=kvm:tcg" and run the VM using
-> "-machine $MACHINE,accel=kvm".
+This makes sure the regions are properly cleaned when unplugging -device
+seconday-vga.
 
-Right, that needs to be qualified with "without libvirt".
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/vga_int.h    |  1 +
+ hw/display/vga-pci.c    | 11 ++++++-----
+ hw/display/virtio-vga.c |  2 +-
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-> In either case, I'm not arguing (yet) for changing the default
-> upstream.  I'm just arguing for upstream QEMU to not make any
-> promises about the default.
-
-It would be a guest ABI breakage for TCG guests, so it would only apply
-to new machine types.  I don't think it's worth the complication.
-
-BTW, another thing that needs documenting is ABI promises for HAX and
-WHPX.  Both do not support -cpu in any meaningful way, at least WHPX
-installs a migration blocker.
-
-Paolo
+diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
+index 313cff84fc..f8fcf62a56 100644
+--- a/hw/display/vga_int.h
++++ b/hw/display/vga_int.h
+@@ -193,6 +193,7 @@ extern const MemoryRegionOps vga_mem_ops;
+ 
+ /* vga-pci.c */
+ void pci_std_vga_mmio_region_init(VGACommonState *s,
++                                  Object *owner,
+                                   MemoryRegion *parent,
+                                   MemoryRegion *subs,
+                                   bool qext);
+diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
+index 700ac58c69..1ea559762a 100644
+--- a/hw/display/vga-pci.c
++++ b/hw/display/vga-pci.c
+@@ -192,22 +192,23 @@ static const MemoryRegionOps pci_vga_qext_ops = {
+ };
+ 
+ void pci_std_vga_mmio_region_init(VGACommonState *s,
++                                  Object *owner,
+                                   MemoryRegion *parent,
+                                   MemoryRegion *subs,
+                                   bool qext)
+ {
+-    memory_region_init_io(&subs[0], NULL, &pci_vga_ioport_ops, s,
++    memory_region_init_io(&subs[0], owner, &pci_vga_ioport_ops, s,
+                           "vga ioports remapped", PCI_VGA_IOPORT_SIZE);
+     memory_region_add_subregion(parent, PCI_VGA_IOPORT_OFFSET,
+                                 &subs[0]);
+ 
+-    memory_region_init_io(&subs[1], NULL, &pci_vga_bochs_ops, s,
++    memory_region_init_io(&subs[1], owner, &pci_vga_bochs_ops, s,
+                           "bochs dispi interface", PCI_VGA_BOCHS_SIZE);
+     memory_region_add_subregion(parent, PCI_VGA_BOCHS_OFFSET,
+                                 &subs[1]);
+ 
+     if (qext) {
+-        memory_region_init_io(&subs[2], NULL, &pci_vga_qext_ops, s,
++        memory_region_init_io(&subs[2], owner, &pci_vga_qext_ops, s,
+                               "qemu extended regs", PCI_VGA_QEXT_SIZE);
+         memory_region_add_subregion(parent, PCI_VGA_QEXT_OFFSET,
+                                     &subs[2]);
+@@ -239,7 +240,7 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
+             qext = true;
+             pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
+         }
+-        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
++        pci_std_vga_mmio_region_init(s, OBJECT(dev), &d->mmio, d->mrs, qext);
+ 
+         pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+     }
+@@ -275,7 +276,7 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
+         qext = true;
+         pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
+     }
+-    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
++    pci_std_vga_mmio_region_init(s, OBJECT(dev), &d->mmio, d->mrs, qext);
+ 
+     pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram);
+     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
+index baa74ba82c..97db6c3372 100644
+--- a/hw/display/virtio-vga.c
++++ b/hw/display/virtio-vga.c
+@@ -152,7 +152,7 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+     }
+ 
+     /* add stdvga mmio regions */
+-    pci_std_vga_mmio_region_init(vga, &vpci_dev->modern_bar,
++    pci_std_vga_mmio_region_init(vga, OBJECT(vvga), &vpci_dev->modern_bar,
+                                  vvga->vga_mrs, true);
+ 
+     vga->con = g->scanout[0].con;
+-- 
+2.9.3
