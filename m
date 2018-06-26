@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fXkBB-0004th-Rw
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:22:30 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fXkCu-0006I9-1z
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fXkBA-00022A-UO
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:22:29 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fXkBA-00021w-L1
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:22:28 -0400
-Received: by mail-wm0-x243.google.com with SMTP id w137-v6so1041612wmw.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 02:22:28 -0700 (PDT)
+	(envelope-from <luc.michel@greensocs.com>) id 1fXkCt-0002TO-9s
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 05:24:16 -0400
+References: <20180619093124.24011-1-luc.michel@greensocs.com>
+	<d3c05355-4eda-f501-8f04-d808f416393a@web.de>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <3c8fa899-e420-15a0-a2af-8d92ca390a85@greensocs.com>
+Date: Tue, 26 Jun 2018 11:24:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180621163335.19010217@redhat.com>
-References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
-	<20180515121433.6112-5-marcandre.lureau@redhat.com>
-	<20180621150203.2c985ed2@redhat.com>
-	<CAJ+F1CJHraqeM2q5G-ooVfp771r_K4g=osJG=J6PTH4aV0BprQ@mail.gmail.com>
-	<20180621163335.19010217@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 26 Jun 2018 11:22:26 +0200
-Message-ID: <CAJ+F1C+pYQ-7e-8KqNNwRb4Jtq_HmZUowtiGPjFWV7AE3JL_TA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] tpm: add a fake ACPI memory clear
- interface
+In-Reply-To: <d3c05355-4eda-f501-8f04-d808f416393a@web.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="zKodnuYuSGrEwEQDM9SmVJ0VPRCh8jBds"
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] arm_gic: add virtualization
+ extensions support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Jan Kiszka <jan.kiszka@web.de>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com
 
-On Thu, Jun 21, 2018 at 4:33 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Thu, 21 Jun 2018 15:24:44 +0200
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
->
->> Hi
->>
->> On Thu, Jun 21, 2018 at 3:02 PM, Igor Mammedov <imammedo@redhat.com> wro=
-te:
->> > On Tue, 15 May 2018 14:14:33 +0200
->> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->> >
->> >> This allows to pass the last failing test from the Windows HLK TPM 2.=
-0
->> >> TCG PPI 1.3 tests.
->> >>
->> >> The interface is described in the "TCG Platform Reset Attack
->> >> Mitigation Specification", chapter 6 "ACPI _DSM Function". Whether or
->> >> not we should have a real implementation remains an open question to =
-me.
->> > might it cause security issues?
->>
->> Good question. If the guest assumes success of this operation perhaps.
->> I'll check the spec.
->>
->> > What are implications of faking it and how hard it's to implement thin=
-g
->> > per spec?
->>
->> Laszlo answerd that in "[Qemu-devel] investigating TPM for
->> OVMF-on-QEMU"  2f2b) TCG Memory Clear Interface
-> I get that it's optional, but we probably shouldn't advertise/fake
-> feature if it's not supported.
-
-As said in the commit message, the objective was to pass the Windows
-HLK test. If we don't want to advertize a fake interface, I am fine
-droping this patch. We'll have to revisit with Laszlo the work needed
-in the firmware to support it.
-
->
->>
->> >
->> >
->> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> >> ---
->> >>  hw/i386/acpi-build.c | 9 +++++++++
->> >>  1 file changed, 9 insertions(+)
->> >>
->> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> >> index 95be4f0710..392a1e50bd 100644
->> >> --- a/hw/i386/acpi-build.c
->> >> +++ b/hw/i386/acpi-build.c
->> >> @@ -2072,6 +2072,15 @@ build_tpm_ppi(Aml *dev)
->> >>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
->> >>          }
->> >>          aml_append(method, ifctx);
->> >> +
->> >> +       /* dummy MOR Memory Clear for the sake of WLK PPI test */
->> >> +        ifctx =3D aml_if(
->> >> +            aml_equal(aml_arg(0),
->> >> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D4=
-5D")));
->> >> +        {
->> >> +            aml_append(ifctx, aml_return(aml_int(0)));
->> >> +        }
->> >> +        aml_append(method, ifctx);
->> >>      }
->> >>      aml_append(dev, method);
->> >>  }
->> >
->> >
->>
->>
->>
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zKodnuYuSGrEwEQDM9SmVJ0VPRCh8jBds
+From: Luc Michel <luc.michel@greensocs.com>
+To: Jan Kiszka <jan.kiszka@web.de>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com
+Message-ID: <3c8fa899-e420-15a0-a2af-8d92ca390a85@greensocs.com>
+Subject: Re: [PATCH v2 0/7] arm_gic: add virtualization extensions support
+References: <20180619093124.24011-1-luc.michel@greensocs.com>
+ <d3c05355-4eda-f501-8f04-d808f416393a@web.de>
+In-Reply-To: <d3c05355-4eda-f501-8f04-d808f416393a@web.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
+
+On 06/25/2018 06:55 AM, Jan Kiszka wrote:
+> On 2018-06-19 11:31, luc.michel@greensocs.com wrote:
+>> From: Luc MICHEL <luc.michel@greensocs.com>
+>>
+>> This patch series add support for the virtualization extensions in the=
+
+>> ARM GICv2 interrupt controller.
+>>
+>> The first two commits do some refactoring to prepare for the
+>> implementation. Commits 3 and 4 are the actual implementation. The las=
+t
+>> commit updates the ZynqMP implementation to support virtualization.
+>=20
+> Is it enabled for the virt machine as well? Seems we are missing some
+> mapping of GICV and GICH there.
+>=20
+> And what is the recommended way to get the ZynqMP model running? I've a=
+
+> kernel that works on a ZCU102, but just passing it via -kernel to the
+> QEMU model seems insufficient.
+Hum, I think it should be enough. This is the way I run my tests with Xen=
+:
+qemu-system-aarch64 -M xlnx-zcu102,secure=3Don,virtualization=3Don \
+                    -m 1024 \
+                    -kernel xen-kernel -nographic -smp 1
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Luc
+>=20
+> Jan
+>=20
+
+
+--zKodnuYuSGrEwEQDM9SmVJ0VPRCh8jBds
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlsyBjAACgkQd8knW3Qn
+Tr6e4Q//XoMOFLjSiLpUI9Ley1wkFmrakm/0EOG0aBE4rZheJy1EXpQc5AX3eAiG
+s4oA2Cw6gwaSgGpKqLf3VUOA9/u0lfNSquJrQlEGhYKbZqQuxGfxn9cGpMDWQdmQ
+pTXMoVHM6CuZSdLF77GYVYYg4X+kMBpVTkaE1qjNuCYccennAeg9RNlX8tUH1byR
+uRdNJACJjz9hCDPhtEVYoh4t7NOYprV+dax1WBBrolTgTtXSArL6WSRJTgRA5Xy3
+kEDd+L7iG9chK1PA959L2gCLSCFK21xhj/JAT4TjNvODcrJbHb4DYo8HG5i10Vsy
+hhpwVo1JI+869EpnMb4FmjvKDVY1lcItAc1VPabzJiiD9qD6zv1BdcMV9ffgWgMa
+wpq6yfuEZvxpRASHhDm9h2YQuel6jZ0PHyXLg7PBCp+akyx/zYZheHsXkAWNa9fm
+43cAyIwpFKxuLO12SGO6R7yyy0CJfCRjkEZKzLShM6y5d2KNGdAbCMeBwZkhDRAv
+dB08LtkO9XbSbHxBFJoBJvkDT1Vx6gY9NPwZzEn39iFzrQZfOwDiaudsBPjuJyXl
+rY3yjEGJcgtwX1AOZr1ymu3zvQd3R1AOPdqV81mIFsBvsobMQmbsjhMn3uWcqHku
+fMZBN8aqpTkQuOGERc/yGOaZl5rSGR7OP63dRuh6qeqQpJ22qSM=
+=dT8Q
+-----END PGP SIGNATURE-----
+
+--zKodnuYuSGrEwEQDM9SmVJ0VPRCh8jBds--
