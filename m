@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXhAj-0001GE-VE
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:09:50 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fXheI-0004TV-1C
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fXhAg-0002uo-PB
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:09:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39508 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fXhAg-0002ua-JE
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:09:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E091406E81E
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 06:09:46 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 26 Jun 2018 08:09:41 +0200
-Message-Id: <20180626060941.8326-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] vga: set owner for mmio regions
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fXheE-0004uT-Q5
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:40:22 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:33670)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fXheE-0004sp-FA
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 02:40:18 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 26 Jun 2018 09:40:17 +0300
+Message-ID: <20180626064017.17031.47954.stgit@pasha-VirtualBox>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] sdl2: fix copypaste issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +25,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru
 
-This makes sure the regions are properly cleaned when unplugging -device
-seconday-vga.
+This patch fixes text and mouse event processing. These functions used
+'key' field of the event instead of appropriate 'text', 'motion', 'button',
+or 'wheel'.
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
 ---
- hw/display/vga_int.h    |  1 +
- hw/display/vga-pci.c    | 11 ++++++-----
- hw/display/virtio-vga.c |  2 +-
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ ui/sdl2.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-index 313cff84fc..f8fcf62a56 100644
---- a/hw/display/vga_int.h
-+++ b/hw/display/vga_int.h
-@@ -193,6 +193,7 @@ extern const MemoryRegionOps vga_mem_ops;
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 3ae4719..3fff9f5 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -424,7 +424,7 @@ static void handle_keyup(SDL_Event *ev)
  
- /* vga-pci.c */
- void pci_std_vga_mmio_region_init(VGACommonState *s,
-+                                  Object *owner,
-                                   MemoryRegion *parent,
-                                   MemoryRegion *subs,
-                                   bool qext);
-diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
-index 700ac58c69..1ea559762a 100644
---- a/hw/display/vga-pci.c
-+++ b/hw/display/vga-pci.c
-@@ -192,22 +192,23 @@ static const MemoryRegionOps pci_vga_qext_ops = {
- };
- 
- void pci_std_vga_mmio_region_init(VGACommonState *s,
-+                                  Object *owner,
-                                   MemoryRegion *parent,
-                                   MemoryRegion *subs,
-                                   bool qext)
+ static void handle_textinput(SDL_Event *ev)
  {
--    memory_region_init_io(&subs[0], NULL, &pci_vga_ioport_ops, s,
-+    memory_region_init_io(&subs[0], owner, &pci_vga_ioport_ops, s,
-                           "vga ioports remapped", PCI_VGA_IOPORT_SIZE);
-     memory_region_add_subregion(parent, PCI_VGA_IOPORT_OFFSET,
-                                 &subs[0]);
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->text.windowID);
+     QemuConsole *con = scon ? scon->dcl.con : NULL;
  
--    memory_region_init_io(&subs[1], NULL, &pci_vga_bochs_ops, s,
-+    memory_region_init_io(&subs[1], owner, &pci_vga_bochs_ops, s,
-                           "bochs dispi interface", PCI_VGA_BOCHS_SIZE);
-     memory_region_add_subregion(parent, PCI_VGA_BOCHS_OFFSET,
-                                 &subs[1]);
+     if (qemu_console_is_graphic(con)) {
+@@ -436,7 +436,7 @@ static void handle_textinput(SDL_Event *ev)
+ static void handle_mousemotion(SDL_Event *ev)
+ {
+     int max_x, max_y;
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->motion.windowID);
  
-     if (qext) {
--        memory_region_init_io(&subs[2], NULL, &pci_vga_qext_ops, s,
-+        memory_region_init_io(&subs[2], owner, &pci_vga_qext_ops, s,
-                               "qemu extended regs", PCI_VGA_QEXT_SIZE);
-         memory_region_add_subregion(parent, PCI_VGA_QEXT_OFFSET,
-                                     &subs[2]);
-@@ -239,7 +240,7 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
-             qext = true;
-             pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-         }
--        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
-+        pci_std_vga_mmio_region_init(s, OBJECT(dev), &d->mmio, d->mrs, qext);
+     if (!qemu_console_is_graphic(scon->dcl.con)) {
+         return;
+@@ -468,7 +468,7 @@ static void handle_mousebutton(SDL_Event *ev)
+ {
+     int buttonstate = SDL_GetMouseState(NULL, NULL);
+     SDL_MouseButtonEvent *bev;
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->button.windowID);
  
-         pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-     }
-@@ -275,7 +276,7 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
-         qext = true;
-         pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-     }
--    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
-+    pci_std_vga_mmio_region_init(s, OBJECT(dev), &d->mmio, d->mrs, qext);
+     if (!qemu_console_is_graphic(scon->dcl.con)) {
+         return;
+@@ -492,7 +492,7 @@ static void handle_mousebutton(SDL_Event *ev)
  
-     pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram);
-     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index baa74ba82c..97db6c3372 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -152,7 +152,7 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     }
+ static void handle_mousewheel(SDL_Event *ev)
+ {
+-    struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
++    struct sdl2_console *scon = get_scon_from_window(ev->wheel.windowID);
+     SDL_MouseWheelEvent *wev = &ev->wheel;
+     InputButton btn;
  
-     /* add stdvga mmio regions */
--    pci_std_vga_mmio_region_init(vga, &vpci_dev->modern_bar,
-+    pci_std_vga_mmio_region_init(vga, OBJECT(vvga), &vpci_dev->modern_bar,
-                                  vvga->vga_mrs, true);
- 
-     vga->con = g->scanout[0].con;
--- 
-2.9.3
