@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fXlY2-0005Gi-7R
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:50:11 -0400
+	(envelope-from <lersek@redhat.com>) id 1fXlcn-0006pg-1g
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:55:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fXlXv-0004QK-KM
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:50:10 -0400
-Received: from steffen-goertz.de ([88.198.119.201]:51094)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fXlXv-0004P1-9H
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:50:03 -0400
-From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Tue, 26 Jun 2018 12:49:43 +0200
-Message-Id: <20180626104943.2756-1-contrib@steffen-goertz.de>
+	(envelope-from <lersek@redhat.com>) id 1fXlcj-00063X-TP
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:55:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46210 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fXlcj-00062w-O6
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 06:55:01 -0400
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-3-marcandre.lureau@redhat.com>
+	<20180621120056.663f7f25@redhat.com>
+	<CAJ+F1CLYvrddKXdVfqa-Jiw-jr2LrxUbznW4Tn6kDK+O3J-M9Q@mail.gmail.com>
+	<da0df342-5408-b7a8-497b-560d523a7aa6@redhat.com>
+	<CAJ+F1CLSw9At=ivywgFRtXjWzwZj9HOv2FdobiDFqyx+Z8H9fg@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <43903943-4058-6167-225c-c2ba16f1ad18@redhat.com>
+Date: Tue, 26 Jun 2018 12:54:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAJ+F1CLSw9At=ivywgFRtXjWzwZj9HOv2FdobiDFqyx+Z8H9fg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v2] arm: Add NRF51 random number generator
- peripheral
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] acpi: add fw_cfg file for TPM and
+ PPI virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,373 +33,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Add a model of the NRF51 random number generator peripheral.
+On 06/26/18 12:38, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Mon, Jun 25, 2018 at 5:20 PM, Laszlo Ersek <lersek@redhat.com> wrote=
+:
+>> On 06/21/18 12:10, Marc-Andr=C3=A9 Lureau wrote:
+>>> Hi
+>>>
+>>> On Thu, Jun 21, 2018 at 12:00 PM, Igor Mammedov <imammedo@redhat.com>=
+ wrote:
+>>>> On Tue, 15 May 2018 14:14:31 +0200
+>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>>>>
+>>>>> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>>>>
+>>>>> To avoid having to hard code the base address of the PPI virtual
+>>>>> memory device we introduce a fw_cfg file etc/tpm/config that holds =
+the
+>>>>> base address of the PPI device, the version of the PPI interface an=
+d
+>>>>> the version of the attached TPM.
+>>>> is it related to TPM_PPI_ADDR_BASE added in previous patch?
+>>>>
+>>>>>
+>>>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>>>> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, docum=
+ent it ]
+>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>>> ---
+>>>>>  include/hw/acpi/tpm.h |  3 +++
+>>>>>  hw/i386/acpi-build.c  | 17 +++++++++++++++++
+>>>>>  docs/specs/tpm.txt    | 20 ++++++++++++++++++++
+>>>>>  3 files changed, 40 insertions(+)
+>>>>>
+>>>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>>>>> index c082df7d1d..f79d68a77a 100644
+>>>>> --- a/include/hw/acpi/tpm.h
+>>>>> +++ b/include/hw/acpi/tpm.h
+>>>>> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>>>>>  #define TPM_PPI_ADDR_SIZE           0x400
+>>>>>  #define TPM_PPI_ADDR_BASE           0xFED45000
+>>>>>
+>>>>> +#define TPM_PPI_VERSION_NONE        0
+>>>>> +#define TPM_PPI_VERSION_1_30        1
+>>>>> +
+>>>>>  #endif /* HW_ACPI_TPM_H */
+>>>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>>>> index 9bc6d97ea1..f6d447f03a 100644
+>>>>> --- a/hw/i386/acpi-build.c
+>>>>> +++ b/hw/i386/acpi-build.c
+>>>>> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+>>>>>      bool pcihp_bridge_en;
+>>>>>  } AcpiBuildPciBusHotplugState;
+>>>>>
+>>>>> +typedef struct FWCfgTPMConfig {
+>>>>> +    uint32_t tpmppi_address;
+>>>>> +    uint8_t tpm_version;
+>>>>> +    uint8_t tpmppi_version;
+>>>>> +} QEMU_PACKED FWCfgTPMConfig;
+>>>>> +
+>>>>>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>>>>>  {
+>>>>>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO=
+_BASE, NULL);
+>>>>> @@ -2873,6 +2879,7 @@ void acpi_setup(void)
+>>>>>      AcpiBuildTables tables;
+>>>>>      AcpiBuildState *build_state;
+>>>>>      Object *vmgenid_dev;
+>>>>> +    static FWCfgTPMConfig tpm_config;
+>>>>>
+>>>>>      if (!pcms->fw_cfg) {
+>>>>>          ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+>>>>> @@ -2907,6 +2914,16 @@ void acpi_setup(void)
+>>>>>      fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+>>>>>                      tables.tcpalog->data, acpi_data_len(tables.tcp=
+alog));
+>>>>>
+>>>>> +    if (tpm_find()) {
+>>>>> +        tpm_config =3D (FWCfgTPMConfig) {
+>>>>> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+>>>>> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find(=
+))),
+>>>>> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
+>>>>> +        };
+>>>>> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+>>>>> +                        &tpm_config, sizeof tpm_config);
+>>>>> +    }
+>>>> why it's in ACPI part of the code, shouldn't it be a part of device,
+>>>> could TPM be used without ACPI at all (-noacpi CLI option)?
+>>>>
+>>>> Wouldn't adding fwcfg entry unconditionally break migration?
+>>>
+>>> Because of unstable entry IDs? that could be problematic. (especially
+>>> during boot time) What do you think Laszlo?
+>>>
+>>> I guess we could have a "ppi" device property, that would imply havin=
+g
+>>> the etc/tpm/config fw_cfg entry. We would enable it by default in
+>>> newer machine types (3.0?)
+>>
+>> Can we perhaps draw a parallel with "-device vmcoreinfo" here? For tha=
+t
+>> device model, fw_cfg_add_file_callback() is called in the realize
+>> function, vmcoreinfo_realize(). If libvirt generates the identical
+>> cmdline on both ends of the migration, and uses the same machine type,=
+ I
+>> think the fw_cfg selectors should end up the same on both sides.
+>=20
+> -device vmcoreinfo is a  standalone fw-cfg entry. PPI is tied to a
+> TPM, the fw-cfg entry is an implementation detail between qemu and
+> firmware. So I prefer the "ppi" device property.
 
-Changes since v1:
-  - Add implementation access size hints to MemoryRegionOps
-  - Fail on error if qcrypto_random_bytes fails
-  - Add references to Nrf51 datasheets
+Ah, right, sorry I got confused for a moment. The TPM device makes sense
+without the (optional) Physical Presence Interface too.
 
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
----
- hw/misc/Makefile.objs       |   1 +
- hw/misc/nrf51_rng.c         | 242 ++++++++++++++++++++++++++++++++++++
- include/hw/misc/nrf51_rng.h |  73 +++++++++++
- 3 files changed, 316 insertions(+)
- create mode 100644 hw/misc/nrf51_rng.c
- create mode 100644 include/hw/misc/nrf51_rng.h
+Thanks,
+Laszlo
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 00e834d0f0..fd8cc97249 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -70,3 +70,4 @@ obj-$(CONFIG_AUX) +=3D auxbus.o
- obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
- obj-y +=3D mmio_interface.o
- obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
-+obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o
-diff --git a/hw/misc/nrf51_rng.c b/hw/misc/nrf51_rng.c
-new file mode 100644
-index 0000000000..f9fdcd08e6
---- /dev/null
-+++ b/hw/misc/nrf51_rng.c
-@@ -0,0 +1,242 @@
-+/*
-+ * nrf51_rng.c
-+ *
-+ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "hw/misc/nrf51_rng.h"
-+#include "crypto/random.h"
-+
-+#define NRF51_RNG_SIZE         0x1000
-+
-+#define NRF51_RNG_TASK_START   0x000
-+#define NRF51_RNG_TASK_STOP    0x004
-+#define NRF51_RNG_EVENT_VALRDY 0x100
-+#define NRF51_RNG_REG_SHORTS   0x200
-+#define NRF51_RNG_REG_SHORTS_VALRDY_STOP 0
-+#define NRF51_RNG_REG_INTEN    0x300
-+#define NRF51_RNG_REG_INTEN_VALRDY 0
-+#define NRF51_RNG_REG_INTENSET 0x304
-+#define NRF51_RNG_REG_INTENCLR 0x308
-+#define NRF51_RNG_REG_CONFIG   0x504
-+#define NRF51_RNG_REG_CONFIG_DECEN 0
-+#define NRF51_RNG_REG_VALUE    0x508
-+
-+#define NRF51_TRIGGER_TASK 0x01
-+#define NRF51_EVENT_CLEAR  0x00
-+
-+
-+static uint64_t rng_read(void *opaque, hwaddr offset, unsigned int size)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+    uint64_t r =3D 0;
-+
-+    switch (offset) {
-+    case NRF51_RNG_EVENT_VALRDY:
-+        r =3D s->state.event_valrdy;
-+        break;
-+    case NRF51_RNG_REG_SHORTS:
-+        r =3D s->state.shortcut_stop_on_valrdy;
-+        break;
-+    case NRF51_RNG_REG_INTEN:
-+    case NRF51_RNG_REG_INTENSET:
-+    case NRF51_RNG_REG_INTENCLR:
-+        r =3D s->state.interrupt_enabled;
-+        break;
-+    case NRF51_RNG_REG_CONFIG:
-+        r =3D s->state.filter_enabled;
-+        break;
-+    case NRF51_RNG_REG_VALUE:
-+        r =3D s->value;
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+
-+    return r;
-+}
-+
-+static int64_t calc_next_timeout(Nrf51RNGState *s)
-+{
-+    int64_t timeout =3D qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
-+    if (s->state.filter_enabled) {
-+        timeout +=3D s->period_filtered_us;
-+    } else {
-+        timeout +=3D s->period_unfiltered_us;
-+    }
-+
-+    return timeout;
-+}
-+
-+
-+static void rng_update_timer(Nrf51RNGState *s)
-+{
-+    if (s->state.active) {
-+        timer_mod(&s->timer, calc_next_timeout(s));
-+    } else {
-+        timer_del(&s->timer);
-+    }
-+}
-+
-+
-+static void rng_write(void *opaque, hwaddr offset,
-+                       uint64_t value, unsigned int size)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    switch (offset) {
-+    case NRF51_RNG_TASK_START:
-+        if (value =3D=3D NRF51_TRIGGER_TASK) {
-+            s->state.active =3D 1;
-+            rng_update_timer(s);
-+        }
-+        break;
-+    case NRF51_RNG_TASK_STOP:
-+        if (value =3D=3D NRF51_TRIGGER_TASK) {
-+            s->state.active =3D 0;
-+            rng_update_timer(s);
-+        }
-+        break;
-+    case NRF51_RNG_EVENT_VALRDY:
-+        if (value =3D=3D NRF51_EVENT_CLEAR) {
-+            s->state.event_valrdy =3D 0;
-+            qemu_set_irq(s->eep_valrdy, 0);
-+        }
-+        break;
-+    case NRF51_RNG_REG_SHORTS:
-+        s->state.shortcut_stop_on_valrdy =3D
-+                (value & BIT_MASK(NRF51_RNG_REG_SHORTS_VALRDY_STOP)) ? 1=
- : 0;
-+        break;
-+    case NRF51_RNG_REG_INTEN:
-+        s->state.interrupt_enabled =3D
-+                (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) ? 1 : 0;
-+        break;
-+    case NRF51_RNG_REG_INTENSET:
-+        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
-+            s->state.interrupt_enabled =3D 1;
-+        }
-+        break;
-+    case NRF51_RNG_REG_INTENCLR:
-+        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
-+            s->state.interrupt_enabled =3D 0;
-+        }
-+        break;
-+    case NRF51_RNG_REG_CONFIG:
-+        s->state.filter_enabled =3D
-+                      (value & BIT_MASK(NRF51_RNG_REG_CONFIG_DECEN)) ? 1=
- : 0;
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+}
-+
-+static const MemoryRegionOps rng_ops =3D {
-+    .read =3D  rng_read,
-+    .write =3D rng_write,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+    .impl.min_access_size =3D 4,
-+    .impl.max_access_size =3D 4
-+};
-+
-+static void nrf51_rng_timer_expire(void *opaque)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    qcrypto_random_bytes(&s->value, 1, &error_abort);
-+
-+    s->state.event_valrdy =3D 1;
-+    qemu_set_irq(s->eep_valrdy, 1);
-+
-+    if (s->state.interrupt_enabled) {
-+        qemu_irq_pulse(s->irq);
-+    }
-+
-+    if (s->state.shortcut_stop_on_valrdy) {
-+        s->state.active =3D 0;
-+    }
-+
-+    rng_update_timer(s);
-+}
-+
-+static void nrf51_rng_tep_start(void *opaque, int n, int level)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    if (level) {
-+        s->state.active =3D 1;
-+        rng_update_timer(s);
-+    }
-+}
-+
-+static void nrf51_rng_tep_stop(void *opaque, int n, int level)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-+
-+    if (level) {
-+        s->state.active =3D 0;
-+        rng_update_timer(s);
-+    }
-+}
-+
-+
-+static void nrf51_rng_init(Object *obj)
-+{
-+    Nrf51RNGState *s =3D NRF51_RNG(obj);
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->mmio, obj, &rng_ops, s,
-+            TYPE_NRF51_RNG, NRF51_RNG_SIZE);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+
-+    timer_init_us(&s->timer, QEMU_CLOCK_VIRTUAL, nrf51_rng_timer_expire,=
- s);
-+
-+    qdev_init_gpio_out_named(DEVICE(s), &s->irq, "irq", 1);
-+
-+    /* Tasks */
-+    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_start, "tep_start",=
- 1);
-+    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_stop, "tep_stop", 1=
-);
-+
-+    /* Events */
-+    qdev_init_gpio_out_named(DEVICE(s), &s->eep_valrdy, "eep_valrdy", 1)=
-;
-+}
-+
-+static Property nrf51_rng_properties[] =3D {
-+    DEFINE_PROP_UINT16("period_unfiltered_us", Nrf51RNGState,
-+            period_unfiltered_us, 167),
-+    DEFINE_PROP_UINT16("period_filtered_us", Nrf51RNGState,
-+            period_filtered_us, 660),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void nrf51_rng_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->props =3D nrf51_rng_properties;
-+}
-+
-+static const TypeInfo nrf51_rng_info =3D {
-+    .name =3D TYPE_NRF51_RNG,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(Nrf51RNGState),
-+    .instance_init =3D nrf51_rng_init,
-+    .class_init =3D nrf51_rng_class_init
-+};
-+
-+static void nrf51_rng_register_types(void)
-+{
-+    type_register_static(&nrf51_rng_info);
-+}
-+
-+type_init(nrf51_rng_register_types)
-diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
-new file mode 100644
-index 0000000000..a8f0630a98
---- /dev/null
-+++ b/include/hw/misc/nrf51_rng.h
-@@ -0,0 +1,73 @@
-+/*
-+ * nrf51_rng.h
-+ *
-+ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * See NRF51 reference manual section 21 Random Number Generator
-+ * See NRF51 product specification section 8.16 Random Number Generator
-+ *
-+ * QEMU interface:
-+ * + Property "period_unfiltered_us": Time between two biased values in
-+ *   microseconds.
-+ * + Property "period_filtered_us": Time between two unbiased values in
-+ *   microseconds.
-+ * + sysbus MMIO regions 0: Memory Region with tasks, events and registe=
-rs
-+ *   to be mapped to the peripherals instance address by the SOC.
-+ * + Named GPIO output "irq": Interrupt line of the peripheral. Must be
-+ *   connected to the associated peripheral interrupt line of the NVIC.
-+ * + Named GPIO output "eep_valrdy": Event set when new random value is =
-ready
-+ *   to be read.
-+ * + Named GPIO input "tep_start": Task that triggers start of continuou=
-s
-+ *   generation of random values.
-+ * + Named GPIO input "tep_stop": Task that ends continuous generation o=
-f
-+ *   random values.
-+ *
-+ * Accuracy of the peripheral model:
-+ * + Stochastic properties of different configurations of the random sou=
-rce
-+ *   are not modeled.
-+ * + Generation of unfiltered and filtered random values take at least t=
-he
-+ *   average generation time stated in the production specification;
-+ *   non-deterministic generation times are not modeled.
-+ *
-+ */
-+#ifndef NRF51_RNG_H
-+#define NRF51_RNG_H
-+
-+#include "hw/sysbus.h"
-+#include "qemu/timer.h"
-+#define TYPE_NRF51_RNG "nrf51_soc.rng"
-+#define NRF51_RNG(obj) OBJECT_CHECK(Nrf51RNGState, (obj), TYPE_NRF51_RNG=
-)
-+
-+typedef struct Nrf51RNGState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+    qemu_irq irq;
-+
-+    /* Event End Points */
-+    qemu_irq eep_valrdy;
-+
-+    QEMUTimer timer;
-+
-+    /* Time between generation of successive unfiltered values in us */
-+    uint16_t period_unfiltered_us;
-+    /* Time between generation of successive filtered values in us */
-+    uint16_t period_filtered_us;
-+
-+    uint8_t value;
-+
-+    struct {
-+        uint32_t active:1;
-+        uint32_t event_valrdy:1;
-+        uint32_t shortcut_stop_on_valrdy:1;
-+        uint32_t interrupt_enabled:1;
-+        uint32_t filter_enabled:1;
-+    } state;
-+
-+} Nrf51RNGState;
-+
-+
-+#endif /* NRF51_RNG_H_ */
---=20
-2.17.1
+> Wrt to migration,
+> that should be equivalent to -device vmcoreinfo (except that -device
+> vmcoreinfo is not enabled by default in newer machine types)
+>=20
+>> Thanks
+>> Laszlo
+>>
+>>>>
+>>>>> +
+>>>>>      vmgenid_dev =3D find_vmgenid_dev();
+>>>>>      if (vmgenid_dev) {
+>>>>>          vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+>>>>> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+>>>>> index c230c4c93e..2ddb768084 100644
+>>>>> --- a/docs/specs/tpm.txt
+>>>>> +++ b/docs/specs/tpm.txt
+>>>>> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
+>>>>>   - hw/tpm/tpm_tis.h
+>>>>>
+>>>>>
+>>>>> +=3D fw_cfg interface =3D
+>>>>> +
+>>>>> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
+>>>>> +configuring the guest appropriately.
+>>>>> +
+>>>>> +The entry of 6 bytes has the following content, in little-endian:
+>>>>> +
+>>>>> +    #define TPM_VERSION_UNSPEC          0
+>>>>> +    #define TPM_VERSION_1_2             1
+>>>>> +    #define TPM_VERSION_2_0             2
+>>>>> +
+>>>>> +    #define TPM_PPI_VERSION_NONE        0
+>>>>> +    #define TPM_PPI_VERSION_1_30        1
+>>>>> +
+>>>>> +    struct FWCfgTPMConfig {
+>>>>> +        uint32_t tpmppi_address;         /* PPI memory location */
+>>>>> +        uint8_t tpm_version;             /* TPM version */
+>>>>> +        uint8_t tpmppi_version;          /* PPI version */
+>>>>> +    };
+>>>>> +
+>>>>>  =3D ACPI Interface =3D
+>>>>>
+>>>>>  The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SS=
+DT and passes
+>>>>
+>>>>
+>>>
+>>>
+>>>
+>>
+>=20
+>=20
+>=20
