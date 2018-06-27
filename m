@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYA2J-0003j6-Sq
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fYA2K-0003k9-P6
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYA2I-0003xI-B0
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36658 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fYA2J-0003yz-OF
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51948 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fYA2I-0003wf-5u
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:02 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fYA2J-0003xt-Ik
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:03 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 27 Jun 2018 13:58:46 +0100
-Message-Id: <20180627125847.5413-6-stefanha@redhat.com>
+Date: Wed, 27 Jun 2018 13:58:47 +0100
+Message-Id: <20180627125847.5413-7-stefanha@redhat.com>
 In-Reply-To: <20180627125847.5413-1-stefanha@redhat.com>
 References: <20180627125847.5413-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 5/6] trace: enable tracing of TCG atomics
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 6/6] trace: forbid floating point types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,295 +27,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-From: "Emilio G. Cota" <cota@braap.org>
+Only one existing trace event uses a floating point type.  Unfortunately
+float and double cannot be supported since SystemTap does not have
+floating point types.
 
-We do not trace guest atomic accesses. Fix it.
+Remove float and double from the whitelist and document this limitation.
+Update the migrate_transferred trace event to use uint64_t instead of
+double.
 
-Tested with a modified atomic_add-bench so that it executes
-a deterministic number of instructions, i.e. fixed seeding,
-no threading and fixed number of loop iterations instead
-of running for a certain time.
-
-Before:
-- With parallel_cpus = false (no clone syscall so it is never set to true):
-  220070 memory accesses
-- With parallel_cpus = true (hard-coded):
-  212105 memory accesses <-- we're not tracing the atomics!
-
-After:
-  220070 memory accesses regardless of parallel_cpus.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-id: 1527028012-21888-6-git-send-email-cota@braap.org
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-id: 20180621150254.4922-1-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- accel/tcg/atomic_template.h | 87 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 81 insertions(+), 6 deletions(-)
+ docs/devel/tracing.txt        | 5 +++++
+ migration/trace-events        | 2 +-
+ qapi/trace-events             | 2 +-
+ scripts/tracetool/__init__.py | 2 --
+ 4 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
-index 3f41ef2782..d751bcba48 100644
---- a/accel/tcg/atomic_template.h
-+++ b/accel/tcg/atomic_template.h
-@@ -18,30 +18,37 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+#include "trace/mem.h"
+diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
+index 07abbb345c..6f815ecbd7 100644
+--- a/docs/devel/tracing.txt
++++ b/docs/devel/tracing.txt
+@@ -104,6 +104,11 @@ Trace events should use types as follows:
+  * For everything else, use primitive scalar types (char, int, long) wit=
+h the
+    appropriate signedness.
+=20
++ * Avoid floating point types (float and double) because SystemTap does =
+not
++   support them.  In most cases it is possible to round to an integer ty=
+pe
++   instead.  This may require scaling the value first by multiplying it =
+by 1000
++   or the like when digits after the decimal point need to be preserved.
 +
- #if DATA_SIZE == 16
- # define SUFFIX     o
- # define DATA_TYPE  Int128
- # define BSWAP      bswap128
-+# define SHIFT      4
- #elif DATA_SIZE == 8
- # define SUFFIX     q
- # define DATA_TYPE  uint64_t
- # define SDATA_TYPE int64_t
- # define BSWAP      bswap64
-+# define SHIFT      3
- #elif DATA_SIZE == 4
- # define SUFFIX     l
- # define DATA_TYPE  uint32_t
- # define SDATA_TYPE int32_t
- # define BSWAP      bswap32
-+# define SHIFT      2
- #elif DATA_SIZE == 2
- # define SUFFIX     w
- # define DATA_TYPE  uint16_t
- # define SDATA_TYPE int16_t
- # define BSWAP      bswap16
-+# define SHIFT      1
- #elif DATA_SIZE == 1
- # define SUFFIX     b
- # define DATA_TYPE  uint8_t
- # define SDATA_TYPE int8_t
- # define BSWAP
-+# define SHIFT      0
- #else
- # error unsupported data size
- #endif
-@@ -52,14 +59,37 @@
- # define ABI_TYPE  uint32_t
- #endif
- 
-+#define ATOMIC_TRACE_RMW do {                                           \
-+        uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, false); \
-+                                                                        \
-+        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr, info);      \
-+        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr,             \
-+                                    info | TRACE_MEM_ST);               \
-+    } while (0)
-+
-+#define ATOMIC_TRACE_LD do {                                            \
-+        uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, false); \
-+                                                                        \
-+        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr, info);      \
-+    } while (0)
-+
-+# define ATOMIC_TRACE_ST do {                                           \
-+        uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, true); \
-+                                                                        \
-+        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr, info);      \
-+    } while (0)
-+
- /* Define host-endian atomic operations.  Note that END is used within
-    the ATOMIC_NAME macro, and redefined below.  */
- #if DATA_SIZE == 1
- # define END
-+# define MEND _be /* either le or be would be fine */
- #elif defined(HOST_WORDS_BIGENDIAN)
- # define END  _be
-+# define MEND _be
- #else
- # define END  _le
-+# define MEND _le
- #endif
- 
- ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
-@@ -67,7 +97,10 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
--    DATA_TYPE ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
-+    DATA_TYPE ret;
-+
-+    ATOMIC_TRACE_RMW;
-+    ret = atomic_cmpxchg__nocheck(haddr, cmpv, newv);
-     ATOMIC_MMU_CLEANUP;
-     return ret;
- }
-@@ -77,6 +110,8 @@ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
-+
-+    ATOMIC_TRACE_LD;
-     __atomic_load(haddr, &val, __ATOMIC_RELAXED);
-     ATOMIC_MMU_CLEANUP;
-     return val;
-@@ -87,6 +122,8 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
-+
-+    ATOMIC_TRACE_ST;
-     __atomic_store(haddr, &val, __ATOMIC_RELAXED);
-     ATOMIC_MMU_CLEANUP;
- }
-@@ -96,7 +133,10 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
--    DATA_TYPE ret = atomic_xchg__nocheck(haddr, val);
-+    DATA_TYPE ret;
-+
-+    ATOMIC_TRACE_RMW;
-+    ret = atomic_xchg__nocheck(haddr, val);
-     ATOMIC_MMU_CLEANUP;
-     return ret;
- }
-@@ -107,7 +147,10 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
- {                                                                   \
-     ATOMIC_MMU_DECLS;                                               \
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
--    DATA_TYPE ret = atomic_##X(haddr, val);                         \
-+    DATA_TYPE ret;                                                  \
-+                                                                    \
-+    ATOMIC_TRACE_RMW;                                               \
-+    ret = atomic_##X(haddr, val);                                   \
-     ATOMIC_MMU_CLEANUP;                                             \
-     return ret;                                                     \
- }
-@@ -126,6 +169,9 @@ GEN_ATOMIC_HELPER(xor_fetch)
- /* These helpers are, as a whole, full barriers.  Within the helper,
-  * the leading barrier is explicit and the trailing barrier is within
-  * cmpxchg primitive.
-+ *
-+ * Trace this load + RMW loop as a single RMW op. This way, regardless
-+ * of CF_PARALLEL's value, we'll trace just a read and a write.
-  */
- #define GEN_ATOMIC_HELPER_FN(X, FN, XDATA_TYPE, RET)                \
- ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
-@@ -134,6 +180,8 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
-     ATOMIC_MMU_DECLS;                                               \
-     XDATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                          \
-     XDATA_TYPE cmp, old, new, val = xval;                           \
-+                                                                    \
-+    ATOMIC_TRACE_RMW;                                               \
-     smp_mb();                                                       \
-     cmp = atomic_read__nocheck(haddr);                              \
-     do {                                                            \
-@@ -158,6 +206,7 @@ GEN_ATOMIC_HELPER_FN(umax_fetch, MAX,  DATA_TYPE, new)
- #endif /* DATA SIZE >= 16 */
- 
- #undef END
-+#undef MEND
- 
- #if DATA_SIZE > 1
- 
-@@ -165,8 +214,10 @@ GEN_ATOMIC_HELPER_FN(umax_fetch, MAX,  DATA_TYPE, new)
-    within the ATOMIC_NAME macro.  */
- #ifdef HOST_WORDS_BIGENDIAN
- # define END  _le
-+# define MEND _le
- #else
- # define END  _be
-+# define MEND _be
- #endif
- 
- ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
-@@ -174,7 +225,10 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
--    DATA_TYPE ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
-+    DATA_TYPE ret;
-+
-+    ATOMIC_TRACE_RMW;
-+    ret = atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv));
-     ATOMIC_MMU_CLEANUP;
-     return BSWAP(ret);
- }
-@@ -184,6 +238,8 @@ ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;
-+
-+    ATOMIC_TRACE_LD;
-     __atomic_load(haddr, &val, __ATOMIC_RELAXED);
-     ATOMIC_MMU_CLEANUP;
-     return BSWAP(val);
-@@ -194,6 +250,8 @@ void ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
-+
-+    ATOMIC_TRACE_ST;
-     val = BSWAP(val);
-     __atomic_store(haddr, &val, __ATOMIC_RELAXED);
-     ATOMIC_MMU_CLEANUP;
-@@ -204,7 +262,10 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,
- {
-     ATOMIC_MMU_DECLS;
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;
--    ABI_TYPE ret = atomic_xchg__nocheck(haddr, BSWAP(val));
-+    ABI_TYPE ret;
-+
-+    ATOMIC_TRACE_RMW;
-+    ret = atomic_xchg__nocheck(haddr, BSWAP(val));
-     ATOMIC_MMU_CLEANUP;
-     return BSWAP(ret);
- }
-@@ -215,7 +276,10 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
- {                                                                   \
-     ATOMIC_MMU_DECLS;                                               \
-     DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \
--    DATA_TYPE ret = atomic_##X(haddr, BSWAP(val));                  \
-+    DATA_TYPE ret;                                                  \
-+                                                                    \
-+    ATOMIC_TRACE_RMW;                                               \
-+    ret = atomic_##X(haddr, BSWAP(val));                            \
-     ATOMIC_MMU_CLEANUP;                                             \
-     return BSWAP(ret);                                              \
- }
-@@ -232,6 +296,9 @@ GEN_ATOMIC_HELPER(xor_fetch)
- /* These helpers are, as a whole, full barriers.  Within the helper,
-  * the leading barrier is explicit and the trailing barrier is within
-  * cmpxchg primitive.
-+ *
-+ * Trace this load + RMW loop as a single RMW op. This way, regardless
-+ * of CF_PARALLEL's value, we'll trace just a read and a write.
-  */
- #define GEN_ATOMIC_HELPER_FN(X, FN, XDATA_TYPE, RET)                \
- ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
-@@ -240,6 +307,8 @@ ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
-     ATOMIC_MMU_DECLS;                                               \
-     XDATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                          \
-     XDATA_TYPE ldo, ldn, old, new, val = xval;                      \
-+                                                                    \
-+    ATOMIC_TRACE_RMW;                                               \
-     smp_mb();                                                       \
-     ldn = atomic_read__nocheck(haddr);                              \
-     do {                                                            \
-@@ -271,11 +340,17 @@ GEN_ATOMIC_HELPER_FN(add_fetch, ADD, DATA_TYPE, new)
- #endif /* DATA_SIZE >= 16 */
- 
- #undef END
-+#undef MEND
- #endif /* DATA_SIZE > 1 */
- 
-+#undef ATOMIC_TRACE_ST
-+#undef ATOMIC_TRACE_LD
-+#undef ATOMIC_TRACE_RMW
-+
- #undef BSWAP
- #undef ABI_TYPE
- #undef DATA_TYPE
- #undef SDATA_TYPE
- #undef SUFFIX
- #undef DATA_SIZE
-+#undef SHIFT
--- 
+ Format strings should reflect the types defined in the trace event.  Tak=
+e
+ special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+ respectively.  This ensures portability between 32- and 64-bit platforms=
+.
+diff --git a/migration/trace-events b/migration/trace-events
+index 3f67758893..7ea522e453 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -133,7 +133,7 @@ migrate_global_state_post_load(const char *state) "lo=
+aded state: %s"
+ migrate_global_state_pre_save(const char *state) "saved state: %s"
+ migration_thread_low_pending(uint64_t pending) "%" PRIu64
+ migrate_state_too_big(void) ""
+-migrate_transferred(uint64_t tranferred, uint64_t time_spent, double ban=
+dwidth, uint64_t size) "transferred %" PRIu64 " time_spent %" PRIu64 " ba=
+ndwidth %g max_size %" PRId64
++migrate_transferred(uint64_t tranferred, uint64_t time_spent, uint64_t b=
+andwidth, uint64_t size) "transferred %" PRIu64 " time_spent %" PRIu64 " =
+bandwidth %" PRIu64 " max_size %" PRId64
+ process_incoming_migration_co_end(int ret, int ps) "ret=3D%d postcopy-st=
+ate=3D%d"
+ process_incoming_migration_co_postcopy_end_main(void) ""
+ migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=3D%p=
+ ioctype=3D%s"
+diff --git a/qapi/trace-events b/qapi/trace-events
+index 9e9008a1dc..70e049ea80 100644
+--- a/qapi/trace-events
++++ b/qapi/trace-events
+@@ -29,6 +29,6 @@ visit_type_int64(void *v, const char *name, int64_t *ob=
+j) "v=3D%p name=3D%s obj=3D%p"
+ visit_type_size(void *v, const char *name, uint64_t *obj) "v=3D%p name=3D=
+%s obj=3D%p"
+ visit_type_bool(void *v, const char *name, bool *obj) "v=3D%p name=3D%s =
+obj=3D%p"
+ visit_type_str(void *v, const char *name, char **obj) "v=3D%p name=3D%s =
+obj=3D%p"
+-visit_type_number(void *v, const char *name, double *obj) "v=3D%p name=3D=
+%s obj=3D%p"
++visit_type_number(void *v, const char *name, void *obj) "v=3D%p name=3D%=
+s obj=3D%p"
+ visit_type_any(void *v, const char *name, void *obj) "v=3D%p name=3D%s o=
+bj=3D%p"
+ visit_type_null(void *v, const char *name, void *obj) "v=3D%p name=3D%s =
+obj=3D%p"
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
+y
+index b20fac34a3..0e3c9e146c 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -53,8 +53,6 @@ ALLOWED_TYPES =3D [
+     "bool",
+     "unsigned",
+     "signed",
+-    "float",
+-    "double",
+     "int8_t",
+     "uint8_t",
+     "int16_t",
+--=20
 2.17.1
