@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fYA2j-0004Bg-Dj
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:30 -0400
+	(envelope-from <shorne@gmail.com>) id 1fYA3F-0004lY-C3
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fYA2f-0004Tx-Et
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51966 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fYA2f-0004TO-AE
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:25 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <87fu18ach6.fsf_-_@dusky.pond.sub.org> (Markus Armbruster's
-	message of "Wed, 27 Jun 2018 09:57:09 +0200")
-References: <20180625131253.11218-1-kraxel@redhat.com>
-	<20180625131253.11218-2-kraxel@redhat.com>
-	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
-	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
-	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
-	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Jun 2018 15:02:48 +0200
-Message-ID: <87fu18jsav.fsf@secure.laptop>
+	(envelope-from <shorne@gmail.com>) id 1fYA3B-0004sB-Bl
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:01 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:42207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYA3B-0004rp-2O
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:57 -0400
+Received: by mail-pl0-x242.google.com with SMTP id w17-v6so1000937pll.9
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 05:59:56 -0700 (PDT)
+Date: Wed, 27 Jun 2018 21:59:53 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20180627125953.GK24595@lianli.shorne-pla.net>
+References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	<20180618184046.6270-14-richard.henderson@linaro.org>
+	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
+	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
+	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Martin Schrodt <martin@schrodt.org>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Thomas Huth <thuth@redhat.com> writes:
->
->> On 27.06.2018 08:51, Gerd Hoffmann wrote:
-> [...]
->>> Drop support for 32bit hosts in qemu?
->>
->> I guess the only way to answer that question reliably is to send a patch
->> to mark 32-bit hosts as deprecated...
->>
->> Anyway, you still have got to fix that problem with -m32 now somehow
->> since we certainly can not drop 32-bit immediately.
->
-> We certainly can if we want to.
->
-> Our formal deprecation policy codifies our compromise between the need
-> to evolve QEMU and the need of its users for stable external interfaces.
->
-> "Compiles on host X" is also a need, but it's a different one.
-> Evidence: "Supported build platforms" has its own appendix, separate
-> from "Deprecated features".  It's mum on 32-bit hosts.
->
-> I'm not saying we *should* drop 32-bit hosts immediately.  Only that the
-> feature deprecation policy does not apply.
->
-> Is QEMU still useful on 32-bit hosts?  Honest question!
+On Tue, Jun 26, 2018 at 03:26:01PM -0700, Richard Henderson wrote:
+> On 06/26/2018 03:07 PM, Stafford Horne wrote:
+> > Hello,
+> > 
+> > I think I found out something.
+> > 
+> > in: target/openrisc/sys_helper.c:92
+> > 
+> > When we write to `env->tlb.dtlb[idx].tr`  in helper_mtspr():
+> >   93          case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1):
+> > /* DTLBW0TR 0-127 */
+> >   94              idx = spr - TO_SPR(1, 640);
+> >   95              env->tlb.dtlb[idx].tr = rb;
+> > 
+> > 
+> > Somehow we are overlapping with `cpu->tb_jmp_cache`,  these are both
+> > pointing to the same spot in memory.
+> > 
+> > (gdb) p &cs->tb_jmp_cache[3014]
+> > $9 = (struct TranslationBlock **) 0x55555608b300
+> > (gdb) p &env->tlb.dtlb[idx].tr
+> > $10 = (uint32_t *) 0x55555608b304
+> 
+> That is definitely weird.  How about
+> 
+> (gdb) p openrisc_env_get_cpu(env)
+> $1 = xxxx
+> (gdb) p &$1->parent_obj
+> (gdb) p &$1->env
+> (gdb) p cs->env_ptr
+> 
+> There should be 4096 entries in tb_jmp_cache, so there should
+> be no way that overlaps.  I can only imagine either CS or ENV
+> is incorrect somehow.  How that would be, I don't know...
 
-At least require 32bits architectures/compilers able to use 64bit
-atomics.  That leaves us with x86 (depending on compiler).  And there
-haven't been 32bit x86 hosts since .....
+Nothing looks strange there... but this does... :)
 
-Later, Juan.
+(gdb) p &cs->tb_jmp_cache[3014]
+$56 = (struct TranslationBlock **) 0x55555606c570
+(gdb) p &env->tlb.dtlb[idx].tr
+$57 = (uint32_t *) 0x55555606c574
+(gdb) p &env->tlb.dtlb[idx].mr
+$58 = (uint32_t *) 0x55555606c570
+(gdb) p idx
+$59 = -1502
+
+The index is negative... this patch should fix that.
+
+@@ -78,6 +78,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr,
+target_ulong rb)
+     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+         idx = (spr - 1024);
+         env->shadow_gpr[idx / 32][idx % 32] = rb;
++        break;
+ 
+     case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
+
+-Stafford
