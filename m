@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYBkX-0005Qy-Te
+	(envelope-from <stefanha@redhat.com>) id 1fYBkX-0005Qw-Lm
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYBkW-00054u-Lj
+	(envelope-from <stefanha@redhat.com>) id 1fYBkW-00054B-9X
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:48:49 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 27 Jun 2018 15:48:38 +0100
-Message-Id: <20180627144838.26772-3-stefanha@redhat.com>
+Date: Wed, 27 Jun 2018 15:48:37 +0100
+Message-Id: <20180627144838.26772-2-stefanha@redhat.com>
 In-Reply-To: <20180627144838.26772-1-stefanha@redhat.com>
 References: <20180627144838.26772-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] linux-aio: properly bubble up errors from
- initialization
+Subject: [Qemu-devel] [PULL 1/2] compiler: add a sizeof_field() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,202 +22,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Determining the size of a field is useful when you don't have a struct
+variable handy.  Open-coding this is ugly.
 
-laio_init() can fail for a couple of reasons, which will lead to a NULL
-pointer dereference in laio_attach_aio_context().
+This patch adds the sizeof_field() macro, which is similar to
+typeof_field().  Existing instances are updated to use the macro.
 
-To solve this, add a aio_setup_linux_aio() function which is called
-early in raw_open_common. If this fails, propagate the error up. The
-signature of aio_get_linux_aio() was not modified, because it seems
-preferable to return the actual errno from the possible failing
-initialization calls.
-
-Additionally, when the AioContext changes, we need to associate a
-LinuxAioState with the new AioContext. Use the bdrv_attach_aio_context
-callback and call the new aio_setup_linux_aio(), which will allocate a
-new AioContext if needed, and return errors on failures. If it fails for
-any reason, fallback to threaded AIO with an error message, as the
-device is already in-use by the guest.
-
-Add an assert that aio_get_linux_aio() cannot return NULL.
-
-Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Message-id: 20180622193700.6523-1-naravamudan@digitalocean.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20180614164431.29305-1-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/block/aio.h     |  3 +++
- include/block/raw-aio.h |  2 +-
- block/file-posix.c      | 33 ++++++++++++++++++++++++++++-----
- block/linux-aio.c       | 12 +++++++++---
- stubs/linux-aio.c       |  2 +-
- util/async.c            | 14 +++++++++++---
- 6 files changed, 53 insertions(+), 13 deletions(-)
+ include/hw/xen/io/ring.h      |  2 +-
+ include/qemu/compiler.h       |  2 ++
+ accel/tcg/translate-all.c     |  2 +-
+ hw/display/xenfb.c            |  4 ++--
+ hw/net/rocker/rocker_of_dpa.c |  2 +-
+ hw/net/virtio-net.c           |  2 +-
+ target/i386/kvm.c             |  2 +-
+ target/ppc/arch_dump.c        | 10 +++++-----
+ target/s390x/arch_dump.c      | 20 ++++++++++----------
+ 9 files changed, 24 insertions(+), 22 deletions(-)
 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index ae6f354e6c..f08630c6e5 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -381,6 +381,9 @@ GSource *aio_get_g_source(AioContext *ctx);
- /* Return the ThreadPool bound to this AioContext */
- struct ThreadPool *aio_get_thread_pool(AioContext *ctx);
- 
-+/* Setup the LinuxAioState bound to this AioContext */
-+struct LinuxAioState *aio_setup_linux_aio(AioContext *ctx, Error **errp);
-+
- /* Return the LinuxAioState bound to this AioContext */
- struct LinuxAioState *aio_get_linux_aio(AioContext *ctx);
- 
-diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
-index 0e717fd475..8d698ccd31 100644
---- a/include/block/raw-aio.h
-+++ b/include/block/raw-aio.h
-@@ -43,7 +43,7 @@
- /* linux-aio.c - Linux native implementation */
- #ifdef CONFIG_LINUX_AIO
- typedef struct LinuxAioState LinuxAioState;
--LinuxAioState *laio_init(void);
-+LinuxAioState *laio_init(Error **errp);
- void laio_cleanup(LinuxAioState *s);
- int coroutine_fn laio_co_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
-                                 uint64_t offset, QEMUIOVector *qiov, int type);
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 07bb061fe4..43b963b13e 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -545,11 +545,17 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
- 
- #ifdef CONFIG_LINUX_AIO
-      /* Currently Linux does AIO only for files opened with O_DIRECT */
--    if (s->use_linux_aio && !(s->open_flags & O_DIRECT)) {
--        error_setg(errp, "aio=native was specified, but it requires "
--                         "cache.direct=on, which was not specified.");
--        ret = -EINVAL;
--        goto fail;
-+    if (s->use_linux_aio) {
-+        if (!(s->open_flags & O_DIRECT)) {
-+            error_setg(errp, "aio=native was specified, but it requires "
-+                             "cache.direct=on, which was not specified.");
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+        if (!aio_setup_linux_aio(bdrv_get_aio_context(bs), errp)) {
-+            error_prepend(errp, "Unable to use native AIO: ");
-+            goto fail;
-+        }
-     }
- #else
-     if (s->use_linux_aio) {
-@@ -1723,6 +1729,22 @@ static BlockAIOCB *raw_aio_flush(BlockDriverState *bs,
-     return paio_submit(bs, s->fd, 0, NULL, 0, cb, opaque, QEMU_AIO_FLUSH);
- }
- 
-+static void raw_aio_attach_aio_context(BlockDriverState *bs,
-+                                       AioContext *new_context)
-+{
-+#ifdef CONFIG_LINUX_AIO
-+    BDRVRawState *s = bs->opaque;
-+    if (s->use_linux_aio) {
-+        Error *local_err;
-+        if (!aio_setup_linux_aio(new_context, &local_err)) {
-+            error_reportf_err(local_err, "Unable to use native AIO, "
-+                                         "falling back to thread pool: ");
-+            s->use_linux_aio = false;
-+        }
-+    }
-+#endif
-+}
-+
- static void raw_close(BlockDriverState *bs)
- {
-     BDRVRawState *s = bs->opaque;
-@@ -2601,6 +2623,7 @@ BlockDriver bdrv_file = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
- 
-     .bdrv_truncate = raw_truncate,
-     .bdrv_getlength = raw_getlength,
-diff --git a/block/linux-aio.c b/block/linux-aio.c
-index 88b8d55ec7..19eb922fdd 100644
---- a/block/linux-aio.c
-+++ b/block/linux-aio.c
-@@ -15,6 +15,7 @@
- #include "block/raw-aio.h"
- #include "qemu/event_notifier.h"
- #include "qemu/coroutine.h"
-+#include "qapi/error.h"
- 
- #include <libaio.h>
- 
-@@ -470,16 +471,21 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
-                            qemu_laio_poll_cb);
- }
- 
--LinuxAioState *laio_init(void)
-+LinuxAioState *laio_init(Error **errp)
- {
-+    int rc;
-     LinuxAioState *s;
- 
-     s = g_malloc0(sizeof(*s));
--    if (event_notifier_init(&s->e, false) < 0) {
-+    rc = event_notifier_init(&s->e, false);
-+    if (rc < 0) {
-+        error_setg_errno(errp, -rc, "failed to to initialize event notifier");
-         goto out_free_state;
-     }
- 
--    if (io_setup(MAX_EVENTS, &s->ctx) != 0) {
-+    rc = io_setup(MAX_EVENTS, &s->ctx);
-+    if (rc < 0) {
-+        error_setg_errno(errp, -rc, "failed to create linux AIO context");
-         goto out_close_efd;
-     }
- 
-diff --git a/stubs/linux-aio.c b/stubs/linux-aio.c
-index ed47bd443c..84d1f784ae 100644
---- a/stubs/linux-aio.c
-+++ b/stubs/linux-aio.c
-@@ -21,7 +21,7 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
-     abort();
- }
- 
--LinuxAioState *laio_init(void)
-+LinuxAioState *laio_init(Error **errp)
- {
-     abort();
- }
-diff --git a/util/async.c b/util/async.c
-index 03f62787f2..05979f8014 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -323,14 +323,22 @@ ThreadPool *aio_get_thread_pool(AioContext *ctx)
- }
- 
- #ifdef CONFIG_LINUX_AIO
--LinuxAioState *aio_get_linux_aio(AioContext *ctx)
-+LinuxAioState *aio_setup_linux_aio(AioContext *ctx, Error **errp)
- {
-     if (!ctx->linux_aio) {
--        ctx->linux_aio = laio_init();
--        laio_attach_aio_context(ctx->linux_aio, ctx);
-+        ctx->linux_aio = laio_init(errp);
-+        if (ctx->linux_aio) {
-+            laio_attach_aio_context(ctx->linux_aio, ctx);
-+        }
-     }
-     return ctx->linux_aio;
- }
-+
-+LinuxAioState *aio_get_linux_aio(AioContext *ctx)
-+{
-+    assert(ctx->linux_aio);
-+    return ctx->linux_aio;
-+}
+diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
+index abbca47687..ffa3ebadc8 100644
+--- a/include/hw/xen/io/ring.h
++++ b/include/hw/xen/io/ring.h
+@@ -65,7 +65,7 @@ typedef unsigned int RING_IDX;
+  */
+ #define __CONST_RING_SIZE(_s, _sz) \
+     (__RD32(((_sz) - offsetof(struct _s##_sring, ring)) / \
+-	    sizeof(((struct _s##_sring *)0)->ring[0])))
++            sizeof_field(struct _s##_sring, ring[0])))
+ /*
+  * The same for passing in an actual pointer instead of a name tag.
+  */
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 9f762695d1..5843812710 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -64,6 +64,8 @@
+         (type *) ((char *) __mptr - offsetof(type, member));})
  #endif
  
- void aio_notify(AioContext *ctx)
++#define sizeof_field(type, field) sizeof(((type *)0)->field)
++
+ /* Convert from a base type to a parent type, with compile time checking.  */
+ #ifdef __GNUC__
+ #define DO_UPCAST(type, field, dev) ( __extension__ ( { \
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index f0c3fd4d03..ad997cba28 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -191,7 +191,7 @@ struct page_collection {
+ 
+ /* Make sure all possible CPU event bits fit in tb->trace_vcpu_dstate */
+ QEMU_BUILD_BUG_ON(CPU_TRACE_DSTATE_MAX_EVENTS >
+-                  sizeof(((TranslationBlock *)0)->trace_vcpu_dstate)
++                  sizeof_field(TranslationBlock, trace_vcpu_dstate)
+                   * BITS_PER_BYTE);
+ 
+ /*
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index f5afcc0358..911291c5c3 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -525,8 +525,8 @@ static int xenfb_configure_fb(struct XenFB *xenfb, size_t fb_len_lim,
+                               int width, int height, int depth,
+                               size_t fb_len, int offset, int row_stride)
+ {
+-    size_t mfn_sz = sizeof(*((struct xenfb_page *)0)->pd);
+-    size_t pd_len = sizeof(((struct xenfb_page *)0)->pd) / mfn_sz;
++    size_t mfn_sz = sizeof_field(struct xenfb_page, pd[0]);
++    size_t pd_len = sizeof_field(struct xenfb_page, pd) / mfn_sz;
+     size_t fb_pages = pd_len * XC_PAGE_SIZE / mfn_sz;
+     size_t fb_len_max = fb_pages * XC_PAGE_SIZE;
+     int max_width, max_height;
+diff --git a/hw/net/rocker/rocker_of_dpa.c b/hw/net/rocker/rocker_of_dpa.c
+index 60046720a5..8e347d1ee4 100644
+--- a/hw/net/rocker/rocker_of_dpa.c
++++ b/hw/net/rocker/rocker_of_dpa.c
+@@ -104,7 +104,7 @@ typedef struct of_dpa_flow_key {
+ 
+ /* Width of key which includes field 'f' in u64s, rounded up */
+ #define FLOW_KEY_WIDTH(f) \
+-    DIV_ROUND_UP(offsetof(OfDpaFlowKey, f) + sizeof(((OfDpaFlowKey *)0)->f), \
++    DIV_ROUND_UP(offsetof(OfDpaFlowKey, f) + sizeof_field(OfDpaFlowKey, f), \
+     sizeof(uint64_t))
+ 
+ typedef struct of_dpa_flow_action {
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 90502fca7c..f154756e85 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -46,7 +46,7 @@
+  * 'container'.
+  */
+ #define endof(container, field) \
+-    (offsetof(container, field) + sizeof(((container *)0)->field))
++    (offsetof(container, field) + sizeof_field(container, field))
+ 
+ typedef struct VirtIOFeature {
+     uint64_t flags;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 2d174f3a91..5116a8a956 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1533,7 +1533,7 @@ static int kvm_put_fpu(X86CPU *cpu)
+ #define XSAVE_PKRU        672
+ 
+ #define XSAVE_BYTE_OFFSET(word_offset) \
+-    ((word_offset) * sizeof(((struct kvm_xsave *)0)->region[0]))
++    ((word_offset) * sizeof_field(struct kvm_xsave, region[0]))
+ 
+ #define ASSERT_OFFSET(word_offset, field) \
+     QEMU_BUILD_BUG_ON(XSAVE_BYTE_OFFSET(word_offset) != \
+diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+index 351a65b22f..cc1460e4e3 100644
+--- a/target/ppc/arch_dump.c
++++ b/target/ppc/arch_dump.c
+@@ -210,11 +210,11 @@ static const struct NoteFuncDescStruct {
+     int contents_size;
+     void (*note_contents_func)(NoteFuncArg *arg, PowerPCCPU *cpu);
+ } note_func[] = {
+-    {sizeof(((Note *)0)->contents.prstatus),  ppc_write_elf_prstatus},
+-    {sizeof(((Note *)0)->contents.fpregset),  ppc_write_elf_fpregset},
+-    {sizeof(((Note *)0)->contents.vmxregset), ppc_write_elf_vmxregset},
+-    {sizeof(((Note *)0)->contents.vsxregset), ppc_write_elf_vsxregset},
+-    {sizeof(((Note *)0)->contents.speregset), ppc_write_elf_speregset},
++    {sizeof_field(Note, contents.prstatus),  ppc_write_elf_prstatus},
++    {sizeof_field(Note, contents.fpregset),  ppc_write_elf_fpregset},
++    {sizeof_field(Note, contents.vmxregset), ppc_write_elf_vmxregset},
++    {sizeof_field(Note, contents.vsxregset), ppc_write_elf_vsxregset},
++    {sizeof_field(Note, contents.speregset), ppc_write_elf_speregset},
+     { 0, NULL}
+ };
+ 
+diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
+index 6f61ff95af..c9ef0a6e60 100644
+--- a/target/s390x/arch_dump.c
++++ b/target/s390x/arch_dump.c
+@@ -184,20 +184,20 @@ typedef struct NoteFuncDescStruct {
+ } NoteFuncDesc;
+ 
+ static const NoteFuncDesc note_core[] = {
+-    {sizeof(((Note *)0)->contents.prstatus), s390x_write_elf64_prstatus},
+-    {sizeof(((Note *)0)->contents.fpregset), s390x_write_elf64_fpregset},
++    {sizeof_field(Note, contents.prstatus), s390x_write_elf64_prstatus},
++    {sizeof_field(Note, contents.fpregset), s390x_write_elf64_fpregset},
+     { 0, NULL}
+ };
+ 
+ static const NoteFuncDesc note_linux[] = {
+-    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
+-    {sizeof(((Note *)0)->contents.ctrs),     s390x_write_elf64_ctrs},
+-    {sizeof(((Note *)0)->contents.timer),    s390x_write_elf64_timer},
+-    {sizeof(((Note *)0)->contents.todcmp),   s390x_write_elf64_todcmp},
+-    {sizeof(((Note *)0)->contents.todpreg),  s390x_write_elf64_todpreg},
+-    {sizeof(((Note *)0)->contents.vregslo),  s390x_write_elf64_vregslo},
+-    {sizeof(((Note *)0)->contents.vregshi),  s390x_write_elf64_vregshi},
+-    {sizeof(((Note *)0)->contents.gscb),     s390x_write_elf64_gscb},
++    {sizeof_field(Note, contents.prefix),   s390x_write_elf64_prefix},
++    {sizeof_field(Note, contents.ctrs),     s390x_write_elf64_ctrs},
++    {sizeof_field(Note, contents.timer),    s390x_write_elf64_timer},
++    {sizeof_field(Note, contents.todcmp),   s390x_write_elf64_todcmp},
++    {sizeof_field(Note, contents.todpreg),  s390x_write_elf64_todpreg},
++    {sizeof_field(Note, contents.vregslo),  s390x_write_elf64_vregslo},
++    {sizeof_field(Note, contents.vregshi),  s390x_write_elf64_vregshi},
++    {sizeof_field(Note, contents.gscb),     s390x_write_elf64_gscb},
+     { 0, NULL}
+ };
+ 
 -- 
 2.17.1
