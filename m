@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fY8Hj-0002xO-Aw
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:06:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fY8JS-0003mH-Au
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fY8Hg-00087v-6a
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:06:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fY8Hf-00087T-WA
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:06:48 -0400
-Date: Wed, 27 Jun 2018 07:06:45 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <2067006616.46310203.1530097605117.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180627102142.GB5955@stefanha-x1.localdomain>
-References: <20180627082248.14921-1-pagupta@redhat.com>
-	<20180627082248.14921-3-pagupta@redhat.com>
-	<20180627102142.GB5955@stefanha-x1.localdomain>
+	(envelope-from <alex.bennee@linaro.org>) id 1fY8JP-0001MB-4B
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:08:38 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fY8JO-0001K1-KG
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:08:35 -0400
+Received: by mail-wr0-x242.google.com with SMTP id h10-v6so1599554wrq.8
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 04:08:34 -0700 (PDT)
+References: <20180625131253.11218-1-kraxel@redhat.com>
+	<20180625131253.11218-2-kraxel@redhat.com>
+	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
+	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
+	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
+	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
+	<aa9afd06-19da-1f48-c20c-2f1eff2e861a@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <aa9afd06-19da-1f48-c20c-2f1eff2e861a@redhat.com>
+Date: Wed, 27 Jun 2018 12:08:31 +0100
+Message-ID: <87in64wkpc.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: Set status early in
- VirtIODevice parent object
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org, slopezpa@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Martin Schrodt <martin@schrodt.org>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 
-> 
-> On Wed, Jun 27, 2018 at 01:52:48PM +0530, Pankaj Gupta wrote:
-> >  To process pending requests for driver status 'VIRTIO_CONFIG_S_DRIVER_OK',
-> >  virtio-rng 'set_status' calls 'is_guest_ready' function. This checks if
-> >  virtqueue is ready and status is set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
-> > 
-> >  This call is made before new status is updated in VirtIODevice parent
-> >  object
-> >  and calling function uses old status value.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  hw/virtio/virtio.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > index d4e4d98b59..37dc59a686 100644
-> > --- a/hw/virtio/virtio.c
-> > +++ b/hw/virtio/virtio.c
-> > @@ -1154,10 +1154,11 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t
-> > val)
-> >              }
-> >          }
-> >      }
-> > +    vdev->status = val;
-> > +
-> >      if (k->set_status) {
-> >          k->set_status(vdev, val);
-> >      }
-> > -    vdev->status = val;
-> 
-> This breaks existing ->set_status() callbacks that rely on vdev->status
-> containing the old value.  Have you audited them?
+Thomas Huth <thuth@redhat.com> writes:
 
-I did not audit them all. I thought that's the way it should be base object
-first get updated. But you are right, it can break things where old status is used.
+> On 27.06.2018 09:57, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+>>
+>>> On 27.06.2018 08:51, Gerd Hoffmann wrote:
+>> [...]
+>>>> Drop support for 32bit hosts in qemu?
+>>>
+>>> I guess the only way to answer that question reliably is to send a patch
+>>> to mark 32-bit hosts as deprecated...
+>>>
+>>> Anyway, you still have got to fix that problem with -m32 now somehow
+>>> since we certainly can not drop 32-bit immediately.
+>>
+>> We certainly can if we want to.
+>>
+>> Our formal deprecation policy codifies our compromise between the need
+>> to evolve QEMU and the need of its users for stable external interfaces.
+>>
+>> "Compiles on host X" is also a need, but it's a different one.
+>> Evidence: "Supported build platforms" has its own appendix, separate
+>> from "Deprecated features".  It's mum on 32-bit hosts.
+>
+> Theoretically I'd agree, but actually it's more than that: If we drop
+> support for 32-bit hosts, we could also drop the qemu-system-i386,
+> qemu-system-ppc and qemu-system-arm targets, since qemu-system-x86_64,
+> qemu-system-ppc64 and qemu-system-aarch64 are a clear superset of
+> these.
 
-> 
-> For example, virtio_net_set_status -> virtio_net_vnet_endian_status uses
-> vdev->status!
-> 
-> It may be easier to modify virtio-rng.c so that the old status value
-> isn't used.
+Hmm not quite - not building on HOST !=3D not wanting to run GUEST
 
-Just updating status only for virtio_rng_set_status looks okay? This will avoid
-multiple copies of status as different functions are using it.
+While I'm unlikely to build on a 32 bit ARM system I run 32 bit guests
+all the time.
 
-I will send a V2.
-
-+static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
-+{
-+    VirtIORNG *vrng = VIRTIO_RNG(vdev);
-+
-+    if (!vdev->vm_running) {
-+        return;
-+    }
-+    vdev->status = status;
-+
-+    /* Something changed, try to process buffers */
-+    virtio_rng_process(vrng);
-+}
-+
+> But that would also mean a change of the user interface, since the name
+> of the executable changes, and at least for ppc, there are also subtle
+> differences (different default machine type, different default CPU types).
+>
+>  Thomas
 
 
-Thanks,
-Pankaj
-
-> 
-> Stefan
-> 
+--
+Alex Benn=C3=A9e
