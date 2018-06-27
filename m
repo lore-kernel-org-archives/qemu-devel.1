@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYBI0-0000vC-T3
+	(envelope-from <alex.bennee@linaro.org>) id 1fYBI0-0000v1-Km
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYBHx-00056g-J1
+	(envelope-from <alex.bennee@linaro.org>) id 1fYBHx-00056L-BX
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:19:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49724 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fYBHx-00055q-Cd
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34273)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYBHx-000557-0h
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:19:17 -0400
-Date: Wed, 27 Jun 2018 16:19:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180627161914.024ddd2b@redhat.com>
-In-Reply-To: <d5dd8b75-377a-4e68-59e6-49b1d3e2176e@linux.vnet.ibm.com>
-References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
-	<20180626122343.13473-3-marcandre.lureau@redhat.com>
-	<20180627134438.3016259b@redhat.com>
-	<d5dd8b75-377a-4e68-59e6-49b1d3e2176e@linux.vnet.ibm.com>
+Received: by mail-wm0-x22c.google.com with SMTP id l15-v6so18186113wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:19:16 -0700 (PDT)
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-6-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180621015359.12018-6-richard.henderson@linaro.org>
+Date: Wed, 27 Jun 2018 15:19:14 +0100
+Message-ID: <877emkwbvh.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] tpm: implement virtual memory
- device for TPM PPI
+Subject: Re: [Qemu-devel] [PATCH v5 05/35] target/arm: Implement SVE integer
+ convert to floating-point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +31,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Wed, 27 Jun 2018 08:53:28 -0400
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
 
-> On 06/27/2018 07:44 AM, Igor Mammedov wrote:
-> > On Tue, 26 Jun 2018 14:23:41 +0200
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > =20
-> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >>
-> >> Implement a virtual memory device for the TPM Physical Presence interf=
-ace.
-> >> The memory is located at 0xFED45000 and used by ACPI to send messages =
-to the
-> >> firmware (BIOS) and by the firmware to provide parameters for each one=
- of
-> >> the supported codes.
-> >>
-> >> This device should be used by all TPM interfaces on x86 and can be add=
-ed
-> >> by calling tpm_ppi_init_io().
-> >>
-> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v4 (Marc-Andr=C3=A9):
-> >>   - pass TPM_PPI_ADDR_BASE as argument to tpm_ppi_init_io()
-> >>   - only enable PPI if property is set
-> >>
-> >> v3 (Marc-Andr=C3=A9):
-> >>   - merge CRB support
-> >>   - use trace events instead of DEBUG printf
-> >>   - headers inclusion simplification
-> >>
-> >> v2:
-> >>   - moved to byte access since an infrequently used device;
-> >>     this simplifies code
-> >>   - increase size of device to 0x400
-> >>   - move device to 0xfffef000 since SeaBIOS has some code at 0xffff000=
-0:
-> >>     'On the emulators, the bios at 0xf0000 is also at 0xffff0000'
-> >> ---
-> >>   hw/tpm/tpm_ppi.h      | 27 ++++++++++++++++++++
-> >>   include/hw/acpi/tpm.h |  6 +++++
-> >>   hw/tpm/tpm_crb.c      |  7 ++++++
-> >>   hw/tpm/tpm_ppi.c      | 57 +++++++++++++++++++++++++++++++++++++++++=
-++
-> >>   hw/tpm/tpm_tis.c      |  7 ++++++
-> >>   hw/tpm/Makefile.objs  |  2 +-
-> >>   hw/tpm/trace-events   |  4 +++
-> >>   7 files changed, 109 insertions(+), 1 deletion(-)
-> >>   create mode 100644 hw/tpm/tpm_ppi.h
-> >>   create mode 100644 hw/tpm/tpm_ppi.c
-> >>
-> >> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-> >> new file mode 100644
-> >> index 0000000000..ac7ad47238
-> >> --- /dev/null
-> >> +++ b/hw/tpm/tpm_ppi.h
-> >> @@ -0,0 +1,27 @@
-> >> +/*
-> >> + * TPM Physical Presence Interface
-> >> + *
-> >> + * Copyright (C) 2018 IBM Corporation
-> >> + *
-> >> + * Authors:
-> >> + *  Stefan Berger    <stefanb@us.ibm.com>
-> >> + *
-> >> + * This work is licensed under the terms of the GNU GPL, version 2 or=
- later.
-> >> + * See the COPYING file in the top-level directory.
-> >> + */
-> >> +#ifndef TPM_TPM_PPI_H
-> >> +#define TPM_TPM_PPI_H
-> >> +
-> >> +#include "hw/acpi/tpm.h"
-> >> +#include "exec/address-spaces.h"
-> >> +
-> >> +typedef struct TPMPPI {
-> >> +    MemoryRegion mmio;
-> >> +
-> >> +    uint8_t ram[TPM_PPI_ADDR_SIZE];
-> >> +} TPMPPI; =20
-> > I probably miss something obvious here,
-> > 1st:
-> > commit message says that memory reion is supposed to be interface
-> > between FW and OSPM (i.e. totally guest internal thingy).
-> > So question is:
-> >    why do we register memory region at all? =20
->=20
-> One reason for the device itself was being able to debug the interaction=
-=20
-> of the guest with ACPI though I had additional instrumentation for that=20
-> showing register contents.
-> We need it to have some memory in the region where we place it. I=20
-> suppose a memory_region_init_ram() would provide migration support=20
-> automatically but cannot be used on memory where we have=20
-> MemoryRegionOps. So we could drop most parts of the device and only run=20
-> memory_region_init_ram() ?
-if QEMU doesn't need to touch it ever, you could do even better.
-Use bios_linker to make FW allocate a reserved portion if guest RAM and
-patch TPM aml code with allocated address. Then you won't have to worry
-about migration as reserved area is already migrated as part of RAM.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Huge benefit here is that QEMU doesn't dictate address so no chance
-of conflicts and related compat hacks in case we have to move it.=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-To do it easily, I'd suggest to extract TPM from DSDT into a dedicated
-SSDT table (see vmgenid_build_acpi() as example /you don't need
-bios_linker_loader_write_pointer() part, later we can use it if
-it would be necessary for QEMU to know address/)
-=20
->  =C2=A0=C2=A0 Stefan
->=20
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/helper-sve.h    | 30 +++++++++++++
+>  target/arm/sve_helper.c    | 38 ++++++++++++++++
+>  target/arm/translate-sve.c | 90 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      | 22 ++++++++++
+>  4 files changed, 180 insertions(+)
+>
+> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+> index b768128951..185112e1d2 100644
+> --- a/target/arm/helper-sve.h
+> +++ b/target/arm/helper-sve.h
+> @@ -720,6 +720,36 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
+>  DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
+>                     void, ptr, ptr, ptr, ptr, i32)
+>
+> +DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_scvt_dh, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_scvt_ss, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_scvt_sd, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_scvt_ds, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_scvt_dd, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +
+> +DEF_HELPER_FLAGS_5(sve_ucvt_hh, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_ucvt_sh, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_ucvt_dh, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_ucvt_ss, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_ucvt_sd, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_ucvt_ds, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +DEF_HELPER_FLAGS_5(sve_ucvt_dd, TCG_CALL_NO_RWG,
+> +                   void, ptr, ptr, ptr, ptr, i32)
+> +
+>  DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+>  DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+>  DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index f20774e240..a2f034820a 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -2811,6 +2811,44 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t coun=
+t, uint32_t pred_desc)
+>      return predtest_ones(d, oprsz, esz_mask);
+>  }
+>
+> +/* Fully general two-operand expander, controlled by a predicate,
+> + * With the extra float_status parameter.
+> + */
+> +#define DO_ZPZ_FP(NAME, TYPE, H, OP)                                  \
+> +void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t d=
+esc) \
+> +{                                                                     \
+> +    intptr_t i =3D simd_oprsz(desc);                                    \
+> +    uint64_t *g =3D vg;                                                 \
+> +    do {                                                              \
+> +        uint64_t pg =3D g[(i - 1) >> 6];                                \
+> +        do {                                                          \
+> +            i -=3D sizeof(TYPE);                                        \
+> +            if (likely((pg >> (i & 63)) & 1)) {                       \
+> +                TYPE nn =3D *(TYPE *)(vn + H(i));                       \
+> +                *(TYPE *)(vd + H(i)) =3D OP(nn, status);                \
+> +            }                                                         \
+> +        } while (i & 63);                                             \
+> +    } while (i !=3D 0);                                                 \
+> +}
+> +
+> +DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
+> +DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
+> +DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
+> +DO_ZPZ_FP(sve_scvt_sd, uint64_t,     , int32_to_float64)
+> +DO_ZPZ_FP(sve_scvt_dh, uint64_t,     , int64_to_float16)
+> +DO_ZPZ_FP(sve_scvt_ds, uint64_t,     , int64_to_float32)
+> +DO_ZPZ_FP(sve_scvt_dd, uint64_t,     , int64_to_float64)
+> +
+> +DO_ZPZ_FP(sve_ucvt_hh, uint16_t, H1_2, uint16_to_float16)
+> +DO_ZPZ_FP(sve_ucvt_sh, uint32_t, H1_4, uint32_to_float16)
+> +DO_ZPZ_FP(sve_ucvt_ss, uint32_t, H1_4, uint32_to_float32)
+> +DO_ZPZ_FP(sve_ucvt_sd, uint64_t,     , uint32_to_float64)
+> +DO_ZPZ_FP(sve_ucvt_dh, uint64_t,     , uint64_to_float16)
+> +DO_ZPZ_FP(sve_ucvt_ds, uint64_t,     , uint64_to_float32)
+> +DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_float64)
+> +
+> +#undef DO_ZPZ_FP
+> +
+>  /*
+>   * Load contiguous data, protected by a governing predicate.
+>   */
+> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+> index 83de87ee0e..7639e589f5 100644
+> --- a/target/arm/translate-sve.c
+> +++ b/target/arm/translate-sve.c
+> @@ -3425,6 +3425,96 @@ DO_FP3(FRSQRTS, rsqrts)
+>
+>  #undef DO_FP3
+>
+> +
+> +/*
+> + *** SVE Floating Point Unary Operations Prediated Group
+> + */
+> +
+> +static bool do_zpz_ptr(DisasContext *s, int rd, int rn, int pg,
+> +                       bool is_fp16, gen_helper_gvec_3_ptr *fn)
+> +{
+> +    if (sve_access_check(s)) {
+> +        unsigned vsz =3D vec_full_reg_size(s);
+> +        TCGv_ptr status =3D get_fpstatus_ptr(is_fp16);
+> +        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
+> +                           vec_full_reg_offset(s, rn),
+> +                           pred_full_reg_offset(s, pg),
+> +                           status, vsz, vsz, 0, fn);
+> +        tcg_temp_free_ptr(status);
+> +    }
+> +    return true;
+> +}
+> +
+> +static bool trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_=
+hh);
+> +}
+> +
+> +static bool trans_SCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_=
+sh);
+> +}
+> +
+> +static bool trans_SCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_=
+dh);
+> +}
+> +
+> +static bool trans_SCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
+_ss);
+> +}
+> +
+> +static bool trans_SCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
+_ds);
+> +}
+> +
+> +static bool trans_SCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
+_sd);
+> +}
+> +
+> +static bool trans_SCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
+_dd);
+> +}
+> +
+> +static bool trans_UCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_=
+hh);
+> +}
+> +
+> +static bool trans_UCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_=
+sh);
+> +}
+> +
+> +static bool trans_UCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_=
+dh);
+> +}
+> +
+> +static bool trans_UCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
+_ss);
+> +}
+> +
+> +static bool trans_UCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
+_ds);
+> +}
+> +
+> +static bool trans_UCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
+_sd);
+> +}
+> +
+> +static bool trans_UCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
+n)
+> +{
+> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
+_dd);
+> +}
+> +
+>  /*
+>   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
+>   */
+> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+> index 606c4f623c..3abdb87cf5 100644
+> --- a/target/arm/sve.decode
+> +++ b/target/arm/sve.decode
+> @@ -133,6 +133,9 @@
+>  @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
+>  @rd_pg4_pn      ........ esz:2 ... ... .. pg:4 . rn:4 rd:5      &rpr_esz
+>
+> +# One register operand, with governing predicate, no vector element size
+> +@rd_pg_rn_e0    ........ .. ... ... ... pg:3 rn:5 rd:5          &rpr_esz=
+ esz=3D0
+> +
+>  # Two register operands with a 6-bit signed immediate.
+>  @rd_rn_i6       ........ ... rn:5 ..... imm:s6 rd:5             &rri
+>
+> @@ -681,6 +684,25 @@ FTSMUL          01100101 .. 0 ..... 000 011 ..... ..=
+...         @rd_rn_rm
+>  FRECPS          01100101 .. 0 ..... 000 110 ..... .....         @rd_rn_rm
+>  FRSQRTS         01100101 .. 0 ..... 000 111 ..... .....         @rd_rn_rm
+>
+> +### SVE FP Unary Operations Predicated Group
+> +
+> +# SVE integer convert to floating-point
+> +SCVTF_hh        01100101 01 010 01 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +SCVTF_sh        01100101 01 010 10 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +SCVTF_dh        01100101 01 010 11 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +SCVTF_ss        01100101 10 010 10 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +SCVTF_sd        01100101 11 010 00 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +SCVTF_ds        01100101 11 010 10 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +SCVTF_dd        01100101 11 010 11 0 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +
+> +UCVTF_hh        01100101 01 010 01 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +UCVTF_sh        01100101 01 010 10 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +UCVTF_dh        01100101 01 010 11 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +UCVTF_ss        01100101 10 010 10 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +UCVTF_sd        01100101 11 010 00 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +UCVTF_ds        01100101 11 010 10 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +UCVTF_dd        01100101 11 010 11 1 101 ... ..... .....        @rd_pg_r=
+n_e0
+> +
+>  ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
+>
+>  # SVE load predicate register
+
+
+--
+Alex Benn=C3=A9e
