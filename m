@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Su-0006eP-HV
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:58 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Sw-0006eg-36
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Sr-00061g-7A
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:56 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:59416)
+	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Sv-00069M-00
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:58 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:59464)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1fY1Sq-0005wm-Vv
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:53 -0400
+	id 1fY1Su-00067q-QK
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:56 -0400
 From: Venu Busireddy <venu.busireddy@oracle.com>
-Date: Tue, 26 Jun 2018 22:49:30 -0500
-Message-Id: <20180627034935.20276-1-venu.busireddy@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for pairing
- virtio and passthrough devices...
+Date: Tue, 26 Jun 2018 22:49:33 -0500
+Message-Id: <20180627034935.20276-4-venu.busireddy@oracle.com>
+In-Reply-To: <20180627034935.20276-1-venu.busireddy@oracle.com>
+References: <20180627034935.20276-1-venu.busireddy@oracle.com>
+Subject: [Qemu-devel] [PATCH v2 3/4] Add "Group Identifier" support to Red
+ Hat PCI bridge.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,98 +28,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: venu.busireddy@oracle.com, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-The patch set "Enable virtio_net to act as a standby for a passthru
-device" [1] deals with live migration of guests that use passthrough
-devices. However, that scheme uses the MAC address for pairing
-the virtio device and the passthrough device. The thread "netvsc:
-refactor notifier/event handling code to use the failover framework"
-[2] discusses an alternate mechanism, such as using an UUID, for pairing
-the devices. Based on that discussion, proposals "Add "Group Identifier"
-to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
-store pairing information..." [4] were made.
+Add the "Vendor-Specific" capability to the Red Hat PCI bridge device
+"pci-bridge", to contain the "Group Identifier" (UUID) that will be
+used to pair a virtio device with the passthrough device attached to
+that bridge.
 
-The current patch set includes all the feedback received for proposals [3]
-and [4]. For the sake of completeness, patch for the virtio specification
-is also included here. Following is the updated proposal.
+This capability is added to the bridge iff the "uuid" option is specified
+for the bridge.
 
-1. Extend the virtio specification to include a new virtio PCI capability
-   "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+---
+ hw/pci-bridge/pci_bridge_dev.c |  8 ++++++++
+ hw/pci/pci_bridge.c            | 26 ++++++++++++++++++++++++++
+ include/hw/pci/pcie.h          |  1 +
+ 3 files changed, 35 insertions(+)
 
-2. Enhance the QEMU CLI to include a "uuid" option to the virtio device.
-   The "uuid" is a string in UUID format.
-
-3. Enhance the QEMU CLI to include a "uuid" option to the bridge device.
-   The "uuid" is a string in UUID format. Currently, PCIe bridge for
-   the Q35 model is supported.
-
-4. The operator creates a unique identifier string using 'uuidgen'.
-
-5. When the virtio device is created, the operator uses the "uuid" option
-   (for example, '-device virtio-net-pci,uuid="string"') and specifies
-   the UUID created in step 4.
-
-   QEMU stores the UUID in the virtio device's configuration space
-   in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-
-6. When assigning a PCI device to the guest in passthrough mode, the
-   operator first creates a bridge using the "uuid" option (for example,
-   '-device pcie-downstream,uuid="string"') to specify the UUID created
-   in step 4, and then attaches the passthrough device to the bridge.
-
-   QEMU stores the UUID in the configuration space of the bridge as
-   Vendor-Specific capability (0x09). The "Vendor" here is not to be
-   confused with a specific organization. Instead, the vendor of the
-   bridge is QEMU. To avoid mixing up with other bridges, the bridge
-   will be created with vendor ID 0x1b36 (PCI_VENDOR_ID_REDHAT) and
-   device ID 0x000e (PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE) if the "uuid"
-   option is specified. Otherwise, current defaults are used.
-
-7. Patch 4 in patch series "Enable virtio_net to act as a standby for
-   a passthru device" [1] needs to be modified to use the UUID values
-   present in the bridge's configuration space and the virtio device's
-   configuration space instead of the MAC address for pairing the devices.
-
-Thanks!
-
-Venu
-
-[1] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00156.html
-[2] https://www.spinics.net/lists/netdev/msg499011.html
-[3] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00118.html
-[4] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00204.html
-
-Changes in v2:
-  - As Michael Tsirkin suggested, changed the virtio specification
-    to restrict the group identifier to be a 16-byte field, presented
-    entirely in the virtio device's configuration space.
-  - As Michael Tsirkin suggested, instead of tweaking the ioh3420
-    device with Red Hat vendor ID, create a new PCIe bridge device
-    named "pcie-downstream" with Red Hat Vendor ID, and include the
-    group identifier in this device.
-  - Added a new patch to enhance the "pci-bridge" device to support
-    the group identifier (for the i440FX model).
-
-Venu Busireddy (4):
-  Add a true or false option to the DEFINE_PROP_UUID macro.
-  Add "Group Identifier" support to virtio devices.
-  Add "Group Identifier" support to Red Hat PCI bridge.
-  Add "Group Identifier" support to Red Hat PCI Express bridge.
-
- default-configs/arm-softmmu.mak             |   1 +
- default-configs/i386-softmmu.mak            |   1 +
- default-configs/x86_64-softmmu.mak          |   1 +
- hw/acpi/vmgenid.c                           |   2 +-
- hw/pci-bridge/Makefile.objs                 |   1 +
- hw/pci-bridge/pci_bridge_dev.c              |   8 +
- hw/pci-bridge/pcie_downstream.c             | 215 ++++++++++++++++++++
- hw/pci-bridge/pcie_downstream.h             |  10 +
- hw/pci/pci_bridge.c                         |  26 +++
- hw/virtio/virtio-pci.c                      |  15 ++
- hw/virtio/virtio-pci.h                      |   3 +-
- include/hw/pci/pci.h                        |   3 +
- include/hw/pci/pcie.h                       |   1 +
- include/hw/qdev-properties.h                |   4 +-
- include/standard-headers/linux/virtio_pci.h |   8 +
- 15 files changed, 295 insertions(+), 4 deletions(-)
- create mode 100644 hw/pci-bridge/pcie_downstream.c
- create mode 100644 hw/pci-bridge/pcie_downstream.h
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index b2d861d216..bbbc6fa1c6 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -71,6 +71,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+         bridge_dev->msi = ON_OFF_AUTO_OFF;
+     }
+ 
++    err = pci_bridge_vendor_init(dev, 0, errp);
++    if (err < 0) {
++        error_append_hint(errp, "Can't init group ID, error %d\n", err);
++        goto vendor_cap_err;
++    }
++
+     err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+     if (err) {
+         goto slotid_error;
+@@ -109,6 +115,7 @@ slotid_error:
+     if (shpc_present(dev)) {
+         shpc_cleanup(dev, &bridge_dev->bar);
+     }
++vendor_cap_err:
+ shpc_error:
+     pci_bridge_exitfn(dev);
+ }
+@@ -162,6 +169,7 @@ static Property pci_bridge_dev_properties[] = {
+                             ON_OFF_AUTO_AUTO),
+     DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
+                     PCI_BRIDGE_DEV_F_SHPC_REQ, true),
++    DEFINE_PROP_UUID(COMPAT_PROP_UUID, PCIDevice, uuid, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index 40a39f57cb..cb8b3dad2a 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -34,12 +34,17 @@
+ #include "hw/pci/pci_bus.h"
+ #include "qemu/range.h"
+ #include "qapi/error.h"
++#include "qemu/uuid.h"
+ 
+ /* PCI bridge subsystem vendor ID helper functions */
+ #define PCI_SSVID_SIZEOF        8
+ #define PCI_SSVID_SVID          4
+ #define PCI_SSVID_SSID          6
+ 
++#define PCI_VENDOR_SIZEOF             20
++#define PCI_VENDOR_CAP_LEN_OFFSET      2
++#define PCI_VENDOR_GROUP_ID_OFFSET     4
++
+ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+                           uint16_t svid, uint16_t ssid,
+                           Error **errp)
+@@ -57,6 +62,27 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+     return pos;
+ }
+ 
++int pci_bridge_vendor_init(PCIDevice *d, uint8_t offset, Error **errp)
++{
++    int pos;
++
++    if (qemu_uuid_is_null(&d->uuid)) {
++        return 0;
++    }
++
++    pos = pci_add_capability(d, PCI_CAP_ID_VNDR, offset, PCI_VENDOR_SIZEOF,
++            errp);
++    if (pos < 0) {
++        return pos;
++    }
++
++    pci_set_word(d->config + pos + PCI_VENDOR_CAP_LEN_OFFSET,
++            PCI_VENDOR_SIZEOF);
++    memcpy(d->config + pos + PCI_VENDOR_GROUP_ID_OFFSET, &d->uuid,
++            sizeof(QemuUUID));
++    return pos;
++}
++
+ /* Accessor function to get parent bridge device from pci bus. */
+ PCIDevice *pci_bridge_get_device(PCIBus *bus)
+ {
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index b71e369703..b4189d0ce3 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -82,6 +82,7 @@ struct PCIExpressDevice {
+ };
+ 
+ #define COMPAT_PROP_PCP "power_controller_present"
++#define COMPAT_PROP_UUID "uuid"
+ 
+ /* PCI express capability helper functions */
+ int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
