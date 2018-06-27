@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fXzPf-0008Be-P6
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:38:28 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1fXzQ3-0008Lx-Qn
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:38:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fXzPe-0004TE-Ho
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:38:27 -0400
-References: <20180626222226.27620-1-jsnow@redhat.com>
-	<20180626222226.27620-2-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <67381f57-d8a6-b8e2-ac70-9e0fa10cbd94@redhat.com>
-Date: Tue, 26 Jun 2018 20:38:16 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180626222226.27620-2-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+	(envelope-from <benh@kernel.crashing.org>) id 1fXzPy-0004dt-U7
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:38:51 -0400
+Message-ID: <1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Wed, 27 Jun 2018 11:38:17 +1000
+In-Reply-To: <20180627033321-mutt-send-email-mst@kernel.org>
+References: <20180626135928.23950-1-clg@kaod.org>
+	<20180627033321-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] block: allow blockdev-backup from
- any source
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>
 
-On 06/26/2018 05:22 PM, John Snow wrote:
-> In the case of image fleecing, the node we choose as the source
-> for a blockdev-backup is going to be both a root node AND the
-> backing node for the exported image. It does not qualify as a root
-> image in this case.
+On Wed, 2018-06-27 at 03:35 +0300, Michael S. Tsirkin wrote:
 > 
-> Loosen the restriction.
-
-Did we regress (and if so, when), or has this never worked?  But you are 
-right: visually, we are starting with:
-
-                   Device
-Base (backing) <- Top (active)
-
-then want to add nodes for an NBD export:
-                   Device    NBD
-Base (backing) <- Top    <- Tmp
-
-with a blockdev-backup "sync":"none" from Top to Tmp (any writes from 
-the Device first copy the old data to Tmp; the NBD export sees a 
-read-only view of Tmp that is unchanging from the time the backup job 
-started, regardless of what the Device does in the meantime).
-
-Then when the fleece job ends, the NBD export is stopped, the 
-blockdev-backup job is canceled, and Tmp is thrown away as unneeded.
-
+> > +
+> > +/* Extract field fname from val */
+> > +#define GETFIELD(fname, val)                    \
+> > +        (((val) & fname##_MASK) >> fname##_LSH)
+> > +
+> > +/* Set field fname of oval to fval
+> > + * NOTE: oval isn't modified, the combined result is returned
+> > + */
+> > +#define SETFIELD(fname, oval, fval)                     \
+> > +        (((oval) & ~fname##_MASK) | \
+> > +         ((((typeof(oval))(fval)) << fname##_LSH) & fname##_MASK))
+> > +
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   blockdev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Pls don't make up macros like these. We can't have each device do it.
+
+So what ? We move the macros in a generic place ? These are MUCH better
+than open-coding the masks & shifts and much less error prone.
+
+> > @@ -1031,6 +1110,7 @@ static Property pnv_chip_properties[] = {
+> >      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
+> >      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
+> >      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
+> > +    DEFINE_PROP_UINT32("num-phbs", PnvChip, num_phbs, 1),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
 > 
-> diff --git a/blockdev.c b/blockdev.c
-> index 58d7570932..526f8b60be 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -3517,7 +3517,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
->           backup->compress = false;
->       }
->   
-> -    bs = qmp_get_root_bs(backup->device, errp);
-> +    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
+> How about instanciating each extra phb using -device?
+> Seems better than teaching everyone about platform-specific
+> options.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+It's about which PHBs are enabled, not which are instanciated, if I
+understand Cedric changes ...
 
->       if (!bs) {
->           return NULL;
->       }
-> 
+This aims are implementing the POWER8 chip correctly, it has a fixed
+number of PHBs per-chip at very specific XSCOM addresses, that the
+firwmare knows about.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cheers,
+Ben.
