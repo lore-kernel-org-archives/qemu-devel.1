@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fY7sF-00037N-PW
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:40:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fY7yD-0004Ll-SQ
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fY7sA-0005nz-Pj
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:40:31 -0400
-Message-ID: <c071d87d3b3ad43c7c17de17ef5116ada666ef6f.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 27 Jun 2018 12:40:21 +0200
-In-Reply-To: <9f9a4454bec8e7009a02d544d7a98f6215bd1fa0.camel@kernel.crashing.org>
-References: <20180626135928.23950-1-clg@kaod.org>
-	<20180627033321-mutt-send-email-mst@kernel.org>
-	<1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
-	<20180627072825.GH14434@umbus.fritz.box>
-	<65c545f3-6279-62af-9bd8-2be93a3d7d18@kaod.org>
-	<9f9a4454bec8e7009a02d544d7a98f6215bd1fa0.camel@kernel.crashing.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+	(envelope-from <dgilbert@redhat.com>) id 1fY7y9-0007M0-0U
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:46:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47298 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fY7y8-0007LH-Rh
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:46:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A78D401EF28
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 10:46:36 +0000 (UTC)
+Date: Wed, 27 Jun 2018 11:46:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180627104630.GD2423@work-vm>
+References: <20180626181932.11909-1-quintela@redhat.com>
+	<20180626181932.11909-13-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180626181932.11909-13-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v16 13/14] migration: Remove not needed
+ semaphore and quit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Wed, 2018-06-27 at 18:41 +1000, Benjamin Herrenschmidt wrote:
-> On Wed, 2018-06-27 at 09:46 +0200, C=C3=A9dric Le Goater wrote:
-> > So the "IBM PHB3 PCIE Root Port" is already user createable.
-> >=20
-> > I can take a look at user createable PHB3s. I think this is OK from a=
- model
-> > perspective. The object is rather standalone, it needs the machine fo=
-r=20
-> > the XICS fabric and a couple of ids, phb id and chip id. These can co=
-me
-> > from the command line.
-> >=20
-> > We want at least one PHB3 per socket/chip though.=20
->=20
-> We don't want the user to specify the SCOM addresses though (for the
-> MMIO windows we should get skiboot to assign them).
->=20
-> If the user gets to specify a thing it would be which of the 3 or 4 HW
-> PHBs of the chip it is, the SCOM addresses gets deduced.
+* Juan Quintela (quintela@redhat.com) wrote:
+> We know quit with shutdwon in the QIO.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-For pSeries guests libvirt will either automatically create, or
-allow users to configure manually, PHBs with something like
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-  <controller type=3D'pci' index=3D'1' model=3D'pci-root'>
-    <target index=3D'1'/>
-  </controller>
-
-which is ultimately converted to
-
-  -device spapr-pci-host-bridge,index=3D1,id=3Dpci.1
-
-Ideally the interface for PowerNV guests can be made to be similar
-if not identical at the libvirt level, without having to add too
-many hacks... It would certainly help a lot if the QEMU interface
-for PowerNV PHBs didn't stray too far from the above.
-
---=20
-Andrea Bolognani / Red Hat / Virtualization
+> --
+> Add comment
+> Use shutdown() instead of unref()
+> ---
+>  migration/ram.c | 14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 5d38d699f3..61f7313093 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -594,14 +594,10 @@ typedef struct {
+>      QemuThread thread;
+>      /* communication channel */
+>      QIOChannel *c;
+> -    /* sem where to wait for more work */
+> -    QemuSemaphore sem;
+>      /* this mutex protects the following parameters */
+>      QemuMutex mutex;
+>      /* is this channel thread running */
+>      bool running;
+> -    /* should this thread finish */
+> -    bool quit;
+>      /* array of pages to receive */
+>      MultiFDPages_t *pages;
+>      /* packet allocated len */
+> @@ -1144,8 +1140,11 @@ static void multifd_recv_terminate_threads(Error *err)
+>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>  
+>          qemu_mutex_lock(&p->mutex);
+> -        p->quit = true;
+> -        qemu_sem_post(&p->sem);
+> +        /* We could arrive here for two reasons:
+> +           - normal quit, i.e. everything went fine, just finished
+> +           - error quit: We close the channels so the channel threads
+> +             finish the qio_channel_read_all_eof() */
+> +        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
+>          qemu_mutex_unlock(&p->mutex);
+>      }
+>  }
+> @@ -1168,7 +1167,6 @@ int multifd_load_cleanup(Error **errp)
+>          object_unref(OBJECT(p->c));
+>          p->c = NULL;
+>          qemu_mutex_destroy(&p->mutex);
+> -        qemu_sem_destroy(&p->sem);
+>          qemu_sem_destroy(&p->sem_sync);
+>          g_free(p->name);
+>          p->name = NULL;
+> @@ -1291,9 +1289,7 @@ int multifd_load_setup(void)
+>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>  
+>          qemu_mutex_init(&p->mutex);
+> -        qemu_sem_init(&p->sem, 0);
+>          qemu_sem_init(&p->sem_sync, 0);
+> -        p->quit = false;
+>          p->id = i;
+>          p->pages = multifd_pages_init(page_count);
+>          p->packet_len = sizeof(MultiFDPacket_t)
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
