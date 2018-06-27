@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fY8S6-00005S-Lu
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:17:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fY8U1-00012k-8P
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fY8S3-00026K-DJ
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:17:34 -0400
-References: <20180625115352.6889-1-david@redhat.com>
-	<20180625115352.6889-8-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7cfbd0da-8654-b9b6-983f-b0bb9c45b6ba@redhat.com>
-Date: Wed, 27 Jun 2018 13:17:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180625115352.6889-8-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 7/9] s390x/tcg: implement
- SET CLOCK
+	(envelope-from <kraxel@redhat.com>) id 1fY8Tz-00048Y-R0
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:19:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33114 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fY8Tz-00048H-LB
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:19:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B38F40201CE
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 11:19:31 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 27 Jun 2018 13:19:25 +0200
+Message-Id: <20180627111925.30292-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] audio/hda: adjust larger gaps faster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 25.06.2018 13:53, David Hildenbrand wrote:
-> This allows a guest to change its TOD. We already take care of updating
-> all CKC timers from within S390TODClass.
-> 
-> Use MO_ALIGN to load the operand manually - this will properly trigger a
-> SPECIFICATION exception.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/helper.h      |  1 +
->  target/s390x/insn-data.def |  3 +--
->  target/s390x/misc_helper.c | 16 ++++++++++++++++
->  target/s390x/translate.c   |  9 +++++++++
->  4 files changed, 27 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 59cba86a27..97c60ca7bc 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -127,6 +127,7 @@ DEF_HELPER_4(diag, void, env, i32, i32, i32)
->  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
-> +DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 157619403d..5c6f33ed9c 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -997,8 +997,7 @@
->  /* SET ADDRESS SPACE CONTROL FAST */
->      C(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0)
->  /* SET CLOCK */
-> -    /* ??? Not implemented - is it necessary? */
-> -    C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
-> +    C(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0)
->  /* SET CLOCK COMPARATOR */
->      C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
->  /* SET CLOCK PROGRAMMABLE FIELD */
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 4872bdd774..a223970d1c 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -189,6 +189,22 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
->      helper_sckc(env, env->ckc);
->  }
->  
-> +/* Set Clock */
-> +uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
-> +{
-> +    S390TODState *td = s390_get_todstate();
-> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-> +    S390TOD tod = {
-> +        .high = 0,
-> +        .low = tod_low,
-> +    };
-> +
-> +    qemu_mutex_lock_iothread();
-> +    tdc->set(td, &tod, &error_abort);
-> +    qemu_mutex_unlock_iothread();
-> +    return 0;
-> +}
-> +
->  /* Set Tod Programmable Field */
->  void HELPER(sckpf)(CPUS390XState *env, uint64_t r0)
->  {
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index fdfec7feba..57c03cbf58 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -4016,6 +4016,15 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
->      return DISAS_NEXT;
->  }
->  
-> +static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
-> +{
-> +    check_privileged(s);
-> +    tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-> +    gen_helper_sck(cc_op, cpu_env, o->in1);
-> +    set_cc_static(s);
-> +    return DISAS_NEXT;
-> +}
-> +
->  static DisasJumpType op_sckc(DisasContext *s, DisasOps *o)
->  {
->      check_privileged(s);
-> 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/audio/hda-codec.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index fc4945086b..8a8214de74 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -204,6 +204,9 @@ static inline void hda_timer_sync_adjust(HDAAudioStream *st, int64_t target_pos)
+     if (target_pos < -limit) {
+         corr = -HDA_TIMER_TICKS;
+     }
++    if (target_pos < -(2*limit)) {
++        corr = -(4*HDA_TIMER_TICKS);
++    }
+     if (corr == 0) {
+         return;
+     }
+-- 
+2.9.3
