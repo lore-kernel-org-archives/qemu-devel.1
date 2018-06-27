@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fYBSz-00070p-3E
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:30:41 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fYBXl-0001Ua-5q
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fYBSu-0005Bd-0c
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:30:41 -0400
-References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-15-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <dd88cb0f-1b0e-ce65-7418-78a25d3b8855@redhat.com>
-Date: Wed, 27 Jun 2018 16:30:17 +0200
+	(envelope-from <joel.stan@gmail.com>) id 1fYBXk-0000tf-3g
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:35:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180411163940.2523-15-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GtrRxfucIet5MqOlKY9Q6zCkHDmowuzwg"
-Subject: Re: [Qemu-devel] [PATCH 14/19] block: Defer .bdrv_drain_begin
- callback to polling phase
+Sender: joel.stan@gmail.com
+In-Reply-To: <CAFEAcA_dP5QRrZoX8P67xjNVpv7QssnMP9yd5sXqAEu2tQ5Lww@mail.gmail.com>
+References: <20180503090532.3113-1-joel@jms.id.au>
+	<CAFEAcA_dP5QRrZoX8P67xjNVpv7QssnMP9yd5sXqAEu2tQ5Lww@mail.gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Thu, 28 Jun 2018 00:05:14 +0930
+Message-ID: <CACPK8XdeN2FBJfcCPV7bi_yq9so-w9z=vW37gyp+Y7sQi_Qjuw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/2] arm: Add nRF51 SoC and micro:bit
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GtrRxfucIet5MqOlKY9Q6zCkHDmowuzwg
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <dd88cb0f-1b0e-ce65-7418-78a25d3b8855@redhat.com>
-Subject: Re: [PATCH 14/19] block: Defer .bdrv_drain_begin callback to polling
- phase
-References: <20180411163940.2523-1-kwolf@redhat.com>
- <20180411163940.2523-15-kwolf@redhat.com>
-In-Reply-To: <20180411163940.2523-15-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 3 May 2018 at 18:54, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 3 May 2018 at 10:05, Joel Stanley <joel@jms.id.au> wrote:
+>> Hello,
+>>
+>> This short series implements a minimal definition of the Nordic
+>> Semiconductor nRF51, a Cortex-M0 ARM SoC, and the BBC micro:bit, a
+>> machine that will use this SoC.
+>>
+>> This work will serve as the base for our Google Summer of Code and
+>> Outreachy interns who will work on implementing a number of features on
+>> top of this base.
+>>
+>> I've tested this with a microbit micropython firmware, and checked that
+>> it starts running by looking at it with gdb.
+>>
+>> I chose to keep the nrf51 and the microbit seperate, to not confuse the
+>> peripherals that are on the microbit but are not part of the nrf51, and
+>> vice versa.
+>>
+>> Please review!
+>
+> Hi; thanks for this patchset. I've done some quick overview review.
+> It looks broadly ok but there are some details which don't follow
+> our current preferences/practices for board and SoC models (we have
+> a lot of legacy code in the codebase that follows older approaches
+> or is just buggy, so it can be hard to get those right. The mps2
+> boards and the iotkit SoC are the most recent I've written so
+> probably not a bad pattern to look at.)
 
-On 2018-04-11 18:39, Kevin Wolf wrote:
-> We cannot allow aio_poll() in bdrv_drain_invoke(begin=3Dtrue) until we'=
-re
-> done with propagating the drain through the graph and are doing the
-> single final BDRV_POLL_WHILE().
->=20
-> Just schedule the coroutine with the callback and increase bs->in_fligh=
-t
-> to make sure that the polling phase will wait for it.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/io.c | 28 +++++++++++++++++++++++-----
->  1 file changed, 23 insertions(+), 5 deletions(-)
+Thanks for taking a look. It's taken a while for me to get back to
+this, but I've got a v2 on it's way.
 
-According to bisect, this breaks blockdev-snapshot with QED:
+I got a bit lost in the mps2, with the different variants and such.
+I've had a stab at fixing the specifics that you suggested, but I
+might need some more advice there.
 
-$ ./qemu-img create -f qed foo.qed 64M
-Formatting 'foo.qed', fmt=3Dqed size=3D67108864 cluster_size=3D65536
-$ echo "{'execute':'qmp_capabilities'}
-        {'execute':'blockdev-snapshot',
-         'arguments':{'node':'backing','overlay':'overlay'}}
-        {'execute':'quit'}" | \
-    x86_64-softmmu/qemu-system-x86_64 -qmp stdio -nodefaults \
-        -blockdev "{'node-name':'backing','driver':'null-co'}" \
-        -blockdev "{'node-name':'overlay','driver':'qed',
-                    'file':{'driver':'file','filename':'foo.qed'}}"
-{"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
-"package": "v2.12.0-1422-g0109e7e6f8"}, "capabilities": []}}
-{"return": {}}
-qemu-system-x86_64: block.c:3434: bdrv_replace_node: Assertion
-`!atomic_read(&to->in_flight)' failed.
-[1]    5252 done                 echo  |
-       5253 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -qmp
-stdio -nodefaults -blockdev  -blockdev
+Cheers,
 
-Max
+Joel
 
-
---GtrRxfucIet5MqOlKY9Q6zCkHDmowuzwg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlszn3kACgkQ9AfbAGHV
-z0BV+ggAo5hL5634W3rv5qbRTSDFrGM7pf2rMQ+ctjd/vSIddcs+EzlzWljbeLX8
-R7DyHIXsRq6LQ8Q/lQvw9dmsTDhFFy5CAf03Ja6zDd+oITtuXuzOEMvuPtAunmQl
-ypO4NyURsEJhKg8VLhNTp6nj+9LZkF18hZgw3os2WIIWsCaTBz1daQy+t+hJ+6cw
-D8CsKmY07psUQIU+x0d6kn7uVP2n0Q7pNtHBrQNwhAufWZ6YXswXWyMKZ3z58LQ8
-sMvEPbGlaxOXjgM2vqRAuRICSMLR17E1IE+71rAJ0b02CoznZKZ4jiY6/Snc1ArG
-+XGApjqQRhsWLJ/Zg95coFjJoRpICQ==
-=sPLz
------END PGP SIGNATURE-----
-
---GtrRxfucIet5MqOlKY9Q6zCkHDmowuzwg--
+> We should probably not put this into master until we've got at least
+> the cortex-m0 model, though.
