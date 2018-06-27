@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fYGPP-0003TZ-OK
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:47:21 -0400
+	(envelope-from <clg@kaod.org>) id 1fYGQO-0003tD-5L
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fYGPM-0004Q5-8R
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:47:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55772)
+	(envelope-from <clg@kaod.org>) id 1fYGQL-0005QG-2e
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:48:20 -0400
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:43978)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fYGPL-0004Om-Ui
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:47:16 -0400
-Date: Wed, 27 Jun 2018 22:47:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180627224418-mutt-send-email-mst@kernel.org>
-References: <20180627034935.20276-1-venu.busireddy@oracle.com>
-	<20180627122457.GA19714@rkaganb.sw.ru>
-	<20180627192958.GA17236@vbusired-vm>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fYGQK-0005PI-SN
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:48:17 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.122.47])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1F4D3E898E
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 21:48:14 +0200 (CEST)
+References: <20180626135928.23950-1-clg@kaod.org>
+	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
+	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
+	<8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
+	<9704639c-1c76-103a-7a90-6cfbb5aa4968@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <79161afb-96ae-0dd7-5f1e-fc4410950789@kaod.org>
+Date: Wed, 27 Jun 2018 21:48:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180627192958.GA17236@vbusired-vm>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for
- pairing virtio and passthrough devices...
+In-Reply-To: <9704639c-1c76-103a-7a90-6cfbb5aa4968@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +35,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Venu Busireddy <venu.busireddy@oracle.com>
-Cc: Roman Kagan <rkagan@virtuozzo.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, Jun 27, 2018 at 02:29:58PM -0500, Venu Busireddy wrote:
-> On 2018-06-27 15:24:58 +0300, Roman Kagan wrote:
-> > On Tue, Jun 26, 2018 at 10:49:30PM -0500, Venu Busireddy wrote:
-> > > The patch set "Enable virtio_net to act as a standby for a passthru
-> > > device" [1] deals with live migration of guests that use passthrough
-> > > devices. However, that scheme uses the MAC address for pairing
-> > > the virtio device and the passthrough device. The thread "netvsc:
-> > > refactor notifier/event handling code to use the failover framework"
-> > > [2] discusses an alternate mechanism, such as using an UUID, for pairing
-> > > the devices. Based on that discussion, proposals "Add "Group Identifier"
-> > > to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
-> > > store pairing information..." [4] were made.
-> > 
-> > I must have missed something in those threads, but where does this UUID
-> > thing come about?  AFAICS this identifier doesn't need to be
-> > "universally" unique, nor persistent; it only has to be unique across
-> > the VM and stable throughout the VM lifetime.
-> 
-> The notion of using UUID came up in the thread
-> 
->    https://www.spinics.net/lists/netdev/msg499011.html
+On 06/27/2018 02:18 PM, C=C3=A9dric Le Goater wrote:
+> On 06/27/2018 12:22 PM, Andrea Bolognani wrote:
+>> On Tue, 2018-06-26 at 19:02 +0200, C=C3=A9dric Le Goater wrote:
+>>> On 06/26/2018 05:57 PM, Andrea Bolognani wrote:
+>>>> On Tue, 2018-06-26 at 15:59 +0200, C=C3=A9dric Le Goater wrote:
+>>>>> This is a model of the PCIe host bridge found on Power8 chips,
+>>>>> including PowerBus logic interface, IOMMU support, PCIe root comple=
+x,
+>>>>> XICS MSI and LSI interrupt sources.
+>>>>>
+>>>>> 4 PHBs are provisioned under the Power8 chip model to fit hardware =
+but
+>>>>> only one is currently initialized.
+>>>>
+>>>> What's the advantage in creating 4 PHBs instead of a single one,
+>>>
+>>> The Power8 chip comes in different flavors: Venice, Murano, Naple,=20
+>>> each having a different number of PHBs. We don't need to initialize=20
+>>> them all to plug only a couple of devices (net, storage, usbs)=20
+>>>
+>>> When time comes, we might want to test some more complex configuratio=
+ns
+>>> or extend the modeling with CAPI support. That's why we have a :
+>>>
+>>> 	#define PNV_MAX_CHIP_PHB 4
+>>> 	    PnvPHB3      phbs[PNV_MAX_CHIP_PHB];
+>>>
+>>> under the chip, and a 'num_phbs' attribute to increase the number
+>>> of controllers. It still needs to be tested but that's the goal.
+>>
+>> I was a bit confused about the difference between "provisioning"
+>> and "initializing" a PHB, I guess.
+>=20
+> objects have different states : allocated, initialized, realized
+> I guess "provision (memory)" is not the best choice for the first
+> state.
+>=20
+>> Now that I've looked at the code, my (very uneducated) reading is
+>> that you're allocating memory for 4 PHBs along with the chip, but
+>> only actually initializing num_phbs of them, with 1 being the
+>> default.
+>=20
+> Yes. I had the idea to increase the number of PHBs with a machine
+> option later on if needed.
+>=20
+>> I have no idea what this implies when it comes to adding PCI
+>> controller to the guest, though. If I run a guest with num_phbs=3D1,
+>> are ids pci.1..pci.3 reserved even though the corresponding PHBs
+>> have not been initialized?=20
+>=20
+> They don't exist on the PowerNV machine if you don't have a PHB3
+> device backing them.
+>=20
+>> Is num_phbs the only way you can control how many PHBs a PowerNV=20
+>> guest will have?
+>=20
+> yes. Unless we make them user creatable but that's a discussion in
+> progress. I am not sure user creatable PHB3s are needed. We will
+> see.
+> =20
+>> I would play around and try to figure out all the kinks on my own,
+>> but I can't actually compile QEMU with this patch applied:
+>=20
+> you need to use David's branch :
+>=20
+> 	https://github.com/dgibson/qemu/tree/ppc-for-3.0
 
-That's probably because it was expected one of standard serial number capabilities
-(VPD or PCI Express serial #) will be used, which are expected to be unique.
+I have pushed a tree here :
 
-If you are rolling your own vendor specific one, it's just an ID and
-does not have to be unique.
+	https://github.com/legoater/qemu/tree/phb3-3.0
 
-> > FWIW Hyper-V uses a 32-bit integer for this purpose, not a UUID as seems
-> > to be implied in the thread you refer to.
-> 
-> Yes, Hyper-V uses a serial number (but I think it is 64-bit value).
-> However, what we are doing is similar to that. Instead of 32 bits,
-> we are using 128 bits.
+with two patches, the one we have been discussing about, with some
+cleanups and fixes, and one adding user creatable PHB3 devices so=20
+that extra phbs and devices can be defined on the command line :
 
-That's OK. The name is confusing though. It's a failover group id,
-not a UUID.
+-device pnv-phb3,chip-id=3D1,index=3D1,id=3Dphb-1.1 -device nec-usb-xhci,=
+bus=3Dpci.1,addr=3D0x7
 
-> > > The current patch set includes all the feedback received for proposals [3]
-> > > and [4]. For the sake of completeness, patch for the virtio specification
-> > > is also included here. Following is the updated proposal.
-> > > 
-> > > 1. Extend the virtio specification to include a new virtio PCI capability
-> > >    "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-> > > 
-> > > 2. Enhance the QEMU CLI to include a "uuid" option to the virtio device.
-> > >    The "uuid" is a string in UUID format.
-> > > 
-> > > 3. Enhance the QEMU CLI to include a "uuid" option to the bridge device.
-> > >    The "uuid" is a string in UUID format. Currently, PCIe bridge for
-> > >    the Q35 model is supported.
-> > > 
-> > > 4. The operator creates a unique identifier string using 'uuidgen'.
-> > > 
-> > > 5. When the virtio device is created, the operator uses the "uuid" option
-> > >    (for example, '-device virtio-net-pci,uuid="string"') and specifies
-> > >    the UUID created in step 4.
-> > > 
-> > >    QEMU stores the UUID in the virtio device's configuration space
-> > >    in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-> > > 
-> > > 6. When assigning a PCI device to the guest in passthrough mode, the
-> > >    operator first creates a bridge using the "uuid" option (for example,
-> > >    '-device pcie-downstream,uuid="string"') to specify the UUID created
-> > >    in step 4, and then attaches the passthrough device to the bridge.
-> > > 
-> > >    QEMU stores the UUID in the configuration space of the bridge as
-> > >    Vendor-Specific capability (0x09). The "Vendor" here is not to be
-> > >    confused with a specific organization. Instead, the vendor of the
-> > >    bridge is QEMU. To avoid mixing up with other bridges, the bridge
-> > >    will be created with vendor ID 0x1b36 (PCI_VENDOR_ID_REDHAT) and
-> > >    device ID 0x000e (PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE) if the "uuid"
-> > >    option is specified. Otherwise, current defaults are used.
-> > 
-> > I wonder if it makes more sense to drop the concept of failover groups,
-> > and just refer to the standby device by device-id, like 
-> > 
-> >   -device virtio-net-pci,id=foo \
-> >   -device pcie-downstream,failover=foo
-> 
-> Isn't this the same as what this patch series proposes? In your
-> suggestion, "foo" is the entity that connects the passthrough device
-> and the failover device. In this patch set, that "foo" is the UUID,
-> and the options "id" and "failover" are replaced by "uuid". Do you agree?
-> 
-> Regards,
-> 
-> Venu
-> 
-> > The bridge device will then lookup the failover device, figure out the
-> > common identifier to expose to the guest, and defer the visibility of
-> > the PT device behind the bridge until the guest acknowledged the support
-> > for failover on the PV device.
-> > 
-> > Roman.
+The PHB identifier is named 'index' now, to be compatible with the=20
+libvirt attribute.=20
+
+Cheers,
+
+C.=20
