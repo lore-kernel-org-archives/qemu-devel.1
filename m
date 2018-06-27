@@ -1,16 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYAkG-0006Q8-Sx
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:44:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fYAnE-0000Sv-NQ
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:47:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYAkC-0005M3-II
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:44:28 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 27 Jun 2018 15:44:08 +0200
-Message-Id: <20180627134410.4901-8-david@redhat.com>
-In-Reply-To: <20180627134410.4901-1-david@redhat.com>
-References: <20180627134410.4901-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 7/9] s390x/tcg: implement SET CLOCK
+	(envelope-from <richard.henderson@linaro.org>) id 1fYAnA-0000N4-0R
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:47:32 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:43902)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fYAn9-0000MH-Qp
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:47:27 -0400
+Received: by mail-pf0-x244.google.com with SMTP id y8-v6so993704pfm.10
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 06:47:27 -0700 (PDT)
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-36-f4bug@amsat.org>
+	<3c5eef2f-115c-9c6d-2dba-0407fcebcdc4@linaro.org>
+	<45330ee3-4dcf-3c9c-6781-2db11ff4e8c5@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c487ad94-5a1c-64da-5e26-61202e0e6d69@linaro.org>
+Date: Wed, 27 Jun 2018 06:47:23 -0700
+MIME-Version: 1.0
+In-Reply-To: <45330ee3-4dcf-3c9c-6781-2db11ff4e8c5@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 35/46] hw/usb: Use the IEC binary prefix
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,96 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-This allows a guest to change its TOD. We already take care of updating
-all CKC timers from within S390TODClass.
+On 06/27/2018 06:03 AM, Philippe Mathieu-Daudé wrote:
+> On 06/27/2018 04:04 AM, Richard Henderson wrote:
+>> On 06/25/2018 05:42 AM, Philippe Mathieu-Daudé wrote:
+>>> -#define VSCARD_IN_SIZE 65536
+>>> +#define VSCARD_IN_SIZE      (64 * KiB)
+>>>  
+>>>  /* maximum size of ATR - from 7816-3 */
+>>>  #define MAX_ATR_SIZE        40
+>>> @@ -276,7 +277,7 @@ static void ccid_card_vscard_read(void *opaque, const uint8_t *buf, int size)
+>>>  
+>>>      if (card->vscard_in_pos + size > VSCARD_IN_SIZE) {
+>>>          error_report(
+>>> -            "no room for data: pos %d +  size %d > %d. dropping connection.",
+>>> +            "no room for data: pos %u +  size %d > %ld. dropping connection.",
+>>>              card->vscard_in_pos, size, VSCARD_IN_SIZE);
+>>
+>> Did you test this with i686 host?  %ld doesn't look right.
+> 
+> Yes...
+> 
+> $ uname -m
+> x86_64
+> $ make hw/usb/ccid-card-passthru.o
+>   CC      hw/usb/ccid-card-passthru.o
+> $
 
-Use MO_ALIGN to load the operand manually - this will properly trigger a
-SPECIFICATION exception.
+Ah, no, I mean 32-bit i686, not x86_64.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  3 +--
- target/s390x/misc_helper.c | 16 ++++++++++++++++
- target/s390x/translate.c   |  9 +++++++++
- 4 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 59cba86a27..97c60ca7bc 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -127,6 +127,7 @@ DEF_HELPER_4(diag, void, env, i32, i32, i32)
- DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
- DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
-+DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
- DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 157619403d..5c6f33ed9c 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -997,8 +997,7 @@
- /* SET ADDRESS SPACE CONTROL FAST */
-     C(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0)
- /* SET CLOCK */
--    /* ??? Not implemented - is it necessary? */
--    C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
-+    C(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0)
- /* SET CLOCK COMPARATOR */
-     C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
- /* SET CLOCK PROGRAMMABLE FIELD */
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index e4c1522140..7656a9b90a 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -184,6 +184,22 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
-     helper_sckc(env, env->ckc);
- }
- 
-+/* Set Clock */
-+uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
-+{
-+    S390TODState *td = s390_get_todstate();
-+    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-+    S390TOD tod = {
-+        .high = 0,
-+        .low = tod_low,
-+    };
-+
-+    qemu_mutex_lock_iothread();
-+    tdc->set(td, &tod, &error_abort);
-+    qemu_mutex_unlock_iothread();
-+    return 0;
-+}
-+
- /* Set Tod Programmable Field */
- void HELPER(sckpf)(CPUS390XState *env, uint64_t r0)
- {
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index fdfec7feba..57c03cbf58 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4016,6 +4016,15 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
-     return DISAS_NEXT;
- }
- 
-+static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
-+{
-+    check_privileged(s);
-+    tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
-+    gen_helper_sck(cc_op, cpu_env, o->in1);
-+    set_cc_static(s);
-+    return DISAS_NEXT;
-+}
-+
- static DisasJumpType op_sckc(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--- 
-2.17.1
+r~
