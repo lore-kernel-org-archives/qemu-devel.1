@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fY7a9-0005Mk-7u
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:21:50 -0400
+	(envelope-from <abologna@redhat.com>) id 1fY7aw-0005rj-Lw
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fY7a6-0003Rp-4k
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:21:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46482 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fY7a5-0003RW-UV
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:21:46 -0400
-Date: Wed, 27 Jun 2018 11:21:42 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180627102142.GB5955@stefanha-x1.localdomain>
-References: <20180627082248.14921-1-pagupta@redhat.com>
-	<20180627082248.14921-3-pagupta@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
-Content-Disposition: inline
-In-Reply-To: <20180627082248.14921-3-pagupta@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: Set status early in
- VirtIODevice parent object
+	(envelope-from <abologna@redhat.com>) id 1fY7av-0003wl-Ez
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:22:38 -0400
+Message-ID: <8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 27 Jun 2018 12:22:31 +0200
+In-Reply-To: <dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
+References: <20180626135928.23950-1-clg@kaod.org>
+	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
+	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org, slopezpa@redhat.com
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-
---LpQ9ahxlCli8rRTG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 27, 2018 at 01:52:48PM +0530, Pankaj Gupta wrote:
->  To process pending requests for driver status 'VIRTIO_CONFIG_S_DRIVER_OK=
-',
->  virtio-rng 'set_status' calls 'is_guest_ready' function. This checks if=
-=20
->  virtqueue is ready and status is set to 'VIRTIO_CONFIG_S_DRIVER_OK'.=20
+On Tue, 2018-06-26 at 19:02 +0200, C=C3=A9dric Le Goater wrote:
+> On 06/26/2018 05:57 PM, Andrea Bolognani wrote:
+> > On Tue, 2018-06-26 at 15:59 +0200, C=C3=A9dric Le Goater wrote:
+> > > This is a model of the PCIe host bridge found on Power8 chips,
+> > > including PowerBus logic interface, IOMMU support, PCIe root comple=
+x,
+> > > XICS MSI and LSI interrupt sources.
+> > >=20
+> > > 4 PHBs are provisioned under the Power8 chip model to fit hardware =
+but
+> > > only one is currently initialized.
+> >=20
+> > What's the advantage in creating 4 PHBs instead of a single one,
 >=20
->  This call is made before new status is updated in VirtIODevice parent ob=
-ject=20
->  and calling function uses old status value.
+> The Power8 chip comes in different flavors: Venice, Murano, Naple,=20
+> each having a different number of PHBs. We don't need to initialize=20
+> them all to plug only a couple of devices (net, storage, usbs)=20
 >=20
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  hw/virtio/virtio.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> When time comes, we might want to test some more complex configurations
+> or extend the modeling with CAPI support. That's why we have a :
 >=20
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index d4e4d98b59..37dc59a686 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -1154,10 +1154,11 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t=
- val)
->              }
->          }
->      }
-> +    vdev->status =3D val;
-> +
->      if (k->set_status) {
->          k->set_status(vdev, val);
->      }
-> -    vdev->status =3D val;
+> 	#define PNV_MAX_CHIP_PHB 4
+> 	    PnvPHB3      phbs[PNV_MAX_CHIP_PHB];
+>=20
+> under the chip, and a 'num_phbs' attribute to increase the number
+> of controllers. It still needs to be tested but that's the goal.
 
-This breaks existing ->set_status() callbacks that rely on vdev->status
-containing the old value.  Have you audited them?
+I was a bit confused about the difference between "provisioning"
+and "initializing" a PHB, I guess.
 
-For example, virtio_net_set_status -> virtio_net_vnet_endian_status uses
-vdev->status!
+Now that I've looked at the code, my (very uneducated) reading is
+that you're allocating memory for 4 PHBs along with the chip, but
+only actually initializing num_phbs of them, with 1 being the
+default.
 
-It may be easier to modify virtio-rng.c so that the old status value
-isn't used.
+I have no idea what this implies when it comes to adding PCI
+controller to the guest, though. If I run a guest with num_phbs=3D1,
+are ids pci.1..pci.3 reserved even though the corresponding PHBs
+have not been initialized? Is num_phbs the only way you can control
+how many PHBs a PowerNV guest will have?
 
-Stefan
+I would play around and try to figure out all the kinks on my own,
+but I can't actually compile QEMU with this patch applied:
 
---LpQ9ahxlCli8rRTG
-Content-Type: application/pgp-signature; name="signature.asc"
+  hw/pci-host/pnv_phb3_msi.c: In function =E2=80=98phb3_msi_reset=E2=80=99=
+:
+  hw/pci-host/pnv_phb3_msi.c:229:11: error: =E2=80=98ICSStateClass=E2=80=99=
+ {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
+parent_reset=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
+       icsc->parent_reset(dev);
+             ^~~~~~~~~~~~
+             parent_class
+  hw/pci-host/pnv_phb3_msi.c: In function =E2=80=98phb3_msi_realize=E2=80=
+=99:
+  hw/pci-host/pnv_phb3_msi.c:260:11: error: =E2=80=98ICSStateClass=E2=80=99=
+ {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
+parent_realize=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
+       icsc->parent_realize(dev, &local_err);
+             ^~~~~~~~~~~~~~
+             parent_class
+  hw/pci-host/pnv_phb3_msi.c: In function =E2=80=98phb3_msi_class_init=E2=
+=80=99:
+  hw/pci-host/pnv_phb3_msi.c:293:43: error: =E2=80=98ICSStateClass=E2=80=99=
+ {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
+parent_realize=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
+                                       &isc->parent_realize);
+                                             ^~~~~~~~~~~~~~
+                                             parent_class
+  hw/pci-host/pnv_phb3_msi.c:295:41: error: =E2=80=98ICSStateClass=E2=80=99=
+ {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
+parent_reset=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
+                                     &isc->parent_reset);
+                                           ^~~~~~~~~~~~
+                                           parent_class
 
------BEGIN PGP SIGNATURE-----
+> > like we already do for pSeries guests?=20
+>=20
+> I didn't follow that discussion but this is "another" kind of PHB.
+> This one models the baremetal controller as found on OpenPOWER and
+> IBM Power machines. pSeries has a virtual PHB.
 
-iQEcBAEBAgAGBQJbM2U2AAoJEJykq7OBq3PIOb4IAMHuSDMVK883dE9kAz20hq0x
-VelGOBzyuX8VPEUB82qDp8gelNbOOBUmN90O4qx+ziXLB/axRubHwzKLlGDBeNcA
-RnF3Oh32B7A2aQh0jpGY6zzRPyb7DjbMD3ngAtLz7vDnyiQcF9s/UdMrLgqW0NsP
-6whH8rL5SVDTO3JP3ZPJdRYRmbC7aJxPbzspKyLEyxmT1bi2kHy5EGmy2yhWpzbi
-qz/02kFCd1t0s2voIDznk6AjEPcgp5z8Ij2jKjE1PQjW3lSSCq51YPsF/zJyFiqg
-MyF9eyQrX8ajWKrWmEX6VH8XGTZn66I8ZTyuiwGfoAOe0uf6/eCPFb2u+kqs3YE=
-=zViY
------END PGP SIGNATURE-----
+I understand that, and of course libvirt will need to learn about
+this new type of PHB and make sure both pSeries and PowerNV guests
+get the correct one assigned to them.
 
---LpQ9ahxlCli8rRTG--
+What I meant is that pSeries guests get a single PHB by default,
+with additional ones being instantiable through -device; this is
+also consistent with how PCI controllers are added to other guest
+types including pc, q35 and aarch64/virt, so it would be really
+nice if PowerNV behaved the same way.
+
+> > As it is, this will confuse the heck out of libvirt's PCI address > a=
+llocation algorithm :)
+>=20
+> The pci bus name should be directly related to the PHB index. But
+> I agree we need to be careful. That's why you are in cc: :)
+
+Thanks, I really appreciate you keeping me in the loop :)
+
+--=20
+Andrea Bolognani / Red Hat / Virtualization
