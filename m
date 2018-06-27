@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29L-00048p-7I
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29M-00049p-6R
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29I-0000Gm-3O
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:47 -0400
-Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:32906)
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29J-0000Ke-Ml
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:48 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:46870)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY29H-0000FA-Qg
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:43 -0400
-Received: by mail-pg0-x236.google.com with SMTP id e11-v6so369956pgq.0
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:33:43 -0700 (PDT)
+	id 1fY29J-0000IM-94
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:45 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id q1-v6so379241pff.13
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:33:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 21:33:01 -0700
-Message-Id: <20180627043328.11531-9-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 21:33:02 -0700
+Message-Id: <20180627043328.11531-10-richard.henderson@linaro.org>
 In-Reply-To: <20180627043328.11531-1-richard.henderson@linaro.org>
 References: <20180627043328.11531-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 08/35] target/arm: Implement SVE Floating
- Point Accumulating Reduction Group
+Subject: [Qemu-devel] [PATCH v6 09/35] target/arm: Implement SVE load and
+ broadcast element
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,169 +32,186 @@ Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
 ---
- target/arm/helper-sve.h    |  7 +++++
- target/arm/sve_helper.c    | 56 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 45 ++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  5 ++++
+v6: Fix typo in comment.
+---
+ target/arm/helper-sve.h    |  5 +++
+ target/arm/sve_helper.c    | 41 +++++++++++++++++++++++++
+ target/arm/translate-sve.c | 62 ++++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  5 +++
  4 files changed, 113 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index eb0645dd43..68e55a8d03 100644
+index 68e55a8d03..a5d3bb121c 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -720,6 +720,13 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
+@@ -274,6 +274,11 @@ DEF_HELPER_FLAGS_3(sve_clr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_clr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_clr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_5(sve_fadda_h, TCG_CALL_NO_RWG,
-+                   i64, i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fadda_s, TCG_CALL_NO_RWG,
-+                   i64, i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_fadda_d, TCG_CALL_NO_RWG,
-+                   i64, i64, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_movz_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_movz_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_movz_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_movz_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
- DEF_HELPER_FLAGS_6(sve_fadd_h, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_6(sve_fadd_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_4(sve_asr_zpzi_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_asr_zpzi_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_asr_zpzi_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 2f416e5e28..2d08b7dcd3 100644
+index 2d08b7dcd3..93f2942590 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2811,6 +2811,62 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
-     return predtest_ones(d, oprsz, esz_mask);
+@@ -995,6 +995,47 @@ void HELPER(sve_clr_d)(void *vd, void *vg, uint32_t desc)
+     }
  }
  
-+uint64_t HELPER(sve_fadda_h)(uint64_t nn, void *vm, void *vg,
-+                             void *status, uint32_t desc)
++/* Copy Zn into Zd, and store zero into inactive elements.  */
++void HELPER(sve_movz_b)(void *vd, void *vn, void *vg, uint32_t desc)
 +{
-+    intptr_t i = 0, opr_sz = simd_oprsz(desc);
-+    float16 result = nn;
-+
-+    do {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                float16 mm = *(float16 *)(vm + H1_2(i));
-+                result = float16_add(result, mm, status);
-+            }
-+            i += sizeof(float16), pg >>= sizeof(float16);
-+        } while (i & 15);
-+    } while (i < opr_sz);
-+
-+    return result;
-+}
-+
-+uint64_t HELPER(sve_fadda_s)(uint64_t nn, void *vm, void *vg,
-+                             void *status, uint32_t desc)
-+{
-+    intptr_t i = 0, opr_sz = simd_oprsz(desc);
-+    float32 result = nn;
-+
-+    do {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                float32 mm = *(float32 *)(vm + H1_2(i));
-+                result = float32_add(result, mm, status);
-+            }
-+            i += sizeof(float32), pg >>= sizeof(float32);
-+        } while (i & 15);
-+    } while (i < opr_sz);
-+
-+    return result;
-+}
-+
-+uint64_t HELPER(sve_fadda_d)(uint64_t nn, void *vm, void *vg,
-+                             void *status, uint32_t desc)
-+{
-+    intptr_t i = 0, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *m = vm;
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
 +    uint8_t *pg = vg;
-+
-+    for (i = 0; i < opr_sz; i++) {
-+        if (pg[H1(i)] & 1) {
-+            nn = float64_add(nn, m[i], status);
-+        }
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] & expand_pred_b(pg[H1(i)]);
 +    }
-+
-+    return nn;
 +}
 +
- /* Fully general three-operand expander, controlled by a predicate,
-  * With the extra float_status parameter.
++void HELPER(sve_movz_h)(void *vd, void *vn, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] & expand_pred_h(pg[H1(i)]);
++    }
++}
++
++void HELPER(sve_movz_s)(void *vd, void *vn, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[i] & expand_pred_s(pg[H1(i)]);
++    }
++}
++
++void HELPER(sve_movz_d)(void *vd, void *vn, void *vg, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = n[1] & -(uint64_t)(pg[H1(i)] & 1);
++    }
++}
++
+ /* Three-operand expander, immediate operand, controlled by a predicate.
   */
+ #define DO_ZPZI(NAME, TYPE, H, OP)                              \
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index acad6374ef..483ad33179 100644
+index 483ad33179..954d6653d3 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3383,6 +3383,51 @@ DO_ZZI(UMIN, umin)
+@@ -606,6 +606,20 @@ static bool do_clr_zp(DisasContext *s, int rd, int pg, int esz)
+     return true;
+ }
  
- #undef DO_ZZI
- 
-+/*
-+ *** SVE Floating Point Accumulating Reduction Group
-+ */
-+
-+static bool trans_FADDA(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
++/* Copy Zn into Zd, storing zeros into inactive elements.  */
++static void do_movz_zpz(DisasContext *s, int rd, int rn, int pg, int esz)
 +{
-+    typedef void fadda_fn(TCGv_i64, TCGv_i64, TCGv_ptr,
-+                          TCGv_ptr, TCGv_ptr, TCGv_i32);
-+    static fadda_fn * const fns[3] = {
-+        gen_helper_sve_fadda_h,
-+        gen_helper_sve_fadda_s,
-+        gen_helper_sve_fadda_d,
++    static gen_helper_gvec_3 * const fns[4] = {
++        gen_helper_sve_movz_b, gen_helper_sve_movz_h,
++        gen_helper_sve_movz_s, gen_helper_sve_movz_d,
 +    };
 +    unsigned vsz = vec_full_reg_size(s);
-+    TCGv_ptr t_rm, t_pg, t_fpst;
-+    TCGv_i64 t_val;
-+    TCGv_i32 t_desc;
++    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
++                       vec_full_reg_offset(s, rn),
++                       pred_full_reg_offset(s, pg),
++                       vsz, vsz, 0, fns[esz]);
++}
 +
-+    if (a->esz == 0) {
-+        return false;
-+    }
+ static bool do_zpzi_ool(DisasContext *s, arg_rpri_esz *a,
+                         gen_helper_gvec_3 *fn)
+ {
+@@ -3999,6 +4013,54 @@ static bool trans_LD1RQ_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+     return true;
+ }
+ 
++/* Load and broadcast element.  */
++static bool trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
++{
 +    if (!sve_access_check(s)) {
 +        return true;
 +    }
 +
-+    t_val = load_esz(cpu_env, vec_reg_offset(s, a->rn, 0, a->esz), a->esz);
-+    t_rm = tcg_temp_new_ptr();
-+    t_pg = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(t_rm, cpu_env, vec_full_reg_offset(s, a->rm));
-+    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, a->pg));
-+    t_fpst = get_fpstatus_ptr(a->esz == MO_16);
-+    t_desc = tcg_const_i32(simd_desc(vsz, vsz, 0));
++    unsigned vsz = vec_full_reg_size(s);
++    unsigned psz = pred_full_reg_size(s);
++    unsigned esz = dtype_esz[a->dtype];
++    TCGLabel *over = gen_new_label();
++    TCGv_i64 temp;
 +
-+    fns[a->esz - 1](t_val, t_val, t_rm, t_pg, t_fpst, t_desc);
++    /* If the guarding predicate has no bits set, no load occurs.  */
++    if (psz <= 8) {
++        /* Reduce the pred_esz_masks value simply to reduce the
++         * size of the code generated here.
++         */
++        uint64_t psz_mask = MAKE_64BIT_MASK(0, psz * 8);
++        temp = tcg_temp_new_i64();
++        tcg_gen_ld_i64(temp, cpu_env, pred_full_reg_offset(s, a->pg));
++        tcg_gen_andi_i64(temp, temp, pred_esz_masks[esz] & psz_mask);
++        tcg_gen_brcondi_i64(TCG_COND_EQ, temp, 0, over);
++        tcg_temp_free_i64(temp);
++    } else {
++        TCGv_i32 t32 = tcg_temp_new_i32();
++        find_last_active(s, t32, esz, a->pg);
++        tcg_gen_brcondi_i32(TCG_COND_LT, t32, 0, over);
++        tcg_temp_free_i32(t32);
++    }
 +
-+    tcg_temp_free_i32(t_desc);
-+    tcg_temp_free_ptr(t_fpst);
-+    tcg_temp_free_ptr(t_pg);
-+    tcg_temp_free_ptr(t_rm);
++    /* Load the data.  */
++    temp = tcg_temp_new_i64();
++    tcg_gen_addi_i64(temp, cpu_reg_sp(s, a->rn), a->imm << esz);
++    tcg_gen_qemu_ld_i64(temp, temp, get_mem_index(s),
++                        s->be_data | dtype_mop[a->dtype]);
 +
-+    write_fp_dreg(s, a->rd, t_val);
-+    tcg_temp_free_i64(t_val);
++    /* Broadcast to *all* elements.  */
++    tcg_gen_gvec_dup_i64(esz, vec_full_reg_offset(s, a->rd),
++                         vsz, vsz, temp);
++    tcg_temp_free_i64(temp);
++
++    /* Zero the inactive elements.  */
++    gen_set_label(over);
++    do_movz_zpz(s, a->rd, a->rd, a->pg, esz);
 +    return true;
 +}
 +
- /*
-  *** SVE Floating Point Arithmetic - Unpredicated Group
-  */
+ static void do_st_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+                       int msz, int esz, int nreg)
+ {
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index e8531e28cd..675b81aaa0 100644
+index 675b81aaa0..765e7e479b 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -676,6 +676,11 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
- # SVE integer multiply immediate (unpredicated)
- MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
+@@ -28,6 +28,7 @@
+ %imm8_16_10     16:5 10:3
+ %imm9_16_10     16:s6 10:3
+ %size_23        23:2
++%dtype_23_13    23:2 13:2
  
-+### SVE FP Accumulating Reduction Group
-+
-+# SVE floating-point serial reduction (predicated)
-+FADDA           01100101 .. 011 000 001 ... ..... .....         @rdn_pg_rm
-+
- ### SVE Floating Point Arithmetic - Unpredicated Group
+ # A combination of tsz:imm3 -- extract esize.
+ %tszimm_esz     22:2 5:5 !function=tszimm_esz
+@@ -751,6 +752,10 @@ LDR_pri         10000101 10 ...... 000 ... ..... 0 ....         @pd_rn_i9
+ # SVE load vector register
+ LDR_zri         10000101 10 ...... 010 ... ..... .....          @rd_rn_i9
  
- # SVE floating-point arithmetic (unpredicated)
++# SVE load and broadcast element
++LD1R_zpri       1000010 .. 1 imm:6 1.. pg:3 rn:5 rd:5 \
++                &rpri_load dtype=%dtype_23_13 nreg=0
++
+ ### SVE Memory Contiguous Load Group
+ 
+ # SVE contiguous load (scalar plus scalar)
 -- 
 2.17.1
