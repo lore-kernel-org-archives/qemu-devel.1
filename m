@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fY7ZD-0004yb-2n
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:20:52 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fY7a9-0005Mk-7u
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:21:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fY7Z9-0002Oh-U5
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:20:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36042 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fY7a6-0003Rp-4k
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:21:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46482 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fY7Z9-0002Nj-Or
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:20:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 324AB857AB
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 10:20:47 +0000 (UTC)
-Date: Wed, 27 Jun 2018 11:20:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180627102043.GD30628@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
-	<87wouk8vul.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fY7a5-0003RW-UV
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:21:46 -0400
+Date: Wed, 27 Jun 2018 11:21:42 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180627102142.GB5955@stefanha-x1.localdomain>
+References: <20180627082248.14921-1-pagupta@redhat.com>
+	<20180627082248.14921-3-pagupta@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
 Content-Disposition: inline
-In-Reply-To: <87wouk8vul.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+In-Reply-To: <20180627082248.14921-3-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: Set status early in
+ VirtIODevice parent object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org, slopezpa@redhat.com
 
-On Wed, Jun 27, 2018 at 10:41:38AM +0200, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
-> > Markus Armbruster <armbru@redhat.com> writes:
-> >
-> >> I fooled around a bit, and I think there are a few lose ends.
-> > [...]
-> >> Talking to a QMP monitor that supports OOB:
-> >>
-> >>     $ socat UNIX:test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
-> >>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
-> >>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true } }
-> >>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' is unexpected"}}
-> >>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
-> >>     {"return": {}}
-> >>     QMP> { "execute": "query-qmp-schema" }
-> >>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capability requires that every command contains an 'id' field"}}
-> >>
-> >> Why does every command require 'id'?
-> >
-> > I found one reason: event COMMAND_DROPPED wants it.  Any other reason?
-> >
-> > [...]
-> 
-> Apropos COMMAND_DROPPED: we send an event rather than an error response
-> because we may send it out-of-order.  Makes sense.
-> 
-> However, broadcasting it to all monitors doesn't make sense.  We could
-> use a way to send an event to just one monitor.
 
-Worse than that - broadcasting to all monitors is categorically broken.
-Different monitors make use the same "id" formatting scheme, so if you
-broadcast COMMAND_DROPPED to a different monitor you might have clashing
-"id" and thus incorrectly tell a client its command was dropped when in
-fact it was processed. You'd have to be fairly unlucky in timing, but
-it could happen.
+--LpQ9ahxlCli8rRTG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Wed, Jun 27, 2018 at 01:52:48PM +0530, Pankaj Gupta wrote:
+>  To process pending requests for driver status 'VIRTIO_CONFIG_S_DRIVER_OK=
+',
+>  virtio-rng 'set_status' calls 'is_guest_ready' function. This checks if=
+=20
+>  virtqueue is ready and status is set to 'VIRTIO_CONFIG_S_DRIVER_OK'.=20
+>=20
+>  This call is made before new status is updated in VirtIODevice parent ob=
+ject=20
+>  and calling function uses old status value.
+>=20
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  hw/virtio/virtio.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index d4e4d98b59..37dc59a686 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1154,10 +1154,11 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t=
+ val)
+>              }
+>          }
+>      }
+> +    vdev->status =3D val;
+> +
+>      if (k->set_status) {
+>          k->set_status(vdev, val);
+>      }
+> -    vdev->status =3D val;
+
+This breaks existing ->set_status() callbacks that rely on vdev->status
+containing the old value.  Have you audited them?
+
+For example, virtio_net_set_status -> virtio_net_vnet_endian_status uses
+vdev->status!
+
+It may be easier to modify virtio-rng.c so that the old status value
+isn't used.
+
+Stefan
+
+--LpQ9ahxlCli8rRTG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbM2U2AAoJEJykq7OBq3PIOb4IAMHuSDMVK883dE9kAz20hq0x
+VelGOBzyuX8VPEUB82qDp8gelNbOOBUmN90O4qx+ziXLB/axRubHwzKLlGDBeNcA
+RnF3Oh32B7A2aQh0jpGY6zzRPyb7DjbMD3ngAtLz7vDnyiQcF9s/UdMrLgqW0NsP
+6whH8rL5SVDTO3JP3ZPJdRYRmbC7aJxPbzspKyLEyxmT1bi2kHy5EGmy2yhWpzbi
+qz/02kFCd1t0s2voIDznk6AjEPcgp5z8Ij2jKjE1PQjW3lSSCq51YPsF/zJyFiqg
+MyF9eyQrX8ajWKrWmEX6VH8XGTZn66I8ZTyuiwGfoAOe0uf6/eCPFb2u+kqs3YE=
+=zViY
+-----END PGP SIGNATURE-----
+
+--LpQ9ahxlCli8rRTG--
