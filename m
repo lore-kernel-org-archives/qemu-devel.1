@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fY3jY-0000uR-Md
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:15:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fY3n1-0002fX-GX
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fY3jV-0002KZ-HL
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:15:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52744 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fY3jV-0002Jq-C2
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:15:13 -0400
-Date: Wed, 27 Jun 2018 08:15:08 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180627061508.ka3j47vlbidmve3q@sirius.home.kraxel.org>
-References: <1462367134-23894-1-git-send-email-kraxel@redhat.com>
-	<20160509144316.GI3372@stefanha-x1.localdomain>
-	<1462874939.8035.52.camel@redhat.com>
-	<1462879537.8035.53.camel@redhat.com>
-	<20180620061438-mutt-send-email-mst@kernel.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1fY3mw-0005GF-Ph
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:18:51 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:44037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fY3mw-0005FV-K3
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:18:46 -0400
+Received: by mail-pl0-x241.google.com with SMTP id m16-v6so543663pls.11
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 23:18:46 -0700 (PDT)
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-23-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <250c288c-491f-f8f2-5c17-77277c112f41@linaro.org>
+Date: Tue, 26 Jun 2018 23:18:42 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180620061438-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH] Add virtio gpu device
- specification.
+In-Reply-To: <20180625124238.25339-23-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 22/46] hw/alpha: Use the IEC binary
+ prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-  Hi,
+On 06/25/2018 05:42 AM, Philippe Mathieu-Daudé wrote:
+> It eases code review, unit is explicit.
+> 
+> Patch generated using:
+> 
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
+> 
+> and modified manually.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/alpha/typhoon.c | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
 
-> > > > >   https://www.kraxel.org/virtio/virtio-v1.0-cs03-virtio-gpu.html#x1-2800007
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> Is there a chance you could rebase and post?
-> This is used widely, I think we shoould have it in 1.1
-> if at all possible.
 
-https://www.kraxel.org/virtio/virtio-v1.0-cs04-virtio-gpu.html#x1-3150007
-
-Repost will follow in a moment.
-
-For virtio-input I don't have the latest version at hand,
-Ladi worked on it last.
-
-cheers,
-  Gerd
+r~
