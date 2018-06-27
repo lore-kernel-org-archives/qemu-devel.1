@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fY5Cd-0000q3-KH
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:49:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1fY5KH-0002eC-5U
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fY5CY-0004g2-Kc
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:49:23 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:44839)
+	(envelope-from <armbru@redhat.com>) id 1fY5KC-0002hI-7n
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:57:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39908 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fY5CY-0004eo-A1
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:49:18 -0400
-Date: Wed, 27 Jun 2018 09:49:16 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180625222718.4488-1-mail@sebastianbauer.info>
-Message-ID: <alpine.BSF.2.21.1806270945590.79722@zero.eik.bme.hu>
-References: <20180625222718.4488-1-mail@sebastianbauer.info>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY5KC-0002go-3O
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:57:12 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180625131253.11218-1-kraxel@redhat.com>
+	<20180625131253.11218-2-kraxel@redhat.com>
+	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
+	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
+	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
+Date: Wed, 27 Jun 2018 09:57:09 +0200
+In-Reply-To: <0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com> (Thomas Huth's
+	message of "Wed, 27 Jun 2018 09:24:46 +0200")
+Message-ID: <87fu18ach6.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] ehci: Don't fetch a NULL current qtd but
- advance the queue instead.
+Content-Type: text/plain
+Subject: [Qemu-devel] Drop support for 32bit hosts in qemu? (was: [PULL 1/6]
+ audio/hda: create millisecond timers that handle IO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sebastian Bauer <mail@sebastianbauer.info>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>, Martin Schrodt <martin@schrodt.org>, qemu-devel@nongnu.org
 
-On Tue, 26 Jun 2018, Sebastian Bauer wrote:
-> Fetching qtd with the NULL address most likely makes no sense so from now
-> on, we handle it this case similarly as if the terminate (T) bit is not
-> set, which is already an exception as according to section 3.6 of the EHCI
-> spec there is no T bit defined for the current_qtd field.
->
-> The spec is a bit vague on how an EHCI driver should initialize these
-> fields: "The general operational model is that the host controller can
-> detect whether the overlay area contains a description of an active
-> transfer" (p. 49). QEMU primarily uses the QTD_TOKEN_ACTIVE bit of the
-> queue header to infer the activity state but there are other ways
-> conceivable.
->
-> This change allows QEMU to boot further into AmigaOS. The public available
-> version of the EHCI driver recycles queue heads in some rare conditions but
-> only clears the current_qtd field but not the status field. This works with
-> many available EHCI PCI cards but e.g., not with the Freescale USB
-> controller's found on the P5040. On the emulated EHCI controller of QEMU
-> the consequence is that some garbage was read in, which resulted in a
-> reset of the controller. This change fixes the problem.
->
-> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Thomas Huth <thuth@redhat.com> writes:
 
-This fixes mouse and keyboard for AmigaOS on sam460ex. It would be 
-appreciated if this could be merged before the freeze. I guess it could be 
-removed again before the release if found to cause any problems or fixed 
-if needed but if it's not merged now then we can't make QEMU 3.0 support 
-AmigaOS.
+> On 27.06.2018 08:51, Gerd Hoffmann wrote:
+[...]
+>> Drop support for 32bit hosts in qemu?
+>
+> I guess the only way to answer that question reliably is to send a patch
+> to mark 32-bit hosts as deprecated...
+>
+> Anyway, you still have got to fix that problem with -m32 now somehow
+> since we certainly can not drop 32-bit immediately.
 
-Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
+We certainly can if we want to.
 
-> ---
->
-> The fix is probably not the best solution. However, it is one that is very
-> small.
->
-> QEMU still warns that an active qh will be changed if the qh is recycled,
-> so more changes could be done. But I didn't notice any negative
-> consequences implied by the warning so I would leave a possible fix to this
-> problem to a further patch.
-> ---
-> hw/usb/hcd-ehci.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-> index 0134232627..e5acfc5ba5 100644
-> --- a/hw/usb/hcd-ehci.c
-> +++ b/hw/usb/hcd-ehci.c
-> @@ -1672,7 +1672,8 @@ static EHCIQueue *ehci_state_fetchqh(EHCIState *ehci, int async)
->         ehci_set_state(ehci, async, EST_HORIZONTALQH);
->
->     } else if ((q->qh.token & QTD_TOKEN_ACTIVE) &&
-> -               (NLPTR_TBIT(q->qh.current_qtd) == 0)) {
-> +               (NLPTR_TBIT(q->qh.current_qtd) == 0) &&
-> +               (q->qh.current_qtd != 0)) {
->         q->qtdaddr = q->qh.current_qtd;
->         ehci_set_state(ehci, async, EST_FETCHQTD);
->
->
+Our formal deprecation policy codifies our compromise between the need
+to evolve QEMU and the need of its users for stable external interfaces.
+
+"Compiles on host X" is also a need, but it's a different one.
+Evidence: "Supported build platforms" has its own appendix, separate
+from "Deprecated features".  It's mum on 32-bit hosts.
+
+I'm not saying we *should* drop 32-bit hosts immediately.  Only that the
+feature deprecation policy does not apply.
+
+Is QEMU still useful on 32-bit hosts?  Honest question!
