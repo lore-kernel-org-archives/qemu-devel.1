@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYCZu-0003v6-PK
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 11:41:55 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYCdA-0004qW-2V
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 11:46:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYCZp-0002yC-TW
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 11:41:54 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:36551)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYCZp-0002wV-Jj
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 11:41:49 -0400
-References: <20180625131253.11218-1-kraxel@redhat.com>
-	<20180625131253.11218-2-kraxel@redhat.com>
-	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
-	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
-	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
-	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
-	<alpine.BSF.2.21.1806271010080.90116@zero.eik.bme.hu>
-	<20180627085217.blrsx5lmu4sau4fd@sirius.home.kraxel.org>
-	<5d591d6c-ccc4-cc86-ebbc-3c66a6817c70@redhat.com>
-	<db5529c6-7002-4b96-9d94-ca719e3845f8@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4c86fb26-f7c3-e66e-33a2-dbbfe2e70960@vivier.eu>
-Date: Wed, 27 Jun 2018 17:41:27 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fYCcf-0006H5-MD
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 11:45:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53680 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYCcf-0006FE-93
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 11:44:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2685AB5C9
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 15:44:44 +0000 (UTC)
+References: <20180626154028.11133-1-pbonzini@redhat.com>
+	<20180626154028.11133-5-pbonzini@redhat.com>
+	<6f643a0b-71f4-4034-d8ec-c5a0a2f84ba6@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8c63167d-c5e4-5fe4-ddae-5c69c7fd46e0@redhat.com>
+Date: Wed, 27 Jun 2018 17:44:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <db5529c6-7002-4b96-9d94-ca719e3845f8@amsat.org>
+In-Reply-To: <6f643a0b-71f4-4034-d8ec-c5a0a2f84ba6@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu? (was: [PULL
- 1/6] audio/hda: create millisecond timers that handle IO)
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] pr-manager: add query-pr-managers QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, Markus Armbruster <armbru@redhat.com>, Martin Schrodt <martin@schrodt.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
 
-Le 27/06/2018 à 15:33, Philippe Mathieu-Daudé a écrit :
-> On 06/27/2018 06:09 AM, Thomas Huth wrote:
->> On 27.06.2018 10:52, Gerd Hoffmann wrote:
->>>   Hi,
->>>
->>>>> Is QEMU still useful on 32-bit hosts?  Honest question!
->>>>
->>>> I guess it depends on what 32-bit hosts you consider. If you look at only
->>>> x86 vs. x86_64 then probably x86 is not that important any more but for some
->>>> embedded systems/SoCs 32bit might still be common and QEMU useful for those
->>>> (also as host not only emulated).
->>>
->>> Well.  I've used kvm with an 32bit arm soc (cubietruck).  It's very
->>> slow.  And all the arm architecture improvements to support kvm better
->>> are for aarch64 only.
->>>
->>>> Another option might be to not support audio/hda on 32bit hosts. It's not
->>>> nice either but a lot nicer than dropping support for 32bit hosts
->>>> alltogether to fix a problem in device emulation.
->>>
->>> But it also is not useful and a waste of resources to maintain 32bit
->>> host compatibility if nobody actually uses that ...
->>>
->>> For me testbuilds are the only reason to compile qemu for 32bit hosts.
->>> Since years.
->>
->> Well, while that's true for you, me and likely most of us developers,
->> you can not know whether this is also true for all users of qemu. Thus
->> this needs to be announced first for a couple of releases so that people
->> have a chance to speak up whether they still need this or not. As
->> mentioned earlier, embedded devices are often still 32-bit and I know
->> that there really are people who use QEMU on embedded devices.
->>
->> But I think we could at least announce now already that we intend to
->> drop support for 32-bit hosts in the future (maybe not in 2 releases
->> already, but, let's say in 2020? 2020 is already the EOL of Python 2, so
->> that will rule out a bunch of other legacy hosts, too).
-> 
-> linux-user is certainly widely used on ARMv6 / ARMv7.
-> 
-> Known user cases:
-> 
-> - run ARMv7 binaries on ARMv6
-> - run armhf binaries on armel
-> - run x86-64 binaries on ARMv7
-> 
+On 26/06/2018 18:31, Michal Privoznik wrote:
+>>  
+>> +static bool pr_manager_helper_is_connected(PRManager *p)
+>> +{
+>> +    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(p);
+>> +    bool result;
+>> +
+>> +    qemu_mutex_lock(&pr_mgr->lock);
+>> +    result = (pr_mgr->ioc != NULL);
+> I worry it is not that easy. pr_mgr->ioc is unset only when there's
+> PR_IN/PR_OUT command coming from the guest (in pr_manager_helper_run ->
+> pr_manager_helper_write). In fact, after 5/5 that is also the time when
+> the event is delivered. But that might be too late for mgmt app to
+> restart the helper process (although pr_manager_helper_run() tries to
+> reconnect for 5 seconds before giving up).
 
-I run i386 binaries on ARMv6.
+That's true, however the important thing IMO is to have a QMP interface
+that libvirt can use; everything else is just quality of implementation.
 
-I use it to run i386 printer driver on my raspberry Pi B+.
-Brother doesn't provide the binary for ARM, neither the source.
+qemu-pr-helper anyway does something only when a guests sends it a PR
+command - and with libvirt's per-guest model, that would (hopefully)
+mean that the only case that remains is when someone manually kills the
+qemu-pr-helper process.  In that case there's a certain amount of PEBKAC
+involved... :)
 
-Thanks,
-Laurent
+Paolo
+
+> The patch is good code-wise though.
