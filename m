@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fXzyg-0006el-Db
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:14:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fXzyk-0006fu-KY
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:14:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fXzyb-0001pu-Ge
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:14:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60826)
+	(envelope-from <ehabkost@redhat.com>) id 1fXzyj-00020l-PO
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:14:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fXzyb-0001nb-9H
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:14:33 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fXzyj-0001zu-Ia
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:14:41 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 26 Jun 2018 23:14:17 -0300
-Message-Id: <20180627021423.18404-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/6] docker: Port to Python 3
+Date: Tue, 26 Jun 2018 23:14:18 -0300
+Message-Id: <20180627021423.18404-2-ehabkost@redhat.com>
+In-Reply-To: <20180627021423.18404-1-ehabkost@redhat.com>
+References: <20180627021423.18404-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/6] docker: Use BytesIO instead of StringIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This series makes tests/docker/docker.py compatible with both
-Python 2 and Python 3, and adds type annotation to make
-maintenance easier in the future.
+The file passed as argument to TarFile.addfile() must be a binary
+file, so BytesIO is more appropriate than StringIO.
 
-A note about dockerfile encoding
---------------------------------
+This is necessary to make the code work on Python 3.
 
-One decision I made while working on this was to open dockerfiles
-in text mode instead of binary mode, to make the code simpler and
-safer.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ tests/docker/docker.py | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-This means we won't support dockerfiles that are not valid utf-8
-data, but I see that as a feature and not a bug.  :)
-
-Opening dockerfiles in binary mode and treating its contents as
-byte sequences instead of text is possible if we really want to,
-but I don't think it would be worth the extra code complexity.
-
-Eduardo Habkost (6):
-  docker: Use BytesIO instead of StringIO
-  docker: Always return int on run()
-  docker: Add type annotations
-  docker: Use os.environ.items() instead of .iteritems()
-  docker: Make _get_so_libs() work on Python 3
-  docker: Open dockerfiles in text mode
-
- tests/docker/docker.py | 115 ++++++++++++++++++++++++++++-------------
- 1 file changed, 79 insertions(+), 36 deletions(-)
-
-
-base-commit: bd4e4a387aa733e40270a7406c7d111f2292de65
-prerequisite-patch-id: 83051ebcf718afae38540902b60a0f8e9f91c174
-prerequisite-patch-id: 1a35c71f2a58523de78e3ea2e44c5ef1f84bcc4a
-prerequisite-patch-id: 5206b4c5a6797ea17eb763da6203e1881d379f2c
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 8e13f18e6c..0de7662146 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -24,10 +24,7 @@ import tempfile
+ import re
+ import signal
+ from tarfile import TarFile, TarInfo
+-try:
+-    from StringIO import StringIO
+-except ImportError:
+-    from io import StringIO
++from io import BytesIO
+ from shutil import copy, rmtree
+ from pwd import getpwuid
+ from datetime import datetime,timedelta
+@@ -372,13 +369,13 @@ class UpdateCommand(SubCommand):
+                 tmp_tar.add(os.path.realpath(l), arcname=l)
+ 
+         # Create a Docker buildfile
+-        df = StringIO()
+-        df.write("FROM %s\n" % args.tag)
+-        df.write("ADD . /\n")
+-        df.seek(0)
++        df = BytesIO()
++        df.write(b"FROM %s\n" % args.tag.encode())
++        df.write(b"ADD . /\n")
+ 
+         df_tar = TarInfo(name="Dockerfile")
+-        df_tar.size = len(df.buf)
++        df_tar.size = df.tell()
++        df.seek(0)
+         tmp_tar.addfile(df_tar, fileobj=df)
+ 
+         tmp_tar.close()
 -- 
 2.18.0.rc1.1.g3f1ff2140
