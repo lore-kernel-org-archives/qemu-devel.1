@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fYBaz-0004il-DI
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:38:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fYBbW-0005L1-JQ
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fYBay-0002zP-G6
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:38:57 -0400
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 28 Jun 2018 00:08:15 +0930
-Message-Id: <20180627143815.1829-4-joel@jms.id.au>
-In-Reply-To: <20180627143815.1829-1-joel@jms.id.au>
-References: <20180627143815.1829-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH v2 3/3] MAINTAINERS: Add NRF51 entry
+	(envelope-from <richard.henderson@linaro.org>) id 1fYBbS-0003KP-RK
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:39:30 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45949)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fYBbS-0003JV-Le
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:39:26 -0400
+Received: by mail-pf0-x243.google.com with SMTP id a22-v6so1061098pfo.12
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:39:26 -0700 (PDT)
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-43-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <77701561-fead-eeea-2184-6a45aa7deafa@linaro.org>
+Date: Wed, 27 Jun 2018 07:39:22 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180625124238.25339-43-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 42/46] monitor: Use the IEC binary
+ prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, Eric Blake <eblake@redhat.com>
+Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-This contains the NRF51, and the machine that uses it, the BBC
-micro:bit.
+On 06/25/2018 05:42 AM, Philippe Mathieu-Daudé wrote:
+> It eases code review, unit is explicit.
+> 
+> Patch generated using:
+> 
+>   $ git grep -n '[<>][<>]= ?[1-5]0'
+> 
+> and modified manually.
+> 
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  monitor.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8c626f6a079e..fef3d71dbef7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -656,6 +656,14 @@ F: include/hw/*/*aspeed*
- F: hw/net/ftgmac100.c
- F: include/hw/net/ftgmac100.h
- 
-+NRF51
-+M: Joel Stanley <joel@jms.id.au>
-+L: qemu-arm@nognu.org
-+S: Maintained
-+F: hw/arm/nrf51_soc.c
-+F: hw/arm/microbit.c
-+F: include/hw/arm/nrf51_soc.h
-+
- CRIS Machines
- -------------
- Axis Dev88
--- 
-2.17.1
+
+r~
