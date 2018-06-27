@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYJna-000330-33
+	(envelope-from <laurent@vivier.eu>) id 1fYJnb-00038d-Jt
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYJnW-0007S4-PP
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:24:30 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYJnY-0007Tl-Bm
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:24:31 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 28 Jun 2018 01:23:25 +0200
-Message-Id: <20180627232334.14142-2-laurent@vivier.eu>
+Date: Thu, 28 Jun 2018 01:23:29 +0200
+Message-Id: <20180627232334.14142-6-laurent@vivier.eu>
 In-Reply-To: <20180627232334.14142-1-laurent@vivier.eu>
 References: <20180627232334.14142-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [C v2 01/10] hw/m68k: add via support
+Subject: [Qemu-devel] [C v2 05/10] hw/m68k: Apple Sound Chip (ASC) emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +22,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>
 
+This is broken as the linux driver seems broken too...
+
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/misc/Makefile.objs     |   1 +
- hw/misc/mac_via.c         | 675 ++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/mac_via.h | 106 ++++++++
- 3 files changed, 782 insertions(+)
- create mode 100644 hw/misc/mac_via.c
- create mode 100644 include/hw/misc/mac_via.h
+ hw/audio/Makefile.objs |   1 +
+ hw/audio/asc.c         | 463 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/audio/asc.h |  48 +++++
+ 3 files changed, 512 insertions(+)
+ create mode 100644 hw/audio/asc.c
+ create mode 100644 include/hw/audio/asc.h
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 9350900845..24eb8011f1 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -70,5 +70,6 @@ obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
- obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
-+obj-$(CONFIG_MAC_VIA) += mac_via.o
- obj-y += mmio_interface.o
- obj-$(CONFIG_MSF2) += msf2-sysreg.o
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
+index 63db383709..44d1ada7b0 100644
+--- a/hw/audio/Makefile.objs
++++ b/hw/audio/Makefile.objs
+@@ -16,3 +16,4 @@ common-obj-$(CONFIG_MARVELL_88W8618) += marvell_88w8618.o
+ common-obj-$(CONFIG_MILKYMIST) += milkymist-ac97.o
+ 
+ common-obj-y += soundhw.o
++common-obj-$(CONFIG_ASC) += asc.o
+diff --git a/hw/audio/asc.c b/hw/audio/asc.c
 new file mode 100644
-index 0000000000..586477ca9e
+index 0000000000..1066bf4488
 --- /dev/null
-+++ b/hw/misc/mac_via.c
-@@ -0,0 +1,675 @@
++++ b/hw/audio/asc.c
+@@ -0,0 +1,463 @@
 +/*
-+ * QEMU m68k Macintosh VIA device support
++ *  QEMU Apple Sound Chip emulation
 + *
-+ * Copyright (c) 2011-2018 Laurent Vivier
++ *  Apple Sound Chip (ASC) 344S0063
++ *  Enhanced Apple Sound Chip (EASC) 343S1063
 + *
-+ * Some parts from hw/cuda.c
-+ *
-+ * Copyright (c) 2004-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ *
-+ * some parts from linux-2.6.29, arch/m68k/include/asm/mac_via.h
++ *  Copyright (c) 2012-2018 Laurent Vivier <laurent@vivier.eu>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
@@ -69,772 +65,506 @@ index 0000000000..586477ca9e
 +
 +#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
-+#include "qemu/timer.h"
-+#include "hw/misc/mac_via.h"
-+#include "hw/misc/mos6522.h"
-+#include "hw/input/adb.h"
-+#include "sysemu/sysemu.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+
++#include "audio/audio.h"
++#include "hw/audio/asc.h"
 +
 +/*
-+ * VIAs: There are two in every machine,
-+ */
-+
-+#define VIA_SIZE (0x2000)
-+
-+/*
-+ * Not all of these are true post MacII I think.
-+ * CSA: probably the ones CHRP marks as 'unused' change purposes
-+ * when the IWM becomes the SWIM.
-+ * http://www.rs6000.ibm.com/resource/technology/chrpio/via5.mak.html
-+ * ftp://ftp.austin.ibm.com/pub/technology/spec/chrp/inwork/CHRP_IORef_1.0.pdf
++ * Linux doesn't provide information about ASC, see arch/m68k/mac/macboing.c
++ * and arch/m68k/include/asm/mac_asc.h
 + *
-+ * also, http://developer.apple.com/technotes/hw/hw_09.html claims the
-+ * following changes for IIfx:
-+ * VIA1A_vSccWrReq not available and that VIA1A_vSync has moved to an IOP.
-+ * Also, "All of the functionality of VIA2 has been moved to other chips".
++ * best information is coming from MAME:
++ *   http://mamedev.org/source/src/emu/sound/asc.h.html
++ *   http://mamedev.org/source/src/emu/sound/asc.c.html
++ *   Emulation by R. Belmont
++ *
++ *     0x800: VERSION
++ *     0x801: MODE
++ *            1=FIFO mode,
++ *            2=wavetable mode
++ *     0x802: CONTROL
++ *            bit 0=analog or PWM output,
++ *                1=stereo/mono,
++ *                7=processing time exceeded
++ *     0x803: FIFO MODE
++ *            bit 7=clear FIFO,
++ *            bit 1="non-ROM companding",
++ *            bit 0="ROM companding")
++ *     0x804: FIFO IRQ STATUS
++ *            bit 0=ch A 1/2 full,
++ *                1=ch A full,
++ *                2=ch B 1/2 full,
++ *                3=ch B full)
++ *     0x805: WAVETABLE CONTROL
++ *            bits 0-3 wavetables 0-3 start
++ *     0x806: VOLUME
++ *            bits 2-4 = 3 bit internal ASC volume,
++ *            bits 5-7 = volume control sent to Sony sound chip
++ *     0x807: CLOCK RATE
++ *            0 = Mac 22257 Hz,
++ *            1 = undefined,
++ *            2 = 22050 Hz,
++ *            3 = 44100 Hz
++ *     0x80a: PLAY REC A
++ *     0x80f: TEST
++ *            bits 6-7 = digital test,
++ *            bits 4-5 = analog test
++ *     0x810: WAVETABLE 0 PHASE
++ *            big-endian 9.15 fixed-point, only 24 bits valid
++ *     0x814: WAVETABLE 0 INCREMENT
++ *            big-endian 9.15 fixed-point, only 24 bits valid
++ *     0x818: WAVETABLE 1 PHASE
++ *     0x81C: WAVETABLE 1 INCREMENT
++ *     0x820: WAVETABLE 2 PHASE
++ *     0x824: WAVETABLE 2 INCREMENT
++ *     0x828: WAVETABLE 3 PHASE
++ *     0x82C: WAVETABLE 3 INCREMENT
 + */
 +
-+#define VIA1A_vSccWrReq 0x80   /* SCC write. (input)
-+                                * [CHRP] SCC WREQ: Reflects the state of the
-+                                * Wait/Request pins from the SCC.
-+                                * [Macintosh Family Hardware]
-+                                * as CHRP on SE/30,II,IIx,IIcx,IIci.
-+                                * on IIfx, "0 means an active request"
-+                                */
-+#define VIA1A_vRev8     0x40   /* Revision 8 board ???
-+                                * [CHRP] En WaitReqB: Lets the WaitReq_L
-+                                * signal from port B of the SCC appear on
-+                                * the PA7 input pin. Output.
-+                                * [Macintosh Family] On the SE/30, this
-+                                * is the bit to flip screen buffers.
-+                                * 0=alternate, 1=main.
-+                                * on II,IIx,IIcx,IIci,IIfx this is a bit
-+                                * for Rev ID. 0=II,IIx, 1=IIcx,IIci,IIfx
-+                                */
-+#define VIA1A_vHeadSel  0x20   /* Head select for IWM.
-+                                * [CHRP] unused.
-+                                * [Macintosh Family] "Floppy disk
-+                                * state-control line SEL" on all but IIfx
-+                                */
-+#define VIA1A_vOverlay  0x10   /* [Macintosh Family] On SE/30,II,IIx,IIcx
-+                                * this bit enables the "Overlay" address
-+                                * map in the address decoders as it is on
-+                                * reset for mapping the ROM over the reset
-+                                * vector. 1=use overlay map.
-+                                * On the IIci,IIfx it is another bit of the
-+                                * CPU ID: 0=normal IIci, 1=IIci with parity
-+                                * feature or IIfx.
-+                                * [CHRP] En WaitReqA: Lets the WaitReq_L
-+                                * signal from port A of the SCC appear
-+                                * on the PA7 input pin (CHRP). Output.
-+                                * [MkLinux] "Drive Select"
-+                                *  (with 0x20 being 'disk head select')
-+                                */
-+#define VIA1A_vSync     0x08   /* [CHRP] Sync Modem: modem clock select:
-+                                * 1: select the external serial clock to
-+                                *    drive the SCC's /RTxCA pin.
-+                                * 0: Select the 3.6864MHz clock to drive
-+                                *    the SCC cell.
-+                                * [Macintosh Family] Correct on all but IIfx
-+                                */
++#define ASC_LENGTH   0x2000
++#define ASC_BUF_SIZE 0x0800
 +
-+/* Macintosh Family Hardware sez: bits 0-2 of VIA1A are volume control
-+ * on Macs which had the PWM sound hardware.  Reserved on newer models.
-+ * On IIci,IIfx, bits 1-2 are the rest of the CPU ID:
-+ * bit 2: 1=IIci, 0=IIfx
-+ * bit 1: 1 on both IIci and IIfx.
-+ * MkLinux sez bit 0 is 'burnin flag' in this case.
-+ * CHRP sez: VIA1A bits 0-2 and 5 are 'unused': if programmed as
-+ * inputs, these bits will read 0.
-+ */
-+#define VIA1A_vVolume   0x07    /* Audio volume mask for PWM */
-+#define VIA1A_CPUID0    0x02    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID1    0x04    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID2    0x10    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID3    0x40    /* CPU id bit 0 on RBV, others */
++#define ASC_REG_BASE 0x0800
++enum {
++    ASC_VERSION     = 0x00,
++    ASC_MODE        = 0x01,
++    ASC_CONTROL     = 0x02,
++    ASC_FIFOMODE    = 0x03,
++    ASC_FIFOIRQ     = 0x04,
++    ASC_WAVECTRL    = 0x05,
++    ASC_VOLUME      = 0x06,
++    ASC_CLOCK       = 0x07,
++    ASC_PLAYRECA    = 0x0a,
++    ASC_TEST        = 0x0f,
++    ASC_WAVETABLE   = 0x10
++};
 +
-+/* Info on VIA1B is from Macintosh Family Hardware & MkLinux.
-+ * CHRP offers no info. */
-+#define VIA1B_vSound   0x80    /* Sound enable (for compatibility with
-+                                * PWM hardware) 0=enabled.
-+                                * Also, on IIci w/parity, shows parity error
-+                                * 0=error, 1=OK. */
-+#define VIA1B_vMystery 0x40    /* On IIci, parity enable. 0=enabled,1=disabled
-+                                * On SE/30, vertical sync interrupt enable.
-+                                * 0=enabled. This vSync interrupt shows up
-+                                * as a slot $E interrupt. */
-+#define VIA1B_vADBS2   0x20    /* ADB state input bit 1 (unused on IIfx) */
-+#define VIA1B_vADBS1   0x10    /* ADB state input bit 0 (unused on IIfx) */
-+#define VIA1B_vADBInt  0x08    /* ADB interrupt 0=interrupt (unused on IIfx)*/
-+#define VIA1B_vRTCEnb  0x04    /* Enable Real time clock. 0=enabled. */
-+#define VIA1B_vRTCClk  0x02    /* Real time clock serial-clock line. */
-+#define VIA1B_vRTCData 0x01    /* Real time clock serial-data line. */
-+
-+/*
-+ *    VIA2 A register is the interrupt lines raised off the nubus
-+ *    slots.
-+ *      The below info is from 'Macintosh Family Hardware.'
-+ *      MkLinux calls the 'IIci internal video IRQ' below the 'RBV slot 0 irq.'
-+ *      It also notes that the slot $9 IRQ is the 'Ethernet IRQ' and
-+ *      defines the 'Video IRQ' as 0x40 for the 'EVR' VIA work-alike.
-+ *      Perhaps OSS uses vRAM1 and vRAM2 for ADB.
-+ */
-+
-+#define VIA2A_vRAM1    0x80    /* RAM size bit 1 (IIci: reserved) */
-+#define VIA2A_vRAM0    0x40    /* RAM size bit 0 (IIci: internal video IRQ) */
-+#define VIA2A_vIRQE    0x20    /* IRQ from slot $E */
-+#define VIA2A_vIRQD    0x10    /* IRQ from slot $D */
-+#define VIA2A_vIRQC    0x08    /* IRQ from slot $C */
-+#define VIA2A_vIRQB    0x04    /* IRQ from slot $B */
-+#define VIA2A_vIRQA    0x02    /* IRQ from slot $A */
-+#define VIA2A_vIRQ9    0x01    /* IRQ from slot $9 */
-+
-+/* RAM size bits decoded as follows:
-+ * bit1 bit0  size of ICs in bank A
-+ *  0    0    256 kbit
-+ *  0    1    1 Mbit
-+ *  1    0    4 Mbit
-+ *  1    1   16 Mbit
-+ */
-+
-+/*
-+ *    Register B has the fun stuff in it
-+ */
-+
-+#define VIA2B_vVBL    0x80    /* VBL output to VIA1 (60.15Hz) driven by
-+                               * timer T1.
-+                               * on IIci, parity test: 0=test mode.
-+                               * [MkLinux] RBV_PARODD: 1=odd,0=even. */
-+#define VIA2B_vSndJck 0x40    /* External sound jack status.
-+                               * 0=plug is inserted.  On SE/30, always 0 */
-+#define VIA2B_vTfr0   0x20    /* Transfer mode bit 0 ack from NuBus */
-+#define VIA2B_vTfr1   0x10    /* Transfer mode bit 1 ack from NuBus */
-+#define VIA2B_vMode32 0x08    /* 24/32bit switch - doubles as cache flush
-+                               * on II, AMU/PMMU control.
-+                               *   if AMU, 0=24bit to 32bit translation
-+                               *   if PMMU, 1=PMMU is accessing page table.
-+                               * on SE/30 tied low.
-+                               * on IIx,IIcx,IIfx, unused.
-+                               * on IIci/RBV, cache control. 0=flush cache.
-+                               */
-+#define VIA2B_vPower  0x04   /* Power off, 0=shut off power.
-+                              * on SE/30 this signal sent to PDS card.
-+                              */
-+#define VIA2B_vBusLk  0x02   /* Lock NuBus transactions, 0=locked.
-+                              * on SE/30 sent to PDS card.
-+                              */
-+#define VIA2B_vCDis   0x01   /* Cache control. On IIci, 1=disable cache card
-+                              * on others, 0=disable processor's instruction
-+                              * and data caches.
-+                              */
-+
-+/* interrupt flags */
-+
-+#define IRQ_SET         0x80
-+
-+/* common */
-+
-+#define VIA_IRQ_TIMER1      0x40
-+#define VIA_IRQ_TIMER2      0x20
-+
-+/* Apple sez: http://developer.apple.com/technotes/ov/ov_04.html
-+ * Another example of a valid function that has no ROM support is the use
-+ * of the alternate video page for page-flipping animation. Since there
-+ * is no ROM call to flip pages, it is necessary to go play with the
-+ * right bit in the VIA chip (6522 Versatile Interface Adapter).
-+ * [CSA: don't know which one this is, but it's one of 'em!]
-+ */
-+
-+/*
-+ *    6522 registers - see databook.
-+ * CSA: Assignments for VIA1 confirmed from CHRP spec.
-+ */
-+
-+/* partial address decode.  0xYYXX : XX part for RBV, YY part for VIA */
-+/* Note: 15 VIA regs, 8 RBV regs */
-+
-+#define vBufB    0x0000  /* [VIA/RBV]  Register B */
-+#define vBufAH   0x0200  /* [VIA only] Buffer A, with handshake. DON'T USE! */
-+#define vDirB    0x0400  /* [VIA only] Data Direction Register B. */
-+#define vDirA    0x0600  /* [VIA only] Data Direction Register A. */
-+#define vT1CL    0x0800  /* [VIA only] Timer one counter low. */
-+#define vT1CH    0x0a00  /* [VIA only] Timer one counter high. */
-+#define vT1LL    0x0c00  /* [VIA only] Timer one latches low. */
-+#define vT1LH    0x0e00  /* [VIA only] Timer one latches high. */
-+#define vT2CL    0x1000  /* [VIA only] Timer two counter low. */
-+#define vT2CH    0x1200  /* [VIA only] Timer two counter high. */
-+#define vSR      0x1400  /* [VIA only] Shift register. */
-+#define vACR     0x1600  /* [VIA only] Auxilary control register. */
-+#define vPCR     0x1800  /* [VIA only] Peripheral control register. */
-+                         /*            CHRP sez never ever to *write* this.
-+                          *            Mac family says never to *change* this.
-+                          * In fact we need to initialize it once at start.
-+                          */
-+#define vIFR     0x1a00  /* [VIA/RBV]  Interrupt flag register. */
-+#define vIER     0x1c00  /* [VIA/RBV]  Interrupt enable register. */
-+#define vBufA    0x1e00  /* [VIA/RBV] register A (no handshake) */
-+
-+/* from linux 2.6 drivers/macintosh/via-macii.c */
-+
-+/* Bits in ACR */
-+
-+#define VIA1ACR_vShiftCtrl         0x1c        /* Shift register control bits */
-+#define VIA1ACR_vShiftExtClk       0x0c        /* Shift on external clock */
-+#define VIA1ACR_vShiftOut          0x10        /* Shift out if 1 */
-+
-+/* Apple Macintosh Family Hardware Refenece
-+ * Table 19-10 ADB transaction states
-+ */
-+
-+#define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
-+#define VIA1B_vADB_StateShift   4
-+
-+#define VIA_ADB_POLL_FREQ 50 /* XXX: not real */
-+
-+#define VIA_TIMER_FREQ (783360)
-+
-+
-+static void via1_VBL(void *opaque)
++static inline uint32_t get_phase(ASCState *s, int channel)
 +{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    s->ifr |= VIA1_IRQ_VBLANK;
-+    mdc->update_irq(s);
-+
-+    timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-+              / 16630 * 16630);
++    return be32_to_cpu(*(uint32_t *)(s->regs + ASC_WAVETABLE + channel * 8));
 +}
 +
-+static void via1_one_second(void *opaque)
++static inline void set_phase(ASCState *s, int channel, uint32_t phase)
 +{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    s->ifr |= VIA1_IRQ_ONE_SECOND;
-+    mdc->update_irq(s);
-+
-+    timer_mod(m->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
-+              + 1000) / 1000 * 1000);
++    *(uint32_t *)(s->regs + ASC_WAVETABLE + channel * 8) = cpu_to_be32(phase);
 +}
 +
-+static void via1_irq_request(void *opaque, int irq, int level)
++static inline uint32_t get_incr(ASCState *s, int channel)
 +{
-+    MOS6522Q800VIA1State *v1s = opaque;
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
++    return be32_to_cpu(*(uint32_t *)(s->regs + ASC_WAVETABLE + 4 +
++                                     channel * 8));
++}
 +
-+    if (level) {
-+        s->ifr |= 1 << irq;
-+    } else {
-+        s->ifr &= ~(1 << irq);
++static inline uint32_t incr_phase(ASCState *s, int channel)
++{
++    uint32_t incr = get_incr(s, channel);
++    uint32_t phase = get_phase(s, channel);
++
++    set_phase(s, channel, phase + incr);
++
++    return get_phase(s, channel);
++}
++
++static void generate_fifo(ASCState *s, int free_b)
++{
++    int8_t buf[2048];
++    int i;
++    int to_copy;
++
++    do {
++        to_copy = audio_MIN(sizeof(buf), free_b);
++        for (i = 0; i < (to_copy >> 1); to_copy++) {
++            int8_t left, right;
++
++            left = s->fifo[s->a_rptr] ^ 0x80;
++            right = s->fifo[s->b_rptr + 0x400] ^ 0x80;
++
++            if (s->a_cnt) {
++                s->a_rptr++;
++                s->a_rptr &= 0x3ff;
++                s->a_cnt--;
++            }
++
++            if (s->b_cnt) {
++                s->b_rptr++;
++                s->b_rptr &= 0x3ff;
++                s->b_cnt--;
++            }
++
++            if (s->type == ASC_TYPE_SONORA) {
++                if (s->a_cnt < 0x200) {
++                    s->regs[ASC_FIFOIRQ] |= 4; /* FIFO A less than half full */
++                    qemu_irq_raise(s->irq);
++                }
++                if (s->b_cnt < 0x200) {
++                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO B less than half full */
++                    qemu_irq_raise(s->irq);
++                }
++            } else {
++                if (s->a_cnt == 0x1ff) {
++                    s->regs[ASC_FIFOIRQ] |= 1; /* FIFO A half empty */
++                    qemu_irq_raise(s->irq);
++                } else if (s->a_cnt == 0x001) {
++                    s->regs[ASC_FIFOIRQ] |= 2; /* FIFO A half empty */
++                    qemu_irq_raise(s->irq);
++                }
++                if (s->b_cnt == 0x1ff) {
++                    s->regs[ASC_FIFOIRQ] |= 4; /* FIFO A half empty */
++                    qemu_irq_raise(s->irq);
++                } else if (s->b_cnt == 0x001) {
++                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO A half empty */
++                    qemu_irq_raise(s->irq);
++                }
++            }
++            buf[i * 2] = left;
++            buf[i * 2 + 1] = right;
++        }
++        AUD_write(s->channel, buf, to_copy);
++        free_b -= to_copy;
++    } while (free_b);
++}
++
++static void generate_wavetable(ASCState *s, int free_b)
++{
++    int8_t buf[2048];
++    int i;
++    int channel;
++    int to_copy;
++    int control = s->regs[ASC_WAVECTRL];
++
++    do {
++        to_copy = audio_MIN(sizeof(buf), free_b);
++        for (i = 0; i < (to_copy >> 1); i++) {
++                int32_t left, right;
++                int8_t sample;
++
++                left = 0;
++                right = 0;
++
++                if (control) { /* FIXME: how to use it ? */
++                    for (channel = 0; channel < 4; channel++) {
++                        uint32_t phase = incr_phase(s, channel);
++
++                        phase = (phase >> 15) & 0x1ff;
++                        sample = s->fifo[0x200 * channel + phase] ^ 0x80;
++
++                        left += sample;
++                        right += sample;
++                    }
++                    buf[i * 2] = left >> 2;
++                    buf[i * 2 + 1] = right >> 2;
++                } else {
++                    /* FIXME: only works with linux macboing.c */
++                    uint32_t phase = incr_phase(s, 0);
++                    phase = (phase >> 15) & 0x7ff;
++                    sample = s->fifo[phase];
++                    buf[i * 2] = sample;
++                    buf[i * 2 + 1] = sample;
++                }
++        }
++        AUD_write(s->channel, buf, to_copy);
++        free_b -= to_copy;
++    } while (free_b);
++}
++
++static void asc_out_cb(void *opaque, int free_b)
++{
++    ASCState *s = opaque;
++
++    switch (s->regs[ASC_MODE] & 3) {
++    case 0: /* Off */
++        break;
++    case 1: /* FIFO mode */
++        generate_fifo(s, free_b);
++        break;
++    case 2: /* Wave table mode */
++        generate_wavetable(s, free_b);
++        break;
++    }
++}
++
++static uint64_t asc_read(void *opaque, hwaddr addr,
++                              unsigned size)
++{
++    ASCState *s = opaque;
++    uint64_t prev;
++
++    if (addr < 0x800) {
++        return s->fifo[addr];
 +    }
 +
-+    mdc->update_irq(s);
-+}
++    addr -= 0x800;
 +
-+static void via2_irq_request(void *opaque, int irq, int level)
-+{
-+    MOS6522Q800VIA2State *v2s = opaque;
-+    MOS6522State *s = MOS6522(v2s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (level) {
-+        s->ifr |= 1 << irq;
-+    } else {
-+        s->ifr &= ~(1 << irq);
++    if (addr >= 0x030) {
++        return 0;
 +    }
 +
-+    mdc->update_irq(s);
++    switch (addr) {
++    case ASC_VERSION:
++        switch (s->type) {
++        case ASC_TYPE_ASC:
++            return 0;
++        case ASC_TYPE_V8:
++        case ASC_TYPE_EAGLE:
++        case ASC_TYPE_SPICE:
++        case ASC_TYPE_VASP:
++            return 0xe8;
++        case ASC_TYPE_SONORA:
++            return 0xbc;
++        default:
++            break;
++        }
++        break;
++    case ASC_MODE:
++        switch (s->type) {
++        case ASC_TYPE_V8:
++        case ASC_TYPE_EAGLE:
++        case ASC_TYPE_SPICE:
++        case ASC_TYPE_VASP:
++            return 1;
++        default:
++            break;
++        }
++        break;
++    case ASC_CONTROL:
++        switch (s->type) {
++        case ASC_TYPE_V8:
++        case ASC_TYPE_EAGLE:
++        case ASC_TYPE_SPICE:
++        case ASC_TYPE_VASP:
++            return 1;
++        default:
++            break;
++        }
++        break;
++    case ASC_FIFOIRQ:
++        if (s->type == ASC_TYPE_V8) {
++            prev = 3;
++        } else {
++            prev = s->regs[ASC_FIFOIRQ];
++        }
++        s->regs[ASC_FIFOIRQ] = 0;
++        qemu_irq_lower(s->irq);
++        return prev;
++    default:
++        break;
++    }
++
++    return s->regs[addr];
 +}
 +
-+#define RTC_OFFSET 2082844800
-+static uint8_t PRAM[256];
-+
-+static void via1_rtc_update(MacVIAState *m)
++static void asc_write(void *opaque, hwaddr addr, uint64_t value,
++                           unsigned size)
 +{
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
++    ASCState *s = opaque;
 +
-+    if (s->b & VIA1B_vRTCEnb) {
++    if (addr < 0x800) {
++        if (s->regs[ASC_MODE] == 1) {
++            if (addr < 0x400) {
++                /* FIFO A */
++                s->fifo[s->a_wptr++] = value;
++                s->a_cnt++;
++                if (s->a_cnt == 0x3ff) {
++                    s->regs[ASC_FIFOIRQ] |= 2; /* FIFO A Full */
++                }
++                s->a_wptr &= 0x3ff;
++            } else {
++                /* FIFO B */
++                s->fifo[s->b_wptr++ + 0x400] = value;
++                s->b_cnt++;
++                if (s->b_cnt == 0x3ff) {
++                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO B Full */
++                }
++                s->b_wptr &= 0x3ff;
++            }
++        } else {
++            s->fifo[addr] = value;
++        }
 +        return;
 +    }
 +
-+    if (s->dirb & VIA1B_vRTCData) {
-+        /* send bits to the RTC */
-+        if (!(v1s->last_b & VIA1B_vRTCClk) && (s->b & VIA1B_vRTCClk)) {
-+            m->data_out <<= 1;
-+            m->data_out |= s->b & VIA1B_vRTCData;
-+            m->data_out_cnt++;
-+        }
-+    } else {
-+        /* receive bits from the RTC */
-+        if ((v1s->last_b & VIA1B_vRTCClk) &&
-+            !(s->b & VIA1B_vRTCClk) &&
-+            m->data_in_cnt) {
-+            s->b = (s->b & ~VIA1B_vRTCData) |
-+                   ((m->data_in >> 7) & VIA1B_vRTCData);
-+            m->data_in <<= 1;
-+            m->data_in_cnt--;
-+        }
++    addr -= 0x800;
++    if (addr >= 0x30) {
++        return;
 +    }
-+
-+    if (m->data_out_cnt == 8) {
-+        m->data_out_cnt = 0;
-+
-+        if (m->cmd == 0) {
-+            if (m->data_out & 0x80) {
-+                /* this is a read command */
-+                uint32_t time = m->tick_offset +
-+                               (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
-+                               NANOSECONDS_PER_SECOND);
-+                if (m->data_out == 0x81) {        /* seconds register 0 */
-+                    m->data_in = time & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x85) { /* seconds register 1 */
-+                    m->data_in = (time >> 8) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x89) { /* seconds register 2 */
-+                    m->data_in = (time >> 16) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x8d) { /* seconds register 3 */
-+                    m->data_in = (time >> 24) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x10 -> 0x13 */
-+                    int addr = (m->data_out >> 2) & 0x03;
-+                    m->data_in = PRAM[addr];
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x00 -> 0x0f */
-+                    int addr = (m->data_out >> 2) & 0x0f;
-+                    m->data_in = PRAM[addr];
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    m->cmd = m->data_out;
-+                }
++    switch (addr) {
++    case ASC_MODE:
++        value &= 3;
++        if (value != s->regs[ASC_MODE]) {
++            s->a_rptr = 0;
++            s->a_wptr = 0;
++            s->a_cnt = 0;
++            s->b_rptr = 0;
++            s->b_wptr = 0;
++            s->b_cnt = 0;
++            if (value != 0) {
++                AUD_set_active_out(s->channel, 1);
 +            } else {
-+                /* this is a write command */
-+                m->cmd = m->data_out;
-+            }
-+        } else {
-+            if (m->cmd & 0x80) {
-+                if ((m->cmd & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    int sector = m->cmd & 0x07;
-+                    int addr = (m->data_out >> 2) & 0x1f;
-+
-+                    m->data_in = PRAM[sector * 8 + addr];
-+                    m->data_in_cnt = 8;
-+                }
-+            } else if (!m->wprotect) {
-+                /* this is a write command */
-+                if (m->alt != 0) {
-+                    /* extended memory designator and sector number */
-+                    int sector = m->cmd & 0x07;
-+                    int addr = (m->alt >> 2) & 0x1f;
-+
-+                    PRAM[sector * 8 + addr] = m->data_out;
-+
-+                    m->alt = 0;
-+                } else if (m->cmd == 0x01) { /* seconds register 0 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x05) { /* seconds register 1 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x09) { /* seconds register 2 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x0d) { /* seconds register 3 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x31) {
-+                    /* Test Register */
-+                } else if (m->cmd == 0x35) {
-+                    /* Write Protect register */
-+                    m->wprotect = m->data_out & 1;
-+                } else if ((m->cmd & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x10 -> 0x13 */
-+                    int addr = (m->cmd >> 2) & 0x03;
-+                    PRAM[addr] = m->data_out;
-+                } else if ((m->cmd & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x00 -> 0x0f */
-+                    int addr = (m->cmd >> 2) & 0x0f;
-+                    PRAM[addr] = m->data_out;
-+                } else if ((m->cmd & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    m->alt = m->cmd;
-+                }
++                AUD_set_active_out(s->channel, 0);
 +            }
 +        }
-+        m->data_out = 0;
++        break;
++    case ASC_FIFOMODE:
++        if (value & 0x80) {
++            s->a_rptr = 0;
++            s->a_wptr = 0;
++            s->a_cnt = 0;
++            s->b_rptr = 0;
++            s->b_wptr = 0;
++            s->b_cnt = 0;
++        }
++        break;
++    case ASC_WAVECTRL:
++        break;
 +    }
++    s->regs[addr] = value;
 +}
 +
-+static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522Q800VIA1State *s = opaque;
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
-+
-+static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
-+                                    unsigned size)
-+{
-+    MOS6522Q800VIA1State *s = opaque;
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
-+}
-+
-+static const MemoryRegionOps mos6522_q800_via1_ops = {
-+    .read = mos6522_q800_via1_read,
-+    .write = mos6522_q800_via1_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
++static const MemoryRegionOps asc_mmio_ops = {
++    .read = asc_read,
++    .write = asc_write,
++    .impl = {
 +        .min_access_size = 1,
 +        .max_access_size = 1,
 +    },
-+};
-+
-+static uint64_t mos6522_q800_via2_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522Q800VIA2State *s = opaque;
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
-+
-+static void mos6522_q800_via2_write(void *opaque, hwaddr addr, uint64_t val,
-+                                    unsigned size)
-+{
-+    MOS6522Q800VIA2State *s = opaque;
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
-+}
-+
-+static const MemoryRegionOps mos6522_q800_via2_ops = {
-+    .read = mos6522_q800_via2_read,
-+    .write = mos6522_q800_via2_write,
 +    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
 +};
 +
-+static void mac_via_reset(DeviceState *dev)
++static int asc_post_load(void *opaque, int version_id)
 +{
-+    MacVIAState *m = MAC_VIA(dev);
-+
-+    timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-+              / 16630 * 16630);
-+
-+    timer_mod(m->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
-+              + 1000) / 1000 * 1000);
++    return 0;
 +}
 +
-+static void mac_via_realize(DeviceState *dev, Error **errp)
++static const VMStateDescription vmstate_asc = {
++    .name = "apple-sound-chip",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .post_load = asc_post_load,
++    .fields      = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void asc_reset(DeviceState *d)
 +{
-+    MacVIAState *m = MAC_VIA(dev);
-+    struct tm tm;
++    ASCState *s = ASC(d);
 +
-+    /* VIA 1 */
-+    m->one_second_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, via1_one_second, m);
-+    m->VBL_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via1_VBL, m);
++    AUD_set_active_out(s->channel, 0);
 +
-+    qemu_get_timedate(&tm, 0);
-+    m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
++    memset(s->regs, 0, sizeof(s->regs));
++    s->a_wptr = 0;
++    s->a_rptr = 0;
++    s->a_cnt = 0;
++    s->b_wptr = 0;
++    s->b_rptr = 0;
++    s->b_cnt = 0;
 +}
 +
-+static void mac_via_init(Object *obj)
++static void asc_init(Object *obj)
 +{
++    ASCState *s = ASC(obj);
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MacVIAState *m = MAC_VIA(obj);
-+    MOS6522State *ms;
++    struct audsettings as;
 +
-+    object_initialize(&m->mos6522_via1, sizeof(m->mos6522_via1),
-+                      TYPE_MOS6522_Q800_VIA1);
-+    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
-+    object_property_add_child(obj, TYPE_MOS6522_Q800_VIA1,
-+                              OBJECT(&m->mos6522_via1), NULL);
++    AUD_register_card("Apple Sound Chip", &s->card);
 +
-+    object_initialize(&m->mos6522_via2, sizeof(m->mos6522_via2),
-+                      TYPE_MOS6522_Q800_VIA2);
-+    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
-+    object_property_add_child(obj, TYPE_MOS6522_Q800_VIA2,
-+                              OBJECT(&m->mos6522_via2), NULL);
++    as.freq = 22257;
++    as.nchannels = 2;
++    as.fmt = AUD_FMT_S8;
++    as.endianness = 0;
 +
-+    /* Pass through mos6522 output IRQs */
-+    ms = MOS6522(&m->mos6522_via1);
-+    object_property_add_alias(obj, "irq[0]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    ms = MOS6522(&m->mos6522_via2);
-+    object_property_add_alias(obj, "irq[1]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
++    s->channel = AUD_open_out(&s->card, s->channel, "asc.out",
++                              s, asc_out_cb, &as);
 +
-+    /* Pass through mos6522 input IRQs */
-+    qdev_pass_gpios(DEVICE(&m->mos6522_via1), DEVICE(obj), "via1-irq");
-+    qdev_pass_gpios(DEVICE(&m->mos6522_via2), DEVICE(obj), "via2-irq");
++    s->fifo = g_malloc0(ASC_BUF_SIZE);
 +
-+    /* MMIO */
-+    memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
-+    sysbus_init_mmio(sbd, &m->mmio);
++    memory_region_init_io(&s->mem_regs, NULL, &asc_mmio_ops, s, "asc",
++                          ASC_LENGTH);
 +
-+    memory_region_init_io(&m->via1mem, obj, &mos6522_q800_via1_ops,
-+                          MOS6522_Q800_VIA1(&m->mos6522_via1), "via1",
-+                          VIA_SIZE);
-+    memory_region_add_subregion(&m->mmio, 0x0, &m->via1mem);
-+
-+    memory_region_init_io(&m->via2mem, obj, &mos6522_q800_via2_ops,
-+                          MOS6522_Q800_VIA2(&m->mos6522_via2), "via2",
-+                          VIA_SIZE);
-+    memory_region_add_subregion(&m->mmio, VIA_SIZE, &m->via2mem);
-+
-+    /* ADB */
-+    qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
-+                        TYPE_ADB_BUS, DEVICE(obj), "adb.0");
++    sysbus_init_irq(sbd, &s->irq);
++    sysbus_init_mmio(sbd, &s->mem_regs);
 +}
 +
-+static void mac_via_class_init(ObjectClass *oc, void *data)
++static Property asc_properties[] = {
++    DEFINE_PROP_UINT8("asctype", ASCState, type, ASC_TYPE_ASC),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void asc_class_init(ObjectClass *oc, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(oc);
 +
-+    dc->realize = mac_via_realize;
-+    dc->reset = mac_via_reset;
++    dc->reset = asc_reset;
++    dc->vmsd = &vmstate_asc;
++    dc->props = asc_properties;
 +}
 +
-+static TypeInfo mac_via_info = {
-+    .name = TYPE_MAC_VIA,
++static TypeInfo asc_info = {
++    .name = TYPE_ASC,
 +    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MacVIAState),
-+    .instance_init = mac_via_init,
-+    .class_init = mac_via_class_init,
++    .instance_size = sizeof(ASCState),
++    .instance_init = asc_init,
++    .class_init = asc_class_init,
 +};
 +
-+/* VIA 1 */
-+static void mos6522_q800_via1_portB_write(MOS6522State *s)
++static void asc_register_types(void)
 +{
-+    MOS6522Q800VIA1State *v1s = container_of(s, MOS6522Q800VIA1State,
-+                                             parent_obj);
-+    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
-+
-+    via1_rtc_update(m);
-+
-+    v1s->last_b = s->b;
++    type_register_static(&asc_info);
 +}
 +
-+static void mos6522_q800_via1_reset(DeviceState *dev)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_reset(dev);
-+
-+    ms->timers[0].frequency = VIA_TIMER_FREQ;
-+    ms->timers[1].frequency = VIA_TIMER_FREQ;
-+
-+    ms->b = VIA1B_vADB_StateMask | VIA1B_vADBInt | VIA1B_vRTCEnb;
-+}
-+
-+static void mos6522_q800_via1_init(Object *obj)
-+{
-+    qdev_init_gpio_in_named(DEVICE(obj), via1_irq_request, "via1-irq",
-+                            VIA1_IRQ_NB);
-+}
-+
-+static void mos6522_q800_via1_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->reset = mos6522_q800_via1_reset;
-+    mdc->portB_write = mos6522_q800_via1_portB_write;
-+}
-+
-+static const TypeInfo mos6522_q800_via1_type_info = {
-+    .name = TYPE_MOS6522_Q800_VIA1,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522Q800VIA1State),
-+    .instance_init = mos6522_q800_via1_init,
-+    .class_init = mos6522_q800_via1_class_init,
-+};
-+
-+/* VIA 2 */
-+static void mos6522_q800_via2_portB_write(MOS6522State *s)
-+{
-+    if (s->dirb & VIA2B_vPower && (s->b & VIA2B_vPower) == 0) {
-+        /* shutdown */
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    }
-+}
-+
-+static void mos6522_q800_via2_reset(DeviceState *dev)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_reset(dev);
-+
-+    ms->timers[0].frequency = VIA_TIMER_FREQ;
-+    ms->timers[1].frequency = VIA_TIMER_FREQ;
-+
-+    ms->dirb = 0;
-+    ms->b = 0;
-+}
-+
-+static void mos6522_q800_via2_init(Object *obj)
-+{
-+    qdev_init_gpio_in_named(DEVICE(obj), via2_irq_request, "via2-irq",
-+                            VIA2_IRQ_NB);
-+}
-+
-+static void mos6522_q800_via2_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->reset = mos6522_q800_via2_reset;
-+    mdc->portB_write = mos6522_q800_via2_portB_write;
-+}
-+
-+static const TypeInfo mos6522_q800_via2_type_info = {
-+    .name = TYPE_MOS6522_Q800_VIA2,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522Q800VIA2State),
-+    .instance_init = mos6522_q800_via2_init,
-+    .class_init = mos6522_q800_via2_class_init,
-+};
-+
-+static void mac_via_register_types(void)
-+{
-+    type_register_static(&mos6522_q800_via1_type_info);
-+    type_register_static(&mos6522_q800_via2_type_info);
-+    type_register_static(&mac_via_info);
-+}
-+
-+type_init(mac_via_register_types);
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
++type_init(asc_register_types)
+diff --git a/include/hw/audio/asc.h b/include/hw/audio/asc.h
 new file mode 100644
-index 0000000000..a3a972ccc5
+index 0000000000..3540e32f69
 --- /dev/null
-+++ b/include/hw/misc/mac_via.h
-@@ -0,0 +1,106 @@
++++ b/include/hw/audio/asc.h
+@@ -0,0 +1,48 @@
 +/*
-+ *
-+ * Copyright (c) 2011-2018 Laurent Vivier
++ *  Copyright (c) 2012-2018 Laurent Vivier <laurent@vivier.eu>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
++ *
 + */
 +
-+#ifndef HW_MISC_MAC_VIA_H
-+#define HW_MISC_MAC_VIA_H
++#ifndef HW_AUDIO_ASC_H
++#define HW_AUDIO_ASC_H
 +
-+#include "exec/memory.h"
++#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
-+#include "hw/misc/mos6522.h"
++#include "audio/audio.h"
 +
++enum {
++    ASC_TYPE_ASC    = 0,  /* original discrete Apple Sound Chip */
++    ASC_TYPE_EASC   = 1,  /* discrete Enhanced Apple Sound Chip */
++    ASC_TYPE_V8     = 2,  /* ASC included in the V8 ASIC (LC/LCII) */
++    ASC_TYPE_EAGLE  = 3,  /* ASC included in the Eagle ASIC (Classic II) */
++    ASC_TYPE_SPICE  = 4,  /* ASC included in the Spice ASIC (Color Classic) */
++    ASC_TYPE_SONORA = 5,  /* ASC included in the Sonora ASIC (LCIII) */
++    ASC_TYPE_VASP   = 6,  /* ASC included in the VASP ASIC  (IIvx/IIvi) */
++    ASC_TYPE_ARDBEG = 7   /* ASC included in the Ardbeg ASIC (LC520) */
++};
 +
-+/* VIA 1 */
-+#define VIA1_IRQ_ONE_SECOND_BIT 0
-+#define VIA1_IRQ_VBLANK_BIT     1
-+#define VIA1_IRQ_ADB_READY_BIT  2
-+#define VIA1_IRQ_ADB_DATA_BIT   3
-+#define VIA1_IRQ_ADB_CLOCK_BIT  4
++typedef struct ASCState {
++    SysBusDevice parent_obj;
 +
-+#define VIA1_IRQ_NB             8
++    MemoryRegion mem_regs;
++    QEMUSoundCard card;
++    SWVoiceOut *channel;
 +
-+#define VIA1_IRQ_ONE_SECOND (1 << VIA1_IRQ_ONE_SECOND_BIT)
-+#define VIA1_IRQ_VBLANK     (1 << VIA1_IRQ_VBLANK_BIT)
-+#define VIA1_IRQ_ADB_READY  (1 << VIA1_IRQ_ADB_READY_BIT)
-+#define VIA1_IRQ_ADB_DATA   (1 << VIA1_IRQ_ADB_DATA_BIT)
-+#define VIA1_IRQ_ADB_CLOCK  (1 << VIA1_IRQ_ADB_CLOCK_BIT)
++    qemu_irq irq;
 +
++    uint8_t type;
++    int a_wptr, a_rptr, a_cnt;
++    int b_wptr, b_rptr, b_cnt;
 +
-+#define TYPE_MOS6522_Q800_VIA1 "mos6522-q800-via1"
-+#define MOS6522_Q800_VIA1(obj)  OBJECT_CHECK(MOS6522Q800VIA1State, (obj), \
-+                                    TYPE_MOS6522_Q800_VIA1)
++    uint8_t *fifo;
 +
-+typedef struct MOS6522Q800VIA1State {
-+    /*< private >*/
-+    MOS6522State parent_obj;
++    uint8_t regs[48];
++} ASCState;
 +
-+    qemu_irq irqs[VIA1_IRQ_NB];
-+    uint8_t last_b;
-+} MOS6522Q800VIA1State;
-+
-+
-+/* VIA 2 */
-+#define VIA2_IRQ_SCSI_DATA_BIT  0
-+#define VIA2_IRQ_SLOT_BIT       1
-+#define VIA2_IRQ_UNUSED_BIT     2
-+#define VIA2_IRQ_SCSI_BIT       3
-+#define VIA2_IRQ_ASC_BIT        4
-+
-+#define VIA2_IRQ_NB             8
-+
-+#define VIA2_IRQ_SCSI_DATA  (1 << VIA2_IRQ_SCSI_DATA_BIT)
-+#define VIA2_IRQ_SLOT       (1 << VIA2_IRQ_SLOT_BIT)
-+#define VIA2_IRQ_UNUSED     (1 << VIA2_IRQ_SCSI_BIT)
-+#define VIA2_IRQ_SCSI       (1 << VIA2_IRQ_UNUSED_BIT)
-+#define VIA2_IRQ_ASC        (1 << VIA2_IRQ_ASC_BIT)
-+
-+#define TYPE_MOS6522_Q800_VIA2 "mos6522-q800-via2"
-+#define MOS6522_Q800_VIA2(obj)  OBJECT_CHECK(MOS6522Q800VIA2State, (obj), \
-+                                    TYPE_MOS6522_Q800_VIA2)
-+
-+typedef struct MOS6522Q800VIA2State {
-+    /*< private >*/
-+    MOS6522State parent_obj;
-+} MOS6522Q800VIA2State;
-+
-+
-+#define TYPE_MAC_VIA "mac_via"
-+#define MAC_VIA(obj)   OBJECT_CHECK(MacVIAState, (obj), TYPE_MAC_VIA)
-+
-+typedef struct MacVIAState {
-+    SysBusDevice busdev;
-+
-+    /* MMIO */
-+    MemoryRegion mmio;
-+    MemoryRegion via1mem;
-+    MemoryRegion via2mem;
-+
-+    /* VIAs */
-+    MOS6522Q800VIA1State mos6522_via1;
-+    MOS6522Q800VIA2State mos6522_via2;
-+
-+    /* RTC */
-+    uint32_t tick_offset;
-+
-+    uint8_t data_out;
-+    int data_out_cnt;
-+    uint8_t data_in;
-+    uint8_t data_in_cnt;
-+    uint8_t cmd;
-+    int wprotect;
-+    int alt;
-+
-+    /* ADB */
-+    ADBBusState adb_bus;
-+
-+    /* external timers */
-+    QEMUTimer *one_second_timer;
-+    QEMUTimer *VBL_timer;
-+
-+} MacVIAState;
++#define TYPE_ASC "apple-sound-chip"
++#define ASC(obj) OBJECT_CHECK(ASCState, (obj), TYPE_ASC)
 +
 +#endif
 -- 
