@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fY6tf-0005UA-Mn
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:37:56 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fY70a-0007ey-0g
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fY6tb-0003GM-P9
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:37:55 -0400
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:41425)
+	(envelope-from <stefanha@gmail.com>) id 1fY70W-0002zh-2D
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:45:04 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34696)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fY6tb-0003FT-IY
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:37:51 -0400
-Received: by mail-wr0-f195.google.com with SMTP id h10-v6so1309178wrq.8
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 02:37:51 -0700 (PDT)
-References: <20180517162342.4330-1-viktor.prutyanov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <16962ebe-86a2-dcb2-c169-82487e77c420@redhat.com>
-Date: Wed, 27 Jun 2018 11:37:48 +0200
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fY70V-0002yc-PF
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:44:59 -0400
+Received: by mail-wr0-x241.google.com with SMTP id a12-v6so1351162wro.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 02:44:59 -0700 (PDT)
+Date: Wed, 27 Jun 2018 10:44:56 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180627094456.GB4325@stefanha-x1.localdomain>
+References: <20180626093204.27612-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
-In-Reply-To: <20180517162342.4330-1-viktor.prutyanov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] dump: add Windows crashdump format
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xXmbgvnjoT4axfJE"
+Content-Disposition: inline
+In-Reply-To: <20180626093204.27612-1-contrib@steffen-goertz.de>
+Subject: Re: [Qemu-devel] [RFC v2] arm: Add NRF51 SOC non-volatile memory
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +30,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, rkagan@virtuozzo.com, armbru@redhat.com, dgilbert@redhat.com
+To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
+Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 17/05/2018 18:23, Viktor Prutyanov wrote:
-> Recently a Windows guest driver has been added with the ability to
-> publish the data needed to produce useful guest dumps on the
-> hypervisor side.  The data is wrapped in a standard VMCOREINFO
-> container and is exposed to the hypervisor via FwCfg (see
-> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/fwcfg64)
-> 
-> This patch series extends dump-guest-memory to make use of this data
-> and generate guest dumps in Windows crashdump format directly in QEMU
-> (as opposed to postprocessing the traditional ELF dumps).
-> 
-> The first patch in the series is identical to the one posted two weeks
-> ago with message-id: <20180501132031.13270-1-viktor.prutyanov@virtuozzo.com>.
-> The rest are various improvements on top of it, making it useful in
-> situations beyond immediately after a BSOD.
-> 
-> Viktor Prutyanov (4):
->   dump: add Windows dump format to dump-guest-memory
->   dump: use system context in Windows dump
->   dump: add fallback KDBG using in Windows dump
->   dump: add Windows live system dump
-> 
->  Makefile.target |   1 +
->  dump.c          |  24 +++-
->  hmp-commands.hx |  13 +-
->  hmp.c           |   9 +-
->  qapi/misc.json  |   5 +-
->  win_dump.c      | 385 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  win_dump.h      | 176 ++++++++++++++++++++++++++
->  7 files changed, 604 insertions(+), 9 deletions(-)
->  create mode 100644 win_dump.c
->  create mode 100644 win_dump.h
-> 
 
-Queued, thanks.
+--xXmbgvnjoT4axfJE
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Tue, Jun 26, 2018 at 11:32:04AM +0200, Steffen G=F6rtz wrote:
+> Changes since V1:
+> - Code style changes
+
+Please put the changelog below '---'.
+
+> diff --git a/hw/nvram/nrf51_nvmc.c b/hw/nvram/nrf51_nvmc.c
+> new file mode 100644
+> index 0000000000..5dde3088a8
+> --- /dev/null
+> +++ b/hw/nvram/nrf51_nvmc.c
+> @@ -0,0 +1,168 @@
+> +/*
+> + * nrf51_nvmc.c
+> + *
+> + * Copyright 2018 Steffen G=F6rtz <contrib@steffen-goertz.de>
+> + *
+> + * This code is licensed under the GPL version 2 or later.  See
+> + * the COPYING file in the top-level directory.
+> + */
+
+Please mention the full name of the peripheral so its purpose is clear
+and include a link to the datasheet.
+
+It's convenient to have this information in the .c file, since that's
+where the majority of code changes happen.
+
+> diff --git a/include/hw/nvram/nrf51_nvmc.h b/include/hw/nvram/nrf51_nvmc.h
+> new file mode 100644
+> index 0000000000..3a63b7e5ad
+> --- /dev/null
+> +++ b/include/hw/nvram/nrf51_nvmc.h
+> @@ -0,0 +1,51 @@
+> +/*
+> + * nrf51_nvmc.h
+> + *
+> + * Copyright 2018 Steffen G=F6rtz <contrib@steffen-goertz.de>
+> + *
+> + * This code is licensed under the GPL version 2 or later.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * See Nrf51 reference manual 6 Non-Volatile Memory Controller (NVMC)
+> + * See Nrf51 product sheet 8.22 NVMC specifications
+> + *
+> + * QEMU interface:
+> + * + sysbus MMIO regions 0: Memory Region with registers
+> + *   to be mapped to the peripherals instance address by the SOC.
+> + * + page_size property to set the page size in bytes.
+> + * + code_size property to set the code size in number of pages.
+> + *
+> + * Accuracy of the peripheral model:
+> + * + The NVMC is always ready, all requested erase operations succeed
+> + *   immediately.
+> + * + CONFIG.WEN and CONFIG.EEN flags can be written and read back
+> + *   but are not evaluated to check whether a requested write/erase oper=
+ation
+> + *   is legal.
+
+Checking CONFIG.EEN would be easy, please do it.
+
+Peter: CONFIG.WEN determines whether stores to the flash memory region
+are allowed.  What is the best way to implement this protection?
+
+> +    MemoryRegion *mr;
+> +    AddressSpace as;
+
+I remember you said you tried
+address_space_read/write(get_system_memory(), ...) but it didn't work.
+Did you figure out why?
+
+> +    struct {
+> +        uint32_t config:2;
+> +    } state;
+
+I noticed you used bit-fields in recent patches.  They are rarely-used
+in QEMU.
+
+The representation of bit-fields is (compiler) implementation-defined,
+so they cannot be used for live-migration where values are serialized
+(marshaled).
+
+For boolean flags just 'bool' is preferred because 'true'/'false' is
+clearer in code than '0'/'1' (the reader doesn't know whether it's a
+bool or used as an integer at some point unless they study all the
+code).
+
+For this field I would use just uint32_t config.
+
+Stefan
+
+--xXmbgvnjoT4axfJE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbM1yYAAoJEJykq7OBq3PItr4H/14Yp7tKImQ8P3/GEaR94KPh
+Atm931QWKVC+EfUAdwcMb3hG7DcT9wEGTjg6F7Wo6sAVlRyfHJDO5GjqTWTTWI9f
++k9Pv454m97cDKp6XjCzRZtMNrzJjf5/jAVEG+k7zmMPlbPeHiIOn9pP5Ce+7Yni
+Ez4jm57mArhE9D3P/ti/B05vb/Jss46KjZwSUBN+TcUgDGo8X7kuNZ+5w37Ocs+D
+Gyqj9t8kwhVT9JcWQNRyanB0ko9yDZt9qBnltqHlFP5KWIAwk/dXX88j3g6PO9f0
+1mG35J0d6dehwfA7hgW+u+iuGrPfgYI5/ct1kpM7SqcAxE9OlgEQyAme4VUVqgU=
+=vNDx
+-----END PGP SIGNATURE-----
+
+--xXmbgvnjoT4axfJE--
