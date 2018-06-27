@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYCsc-0001cY-78
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:01:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYCut-0003Wa-Qb
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:03:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYCsV-0006b9-1G
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:01:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56102 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYCsU-0006Z3-S7
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:01:06 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 27 Jun 2018 17:01:03 +0100
-Message-Id: <20180627160103.13634-1-berrange@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYCup-0000cq-CU
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:03:35 -0400
+Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:42132)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYCup-0000bc-5T
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:03:31 -0400
+Received: by mail-qt0-x22c.google.com with SMTP id y31-v6so2096001qty.9
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:03:31 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	<20180618184046.6270-20-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <66ecea9b-bc0b-371a-b834-0a9c0a4685ad@amsat.org>
+Date: Wed, 27 Jun 2018 13:03:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] docs: add guidance on configuring CPU
- models for x86
+In-Reply-To: <20180618184046.6270-20-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 19/22] target/openrisc: Add
+ print_insn_or1k
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,646 +36,1031 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, shorne@gmail.com
 
-With the recent set of CPU hardware vulnerabilities on x86, it is
-increasingly difficult to understand which CPU configurations are
-good to use and what flaws they might be vulnerable to.
+On 06/18/2018 03:40 PM, Richard Henderson wrote:
+> Rather than emit disassembly while translating, reuse the
+> generated decoder to build a separate disassembler.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/openrisc/cpu.h         |   1 +
+>  target/openrisc/cpu.c         |   6 ++
+>  target/openrisc/disas.c       | 170 ++++++++++++++++++++++++++++++++++
+>  target/openrisc/translate.c   | 114 -----------------------
+>  target/openrisc/Makefile.objs |   3 +-
+>  5 files changed, 179 insertions(+), 115 deletions(-)
+>  create mode 100644 target/openrisc/disas.c
+> 
+> diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+> index 1efffa5269..f1b31bc24a 100644
+> --- a/target/openrisc/cpu.h
+> +++ b/target/openrisc/cpu.h
+> @@ -348,6 +348,7 @@ void openrisc_translate_init(void);
+>  int openrisc_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+>                                    int rw, int mmu_idx);
+>  int cpu_openrisc_signal_handler(int host_signum, void *pinfo, void *puc);
+> +int print_insn_or1k(bfd_vma addr, disassemble_info *info);
+>  
+>  #define cpu_list cpu_openrisc_list
+>  #define cpu_signal_handler cpu_openrisc_signal_handler
+> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+> index 677f02efa4..e01ce9ed1c 100644
+> --- a/target/openrisc/cpu.c
+> +++ b/target/openrisc/cpu.c
+> @@ -35,6 +35,11 @@ static bool openrisc_cpu_has_work(CPUState *cs)
+>                                      CPU_INTERRUPT_TIMER);
+>  }
+>  
+> +static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
+> +{
+> +    info->print_insn = print_insn_or1k;
+> +}
+> +
+>  /* CPUClass::reset() */
+>  static void openrisc_cpu_reset(CPUState *s)
+>  {
+> @@ -150,6 +155,7 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
+>  #endif
+>      cc->gdb_num_core_regs = 32 + 3;
+>      cc->tcg_initialize = openrisc_translate_init;
+> +    cc->disas_set_info = openrisc_disas_set_info;
+>  }
+>  
+>  /* Sort alphabetically by type name, except for "any". */
+> diff --git a/target/openrisc/disas.c b/target/openrisc/disas.c
+> new file mode 100644
+> index 0000000000..5acf4f4744
+> --- /dev/null
+> +++ b/target/openrisc/disas.c
+> @@ -0,0 +1,170 @@
+> +/*
+> + * OpenRISC disassembler
+> + *
+> + * Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
+> + *
+> + * This program is free software: you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation, either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "disas/bfd.h"
+> +#include "qemu/bitops.h"
+> +#include "cpu.h"
+> +
+> +typedef disassemble_info DisasContext;
+> +
+> +/* Include the auto-generated decoder.  */
+> +#include "decode.inc.c"
+> +
+> +#define output(mnemonic, format, ...) \
+> +    info->fprintf_func(info->stream, "%-9s " format, \
+> +                       mnemonic, ##__VA_ARGS__)
+> +
+> +int print_insn_or1k(bfd_vma addr, disassemble_info *info)
+> +{
+> +    bfd_byte buffer[4];
+> +    uint32_t insn;
+> +    int status;
+> +
+> +    status = info->read_memory_func(addr, buffer, 4, info);
+> +    if (status != 0) {
+> +        info->memory_error_func(status, addr, info);
+> +        return -1;
+> +    }
+> +    insn = bfd_getb32(buffer);
+> +
+> +    if (!decode(info, insn)) {
+> +        output(".long", "%#08x", insn);
+> +    }
+> +    return 4;
+> +}
+> +
+> +#define INSN(opcode, format, ...) \
+> +static bool trans_l_##opcode(disassemble_info *info,    \
+> +    arg_l_##opcode *a, uint32_t insn)                   \
+> +{                                                       \
+> +    output("l." #opcode, format, ##__VA_ARGS__);        \
+> +    return true;                                        \
+> +}
+> +
+> +INSN(add,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(addc,   "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(sub,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(and,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(or,     "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(xor,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(sll,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(srl,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(sra,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(ror,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(exths,  "r%d, r%d", a->d, a->a)
+> +INSN(extbs,  "r%d, r%d", a->d, a->a)
+> +INSN(exthz,  "r%d, r%d", a->d, a->a)
+> +INSN(extbz,  "r%d, r%d", a->d, a->a)
+> +INSN(cmov,   "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(ff1,    "r%d, r%d", a->d, a->a)
+> +INSN(fl1,    "r%d, r%d", a->d, a->a)
+> +INSN(mul,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(mulu,   "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(div,    "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(divu,   "r%d, r%d, r%d", a->d, a->a, a->b)
+> +INSN(muld,   "r%d, r%d", a->a, a->b)
+> +INSN(muldu,  "r%d, r%d", a->a, a->b)
+> +INSN(j,      "%d", a->n)
+> +INSN(jal,    "%d", a->n)
+> +INSN(bf,     "%d", a->n)
+> +INSN(bnf,    "%d", a->n)
+> +INSN(jr,     "r%d", a->b)
+> +INSN(jalr,   "r%d", a->b)
 
-This doc attempts to help management applications and administrators in
-picking sensible CPU configuration on x86 hosts. It outlines which of
-the named CPU models are good choices, and describes which extra CPU
-flags should be enabled to allow the guest to mitigate hardware flaws.
+> +INSN(lwa,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(lwz,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(lws,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(lbz,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(lbs,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(lhz,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(lhs,    "r%d, %d(r%d)", a->d, a->i, a->a)
+> +INSN(swa,    "%d(r%d), r%d", a->i, a->a, a->b)
+> +INSN(sw,     "%d(r%d), r%d", a->i, a->a, a->b)
+> +INSN(sb,     "%d(r%d), r%d", a->i, a->a, a->b)
+> +INSN(sh,     "%d(r%d), r%d", a->i, a->a, a->b)
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
+You updated to use the offset(reg) notation, ok.
 
-Changed in v2:
+> +INSN(nop,    "")
 
- - Add more @menu entries to keep rhel7 happy
+The nop previously displayed 'k', I suppose a left-over from sys/trap.
 
- MAINTAINERS               |   1 +
- Makefile                  |   7 +-
- docs/qemu-cpu-models.texi | 484 ++++++++++++++++++++++++++++++++++++++
- qemu-doc.texi             |   6 +
- 4 files changed, 497 insertions(+), 1 deletion(-)
- create mode 100644 docs/qemu-cpu-models.texi
+> +INSN(addi,   "r%d, r%d, %d", a->d, a->a, a->i)
+> +INSN(addic,  "r%d, r%d, %d", a->d, a->a, a->i)
+> +INSN(muli,   "r%d, r%d, %d", a->d, a->a, a->i)
+> +INSN(maci,   "r%d, %d", a->a, a->i)
+> +INSN(andi,   "r%d, r%d, %d", a->d, a->a, a->k)
+> +INSN(ori,    "r%d, r%d, %d", a->d, a->a, a->k)
+> +INSN(xori,   "r%d, r%d, %d", a->d, a->a, a->i)
+> +INSN(mfspr,  "r%d, r%d, %d", a->d, a->a, a->k)
+> +INSN(mtspr,  "r%d, r%d, %d", a->a, a->b, a->k)
+> +INSN(mac,    "r%d, r%d", a->a, a->b)
+> +INSN(msb,    "r%d, r%d", a->a, a->b)
+> +INSN(macu,   "r%d, r%d", a->a, a->b)
+> +INSN(msbu,   "r%d, r%d", a->a, a->b)
+> +INSN(slli,   "r%d, r%d, %d", a->d, a->a, a->l)
+> +INSN(srli,   "r%d, r%d, %d", a->d, a->a, a->l)
+> +INSN(srai,   "r%d, r%d, %d", a->d, a->a, a->l)
+> +INSN(rori,   "r%d, r%d, %d", a->d, a->a, a->l)
+> +INSN(movhi,  "r%d, %d", a->d, a->k)
+> +INSN(macrc,  "r%d", a->d)
+> +INSN(sfeq,   "r%d, r%d", a->a, a->b)
+> +INSN(sfne,   "r%d, r%d", a->a, a->b)
+> +INSN(sfgtu,  "r%d, r%d", a->a, a->b)
+> +INSN(sfgeu,  "r%d, r%d", a->a, a->b)
+> +INSN(sfltu,  "r%d, r%d", a->a, a->b)
+> +INSN(sfleu,  "r%d, r%d", a->a, a->b)
+> +INSN(sfgts,  "r%d, r%d", a->a, a->b)
+> +INSN(sfges,  "r%d, r%d", a->a, a->b)
+> +INSN(sflts,  "r%d, r%d", a->a, a->b)
+> +INSN(sfles,  "r%d, r%d", a->a, a->b)
+> +INSN(sfeqi,  "r%d, %d", a->a, a->i)
+> +INSN(sfnei,  "r%d, %d", a->a, a->i)
+> +INSN(sfgtui, "r%d, %d", a->a, a->i)
+> +INSN(sfgeui, "r%d, %d", a->a, a->i)
+> +INSN(sfltui, "r%d, %d", a->a, a->i)
+> +INSN(sfleui, "r%d, %d", a->a, a->i)
+> +INSN(sfgtsi, "r%d, %d", a->a, a->i)
+> +INSN(sfgesi, "r%d, %d", a->a, a->i)
+> +INSN(sfltsi, "r%d, %d", a->a, a->i)
+> +INSN(sflesi, "r%d, %d", a->a, a->i)
+> +INSN(sys,    "%d", a->k)
+> +INSN(trap,   "%d", a->k)
+> +INSN(msync,  "")
+> +INSN(psync,  "")
+> +INSN(csync,  "")
+> +INSN(rfe,    "")
+> +
+> +#define FP_INSN(opcode, suffix, format, ...) \
+> +static bool trans_lf_##opcode##_##suffix(disassemble_info *info, \
+> +    arg_lf_##opcode##_##suffix *a, uint32_t insn)                \
+> +{                                                                \
+> +    output("lf." #opcode "." #suffix, format, ##__VA_ARGS__);    \
+> +    return true;                                                 \
+> +}
+> +
+> +FP_INSN(add, s,  "r%d, r%d, r%d", a->d, a->a, a->b)
+> +FP_INSN(sub, s,  "r%d, r%d, r%d", a->d, a->a, a->b)
+> +FP_INSN(mul, s,  "r%d, r%d, r%d", a->d, a->a, a->b)
+> +FP_INSN(div, s,  "r%d, r%d, r%d", a->d, a->a, a->b)
+> +FP_INSN(rem, s,  "r%d, r%d, r%d", a->d, a->a, a->b)
+> +FP_INSN(itof, s, "r%d, r%d", a->d, a->a)
+> +FP_INSN(ftoi, s, "r%d, r%d", a->d, a->a)
+> +FP_INSN(madd, s, "r%d, r%d, r%d", a->d, a->a, a->b)
+> +FP_INSN(sfeq, s, "r%d, r%d", a->a, a->b)
+> +FP_INSN(sfne, s, "r%d, r%d", a->a, a->b)
+> +FP_INSN(sfgt, s, "r%d, r%d", a->a, a->b)
+> +FP_INSN(sfge, s, "r%d, r%d", a->a, a->b)
+> +FP_INSN(sflt, s, "r%d, r%d", a->a, a->b)
+> +FP_INSN(sfle, s, "r%d, r%d", a->a, a->b)
+> diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+> index 60c6e19f4b..d0662f38c6 100644
+> --- a/target/openrisc/translate.c
+> +++ b/target/openrisc/translate.c
+> @@ -36,10 +36,6 @@
+>  #include "trace-tcg.h"
+>  #include "exec/log.h"
+>  
+> -#define LOG_DIS(str, ...) \
+> -    qemu_log_mask(CPU_LOG_TB_IN_ASM, "%08x: " str, dc->base.pc_next,    \
+> -                  ## __VA_ARGS__)
+> -
+>  /* is_jmp field values */
+>  #define DISAS_EXIT    DISAS_TARGET_0  /* force exit to main loop */
+>  #define DISAS_JUMP    DISAS_TARGET_1  /* exit via jmp_pc/jmp_pc_imm */
+> @@ -440,7 +436,6 @@ static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
+>  
+>  static bool trans_l_add(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.add r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      gen_add(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -448,7 +443,6 @@ static bool trans_l_add(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_addc(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.addc r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      gen_addc(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -456,7 +450,6 @@ static bool trans_l_addc(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_sub(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sub r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      gen_sub(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -464,7 +457,6 @@ static bool trans_l_sub(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_and(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.and r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_and_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -472,7 +464,6 @@ static bool trans_l_and(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_or(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.or r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_or_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -480,7 +471,6 @@ static bool trans_l_or(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_xor(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.xor r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_xor_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -488,7 +478,6 @@ static bool trans_l_xor(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_sll(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sll r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_shl_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -496,7 +485,6 @@ static bool trans_l_sll(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_srl(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.srl r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_shr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -504,7 +492,6 @@ static bool trans_l_srl(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_sra(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sra r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_sar_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -512,7 +499,6 @@ static bool trans_l_sra(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_ror(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.ror r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      tcg_gen_rotr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -520,7 +506,6 @@ static bool trans_l_ror(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_exths(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.exths r%d, r%d\n", a->d, a->a);
+>      check_r0_write(a->d);
+>      tcg_gen_ext16s_tl(cpu_R[a->d], cpu_R[a->a]);
+>      return true;
+> @@ -528,7 +513,6 @@ static bool trans_l_exths(DisasContext *dc, arg_da *a, uint32_t insn)
+>  
+>  static bool trans_l_extbs(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.extbs r%d, r%d\n", a->d, a->a);
+>      check_r0_write(a->d);
+>      tcg_gen_ext8s_tl(cpu_R[a->d], cpu_R[a->a]);
+>      return true;
+> @@ -536,7 +520,6 @@ static bool trans_l_extbs(DisasContext *dc, arg_da *a, uint32_t insn)
+>  
+>  static bool trans_l_exthz(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.exthz r%d, r%d\n", a->d, a->a);
+>      check_r0_write(a->d);
+>      tcg_gen_ext16u_tl(cpu_R[a->d], cpu_R[a->a]);
+>      return true;
+> @@ -544,7 +527,6 @@ static bool trans_l_exthz(DisasContext *dc, arg_da *a, uint32_t insn)
+>  
+>  static bool trans_l_extbz(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.extbz r%d, r%d\n", a->d, a->a);
+>      check_r0_write(a->d);
+>      tcg_gen_ext8u_tl(cpu_R[a->d], cpu_R[a->a]);
+>      return true;
+> @@ -553,7 +535,6 @@ static bool trans_l_extbz(DisasContext *dc, arg_da *a, uint32_t insn)
+>  static bool trans_l_cmov(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+>      TCGv zero;
+> -    LOG_DIS("l.cmov r%d, r%d, r%d\n", a->d, a->a, a->b);
+>  
+>      check_r0_write(a->d);
+>      zero = tcg_const_tl(0);
+> @@ -565,8 +546,6 @@ static bool trans_l_cmov(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_ff1(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.ff1 r%d, r%d\n", a->d, a->a);
+> -
+>      check_r0_write(a->d);
+>      tcg_gen_ctzi_tl(cpu_R[a->d], cpu_R[a->a], -1);
+>      tcg_gen_addi_tl(cpu_R[a->d], cpu_R[a->d], 1);
+> @@ -575,8 +554,6 @@ static bool trans_l_ff1(DisasContext *dc, arg_da *a, uint32_t insn)
+>  
+>  static bool trans_l_fl1(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.fl1 r%d, r%d\n", a->d, a->a);
+> -
+>      check_r0_write(a->d);
+>      tcg_gen_clzi_tl(cpu_R[a->d], cpu_R[a->a], TARGET_LONG_BITS);
+>      tcg_gen_subfi_tl(cpu_R[a->d], TARGET_LONG_BITS, cpu_R[a->d]);
+> @@ -585,8 +562,6 @@ static bool trans_l_fl1(DisasContext *dc, arg_da *a, uint32_t insn)
+>  
+>  static bool trans_l_mul(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.mul r%d, r%d, r%d\n", a->d, a->a, a->b);
+> -
+>      check_r0_write(a->d);
+>      gen_mul(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -594,8 +569,6 @@ static bool trans_l_mul(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_mulu(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.mulu r%d, r%d, r%d\n", a->d, a->a, a->b);
+> -
+>      check_r0_write(a->d);
+>      gen_mulu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -603,8 +576,6 @@ static bool trans_l_mulu(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_div(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.div r%d, r%d, r%d\n", a->d, a->a, a->b);
+> -
+>      check_r0_write(a->d);
+>      gen_div(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -612,8 +583,6 @@ static bool trans_l_div(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_divu(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.divu r%d, r%d, r%d\n", a->d, a->a, a->b);
+> -
+>      check_r0_write(a->d);
+>      gen_divu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+> @@ -621,14 +590,12 @@ static bool trans_l_divu(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_l_muld(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.muld r%d, r%d\n", a->a, a->b);
+>      gen_muld(dc, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_muldu(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.muldu r%d, r%d\n", a->a, a->b);
+>      gen_muldu(dc, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+> @@ -637,7 +604,6 @@ static bool trans_l_j(DisasContext *dc, arg_l_j *a, uint32_t insn)
+>  {
+>      target_ulong tmp_pc = dc->base.pc_next + a->n * 4;
+>  
+> -    LOG_DIS("l.j %d\n", a->n);
+>      tcg_gen_movi_tl(jmp_pc, tmp_pc);
+>      dc->jmp_pc_imm = tmp_pc;
+>      dc->delayed_branch = 2;
+> @@ -649,7 +615,6 @@ static bool trans_l_jal(DisasContext *dc, arg_l_jal *a, uint32_t insn)
+>      target_ulong tmp_pc = dc->base.pc_next + a->n * 4;
+>      target_ulong ret_pc = dc->base.pc_next + 8;
+>  
+> -    LOG_DIS("l.jal %d\n", a->n);
+>      tcg_gen_movi_tl(cpu_R[9], ret_pc);
+>      /* Optimize jal being used to load the PC for PIC.  */
+>      if (tmp_pc != ret_pc) {
+> @@ -677,21 +642,18 @@ static void do_bf(DisasContext *dc, arg_l_bf *a, TCGCond cond)
+>  
+>  static bool trans_l_bf(DisasContext *dc, arg_l_bf *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.bf %d\n", a->n);
+>      do_bf(dc, a, TCG_COND_NE);
+>      return true;
+>  }
+>  
+>  static bool trans_l_bnf(DisasContext *dc, arg_l_bf *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.bnf %d\n", a->n);
+>      do_bf(dc, a, TCG_COND_EQ);
+>      return true;
+>  }
+>  
+>  static bool trans_l_jr(DisasContext *dc, arg_l_jr *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.jr r%d\n", a->b);
+>      tcg_gen_mov_tl(jmp_pc, cpu_R[a->b]);
+>      dc->delayed_branch = 2;
+>      return true;
+> @@ -699,7 +661,6 @@ static bool trans_l_jr(DisasContext *dc, arg_l_jr *a, uint32_t insn)
+>  
+>  static bool trans_l_jalr(DisasContext *dc, arg_l_jalr *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.jalr r%d\n", a->b);
+>      tcg_gen_mov_tl(jmp_pc, cpu_R[a->b]);
+>      tcg_gen_movi_tl(cpu_R[9], dc->base.pc_next + 8);
+>      dc->delayed_branch = 2;
+> @@ -710,8 +671,6 @@ static bool trans_l_lwa(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+>      TCGv ea;
+>  
+> -    LOG_DIS("l.lwa r%d, r%d, %d\n", a->d, a->a, a->i);
+> -
+>      check_r0_write(a->d);
+>      ea = tcg_temp_new();
+>      tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
+> @@ -735,42 +694,36 @@ static void do_load(DisasContext *dc, arg_load *a, TCGMemOp mop)
+>  
+>  static bool trans_l_lwz(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.lwz r%d, r%d, %d\n", a->d, a->a, a->i);
+>      do_load(dc, a, MO_TEUL);
+>      return true;
+>  }
+>  
+>  static bool trans_l_lws(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.lws r%d, r%d, %d\n", a->d, a->a, a->i);
+>      do_load(dc, a, MO_TESL);
+>      return true;
+>  }
+>  
+>  static bool trans_l_lbz(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.lbz r%d, r%d, %d\n", a->d, a->a, a->i);
+>      do_load(dc, a, MO_UB);
+>      return true;
+>  }
+>  
+>  static bool trans_l_lbs(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.lbs r%d, r%d, %d\n", a->d, a->a, a->i);
+>      do_load(dc, a, MO_SB);
+>      return true;
+>  }
+>  
+>  static bool trans_l_lhz(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.lhz r%d, r%d, %d\n", a->d, a->a, a->i);
+>      do_load(dc, a, MO_TEUW);
+>      return true;
+>  }
+>  
+>  static bool trans_l_lhs(DisasContext *dc, arg_load *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.lhs r%d, r%d, %d\n", a->d, a->a, a->i);
+>      do_load(dc, a, MO_TESW);
+>      return true;
+>  }
+> @@ -780,8 +733,6 @@ static bool trans_l_swa(DisasContext *dc, arg_store *a, uint32_t insn)
+>      TCGv ea, val;
+>      TCGLabel *lab_fail, *lab_done;
+>  
+> -    LOG_DIS("l.swa r%d, r%d, %d\n", a->a, a->b, a->i);
+> -
+>      ea = tcg_temp_new();
+>      tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
+>  
+> @@ -822,28 +773,24 @@ static void do_store(DisasContext *dc, arg_store *a, TCGMemOp mop)
+>  
+>  static bool trans_l_sw(DisasContext *dc, arg_store *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sw r%d, r%d, %d\n", a->a, a->b, a->i);
+>      do_store(dc, a, MO_TEUL);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sb(DisasContext *dc, arg_store *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sb r%d, r%d, %d\n", a->a, a->b, a->i);
+>      do_store(dc, a, MO_UB);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sh(DisasContext *dc, arg_store *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sh r%d, r%d, %d\n", a->a, a->b, a->i);
+>      do_store(dc, a, MO_TEUW);
+>      return true;
+>  }
+>  
+>  static bool trans_l_nop(DisasContext *dc, arg_l_nop *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.nop %d\n", a->k);
+>      return true;
+>  }
+>  
+> @@ -851,7 +798,6 @@ static bool trans_l_addi(DisasContext *dc, arg_rri *a, uint32_t insn)
+>  {
+>      TCGv t0;
+>  
+> -    LOG_DIS("l.addi r%d, r%d, %d\n", a->d, a->a, a->i);
+>      check_r0_write(a->d);
+>      t0 = tcg_const_tl(a->i);
+>      gen_add(dc, cpu_R[a->d], cpu_R[a->a], t0);
+> @@ -863,7 +809,6 @@ static bool trans_l_addic(DisasContext *dc, arg_rri *a, uint32_t insn)
+>  {
+>      TCGv t0;
+>  
+> -    LOG_DIS("l.addic r%d, r%d, %d\n", a->d, a->a, a->i);
+>      check_r0_write(a->d);
+>      t0 = tcg_const_tl(a->i);
+>      gen_addc(dc, cpu_R[a->d], cpu_R[a->a], t0);
+> @@ -875,7 +820,6 @@ static bool trans_l_muli(DisasContext *dc, arg_rri *a, uint32_t insn)
+>  {
+>      TCGv t0;
+>  
+> -    LOG_DIS("l.muli r%d, r%d, %d\n", a->d, a->a, a->i);
+>      check_r0_write(a->d);
+>      t0 = tcg_const_tl(a->i);
+>      gen_mul(dc, cpu_R[a->d], cpu_R[a->a], t0);
+> @@ -887,7 +831,6 @@ static bool trans_l_maci(DisasContext *dc, arg_l_maci *a, uint32_t insn)
+>  {
+>      TCGv t0;
+>  
+> -    LOG_DIS("l.maci r%d, %d\n", a->a, a->i);
+>      t0 = tcg_const_tl(a->i);
+>      gen_mac(dc, cpu_R[a->a], t0);
+>      tcg_temp_free(t0);
+> @@ -896,7 +839,6 @@ static bool trans_l_maci(DisasContext *dc, arg_l_maci *a, uint32_t insn)
+>  
+>  static bool trans_l_andi(DisasContext *dc, arg_rrk *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.andi r%d, r%d, %d\n", a->d, a->a, a->k);
+>      check_r0_write(a->d);
+>      tcg_gen_andi_tl(cpu_R[a->d], cpu_R[a->a], a->k);
+>      return true;
+> @@ -904,7 +846,6 @@ static bool trans_l_andi(DisasContext *dc, arg_rrk *a, uint32_t insn)
+>  
+>  static bool trans_l_ori(DisasContext *dc, arg_rrk *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.ori r%d, r%d, %d\n", a->d, a->a, a->k);
+>      check_r0_write(a->d);
+>      tcg_gen_ori_tl(cpu_R[a->d], cpu_R[a->a], a->k);
+>      return true;
+> @@ -912,7 +853,6 @@ static bool trans_l_ori(DisasContext *dc, arg_rrk *a, uint32_t insn)
+>  
+>  static bool trans_l_xori(DisasContext *dc, arg_rri *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.xori r%d, r%d, %d\n", a->d, a->a, a->i);
+>      check_r0_write(a->d);
+>      tcg_gen_xori_tl(cpu_R[a->d], cpu_R[a->a], a->i);
+>      return true;
+> @@ -920,7 +860,6 @@ static bool trans_l_xori(DisasContext *dc, arg_rri *a, uint32_t insn)
+>  
+>  static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.mfspr r%d, r%d, %d\n", a->d, a->a, a->k);
+>      check_r0_write(a->d);
+>  
+>      if (is_user(dc)) {
+> @@ -936,8 +875,6 @@ static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
+>  
+>  static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.mtspr r%d, r%d, %d\n", a->a, a->b, a->k);
+> -
+>      if (is_user(dc)) {
+>          gen_illegal_exception(dc);
+>      } else {
+> @@ -973,35 +910,30 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+>  
+>  static bool trans_l_mac(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.mac r%d, r%d\n", a->a, a->b);
+>      gen_mac(dc, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_msb(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.msb r%d, r%d\n", a->a, a->b);
+>      gen_msb(dc, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_macu(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.mac r%d, r%d\n", a->a, a->b);
+>      gen_macu(dc, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_msbu(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.msb r%d, r%d\n", a->a, a->b);
+>      gen_msbu(dc, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_slli(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.slli r%d, r%d, %d\n", a->d, a->a, a->l);
+>      check_r0_write(a->d);
+>      tcg_gen_shli_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+>      return true;
+> @@ -1009,7 +941,6 @@ static bool trans_l_slli(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  
+>  static bool trans_l_srli(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.srli r%d, r%d, %d\n", a->d, a->a, a->l);
+>      check_r0_write(a->d);
+>      tcg_gen_shri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+>      return true;
+> @@ -1017,7 +948,6 @@ static bool trans_l_srli(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  
+>  static bool trans_l_srai(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.srai r%d, r%d, %d\n", a->d, a->a, a->l);
+>      check_r0_write(a->d);
+>      tcg_gen_sari_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+>      return true;
+> @@ -1025,7 +955,6 @@ static bool trans_l_srai(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  
+>  static bool trans_l_rori(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.rori r%d, r%d, %d\n", a->d, a->a, a->l);
+>      check_r0_write(a->d);
+>      tcg_gen_rotri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+>      return true;
+> @@ -1033,7 +962,6 @@ static bool trans_l_rori(DisasContext *dc, arg_dal *a, uint32_t insn)
+>  
+>  static bool trans_l_movhi(DisasContext *dc, arg_l_movhi *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.movhi r%d, %d\n", a->d, a->k);
+>      check_r0_write(a->d);
+>      tcg_gen_movi_tl(cpu_R[a->d], a->k << 16);
+>      return true;
+> @@ -1041,7 +969,6 @@ static bool trans_l_movhi(DisasContext *dc, arg_l_movhi *a, uint32_t insn)
+>  
+>  static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.macrc r%d\n", a->d);
+>      check_r0_write(a->d);
+>      tcg_gen_trunc_i64_tl(cpu_R[a->d], cpu_mac);
+>      tcg_gen_movi_i64(cpu_mac, 0);
+> @@ -1050,147 +977,126 @@ static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a, uint32_t insn)
+>  
+>  static bool trans_l_sfeq(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfeq r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfne(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfne r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_NE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgtu(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgtu r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgeu(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgeu r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfltu(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfltu r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfleu(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfleu r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgts(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgts r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_GT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfges(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfges r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_GE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sflts(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sflts r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_LT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfles(DisasContext *dc, arg_ab *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfles r%d, r%d\n", a->a, a->b);
+>      tcg_gen_setcond_tl(TCG_COND_LE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfeqi(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfeqi r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfnei(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfnei r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_NE, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgtui(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgtui r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgeui(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgeui r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfltui(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfltui r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfleui(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfleui r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgtsi(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgtsi r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_GT, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfgesi(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfgesi r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_GE, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sfltsi(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sfltsi r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_LT, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sflesi(DisasContext *dc, arg_ai *a, TCGCond cond)
+>  {
+> -    LOG_DIS("l.sflesi r%d, %d\n", a->a, a->i);
+>      tcg_gen_setcondi_tl(TCG_COND_LE, cpu_sr_f, cpu_R[a->a], a->i);
+>      return true;
+>  }
+>  
+>  static bool trans_l_sys(DisasContext *dc, arg_l_sys *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.sys %d\n", a->k);
+>      tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
+>      gen_exception(dc, EXCP_SYSCALL);
+>      dc->base.is_jmp = DISAS_NORETURN;
+> @@ -1199,7 +1105,6 @@ static bool trans_l_sys(DisasContext *dc, arg_l_sys *a, uint32_t insn)
+>  
+>  static bool trans_l_trap(DisasContext *dc, arg_l_trap *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.trap %d\n", a->k);
+>      tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
+>      gen_exception(dc, EXCP_TRAP);
+>      dc->base.is_jmp = DISAS_NORETURN;
+> @@ -1208,27 +1113,22 @@ static bool trans_l_trap(DisasContext *dc, arg_l_trap *a, uint32_t insn)
+>  
+>  static bool trans_l_msync(DisasContext *dc, arg_l_msync *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.msync\n");
+>      tcg_gen_mb(TCG_MO_ALL);
+>      return true;
+>  }
+>  
+>  static bool trans_l_psync(DisasContext *dc, arg_l_psync *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.psync\n");
+>      return true;
+>  }
+>  
+>  static bool trans_l_csync(DisasContext *dc, arg_l_csync *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.csync\n");
+>      return true;
+>  }
+>  
+>  static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
+>  {
+> -    LOG_DIS("l.rfe\n");
+> -
+>      if (is_user(dc)) {
+>          gen_illegal_exception(dc);
+>      } else {
+> @@ -1271,56 +1171,48 @@ static void do_fpcmp(DisasContext *dc, arg_ab *a,
+>  
+>  static bool trans_lf_add_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.add.s r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      do_fp3(dc, a, gen_helper_float_add_s);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_sub_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sub.s r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      do_fp3(dc, a, gen_helper_float_sub_s);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_mul_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.mul.s r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      do_fp3(dc, a, gen_helper_float_mul_s);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_div_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.div.s r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      do_fp3(dc, a, gen_helper_float_div_s);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_rem_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.rem.s r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      do_fp3(dc, a, gen_helper_float_rem_s);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_itof_s(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.itof.s r%d, r%d\n", a->d, a->a);
+>      do_fp2(dc, a, gen_helper_itofs);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_ftoi_s(DisasContext *dc, arg_da *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.ftoi.s r%d, r%d\n", a->d, a->a);
+>      do_fp2(dc, a, gen_helper_ftois);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.madd.s r%d, r%d, r%d\n", a->d, a->a, a->b);
+>      check_r0_write(a->d);
+>      gen_helper_float_madd_s(cpu_R[a->d], cpu_env, cpu_R[a->d],
+>                              cpu_R[a->a], cpu_R[a->b]);
+> @@ -1330,42 +1222,36 @@ static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a, uint32_t insn)
+>  
+>  static bool trans_lf_sfeq_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sfeq.s r%d, r%d\n", a->a, a->b);
+>      do_fpcmp(dc, a, gen_helper_float_eq_s, false, false);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_sfne_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sfne.s r%d, r%d\n", a->a, a->b);
+>      do_fpcmp(dc, a, gen_helper_float_eq_s, true, false);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_sfgt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sfgt.s r%d, r%d\n", a->a, a->b);
+>      do_fpcmp(dc, a, gen_helper_float_lt_s, false, true);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_sfge_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sfge.s r%d, r%d\n", a->a, a->b);
+>      do_fpcmp(dc, a, gen_helper_float_le_s, false, true);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_sflt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sflt.s r%d, r%d\n", a->a, a->b);
+>      do_fpcmp(dc, a, gen_helper_float_lt_s, false, false);
+>      return true;
+>  }
+>  
+>  static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+>  {
+> -    LOG_DIS("lf.sfle.s r%d, r%d\n", a->a, a->b);
+>      do_fpcmp(dc, a, gen_helper_float_le_s, false, false);
+>      return true;
+>  }
+> diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.objs
+> index 957ce02199..b5432f4684 100644
+> --- a/target/openrisc/Makefile.objs
+> +++ b/target/openrisc/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  obj-$(CONFIG_SOFTMMU) += machine.o
+> -obj-y += cpu.o exception.o interrupt.o mmu.o translate.o
+> +obj-y += cpu.o exception.o interrupt.o mmu.o translate.o disas.o
+>  obj-y += exception_helper.o fpu_helper.o \
+>           interrupt_helper.o sys_helper.o
+>  obj-y += gdbstub.o
+> @@ -12,3 +12,4 @@ target/openrisc/decode.inc.c: \
+>  	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
+>  
+>  target/openrisc/translate.o: target/openrisc/decode.inc.c
+> +target/openrisc/disas.o: target/openrisc/decode.inc.c
+> 
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8a94517e9e..ac1357cafa 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -285,6 +285,7 @@ S: Maintained
- F: target/i386/
- F: hw/i386/
- F: disas/i386.c
-+F: docs/qemu-cpu-models.texi
- T: git git://github.com/ehabkost/qemu.git x86-next
-=20
- Xtensa
-diff --git a/Makefile b/Makefile
-index e46f2b625a..b232c8b0cb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -359,6 +359,7 @@ DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 q=
-emu-nbd.8 qemu-ga.8
- DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt doc=
-s/interop/qemu-qmp-ref.7
- DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/=
-interop/qemu-ga-ref.7
- DOCS+=3Ddocs/qemu-block-drivers.7
-+DOCS+=3Ddocs/qemu-cpu-models.7
- ifdef CONFIG_VIRTFS
- DOCS+=3Dfsdev/virtfs-proxy-helper.1
- endif
-@@ -772,6 +773,7 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- 	rm -f docs/qemu-block-drivers.7
-+	rm -f docs/qemu-cpu-models.7
- 	for d in $(TARGET_LIST); do \
- 	rm -rf $$d || exit 1 ; \
-         done
-@@ -817,6 +819,7 @@ ifdef CONFIG_POSIX
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) docs/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
-+	$(INSTALL_DATA) docs/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
- ifneq ($(TOOLS),)
- 	$(INSTALL_DATA) qemu-img.1 "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
-@@ -959,6 +962,7 @@ fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helpe=
-r.texi
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
- qemu-ga.8: qemu-ga.texi
- docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
-+docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
-=20
- html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-=
-ref.html
- info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-=
-ref.info
-@@ -968,7 +972,8 @@ txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/=
-interop/qemu-ga-ref.txt
- qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
- 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
- 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
--	qemu-monitor-info.texi docs/qemu-block-drivers.texi
-+	qemu-monitor-info.texi docs/qemu-block-drivers.texi \
-+	docs/qemu-cpu-models.texi
-=20
- docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
-     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
-diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
-new file mode 100644
-index 0000000000..1935f98c63
---- /dev/null
-+++ b/docs/qemu-cpu-models.texi
-@@ -0,0 +1,484 @@
-+@c man begin SYNOPSIS
-+QEMU / KVM CPU model configuration
-+@c man end
-+
-+@c man begin DESCRIPTION
-+
-+@menu
-+* recommendations_cpu_models_x86:: Recommendations for KVM CPU model con=
-figuration on x86 hosts
-+* cpu_model_syntax_apps::          Syntax for configuring CPU models
-+@end menu
-+
-+QEMU / KVM virtualization supports two ways to configure CPU models
-+
-+@table @option
-+
-+@item Host passthrough
-+
-+This passes the host CPU model features, model, stepping, exactly to the
-+guest. Note that KVM may filter out some host CPU model features if they
-+cannot be supported with virtualization. Live migration is unsafe when
-+this mode is used as libvirt / QEMU cannot guarantee a stable CPU is
-+exposed to the guest across hosts. This is the recommended CPU to use,
-+provided live migration is not required.
-+
-+@item Named model
-+
-+QEMU comes with a number of predefined named CPU models, that typically
-+refer to specific generations of hardware released by Intel and AMD.
-+These allow the guest VMs to have a degree of isolation from the host CP=
-U,
-+allowing greater flexibility in live migrating between hosts with differ=
-ing
-+hardware.
-+@end table
-+
-+In both cases, it is possible to optionally add or remove individual CPU
-+features, to alter what is presented to the guest by default.
-+
-+Libvirt supports a third way to configure CPU models known as "Host mode=
-l".
-+This uses the QEMU "Named model" feature, automatically picking a CPU mo=
-del
-+that is similar the host CPU, and then adding extra features to approxim=
-ate
-+the host model as closely as possible. This does not guarantee the CPU f=
-amily,
-+stepping, etc will precisely match the host CPU, as they would with "Hos=
-t
-+passthrough", but gives much of the benefit of passthrough, while making
-+live migration safe.
-+
-+@node recommendations_cpu_models_x86
-+@subsection Recommendations for KVM CPU model configuration on x86 hosts
-+
-+The information that follows provides recommendations for configuring
-+CPU models on x86 hosts. The goals are to maximise performance, while
-+protecting guest OS against various CPU hardware flaws, and optionally
-+enabling live migration between hosts with hetergeneous CPU models.
-+
-+@menu
-+* preferred_cpu_models_intel_x86::       Preferred CPU models for Intel =
-x86 hosts
-+* important_cpu_features_intel_x86::     Important CPU features for Inte=
-l x86 hosts
-+* preferred_cpu_models_amd_x86::         Preferred CPU models for AMD x8=
-6 hosts
-+* important_cpu_features_amd_x86::       Important CPU features for AMD =
-x86 hosts
-+* default_cpu_models_x86::               Default x86 CPU models
-+* other_non_recommended_cpu_models_x86:: Other non-recommended x86 CPUs
-+@end menu
-+
-+@node preferred_cpu_models_intel_x86
-+@subsubsection Preferred CPU models for Intel x86 hosts
-+
-+The following CPU models are preferred for use on Intel hosts. Administr=
-ators /
-+applications are recommended to use the CPU model that matches the gener=
-ation
-+of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-+between machines, if live migration compatibility is required, use the n=
-ewest
-+CPU model that is compatible across all desired hosts.
-+
-+@table @option
-+@item @code{Skylake-Server}
-+@item @code{Skylake-Server-IBRS}
-+
-+Intel Xeon Processor (Skylake, 2016)
-+
-+
-+@item @code{Skylake-Client}
-+@item @code{Skylake-Client-IBRS}
-+
-+Intel Core Processor (Skylake, 2015)
-+
-+
-+@item @code{Broadwell}
-+@item @code{Broadwell-IBRS}
-+@item @code{Broadwell-noTSX}
-+@item @code{Broadwell-noTSX-IBRS}
-+
-+Intel Core Processor (Broadwell, 2014)
-+
-+
-+@item @code{Haswell}
-+@item @code{Haswell-IBRS}
-+@item @code{Haswell-noTSX}
-+@item @code{Haswell-noTSX-IBRS}
-+
-+Intel Core Processor (Haswell, 2013)
-+
-+
-+@item @code{IvyBridge}
-+@item @code{IvyBridge-IBRS}
-+
-+Intel Xeon E3-12xx v2 (Ivy Bridge, 2012)
-+
-+
-+@item @code{SandyBridge}
-+@item @code{SandyBridge-IBRS}
-+
-+Intel Xeon E312xx (Sandy Bridge, 2011)
-+
-+
-+@item @code{Westmere}
-+@item @code{Westmere-IBRS}
-+
-+Westmere E56xx/L56xx/X56xx (Nehalem-C, 2010)
-+
-+
-+@item @code{Nehalem}
-+@item @code{Nehalem-IBRS}
-+
-+Intel Core i7 9xx (Nehalem Class Core i7, 2008)
-+
-+
-+@item @code{Penryn}
-+
-+Intel Core 2 Duo P9xxx (Penryn Class Core 2, 2007)
-+
-+
-+@item @code{Conroe}
-+
-+Intel Celeron_4x0 (Conroe/Merom Class Core 2, 2006)
-+
-+@end table
-+
-+@node important_cpu_features_intel_x86
-+@subsubsection Important CPU features for Intel x86 hosts
-+
-+The following are important CPU features that should be used on Intel x8=
-6
-+hosts, when available in the host CPU. Some of them require explicit
-+configuration to enable, as they are not included by default in some, or=
- all,
-+of the named CPU models listed above. In general all of these features a=
-re
-+included if using "Host passthrough" or "Host model".
-+
-+
-+@table @option
-+
-+@item @code{pcid}
-+
-+Recommended to mitigate the cost of the Meltdown (CVE-2017-5754) fix
-+
-+Included by default in Haswell, Broadwell & Skylake Intel CPU models.
-+
-+Should be explicitly turned on for Westmere, SandyBridge, and IvyBridge
-+Intel CPU models. Note that some desktop/mobile Westmere CPUs cannot
-+support this feature.
-+
-+
-+@item @code{spec-ctrl}
-+
-+Required to enable the Spectre (CVE-2017-5753 and CVE-2017-5715) fix,
-+in cases where retpolines are not sufficient.
-+
-+Included by default in Intel CPU models with -IBRS suffix.
-+
-+Must be explicitly turned on for Intel CPU models without -IBRS suffix.
-+
-+Requires the host CPU microcode to support this feature before it
-+can be used for guest CPUs.
-+
-+
-+@item @code{ssbd}
-+
-+Required to enable the CVE-2018-3639 fix
-+
-+Not included by default in any Intel CPU model.
-+
-+Must be explicitly turned on for all Intel CPU models.
-+
-+Requires the host CPU microcode to support this feature before it
-+can be used for guest CPUs.
-+
-+
-+@item @code{pdpe1gb}
-+
-+Recommended to allow guest OS to use 1GB size pages
-+
-+Not included by default in any Intel CPU model.
-+
-+Should be explicitly turned on for all Intel CPU models.
-+
-+Note that not all CPU hardware will support this feature.
-+@end table
-+
-+
-+@node preferred_cpu_models_amd_x86
-+@subsubsection Preferred CPU models for AMD x86 hosts
-+
-+The following CPU models are preferred for use on Intel hosts. Administr=
-ators /
-+applications are recommended to use the CPU model that matches the gener=
-ation
-+of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-+between machines, if live migration compatibility is required, use the n=
-ewest
-+CPU model that is compatible across all desired hosts.
-+
-+@table @option
-+
-+@item @code{EPYC}
-+@item @code{EPYC-IBPB}
-+
-+AMD EPYC Processor (2017)
-+
-+
-+@item @code{Opteron_G5}
-+
-+AMD Opteron 63xx class CPU (2012)
-+
-+
-+@item @code{Opteron_G4}
-+
-+AMD Opteron 62xx class CPU (2011)
-+
-+
-+@item @code{Opteron_G3}
-+
-+AMD Opteron 23xx (Gen 3 Class Opteron, 2009)
-+
-+
-+@item @code{Opteron_G2}
-+
-+AMD Opteron 22xx (Gen 2 Class Opteron, 2006)
-+
-+
-+@item @code{Opteron_G1}
-+
-+AMD Opteron 240 (Gen 1 Class Opteron, 2004)
-+@end table
-+
-+@node important_cpu_features_amd_x86
-+@subsubsection Important CPU features for AMD x86 hosts
-+
-+The following are important CPU features that should be used on AMD x86
-+hosts, when available in the host CPU. Some of them require explicit
-+configuration to enable, as they are not included by default in some, or=
- all,
-+of the named CPU models listed above. In general all of these features a=
-re
-+included if using "Host passthrough" or "Host model".
-+
-+
-+@table @option
-+
-+@item @code{ibpb}
-+
-+Required to enable the Spectre (CVE-2017-5753 and CVE-2017-5715) fix,
-+in cases where retpolines are not sufficient.
-+
-+Included by default in AMD CPU models with -IBPB suffix.
-+
-+Must be explicitly turned on for AMD CPU models without -IBPB suffix.
-+
-+Requires the host CPU microcode to support this feature before it
-+can be used for guest CPUs.
-+
-+
-+@item @code{virt-ssbd}
-+
-+Required to enable the CVE-2018-3639 fix
-+
-+Not included by default in any AMD CPU model.
-+
-+Must be explicitly turned on for all AMD CPU models.
-+
-+This should be provided to guests, even if amd-ssbd is also
-+provided, for maximum guest compatibility.
-+
-+Note for some QEMU / libvirt versions, this must be force enabled
-+when when using "Host model", because this is a virtual feature
-+that doesn't exist in the physical host CPUs.
-+
-+
-+@item @code{amd-ssbd}
-+
-+Required to enable the CVE-2018-3639 fix
-+
-+Not included by default in any AMD CPU model.
-+
-+Must be explicitly turned on for all AMD CPU models.
-+
-+This provides higher performance than virt-ssbd so should be
-+exposed to guests whenever available in the host. virt-ssbd
-+should none the less also be exposed for maximum guest
-+compatability as some kernels only know about virt-ssbd.
-+
-+
-+@item @code{amd-no-ssb}
-+
-+Recommended to indicate the host is not vulnerable CVE-2018-3639
-+
-+Not included by default in any AMD CPU model.
-+
-+Future hardware genarations of CPU will not be vulnerable to
-+CVE-2018-3639, and thus the guest should be told not to enable
-+its mitigations, by exposing amd-no-ssb. This is mutually
-+exclusive with virt-ssbd and amd-ssbd.
-+
-+
-+@item @code{pdpe1gb}
-+
-+Recommended to allow guest OS to use 1GB size pages
-+
-+Not included by default in any AMD CPU model.
-+
-+Should be explicitly turned on for all AMD CPU models.
-+
-+Note that not all CPU hardware will support this feature.
-+@end table
-+
-+
-+@node default_cpu_models_x86
-+@subsubsection Default x86 CPU models
-+
-+The default QEMU CPU models are designed such that they can run on all h=
-osts.
-+If an application does not wish to do perform any host compatibility che=
-cks
-+before launching guests, the default is guaranteed to work.
-+
-+The default CPU models will, however, leave the guest OS vulnerable to v=
-arious
-+CPU hardware flaws, so their use is strongly discouraged. Applications s=
-hould
-+follow the earlier guidance to setup a better CPU configuration, with ho=
-st
-+passthrough recommended if live migration is not needed.
-+
-+@table @option
-+@item @code{qemu32}
-+@item @code{qemu64}
-+
-+QEMU Virtual CPU version 2.5+ (32 & 64 bit variants)
-+
-+qemu64 is used for x86_64 guests and qemu32 is used for i686 guests, whe=
-n no
-+-cpu argument is given to QEMU, or no <cpu> is provided in libvirt XML.
-+@end table
-+
-+
-+@node other_non_recommended_cpu_models_x86
-+@subsubsection Other non-recommended x86 CPUs
-+
-+The following CPUs models are compatible with most AMD and Intel x86 hos=
-ts, but
-+their usage is discouraged, as they expose a very limited featureset, wh=
-ich
-+prevents guests having optimal performance.
-+
-+@table @option
-+
-+@item @code{kvm32}
-+@item @code{kvm64}
-+
-+Common KVM processor (32 & 64 bit variants)
-+
-+Legacy models just for historical compatibility with ancient QEMU versio=
-ns.
-+
-+
-+@item @code{486}
-+@item @code{athlon}
-+@item @code{phenom}
-+@item @code{coreduo}
-+@item @code{core2duo}
-+@item @code{n270}
-+@item @code{pentium}
-+@item @code{pentium2}
-+@item @code{pentium3}
-+
-+Various very old x86 CPU models, mostly predating the introduction of
-+hardware assisted virtualization, that should thus not be required for
-+running virtual machines.
-+@end table
-+
-+@node cpu_model_syntax_apps
-+@subsection Syntax for configuring CPU models
-+
-+The example below illustrate the approach to configuring the various
-+CPU models / features in QEMU and libvirt
-+
-+@menu
-+* cpu_model_syntax_qemu::    QEMU command line
-+* cpu_model_syntax_libvirt:: Libvirt guest XML
-+@end menu
-+
-+@node cpu_model_syntax_qemu
-+@subsubsection QEMU command line
-+
-+@table @option
-+
-+@item Host passthrough
-+
-+@example
-+   $ qemu-system-x86_64 -cpu host
-+@end example
-+
-+With feature customization:
-+
-+@example
-+   $ qemu-system-x86_64 -cpu host,-vmx,...
-+@end example
-+
-+@item Named CPU models
-+
-+@example
-+   $ qemu-system-x86_64 -cpu Westmere
-+@end example
-+
-+With feature customization:
-+
-+@example
-+   $ qemu-system-x86_64 -cpu Westmere,+pcid,...
-+@end example
-+
-+@end table
-+
-+@node cpu_model_syntax_libvirt
-+@subsubsection Libvirt guest XML
-+
-+@table @option
-+
-+@item Host passthrough
-+
-+@example
-+   <cpu mode=3D'host-passthrough'/>
-+@end example
-+
-+With feature customization:
-+
-+@example
-+   <cpu mode=3D'host-passthrough'>
-+       <feature name=3D"vmx" policy=3D"disable"/>
-+       ...
-+   </cpu>
-+@end example
-+
-+@item Host model
-+
-+@example
-+   <cpu mode=3D'host-model'/>
-+@end example
-+
-+With feature customization:
-+
-+@example
-+   <cpu mode=3D'host-model'>
-+       <feature name=3D"vmx" policy=3D"disable"/>
-+       ...
-+   </cpu>
-+@end example
-+
-+@item Named model
-+
-+@example
-+   <cpu mode=3D'custom'>
-+       <model name=3D"Westmere"/>
-+   </cpu>
-+@end example
-+
-+With feature customization:
-+
-+@example
-+   <cpu mode=3D'custom'>
-+       <model name=3D"Westmere"/>
-+       <feature name=3D"pcid" policy=3D"require"/>
-+       ...
-+   </cpu>
-+@end example
-+
-+@end table
-+
-+@c man end
-+
-+@ignore
-+
-+@setfilename qemu-cpu-models
-+@settitle QEMU / KVM CPU model configuration
-+
-+@c man begin SEEALSO
-+The HTML documentation of QEMU for more precise information and Linux
-+user mode emulator invocation.
-+@c man end
-+
-+@c man begin AUTHOR
-+Daniel P. Berrange
-+@c man end
-+
-+@end ignore
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index cd05760cac..3f2e19eabf 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -135,6 +135,7 @@ accelerator is required to use more than one host CPU=
- for emulation.
- * pcsys_keys::         Keys in the graphical frontends
- * mux_keys::           Keys in the character backend multiplexer
- * pcsys_monitor::      QEMU Monitor
-+* cpu_models::         CPU models
- * disk_images::        Disk Images
- * pcsys_network::      Network emulation
- * pcsys_other_devs::   Other Devices
-@@ -602,6 +603,11 @@ The monitor understands integers expressions for eve=
-ry integer
- argument. You can use register names to get the value of specifics
- CPU registers by prefixing them with @emph{$}.
-=20
-+@node cpu_models
-+@section CPU models
-+
-+@include docs/qemu-cpu-models.texi
-+
- @node disk_images
- @section Disk Images
-=20
---=20
-2.17.1
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
