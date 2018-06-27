@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fY529-0002tP-Gl
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:38:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1fY54J-00052P-4C
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fY526-00089f-BH
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:38:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41924 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fY54G-0000sk-0q
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:40:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54780 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY526-00089K-7I
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:38:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY54F-0000sO-Ri
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:40:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9CEA8401EF06
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:38:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A00E4158832
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:40:43 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180620073223.31964-1-peterx@redhat.com>
 	<871sctea4y.fsf@dusky.pond.sub.org>
-Date: Wed, 27 Jun 2018 09:38:27 +0200
+Date: Wed, 27 Jun 2018 09:40:40 +0200
 In-Reply-To: <871sctea4y.fsf@dusky.pond.sub.org> (Markus Armbruster's message
 	of "Tue, 26 Jun 2018 19:21:49 +0200")
-Message-ID: <87tvpoadcc.fsf_-_@dusky.pond.sub.org>
+Message-ID: <87po0cad8n.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] monitor: enable OOB by default
@@ -36,23 +36,4 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> I fooled around a bit, and I think there are a few lose ends.
-[...]
-> Talking to a QMP monitor that supports OOB:
->
->     $ socat UNIX:test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
->     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
->     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true } }
->     {"error": {"class": "GenericError", "desc": "Parameter 'oob' is unexpected"}}
->     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
->     {"return": {}}
->     QMP> { "execute": "query-qmp-schema" }
->     {"error": {"class": "GenericError", "desc": "Out-Of-Band capability requires that every command contains an 'id' field"}}
->
-> Why does every command require 'id'?
-
-I found one reason: event COMMAND_DROPPED wants it.  Any other reason?
-
-[...]
+Another lose end: event COMMAND_DROPPED seems to lack test coverage.
