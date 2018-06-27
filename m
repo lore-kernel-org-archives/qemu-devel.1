@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYAeX-0001ej-Jh
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:38:35 -0400
+	(envelope-from <david@redhat.com>) id 1fYAea-0001gY-W6
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYAeS-0007WR-QH
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:38:33 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:42020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYAeS-0007Vm-Lm
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:38:28 -0400
-Received: by mail-qk0-x243.google.com with SMTP id u62-v6so1014379qkf.9
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 06:38:28 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180625131253.11218-1-kraxel@redhat.com>
-	<20180625131253.11218-2-kraxel@redhat.com>
-	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
-	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
-	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
-	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
-	<20180627110923.GG30628@redhat.com> <87d0wcwfdv.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f4063e3e-408a-d5c2-6b7b-1ae152dbd54a@amsat.org>
-Date: Wed, 27 Jun 2018 10:38:24 -0300
+	(envelope-from <david@redhat.com>) id 1fYAeW-0007Yl-3i
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:38:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47904 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fYAeV-0007Ta-UH
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:38:32 -0400
+References: <20180622144045.737-1-david@redhat.com>
+	<20180627132156.02c77c07@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a262a687-6107-e9a4-413e-f11caf584619@redhat.com>
+Date: Wed, 27 Jun 2018 15:38:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <87d0wcwfdv.fsf@linaro.org>
+In-Reply-To: <20180627132156.02c77c07@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu? (was: [PULL
- 1/6] audio/hda: create millisecond timers that handle IO)
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] numa: report all DIMM/NVDIMMs as
+ plugged memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,88 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Martin Schrodt <martin@schrodt.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eugene Crosser <evgenii.cherkashin@profitbricks.com>, Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/27/2018 10:03 AM, Alex Bennée wrote:
+On 27.06.2018 13:21, Igor Mammedov wrote:
+> On Fri, 22 Jun 2018 16:40:45 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Daniel P. Berrangé <berrange@redhat.com> writes:
-> 
->> On Wed, Jun 27, 2018 at 09:57:09AM +0200, Markus Armbruster wrote:
->>> Thomas Huth <thuth@redhat.com> writes:
->>>
->>>> On 27.06.2018 08:51, Gerd Hoffmann wrote:
->>> [...]
->>>>> Drop support for 32bit hosts in qemu?
->>>>
->>>> I guess the only way to answer that question reliably is to send a patch
->>>> to mark 32-bit hosts as deprecated...
->>>>
->>>> Anyway, you still have got to fix that problem with -m32 now somehow
->>>> since we certainly can not drop 32-bit immediately.
->>>
->>> We certainly can if we want to.
->>>
->>> Our formal deprecation policy codifies our compromise between the need
->>> to evolve QEMU and the need of its users for stable external interfaces.
->>>
->>> "Compiles on host X" is also a need, but it's a different one.
->>> Evidence: "Supported build platforms" has its own appendix, separate
->>> from "Deprecated features".  It's mum on 32-bit hosts.
+>> Right now, there is some inconsistency between hotplugged and
+>> coldplugged memory. DIMMs added via "-device" result in different stats
+>> than DIMMs added using "device_add".
 >>
->> It is silent on host architecture coverage in general in fact. It was
->> only really focusing on operating systems and so any arch coverage is
->> at best inferred from what those OS target. Fedora covers 32-bit & 64-bit
->> arches for example, so you could take that to imply we need to support
->> both in QEMU.
+>> E.g.
+>>     [...]
+>>     -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
+>>     -m 4G,maxmem=20G,slots=2 \
+>>     -object memory-backend-ram,id=mem0,size=8G \
+>>     -device pc-dimm,id=dimm0,memdev=mem0 \
+>>     -object memory-backend-ram,id=mem1,size=8G \
+>>     -device nvdimm,id=dimm1,memdev=mem1,node=1
 >>
->> It is fuzzier though because while Peter has good OS coverage for his
->> merge testing, I don't think he has full host arch coverage for everything
->> that downstreams expect QEMU to build on ?
-> 
-> We do however have cross build infrastructure for all tcg/foo backends.
-> They are run by the shippable CI framework (which is how I noticed):
-> 
->   https://app.shippable.com/github/qemu/qemu/runs?branchName=master
+>> Results in NUMA info
+>>     (qemu) info numa
+>>     info numa
+>>     2 nodes
+>>     node 0 cpus: 0 1
+>>     node 0 size: 10240 MB
+>>     node 0 plugged: 0 MB
+>>     node 1 cpus: 2 3
+>>     node 1 size: 10240 MB
+>>     node 1 plugged: 0 MB
+> ... 
+>> But in memory size summary:
+>>     (qemu) info memory_size_summary
+>>     info memory_size_summary
+>>     base memory: 4294967296
+>>     plugged memory: 17179869184
+> this looks like right amount wrt used CLI,
+> is this supposed to be correct output or broken one?
+> ('but' implies incorrect one)
 
-FWIW we can also build ppc32 again (with the apt-fake kludge although).
+'but' just highlights the inconsistency here. As explained above, all
+dimms should be reported as plugged (hot and coldplugged).
+
+So in my opinion "memory size summary" does the right thing right now.
 
 > 
-> Once we have the changes made to the wiki I'd like to use:
-> 
->   https://wiki.qemu.org/Template:CIStatus
-> 
-> In a few choice places on the wiki, including the front page, for better
-> visibility.
-> 
->>> I'm not saying we *should* drop 32-bit hosts immediately.  Only that the
->>> feature deprecation policy does not apply.
->>>
->>> Is QEMU still useful on 32-bit hosts?  Honest question!
 >>
->> That answer varies depending on what you're using QEMU for I think. It
->> could be that people see tools like qemu-img/qemu-nbd as useful even
->> if they don't use system emulators. And of course userspace emulators
->> are enough distinct use case.
+>> Make this consistent by reporting all hot and coldplugged
+>> memory a.k.a. DIMM and NVDIMM as "plugged".
 >>
->> IMHO as long as distros are shipping 32-bit support, it is reasonable
->> to assume there will be people who find QEMU useful to some degree.
+>> Fixes: 31959e82fb0 ("hmp: extend "info numa" with hotplugged memory information")
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  numa.c | 6 ++----
+>>  1 file changed, 2 insertions(+), 4 deletions(-)
 >>
->> Personally I don't have any need for 32-bit hosts, but clearly some
->> people do since otherwise distros would  have killed their 32-bit
->> arches already.
+>> diff --git a/numa.c b/numa.c
+>> index 94f758c757..5f6367b989 100644
+>> --- a/numa.c
+>> +++ b/numa.c
+>> @@ -566,10 +566,8 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+>>  
+>>              if (pcdimm_info) {
+>>                  node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
+>> -                if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
+>> -                    node_mem[pcdimm_info->node].node_plugged_mem +=
+>> -                        pcdimm_info->size;
+>> -                }
+>> +                node_mem[pcdimm_info->node].node_plugged_mem +=
+>> +                    pcdimm_info->size;
+>>              }
+>>          }
+>>      }
 > 
-> I know of at least one kernel developer who uses qemu-system-aarch64 on
-> their 32 bit ARM Chromebook to test their 64 bit code. Next time I see
-> them I'll see if they are still using it.
-> 
-> My feeling is although probably not widespread it certainly can be handy.
-> 
->>
->> Regards,
->> Daniel
-> 
-> 
-> --
-> Alex Bennée
-> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
