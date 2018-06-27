@@ -1,42 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fYA3J-0004rC-EB
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYA6f-0007EK-Kt
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fYA3F-0004tV-Hg
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52648
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fYA3F-0004tI-D2
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:01 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5RCx1bW080664
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:00:00 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jv9yyk3gy-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:00:00 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 27 Jun 2018 08:59:59 -0400
-References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
-	<20180626122343.13473-4-marcandre.lureau@redhat.com>
-	<20180627140129.4a751630@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 27 Jun 2018 08:59:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYA6Z-0000ig-Ga
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:03:33 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYA6Z-0000gW-0d
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:03:27 -0400
+Received: by mail-wm0-x242.google.com with SMTP id u18-v6so5441435wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 06:03:26 -0700 (PDT)
+References: <20180625131253.11218-1-kraxel@redhat.com>
+	<20180625131253.11218-2-kraxel@redhat.com>
+	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
+	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
+	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
+	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
+	<20180627110923.GG30628@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180627110923.GG30628@redhat.com>
+Date: Wed, 27 Jun 2018 14:03:24 +0100
+Message-ID: <87d0wcwfdv.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180627140129.4a751630@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <ab5d510e-1308-f581-1e2b-12584391d53c@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] acpi: add fw_cfg file for TPM and
- PPI virtual memory device
+Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu? (was: [PULL
+ 1/6] audio/hda: create millisecond timers that handle IO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,160 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Martin Schrodt <martin@schrodt.org>, Thomas Huth <thuth@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On 06/27/2018 08:01 AM, Igor Mammedov wrote:
-> On Tue, 26 Jun 2018 14:23:42 +0200
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->
->> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> On Wed, Jun 27, 2018 at 09:57:09AM +0200, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
 >>
->> To avoid having to hard code the base address of the PPI virtual
->> memory device we introduce a fw_cfg file etc/tpm/config that holds the
->> base address of the PPI device, the version of the PPI interface and
->> the version of the attached TPM.
+>> > On 27.06.2018 08:51, Gerd Hoffmann wrote:
+>> [...]
+>> >> Drop support for 32bit hosts in qemu?
+>> >
+>> > I guess the only way to answer that question reliably is to send a pat=
+ch
+>> > to mark 32-bit hosts as deprecated...
+>> >
+>> > Anyway, you still have got to fix that problem with -m32 now somehow
+>> > since we certainly can not drop 32-bit immediately.
 >>
->> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document=
- it ]
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> We certainly can if we want to.
 >>
->> ---
+>> Our formal deprecation policy codifies our compromise between the need
+>> to evolve QEMU and the need of its users for stable external interfaces.
 >>
->> v4:
->>   - add ACPI only if PPI is enabled
->> v3:
->>   - renamed to etc/tpm/config, made it static, document it
->> ---
->>   include/hw/acpi/tpm.h |  3 +++
->>   hw/i386/acpi-build.c  | 19 +++++++++++++++++++
->>   docs/specs/tpm.txt    | 20 ++++++++++++++++++++
->>   3 files changed, 42 insertions(+)
+>> "Compiles on host X" is also a need, but it's a different one.
+>> Evidence: "Supported build platforms" has its own appendix, separate
+>> from "Deprecated features".  It's mum on 32-bit hosts.
+>
+> It is silent on host architecture coverage in general in fact. It was
+> only really focusing on operating systems and so any arch coverage is
+> at best inferred from what those OS target. Fedora covers 32-bit & 64-bit
+> arches for example, so you could take that to imply we need to support
+> both in QEMU.
+>
+> It is fuzzier though because while Peter has good OS coverage for his
+> merge testing, I don't think he has full host arch coverage for everything
+> that downstreams expect QEMU to build on ?
+
+We do however have cross build infrastructure for all tcg/foo backends.
+They are run by the shippable CI framework (which is how I noticed):
+
+  https://app.shippable.com/github/qemu/qemu/runs?branchName=3Dmaster
+
+Once we have the changes made to the wiki I'd like to use:
+
+  https://wiki.qemu.org/Template:CIStatus
+
+In a few choice places on the wiki, including the front page, for better
+visibility.
+
+>> I'm not saying we *should* drop 32-bit hosts immediately.  Only that the
+>> feature deprecation policy does not apply.
 >>
->> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->> index c082df7d1d..f79d68a77a 100644
->> --- a/include/hw/acpi/tpm.h
->> +++ b/include/hw/acpi/tpm.h
->> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
->>   #define TPM_PPI_ADDR_SIZE           0x400
->>   #define TPM_PPI_ADDR_BASE           0xFED45000
->>  =20
->> +#define TPM_PPI_VERSION_NONE        0
->> +#define TPM_PPI_VERSION_1_30        1
->> +
->>   #endif /* HW_ACPI_TPM_H */
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 9bc6d97ea1..d9320845ed 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
->>       bool pcihp_bridge_en;
->>   } AcpiBuildPciBusHotplugState;
->>  =20
->> +typedef struct FWCfgTPMConfig {
->> +    uint32_t tpmppi_address;
-> is 32bit enough (what if on ARM or somewhere else area would be above 4=
-Gb)?
-> to be future proof I'd make it 64bit field so we won't have to change A=
-BI
-> later on.
+>> Is QEMU still useful on 32-bit hosts?  Honest question!
 >
->> +    uint8_t tpm_version;
->> +    uint8_t tpmppi_version;
->> +} QEMU_PACKED FWCfgTPMConfig;
->> +
->>   static void init_common_fadt_data(Object *o, AcpiFadtData *data)
->>   {
->>       uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_B=
-ASE, NULL);
->> @@ -2873,6 +2879,8 @@ void acpi_setup(void)
->>       AcpiBuildTables tables;
->>       AcpiBuildState *build_state;
->>       Object *vmgenid_dev;
->> +    TPMIf *tpm;
->> +    static FWCfgTPMConfig tpm_config;
->>  =20
->>       if (!pcms->fw_cfg) {
->>           ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
->> @@ -2907,6 +2915,17 @@ void acpi_setup(void)
-> what about vart-arm machine?
-> (it also has some TPM stuff but it doesn't use acpi_setup())
-> maybe add common helper and reuse it for both?
+> That answer varies depending on what you're using QEMU for I think. It
+> could be that people see tools like qemu-img/qemu-nbd as useful even
+> if they don't use system emulators. And of course userspace emulators
+> are enough distinct use case.
+>
+> IMHO as long as distros are shipping 32-bit support, it is reasonable
+> to assume there will be people who find QEMU useful to some degree.
+>
+> Personally I don't have any need for 32-bit hosts, but clearly some
+> people do since otherwise distros would  have killed their 32-bit
+> arches already.
 
-I have never used ARM with it. I am not sure whether the firmware on ARM=20
-is instrumented to have support for PPI. If someone wanted to enable=20
-that, I would leave these parts up to them.
+I know of at least one kernel developer who uses qemu-system-aarch64 on
+their 32 bit ARM Chromebook to test their 64 bit code. Next time I see
+them I'll see if they are still using it.
+
+My feeling is although probably not widespread it certainly can be handy.
 
 >
->
->>       fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
->>                       tables.tcpalog->data, acpi_data_len(tables.tcpal=
-og));
->>  =20
->> +    tpm =3D tpm_find();
->> +    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_ab=
-ort)) {
->> +        tpm_config =3D (FWCfgTPMConfig) {
->> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
->> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find()))=
-,
-> Have it actually been tested on big endian host?
+> Regards,
+> Daniel
 
-At some point I did, yes.
 
->
->> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
-> ditto
->
-> (that's why I don't welcome packed structures in random places)
-
-I thought a packed structure at least ensures that the offsets of the=20
-fields are agreed upon by 32 and 64bit, no ? So the firmware can use 64=20
-bit or 32bit and the offsets would be ensured.
-
->
-> how about adding unit-tests to series to make sure that it works
-> across different hosts that travis builds on and that thing won't
-> fall apart in future?
-
->> +        };
->> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
->> +                        &tpm_config, sizeof tpm_config);
->> +    }
->> +
->>       vmgenid_dev =3D find_vmgenid_dev();
->>       if (vmgenid_dev) {
->>           vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
->> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
->> index c230c4c93e..2ddb768084 100644
->> --- a/docs/specs/tpm.txt
->> +++ b/docs/specs/tpm.txt
->> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
->>    - hw/tpm/tpm_tis.h
->>  =20
->>  =20
->> +=3D fw_cfg interface =3D
->> +
->> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
->> +configuring the guest appropriately.
->> +
->> +The entry of 6 bytes has the following content, in little-endian:
->> +
->> +    #define TPM_VERSION_UNSPEC          0
->> +    #define TPM_VERSION_1_2             1
->> +    #define TPM_VERSION_2_0             2
->> +
->> +    #define TPM_PPI_VERSION_NONE        0
->> +    #define TPM_PPI_VERSION_1_30        1
->> +
->> +    struct FWCfgTPMConfig {
->> +        uint32_t tpmppi_address;         /* PPI memory location */
->> +        uint8_t tpm_version;             /* TPM version */
->> +        uint8_t tpmppi_version;          /* PPI version */
->> +    };
->> +
->>   =3D ACPI Interface =3D
->>  =20
->>   The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT=
- and passes
+--
+Alex Benn=C3=A9e
