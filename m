@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYJtZ-00086g-6h
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:30:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYJte-000899-Fa
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYJtW-0003nC-1B
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:30:41 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYJtY-0003nr-9K
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:30:46 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 28 Jun 2018 01:29:47 +0200
-Message-Id: <20180627232951.14725-7-laurent@vivier.eu>
+Date: Thu, 28 Jun 2018 01:29:48 +0200
+Message-Id: <20180627232951.14725-8-laurent@vivier.eu>
 In-Reply-To: <20180627232951.14725-1-laurent@vivier.eu>
 References: <20180627232951.14725-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [RFC v3 06/10] ESP: add pseudo-DMA as used by Macintosh
+Subject: [Qemu-devel] [RFC v3 07/10] hw/m68k: add Nubus support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,527 +26,709 @@ Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/mips/mips_jazz.c   |   2 +-
- hw/scsi/esp.c         | 297 ++++++++++++++++++++++++++++++++++++++++++++------
- include/hw/scsi/esp.h |  11 +-
- 3 files changed, 276 insertions(+), 34 deletions(-)
+ hw/Makefile.objs                    |   1 +
+ hw/display/macfb.c                  |  56 ++++++++++
+ hw/nubus/Makefile.objs              |   4 +
+ hw/nubus/mac-nubus-bridge.c         |  45 ++++++++
+ hw/nubus/nubus-bridge.c             |  34 ++++++
+ hw/nubus/nubus-bus.c                | 111 +++++++++++++++++++
+ hw/nubus/nubus-device.c             | 210 ++++++++++++++++++++++++++++++++++++
+ include/hw/display/macfb.h          |  21 ++++
+ include/hw/nubus/mac-nubus-bridge.h |  24 +++++
+ include/hw/nubus/nubus.h            |  69 ++++++++++++
+ 10 files changed, 575 insertions(+)
+ create mode 100644 hw/nubus/Makefile.objs
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
 
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 90cb306f53..87118f2d03 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -282,7 +282,7 @@ static void mips_jazz_init(MachineState *machine,
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index a19c1417ed..8c97b4b97b 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -35,6 +35,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+ devices-dirs-$(CONFIG_SOFTMMU) += xen/
+ devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
+ devices-dirs-$(CONFIG_SOFTMMU) += smbios/
++devices-dirs-$(CONFIG_NUBUS) += nubus/
+ devices-dirs-y += core/
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
+diff --git a/hw/display/macfb.c b/hw/display/macfb.c
+index 05841f4483..d05ade7920 100644
+--- a/hw/display/macfb.c
++++ b/hw/display/macfb.c
+@@ -14,6 +14,7 @@
+ #include "hw/sysbus.h"
+ #include "ui/console.h"
+ #include "ui/pixel_ops.h"
++#include "hw/nubus/nubus.h"
+ #include "hw/display/macfb.h"
  
-     /* SCSI adapter */
-     esp = esp_init(0x80002000, 0, rc4030_dma_read, rc4030_dma_write, dmas[0],
--                   qdev_get_gpio_in(rc4030, 5), &esp_reset, &dma_enable);
-+                   qdev_get_gpio_in(rc4030, 5), NULL, &esp_reset, &dma_enable);
-     scsi_bus_legacy_handle_cmdline(&esp->bus);
- 
-     /* Floppy */
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 9ed9727744..8270abe298 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -37,6 +37,8 @@
-  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR53C9X.txt
-  */
- 
-+/* on Macintosh Quadra it is a NCR53C96 */
-+
- static void esp_raise_irq(ESPState *s)
- {
-     if (!(s->rregs[ESP_RSTAT] & STAT_INT)) {
-@@ -55,6 +57,16 @@ static void esp_lower_irq(ESPState *s)
-     }
+ #define VIDEO_BASE 0x00001000
+@@ -213,12 +214,38 @@ static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
  }
  
-+static void esp_raise_drq(ESPState *s)
++const uint8_t macfb_rom[] = {
++    255, 0, 0, 0,
++};
++
++static void macfb_nubus_realize(DeviceState *dev, Error **errp)
 +{
-+    qemu_irq_raise(s->irq_data);
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    MacfbNubusState *s = NUBUS_MACFB(dev);
++    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
++    MacfbState *ms = &s->macfb;
++
++    ndc->parent_realize(dev, errp);
++
++    macfb_common_realize(dev, ms);
++    memory_region_add_subregion(&nd->slot_mem, DAFB_BASE, &ms->mem_ctrl);
++    memory_region_add_subregion(&nd->slot_mem, VIDEO_BASE, &ms->mem_vram);
++
++    nubus_register_rom(nd, macfb_rom, sizeof(macfb_rom), 1, 9, 0xf);
 +}
 +
-+static void esp_lower_drq(ESPState *s)
-+{
-+    qemu_irq_lower(s->irq_data);
-+}
-+
- void esp_dma_enable(ESPState *s, int irq, int level)
+ static void macfb_sysbus_reset(DeviceState *d)
  {
-     if (level) {
-@@ -81,29 +93,11 @@ void esp_request_cancelled(SCSIRequest *req)
-     }
+     MacfbSysBusState *s = MACFB(d);
+     macfb_reset(&s->macfb);
  }
  
--static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-+static int get_cmd_cb(ESPState *s)
++static void macfb_nubus_reset(DeviceState *d)
++{
++    MacfbNubusState *s = NUBUS_MACFB(d);
++    macfb_reset(&s->macfb);
++}
++
+ static Property macfb_sysbus_properties[] = {
+     DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
+     DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
+@@ -226,6 +253,13 @@ static Property macfb_sysbus_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static Property macfb_nubus_properties[] = {
++    DEFINE_PROP_UINT32("width", MacfbNubusState, macfb.width, 640),
++    DEFINE_PROP_UINT32("height", MacfbNubusState, macfb.height, 480),
++    DEFINE_PROP_UINT8("depth", MacfbNubusState, macfb.depth, 8),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
  {
--    uint32_t dmalen;
-     int target;
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -237,6 +271,19 @@ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
+     dc->props = macfb_sysbus_properties;
+ }
  
-     target = s->wregs[ESP_WBUSID] & BUSID_DID;
--    if (s->dma) {
--        dmalen = s->rregs[ESP_TCLO];
--        dmalen |= s->rregs[ESP_TCMID] << 8;
--        dmalen |= s->rregs[ESP_TCHI] << 16;
--        if (dmalen > buflen) {
--            return 0;
--        }
--        s->dma_memory_read(s->dma_opaque, buf, dmalen);
--    } else {
--        dmalen = s->ti_size;
--        if (dmalen > TI_BUFSZ) {
--            return 0;
--        }
--        memcpy(buf, s->ti_buf, dmalen);
--        buf[0] = buf[2] >> 5;
--    }
--    trace_esp_get_cmd(dmalen, target);
++static void macfb_nubus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
++
++    device_class_set_parent_realize(dc, macfb_nubus_realize,
++                                    &ndc->parent_realize);
++    dc->desc = "Nubus Macintosh framebuffer";
++    dc->reset = macfb_nubus_reset;
++    dc->vmsd = &vmstate_macfb;
++    dc->props = macfb_nubus_properties;
++}
++
+ static TypeInfo macfb_sysbus_info = {
+     .name          = TYPE_MACFB,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+@@ -244,9 +291,18 @@ static TypeInfo macfb_sysbus_info = {
+     .class_init    = macfb_sysbus_class_init,
+ };
  
-     s->ti_size = 0;
-     s->ti_rptr = 0;
-@@ -122,8 +116,48 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-         s->rregs[ESP_RINTR] = INTR_DC;
-         s->rregs[ESP_RSEQ] = SEQ_0;
-         esp_raise_irq(s);
-+        return -1;
-+    }
++static TypeInfo macfb_nubus_info = {
++    .name          = TYPE_NUBUS_MACFB,
++    .parent        = TYPE_NUBUS_DEVICE,
++    .instance_size = sizeof(MacfbNubusState),
++    .class_init    = macfb_nubus_class_init,
++    .class_size    = sizeof(MacfbNubusDeviceClass),
++};
++
+ static void macfb_register_types(void)
+ {
+     type_register_static(&macfb_sysbus_info);
++    type_register_static(&macfb_nubus_info);
+ }
+ 
+ type_init(macfb_register_types)
+diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
+new file mode 100644
+index 0000000000..ebb050a4ad
+--- /dev/null
++++ b/hw/nubus/Makefile.objs
+@@ -0,0 +1,4 @@
++common-obj-y += nubus-device.o
++common-obj-y += nubus-bus.o
++common-obj-y += nubus-bridge.o
++common-obj-$(CONFIG_MAC) += mac-nubus-bridge.o
+diff --git a/hw/nubus/mac-nubus-bridge.c b/hw/nubus/mac-nubus-bridge.c
+new file mode 100644
+index 0000000000..7c329300b8
+--- /dev/null
++++ b/hw/nubus/mac-nubus-bridge.c
+@@ -0,0 +1,45 @@
++/*
++ *  Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++
++
++static void mac_nubus_bridge_init(Object *obj)
++{
++    MacNubusState *s = MAC_NUBUS_BRIDGE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    s->bus = NUBUS_BUS(qbus_create(TYPE_NUBUS_BUS, DEVICE(s), NULL));
++
++    sysbus_init_mmio(sbd, &s->bus->super_slot_io);
++    sysbus_init_mmio(sbd, &s->bus->slot_io);
++}
++
++static void mac_nubus_bridge_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->desc = "Nubus bridge";
++}
++
++static const TypeInfo mac_nubus_bridge_info = {
++    .name          = TYPE_MAC_NUBUS_BRIDGE,
++    .parent        = TYPE_NUBUS_BRIDGE,
++    .instance_init = mac_nubus_bridge_init,
++    .instance_size = sizeof(MacNubusState),
++    .class_init    = mac_nubus_bridge_class_init,
++};
++
++static void mac_nubus_bridge_register_types(void)
++{
++    type_register_static(&mac_nubus_bridge_info);
++}
++
++type_init(mac_nubus_bridge_register_types)
+diff --git a/hw/nubus/nubus-bridge.c b/hw/nubus/nubus-bridge.c
+new file mode 100644
+index 0000000000..cd8c6a91eb
+--- /dev/null
++++ b/hw/nubus/nubus-bridge.c
+@@ -0,0 +1,34 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/nubus/nubus.h"
++
++static void nubus_bridge_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->fw_name = "nubus";
++}
++
++static const TypeInfo nubus_bridge_info = {
++    .name          = TYPE_NUBUS_BRIDGE,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SysBusDevice),
++    .class_init    = nubus_bridge_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_bridge_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-bus.c b/hw/nubus/nubus-bus.c
+new file mode 100644
+index 0000000000..cd566ae640
+--- /dev/null
++++ b/hw/nubus/nubus-bus.c
+@@ -0,0 +1,111 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/nubus/nubus.h"
++#include "hw/sysbus.h"
++#include "qapi/error.h"
++
++
++static NubusBus *nubus_find(void)
++{
++    /* Returns NULL unless there is exactly one nubus device */
++    return NUBUS_BUS(object_resolve_path_type("", TYPE_NUBUS_BUS, NULL));
++}
++
++static void nubus_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                             unsigned int size)
++{
++    return;
++}
++
++
++static uint64_t nubus_slot_read(void *opaque, hwaddr addr,
++                                unsigned int size)
++{
 +    return 0;
 +}
 +
-+static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
++static const MemoryRegionOps nubus_slot_ops = {
++    .read  = nubus_slot_read,
++    .write = nubus_slot_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static void nubus_super_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                                   unsigned int size)
 +{
-+    int target;
-+    uint32_t dmalen;
-+
-+    target = s->wregs[ESP_WBUSID] & BUSID_DID;
-+    if (s->dma) {
-+        dmalen = s->rregs[ESP_TCLO];
-+        dmalen |= s->rregs[ESP_TCMID] << 8;
-+        dmalen |= s->rregs[ESP_TCHI] << 16;
-+        if (dmalen > buflen) {
-+            return 0;
-+        }
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, buf, dmalen);
-+        } else {
-+            memcpy(s->pdma_buf, buf, dmalen);
-+            s->pdma_len = dmalen;
-+            s->pdma_start = s->pdma_buf;
-+            s->pdma_cur = s->pdma_buf;
-+            esp_raise_drq(s);
-+            return 0;
-+        }
-+    } else {
-+        dmalen = s->ti_size;
-+        if (dmalen > TI_BUFSZ) {
-+            return 0;
-+        }
-+        memcpy(buf, s->ti_buf, dmalen);
-+        buf[0] = buf[2] >> 5;
-+    }
-+    trace_esp_get_cmd(dmalen, target);
-+
-+    if (get_cmd_cb(s) < 0) {
-         return 0;
-     }
-+
-     return dmalen;
- }
- 
-@@ -162,6 +196,15 @@ static void do_cmd(ESPState *s, uint8_t *buf)
-     do_busid_cmd(s, &buf[1], busid);
- }
- 
-+static void satn_pdma_cb(ESPState *s)
-+{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    if (s->pdma_cur != s->pdma_start)
-+        do_cmd(s, s->pdma_start);
++    return;
 +}
 +
- static void handle_satn(ESPState *s)
- {
-     uint8_t buf[32];
-@@ -171,11 +214,21 @@ static void handle_satn(ESPState *s)
-         s->dma_cb = handle_satn;
-         return;
-     }
-+    s->pdma_cb = satn_pdma_cb;
-     len = get_cmd(s, buf, sizeof(buf));
-     if (len)
-         do_cmd(s, buf);
- }
- 
-+static void s_without_satn_pdma_cb(ESPState *s)
++static uint64_t nubus_super_slot_read(void *opaque, hwaddr addr,
++                                      unsigned int size)
 +{
-+    if (get_cmd_cb(s) < 0) {
-+        return;
-+    }
-+    if (s->pdma_cur != s->pdma_start)
-+        do_busid_cmd(s, s->pdma_start, 0);
++    return 0;
 +}
 +
- static void handle_s_without_atn(ESPState *s)
- {
-     uint8_t buf[32];
-@@ -185,18 +238,36 @@ static void handle_s_without_atn(ESPState *s)
-         s->dma_cb = handle_s_without_atn;
-         return;
-     }
-+    s->pdma_cb = s_without_satn_pdma_cb;
-     len = get_cmd(s, buf, sizeof(buf));
-     if (len) {
-         do_busid_cmd(s, buf, 0);
-     }
- }
- 
-+static void satn_stop_pdma_cb(ESPState *s)
++static const MemoryRegionOps nubus_super_slot_ops = {
++    .read  = nubus_super_slot_read,
++    .write = nubus_super_slot_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static void nubus_realize(BusState *bus, Error **errp)
 +{
-+    if (get_cmd_cb(s) < 0) {
++    if (!nubus_find()) {
++        error_setg(errp, "at most one %s device is permitted", TYPE_NUBUS_BUS);
 +        return;
-+    }
-+    s->cmdlen = s->pdma_cur - s->pdma_start;
-+    if (s->cmdlen) {
-+        trace_esp_handle_satn_stop(s->cmdlen);
-+        s->do_cmd = 1;
-+        s->rregs[ESP_RSTAT] = STAT_TC | STAT_CD;
-+        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+        s->rregs[ESP_RSEQ] = SEQ_CD;
-+        esp_raise_irq(s);
 +    }
 +}
 +
- static void handle_satn_stop(ESPState *s)
- {
-     if (s->dma && !s->dma_enabled) {
-         s->dma_cb = handle_satn_stop;
-         return;
-     }
-+    s->pdma_cb = satn_stop_pdma_cb;;
-     s->cmdlen = get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
-     if (s->cmdlen) {
-         trace_esp_handle_satn_stop(s->cmdlen);
-@@ -208,16 +279,33 @@ static void handle_satn_stop(ESPState *s)
-     }
- }
- 
-+static void write_response_pdma_cb(ESPState *s)
++static void nubus_init(Object *obj)
 +{
-+    s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-+    s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+    s->rregs[ESP_RSEQ] = SEQ_CD;
-+    esp_raise_irq(s);
++    NubusBus *nubus = NUBUS_BUS(obj);
++
++    memory_region_init_io(&nubus->super_slot_io, obj, &nubus_super_slot_ops,
++                          nubus, "nubus-super-slots",
++                          NUBUS_SUPER_SLOT_NB * NUBUS_SUPER_SLOT_SIZE);
++
++    memory_region_init_io(&nubus->slot_io, obj, &nubus_slot_ops,
++                          nubus, "nubus-slots",
++                          NUBUS_SLOT_NB * NUBUS_SLOT_SIZE);
++
++    nubus->current_slot = NUBUS_FIRST_SLOT;
 +}
 +
- static void write_response(ESPState *s)
- {
-     trace_esp_write_response(s->status);
-     s->ti_buf[0] = s->status;
-     s->ti_buf[1] = 0;
-     if (s->dma) {
--        s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
--        s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
--        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
--        s->rregs[ESP_RSEQ] = SEQ_CD;
-+        if (s->dma_memory_write) {
-+            s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-+            s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-+            s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-+            s->rregs[ESP_RSEQ] = SEQ_CD;
-+        } else {
-+            s->pdma_len = 2;
-+            s->pdma_start = s->ti_buf;
-+            s->pdma_cur = s->ti_buf;
-+            s->pdma_cb = write_response_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     } else {
-         s->ti_size = 2;
-         s->ti_rptr = 0;
-@@ -239,6 +327,39 @@ static void esp_dma_done(ESPState *s)
-     esp_raise_irq(s);
- }
- 
-+static void do_dma_pdma_cb(ESPState *s)
++static void nubus_class_init(ObjectClass *oc, void *data)
 +{
-+    int to_device = (s->ti_size < 0);
-+    int len = s->pdma_cur - s->pdma_start;
-+    if (s->do_cmd) {
-+        s->ti_size = 0;
-+        s->cmdlen = 0;
-+        s->do_cmd = 0;
-+        do_cmd(s, s->cmdbuf);
-+        return;
-+    }
-+    s->dma_left -= len;
-+    s->async_buf += len;
-+    s->async_len -= len;
-+    if (to_device) {
-+        s->ti_size += len;
-+    } else {
-+        s->ti_size -= len;
-+    }
-+    if (s->async_len == 0) {
-+        scsi_req_continue(s->current_req);
-+        /* If there is still data to be read from the device then
-+           complete the DMA operation immediately.  Otherwise defer
-+           until the scsi layer has completed.  */
-+        if (to_device || s->dma_left != 0 || s->ti_size == 0) {
-+            return;
-+        }
-+    }
++    BusClass *bc = BUS_CLASS(oc);
 +
-+    /* Partially filled a scsi buffer. Complete immediately.  */
-+    esp_dma_done(s);
++    bc->realize = nubus_realize;
 +}
 +
- static void esp_do_dma(ESPState *s)
- {
-     uint32_t len;
-@@ -249,10 +370,26 @@ static void esp_do_dma(ESPState *s)
-         trace_esp_do_dma(s->cmdlen, len);
-         assert (s->cmdlen <= sizeof(s->cmdbuf) &&
-                 len <= sizeof(s->cmdbuf) - s->cmdlen);
--        s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-+        } else {
-+            s->pdma_len = len;
-+            s->pdma_start = &s->cmdbuf[s->cmdlen];
-+            s->pdma_cur = &s->cmdbuf[s->cmdlen];
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-+        s->ti_size = 0;
-+        s->cmdlen = 0;
-+        s->do_cmd = 0;
-+        do_cmd(s, s->cmdbuf);
-         return;
-     }
-     if (s->async_len == 0) {
-+        if (s->dma_left == 0) {
-+            esp_dma_done(s);
-+        }
-         /* Defer until data is available.  */
-         return;
-     }
-@@ -261,9 +398,27 @@ static void esp_do_dma(ESPState *s)
-     }
-     to_device = (s->ti_size < 0);
-     if (to_device) {
--        s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-+        if (s->dma_memory_read) {
-+            s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-+        } else {
-+            s->pdma_len = len;
-+            s->pdma_start = s->async_buf;
-+            s->pdma_cur = s->async_buf;
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     } else {
--        s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-+        if (s->dma_memory_write) {
-+            s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-+        } else {
-+            s->pdma_len = len;
-+            s->pdma_start = s->async_buf;
-+            s->pdma_cur = s->async_buf;
-+            s->pdma_cb = do_dma_pdma_cb;
-+            esp_raise_drq(s);
-+            return;
-+        }
-     }
-     s->dma_left -= len;
-     s->async_buf += len;
-@@ -356,8 +511,7 @@ static void handle_ti(ESPState *s)
-         s->dma_left = minlen;
-         s->rregs[ESP_RSTAT] &= ~STAT_TC;
-         esp_do_dma(s);
--    }
--    if (s->do_cmd) {
-+    } else if (s->do_cmd) {
-         trace_esp_handle_ti_cmd(s->cmdlen);
-         s->ti_size = 0;
-         s->cmdlen = 0;
-@@ -384,6 +538,7 @@ void esp_hard_reset(ESPState *s)
- static void esp_soft_reset(ESPState *s)
- {
-     qemu_irq_lower(s->irq);
-+    qemu_irq_lower(s->irq_data);
-     esp_hard_reset(s);
- }
- 
-@@ -409,6 +564,7 @@ uint64_t esp_reg_read(ESPState *s, uint32_t saddr)
-             s->ti_size--;
-             s->rregs[ESP_FIFO] = s->ti_buf[s->ti_rptr++];
-         }
-+        esp_raise_irq(s);
-         if (s->ti_rptr == s->ti_wptr) {
-             s->ti_rptr = 0;
-             s->ti_wptr = 0;
-@@ -619,11 +775,85 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
-     .valid.accepts = esp_mem_accepts,
- };
- 
-+static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
-+                                 uint64_t val, unsigned int size)
-+{
-+    SysBusESPState *sysbus = opaque;
-+    ESPState *s = &sysbus->esp;
-+    uint32_t dmalen;
++static const TypeInfo nubus_bus_info = {
++    .name = TYPE_NUBUS_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(NubusBus),
++    .instance_init = nubus_init,
++    .class_init = nubus_class_init,
++};
 +
-+    dmalen = s->rregs[ESP_TCLO];
-+    dmalen |= s->rregs[ESP_TCMID] << 8;
-+    dmalen |= s->rregs[ESP_TCHI] << 16;
-+    if (dmalen == 0 || s->pdma_len == 0) {
-+        return;
-+    }
-+    switch (size) {
-+    case 1:
-+        *s->pdma_cur++ = val;
-+        s->pdma_len--;
-+        dmalen--;
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_bus_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
+new file mode 100644
+index 0000000000..6b35ddb33d
+--- /dev/null
++++ b/hw/nubus/nubus-device.c
+@@ -0,0 +1,210 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/nubus/nubus.h"
++#include "qapi/error.h"
++
++
++/* The Format Block Structure */
++
++#define FBLOCK_DIRECTORY_OFFSET 0
++#define FBLOCK_LENGTH           4
++#define FBLOCK_CRC              8
++#define FBLOCK_REVISION_LEVEL   12
++#define FBLOCK_FORMAT           13
++#define FBLOCK_TEST_PATTERN     14
++#define FBLOCK_RESERVED         18
++#define FBLOCK_BYTE_LANES       19
++
++#define FBLOCK_SIZE             20
++
++#    define FBLOCK_PATTERN_VAL  0x5a932bc7
++
++static uint64_t nubus_fblock_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    NubusDevice *dev = opaque;
++    uint64_t val;
++
++#define BYTE(v, b) (((v) >> (24 - 8 * (b))) & 0xff)
++    switch (addr) {
++    case FBLOCK_BYTE_LANES:
++        val = dev->byte_lanes;
++        val |= (val ^ 0xf) << 4;
 +        break;
-+    case 2:
-+        *s->pdma_cur++ = val >> 8;
-+        *s->pdma_cur++ = val;
-+        s->pdma_len -= 2;
-+        dmalen -= 2;
++    case FBLOCK_RESERVED:
++        val = 0x00;
 +        break;
-+    }
-+    s->rregs[ESP_TCLO] = dmalen & 0xff;
-+    s->rregs[ESP_TCMID] = dmalen >> 8;
-+    s->rregs[ESP_TCHI] = dmalen >> 16;
-+    if (s->pdma_len == 0 && s->pdma_cb) {
-+        esp_lower_drq(s);
-+        s->pdma_cb(s);
-+        s->pdma_cb = NULL;
-+    }
-+}
-+
-+static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
-+                                    unsigned int size)
-+{
-+    SysBusESPState *sysbus = opaque;
-+    ESPState *s = &sysbus->esp;
-+    uint64_t val = 0;
-+
-+    if (s->pdma_len == 0) {
-+        return 0;
-+    }
-+    switch (size) {
-+    case 1:
-+        val = *s->pdma_cur++;
-+        s->pdma_len--;
++    case FBLOCK_TEST_PATTERN...FBLOCK_TEST_PATTERN + 3:
++        val = BYTE(FBLOCK_PATTERN_VAL, addr - FBLOCK_TEST_PATTERN);
 +        break;
-+    case 2:
-+        val = *s->pdma_cur++;
-+        val = (val << 8) | *s->pdma_cur++;
-+        s->pdma_len -= 2;
++    case FBLOCK_FORMAT:
++        val = dev->rom_format;
 +        break;
-+    }
-+
-+    if (s->pdma_len == 0 && s->pdma_cb) {
-+        esp_lower_drq(s);
-+        s->pdma_cb(s);
-+        s->pdma_cb = NULL;
++    case FBLOCK_REVISION_LEVEL:
++        val = dev->rom_rev;
++        break;
++    case FBLOCK_CRC...FBLOCK_CRC + 3:
++        val = BYTE(dev->rom_crc, addr - FBLOCK_CRC);
++        break;
++    case FBLOCK_LENGTH...FBLOCK_LENGTH + 3:
++        val = BYTE(dev->rom_length, addr - FBLOCK_LENGTH);
++        break;
++    case FBLOCK_DIRECTORY_OFFSET...FBLOCK_DIRECTORY_OFFSET + 3:
++        val = BYTE(dev->directory_offset, addr - FBLOCK_DIRECTORY_OFFSET);
++        break;
++    default:
++        val = 0;
++        break;
 +    }
 +    return val;
 +}
 +
-+static const MemoryRegionOps sysbus_esp_pdma_ops = {
-+    .read = sysbus_esp_pdma_read,
-+    .write = sysbus_esp_pdma_write,
++static void nubus_fblock_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned int size)
++{
++    /* READ-ONLY */
++}
++
++static const MemoryRegionOps nubus_format_block_ops = {
++    .read = nubus_fblock_read,
++    .write = nubus_fblock_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 2,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    }
 +};
 +
- ESPState *esp_init(hwaddr espaddr, int it_shift,
-                    ESPDMAMemoryReadWriteFunc dma_memory_read,
-                    ESPDMAMemoryReadWriteFunc dma_memory_write,
--                   void *dma_opaque, qemu_irq irq, qemu_irq *reset,
--                   qemu_irq *dma_enable)
-+                   void *dma_opaque, qemu_irq irq, qemu_irq irq_data,
-+                   qemu_irq *reset, qemu_irq *dma_enable)
- {
-     DeviceState *dev;
-     SysBusDevice *s;
-@@ -642,6 +872,7 @@ ESPState *esp_init(hwaddr espaddr, int it_shift,
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-     sysbus_connect_irq(s, 0, irq);
-+    sysbus_connect_irq(s, 1, irq_data);
-     sysbus_mmio_map(s, 0, espaddr);
-     *reset = qdev_get_gpio_in(dev, 0);
-     *dma_enable = qdev_get_gpio_in(dev, 1);
-@@ -681,12 +912,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
-     ESPState *s = &sysbus->esp;
++static void nubus_register_format_block(NubusDevice *dev)
++{
++    char fblock_name[27];
++
++    sprintf(fblock_name, "nubus-slot-%d-format-block", dev->slot_nb);
++
++    hwaddr fblock_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE;
++    memory_region_init_io(&dev->fblock_io, NULL, &nubus_format_block_ops,
++                          dev, fblock_name, FBLOCK_SIZE);
++    memory_region_add_subregion(&dev->slot_mem, fblock_offset,
++                                &dev->fblock_io);
++}
++
++static void mac_nubus_rom_write(void *opaque, hwaddr addr, uint64_t val,
++                                       unsigned int size)
++{
++}
++
++static uint64_t mac_nubus_rom_read(void *opaque, hwaddr addr,
++                                    unsigned int size)
++{
++    NubusDevice *dev = opaque;
++
++    return dev->rom[addr];
++}
++
++static const MemoryRegionOps mac_nubus_rom_ops = {
++    .read  = mac_nubus_rom_read,
++    .write = mac_nubus_rom_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes)
++{
++    hwaddr rom_offset;
++    char rom_name[18];
++
++    /* FIXME : really compute CRC */
++    dev->rom_length = 0;
++    dev->rom_crc = 0;
++
++    dev->rom_rev = revision;
++    dev->rom_format = format;
++
++    dev->byte_lanes = byte_lanes;
++    dev->directory_offset = -size;
++
++    /* ROM */
++
++    dev->rom = rom;
++    sprintf(rom_name, "nubus-slot-%d-rom", dev->slot_nb);
++    memory_region_init_io(&dev->rom_io, NULL, &mac_nubus_rom_ops,
++                          dev, rom_name, size);
++    memory_region_set_readonly(&dev->rom_io, true);
++
++    rom_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE +
++                 dev->directory_offset;
++    memory_region_add_subregion(&dev->slot_mem, rom_offset, &dev->rom_io);
++
++}
++
++static void nubus_device_realize(DeviceState *dev, Error **errp)
++{
++    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    char name[16];
++    hwaddr slot_offset;
++
++    if (nubus->current_slot < NUBUS_FIRST_SLOT ||
++            nubus->current_slot > NUBUS_LAST_SLOT) {
++        error_setg(errp, "Cannot register nubus card, not enough slots");
++        return;
++    }
++
++    nd->slot_nb = nubus->current_slot++;
++    snprintf(name, sizeof(name), "nubus-slot-%d", nd->slot_nb);
++
++    if (nd->slot_nb < NUBUS_FIRST_SLOT) {
++        /* Super */
++        slot_offset = (nd->slot_nb - 6) * NUBUS_SUPER_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name,
++                           NUBUS_SUPER_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->super_slot_io, slot_offset,
++                                    &nd->slot_mem);
++    } else {
++        /* Normal */
++        slot_offset = nd->slot_nb * NUBUS_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name, NUBUS_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->slot_io, slot_offset,
++                                    &nd->slot_mem);
++    }
++
++    nubus_register_format_block(nd);
++}
++
++static void nubus_device_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = nubus_device_realize;
++    dc->bus_type = TYPE_NUBUS_BUS;
++}
++
++static const TypeInfo nubus_device_type_info = {
++    .name = TYPE_NUBUS_DEVICE,
++    .parent = TYPE_DEVICE,
++    .abstract = true,
++    .instance_size = sizeof(NubusDevice),
++    .class_init = nubus_device_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_device_type_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+index 70ea5480fe..3059f2f36a 100644
+--- a/include/hw/display/macfb.h
++++ b/include/hw/display/macfb.h
+@@ -39,4 +39,25 @@ typedef struct {
+     MacfbState macfb;
+ } MacfbSysBusState;
  
-     sysbus_init_irq(sbd, &s->irq);
-+    sysbus_init_irq(sbd, &s->irq_data);
-     assert(sysbus->it_shift != -1);
- 
-     s->chip_id = TCHI_FAS100A;
-     memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
--                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
-+                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
-     sysbus_init_mmio(sbd, &sysbus->iomem);
-+    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
-+                          sysbus, "esp-pdma", 2);
-+    sysbus_init_mmio(sbd, &sysbus->pdma);
- 
-     qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
- 
-diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-index 93fdaced67..43312e4bc8 100644
---- a/include/hw/scsi/esp.h
-+++ b/include/hw/scsi/esp.h
-@@ -18,6 +18,7 @@ struct ESPState {
-     uint8_t rregs[ESP_REGS];
-     uint8_t wregs[ESP_REGS];
-     qemu_irq irq;
-+    qemu_irq irq_data;
-     uint8_t chip_id;
-     bool tchi_written;
-     int32_t ti_size;
-@@ -46,6 +47,11 @@ struct ESPState {
-     ESPDMAMemoryReadWriteFunc dma_memory_write;
-     void *dma_opaque;
-     void (*dma_cb)(ESPState *s);
-+    uint8_t pdma_buf[32];
-+    uint32_t pdma_len;
-+    uint8_t *pdma_start;
-+    uint8_t *pdma_cur;
-+    void (*pdma_cb)(ESPState *s);
- };
- 
- #define TYPE_ESP "esp"
-@@ -57,6 +63,7 @@ typedef struct {
-     /*< public >*/
- 
-     MemoryRegion iomem;
-+    MemoryRegion pdma;
-     uint32_t it_shift;
-     ESPState esp;
- } SysBusESPState;
-@@ -134,8 +141,8 @@ typedef struct {
- ESPState *esp_init(hwaddr espaddr, int it_shift,
-                    ESPDMAMemoryReadWriteFunc dma_memory_read,
-                    ESPDMAMemoryReadWriteFunc dma_memory_write,
--                   void *dma_opaque, qemu_irq irq, qemu_irq *reset,
--                   qemu_irq *dma_enable);
-+                   void *dma_opaque, qemu_irq irq, qemu_irq irq_data,
-+                   qemu_irq *reset, qemu_irq *dma_enable);
- void esp_dma_enable(ESPState *s, int irq, int level);
- void esp_request_cancelled(SCSIRequest *req);
- void esp_command_complete(SCSIRequest *req, uint32_t status, size_t resid);
++#define MACFB_NUBUS_DEVICE_CLASS(class) \
++    OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
++#define MACFB_NUBUS_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
++
++typedef struct MacfbNubusDeviceClass {
++    DeviceClass parent_class;
++
++    DeviceRealize parent_realize;
++} MacfbNubusDeviceClass;
++
++#define TYPE_NUBUS_MACFB "nubus-macfb"
++#define NUBUS_MACFB(obj) \
++    OBJECT_CHECK(MacfbNubusState, (obj), TYPE_NUBUS_MACFB)
++
++typedef struct {
++    NubusDevice busdev;
++
++    MacfbState macfb;
++} MacfbNubusState;
++
+ #endif
+diff --git a/include/hw/nubus/mac-nubus-bridge.h b/include/hw/nubus/mac-nubus-bridge.h
+new file mode 100644
+index 0000000000..ce9c789d99
+--- /dev/null
++++ b/include/hw/nubus/mac-nubus-bridge.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_MAC_H
++#define HW_NUBUS_MAC_H
++
++#include "hw/nubus/nubus.h"
++
++#define TYPE_MAC_NUBUS_BRIDGE "mac-nubus-bridge"
++#define MAC_NUBUS_BRIDGE(obj) OBJECT_CHECK(MacNubusState, (obj), \
++                                           TYPE_MAC_NUBUS_BRIDGE)
++
++typedef struct MacNubusState {
++    SysBusDevice sysbus_dev;
++
++    NubusBus *bus;
++} MacNubusState;
++
++#endif
+diff --git a/include/hw/nubus/nubus.h b/include/hw/nubus/nubus.h
+new file mode 100644
+index 0000000000..096bafb322
+--- /dev/null
++++ b/include/hw/nubus/nubus.h
+@@ -0,0 +1,69 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_NUBUS_H
++#define HW_NUBUS_NUBUS_H
++
++#include "hw/qdev.h"
++#include "exec/address-spaces.h"
++
++#define NUBUS_SUPER_SLOT_SIZE 0x10000000U
++#define NUBUS_SUPER_SLOT_NB   0x9
++
++#define NUBUS_SLOT_SIZE       0x01000000
++#define NUBUS_SLOT_NB         0xF
++
++#define NUBUS_FIRST_SLOT      0x9
++#define NUBUS_LAST_SLOT       0xF
++
++#define TYPE_NUBUS_DEVICE "nubus-device"
++#define NUBUS_DEVICE(obj) \
++     OBJECT_CHECK(NubusDevice, (obj), TYPE_NUBUS_DEVICE)
++
++#define TYPE_NUBUS_BUS "nubus-bus"
++#define NUBUS_BUS(obj) OBJECT_CHECK(NubusBus, (obj), TYPE_NUBUS_BUS)
++
++#define TYPE_NUBUS_BRIDGE "nubus-bridge"
++#define NUBUS_BRIDGE(obj) OBJECT_CHECK(NubusBridge, (obj), TYPE_NUBUS_BRIDGE)
++
++typedef struct NubusBus {
++    BusState qbus;
++
++    MemoryRegion super_slot_io;
++    MemoryRegion slot_io;
++
++    int current_slot;
++} NubusBus;
++
++typedef struct NubusDevice {
++    DeviceState qdev;
++
++    int slot_nb;
++    MemoryRegion slot_mem;
++
++    /* Format Block */
++
++    MemoryRegion fblock_io;
++
++    uint32_t rom_length;
++    uint32_t rom_crc;
++    uint8_t rom_rev;
++    uint8_t rom_format;
++    uint8_t byte_lanes;
++    int32_t directory_offset;
++
++    /* ROM */
++
++    MemoryRegion rom_io;
++    const uint8_t *rom;
++} NubusDevice;
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes);
++
++#endif
 -- 
 2.14.4
