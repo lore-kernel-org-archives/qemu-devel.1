@@ -1,32 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fYGQO-0003tD-5L
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:48:21 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYGXr-0005hR-1N
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fYGQL-0005QG-2e
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:48:20 -0400
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:43978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fYGQK-0005PI-SN
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:48:17 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.122.47])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1F4D3E898E
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 21:48:14 +0200 (CEST)
-References: <20180626135928.23950-1-clg@kaod.org>
-	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
-	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
-	<8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
-	<9704639c-1c76-103a-7a90-6cfbb5aa4968@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <79161afb-96ae-0dd7-5f1e-fc4410950789@kaod.org>
-Date: Wed, 27 Jun 2018 21:48:02 +0200
+	(envelope-from <laurent@vivier.eu>) id 1fYGXn-000525-Ve
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:56:03 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:33321)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYGXn-00051X-La
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:55:59 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue005 [212.227.15.167]) with ESMTPSA (Nemesis) id
+	0Mczwc-1fpFAF3guY-00IEKN for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018
+	21:55:58 +0200
+References: <20180625131253.11218-2-kraxel@redhat.com>
+	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
+	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
+	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
+	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
+	<alpine.BSF.2.21.1806271010080.90116@zero.eik.bme.hu>
+	<20180627085217.blrsx5lmu4sau4fd@sirius.home.kraxel.org>
+	<5d591d6c-ccc4-cc86-ebbc-3c66a6817c70@redhat.com>
+	<db5529c6-7002-4b96-9d94-ca719e3845f8@amsat.org>
+	<4c86fb26-f7c3-e66e-33a2-dbbfe2e70960@vivier.eu>
+	<20180627184453.GC2424@work-vm>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e183c7e9-b8d4-2f61-327c-0ad29ad36b75@vivier.eu>
+Date: Wed, 27 Jun 2018 21:55:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <9704639c-1c76-103a-7a90-6cfbb5aa4968@kaod.org>
+In-Reply-To: <20180627184453.GC2424@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu? (was: [PULL
+ 1/6] audio/hda: create millisecond timers that handle IO)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,90 +42,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 06/27/2018 02:18 PM, C=C3=A9dric Le Goater wrote:
-> On 06/27/2018 12:22 PM, Andrea Bolognani wrote:
->> On Tue, 2018-06-26 at 19:02 +0200, C=C3=A9dric Le Goater wrote:
->>> On 06/26/2018 05:57 PM, Andrea Bolognani wrote:
->>>> On Tue, 2018-06-26 at 15:59 +0200, C=C3=A9dric Le Goater wrote:
->>>>> This is a model of the PCIe host bridge found on Power8 chips,
->>>>> including PowerBus logic interface, IOMMU support, PCIe root comple=
-x,
->>>>> XICS MSI and LSI interrupt sources.
+Le 27/06/2018 à 20:44, Dr. David Alan Gilbert a écrit :
+> * Laurent Vivier (laurent@vivier.eu) wrote:
+>> Le 27/06/2018 à 15:33, Philippe Mathieu-Daudé a écrit :
+>>> On 06/27/2018 06:09 AM, Thomas Huth wrote:
+>>>> On 27.06.2018 10:52, Gerd Hoffmann wrote:
+>>>>>   Hi,
 >>>>>
->>>>> 4 PHBs are provisioned under the Power8 chip model to fit hardware =
-but
->>>>> only one is currently initialized.
+>>>>>>> Is QEMU still useful on 32-bit hosts?  Honest question!
+>>>>>>
+>>>>>> I guess it depends on what 32-bit hosts you consider. If you look at only
+>>>>>> x86 vs. x86_64 then probably x86 is not that important any more but for some
+>>>>>> embedded systems/SoCs 32bit might still be common and QEMU useful for those
+>>>>>> (also as host not only emulated).
+>>>>>
+>>>>> Well.  I've used kvm with an 32bit arm soc (cubietruck).  It's very
+>>>>> slow.  And all the arm architecture improvements to support kvm better
+>>>>> are for aarch64 only.
+>>>>>
+>>>>>> Another option might be to not support audio/hda on 32bit hosts. It's not
+>>>>>> nice either but a lot nicer than dropping support for 32bit hosts
+>>>>>> alltogether to fix a problem in device emulation.
+>>>>>
+>>>>> But it also is not useful and a waste of resources to maintain 32bit
+>>>>> host compatibility if nobody actually uses that ...
+>>>>>
+>>>>> For me testbuilds are the only reason to compile qemu for 32bit hosts.
+>>>>> Since years.
 >>>>
->>>> What's the advantage in creating 4 PHBs instead of a single one,
+>>>> Well, while that's true for you, me and likely most of us developers,
+>>>> you can not know whether this is also true for all users of qemu. Thus
+>>>> this needs to be announced first for a couple of releases so that people
+>>>> have a chance to speak up whether they still need this or not. As
+>>>> mentioned earlier, embedded devices are often still 32-bit and I know
+>>>> that there really are people who use QEMU on embedded devices.
+>>>>
+>>>> But I think we could at least announce now already that we intend to
+>>>> drop support for 32-bit hosts in the future (maybe not in 2 releases
+>>>> already, but, let's say in 2020? 2020 is already the EOL of Python 2, so
+>>>> that will rule out a bunch of other legacy hosts, too).
 >>>
->>> The Power8 chip comes in different flavors: Venice, Murano, Naple,=20
->>> each having a different number of PHBs. We don't need to initialize=20
->>> them all to plug only a couple of devices (net, storage, usbs)=20
+>>> linux-user is certainly widely used on ARMv6 / ARMv7.
 >>>
->>> When time comes, we might want to test some more complex configuratio=
-ns
->>> or extend the modeling with CAPI support. That's why we have a :
+>>> Known user cases:
 >>>
->>> 	#define PNV_MAX_CHIP_PHB 4
->>> 	    PnvPHB3      phbs[PNV_MAX_CHIP_PHB];
+>>> - run ARMv7 binaries on ARMv6
+>>> - run armhf binaries on armel
+>>> - run x86-64 binaries on ARMv7
 >>>
->>> under the chip, and a 'num_phbs' attribute to increase the number
->>> of controllers. It still needs to be tested but that's the goal.
 >>
->> I was a bit confused about the difference between "provisioning"
->> and "initializing" a PHB, I guess.
->=20
-> objects have different states : allocated, initialized, realized
-> I guess "provision (memory)" is not the best choice for the first
-> state.
->=20
->> Now that I've looked at the code, my (very uneducated) reading is
->> that you're allocating memory for 4 PHBs along with the chip, but
->> only actually initializing num_phbs of them, with 1 being the
->> default.
->=20
-> Yes. I had the idea to increase the number of PHBs with a machine
-> option later on if needed.
->=20
->> I have no idea what this implies when it comes to adding PCI
->> controller to the guest, though. If I run a guest with num_phbs=3D1,
->> are ids pci.1..pci.3 reserved even though the corresponding PHBs
->> have not been initialized?=20
->=20
-> They don't exist on the PowerNV machine if you don't have a PHB3
-> device backing them.
->=20
->> Is num_phbs the only way you can control how many PHBs a PowerNV=20
->> guest will have?
->=20
-> yes. Unless we make them user creatable but that's a discussion in
-> progress. I am not sure user creatable PHB3s are needed. We will
-> see.
-> =20
->> I would play around and try to figure out all the kinks on my own,
->> but I can't actually compile QEMU with this patch applied:
->=20
-> you need to use David's branch :
->=20
-> 	https://github.com/dgibson/qemu/tree/ppc-for-3.0
+>> I run i386 binaries on ARMv6.
+> 
+> Do you know if that model has the 64bit atomics (ldrexd/strexd)?
 
-I have pushed a tree here :
+http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0489e/Cihbghef.html
 
-	https://github.com/legoater/qemu/tree/phb3-3.0
+"ARM LDREXB, LDREXH, LDREXD, STREXB, STREXD, and STREXH are available in
+ARMv6K and above."
 
-with two patches, the one we have been discussing about, with some
-cleanups and fixes, and one adding user creatable PHB3 devices so=20
-that extra phbs and devices can be defined on the command line :
-
--device pnv-phb3,chip-id=3D1,index=3D1,id=3Dphb-1.1 -device nec-usb-xhci,=
-bus=3Dpci.1,addr=3D0x7
-
-The PHB identifier is named 'index' now, to be compatible with the=20
-libvirt attribute.=20
-
-Cheers,
-
-C.=20
+Laurent
