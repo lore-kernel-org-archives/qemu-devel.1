@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY79l-0003Yw-Pa
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:54:34 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fY7Cx-0004ZG-6g
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:57:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY79i-00050R-Go
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:54:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59038 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY79i-0004yz-Az
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:54:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 770104023337
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:54:29 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180611060228.2998-2-peterx@redhat.com> (Peter Xu's message of
-	"Mon, 11 Jun 2018 14:02:27 +0800")
-References: <20180611060228.2998-1-peterx@redhat.com>
-	<20180611060228.2998-2-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Jun 2018 11:57:55 +0200
-Message-ID: <87po0clffg.fsf@secure.laptop>
+	(envelope-from <stefanha@gmail.com>) id 1fY7Cu-0000Y0-2H
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:57:51 -0400
+Date: Wed, 27 Jun 2018 10:57:44 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180627095744.GE4325@stefanha-x1.localdomain>
+References: <20180627073351.856-1-contrib@steffen-goertz.de>
+	<20180627073351.856-7-contrib@steffen-goertz.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] migration: unbreak postcopy recovery
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4Epv4kl9IRBfg3rk"
+Content-Disposition: inline
+In-Reply-To: <20180627073351.856-7-contrib@steffen-goertz.de>
+Subject: Re: [Qemu-devel] [RFC 6/8] arm: Add UICR/FICR handling to NRF51 SOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
+Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-Peter Xu <peterx@redhat.com> wrote:
-> It was broken due to recent changes in two parts:
->
-> - migration_incoming_process() will be called now even for postcopy
->   recovery sessions (while we shouldn't)
->
-> - Now we don't call migrate_fd_process_incoming() any more (unless in
->   RDMA code), so actually the postcopy recovery logic is fully bypassed
->
-> Fix this up to make sure we only call migration_incoming_process() when
-> necessary, and move the postcopy recovery logic far earlier to the entry
-> point of incoming migration.  Renaming migration_fd_process_incoming()
-> into postcopy_try_recover() since it's mostly for the recovery process,
-> then touch up RDMA code to suite it.
->
-> Since at it, refactor the imcoming port handling to only have one singe
-> entry point for incoming migration.  Then we can avoid calling
-> migration_ioc_process_incoming() everywhere, which is really error
-> prone.
 
-Perhaps splitting some of this bits?
+--4Epv4kl9IRBfg3rk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/migration/ram.h b/migration/ram.h
-> index d386f4d641..457bf54b8c 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -46,7 +46,7 @@ int multifd_save_cleanup(Error **errp);
->  int multifd_load_setup(void);
->  int multifd_load_cleanup(Error **errp);
->  bool multifd_recv_all_channels_created(void);
-> -void multifd_recv_new_channel(QIOChannel *ioc);
-> +bool multifd_recv_new_channel(QIOChannel *ioc);
+On Wed, Jun 27, 2018 at 09:33:49AM +0200, Steffen G=F6rtz wrote:
+> This patch maps preallocated user/factory information
+> configuration registers to the NRF51 SOC.
+> See NRF51 reference manual section 7 and 8.
+>=20
+> Signed-off-by: Steffen G=F6rtz <contrib@steffen-goertz.de>
+> ---
+>  hw/arm/nrf51_soc.c         | 174 ++++++++++++++++++++++++++++++-------
+>  include/hw/arm/nrf51_soc.h |   5 +-
+>  2 files changed, 145 insertions(+), 34 deletions(-)
+>=20
+> diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+> index e93699a4b0..82e4c2d833 100644
+> --- a/hw/arm/nrf51_soc.c
+> +++ b/hw/arm/nrf51_soc.c
+> @@ -19,7 +19,6 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/log.h"
+>  #include "cpu.h"
+> -#include "crypto/random.h"
+> =20
+>  #include "hw/arm/nrf51_soc.h"
+> =20
+> @@ -29,6 +28,9 @@
+>  #define FICR_BASE       0x10000000
+>  #define FICR_SIZE       0x100
+> =20
+> +#define UICR_BASE       0x10001000
+> +#define UICR_SIZE       0x100
 
-I am ok with this type change.
+This definition is duplicated in your NVMC patch.  Please put it in the
+nrf51_soc.h header file.
 
->  void migration_ioc_process_incoming(QIOChannel *ioc)
->  {
->      MigrationIncomingState *mis = migration_incoming_get_current();
-> +    QEMUFile *f = qemu_fopen_channel_input(ioc);
+--4Epv4kl9IRBfg3rk
+Content-Type: application/pgp-signature; name="signature.asc"
 
-We are creating a QEMUFile here.
+-----BEGIN PGP SIGNATURE-----
 
-> +    bool start_migration;
-> +
-> +    /* If it's a recovery attempt, we're done */
-> +    if (postcopy_try_recover(f)) {
+iQEcBAEBAgAGBQJbM1+YAAoJEJykq7OBq3PIk7cH/RJNX0RmF/0jm9YaHbpXiS+W
+5P2K1EW58m/VgxpXlc64HHxbEz6IPniYca/lQT78vmWG3b6IMKDZdevPahAHF9iK
+YjwDtmscMXarjoSRxAfum5WaThjpLcDQ6ni8VqKgRm/EjNn5q15YxY/rsLcXbr3A
+WNOxxNvSfHDMZK8c3exoSR/HdJ0Ed/6KQnrpU9SIxs6wEadPc3/1h/PytjwT5eQ1
+4By3HHPSjaAUqdpPJjBChmU6qNriasyLn0dcLJvgnj8MJJ3XDo9GE7H08A17OiDZ
+ypdFUTGKqr8xeL2u5FtwAByQUwnnY4CUvqg4KcFubCdMqQNsZaBeXx8DG0oS/eY=
+=OwKQ
+-----END PGP SIGNATURE-----
 
-Here we use it.
-
-> +        return;
-> +    }
->  
->      if (!mis->from_src_file) {
-> -        QEMUFile *f = qemu_fopen_channel_input(ioc);
-> +        /* The first connection (multifd may have multiple) */
->          migration_incoming_setup(f);
-
-            Here we use it.
-
-> -        return;
-> +        /*
-> +         * Common migration only needs one channel, so we can start
-> +         * right now.  Multifd needs more than one channel, we wait.
-> +         */
-> +        start_migration = !migrate_use_multifd();
-> +    } else {
-> +        /* Multiple connections */
-> +        assert(migrate_use_multifd());
-> +        start_migration = multifd_recv_new_channel(ioc);
-
-       But here we don't use it.  We are lecking it.
-
-       So, we need to fix the leak.  No clue about how to convince
-       postcopy_try_recover() without the QEMUFile
-
-Later, Juan.
+--4Epv4kl9IRBfg3rk--
