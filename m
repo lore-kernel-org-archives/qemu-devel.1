@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1fY616-0000TT-1f
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1fY61J-0000bf-9B
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1fY613-0005UO-GV
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:32 -0400
-Message-ID: <9f9a4454bec8e7009a02d544d7a98f6215bd1fa0.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Wed, 27 Jun 2018 18:41:05 +1000
-In-Reply-To: <65c545f3-6279-62af-9bd8-2be93a3d7d18@kaod.org>
-References: <20180626135928.23950-1-clg@kaod.org>
-	<20180627033321-mutt-send-email-mst@kernel.org>
-	<1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
-	<20180627072825.GH14434@umbus.fritz.box>
-	<65c545f3-6279-62af-9bd8-2be93a3d7d18@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+	(envelope-from <armbru@redhat.com>) id 1fY61G-0005ev-My
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56586 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY61G-0005eg-ID
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1437640201CF
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 08:41:42 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org>
+	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
+Date: Wed, 27 Jun 2018 10:41:38 +0200
+In-Reply-To: <87tvpoadcc.fsf_-_@dusky.pond.sub.org> (Markus Armbruster's
+	message of "Wed, 27 Jun 2018 09:38:27 +0200")
+Message-ID: <87wouk8vul.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +34,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, 2018-06-27 at 09:46 +0200, C=C3=A9dric Le Goater wrote:
-> So the "IBM PHB3 PCIE Root Port" is already user createable.
->=20
-> I can take a look at user createable PHB3s. I think this is OK from a m=
-odel
-> perspective. The object is rather standalone, it needs the machine for=20
-> the XICS fabric and a couple of ids, phb id and chip id. These can come
-> from the command line.
->=20
-> We want at least one PHB3 per socket/chip though.=20
+Markus Armbruster <armbru@redhat.com> writes:
 
-We don't want the user to specify the SCOM addresses though (for the
-MMIO windows we should get skiboot to assign them).
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> I fooled around a bit, and I think there are a few lose ends.
+> [...]
+>> Talking to a QMP monitor that supports OOB:
+>>
+>>     $ socat UNIX:test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
+>>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true } }
+>>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' is unexpected"}}
+>>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
+>>     {"return": {}}
+>>     QMP> { "execute": "query-qmp-schema" }
+>>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capability requires that every command contains an 'id' field"}}
+>>
+>> Why does every command require 'id'?
+>
+> I found one reason: event COMMAND_DROPPED wants it.  Any other reason?
+>
+> [...]
 
-If the user gets to specify a thing it would be which of the 3 or 4 HW
-PHBs of the chip it is, the SCOM addresses gets deduced.
+Apropos COMMAND_DROPPED: we send an event rather than an error response
+because we may send it out-of-order.  Makes sense.
 
-Cheers,
-Ben.
+However, broadcasting it to all monitors doesn't make sense.  We could
+use a way to send an event to just one monitor.
+
+Another use for that might be QMP "deprecated" notifications, because
+those also can't be error responses, and also only make sense for the
+client that caused them.
