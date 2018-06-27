@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Su-0006eQ-Hf
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:57 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Su-0006eP-HV
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Sr-00062Z-Tq
+	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Sr-00061g-7A
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:56 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:59440)
+Received: from aserp2130.oracle.com ([141.146.126.79]:59416)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1fY1Sr-00061V-K8
+	id 1fY1Sq-0005wm-Vv
 	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:53 -0400
 From: Venu Busireddy <venu.busireddy@oracle.com>
-Date: Tue, 26 Jun 2018 22:49:32 -0500
-Message-Id: <20180627034935.20276-3-venu.busireddy@oracle.com>
-In-Reply-To: <20180627034935.20276-1-venu.busireddy@oracle.com>
-References: <20180627034935.20276-1-venu.busireddy@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] Add "Group Identifier" support to
- virtio devices.
+Date: Tue, 26 Jun 2018 22:49:30 -0500
+Message-Id: <20180627034935.20276-1-venu.busireddy@oracle.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for pairing
+ virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +26,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: venu.busireddy@oracle.com, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-Use the virtio PCI capability "VIRTIO_PCI_CAP_GROUP_ID_CFG" to store the
-"Group Identifier" (UUID) specified via the command line option "uuid"
-for the virtio device. The capability will be present in the virtio
-device's configuration space iff the "uuid" option is specified.
+The patch set "Enable virtio_net to act as a standby for a passthru
+device" [1] deals with live migration of guests that use passthrough
+devices. However, that scheme uses the MAC address for pairing
+the virtio device and the passthrough device. The thread "netvsc:
+refactor notifier/event handling code to use the failover framework"
+[2] discusses an alternate mechanism, such as using an UUID, for pairing
+the devices. Based on that discussion, proposals "Add "Group Identifier"
+to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
+store pairing information..." [4] were made.
 
-Group Identifier is used to pair a virtio device with a passthrough
-device.
+The current patch set includes all the feedback received for proposals [3]
+and [4]. For the sake of completeness, patch for the virtio specification
+is also included here. Following is the updated proposal.
 
-Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
----
- hw/virtio/virtio-pci.c                      | 15 +++++++++++++++
- hw/virtio/virtio-pci.h                      |  3 ++-
- include/hw/pci/pci.h                        |  2 ++
- include/standard-headers/linux/virtio_pci.h |  8 ++++++++
- 4 files changed, 27 insertions(+), 1 deletion(-)
+1. Extend the virtio specification to include a new virtio PCI capability
+   "VIRTIO_PCI_CAP_GROUP_ID_CFG".
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 3a01fe90f0..42703a5567 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -36,6 +36,7 @@
- #include "qemu/range.h"
- #include "hw/virtio/virtio-bus.h"
- #include "qapi/visitor.h"
-+#include "qemu/uuid.h"
- 
- #define VIRTIO_PCI_REGION_SIZE(dev)     VIRTIO_PCI_CONFIG_OFF(msix_present(dev))
- 
-@@ -1638,6 +1639,10 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
-             .cap.cap_len = sizeof cfg,
-             .cap.cfg_type = VIRTIO_PCI_CAP_PCI_CFG,
-         };
-+        struct virtio_pci_group_id_cap group = {
-+            .cap.cap_len = sizeof group,
-+            .cap.cfg_type = VIRTIO_PCI_CAP_GROUP_ID_CFG,
-+        };
-         struct virtio_pci_notify_cap notify_pio = {
-             .cap.cap_len = sizeof notify,
-             .notify_off_multiplier = cpu_to_le32(0x0),
-@@ -1647,6 +1652,11 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
- 
-         virtio_pci_modern_regions_init(proxy);
- 
-+        if (!qemu_uuid_is_null(&proxy->pci_dev.uuid)) {
-+            memcpy(group.uuid, &proxy->pci_dev.uuid, sizeof(QemuUUID));
-+            virtio_pci_modern_mem_region_map(proxy, &proxy->group, &group.cap);
-+        }
-+
-         virtio_pci_modern_mem_region_map(proxy, &proxy->common, &cap);
-         virtio_pci_modern_mem_region_map(proxy, &proxy->isr, &cap);
-         virtio_pci_modern_mem_region_map(proxy, &proxy->device, &cap);
-@@ -1763,6 +1773,10 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
-     proxy->device.size = 0x1000;
-     proxy->device.type = VIRTIO_PCI_CAP_DEVICE_CFG;
- 
-+    proxy->group.offset = 0;
-+    proxy->group.size = 0;
-+    proxy->group.type = VIRTIO_PCI_CAP_GROUP_ID_CFG;
-+
-     proxy->notify.offset = 0x3000;
-     proxy->notify.size = virtio_pci_queue_mem_mult(proxy) * VIRTIO_QUEUE_MAX;
-     proxy->notify.type = VIRTIO_PCI_CAP_NOTIFY_CFG;
-@@ -1898,6 +1912,7 @@ static Property virtio_pci_properties[] = {
-                     VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT, true),
-     DEFINE_PROP_BIT("x-pcie-pm-init", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_INIT_PM_BIT, true),
-+    DEFINE_PROP_UUID("uuid", PCIDevice, uuid, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 813082b0d7..e4592e90bf 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -164,10 +164,11 @@ struct VirtIOPCIProxy {
-             VirtIOPCIRegion common;
-             VirtIOPCIRegion isr;
-             VirtIOPCIRegion device;
-+            VirtIOPCIRegion group;
-             VirtIOPCIRegion notify;
-             VirtIOPCIRegion notify_pio;
-         };
--        VirtIOPCIRegion regs[5];
-+        VirtIOPCIRegion regs[6];
-     };
-     MemoryRegion modern_bar;
-     MemoryRegion io_bar;
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index 990d6fcbde..ee234c5a6f 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -4,6 +4,7 @@
- #include "hw/qdev.h"
- #include "exec/memory.h"
- #include "sysemu/dma.h"
-+#include "qemu/uuid.h"
- 
- /* PCI includes legacy ISA access.  */
- #include "hw/isa/isa.h"
-@@ -343,6 +344,7 @@ struct PCIDevice {
-     bool has_rom;
-     MemoryRegion rom;
-     uint32_t rom_bar;
-+    QemuUUID uuid;
- 
-     /* INTx routing notifier */
-     PCIINTxRoutingNotifier intx_routing_notifier;
-diff --git a/include/standard-headers/linux/virtio_pci.h b/include/standard-headers/linux/virtio_pci.h
-index 9262acd130..f6de333f1d 100644
---- a/include/standard-headers/linux/virtio_pci.h
-+++ b/include/standard-headers/linux/virtio_pci.h
-@@ -113,6 +113,8 @@
- #define VIRTIO_PCI_CAP_DEVICE_CFG	4
- /* PCI configuration access */
- #define VIRTIO_PCI_CAP_PCI_CFG		5
-+/* Group Identifier */
-+#define VIRTIO_PCI_CAP_GROUP_ID_CFG	6
- 
- /* This is the PCI capability header: */
- struct virtio_pci_cap {
-@@ -163,6 +165,12 @@ struct virtio_pci_cfg_cap {
- 	uint8_t pci_cfg_data[4]; /* Data for BAR access. */
- };
- 
-+/* Fields in VIRTIO_PCI_CAP_GROUP_ID_CFG: */
-+struct virtio_pci_group_id_cap {
-+	struct virtio_pci_cap cap;
-+	uint8_t uuid[16];
-+};
-+
- /* Macro versions of offsets for the Old Timers! */
- #define VIRTIO_PCI_CAP_VNDR		0
- #define VIRTIO_PCI_CAP_NEXT		1
+2. Enhance the QEMU CLI to include a "uuid" option to the virtio device.
+   The "uuid" is a string in UUID format.
+
+3. Enhance the QEMU CLI to include a "uuid" option to the bridge device.
+   The "uuid" is a string in UUID format. Currently, PCIe bridge for
+   the Q35 model is supported.
+
+4. The operator creates a unique identifier string using 'uuidgen'.
+
+5. When the virtio device is created, the operator uses the "uuid" option
+   (for example, '-device virtio-net-pci,uuid="string"') and specifies
+   the UUID created in step 4.
+
+   QEMU stores the UUID in the virtio device's configuration space
+   in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+
+6. When assigning a PCI device to the guest in passthrough mode, the
+   operator first creates a bridge using the "uuid" option (for example,
+   '-device pcie-downstream,uuid="string"') to specify the UUID created
+   in step 4, and then attaches the passthrough device to the bridge.
+
+   QEMU stores the UUID in the configuration space of the bridge as
+   Vendor-Specific capability (0x09). The "Vendor" here is not to be
+   confused with a specific organization. Instead, the vendor of the
+   bridge is QEMU. To avoid mixing up with other bridges, the bridge
+   will be created with vendor ID 0x1b36 (PCI_VENDOR_ID_REDHAT) and
+   device ID 0x000e (PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE) if the "uuid"
+   option is specified. Otherwise, current defaults are used.
+
+7. Patch 4 in patch series "Enable virtio_net to act as a standby for
+   a passthru device" [1] needs to be modified to use the UUID values
+   present in the bridge's configuration space and the virtio device's
+   configuration space instead of the MAC address for pairing the devices.
+
+Thanks!
+
+Venu
+
+[1] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00156.html
+[2] https://www.spinics.net/lists/netdev/msg499011.html
+[3] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00118.html
+[4] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00204.html
+
+Changes in v2:
+  - As Michael Tsirkin suggested, changed the virtio specification
+    to restrict the group identifier to be a 16-byte field, presented
+    entirely in the virtio device's configuration space.
+  - As Michael Tsirkin suggested, instead of tweaking the ioh3420
+    device with Red Hat vendor ID, create a new PCIe bridge device
+    named "pcie-downstream" with Red Hat Vendor ID, and include the
+    group identifier in this device.
+  - Added a new patch to enhance the "pci-bridge" device to support
+    the group identifier (for the i440FX model).
+
+Venu Busireddy (4):
+  Add a true or false option to the DEFINE_PROP_UUID macro.
+  Add "Group Identifier" support to virtio devices.
+  Add "Group Identifier" support to Red Hat PCI bridge.
+  Add "Group Identifier" support to Red Hat PCI Express bridge.
+
+ default-configs/arm-softmmu.mak             |   1 +
+ default-configs/i386-softmmu.mak            |   1 +
+ default-configs/x86_64-softmmu.mak          |   1 +
+ hw/acpi/vmgenid.c                           |   2 +-
+ hw/pci-bridge/Makefile.objs                 |   1 +
+ hw/pci-bridge/pci_bridge_dev.c              |   8 +
+ hw/pci-bridge/pcie_downstream.c             | 215 ++++++++++++++++++++
+ hw/pci-bridge/pcie_downstream.h             |  10 +
+ hw/pci/pci_bridge.c                         |  26 +++
+ hw/virtio/virtio-pci.c                      |  15 ++
+ hw/virtio/virtio-pci.h                      |   3 +-
+ include/hw/pci/pci.h                        |   3 +
+ include/hw/pci/pcie.h                       |   1 +
+ include/hw/qdev-properties.h                |   4 +-
+ include/standard-headers/linux/virtio_pci.h |   8 +
+ 15 files changed, 295 insertions(+), 4 deletions(-)
+ create mode 100644 hw/pci-bridge/pcie_downstream.c
+ create mode 100644 hw/pci-bridge/pcie_downstream.h
