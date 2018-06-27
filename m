@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYIoQ-0002UB-CI
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 18:21:19 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fYJ1D-0003rV-8e
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 18:34:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYIoN-0002Kz-6E
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 18:21:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYIoN-0002IN-0J
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 18:21:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYIoK-0002rl-76
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 22:21:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 331762E81E9
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 22:21:09 +0000 (UTC)
+	(envelope-from <venu.busireddy@oracle.com>) id 1fYJ1A-0007Ez-41
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 18:34:31 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52930)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1fYJ19-0007Cy-RZ
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 18:34:28 -0400
+Date: Wed, 27 Jun 2018 17:34:17 -0500
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Message-ID: <20180627223417.GA17004@vbusired-vm>
+References: <20180627034935.20276-1-venu.busireddy@oracle.com>
+	<20180627122457.GA19714@rkaganb.sw.ru>
+	<20180627192958.GA17236@vbusired-vm>
+	<20180627224418-mutt-send-email-mst@kernel.org>
+	<20180627195901.GA11772@vbusired-vm>
+	<20180627230536-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Jun 2018 22:14:44 -0000
-From: Daniel Berrange <1778966@bugs.launchpad.net>
-Reply-To: Bug 1778966 <1778966@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153012207304.7182.2374266143525192096.malonedeb@soybean.canonical.com>
-Message-Id: <153013768417.29876.14363594690735983243.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1778966] Re: Windows 1803 and later crashes on KVM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180627230536-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for
+ pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +33,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-This sounds like the same problem we're investigating in Fedora/RHEL
-land affecting guests with EPYC CPU, or host-passthrough from an EPYC
-family 17h host.  Workaround should be to use "-cpu Opteron_G5" for now
+On 2018-06-27 23:12:12 +0300, Michael S. Tsirkin wrote:
+> On Wed, Jun 27, 2018 at 02:59:01PM -0500, Venu Busireddy wrote:
+> > On 2018-06-27 22:47:05 +0300, Michael S. Tsirkin wrote:
+> > > On Wed, Jun 27, 2018 at 02:29:58PM -0500, Venu Busireddy wrote:
+> > > > On 2018-06-27 15:24:58 +0300, Roman Kagan wrote:
+> > > > > On Tue, Jun 26, 2018 at 10:49:30PM -0500, Venu Busireddy wrote:
+> > > > > > The patch set "Enable virtio_net to act as a standby for a passthru
+> > > > > > device" [1] deals with live migration of guests that use passthrough
+> > > > > > devices. However, that scheme uses the MAC address for pairing
+> > > > > > the virtio device and the passthrough device. The thread "netvsc:
+> > > > > > refactor notifier/event handling code to use the failover framework"
+> > > > > > [2] discusses an alternate mechanism, such as using an UUID, for pairing
+> > > > > > the devices. Based on that discussion, proposals "Add "Group Identifier"
+> > > > > > to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
+> > > > > > store pairing information..." [4] were made.
+> > > > > 
+> > > > > I must have missed something in those threads, but where does this UUID
+> > > > > thing come about?  AFAICS this identifier doesn't need to be
+> > > > > "universally" unique, nor persistent; it only has to be unique across
+> > > > > the VM and stable throughout the VM lifetime.
+> > > > 
+> > > > The notion of using UUID came up in the thread
+> > > > 
+> > > >    https://www.spinics.net/lists/netdev/msg499011.html
+> > > 
+> > > That's probably because it was expected one of standard serial number capabilities
+> > > (VPD or PCI Express serial #) will be used, which are expected to be unique.
+> > > 
+> > > If you are rolling your own vendor specific one, it's just an ID and
+> > > does not have to be unique.
+> > > 
+> > > > > FWIW Hyper-V uses a 32-bit integer for this purpose, not a UUID as seems
+> > > > > to be implied in the thread you refer to.
+> > > > 
+> > > > Yes, Hyper-V uses a serial number (but I think it is 64-bit value).
+> > > > However, what we are doing is similar to that. Instead of 32 bits,
+> > > > we are using 128 bits.
+> > > 
+> > > That's OK. The name is confusing though. It's a failover group id,
+> > > not a UUID.
+> > 
+> > Sure, we can name it whatever we want. I can change it to
+> > "failover-group-id", if that is what we want to call it.
+> > 
+> > But what is more important is, what is represented by that name? I thought
+> > we were going to use UUID. The QEMU command line changes in this patch
+> > set expect the user to specify an UUID as the value for this option
+> > (whatever we name it). Are we still in agreement about that, or do you
+> > propose something else to be used? If so, what is it? A 32-bit number, a
+> > 64-bit number, or an arbitrary string?
+> > 
+> > Regards,
+> > 
+> > Venu
+> 
+> If we don't really need a UUID, I'd avoid that requirement.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1592276
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1593190
+I don't see the need for a 128-bit UUID. I just took that approach because
+UUID was mentioned in "https://www.spinics.net/lists/netdev/msg499011.html".
+Since it is unlikely to have more than 4 billion devices in the system,
+a 32-bit value would be more than enough to uniquely identify devices!
 
-Looks like windows is tickling an undocumented MSR and we're trying to
-find out what this MSR is supposed todo and thus how to handle it in
-KVM/QEMU
+I am looking for direction from you :-). Roman already opined that UUID
+may be an overkill. It appears that you too are leaning that way. Would
+it be acceptable if I change the group identifier ("failover-group-id")
+to a 32-bit value? If you concur, I will start reworking my patch. Could
+you please confirm?
 
-** Bug watch added: Red Hat Bugzilla #1592276
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1592276
+Thanks,
 
-** Bug watch added: Red Hat Bugzilla #1593190
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1593190
+Venu
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1778966
-
-Title:
-  Windows 1803 and later crashes on KVM
-
-Status in QEMU:
-  New
-
-Bug description:
-  For a bionic host, using the current public kvm modules, KVM is not
-  capable of booting a WindowsInsider or msdn Windows 1803 Windows
-  Server iso. In snstalling from an ISO from a started windows 2016
-  guest results in an unbootable and unrepairable guest.
-
-  The hardware is a threadripper 1920x with 32GB of main memory, disk
-  mydigital BPX SSD and WD based 4 column RAID 5 via mdadm.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1778966/+subscriptions
+> 
+> 
+> > > 
+> > > > > > The current patch set includes all the feedback received for proposals [3]
+> > > > > > and [4]. For the sake of completeness, patch for the virtio specification
+> > > > > > is also included here. Following is the updated proposal.
+> > > > > > 
+> > > > > > 1. Extend the virtio specification to include a new virtio PCI capability
+> > > > > >    "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+> > > > > > 
+> > > > > > 2. Enhance the QEMU CLI to include a "uuid" option to the virtio device.
+> > > > > >    The "uuid" is a string in UUID format.
+> > > > > > 
+> > > > > > 3. Enhance the QEMU CLI to include a "uuid" option to the bridge device.
+> > > > > >    The "uuid" is a string in UUID format. Currently, PCIe bridge for
+> > > > > >    the Q35 model is supported.
+> > > > > > 
+> > > > > > 4. The operator creates a unique identifier string using 'uuidgen'.
+> > > > > > 
+> > > > > > 5. When the virtio device is created, the operator uses the "uuid" option
+> > > > > >    (for example, '-device virtio-net-pci,uuid="string"') and specifies
+> > > > > >    the UUID created in step 4.
+> > > > > > 
+> > > > > >    QEMU stores the UUID in the virtio device's configuration space
+> > > > > >    in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+> > > > > > 
+> > > > > > 6. When assigning a PCI device to the guest in passthrough mode, the
+> > > > > >    operator first creates a bridge using the "uuid" option (for example,
+> > > > > >    '-device pcie-downstream,uuid="string"') to specify the UUID created
+> > > > > >    in step 4, and then attaches the passthrough device to the bridge.
+> > > > > > 
+> > > > > >    QEMU stores the UUID in the configuration space of the bridge as
+> > > > > >    Vendor-Specific capability (0x09). The "Vendor" here is not to be
+> > > > > >    confused with a specific organization. Instead, the vendor of the
+> > > > > >    bridge is QEMU. To avoid mixing up with other bridges, the bridge
+> > > > > >    will be created with vendor ID 0x1b36 (PCI_VENDOR_ID_REDHAT) and
+> > > > > >    device ID 0x000e (PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE) if the "uuid"
+> > > > > >    option is specified. Otherwise, current defaults are used.
+> > > > > 
+> > > > > I wonder if it makes more sense to drop the concept of failover groups,
+> > > > > and just refer to the standby device by device-id, like 
+> > > > > 
+> > > > >   -device virtio-net-pci,id=foo \
+> > > > >   -device pcie-downstream,failover=foo
+> > > > 
+> > > > Isn't this the same as what this patch series proposes? In your
+> > > > suggestion, "foo" is the entity that connects the passthrough device
+> > > > and the failover device. In this patch set, that "foo" is the UUID,
+> > > > and the options "id" and "failover" are replaced by "uuid". Do you agree?
+> > > > 
+> > > > Regards,
+> > > > 
+> > > > Venu
+> > > > 
+> > > > > The bridge device will then lookup the failover device, figure out the
+> > > > > common identifier to expose to the guest, and defer the visibility of
+> > > > > the PT device behind the bridge until the guest acknowledged the support
+> > > > > for failover on the PV device.
+> > > > > 
+> > > > > Roman.
