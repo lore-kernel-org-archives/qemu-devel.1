@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYADI-0004c1-R1
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:10:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYAE6-0005HW-G1
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYADF-00006M-IQ
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:10:24 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46209)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYADF-00005e-84
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:10:21 -0400
-Received: by mail-qt0-x244.google.com with SMTP id h5-v6so1512406qtm.13
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 06:10:21 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180627115836.25092-1-kraxel@redhat.com>
-	<20180627115836.25092-2-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <10b74818-155c-bdc8-ca0e-c7239be35673@amsat.org>
-Date: Wed, 27 Jun 2018 10:10:17 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1fYAE5-00016d-Np
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:11:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35234 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYAE5-00015v-Gf
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:11:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E1724001389
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 13:11:12 +0000 (UTC)
+References: <20171229073104.3810-1-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1d6f848e-1727-21cb-8792-bf4b3f1c1bfd@redhat.com>
+Date: Wed, 27 Jun 2018 15:11:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180627115836.25092-2-kraxel@redhat.com>
+In-Reply-To: <20171229073104.3810-1-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] warn about two vga cards
+Subject: Re: [Qemu-devel] [PATCH 0/5] ioapic: support
+ TYPE_INTERRUPT_STATS_PROVIDER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>
 
-Hi Gerd,
-
-On 06/27/2018 08:58 AM, Gerd Hoffmann wrote:
-> Two vga cards will listen on the same legacy (isa) ioports.  Due to this
-> conflict only one of the two cards will work correctly in vga mode.
-
-The last one registered...
-
-> Print a warning message in that case.
+On 29/12/2017 08:30, Peter Xu wrote:
+> Let ioapic join the big family.  At last, I obsoleted "info ioapic",
+> kept the interface but telling people to start use "info pic".  We can
+> fully remove it after some releases.
 > 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/display/vga.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> Please review, thanks.
 > 
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index c82e6d240a..a6c246f76b 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -2273,6 +2273,7 @@ MemoryRegion *vga_init_io(VGACommonState *s, Object *obj,
->  void vga_init(VGACommonState *s, Object *obj, MemoryRegion *address_space,
->                MemoryRegion *address_space_io, bool init_vga_ports)
->  {
-> +    static bool vgaports_registered;
->      MemoryRegion *vga_io_memory;
->      const MemoryRegionPortio *vga_ports, *vbe_ports;
->  
-> @@ -2289,6 +2290,11 @@ void vga_init(VGACommonState *s, Object *obj, MemoryRegion *address_space,
->                                          1);
->      memory_region_set_coalescing(vga_io_memory);
->      if (init_vga_ports) {
-> +        if (vgaports_registered) {
-> +            warn_report("multiple vga cards may not work as expected");
-> +        } else {
-> +            vgaports_registered = true;
-> +        }
->          portio_list_init(&s->vga_port_list, obj, vga_ports, s, "vga");
-
-Here we leak s->vga_port_list->regions from the 1st card.
-Can we call portio_list_destroy() in the if (vgaports_registered) block?
-
->          portio_list_set_flush_coalesced(&s->vga_port_list);
->          portio_list_add(&s->vga_port_list, address_space_io, 0x3b0);
+> Peter Xu (5):
+>   doc: another fix to "info pic"
+>   ioapic: support "info pic"
+>   ioapic: some proper indents when dump info
+>   ioapic: support "info irq"
+>   hmp: obsolete "info ioapic"
+> 
+>  hmp-commands-info.hx              |  2 +-
+>  hw/i386/kvm/ioapic.c              | 11 ++-------
+>  hw/intc/ioapic.c                  | 12 +---------
+>  hw/intc/ioapic_common.c           | 47 +++++++++++++++++++++++++++++++++++----
+>  include/hw/i386/ioapic_internal.h |  3 +++
+>  include/hw/i386/pc.h              |  3 ---
+>  target/i386/monitor.c             |  8 ++-----
+>  7 files changed, 52 insertions(+), 34 deletions(-)
 > 
 
-Regards,
+Queued, better late than never.
 
-Phil.
+Paolo
