@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29I-00047r-Tr
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29K-00048P-Th
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29F-0000BG-Ad
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:44 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:39001)
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29G-0000EJ-RU
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:46 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:38912)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY29E-00009t-Un
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:41 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id n2-v6so362136pgq.6
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:33:40 -0700 (PDT)
+	id 1fY29G-0000Co-Gj
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:42 -0400
+Received: by mail-pf0-x242.google.com with SMTP id s21-v6so384551pfm.6
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:33:42 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 21:32:59 -0700
-Message-Id: <20180627043328.11531-7-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 21:33:00 -0700
+Message-Id: <20180627043328.11531-8-richard.henderson@linaro.org>
 In-Reply-To: <20180627043328.11531-1-richard.henderson@linaro.org>
 References: <20180627043328.11531-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 06/35] target/arm: Implement SVE
- floating-point arithmetic (predicated)
+Subject: [Qemu-devel] [PATCH v6 07/35] target/arm: Implement SVE FP
+ Multiply-Add Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,284 +30,305 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
 ---
- target/arm/helper-sve.h    | 77 +++++++++++++++++++++++++++++++++
- target/arm/sve_helper.c    | 89 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 46 ++++++++++++++++++++
- target/arm/sve.decode      | 17 ++++++++
- 4 files changed, 229 insertions(+)
+v6: Add some decode commentary.
+---
+ target/arm/helper-sve.h    |  16 ++++
+ target/arm/sve_helper.c    | 158 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c |  49 ++++++++++++
+ target/arm/sve.decode      |  18 +++++
+ 4 files changed, 241 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 185112e1d2..4097b55f0e 100644
+index 4097b55f0e..eb0645dd43 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -720,6 +720,83 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
+@@ -827,6 +827,22 @@ DEF_HELPER_FLAGS_5(sve_ucvt_ds, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(sve_ucvt_dd, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_6(sve_fadd_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fadd_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fadd_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_fsub_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fsub_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fsub_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fmls_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fmls_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fmls_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_fmul_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmul_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmul_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fnmla_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fnmla_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fnmla_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_fdiv_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fdiv_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fdiv_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fnmls_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fnmls_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fnmls_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_fmin_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmin_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmin_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmax_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmax_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmax_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fminnum_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fminnum_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fminnum_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmaxnum_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmaxnum_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmaxnum_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fabd_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fabd_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fabd_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fscalbn_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fscalbn_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fscalbn_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmulx_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmulx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmulx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 031bec22df..3401662397 100644
+index 3401662397..2f416e5e28 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2811,6 +2811,95 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
-     return predtest_ones(d, oprsz, esz_mask);
- }
+@@ -2938,6 +2938,164 @@ DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_float64)
  
-+/* Fully general three-operand expander, controlled by a predicate,
-+ * With the extra float_status parameter.
+ #undef DO_ZPZ_FP
+ 
++/* 4-operand predicated multiply-add.  This requires 7 operands to pass
++ * "properly", so we need to encode some of the registers into DESC.
 + */
-+#define DO_ZPZZ_FP(NAME, TYPE, H, OP)                           \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg,       \
-+                  void *status, uint32_t desc)                  \
-+{                                                               \
-+    intptr_t i = simd_oprsz(desc);                              \
-+    uint64_t *g = vg;                                           \
-+    do {                                                        \
-+        uint64_t pg = g[(i - 1) >> 6];                          \
-+        do {                                                    \
-+            i -= sizeof(TYPE);                                  \
-+            if (likely((pg >> (i & 63)) & 1)) {                 \
-+                TYPE nn = *(TYPE *)(vn + H(i));                 \
-+                TYPE mm = *(TYPE *)(vm + H(i));                 \
-+                *(TYPE *)(vd + H(i)) = OP(nn, mm, status);      \
-+            }                                                   \
-+        } while (i & 63);                                       \
-+    } while (i != 0);                                           \
-+}
++QEMU_BUILD_BUG_ON(SIMD_DATA_SHIFT + 20 > 32);
 +
-+DO_ZPZZ_FP(sve_fadd_h, uint16_t, H1_2, float16_add)
-+DO_ZPZZ_FP(sve_fadd_s, uint32_t, H1_4, float32_add)
-+DO_ZPZZ_FP(sve_fadd_d, uint64_t,     , float64_add)
-+
-+DO_ZPZZ_FP(sve_fsub_h, uint16_t, H1_2, float16_sub)
-+DO_ZPZZ_FP(sve_fsub_s, uint32_t, H1_4, float32_sub)
-+DO_ZPZZ_FP(sve_fsub_d, uint64_t,     , float64_sub)
-+
-+DO_ZPZZ_FP(sve_fmul_h, uint16_t, H1_2, float16_mul)
-+DO_ZPZZ_FP(sve_fmul_s, uint32_t, H1_4, float32_mul)
-+DO_ZPZZ_FP(sve_fmul_d, uint64_t,     , float64_mul)
-+
-+DO_ZPZZ_FP(sve_fdiv_h, uint16_t, H1_2, float16_div)
-+DO_ZPZZ_FP(sve_fdiv_s, uint32_t, H1_4, float32_div)
-+DO_ZPZZ_FP(sve_fdiv_d, uint64_t,     , float64_div)
-+
-+DO_ZPZZ_FP(sve_fmin_h, uint16_t, H1_2, float16_min)
-+DO_ZPZZ_FP(sve_fmin_s, uint32_t, H1_4, float32_min)
-+DO_ZPZZ_FP(sve_fmin_d, uint64_t,     , float64_min)
-+
-+DO_ZPZZ_FP(sve_fmax_h, uint16_t, H1_2, float16_max)
-+DO_ZPZZ_FP(sve_fmax_s, uint32_t, H1_4, float32_max)
-+DO_ZPZZ_FP(sve_fmax_d, uint64_t,     , float64_max)
-+
-+DO_ZPZZ_FP(sve_fminnum_h, uint16_t, H1_2, float16_minnum)
-+DO_ZPZZ_FP(sve_fminnum_s, uint32_t, H1_4, float32_minnum)
-+DO_ZPZZ_FP(sve_fminnum_d, uint64_t,     , float64_minnum)
-+
-+DO_ZPZZ_FP(sve_fmaxnum_h, uint16_t, H1_2, float16_maxnum)
-+DO_ZPZZ_FP(sve_fmaxnum_s, uint32_t, H1_4, float32_maxnum)
-+DO_ZPZZ_FP(sve_fmaxnum_d, uint64_t,     , float64_maxnum)
-+
-+static inline float16 abd_h(float16 a, float16 b, float_status *s)
++static void do_fmla_zpzzz_h(CPUARMState *env, void *vg, uint32_t desc,
++                            uint16_t neg1, uint16_t neg3)
 +{
-+    return float16_abs(float16_sub(a, b, s));
++    intptr_t i = simd_oprsz(desc);
++    unsigned rd = extract32(desc, SIMD_DATA_SHIFT, 5);
++    unsigned rn = extract32(desc, SIMD_DATA_SHIFT + 5, 5);
++    unsigned rm = extract32(desc, SIMD_DATA_SHIFT + 10, 5);
++    unsigned ra = extract32(desc, SIMD_DATA_SHIFT + 15, 5);
++    void *vd = &env->vfp.zregs[rd];
++    void *vn = &env->vfp.zregs[rn];
++    void *vm = &env->vfp.zregs[rm];
++    void *va = &env->vfp.zregs[ra];
++    uint64_t *g = vg;
++
++    do {
++        uint64_t pg = g[(i - 1) >> 6];
++        do {
++            i -= 2;
++            if (likely((pg >> (i & 63)) & 1)) {
++                float16 e1, e2, e3, r;
++
++                e1 = *(uint16_t *)(vn + H1_2(i)) ^ neg1;
++                e2 = *(uint16_t *)(vm + H1_2(i));
++                e3 = *(uint16_t *)(va + H1_2(i)) ^ neg3;
++                r = float16_muladd(e1, e2, e3, 0, &env->vfp.fp_status);
++                *(uint16_t *)(vd + H1_2(i)) = r;
++            }
++        } while (i & 63);
++    } while (i != 0);
 +}
 +
-+static inline float32 abd_s(float32 a, float32 b, float_status *s)
++void HELPER(sve_fmla_zpzzz_h)(CPUARMState *env, void *vg, uint32_t desc)
 +{
-+    return float32_abs(float32_sub(a, b, s));
++    do_fmla_zpzzz_h(env, vg, desc, 0, 0);
 +}
 +
-+static inline float64 abd_d(float64 a, float64 b, float_status *s)
++void HELPER(sve_fmls_zpzzz_h)(CPUARMState *env, void *vg, uint32_t desc)
 +{
-+    return float64_abs(float64_sub(a, b, s));
++    do_fmla_zpzzz_h(env, vg, desc, 0x8000, 0);
 +}
 +
-+DO_ZPZZ_FP(sve_fabd_h, uint16_t, H1_2, abd_h)
-+DO_ZPZZ_FP(sve_fabd_s, uint32_t, H1_4, abd_s)
-+DO_ZPZZ_FP(sve_fabd_d, uint64_t,     , abd_d)
-+
-+static inline float64 scalbn_d(float64 a, int64_t b, float_status *s)
++void HELPER(sve_fnmla_zpzzz_h)(CPUARMState *env, void *vg, uint32_t desc)
 +{
-+    int b_int = MIN(MAX(b, INT_MIN), INT_MAX);
-+    return float64_scalbn(a, b_int, s);
++    do_fmla_zpzzz_h(env, vg, desc, 0x8000, 0x8000);
 +}
 +
-+DO_ZPZZ_FP(sve_fscalbn_h, int16_t, H1_2, float16_scalbn)
-+DO_ZPZZ_FP(sve_fscalbn_s, int32_t, H1_4, float32_scalbn)
-+DO_ZPZZ_FP(sve_fscalbn_d, int64_t,     , scalbn_d)
++void HELPER(sve_fnmls_zpzzz_h)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_h(env, vg, desc, 0, 0x8000);
++}
 +
-+DO_ZPZZ_FP(sve_fmulx_h, uint16_t, H1_2, helper_advsimd_mulxh)
-+DO_ZPZZ_FP(sve_fmulx_s, uint32_t, H1_4, helper_vfp_mulxs)
-+DO_ZPZZ_FP(sve_fmulx_d, uint64_t,     , helper_vfp_mulxd)
++static void do_fmla_zpzzz_s(CPUARMState *env, void *vg, uint32_t desc,
++                            uint32_t neg1, uint32_t neg3)
++{
++    intptr_t i = simd_oprsz(desc);
++    unsigned rd = extract32(desc, SIMD_DATA_SHIFT, 5);
++    unsigned rn = extract32(desc, SIMD_DATA_SHIFT + 5, 5);
++    unsigned rm = extract32(desc, SIMD_DATA_SHIFT + 10, 5);
++    unsigned ra = extract32(desc, SIMD_DATA_SHIFT + 15, 5);
++    void *vd = &env->vfp.zregs[rd];
++    void *vn = &env->vfp.zregs[rn];
++    void *vm = &env->vfp.zregs[rm];
++    void *va = &env->vfp.zregs[ra];
++    uint64_t *g = vg;
 +
-+#undef DO_ZPZZ_FP
++    do {
++        uint64_t pg = g[(i - 1) >> 6];
++        do {
++            i -= 4;
++            if (likely((pg >> (i & 63)) & 1)) {
++                float32 e1, e2, e3, r;
 +
- /* Fully general two-operand expander, controlled by a predicate,
-  * With the extra float_status parameter.
++                e1 = *(uint32_t *)(vn + H1_4(i)) ^ neg1;
++                e2 = *(uint32_t *)(vm + H1_4(i));
++                e3 = *(uint32_t *)(va + H1_4(i)) ^ neg3;
++                r = float32_muladd(e1, e2, e3, 0, &env->vfp.fp_status);
++                *(uint32_t *)(vd + H1_4(i)) = r;
++            }
++        } while (i & 63);
++    } while (i != 0);
++}
++
++void HELPER(sve_fmla_zpzzz_s)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_s(env, vg, desc, 0, 0);
++}
++
++void HELPER(sve_fmls_zpzzz_s)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_s(env, vg, desc, 0x80000000, 0);
++}
++
++void HELPER(sve_fnmla_zpzzz_s)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_s(env, vg, desc, 0x80000000, 0x80000000);
++}
++
++void HELPER(sve_fnmls_zpzzz_s)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_s(env, vg, desc, 0, 0x80000000);
++}
++
++static void do_fmla_zpzzz_d(CPUARMState *env, void *vg, uint32_t desc,
++                            uint64_t neg1, uint64_t neg3)
++{
++    intptr_t i = simd_oprsz(desc);
++    unsigned rd = extract32(desc, SIMD_DATA_SHIFT, 5);
++    unsigned rn = extract32(desc, SIMD_DATA_SHIFT + 5, 5);
++    unsigned rm = extract32(desc, SIMD_DATA_SHIFT + 10, 5);
++    unsigned ra = extract32(desc, SIMD_DATA_SHIFT + 15, 5);
++    void *vd = &env->vfp.zregs[rd];
++    void *vn = &env->vfp.zregs[rn];
++    void *vm = &env->vfp.zregs[rm];
++    void *va = &env->vfp.zregs[ra];
++    uint64_t *g = vg;
++
++    do {
++        uint64_t pg = g[(i - 1) >> 6];
++        do {
++            i -= 8;
++            if (likely((pg >> (i & 63)) & 1)) {
++                float64 e1, e2, e3, r;
++
++                e1 = *(uint64_t *)(vn + i) ^ neg1;
++                e2 = *(uint64_t *)(vm + i);
++                e3 = *(uint64_t *)(va + i) ^ neg3;
++                r = float64_muladd(e1, e2, e3, 0, &env->vfp.fp_status);
++                *(uint64_t *)(vd + i) = r;
++            }
++        } while (i & 63);
++    } while (i != 0);
++}
++
++void HELPER(sve_fmla_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_d(env, vg, desc, 0, 0);
++}
++
++void HELPER(sve_fmls_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_d(env, vg, desc, INT64_MIN, 0);
++}
++
++void HELPER(sve_fnmla_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_d(env, vg, desc, INT64_MIN, INT64_MIN);
++}
++
++void HELPER(sve_fnmls_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
++{
++    do_fmla_zpzzz_d(env, vg, desc, 0, INT64_MIN);
++}
++
+ /*
+  * Load contiguous data, protected by a governing predicate.
   */
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 7639e589f5..4df5360da9 100644
+index 4df5360da9..acad6374ef 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3425,6 +3425,52 @@ DO_FP3(FRSQRTS, rsqrts)
+@@ -3472,6 +3472,55 @@ DO_FP3(FMULX, fmulx)
  
  #undef DO_FP3
  
-+/*
-+ *** SVE Floating Point Arithmetic - Predicated Group
-+ */
++typedef void gen_helper_sve_fmla(TCGv_env, TCGv_ptr, TCGv_i32);
 +
-+static bool do_zpzz_fp(DisasContext *s, arg_rprr_esz *a,
-+                       gen_helper_gvec_4_ptr *fn)
++static bool do_fmla(DisasContext *s, arg_rprrr_esz *a, gen_helper_sve_fmla *fn)
 +{
 +    if (fn == NULL) {
 +        return false;
 +    }
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-+        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vec_full_reg_offset(s, a->rm),
-+                           pred_full_reg_offset(s, a->pg),
-+                           status, vsz, vsz, 0, fn);
-+        tcg_temp_free_ptr(status);
++    if (!sve_access_check(s)) {
++        return true;
 +    }
++
++    unsigned vsz = vec_full_reg_size(s);
++    unsigned desc;
++    TCGv_i32 t_desc;
++    TCGv_ptr pg = tcg_temp_new_ptr();
++
++    /* We would need 7 operands to pass these arguments "properly".
++     * So we encode all the register numbers into the descriptor.
++     */
++    desc = deposit32(a->rd, 5, 5, a->rn);
++    desc = deposit32(desc, 10, 5, a->rm);
++    desc = deposit32(desc, 15, 5, a->ra);
++    desc = simd_desc(vsz, vsz, desc);
++
++    t_desc = tcg_const_i32(desc);
++    tcg_gen_addi_ptr(pg, cpu_env, pred_full_reg_offset(s, a->pg));
++    fn(cpu_env, pg, t_desc);
++    tcg_temp_free_i32(t_desc);
++    tcg_temp_free_ptr(pg);
 +    return true;
 +}
 +
-+#define DO_FP3(NAME, name) \
-+static bool trans_##NAME(DisasContext *s, arg_rprr_esz *a, uint32_t insn) \
-+{                                                                   \
-+    static gen_helper_gvec_4_ptr * const fns[4] = {                 \
-+        NULL, gen_helper_sve_##name##_h,                            \
-+        gen_helper_sve_##name##_s, gen_helper_sve_##name##_d        \
-+    };                                                              \
-+    return do_zpzz_fp(s, a, fns[a->esz]);                           \
++#define DO_FMLA(NAME, name) \
++static bool trans_##NAME(DisasContext *s, arg_rprrr_esz *a, uint32_t insn) \
++{                                                                    \
++    static gen_helper_sve_fmla * const fns[4] = {                    \
++        NULL, gen_helper_sve_##name##_h,                             \
++        gen_helper_sve_##name##_s, gen_helper_sve_##name##_d         \
++    };                                                               \
++    return do_fmla(s, a, fns[a->esz]);                               \
 +}
 +
-+DO_FP3(FADD_zpzz, fadd)
-+DO_FP3(FSUB_zpzz, fsub)
-+DO_FP3(FMUL_zpzz, fmul)
-+DO_FP3(FMIN_zpzz, fmin)
-+DO_FP3(FMAX_zpzz, fmax)
-+DO_FP3(FMINNM_zpzz, fminnum)
-+DO_FP3(FMAXNM_zpzz, fmaxnum)
-+DO_FP3(FABD, fabd)
-+DO_FP3(FSCALE, fscalbn)
-+DO_FP3(FDIV, fdiv)
-+DO_FP3(FMULX, fmulx)
++DO_FMLA(FMLA_zpzzz, fmla_zpzzz)
++DO_FMLA(FMLS_zpzzz, fmls_zpzzz)
++DO_FMLA(FNMLA_zpzzz, fnmla_zpzzz)
++DO_FMLA(FNMLS_zpzzz, fnmls_zpzzz)
 +
-+#undef DO_FP3
- 
++#undef DO_FMLA
++
  /*
   *** SVE Floating Point Unary Operations Prediated Group
+  */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 3abdb87cf5..636212a638 100644
+index 636212a638..e8531e28cd 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -684,6 +684,23 @@ FTSMUL          01100101 .. 0 ..... 000 011 ..... .....         @rd_rn_rm
- FRECPS          01100101 .. 0 ..... 000 110 ..... .....         @rd_rn_rm
- FRSQRTS         01100101 .. 0 ..... 000 111 ..... .....         @rd_rn_rm
+@@ -128,6 +128,8 @@
+                 &rprrr_esz ra=%reg_movprfx
+ @rdn_pg_ra_rm   ........ esz:2 . rm:5  ... pg:3 ra:5 rd:5 \
+                 &rprrr_esz rn=%reg_movprfx
++@rdn_pg_rm_ra   ........ esz:2 . ra:5  ... pg:3 rm:5 rd:5 \
++                &rprrr_esz rn=%reg_movprfx
  
-+### SVE FP Arithmetic Predicated Group
+ # One register operand, with governing predicate, vector element size
+ @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
+@@ -701,6 +703,22 @@ FMULX           01100101 .. 00 1010 100 ... ..... .....    @rdn_pg_rm
+ FDIV            01100101 .. 00 1100 100 ... ..... .....    @rdm_pg_rn # FDIVR
+ FDIV            01100101 .. 00 1101 100 ... ..... .....    @rdn_pg_rm
+ 
++### SVE FP Multiply-Add Group
 +
-+# SVE floating-point arithmetic (predicated)
-+FADD_zpzz       01100101 .. 00 0000 100 ... ..... .....    @rdn_pg_rm
-+FSUB_zpzz       01100101 .. 00 0001 100 ... ..... .....    @rdn_pg_rm
-+FMUL_zpzz       01100101 .. 00 0010 100 ... ..... .....    @rdn_pg_rm
-+FSUB_zpzz       01100101 .. 00 0011 100 ... ..... .....    @rdm_pg_rn # FSUBR
-+FMAXNM_zpzz     01100101 .. 00 0100 100 ... ..... .....    @rdn_pg_rm
-+FMINNM_zpzz     01100101 .. 00 0101 100 ... ..... .....    @rdn_pg_rm
-+FMAX_zpzz       01100101 .. 00 0110 100 ... ..... .....    @rdn_pg_rm
-+FMIN_zpzz       01100101 .. 00 0111 100 ... ..... .....    @rdn_pg_rm
-+FABD            01100101 .. 00 1000 100 ... ..... .....    @rdn_pg_rm
-+FSCALE          01100101 .. 00 1001 100 ... ..... .....    @rdn_pg_rm
-+FMULX           01100101 .. 00 1010 100 ... ..... .....    @rdn_pg_rm
-+FDIV            01100101 .. 00 1100 100 ... ..... .....    @rdm_pg_rn # FDIVR
-+FDIV            01100101 .. 00 1101 100 ... ..... .....    @rdn_pg_rm
++# SVE floating-point multiply-accumulate writing addend
++FMLA_zpzzz      01100101 .. 1 ..... 000 ... ..... .....         @rda_pg_rn_rm
++FMLS_zpzzz      01100101 .. 1 ..... 001 ... ..... .....         @rda_pg_rn_rm
++FNMLA_zpzzz     01100101 .. 1 ..... 010 ... ..... .....         @rda_pg_rn_rm
++FNMLS_zpzzz     01100101 .. 1 ..... 011 ... ..... .....         @rda_pg_rn_rm
++
++# SVE floating-point multiply-accumulate writing multiplicand
++# Alter the operand extraction order and reuse the helpers from above.
++# FMAD, FMSB, FNMAD, FNMS
++FMLA_zpzzz      01100101 .. 1 ..... 100 ... ..... .....         @rdn_pg_rm_ra
++FMLS_zpzzz      01100101 .. 1 ..... 101 ... ..... .....         @rdn_pg_rm_ra
++FNMLA_zpzzz     01100101 .. 1 ..... 110 ... ..... .....         @rdn_pg_rm_ra
++FNMLS_zpzzz     01100101 .. 1 ..... 111 ... ..... .....         @rdn_pg_rm_ra
 +
  ### SVE FP Unary Operations Predicated Group
  
