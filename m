@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY5jb-0002N3-CK
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:23:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fY5mA-0004ZT-Na
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY5jY-0003B0-53
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:23:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40464 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fY5m7-0007tV-Fy
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:26:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34456 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY5jX-0003Ao-W9
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:23:24 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180621150254.4922-1-stefanha@redhat.com> (Stefan Hajnoczi's
-	message of "Thu, 21 Jun 2018 16:02:54 +0100")
-References: <20180621150254.4922-1-stefanha@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Jun 2018 10:26:48 +0200
-Message-ID: <878t70my7r.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fY5m7-0007s3-9k
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:26:03 -0400
+References: <1528895946-28677-1-git-send-email-eric.auger@redhat.com>
+	<9830d5df-c36d-1bb3-799b-bfe1f7b93b29@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8108c63d-c755-c682-7529-91ac0c676bf3@redhat.com>
+Date: Wed, 27 Jun 2018 10:26:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] trace: forbid floating point types
+In-Reply-To: <9830d5df-c36d-1bb3-799b-bfe1f7b93b29@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] exec: Fix MAP_RAM for cached access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Daniel P . =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org
+Cc: peterx@redhat.com
 
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> Only one existing trace event uses a floating point type.  Unfortunately
-> float and double cannot be supported since SystemTap does not have
-> floating point types.
->
-> Remove float and double from the whitelist and document this limitation.
-> Update the migrate_transferred trace event to use uint64_t instead of
-> double.
->
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 26/06/2018 22:29, Auger Eric wrote:
+>>
+>> Fixes: 48564041a73a (exec: reintroduce MemoryRegion caching)
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> gentle reminder, just to make sure someone is going to pick up this
+> patch before the freeze ;-) Or please let me know if I miss some concerns.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Yes, it's already queued.
 
-We don't really care so much about this value, and or how it is printed.
+Paolo
