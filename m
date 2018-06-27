@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY6K9-0000Ls-9o
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:01:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1fY6O7-0001pA-KK
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY6K3-0000d4-TE
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:01:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY6K3-0000cx-Ov
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:01:07 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E2BE857AB
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:01:07 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180620202736.21399-1-david@redhat.com> (David Hildenbrand's
-	message of "Wed, 20 Jun 2018 22:27:36 +0200")
-References: <20180620202736.21399-1-david@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 27 Jun 2018 11:04:35 +0200
-Message-ID: <87y3f0lhwc.fsf@secure.laptop>
+	(envelope-from <bounces@canonical.com>) id 1fY6O4-0003dJ-FI
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:05:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fY6O4-0003cz-8t
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:05:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fY6O2-0006gq-IF
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:05:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 890982E807C
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:05:14 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] postcopy: drop ram_pages parameter from
- postcopy_ram_incoming_init()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Jun 2018 08:54:31 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1129571@bugs.launchpad.net>
+Reply-To: Bug 1129571 <1129571@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130218230633.21029.10708.malonedeb@wampee.canonical.com>
+Message-Id: <153008967284.12718.13322613259214766414.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1129571] Re: libreoffice armhf FTBFS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-David Hildenbrand <david@redhat.com> wrote:
-> Not needed. Don't expose last_ram_page().
->
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->
-> v1 -> v2:
-> - Make "last_ram_page" static
+** Changed in: qemu (Ubuntu)
+       Status: Confirmed =3D> Incomplete
 
-And there was already an v2 of the patch ...
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1129571
+
+Title:
+  libreoffice armhf FTBFS
+
+Status in QEMU:
+  Won't Fix
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  We have been experiencing FTBFS of LibreOffice 3.5.7, 12.04, armhf in
+  the launchpad buildds. We believe this is likely due to an error in
+  qemu.
+
+  While we do not have a small test case yet, we do have a build log
+  (attaching here).
+
+  The relevant snippet from the build log is:
+
+  3.5.7/solver/unxlngr.pro/bin/jaxp.jar:/build/buildd/libreoffice-3.5.7/sol=
+ver/unxlngr.pro/bin/juh.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.=
+pro/bin/parser.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/x=
+t.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/unoil.jar:/bui=
+ld/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/ridl.jar:/build/buildd/l=
+ibreoffice-3.5.7/solver/unxlngr.pro/bin/jurt.jar:/build/buildd/libreoffice-=
+3.5.7/solver/unxlngr.pro/bin/xmlsearch.jar:/build/buildd/libreoffice-3.5.7/=
+solver/unxlngr.pro/bin/LuceneHelpWrapper.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/HelpIndexerTool.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/lucene-core-2.3.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/lucene-analyzers-2.3.jar" com.sun.star.help.HelpIn=
+dexerTool -lang cs -mod swriter -zipdir ../../unxlngr.pro/misc/ziptmpswrite=
+r_cs -o ../../unxlngr.pro/bin/swriter_cs.zip.unxlngr.pro
+  dmake:  Error code 132, while making '../../unxlngr.pro/bin/swriter_cs.zi=
+p'
+
+  We believe this is from bash error code 128 + 4, where 4 is illegal
+  instruction, thus leading us to suspect qemu.
+
+  Any help in tracking this down would be appreciated.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1129571/+subscriptions
