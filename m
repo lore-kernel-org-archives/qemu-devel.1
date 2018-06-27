@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYD6D-0007KX-Op
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:15:18 -0400
+	(envelope-from <quintela@redhat.com>) id 1fYDPD-0002fD-Db
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYD6A-0004Pb-JA
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:15:17 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:40776)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYD6A-0004Nq-Bg
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:15:14 -0400
-Received: by mail-pl0-x244.google.com with SMTP id t6-v6so1270135plo.7
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:15:14 -0700 (PDT)
-References: <20180618184046.6270-1-richard.henderson@linaro.org>
-	<20180618184046.6270-20-richard.henderson@linaro.org>
-	<66ecea9b-bc0b-371a-b834-0a9c0a4685ad@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <86822f08-52fb-7912-874b-b2f04d1d79b4@linaro.org>
-Date: Wed, 27 Jun 2018 09:15:09 -0700
+	(envelope-from <quintela@redhat.com>) id 1fYDP8-0001qn-Dx
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:34:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57076 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fYDP8-0001ou-9H
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:34:50 -0400
+From: Juan Quintela <quintela@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 27 Jun 2018 18:38:12 +0200
+Message-ID: <87bmbw422z.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <66ecea9b-bc0b-371a-b834-0a9c0a4685ad@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 19/22] target/openrisc: Add
- print_insn_or1k
+Content-Type: text/plain
+Subject: [Qemu-devel] KVM call for 2018-07-03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, shorne@gmail.com
-
-On 06/27/2018 09:03 AM, Philippe Mathieu-Daudé wrote:
->> +INSN(lwa,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(lwz,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(lws,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(lbz,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(lbs,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(lhz,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(lhs,    "r%d, %d(r%d)", a->d, a->i, a->a)
->> +INSN(swa,    "%d(r%d), r%d", a->i, a->a, a->b)
->> +INSN(sw,     "%d(r%d), r%d", a->i, a->a, a->b)
->> +INSN(sb,     "%d(r%d), r%d", a->i, a->a, a->b)
->> +INSN(sh,     "%d(r%d), r%d", a->i, a->a, a->b)
-> 
-> You updated to use the offset(reg) notation, ok.
-
-Yes, failure to match the usual format was confusing.
-
->> +INSN(nop,    "")
-> 
-> The nop previously displayed 'k', I suppose a left-over from sys/trap.
-
-Yes, real nop has no argument.
+To: kvm <kvm@vger.kernel.org>, QEMU Development <qemu-devel@nongnu.org>
 
 
-r~
+
+Hi
+
+Please, send any topic that you are interested in covering.
+
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
+
+After discussions on the QEMU Summit, we are going to have always open a
+KVM call where you can add topics.
+
+ Call details:
+
+By popular demand, a google calendar public entry with it
+
+  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+
+(Let me know if you have any problems with the calendar entry.  I just
+gave up about getting right at the same time CEST, CET, EDT and DST).
+
+If you need phone number details,  contact me privately
+
+Thanks, Juan.
