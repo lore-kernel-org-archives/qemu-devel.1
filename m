@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fY961-00078T-Mv
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:58:51 -0400
+	(envelope-from <peterx@redhat.com>) id 1fY96d-0007hl-MC
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fY95z-00041b-Sv
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:58:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39642 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fY96a-0004qb-Lq
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:59:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39658 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fY95z-0003zy-NL
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:58:47 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fY96a-0004qL-H9
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:59:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3B28D857AB
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 11:58:47 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 27 Jun 2018 13:58:35 +0200
-Message-Id: <20180627115836.25092-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] vga: disable global_vmstate for 3.0+
- machine types
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FD9570206
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 11:59:24 +0000 (UTC)
+Date: Wed, 27 Jun 2018 19:59:19 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180627115919.GC2516@xz-mi>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <871sctea4y.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] your mail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,257 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Move global_vmstate from vga_common_init() parameter to VGACommonState
-field.  Set global_vmstate to true for isa vga devices, so nothing
-changes here.  virtio-vga and secondary-vga already set global_vmstate
-to false so no change here either.  All other pci vga devices get a new
-global-vmstate property, defaulting to false.  A compat property flips
-it to true for older machine types.
+On Tue, Jun 26, 2018 at 07:21:49PM +0200, Markus Armbruster wrote:
+> I fooled around a bit, and I think there are a few lose ends.
+> 
+> Lets update the examples in docs/interop/qmp-spec.txt to show the
+> current greeting (section 3.1) and how to accept a capability (section
+> 3.2).  The capability negotiation documentation could use some polish.
+> I'll post a patch.
 
-With this in place you don't get a vmstate section naming conflict any
-more when adding multiple pci vga devices to your vm.
+Thanks for doing that!
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/vga_int.h    |  3 ++-
- include/hw/compat.h     | 16 ++++++++++++++++
- hw/display/cirrus_vga.c |  9 ++++++---
- hw/display/qxl.c        |  3 ++-
- hw/display/vga-isa-mm.c |  3 ++-
- hw/display/vga-isa.c    |  3 ++-
- hw/display/vga-pci.c    |  5 +++--
- hw/display/vga.c        |  4 ++--
- hw/display/virtio-vga.c |  2 +-
- hw/display/vmware_vga.c |  4 +++-
- 10 files changed, 39 insertions(+), 13 deletions(-)
+> 
+> Talking to a QMP monitor that supports OOB:
+> 
+>     $ socat UNIX:test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
+>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true } }
+>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' is unexpected"}}
+>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
+>     {"return": {}}
+>     QMP> { "execute": "query-qmp-schema" }
+>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capability requires that every command contains an 'id' field"}}
+> 
+> Why does every command require 'id'?
 
-diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-index f8fcf62a56..339661bc01 100644
---- a/hw/display/vga_int.h
-+++ b/hw/display/vga_int.h
-@@ -133,6 +133,7 @@ typedef struct VGACommonState {
-     bool full_update_gfx;
-     bool big_endian_fb;
-     bool default_endian_fb;
-+    bool global_vmstate;
-     /* hardware mouse cursor support */
-     uint32_t invalidated_y_table[VGA_MAX_HEIGHT / 32];
-     uint32_t hw_cursor_x;
-@@ -157,7 +158,7 @@ static inline int c6_to_8(int v)
-     return (v << 2) | (b << 1) | b;
- }
- 
--void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate);
-+void vga_common_init(VGACommonState *s, Object *obj);
- void vga_init(VGACommonState *s, Object *obj, MemoryRegion *address_space,
-               MemoryRegion *address_space_io, bool init_vga_ports);
- MemoryRegion *vga_init_io(VGACommonState *s, Object *obj,
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 44d5964060..c08f4040bb 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -10,6 +10,22 @@
-         .driver   = "hda-audio",\
-         .property = "use-timer",\
-         .value    = "false",\
-+    },{\
-+        .driver   = "cirrus-vga",\
-+        .property = "global-vmstate",\
-+        .value    = "true",\
-+    },{\
-+        .driver   = "VGA",\
-+        .property = "global-vmstate",\
-+        .value    = "true",\
-+    },{\
-+        .driver   = "vmware-svga",\
-+        .property = "global-vmstate",\
-+        .value    = "true",\
-+    },{\
-+        .driver   = "qxl-vga",\
-+        .property = "global-vmstate",\
-+        .value    = "true",\
-     },
- 
- #define HW_COMPAT_2_11 \
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 138ae961b9..1d050621f1 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -3048,7 +3048,8 @@ static void isa_cirrus_vga_realizefn(DeviceState *dev, Error **errp)
-                    s->vram_size_mb);
-         return;
-     }
--    vga_common_init(s, OBJECT(dev), true);
-+    s->global_vmstate = true;
-+    vga_common_init(s, OBJECT(dev));
-     cirrus_init_common(&d->cirrus_vga, OBJECT(dev), CIRRUS_ID_CLGD5430, 0,
-                        isa_address_space(isadev),
-                        isa_address_space_io(isadev));
-@@ -3062,7 +3063,7 @@ static Property isa_cirrus_vga_properties[] = {
-     DEFINE_PROP_UINT32("vgamem_mb", struct ISACirrusVGAState,
-                        cirrus_vga.vga.vram_size_mb, 4),
-     DEFINE_PROP_BOOL("blitter", struct ISACirrusVGAState,
--                       cirrus_vga.enable_blitter, true),
-+                     cirrus_vga.enable_blitter, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -3105,7 +3106,7 @@ static void pci_cirrus_vga_realize(PCIDevice *dev, Error **errp)
-          return;
-      }
-      /* setup VGA */
--     vga_common_init(&s->vga, OBJECT(dev), true);
-+     vga_common_init(&s->vga, OBJECT(dev));
-      cirrus_init_common(s, OBJECT(dev), device_id, 1, pci_address_space(dev),
-                         pci_address_space_io(dev));
-      s->vga.con = graphic_console_init(DEVICE(dev), 0, s->vga.hw_ops, &s->vga);
-@@ -3134,6 +3135,8 @@ static Property pci_vga_cirrus_properties[] = {
-                        cirrus_vga.vga.vram_size_mb, 4),
-     DEFINE_PROP_BOOL("blitter", struct PCICirrusVGAState,
-                      cirrus_vga.enable_blitter, true),
-+    DEFINE_PROP_BOOL("global-vmstate", struct PCICirrusVGAState,
-+                     cirrus_vga.vga.global_vmstate, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index a71714ccb4..3f740d7aa3 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -2168,7 +2168,7 @@ static void qxl_realize_primary(PCIDevice *dev, Error **errp)
-     qxl_init_ramsize(qxl);
-     vga->vbe_size = qxl->vgamem_size;
-     vga->vram_size_mb = qxl->vga.vram_size >> 20;
--    vga_common_init(vga, OBJECT(dev), true);
-+    vga_common_init(vga, OBJECT(dev));
-     vga_init(vga, OBJECT(dev),
-              pci_address_space(dev), pci_address_space_io(dev), false);
-     portio_list_init(&qxl->vga_port_list, OBJECT(dev), qxl_vga_portio_list,
-@@ -2410,6 +2410,7 @@ static Property qxl_properties[] = {
- #endif
-         DEFINE_PROP_UINT32("xres", PCIQXLDevice, xres, 0),
-         DEFINE_PROP_UINT32("yres", PCIQXLDevice, yres, 0),
-+        DEFINE_PROP_BOOL("global-vmstate", PCIQXLDevice, vga.global_vmstate, false),
-         DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-index e887b45651..d2d6b32abf 100644
---- a/hw/display/vga-isa-mm.c
-+++ b/hw/display/vga-isa-mm.c
-@@ -131,7 +131,8 @@ int isa_vga_mm_init(hwaddr vram_base,
-     s = g_malloc0(sizeof(*s));
- 
-     s->vga.vram_size_mb = VGA_RAM_SIZE >> 20;
--    vga_common_init(&s->vga, NULL, true);
-+    s->vga.global_vmstate = true;
-+    vga_common_init(&s->vga, NULL);
-     vga_mm_init(s, vram_base, ctrl_base, it_shift, address_space);
- 
-     s->vga.con = graphic_console_init(NULL, 0, s->vga.hw_ops, s);
-diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
-index 469834add5..fa44242e0d 100644
---- a/hw/display/vga-isa.c
-+++ b/hw/display/vga-isa.c
-@@ -58,7 +58,8 @@ static void vga_isa_realizefn(DeviceState *dev, Error **errp)
-     MemoryRegion *vga_io_memory;
-     const MemoryRegionPortio *vga_ports, *vbe_ports;
- 
--    vga_common_init(s, OBJECT(dev), true);
-+    s->global_vmstate = true;
-+    vga_common_init(s, OBJECT(dev));
-     s->legacy_address_space = isa_address_space(isadev);
-     vga_io_memory = vga_init_io(s, OBJECT(dev), &vga_ports, &vbe_ports);
-     isa_register_portio_list(isadev, &d->portio_vga,
-diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
-index 1ea559762a..e9e62eac70 100644
---- a/hw/display/vga-pci.c
-+++ b/hw/display/vga-pci.c
-@@ -222,7 +222,7 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
-     bool qext = false;
- 
-     /* vga + console init */
--    vga_common_init(s, OBJECT(dev), true);
-+    vga_common_init(s, OBJECT(dev));
-     vga_init(s, OBJECT(dev), pci_address_space(dev), pci_address_space_io(dev),
-              true);
- 
-@@ -265,7 +265,7 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
-     bool qext = false;
- 
-     /* vga + console init */
--    vga_common_init(s, OBJECT(dev), false);
-+    vga_common_init(s, OBJECT(dev));
-     s->con = graphic_console_init(DEVICE(dev), 0, s->hw_ops, s);
- 
-     /* mmio bar */
-@@ -308,6 +308,7 @@ static Property vga_pci_properties[] = {
-     DEFINE_PROP_BIT("mmio", PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_MMIO, true),
-     DEFINE_PROP_BIT("qemu-extended-regs",
-                     PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
-+    DEFINE_PROP_BOOL("global-vmstate", PCIVGAState, vga.global_vmstate, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index ed476e4e80..c82e6d240a 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -2163,7 +2163,7 @@ static inline uint32_t uint_clamp(uint32_t val, uint32_t vmin, uint32_t vmax)
-     return val;
- }
- 
--void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
-+void vga_common_init(VGACommonState *s, Object *obj)
- {
-     int i, j, v, b;
- 
-@@ -2202,7 +2202,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
-     s->is_vbe_vmstate = 1;
-     memory_region_init_ram_nomigrate(&s->vram, obj, "vga.vram", s->vram_size,
-                            &error_fatal);
--    vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
-+    vmstate_register_ram(&s->vram, s->global_vmstate ? NULL : DEVICE(obj));
-     xen_register_framebuffer(&s->vram);
-     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
-     s->get_bpp = vga_get_bpp;
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index 97db6c3372..8d3d9e14a7 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -106,7 +106,7 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- 
-     /* init vga compat bits */
-     vga->vram_size_mb = 8;
--    vga_common_init(vga, OBJECT(vpci_dev), false);
-+    vga_common_init(vga, OBJECT(vpci_dev));
-     vga_init(vga, OBJECT(vpci_dev), pci_address_space(&vpci_dev->pci_dev),
-              pci_address_space_io(&vpci_dev->pci_dev), true);
-     pci_register_bar(&vpci_dev->pci_dev, 0,
-diff --git a/hw/display/vmware_vga.c b/hw/display/vmware_vga.c
-index bd3e8b3586..39f4d40801 100644
---- a/hw/display/vmware_vga.c
-+++ b/hw/display/vmware_vga.c
-@@ -1241,7 +1241,7 @@ static void vmsvga_init(DeviceState *dev, struct vmsvga_state_s *s,
-                            &error_fatal);
-     s->fifo_ptr = memory_region_get_ram_ptr(&s->fifo_ram);
- 
--    vga_common_init(&s->vga, OBJECT(dev), true);
-+    vga_common_init(&s->vga, OBJECT(dev));
-     vga_init(&s->vga, OBJECT(dev), address_space, io, true);
-     vmstate_register(NULL, 0, &vmstate_vga_common, &s->vga);
-     s->new_depth = 32;
-@@ -1321,6 +1321,8 @@ static void pci_vmsvga_realize(PCIDevice *dev, Error **errp)
- static Property vga_vmware_properties[] = {
-     DEFINE_PROP_UINT32("vgamem_mb", struct pci_vmsvga_state_s,
-                        chip.vga.vram_size_mb, 16),
-+    DEFINE_PROP_BOOL("global-vmstate", struct pci_vmsvga_state_s,
-+                     chip.vga.global_vmstate, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+The COMMAND_DROPPED event is one reason, as you mentioned in the other
+thread. Meanwhile as long as we have OOB command it means that we can
+have more than one commands running in parallel, then it's a must that
+we can mark that out in the response to mark out which command we are
+replying to.
+
+> 
+> Talking to a QMP monitor that doesn't support OOB:
+> 
+>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": []}}
+>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
+>     {"error": {"class": "GenericError", "desc": "This monitor does not support Out-Of-Band (OOB)"}}
+>     QMP> { "execute": "qmp_capabilities" }
+>     {"return": {}}
+>     QMP> { "execute": "query-kvm" }
+>     {"return": {"enabled": true, "present": true}}
+>     QMP> { "execute": "query-kvm", "control": { "run-oob": true } }
+>     {"error": {"class": "GenericError", "desc": "Please enable Out-Of-Band first for the session during capabilities negotiation"}}
+> 
+> Telling people to enable OOB when that cannot be done is suboptimal.
+> More so when it cannot be used here anyway.  I'll post a patch.
+
+Thanks again!
+
 -- 
-2.9.3
+Peter Xu
