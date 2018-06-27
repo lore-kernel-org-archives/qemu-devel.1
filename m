@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCI-0007Ks-Pv
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:45 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCI-0007Kw-QG
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCF-0000kx-GP
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCG-0000o5-LQ
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:47438 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:47458 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fYFCF-00008B-1E
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:39 -0400
+	id 1fYFCG-0000ko-EL
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:40 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 27 Jun 2018 20:29:02 +0200
-Message-Id: <1530124149-3900-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 27 Jun 2018 20:29:04 +0200
+Message-Id: <1530124149-3900-5-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530124149-3900-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530124149-3900-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 2/9] hw/mips/boston: don't make flash region
- 'nomigrate'
+Subject: [Qemu-devel] [PULL v2 4/9] hw/pci-host/xilinx-pcie: don't make "io"
+ region be RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +31,46 @@ Cc: peter.maydell@linaro.org
 From: Peter Maydell <peter.maydell@linaro.org>
 
 Currently we use memory_region_init_rom_nomigrate() to create
-the "boston.flash" memory region, and we don't manually register
-it with vmstate_register_ram(). This currently means that its
-contents are migrated but as a ram block whose name is the empty
-string; in future it may mean they are not migrated at all. Use
-memory_region_init_ram() instead.
+the "io" memory region to pass to pci_register_root_bus().
+This is a dummy region, because this PCI controller doesn't
+support accesses to PCI IO space.
 
-Note that this is a a cross-version migration compatibility break
-for the "boston" machine.
+There is no reason for the dummy region to be a RAM region;
+it is only used as a place where PCI BARs can be mapped,
+and if you could get a PCI card to do a bus master access
+to the IO space it should not get acts-like-RAM behaviour.
+Use a simple container memory region instead. (We do have
+one PCI card model which can do bus master accesses to IO
+space -- the LSI53C895A SCSI adaptor.)
+
+This avoids the oddity of having a memory region which is
+RAM but where the RAM is not migrated.
+
+Note that the size of the region we use here has no
+effect on behaviour.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Paul Burton <paul.burton@mips.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
 ---
- hw/mips/boston.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ hw/pci-host/xilinx-pcie.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index 52cce19..14e6f95 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -471,8 +471,7 @@ static void boston_mach_init(MachineState *machine)
-     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->cps), 0, 0, 1);
-=20
-     flash =3D  g_new(MemoryRegion, 1);
--    memory_region_init_rom_nomigrate(flash, NULL,
--                                     "boston.flash", 128 * M_BYTE, &err)=
-;
-+    memory_region_init_rom(flash, NULL, "boston.flash", 128 * M_BYTE, &e=
-rr);
-     memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
-=20
-     ddr =3D g_new(MemoryRegion, 1);
---=20
+diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+index 044e312..b0a31b9 100644
+--- a/hw/pci-host/xilinx-pcie.c
++++ b/hw/pci-host/xilinx-pcie.c
+@@ -120,9 +120,8 @@ static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
+     memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
+     memory_region_set_enabled(&s->mmio, false);
+ 
+-    /* dummy I/O region */
+-    memory_region_init_ram_nomigrate(&s->io, OBJECT(s), "io", 16, NULL);
+-    memory_region_set_enabled(&s->io, false);
++    /* dummy PCI I/O region (not visible to the CPU) */
++    memory_region_init(&s->io, OBJECT(s), "io", 16);
+ 
+     /* interrupt out */
+     qdev_init_gpio_out_named(dev, &s->irq, "interrupt_out", 1);
+-- 
 2.7.4
