@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fY5A8-0008WB-AM
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:46:49 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fY5Cd-0000q3-KH
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fY5A5-0003KR-5n
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:46:48 -0400
-Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:47807)
+	(envelope-from <balaton@eik.bme.hu>) id 1fY5CY-0004g2-Kc
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:49:23 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:44839)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fY5A4-0003Jd-UC
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:46:45 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.120.40])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 19F83E5CEA
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:46:43 +0200 (CEST)
-References: <20180626135928.23950-1-clg@kaod.org>
-	<20180627033321-mutt-send-email-mst@kernel.org>
-	<1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
-	<20180627072825.GH14434@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <65c545f3-6279-62af-9bd8-2be93a3d7d18@kaod.org>
-Date: Wed, 27 Jun 2018 09:46:32 +0200
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fY5CY-0004eo-A1
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:49:18 -0400
+Date: Wed, 27 Jun 2018 09:49:16 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180625222718.4488-1-mail@sebastianbauer.info>
+Message-ID: <alpine.BSF.2.21.1806270945590.79722@zero.eik.bme.hu>
+References: <20180625222718.4488-1-mail@sebastianbauer.info>
 MIME-Version: 1.0
-In-Reply-To: <20180627072825.GH14434@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] ehci: Don't fetch a NULL current qtd but
+ advance the queue instead.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-On 06/27/2018 09:28 AM, David Gibson wrote:
-> On Wed, Jun 27, 2018 at 11:38:17AM +1000, Benjamin Herrenschmidt wrote:
->> On Wed, 2018-06-27 at 03:35 +0300, Michael S. Tsirkin wrote:
->>>
->>>> +
->>>> +/* Extract field fname from val */
->>>> +#define GETFIELD(fname, val)                    \
->>>> +        (((val) & fname##_MASK) >> fname##_LSH)
->>>> +
->>>> +/* Set field fname of oval to fval
->>>> + * NOTE: oval isn't modified, the combined result is returned
->>>> + */
->>>> +#define SETFIELD(fname, oval, fval)                     \
->>>> +        (((oval) & ~fname##_MASK) | \
->>>> +         ((((typeof(oval))(fval)) << fname##_LSH) & fname##_MASK))
->>>> +
->>>
->>> Pls don't make up macros like these. We can't have each device do it.
->>
->> So what ? We move the macros in a generic place ? These are MUCH better
->> than open-coding the masks & shifts and much less error prone.
-> 
-> There are already deposit32 and deposit64() functions which I think
-> would cover this.
+On Tue, 26 Jun 2018, Sebastian Bauer wrote:
+> Fetching qtd with the NULL address most likely makes no sense so from now
+> on, we handle it this case similarly as if the terminate (T) bit is not
+> set, which is already an exception as according to section 3.6 of the EHCI
+> spec there is no T bit defined for the current_qtd field.
+>
+> The spec is a bit vague on how an EHCI driver should initialize these
+> fields: "The general operational model is that the host controller can
+> detect whether the overlay area contains a description of an active
+> transfer" (p. 49). QEMU primarily uses the QTD_TOKEN_ACTIVE bit of the
+> queue header to infer the activity state but there are other ways
+> conceivable.
+>
+> This change allows QEMU to boot further into AmigaOS. The public available
+> version of the EHCI driver recycles queue heads in some rare conditions but
+> only clears the current_qtd field but not the status field. This works with
+> many available EHCI PCI cards but e.g., not with the Freescale USB
+> controller's found on the P5040. On the emulated EHCI controller of QEMU
+> the consequence is that some garbage was read in, which resulted in a
+> reset of the controller. This change fixes the problem.
+>
+> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
 
-OK. I understand but we can't include target/ppc/cpu.h in this file
-either and we want to use these specific macros to keep the register 
-definition file similar to the one in skiboot.
+This fixes mouse and keyboard for AmigaOS on sam460ex. It would be 
+appreciated if this could be merged before the freeze. I guess it could be 
+removed again before the release if found to cause any problems or fixed 
+if needed but if it's not merged now then we can't make QEMU 3.0 support 
+AmigaOS.
 
-Is their a common area for such needs ? 
+Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
 
->>
->>>> @@ -1031,6 +1110,7 @@ static Property pnv_chip_properties[] = {
->>>>      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
->>>>      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
->>>>      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
->>>> +    DEFINE_PROP_UINT32("num-phbs", PnvChip, num_phbs, 1),
->>>>      DEFINE_PROP_END_OF_LIST(),
->>>>  };
->>>
->>> How about instanciating each extra phb using -device?
->>> Seems better than teaching everyone about platform-specific
->>> options.
->>
->> It's about which PHBs are enabled, not which are instanciated, if I
->> understand Cedric changes ...
->>
->> This aims are implementing the POWER8 chip correctly, it has a fixed
->> number of PHBs per-chip at very specific XSCOM addresses, that the
->> firwmare knows about.
-> 
-> Yeah, this is a recurring design conflict, which I'm not sure how to
-> address.  Usually instantiating things with -device works better, but
-> when do we do when that allows more flexibility with hardware
-> arrangement than is actually possible in the hardware.
-> 
-
-So the "IBM PHB3 PCIE Root Port" is already user createable.
-
-I can take a look at user createable PHB3s. I think this is OK from a model
-perspective. The object is rather standalone, it needs the machine for 
-the XICS fabric and a couple of ids, phb id and chip id. These can come
-from the command line.
-
-We want at least one PHB3 per socket/chip though. 
-
-C. 
+> ---
+>
+> The fix is probably not the best solution. However, it is one that is very
+> small.
+>
+> QEMU still warns that an active qh will be changed if the qh is recycled,
+> so more changes could be done. But I didn't notice any negative
+> consequences implied by the warning so I would leave a possible fix to this
+> problem to a further patch.
+> ---
+> hw/usb/hcd-ehci.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+> index 0134232627..e5acfc5ba5 100644
+> --- a/hw/usb/hcd-ehci.c
+> +++ b/hw/usb/hcd-ehci.c
+> @@ -1672,7 +1672,8 @@ static EHCIQueue *ehci_state_fetchqh(EHCIState *ehci, int async)
+>         ehci_set_state(ehci, async, EST_HORIZONTALQH);
+>
+>     } else if ((q->qh.token & QTD_TOKEN_ACTIVE) &&
+> -               (NLPTR_TBIT(q->qh.current_qtd) == 0)) {
+> +               (NLPTR_TBIT(q->qh.current_qtd) == 0) &&
+> +               (q->qh.current_qtd != 0)) {
+>         q->qtdaddr = q->qh.current_qtd;
+>         ehci_set_state(ehci, async, EST_FETCHQTD);
+>
+>
