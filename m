@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29Z-0004Oa-9y
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29a-0004S5-98
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29X-0000jB-IN
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:01 -0400
-Received: from mail-pl0-x22b.google.com ([2607:f8b0:400e:c01::22b]:46470)
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29Y-0000kO-UU
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:02 -0400
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:37196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY29X-0000iB-8C
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:33:59 -0400
-Received: by mail-pl0-x22b.google.com with SMTP id 30-v6so406006pld.13
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:33:59 -0700 (PDT)
+	id 1fY29Y-0000jn-KX
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:00 -0400
+Received: by mail-pg0-x232.google.com with SMTP id o11-v6so364985pgv.4
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:34:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 21:33:12 -0700
-Message-Id: <20180627043328.11531-20-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 21:33:13 -0700
+Message-Id: <20180627043328.11531-21-richard.henderson@linaro.org>
 In-Reply-To: <20180627043328.11531-1-richard.henderson@linaro.org>
 References: <20180627043328.11531-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 19/35] target/arm: Implement SVE FP Fast
- Reduction Group
+Subject: [Qemu-devel] [PATCH v6 20/35] target/arm: Implement SVE Floating
+ Point Unary Operations - Unpredicated Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,213 +33,132 @@ Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 35 ++++++++++++++++++++++
- target/arm/sve_helper.c    | 61 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 57 +++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  8 +++++
- 4 files changed, 161 insertions(+)
+ target/arm/helper.h        |  8 +++++++
+ target/arm/translate-sve.c | 47 ++++++++++++++++++++++++++++++++++++++
+ target/arm/vec_helper.c    | 20 ++++++++++++++++
+ target/arm/sve.decode      |  5 ++++
+ 4 files changed, 80 insertions(+)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 087819ec2b..ff69d143a0 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -725,6 +725,41 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 56439ac1e4..ad9cb6c7d5 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -601,6 +601,14 @@ DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_4(sve_faddv_h, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_faddv_s, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_faddv_d, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frecpe_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frecpe_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frecpe_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_fmaxnmv_h, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fmaxnmv_s, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fmaxnmv_d, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frsqrte_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frsqrte_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frsqrte_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_fminnmv_h, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fminnmv_s, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fminnmv_d, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_fmaxv_h, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fmaxv_s, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fmaxv_d, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_fminv_h, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fminv_s, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_fminv_d, TCG_CALL_NO_RWG,
-+                   i64, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_fadda_h, TCG_CALL_NO_RWG,
-                    i64, i64, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_fadda_s, TCG_CALL_NO_RWG,
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index bc23c66221..4c44d52a23 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2852,6 +2852,67 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
-     return predtest_ones(d, oprsz, esz_mask);
- }
- 
-+/* Recursive reduction on a function;
-+ * C.f. the ARM ARM function ReducePredicated.
-+ *
-+ * While it would be possible to write this without the DATA temporary,
-+ * it is much simpler to process the predicate register this way.
-+ * The recursion is bounded to depth 7 (128 fp16 elements), so there's
-+ * little to gain with a more complex non-recursive form.
-+ */
-+#define DO_REDUCE(NAME, TYPE, H, FUNC, IDENT)                         \
-+static TYPE NAME##_reduce(TYPE *data, float_status *status, uintptr_t n) \
-+{                                                                     \
-+    if (n == 1) {                                                     \
-+        return *data;                                                 \
-+    } else {                                                          \
-+        uintptr_t half = n / 2;                                       \
-+        TYPE lo = NAME##_reduce(data, status, half);                  \
-+        TYPE hi = NAME##_reduce(data + half, status, half);           \
-+        return TYPE##_##FUNC(lo, hi, status);                         \
-+    }                                                                 \
-+}                                                                     \
-+uint64_t HELPER(NAME)(void *vn, void *vg, void *vs, uint32_t desc)    \
-+{                                                                     \
-+    uintptr_t i, oprsz = simd_oprsz(desc), maxsz = simd_maxsz(desc);  \
-+    TYPE data[sizeof(ARMVectorReg) / sizeof(TYPE)];                   \
-+    for (i = 0; i < oprsz; ) {                                        \
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));               \
-+        do {                                                          \
-+            TYPE nn = *(TYPE *)(vn + H(i));                           \
-+            *(TYPE *)((void *)data + i) = (pg & 1 ? nn : IDENT);      \
-+            i += sizeof(TYPE), pg >>= sizeof(TYPE);                   \
-+        } while (i & 15);                                             \
-+    }                                                                 \
-+    for (; i < maxsz; i += sizeof(TYPE)) {                            \
-+        *(TYPE *)((void *)data + i) = IDENT;                          \
-+    }                                                                 \
-+    return NAME##_reduce(data, vs, maxsz / sizeof(TYPE));             \
-+}
-+
-+DO_REDUCE(sve_faddv_h, float16, H1_2, add, float16_zero)
-+DO_REDUCE(sve_faddv_s, float32, H1_4, add, float32_zero)
-+DO_REDUCE(sve_faddv_d, float64,     , add, float64_zero)
-+
-+/* Identity is floatN_default_nan, without the function call.  */
-+DO_REDUCE(sve_fminnmv_h, float16, H1_2, minnum, 0x7E00)
-+DO_REDUCE(sve_fminnmv_s, float32, H1_4, minnum, 0x7FC00000)
-+DO_REDUCE(sve_fminnmv_d, float64,     , minnum, 0x7FF8000000000000ULL)
-+
-+DO_REDUCE(sve_fmaxnmv_h, float16, H1_2, maxnum, 0x7E00)
-+DO_REDUCE(sve_fmaxnmv_s, float32, H1_4, maxnum, 0x7FC00000)
-+DO_REDUCE(sve_fmaxnmv_d, float64,     , maxnum, 0x7FF8000000000000ULL)
-+
-+DO_REDUCE(sve_fminv_h, float16, H1_2, min, float16_infinity)
-+DO_REDUCE(sve_fminv_s, float32, H1_4, min, float32_infinity)
-+DO_REDUCE(sve_fminv_d, float64,     , min, float64_infinity)
-+
-+DO_REDUCE(sve_fmaxv_h, float16, H1_2, max, float16_chs(float16_infinity))
-+DO_REDUCE(sve_fmaxv_s, float32, H1_4, max, float32_chs(float32_infinity))
-+DO_REDUCE(sve_fmaxv_d, float64,     , max, float64_chs(float64_infinity))
-+
-+#undef DO_REDUCE
-+
- uint64_t HELPER(sve_fadda_h)(uint64_t nn, void *vm, void *vg,
-                              void *status, uint32_t desc)
- {
+ DEF_HELPER_FLAGS_5(gvec_fadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_fadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_fadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index b60d47af2c..3b009193a9 100644
+index 3b009193a9..1dcc2d38c9 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3450,6 +3450,63 @@ static bool trans_FMUL_zzx(DisasContext *s, arg_FMUL_zzx *a, uint32_t insn)
-     return true;
- }
+@@ -3507,6 +3507,53 @@ DO_VPZ(FMAXNMV, fmaxnmv)
+ DO_VPZ(FMINV, fminv)
+ DO_VPZ(FMAXV, fmaxv)
  
 +/*
-+ *** SVE Floating Point Fast Reduction Group
++ *** SVE Floating Point Unary Operations - Unpredicated Group
 + */
 +
-+typedef void gen_helper_fp_reduce(TCGv_i64, TCGv_ptr, TCGv_ptr,
-+                                  TCGv_ptr, TCGv_i32);
-+
-+static void do_reduce(DisasContext *s, arg_rpr_esz *a,
-+                      gen_helper_fp_reduce *fn)
++static void do_zz_fp(DisasContext *s, arg_rr_esz *a, gen_helper_gvec_2_ptr *fn)
 +{
 +    unsigned vsz = vec_full_reg_size(s);
-+    unsigned p2vsz = pow2ceil(vsz);
-+    TCGv_i32 t_desc = tcg_const_i32(simd_desc(vsz, p2vsz, 0));
-+    TCGv_ptr t_zn, t_pg, status;
-+    TCGv_i64 temp;
++    TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
 +
-+    temp = tcg_temp_new_i64();
-+    t_zn = tcg_temp_new_ptr();
-+    t_pg = tcg_temp_new_ptr();
-+
-+    tcg_gen_addi_ptr(t_zn, cpu_env, vec_full_reg_offset(s, a->rn));
-+    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, a->pg));
-+    status = get_fpstatus_ptr(a->esz == MO_16);
-+
-+    fn(temp, t_zn, t_pg, status, t_desc);
-+    tcg_temp_free_ptr(t_zn);
-+    tcg_temp_free_ptr(t_pg);
++    tcg_gen_gvec_2_ptr(vec_full_reg_offset(s, a->rd),
++                       vec_full_reg_offset(s, a->rn),
++                       status, vsz, vsz, 0, fn);
 +    tcg_temp_free_ptr(status);
-+    tcg_temp_free_i32(t_desc);
-+
-+    write_fp_dreg(s, a->rd, temp);
-+    tcg_temp_free_i64(temp);
 +}
 +
-+#define DO_VPZ(NAME, name) \
-+static bool trans_##NAME(DisasContext *s, arg_rpr_esz *a, uint32_t insn) \
-+{                                                                        \
-+    static gen_helper_fp_reduce * const fns[3] = {                       \
-+        gen_helper_sve_##name##_h,                                       \
-+        gen_helper_sve_##name##_s,                                       \
-+        gen_helper_sve_##name##_d,                                       \
-+    };                                                                   \
-+    if (a->esz == 0) {                                                   \
-+        return false;                                                    \
-+    }                                                                    \
-+    if (sve_access_check(s)) {                                           \
-+        do_reduce(s, a, fns[a->esz - 1]);                                \
-+    }                                                                    \
-+    return true;                                                         \
++static bool trans_FRECPE(DisasContext *s, arg_rr_esz *a, uint32_t insn)
++{
++    static gen_helper_gvec_2_ptr * const fns[3] = {
++        gen_helper_gvec_frecpe_h,
++        gen_helper_gvec_frecpe_s,
++        gen_helper_gvec_frecpe_d,
++    };
++    if (a->esz == 0) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        do_zz_fp(s, a, fns[a->esz - 1]);
++    }
++    return true;
 +}
 +
-+DO_VPZ(FADDV, faddv)
-+DO_VPZ(FMINNMV, fminnmv)
-+DO_VPZ(FMAXNMV, fmaxnmv)
-+DO_VPZ(FMINV, fminv)
-+DO_VPZ(FMAXV, fmaxv)
++static bool trans_FRSQRTE(DisasContext *s, arg_rr_esz *a, uint32_t insn)
++{
++    static gen_helper_gvec_2_ptr * const fns[3] = {
++        gen_helper_gvec_frsqrte_h,
++        gen_helper_gvec_frsqrte_s,
++        gen_helper_gvec_frsqrte_d,
++    };
++    if (a->esz == 0) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        do_zz_fp(s, a, fns[a->esz - 1]);
++    }
++    return true;
++}
 +
  /*
   *** SVE Floating Point Accumulating Reduction Group
   */
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 97af75a61b..073e5c58e7 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -427,6 +427,26 @@ void HELPER(gvec_fcmlad)(void *vd, void *vn, void *vm,
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
++#define DO_2OP(NAME, FUNC, TYPE) \
++void HELPER(NAME)(void *vd, void *vn, void *stat, uint32_t desc)  \
++{                                                                 \
++    intptr_t i, oprsz = simd_oprsz(desc);                         \
++    TYPE *d = vd, *n = vn;                                        \
++    for (i = 0; i < oprsz / sizeof(TYPE); i++) {                  \
++        d[i] = FUNC(n[i], stat);                                  \
++    }                                                             \
++}
++
++DO_2OP(gvec_frecpe_h, helper_recpe_f16, float16)
++DO_2OP(gvec_frecpe_s, helper_recpe_f32, float32)
++DO_2OP(gvec_frecpe_d, helper_recpe_f64, float64)
++
++DO_2OP(gvec_frsqrte_h, helper_rsqrte_f16, float16)
++DO_2OP(gvec_frsqrte_s, helper_rsqrte_f32, float32)
++DO_2OP(gvec_frsqrte_d, helper_rsqrte_f64, float64)
++
++#undef DO_2OP
++
+ /* Floating-point trigonometric starting value.
+  * See the ARM ARM pseudocode function FPTrigSMul.
+  */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 15fa790d5b..66b0fd0cc4 100644
+index 66b0fd0cc4..ca93bdb2b3 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -735,6 +735,14 @@ FMUL_zzx        01100100 0.1 .. rm:3 001000 rn:5 rd:5 \
- FMUL_zzx        01100100 101 index:2 rm:3 001000 rn:5 rd:5      esz=2
- FMUL_zzx        01100100 111 index:1 rm:4 001000 rn:5 rd:5      esz=3
+@@ -743,6 +743,11 @@ FMINNMV         01100101 .. 000 101 001 ... ..... .....         @rd_pg_rn
+ FMAXV           01100101 .. 000 110 001 ... ..... .....         @rd_pg_rn
+ FMINV           01100101 .. 000 111 001 ... ..... .....         @rd_pg_rn
  
-+### SVE FP Fast Reduction Group
++## SVE Floating Point Unary Operations - Unpredicated Group
 +
-+FADDV           01100101 .. 000 000 001 ... ..... .....         @rd_pg_rn
-+FMAXNMV         01100101 .. 000 100 001 ... ..... .....         @rd_pg_rn
-+FMINNMV         01100101 .. 000 101 001 ... ..... .....         @rd_pg_rn
-+FMAXV           01100101 .. 000 110 001 ... ..... .....         @rd_pg_rn
-+FMINV           01100101 .. 000 111 001 ... ..... .....         @rd_pg_rn
++FRECPE          01100101 .. 001 110 001100 ..... .....          @rd_rn
++FRSQRTE         01100101 .. 001 111 001100 ..... .....          @rd_rn
 +
  ### SVE FP Accumulating Reduction Group
  
