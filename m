@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fY7aw-0005rj-Lw
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:22:40 -0400
+	(envelope-from <peterx@redhat.com>) id 1fY7cH-0006j6-LQ
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:24:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fY7av-0003wl-Ez
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:22:38 -0400
-Message-ID: <8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 27 Jun 2018 12:22:31 +0200
-In-Reply-To: <dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
-References: <20180626135928.23950-1-clg@kaod.org>
-	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
-	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+	(envelope-from <peterx@redhat.com>) id 1fY7cG-00053Y-PO
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:24:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46520 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fY7cG-000524-Jf
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:24:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DBC8401EF06
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 10:23:59 +0000 (UTC)
+Date: Wed, 27 Jun 2018 18:23:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180627102354.GA2516@xz-mi>
+References: <20180611060228.2998-1-peterx@redhat.com>
+	<20180611060228.2998-2-peterx@redhat.com>
+	<87po0clffg.fsf@secure.laptop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87po0clffg.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: unbreak postcopy recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +34,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 2018-06-26 at 19:02 +0200, C=C3=A9dric Le Goater wrote:
-> On 06/26/2018 05:57 PM, Andrea Bolognani wrote:
-> > On Tue, 2018-06-26 at 15:59 +0200, C=C3=A9dric Le Goater wrote:
-> > > This is a model of the PCIe host bridge found on Power8 chips,
-> > > including PowerBus logic interface, IOMMU support, PCIe root comple=
-x,
-> > > XICS MSI and LSI interrupt sources.
-> > >=20
-> > > 4 PHBs are provisioned under the Power8 chip model to fit hardware =
-but
-> > > only one is currently initialized.
-> >=20
-> > What's the advantage in creating 4 PHBs instead of a single one,
->=20
-> The Power8 chip comes in different flavors: Venice, Murano, Naple,=20
-> each having a different number of PHBs. We don't need to initialize=20
-> them all to plug only a couple of devices (net, storage, usbs)=20
->=20
-> When time comes, we might want to test some more complex configurations
-> or extend the modeling with CAPI support. That's why we have a :
->=20
-> 	#define PNV_MAX_CHIP_PHB 4
-> 	    PnvPHB3      phbs[PNV_MAX_CHIP_PHB];
->=20
-> under the chip, and a 'num_phbs' attribute to increase the number
-> of controllers. It still needs to be tested but that's the goal.
+On Wed, Jun 27, 2018 at 11:57:55AM +0200, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > It was broken due to recent changes in two parts:
+> >
+> > - migration_incoming_process() will be called now even for postcopy
+> >   recovery sessions (while we shouldn't)
+> >
+> > - Now we don't call migrate_fd_process_incoming() any more (unless in
+> >   RDMA code), so actually the postcopy recovery logic is fully bypassed
+> >
+> > Fix this up to make sure we only call migration_incoming_process() when
+> > necessary, and move the postcopy recovery logic far earlier to the entry
+> > point of incoming migration.  Renaming migration_fd_process_incoming()
+> > into postcopy_try_recover() since it's mostly for the recovery process,
+> > then touch up RDMA code to suite it.
+> >
+> > Since at it, refactor the imcoming port handling to only have one singe
+> > entry point for incoming migration.  Then we can avoid calling
+> > migration_ioc_process_incoming() everywhere, which is really error
+> > prone.
+> 
+> Perhaps splitting some of this bits?
 
-I was a bit confused about the difference between "provisioning"
-and "initializing" a PHB, I guess.
+Actually I tried a bit but failed, but of course I can try harder. :)
 
-Now that I've looked at the code, my (very uneducated) reading is
-that you're allocating memory for 4 PHBs along with the chip, but
-only actually initializing num_phbs of them, with 1 being the
-default.
+> 
+> > diff --git a/migration/ram.h b/migration/ram.h
+> > index d386f4d641..457bf54b8c 100644
+> > --- a/migration/ram.h
+> > +++ b/migration/ram.h
+> > @@ -46,7 +46,7 @@ int multifd_save_cleanup(Error **errp);
+> >  int multifd_load_setup(void);
+> >  int multifd_load_cleanup(Error **errp);
+> >  bool multifd_recv_all_channels_created(void);
+> > -void multifd_recv_new_channel(QIOChannel *ioc);
+> > +bool multifd_recv_new_channel(QIOChannel *ioc);
+> 
+> I am ok with this type change.
+> 
+> >  void migration_ioc_process_incoming(QIOChannel *ioc)
+> >  {
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    QEMUFile *f = qemu_fopen_channel_input(ioc);
+> 
+> We are creating a QEMUFile here.
+> 
+> > +    bool start_migration;
+> > +
+> > +    /* If it's a recovery attempt, we're done */
+> > +    if (postcopy_try_recover(f)) {
+> 
+> Here we use it.
+> 
+> > +        return;
+> > +    }
+> >  
+> >      if (!mis->from_src_file) {
+> > -        QEMUFile *f = qemu_fopen_channel_input(ioc);
+> > +        /* The first connection (multifd may have multiple) */
+> >          migration_incoming_setup(f);
+> 
+>             Here we use it.
+> 
+> > -        return;
+> > +        /*
+> > +         * Common migration only needs one channel, so we can start
+> > +         * right now.  Multifd needs more than one channel, we wait.
+> > +         */
+> > +        start_migration = !migrate_use_multifd();
+> > +    } else {
+> > +        /* Multiple connections */
+> > +        assert(migrate_use_multifd());
+> > +        start_migration = multifd_recv_new_channel(ioc);
+> 
+>        But here we don't use it.  We are lecking it.
+> 
+>        So, we need to fix the leak.  No clue about how to convince
+>        postcopy_try_recover() without the QEMUFile
 
-I have no idea what this implies when it comes to adding PCI
-controller to the guest, though. If I run a guest with num_phbs=3D1,
-are ids pci.1..pci.3 reserved even though the corresponding PHBs
-have not been initialized? Is num_phbs the only way you can control
-how many PHBs a PowerNV guest will have?
+Indeed!  Thanks for spotting that!  I'll prepare a new version.
 
-I would play around and try to figure out all the kinks on my own,
-but I can't actually compile QEMU with this patch applied:
-
-  hw/pci-host/pnv_phb3_msi.c: In function =E2=80=98phb3_msi_reset=E2=80=99=
-:
-  hw/pci-host/pnv_phb3_msi.c:229:11: error: =E2=80=98ICSStateClass=E2=80=99=
- {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
-parent_reset=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
-       icsc->parent_reset(dev);
-             ^~~~~~~~~~~~
-             parent_class
-  hw/pci-host/pnv_phb3_msi.c: In function =E2=80=98phb3_msi_realize=E2=80=
-=99:
-  hw/pci-host/pnv_phb3_msi.c:260:11: error: =E2=80=98ICSStateClass=E2=80=99=
- {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
-parent_realize=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
-       icsc->parent_realize(dev, &local_err);
-             ^~~~~~~~~~~~~~
-             parent_class
-  hw/pci-host/pnv_phb3_msi.c: In function =E2=80=98phb3_msi_class_init=E2=
-=80=99:
-  hw/pci-host/pnv_phb3_msi.c:293:43: error: =E2=80=98ICSStateClass=E2=80=99=
- {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
-parent_realize=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
-                                       &isc->parent_realize);
-                                             ^~~~~~~~~~~~~~
-                                             parent_class
-  hw/pci-host/pnv_phb3_msi.c:295:41: error: =E2=80=98ICSStateClass=E2=80=99=
- {aka =E2=80=98struct ICSStateClass=E2=80=99} has no member named =E2=80=98=
-parent_reset=E2=80=99; did you mean =E2=80=98parent_class=E2=80=99?
-                                     &isc->parent_reset);
-                                           ^~~~~~~~~~~~
-                                           parent_class
-
-> > like we already do for pSeries guests?=20
->=20
-> I didn't follow that discussion but this is "another" kind of PHB.
-> This one models the baremetal controller as found on OpenPOWER and
-> IBM Power machines. pSeries has a virtual PHB.
-
-I understand that, and of course libvirt will need to learn about
-this new type of PHB and make sure both pSeries and PowerNV guests
-get the correct one assigned to them.
-
-What I meant is that pSeries guests get a single PHB by default,
-with additional ones being instantiable through -device; this is
-also consistent with how PCI controllers are added to other guest
-types including pc, q35 and aarch64/virt, so it would be really
-nice if PowerNV behaved the same way.
-
-> > As it is, this will confuse the heck out of libvirt's PCI address > a=
-llocation algorithm :)
->=20
-> The pci bus name should be directly related to the PHB index. But
-> I agree we need to be careful. That's why you are in cc: :)
-
-Thanks, I really appreciate you keeping me in the loop :)
-
---=20
-Andrea Bolognani / Red Hat / Virtualization
+-- 
+Peter Xu
