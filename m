@@ -1,29 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fYA3F-0004lY-C3
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:05 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fYA3J-0004rC-EB
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fYA3B-0004sB-Bl
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fYA3F-0004tV-Hg
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52648
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fYA3F-0004tI-D2
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:00:01 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:42207)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYA3B-0004rp-2O
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:59:57 -0400
-Received: by mail-pl0-x242.google.com with SMTP id w17-v6so1000937pll.9
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 05:59:56 -0700 (PDT)
-Date: Wed, 27 Jun 2018 21:59:53 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20180627125953.GK24595@lianli.shorne-pla.net>
-References: <20180618184046.6270-1-richard.henderson@linaro.org>
-	<20180618184046.6270-14-richard.henderson@linaro.org>
-	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
-	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
-	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5RCx1bW080664
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:00:00 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jv9yyk3gy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:00:00 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 27 Jun 2018 08:59:59 -0400
+References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
+	<20180626122343.13473-4-marcandre.lureau@redhat.com>
+	<20180627140129.4a751630@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 27 Jun 2018 08:59:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
+In-Reply-To: <20180627140129.4a751630@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <ab5d510e-1308-f581-1e2b-12584391d53c@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] acpi: add fw_cfg file for TPM and
+ PPI virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +45,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jun 26, 2018 at 03:26:01PM -0700, Richard Henderson wrote:
-> On 06/26/2018 03:07 PM, Stafford Horne wrote:
-> > Hello,
-> > 
-> > I think I found out something.
-> > 
-> > in: target/openrisc/sys_helper.c:92
-> > 
-> > When we write to `env->tlb.dtlb[idx].tr`  in helper_mtspr():
-> >   93          case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1):
-> > /* DTLBW0TR 0-127 */
-> >   94              idx = spr - TO_SPR(1, 640);
-> >   95              env->tlb.dtlb[idx].tr = rb;
-> > 
-> > 
-> > Somehow we are overlapping with `cpu->tb_jmp_cache`,  these are both
-> > pointing to the same spot in memory.
-> > 
-> > (gdb) p &cs->tb_jmp_cache[3014]
-> > $9 = (struct TranslationBlock **) 0x55555608b300
-> > (gdb) p &env->tlb.dtlb[idx].tr
-> > $10 = (uint32_t *) 0x55555608b304
-> 
-> That is definitely weird.  How about
-> 
-> (gdb) p openrisc_env_get_cpu(env)
-> $1 = xxxx
-> (gdb) p &$1->parent_obj
-> (gdb) p &$1->env
-> (gdb) p cs->env_ptr
-> 
-> There should be 4096 entries in tb_jmp_cache, so there should
-> be no way that overlaps.  I can only imagine either CS or ENV
-> is incorrect somehow.  How that would be, I don't know...
+On 06/27/2018 08:01 AM, Igor Mammedov wrote:
+> On Tue, 26 Jun 2018 14:23:42 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>
+>> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>
+>> To avoid having to hard code the base address of the PPI virtual
+>> memory device we introduce a fw_cfg file etc/tpm/config that holds the
+>> base address of the PPI device, the version of the PPI interface and
+>> the version of the attached TPM.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document=
+ it ]
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> ---
+>>
+>> v4:
+>>   - add ACPI only if PPI is enabled
+>> v3:
+>>   - renamed to etc/tpm/config, made it static, document it
+>> ---
+>>   include/hw/acpi/tpm.h |  3 +++
+>>   hw/i386/acpi-build.c  | 19 +++++++++++++++++++
+>>   docs/specs/tpm.txt    | 20 ++++++++++++++++++++
+>>   3 files changed, 42 insertions(+)
+>>
+>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>> index c082df7d1d..f79d68a77a 100644
+>> --- a/include/hw/acpi/tpm.h
+>> +++ b/include/hw/acpi/tpm.h
+>> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>>   #define TPM_PPI_ADDR_SIZE           0x400
+>>   #define TPM_PPI_ADDR_BASE           0xFED45000
+>>  =20
+>> +#define TPM_PPI_VERSION_NONE        0
+>> +#define TPM_PPI_VERSION_1_30        1
+>> +
+>>   #endif /* HW_ACPI_TPM_H */
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 9bc6d97ea1..d9320845ed 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+>>       bool pcihp_bridge_en;
+>>   } AcpiBuildPciBusHotplugState;
+>>  =20
+>> +typedef struct FWCfgTPMConfig {
+>> +    uint32_t tpmppi_address;
+> is 32bit enough (what if on ARM or somewhere else area would be above 4=
+Gb)?
+> to be future proof I'd make it 64bit field so we won't have to change A=
+BI
+> later on.
+>
+>> +    uint8_t tpm_version;
+>> +    uint8_t tpmppi_version;
+>> +} QEMU_PACKED FWCfgTPMConfig;
+>> +
+>>   static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>>   {
+>>       uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_B=
+ASE, NULL);
+>> @@ -2873,6 +2879,8 @@ void acpi_setup(void)
+>>       AcpiBuildTables tables;
+>>       AcpiBuildState *build_state;
+>>       Object *vmgenid_dev;
+>> +    TPMIf *tpm;
+>> +    static FWCfgTPMConfig tpm_config;
+>>  =20
+>>       if (!pcms->fw_cfg) {
+>>           ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+>> @@ -2907,6 +2915,17 @@ void acpi_setup(void)
+> what about vart-arm machine?
+> (it also has some TPM stuff but it doesn't use acpi_setup())
+> maybe add common helper and reuse it for both?
 
-Nothing looks strange there... but this does... :)
+I have never used ARM with it. I am not sure whether the firmware on ARM=20
+is instrumented to have support for PPI. If someone wanted to enable=20
+that, I would leave these parts up to them.
 
-(gdb) p &cs->tb_jmp_cache[3014]
-$56 = (struct TranslationBlock **) 0x55555606c570
-(gdb) p &env->tlb.dtlb[idx].tr
-$57 = (uint32_t *) 0x55555606c574
-(gdb) p &env->tlb.dtlb[idx].mr
-$58 = (uint32_t *) 0x55555606c570
-(gdb) p idx
-$59 = -1502
+>
+>
+>>       fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+>>                       tables.tcpalog->data, acpi_data_len(tables.tcpal=
+og));
+>>  =20
+>> +    tpm =3D tpm_find();
+>> +    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_ab=
+ort)) {
+>> +        tpm_config =3D (FWCfgTPMConfig) {
+>> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+>> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find()))=
+,
+> Have it actually been tested on big endian host?
 
-The index is negative... this patch should fix that.
+At some point I did, yes.
 
-@@ -78,6 +78,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr,
-target_ulong rb)
-     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
-         idx = (spr - 1024);
-         env->shadow_gpr[idx / 32][idx % 32] = rb;
-+        break;
- 
-     case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
+>
+>> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
+> ditto
+>
+> (that's why I don't welcome packed structures in random places)
 
--Stafford
+I thought a packed structure at least ensures that the offsets of the=20
+fields are agreed upon by 32 and 64bit, no ? So the firmware can use 64=20
+bit or 32bit and the offsets would be ensured.
+
+>
+> how about adding unit-tests to series to make sure that it works
+> across different hosts that travis builds on and that thing won't
+> fall apart in future?
+
+>> +        };
+>> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+>> +                        &tpm_config, sizeof tpm_config);
+>> +    }
+>> +
+>>       vmgenid_dev =3D find_vmgenid_dev();
+>>       if (vmgenid_dev) {
+>>           vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+>> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+>> index c230c4c93e..2ddb768084 100644
+>> --- a/docs/specs/tpm.txt
+>> +++ b/docs/specs/tpm.txt
+>> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
+>>    - hw/tpm/tpm_tis.h
+>>  =20
+>>  =20
+>> +=3D fw_cfg interface =3D
+>> +
+>> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
+>> +configuring the guest appropriately.
+>> +
+>> +The entry of 6 bytes has the following content, in little-endian:
+>> +
+>> +    #define TPM_VERSION_UNSPEC          0
+>> +    #define TPM_VERSION_1_2             1
+>> +    #define TPM_VERSION_2_0             2
+>> +
+>> +    #define TPM_PPI_VERSION_NONE        0
+>> +    #define TPM_PPI_VERSION_1_30        1
+>> +
+>> +    struct FWCfgTPMConfig {
+>> +        uint32_t tpmppi_address;         /* PPI memory location */
+>> +        uint8_t tpm_version;             /* TPM version */
+>> +        uint8_t tpmppi_version;          /* PPI version */
+>> +    };
+>> +
+>>   =3D ACPI Interface =3D
+>>  =20
+>>   The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT=
+ and passes
