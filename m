@@ -1,16 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYBkX-0005Qw-Lm
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:48:53 -0400
+	(envelope-from <quytelda@tamalin.org>) id 1fYBO8-0004ug-DY
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYBkW-00054B-9X
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:48:49 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 27 Jun 2018 15:48:37 +0100
-Message-Id: <20180627144838.26772-2-stefanha@redhat.com>
-In-Reply-To: <20180627144838.26772-1-stefanha@redhat.com>
-References: <20180627144838.26772-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] compiler: add a sizeof_field() macro
+	(envelope-from <quytelda@tamalin.org>) id 1fYBO3-0001bi-4y
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:25:40 -0400
+Received: from mout.perfora.net ([74.208.4.196]:53967)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <quytelda@tamalin.org>)
+	id 1fYBO2-0001aZ-Td
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:25:35 -0400
+Received: from mail-pl0-f45.google.com ([209.85.160.45]) by mrelay.perfora.net
+	(mreueus001 [74.208.5.2]) with ESMTPSA (Nemesis) id
+	0MHZc2-1fbTAe3Xhs-003UOY
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 16:25:32 +0200
+Received: by mail-pl0-f45.google.com with SMTP id 31-v6so1123030plc.4
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:25:32 -0700 (PDT)
+MIME-Version: 1.0
+From: Quytelda Kahja <quytelda@tamalin.org>
+Date: Wed, 27 Jun 2018 07:25:20 -0700
+Message-ID: <CAFLvi203QwYCdfdhq6pb855xOZbt-bOiMsYU3cDSx6itHeu2=w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [BUG] qed_aio_write_alloc: Assertion
+ `s->allocating_acb == NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,178 +32,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Determining the size of a field is useful when you don't have a struct
-variable handy.  Open-coding this is ugly.
+Hello all,
+I wanted to submit a bug report in the tracker, but it seem to require
+an Ubuntu One account, which I'm having trouble with, so I'll just
+give it here and hopefully somebody can make use of it.  The issue
+seems to be in an experimental format, so it's likely not very
+consequential anyway.
 
-This patch adds the sizeof_field() macro, which is similar to
-typeof_field().  Existing instances are updated to use the macro.
+For the sake of anyone else simply googling for a workaround, I'll
+just paste in the (cleaned up) brief IRC conversation about my issue
+from the official channel:
+<quy> I'm using QEMU version 2.12.0 on an x86_64 host (Arch Linux,
+Kernel v4.17.2), and I'm trying to create an x86_64 virtual machine
+(FreeBSD-11.1).  The VM always aborts at the same point in the
+installation (downloading 'ports.tgz') with the following error
+message:
+"qemu-system-x86_64: /build/qemu/src/qemu-2.12.0/block/qed.c:1197:
+qed_aio_write_alloc: Assertion `s->allocating_acb == NULL' failed.
+zsh: abort (core dumped)  qemu-system-x86_64 -smp 2 -m 4096
+-enable-kvm -hda freebsd/freebsd.qed -devic"
+The commands I ran to create the machine are as follows:
+"qemu-img create -f qed freebsd/freebsd.qed 16G"
+"qemu-system-x86_64 -smp 2 -m 4096 -enable-kvm -hda
+freebsd/freebsd.qed -device e1000,netdev=net0 -netdev user,id=net0
+-cdrom FreeBSD-11.1-RELEASE-amd64-bootonly.iso -boot order=d"
+I tried adding logging options with the -d flag, but I didn't get
+anything that seemed relevant, since I'm not sure what to look for.
+<stsquad> ohh what's a qed device?
+<stsquad> quy: it might be a workaround to use a qcow2 image for now
+<stsquad> ahh the wiki has a statement "It is not recommended to use
+QED for any new images. "
+<danpb> 'qed' was an experimental disk image format created by IBM
+before qcow2 v3 came along
+<danpb> honestly nothing should ever use  QED these days
+<danpb> the good ideas from QED became  qcow2v3
+<stsquad> danpb: sounds like we should put a warning on the option to
+remind users of that fact
+<danpb> quy: sounds like qed driver is simply broken - please do file
+a bug against qemu bug tracker
+<danpb> quy: but you should also really switch to qcow2
+<quy> I see; some people need to update their wikis then.  I don't
+remember where which guide I read when I first learned what little
+QEMU I know, but I remember it specifically remember it saying QED was
+the newest and most optimal format.
+<stsquad> quy: we can only be responsible for our own wiki I'm afraid...
+<danpb> if you remember where you saw that please let us know so we
+can try to get it fixed
+<quy> Thank you very much for the info; I will switch to QCOW.
+Unfortunately, I'm not sure if I will be able to file any bug reports
+in the tracker as I can't seem to log Launchpad, which it seems to
+require.
+<danpb> quy:  an email to the mailing list would suffice too if you
+can't deal with launchpad
+<danpb> kwolf: ^^^ in case you're interested in possible QED
+assertions from 2.12
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20180614164431.29305-1-stefanha@redhat.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/hw/xen/io/ring.h      |  2 +-
- include/qemu/compiler.h       |  2 ++
- accel/tcg/translate-all.c     |  2 +-
- hw/display/xenfb.c            |  4 ++--
- hw/net/rocker/rocker_of_dpa.c |  2 +-
- hw/net/virtio-net.c           |  2 +-
- target/i386/kvm.c             |  2 +-
- target/ppc/arch_dump.c        | 10 +++++-----
- target/s390x/arch_dump.c      | 20 ++++++++++----------
- 9 files changed, 24 insertions(+), 22 deletions(-)
-
-diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
-index abbca47687..ffa3ebadc8 100644
---- a/include/hw/xen/io/ring.h
-+++ b/include/hw/xen/io/ring.h
-@@ -65,7 +65,7 @@ typedef unsigned int RING_IDX;
-  */
- #define __CONST_RING_SIZE(_s, _sz) \
-     (__RD32(((_sz) - offsetof(struct _s##_sring, ring)) / \
--	    sizeof(((struct _s##_sring *)0)->ring[0])))
-+            sizeof_field(struct _s##_sring, ring[0])))
- /*
-  * The same for passing in an actual pointer instead of a name tag.
-  */
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 9f762695d1..5843812710 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -64,6 +64,8 @@
-         (type *) ((char *) __mptr - offsetof(type, member));})
- #endif
- 
-+#define sizeof_field(type, field) sizeof(((type *)0)->field)
-+
- /* Convert from a base type to a parent type, with compile time checking.  */
- #ifdef __GNUC__
- #define DO_UPCAST(type, field, dev) ( __extension__ ( { \
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f0c3fd4d03..ad997cba28 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -191,7 +191,7 @@ struct page_collection {
- 
- /* Make sure all possible CPU event bits fit in tb->trace_vcpu_dstate */
- QEMU_BUILD_BUG_ON(CPU_TRACE_DSTATE_MAX_EVENTS >
--                  sizeof(((TranslationBlock *)0)->trace_vcpu_dstate)
-+                  sizeof_field(TranslationBlock, trace_vcpu_dstate)
-                   * BITS_PER_BYTE);
- 
- /*
-diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-index f5afcc0358..911291c5c3 100644
---- a/hw/display/xenfb.c
-+++ b/hw/display/xenfb.c
-@@ -525,8 +525,8 @@ static int xenfb_configure_fb(struct XenFB *xenfb, size_t fb_len_lim,
-                               int width, int height, int depth,
-                               size_t fb_len, int offset, int row_stride)
- {
--    size_t mfn_sz = sizeof(*((struct xenfb_page *)0)->pd);
--    size_t pd_len = sizeof(((struct xenfb_page *)0)->pd) / mfn_sz;
-+    size_t mfn_sz = sizeof_field(struct xenfb_page, pd[0]);
-+    size_t pd_len = sizeof_field(struct xenfb_page, pd) / mfn_sz;
-     size_t fb_pages = pd_len * XC_PAGE_SIZE / mfn_sz;
-     size_t fb_len_max = fb_pages * XC_PAGE_SIZE;
-     int max_width, max_height;
-diff --git a/hw/net/rocker/rocker_of_dpa.c b/hw/net/rocker/rocker_of_dpa.c
-index 60046720a5..8e347d1ee4 100644
---- a/hw/net/rocker/rocker_of_dpa.c
-+++ b/hw/net/rocker/rocker_of_dpa.c
-@@ -104,7 +104,7 @@ typedef struct of_dpa_flow_key {
- 
- /* Width of key which includes field 'f' in u64s, rounded up */
- #define FLOW_KEY_WIDTH(f) \
--    DIV_ROUND_UP(offsetof(OfDpaFlowKey, f) + sizeof(((OfDpaFlowKey *)0)->f), \
-+    DIV_ROUND_UP(offsetof(OfDpaFlowKey, f) + sizeof_field(OfDpaFlowKey, f), \
-     sizeof(uint64_t))
- 
- typedef struct of_dpa_flow_action {
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 90502fca7c..f154756e85 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -46,7 +46,7 @@
-  * 'container'.
-  */
- #define endof(container, field) \
--    (offsetof(container, field) + sizeof(((container *)0)->field))
-+    (offsetof(container, field) + sizeof_field(container, field))
- 
- typedef struct VirtIOFeature {
-     uint64_t flags;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 2d174f3a91..5116a8a956 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1533,7 +1533,7 @@ static int kvm_put_fpu(X86CPU *cpu)
- #define XSAVE_PKRU        672
- 
- #define XSAVE_BYTE_OFFSET(word_offset) \
--    ((word_offset) * sizeof(((struct kvm_xsave *)0)->region[0]))
-+    ((word_offset) * sizeof_field(struct kvm_xsave, region[0]))
- 
- #define ASSERT_OFFSET(word_offset, field) \
-     QEMU_BUILD_BUG_ON(XSAVE_BYTE_OFFSET(word_offset) != \
-diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
-index 351a65b22f..cc1460e4e3 100644
---- a/target/ppc/arch_dump.c
-+++ b/target/ppc/arch_dump.c
-@@ -210,11 +210,11 @@ static const struct NoteFuncDescStruct {
-     int contents_size;
-     void (*note_contents_func)(NoteFuncArg *arg, PowerPCCPU *cpu);
- } note_func[] = {
--    {sizeof(((Note *)0)->contents.prstatus),  ppc_write_elf_prstatus},
--    {sizeof(((Note *)0)->contents.fpregset),  ppc_write_elf_fpregset},
--    {sizeof(((Note *)0)->contents.vmxregset), ppc_write_elf_vmxregset},
--    {sizeof(((Note *)0)->contents.vsxregset), ppc_write_elf_vsxregset},
--    {sizeof(((Note *)0)->contents.speregset), ppc_write_elf_speregset},
-+    {sizeof_field(Note, contents.prstatus),  ppc_write_elf_prstatus},
-+    {sizeof_field(Note, contents.fpregset),  ppc_write_elf_fpregset},
-+    {sizeof_field(Note, contents.vmxregset), ppc_write_elf_vmxregset},
-+    {sizeof_field(Note, contents.vsxregset), ppc_write_elf_vsxregset},
-+    {sizeof_field(Note, contents.speregset), ppc_write_elf_speregset},
-     { 0, NULL}
- };
- 
-diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
-index 6f61ff95af..c9ef0a6e60 100644
---- a/target/s390x/arch_dump.c
-+++ b/target/s390x/arch_dump.c
-@@ -184,20 +184,20 @@ typedef struct NoteFuncDescStruct {
- } NoteFuncDesc;
- 
- static const NoteFuncDesc note_core[] = {
--    {sizeof(((Note *)0)->contents.prstatus), s390x_write_elf64_prstatus},
--    {sizeof(((Note *)0)->contents.fpregset), s390x_write_elf64_fpregset},
-+    {sizeof_field(Note, contents.prstatus), s390x_write_elf64_prstatus},
-+    {sizeof_field(Note, contents.fpregset), s390x_write_elf64_fpregset},
-     { 0, NULL}
- };
- 
- static const NoteFuncDesc note_linux[] = {
--    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
--    {sizeof(((Note *)0)->contents.ctrs),     s390x_write_elf64_ctrs},
--    {sizeof(((Note *)0)->contents.timer),    s390x_write_elf64_timer},
--    {sizeof(((Note *)0)->contents.todcmp),   s390x_write_elf64_todcmp},
--    {sizeof(((Note *)0)->contents.todpreg),  s390x_write_elf64_todpreg},
--    {sizeof(((Note *)0)->contents.vregslo),  s390x_write_elf64_vregslo},
--    {sizeof(((Note *)0)->contents.vregshi),  s390x_write_elf64_vregshi},
--    {sizeof(((Note *)0)->contents.gscb),     s390x_write_elf64_gscb},
-+    {sizeof_field(Note, contents.prefix),   s390x_write_elf64_prefix},
-+    {sizeof_field(Note, contents.ctrs),     s390x_write_elf64_ctrs},
-+    {sizeof_field(Note, contents.timer),    s390x_write_elf64_timer},
-+    {sizeof_field(Note, contents.todcmp),   s390x_write_elf64_todcmp},
-+    {sizeof_field(Note, contents.todpreg),  s390x_write_elf64_todpreg},
-+    {sizeof_field(Note, contents.vregslo),  s390x_write_elf64_vregslo},
-+    {sizeof_field(Note, contents.vregshi),  s390x_write_elf64_vregshi},
-+    {sizeof_field(Note, contents.gscb),     s390x_write_elf64_gscb},
-     { 0, NULL}
- };
- 
--- 
-2.17.1
+If any more info is needed, feel free to email me; I'm not actually
+subscribed to this list though.
+Thank you,
+Quytelda Kahja
