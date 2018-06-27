@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY3gZ-0007VA-JL
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:12:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fY3hm-00089a-RC
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY3gW-0007SL-ET
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:12:11 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:46260)
+	(envelope-from <richard.henderson@linaro.org>) id 1fY3hj-000072-Um
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:13:26 -0400
+Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:39675)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY3gW-0007Qj-8F
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:12:08 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id q14-v6so461458pgt.13
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 23:12:08 -0700 (PDT)
+	id 1fY3hj-00005c-OB
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 02:13:23 -0400
+Received: by mail-pf0-x234.google.com with SMTP id s21-v6so498863pfm.6
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 23:13:23 -0700 (PDT)
 References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-14-f4bug@amsat.org>
+	<20180625124238.25339-16-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b6becd9c-60f5-e9e7-0bd5-95fdcc1a1716@linaro.org>
-Date: Tue, 26 Jun 2018 23:12:04 -0700
+Message-ID: <78b2acfa-0f42-b764-7469-d6768027c30b@linaro.org>
+Date: Tue, 26 Jun 2018 23:13:19 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180625124238.25339-14-f4bug@amsat.org>
+In-Reply-To: <20180625124238.25339-16-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 13/46] hw/block: Use the IEC binary
+Subject: Re: [Qemu-devel] [PATCH v5 15/46] hw/misc: Use the IEC binary
  prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,7 +33,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-trivial@nongnu.org, Jiri Slaby <jslaby@suse.cz>, qemu-devel@nongnu.org
 
 On 06/25/2018 05:42 AM, Philippe Mathieu-Daudé wrote:
 > It eases code review, unit is explicit.
@@ -46,10 +46,9 @@ On 06/25/2018 05:42 AM, Philippe Mathieu-Daudé wrote:
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/block/m25p80.c  | 5 +++--
->  hw/block/nvme.c    | 3 ++-
->  hw/block/tc58128.c | 3 ++-
->  3 files changed, 7 insertions(+), 4 deletions(-)
+>  hw/misc/auxbus.c | 3 ++-
+>  hw/misc/edu.c    | 3 ++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
