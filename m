@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYAkD-0006My-OP
+	(envelope-from <david@redhat.com>) id 1fYAkB-0006Li-Md
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:44:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYAkB-0005KR-3r
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:44:25 -0400
+	(envelope-from <david@redhat.com>) id 1fYAk9-0005Ht-BS
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:44:23 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 27 Jun 2018 15:44:07 +0200
-Message-Id: <20180627134410.4901-7-david@redhat.com>
+Date: Wed, 27 Jun 2018 15:44:06 +0200
+Message-Id: <20180627134410.4901-6-david@redhat.com>
 In-Reply-To: <20180627134410.4901-1-david@redhat.com>
 References: <20180627134410.4901-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 6/9] s390x/tcg: SET CLOCK COMPARATOR can
- clear CKC interrupts
+Subject: [Qemu-devel] [PATCH v4 5/9] s390x/tcg: properly implement the TOD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +22,333 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Let's stop the timer and delete any pending CKC IRQ before doing
-anything else.
+Right now, each CPU has its own TOD. Especially, the TOD will differ
+based on creation time of a CPU - e.g. when hotplugging a CPU the times
+will differ quite a lot, resulting in stall warnings in the guest.
 
-While at it, add a comment why the check for ckc == -1ULL is needed.
+Let's use a single TOD by implementing our new TOD device. Prepare it
+for TOD-clock epoch extension.
+
+Most importantly, whenever we set the TOD, we have to update the CKC
+timer.
+
+Introduce "tcg_s390x.h" just like "kvm_s390x.h" for tcg specific
+function declarations that should not go into cpu.h.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/misc_helper.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/s390x/tod-qemu.c        | 46 ++++++++++++++++++++++++++++++++++----
+ hw/s390x/tod.c             | 11 +++++++++
+ include/hw/s390x/tod.h     | 19 ++++++++++++++++
+ target/s390x/cpu.c         |  7 ------
+ target/s390x/cpu.h         |  1 -
+ target/s390x/internal.h    | 16 -------------
+ target/s390x/misc_helper.c | 25 ++++++++++++++++-----
+ target/s390x/tcg_s390x.h   | 18 +++++++++++++++
+ 8 files changed, 109 insertions(+), 34 deletions(-)
+ create mode 100644 target/s390x/tcg_s390x.h
 
+diff --git a/hw/s390x/tod-qemu.c b/hw/s390x/tod-qemu.c
+index 03ea1ce4e8..59c015c69d 100644
+--- a/hw/s390x/tod-qemu.c
++++ b/hw/s390x/tod-qemu.c
+@@ -11,19 +11,43 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/s390x/tod.h"
++#include "qemu/timer.h"
++#include "qemu/cutils.h"
++#include "cpu.h"
++#include "tcg_s390x.h"
+ 
+ static void qemu_s390_tod_get(const S390TODState *td, S390TOD *tod,
+                               Error **errp)
+ {
+-    /* FIXME */
+-    tod->high = 0;
+-    tod->low = 0;
++    *tod = td->base;
++
++    tod->low += time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++    if (tod->low < td->base.low) {
++        tod->high++;
++    }
+ }
+ 
+ static void qemu_s390_tod_set(S390TODState *td, const S390TOD *tod,
+                               Error **errp)
+ {
+-    /* FIXME */
++    CPUState *cpu;
++
++    td->base = *tod;
++
++    td->base.low -= time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++    if (td->base.low > tod->low) {
++        td->base.high--;
++    }
++
++    /*
++     * The TOD has been changed and we have to recalculate the CKC values
++     * for all CPUs. We do this asynchronously, as "SET CLOCK should be
++     * issued only while all other activity on all CPUs .. has been
++     * suspended".
++     */
++    CPU_FOREACH(cpu) {
++        async_run_on_cpu(cpu, tcg_s390_tod_updated, RUN_ON_CPU_NULL);
++    }
+ }
+ 
+ static void qemu_s390_tod_class_init(ObjectClass *oc, void *data)
+@@ -34,10 +58,24 @@ static void qemu_s390_tod_class_init(ObjectClass *oc, void *data)
+     tdc->set = qemu_s390_tod_set;
+ }
+ 
++static void qemu_s390_tod_init(Object *obj)
++{
++    S390TODState *td = S390_TOD(obj);
++    struct tm tm;
++
++    qemu_get_timedate(&tm, 0);
++    td->base.high = 0;
++    td->base.low = TOD_UNIX_EPOCH + (time2tod(mktimegm(&tm)) * 1000000000ULL);
++    if (td->base.low < TOD_UNIX_EPOCH) {
++        td->base.high += 1;
++    }
++}
++
+ static TypeInfo qemu_s390_tod_info = {
+     .name = TYPE_QEMU_S390_TOD,
+     .parent = TYPE_S390_TOD,
+     .instance_size = sizeof(S390TODState),
++    .instance_init = qemu_s390_tod_init,
+     .class_init = qemu_s390_tod_class_init,
+     .class_size = sizeof(S390TODClass),
+ };
+diff --git a/hw/s390x/tod.c b/hw/s390x/tod.c
+index 0501affa7f..1c63f411e6 100644
+--- a/hw/s390x/tod.c
++++ b/hw/s390x/tod.c
+@@ -30,6 +30,17 @@ void s390_init_tod(void)
+     qdev_init_nofail(DEVICE(obj));
+ }
+ 
++S390TODState *s390_get_todstate(void)
++{
++    static S390TODState *ts;
++
++    if (!ts) {
++        ts = S390_TOD(object_resolve_path_type("", TYPE_S390_TOD, NULL));
++    }
++
++    return ts;
++}
++
+ #define S390_TOD_CLOCK_VALUE_MISSING    0x00
+ #define S390_TOD_CLOCK_VALUE_PRESENT    0x01
+ 
+diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+index 7096b574ae..413c0d7c02 100644
+--- a/include/hw/s390x/tod.h
++++ b/include/hw/s390x/tod.h
+@@ -30,6 +30,9 @@ typedef struct S390TOD {
+ typedef struct S390TODState {
+     /* private */
+     DeviceState parent_obj;
++
++    /* unused by KVM implementation */
++    S390TOD base;
+ } S390TODState;
+ 
+ typedef struct S390TODClass {
+@@ -41,6 +44,22 @@ typedef struct S390TODClass {
+     void (*set)(S390TODState *td, const S390TOD *tod, Error **errp);
+ } S390TODClass;
+ 
++/* The value of the TOD clock for 1.1.1970. */
++#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
++
++/* Converts ns to s390's clock format */
++static inline uint64_t time2tod(uint64_t ns)
++{
++    return (ns << 9) / 125 + (((ns & 0xff10000000000000ull) / 125) << 9);
++}
++
++/* Converts s390's clock format to ns */
++static inline uint64_t tod2time(uint64_t t)
++{
++    return ((t >> 9) * 125) + (((t & 0x1ff) * 125) >> 9);
++}
++
+ void s390_init_tod(void);
++S390TODState *s390_get_todstate(void);
+ 
+ #endif
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index a41b3f34ab..40d6980229 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -30,7 +30,6 @@
+ #include "kvm_s390x.h"
+ #include "sysemu/kvm.h"
+ #include "qemu-common.h"
+-#include "qemu/cutils.h"
+ #include "qemu/timer.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+@@ -275,9 +274,6 @@ static void s390_cpu_initfn(Object *obj)
+     CPUState *cs = CPU(obj);
+     S390CPU *cpu = S390_CPU(obj);
+     CPUS390XState *env = &cpu->env;
+-#if !defined(CONFIG_USER_ONLY)
+-    struct tm tm;
+-#endif
+ 
+     cs->env_ptr = env;
+     cs->halted = 1;
+@@ -286,9 +282,6 @@ static void s390_cpu_initfn(Object *obj)
+                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
+     s390_cpu_model_register_props(obj);
+ #if !defined(CONFIG_USER_ONLY)
+-    qemu_get_timedate(&tm, 0);
+-    env->tod_offset = TOD_UNIX_EPOCH +
+-                      (time2tod(mktimegm(&tm)) * 1000000000ULL);
+     env->tod_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
+     env->cpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
+     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 4abfe88a3d..2c3dd2d189 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -130,7 +130,6 @@ struct CPUS390XState {
+     uint64_t cpuid;
+ #endif
+ 
+-    uint64_t tod_offset;
+     QEMUTimer *tod_timer;
+ 
+     QEMUTimer *cpu_timer;
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 6cf63340bf..f2a771e2b4 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -237,22 +237,6 @@ enum cc_op {
+     CC_OP_MAX
+ };
+ 
+-/* The value of the TOD clock for 1.1.1970. */
+-#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
+-
+-/* Converts ns to s390's clock format */
+-static inline uint64_t time2tod(uint64_t ns)
+-{
+-    return (ns << 9) / 125 + (((ns & 0xff10000000000000ull) / 125) << 9);
+-
+-}
+-
+-/* Converts s390's clock format to ns */
+-static inline uint64_t tod2time(uint64_t t)
+-{
+-    return ((t >> 9) * 125) + (((t & 0x1ff) * 125) >> 9);
+-}
+-
+ static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
+                                        uint8_t *ar)
+ {
 diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 229f14d3da..e4c1522140 100644
+index dd5273949b..229f14d3da 100644
 --- a/target/s390x/misc_helper.c
 +++ b/target/s390x/misc_helper.c
-@@ -154,6 +154,13 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
- {
-     S390TODState *td = s390_get_todstate();
+@@ -28,6 +28,8 @@
+ #include "qemu/timer.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
++#include "qapi/error.h"
++#include "tcg_s390x.h"
  
-+    /* stop the timer and remove pending CKC IRQs */
-+    timer_del(env->tod_timer);
-+    qemu_mutex_lock_iothread();
-+    env->pending_int &= ~INTERRUPT_EXT_CLOCK_COMPARATOR;
-+    qemu_mutex_unlock_iothread();
+ #if !defined(CONFIG_USER_ONLY)
+ #include "sysemu/cpus.h"
+@@ -39,6 +41,7 @@
+ #include "hw/s390x/ioinst.h"
+ #include "hw/s390x/s390-pci-inst.h"
+ #include "hw/boards.h"
++#include "hw/s390x/tod.h"
+ #endif
+ 
+ /* #define DEBUG_HELPER */
+@@ -138,17 +141,19 @@ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
+ /* Store Clock */
+ uint64_t HELPER(stck)(CPUS390XState *env)
+ {
+-    uint64_t time;
++    S390TODState *td = s390_get_todstate();
++    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
++    S390TOD tod;
+ 
+-    time = env->tod_offset +
+-        time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+-
+-    return time;
++    tdc->get(td, &tod, &error_abort);
++    return tod.low;
+ }
+ 
+ /* Set Clock Comparator */
+ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+ {
++    S390TODState *td = s390_get_todstate();
 +
-+    /* the tod has to exceed the ckc, this can never happen if ckc is all 1's */
      if (time == -1ULL) {
          return;
      }
+@@ -156,7 +161,7 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+     env->ckc = time;
+ 
+     /* difference between origins */
+-    time -= env->tod_offset;
++    time -= td->base.low;
+ 
+     /* nanoseconds */
+     time = tod2time(time);
+@@ -164,6 +169,14 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+     timer_mod(env->tod_timer, time);
+ }
+ 
++void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
++{
++    S390CPU *cpu = S390_CPU(cs);
++    CPUS390XState *env = &cpu->env;
++
++    helper_sckc(env, env->ckc);
++}
++
+ /* Set Tod Programmable Field */
+ void HELPER(sckpf)(CPUS390XState *env, uint64_t r0)
+ {
+diff --git a/target/s390x/tcg_s390x.h b/target/s390x/tcg_s390x.h
+new file mode 100644
+index 0000000000..4e308aa0ce
+--- /dev/null
++++ b/target/s390x/tcg_s390x.h
+@@ -0,0 +1,18 @@
++/*
++ * QEMU TCG support -- s390x specific functions.
++ *
++ * Copyright 2018 Red Hat, Inc.
++ *
++ * Authors:
++ *   David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef TCG_S390X_H
++#define TCG_S390X_H
++
++void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque);
++
++#endif /* TCG_S390X_H */
 -- 
 2.17.1
