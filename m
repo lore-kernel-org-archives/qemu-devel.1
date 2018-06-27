@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fY8Zm-0004g6-5O
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:25:31 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fY8bp-0005ob-0W
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:27:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fY8Zh-0004po-6Q
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:25:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48222 helo=mx1.redhat.com)
+	(envelope-from <robert.hu@linux.intel.com>) id 1fY8bn-00082N-8r
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:27:36 -0400
+Received: from mga05.intel.com ([192.55.52.43]:32719)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fY8Zg-0004oV-Tu
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:25:25 -0400
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Wed, 27 Jun 2018 16:55:20 +0530
-Message-Id: <20180627112520.26085-1-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] virtio-rng: process pending requests when
- driver is ready
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fY8bm-0007zT-Un
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:27:35 -0400
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Wed, 27 Jun 2018 19:27:23 +0800
+Message-Id: <1530098844-236851-5-git-send-email-robert.hu@linux.intel.com>
+In-Reply-To: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
+References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v2 4/5] i386: Add CPUID bit for WBNOINVD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,57 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, slopezpa@redhat.com
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
- virtio-rng device causing old guest kernels(2.6.32) to hang on latest qemu.
- The driver attempts to read from the virtio-rng device too early in it's
- initialization. Qemu detects guest is not ready and returns, resulting in
- hang.
+WBNOINVD: Write back and do not invalidate cache, enumerated by
+CPUID.(EAX=80000008H, ECX=0):EBX[bit 9].
 
- Fix is to handle pending request when guest is running and driver status is
- set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
-
-Reported-by: Sergio lopez <slopezpa@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 ---
-v1->v2: Update new status value early only for virtio-rng (Stefan)
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
- hw/virtio/virtio-rng.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 289bbcac03..855f1b41d1 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -156,6 +156,19 @@ static void check_rate_limit(void *opaque)
-     vrng->activate_timer = true;
- }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c2c3cdb..92bfbbc 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1029,7 +1029,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .feat_names = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
++            NULL, "wbnoinvd", NULL, NULL,
+             "ibpb", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 61d23e5..c67216d 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -692,6 +692,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities of RDCL_NO and IBRS_ALL*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
  
-+static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
-+{
-+    VirtIORNG *vrng = VIRTIO_RNG(vdev);
-+
-+    if (!vdev->vm_running) {
-+        return;
-+    }
-+    vdev->status = status;
-+
-+    /* Something changed, try to process buffers */
-+    virtio_rng_process(vrng);
-+}
-+
- static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -261,6 +274,7 @@ static void virtio_rng_class_init(ObjectClass *klass, void *data)
-     vdc->realize = virtio_rng_device_realize;
-     vdc->unrealize = virtio_rng_device_unrealize;
-     vdc->get_features = get_features;
-+    vdc->set_status = virtio_rng_set_status;
- }
++#define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and do not invalidate cache */
+ #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
  
- static const TypeInfo virtio_rng_info = {
+ #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
 -- 
-2.14.3
+1.8.3.1
