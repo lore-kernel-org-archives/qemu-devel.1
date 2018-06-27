@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fY61J-0000bf-9B
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fY68Y-00041S-A9
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:49:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fY61G-0005ev-My
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56586 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY61G-0005eg-ID
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:41:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1437640201CF
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 08:41:42 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
-Date: Wed, 27 Jun 2018 10:41:38 +0200
-In-Reply-To: <87tvpoadcc.fsf_-_@dusky.pond.sub.org> (Markus Armbruster's
-	message of "Wed, 27 Jun 2018 09:38:27 +0200")
-Message-ID: <87wouk8vul.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1fY68U-00018z-82
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:49:14 -0400
+References: <20180622181108.GY7451@localhost.localdomain>
+	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
+	<20180622193522.GI7451@localhost.localdomain>
+	<743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
+	<87lgb3xsv8.fsf@dusky.pond.sub.org>
+	<4292432f-5f26-6925-4c14-ad1370e36e5b@redhat.com>
+	<20180625173056.GM7451@localhost.localdomain>
+	<97504b42-9ebe-45c5-6ff3-b43102c8374a@redhat.com>
+	<54dfe708-cccf-c628-753f-692c83391ec4@redhat.com>
+	<20180626095004.7e92fdaa.cohuck@redhat.com>
+	<20180626125644.GS7451@localhost.localdomain>
+	<878t71xzub.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <736ff87e-8f3c-ca43-9e79-a316df33701b@redhat.com>
+Date: Wed, 27 Jun 2018 10:49:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+In-Reply-To: <878t71xzub.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
+ -enable-kvm and -enable-hax in the docs anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +35,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On 26/06/2018 18:43, Markus Armbruster wrote:
+>>> Not sure how serious you meant that, but I actually quite like the
+>>> idea :)
+>> Also, this mode could be enabled by default if stderr is a tty.
+> It could be enabled by default, period.
 
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> I fooled around a bit, and I think there are a few lose ends.
-> [...]
->> Talking to a QMP monitor that supports OOB:
->>
->>     $ socat UNIX:test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
->>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
->>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true } }
->>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' is unexpected"}}
->>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
->>     {"return": {}}
->>     QMP> { "execute": "query-qmp-schema" }
->>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capability requires that every command contains an 'id' field"}}
->>
->> Why does every command require 'id'?
->
-> I found one reason: event COMMAND_DROPPED wants it.  Any other reason?
->
-> [...]
+I agree, summarizing the configuration to stderr on startup is a good
+idea and it shouldn't be a problem for backwards compatibility.  Doing
+it only if it is a tty could be a good idea though, at least initially.
 
-Apropos COMMAND_DROPPED: we send an event rather than an error response
-because we may send it out-of-order.  Makes sense.
-
-However, broadcasting it to all monitors doesn't make sense.  We could
-use a way to send an event to just one monitor.
-
-Another use for that might be QMP "deprecated" notifications, because
-those also can't be error responses, and also only make sense for the
-client that caused them.
+Paolo
