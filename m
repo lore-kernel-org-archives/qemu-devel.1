@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fY8sP-0007Uv-DN
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:44:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fY8ye-0001ru-AA
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fY8sM-0002zZ-7G
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:44:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60742 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fY8sL-0002yK-W9
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:44:42 -0400
-Date: Wed, 27 Jun 2018 13:44:38 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180627134438.3016259b@redhat.com>
-In-Reply-To: <20180626122343.13473-3-marcandre.lureau@redhat.com>
-References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
-	<20180626122343.13473-3-marcandre.lureau@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1fY8yd-0001AV-Gk
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:51:12 -0400
+Date: Wed, 27 Jun 2018 12:51:04 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180627115104.GF5955@stefanha-x1.localdomain>
+References: <20180626142434.22090-1-kwolf@redhat.com>
+	<20180626142434.22090-2-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] tpm: implement virtual memory
- device for TPM PPI
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VuQYccsttdhdIfIP"
+Content-Disposition: inline
+In-Reply-To: <20180626142434.22090-2-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qcow2: Fix qcow2_truncate() error
+ return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,274 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, 26 Jun 2018 14:23:41 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+--VuQYccsttdhdIfIP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jun 26, 2018 at 04:24:29PM +0200, Kevin Wolf wrote:
+> If qcow2_alloc_clusters_at() returns an error, we do need to negate it
+> to get back the positive errno code for error_setg_errno(), but we still
+> need to return the negative error code.
 >=20
-> Implement a virtual memory device for the TPM Physical Presence interface.
-> The memory is located at 0xFED45000 and used by ACPI to send messages to =
-the
-> firmware (BIOS) and by the firmware to provide parameters for each one of
-> the supported codes.
->=20
-> This device should be used by all TPM interfaces on x86 and can be added
-> by calling tpm_ppi_init_io().
->=20
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
+> Fixes: 772d1f973f87269f6a4a4ea4b880680f3779bbdf
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->=20
-> v4 (Marc-Andr=C3=A9):
->  - pass TPM_PPI_ADDR_BASE as argument to tpm_ppi_init_io()
->  - only enable PPI if property is set
->=20
-> v3 (Marc-Andr=C3=A9):
->  - merge CRB support
->  - use trace events instead of DEBUG printf
->  - headers inclusion simplification
->=20
-> v2:
->  - moved to byte access since an infrequently used device;
->    this simplifies code
->  - increase size of device to 0x400
->  - move device to 0xfffef000 since SeaBIOS has some code at 0xffff0000:
->    'On the emulators, the bios at 0xf0000 is also at 0xffff0000'
-> ---
->  hw/tpm/tpm_ppi.h      | 27 ++++++++++++++++++++
->  include/hw/acpi/tpm.h |  6 +++++
->  hw/tpm/tpm_crb.c      |  7 ++++++
->  hw/tpm/tpm_ppi.c      | 57 +++++++++++++++++++++++++++++++++++++++++++
->  hw/tpm/tpm_tis.c      |  7 ++++++
->  hw/tpm/Makefile.objs  |  2 +-
->  hw/tpm/trace-events   |  4 +++
->  7 files changed, 109 insertions(+), 1 deletion(-)
->  create mode 100644 hw/tpm/tpm_ppi.h
->  create mode 100644 hw/tpm/tpm_ppi.c
->=20
-> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-> new file mode 100644
-> index 0000000000..ac7ad47238
-> --- /dev/null
-> +++ b/hw/tpm/tpm_ppi.h
-> @@ -0,0 +1,27 @@
-> +/*
-> + * TPM Physical Presence Interface
-> + *
-> + * Copyright (C) 2018 IBM Corporation
-> + *
-> + * Authors:
-> + *  Stefan Berger    <stefanb@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef TPM_TPM_PPI_H
-> +#define TPM_TPM_PPI_H
-> +
-> +#include "hw/acpi/tpm.h"
-> +#include "exec/address-spaces.h"
-> +
-> +typedef struct TPMPPI {
-> +    MemoryRegion mmio;
-> +
-> +    uint8_t ram[TPM_PPI_ADDR_SIZE];
-> +} TPMPPI;
-I probably miss something obvious here,
-1st:
-commit message says that memory reion is supposed to be interface
-between FW and OSPM (i.e. totally guest internal thingy).
-So question is:
-  why do we register memory region at all?
-it should be dropped or explained in commit message.
+>  block/qcow2.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-2nd:
-If region is really necessary, then where is subsection to migrate
-data stored there?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+--VuQYccsttdhdIfIP
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +
-> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m,
-> +                     hwaddr addr, Object *obj);
-> +
-> +#endif /* TPM_TPM_PPI_H */
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index 46ac4dc581..c082df7d1d 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -187,4 +187,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
->  #define TPM2_START_METHOD_MMIO      6
->  #define TPM2_START_METHOD_CRB       7
-> =20
-> +/*
-> + * Physical Presence Interface
-> + */
-> +#define TPM_PPI_ADDR_SIZE           0x400
-> +#define TPM_PPI_ADDR_BASE           0xFED45000
-> +
->  #endif /* HW_ACPI_TPM_H */
-> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> index d5b0ac5920..37c095f00f 100644
-> --- a/hw/tpm/tpm_crb.c
-> +++ b/hw/tpm/tpm_crb.c
-> @@ -29,6 +29,7 @@
->  #include "sysemu/reset.h"
->  #include "tpm_int.h"
->  #include "tpm_util.h"
-> +#include "tpm_ppi.h"
->  #include "trace.h"
-> =20
->  typedef struct CRBState {
-> @@ -43,6 +44,7 @@ typedef struct CRBState {
->      size_t be_buffer_size;
-> =20
->      bool ppi_enabled;
-> +    TPMPPI ppi;
->  } CRBState;
-> =20
->  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-> @@ -294,6 +296,11 @@ static void tpm_crb_realize(DeviceState *dev, Error =
-**errp)
->      memory_region_add_subregion(get_system_memory(),
->          TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
-> =20
-> +    if (s->ppi_enabled) {
-> +        tpm_ppi_init_io(&s->ppi, get_system_memory(),
-> +                        TPM_PPI_ADDR_BASE, OBJECT(s));
-> +    }
-> +
->      qemu_register_reset(tpm_crb_reset, dev);
->  }
-> =20
-> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-> new file mode 100644
-> index 0000000000..79bec186c7
-> --- /dev/null
-> +++ b/hw/tpm/tpm_ppi.c
-> @@ -0,0 +1,57 @@
-> +/*
-> + * tpm_ppi.c - TPM Physical Presence Interface
-> + *
-> + * Copyright (C) 2018 IBM Corporation
-> + *
-> + * Authors:
-> + *  Stefan Berger <stefanb@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "tpm_ppi.h"
-> +#include "trace.h"
-> +
-> +static uint64_t tpm_ppi_mmio_read(void *opaque, hwaddr addr,
-> +                                  unsigned size)
-> +{
-> +    TPMPPI *s =3D opaque;
-> +
-> +    trace_tpm_ppi_mmio_read(addr, size, s->ram[addr]);
-> +
-> +    return s->ram[addr];
-> +}
-> +
-> +static void tpm_ppi_mmio_write(void *opaque, hwaddr addr,
-> +                               uint64_t val, unsigned size)
-> +{
-> +    TPMPPI *s =3D opaque;
-> +
-> +    trace_tpm_ppi_mmio_write(addr, size, val);
-> +
-> +    s->ram[addr] =3D val;
-> +}
-> +
-> +static const MemoryRegionOps tpm_ppi_memory_ops =3D {
-> +    .read =3D tpm_ppi_mmio_read,
-> +    .write =3D tpm_ppi_mmio_write,
-> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 1,
-> +    },
-> +};
-> +
-> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m,
-> +                     hwaddr addr, Object *obj)
-> +{
-> +    memory_region_init_io(&tpmppi->mmio, obj, &tpm_ppi_memory_ops,
-> +                          tpmppi, "tpm-ppi-mmio",
-> +                          TPM_PPI_ADDR_SIZE);
-> +
-> +    memory_region_add_subregion(m, addr, &tpmppi->mmio);
-> +}
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index d9ddf9b723..e7f45a05b9 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -31,6 +31,7 @@
->  #include "sysemu/tpm_backend.h"
->  #include "tpm_int.h"
->  #include "tpm_util.h"
-> +#include "tpm_ppi.h"
->  #include "trace.h"
-> =20
->  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
-> @@ -83,6 +84,7 @@ typedef struct TPMState {
->      size_t be_buffer_size;
-> =20
->      bool ppi_enabled;
-> +    TPMPPI ppi;
->  } TPMState;
-> =20
->  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-> @@ -979,6 +981,11 @@ static void tpm_tis_realizefn(DeviceState *dev, Erro=
-r **errp)
-> =20
->      memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
->                                  TPM_TIS_ADDR_BASE, &s->mmio);
-> +
-> +    if (s->ppi_enabled) {
-> +        tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
-> +                        TPM_PPI_ADDR_BASE, OBJECT(s));
-> +    }
->  }
-> =20
->  static void tpm_tis_initfn(Object *obj)
-> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-> index 1dc9f8bf2c..eedd8b6858 100644
-> --- a/hw/tpm/Makefile.objs
-> +++ b/hw/tpm/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -common-obj-y +=3D tpm_util.o
-> +common-obj-y +=3D tpm_util.o tpm_ppi.o
->  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
->  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
->  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 25bee0cecf..81f9923401 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -8,6 +8,10 @@ tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_=
-t val) "CRB write 0x" TA
->  tpm_passthrough_handle_request(void *cmd) "processing command %p"
->  tpm_passthrough_reset(void) "reset"
-> =20
-> +# hw/tpm/tpm_ppi.c
-> +tpm_ppi_mmio_read(uint64_t addr, unsigned size, uint32_t val) "PPI read =
-0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> +tpm_ppi_mmio_write(uint64_t addr, unsigned size, uint32_t val) "PPI writ=
-e 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> +
->  # hw/tpm/tpm_util.c
->  tpm_util_get_buffer_size_hdr_len(uint32_t len, size_t expected) "tpm_res=
-p->hdr.len =3D %u, expected =3D %zu"
->  tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp->l=
-en =3D %u, expected =3D %zu"
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbM3ooAAoJEJykq7OBq3PIT1IH/1UazoaZ5t0w/W/nmNqPzBbP
+swFSQtxgNXC6Betd0yEYBpEGn5DL/dR6a6CBbKIonh7ly4pt6Kj21OtPy2Gf2TUm
+MrQrXm1iTPq+3ALlS4vmpcCXABvIPUtuEepVDU0zvUp8scx995obiLgrunurllsS
+j4uPTlP53y6NMCngxqxuaRVaBhFf3ceN3umYpuOlrLQTAjHGvlLayz29n8n8baNb
+zTpTNcXmzP3n0tZj6u3ruqVovMb0vmDiaS1ovpYIkMT7ej2GMHz83BXdaUP58xSw
+s+rhYgYgsR4GbKvUOBCnt8GVyQoLHCjS7dqVLtVBpDAV7QwiJpb0+yFoHMKngEg=
+=SGvX
+-----END PGP SIGNATURE-----
+
+--VuQYccsttdhdIfIP--
