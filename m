@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fXyR7-0008Fz-SO
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 20:35:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fXypJ-0003z2-Nl
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:00:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fXyR2-0003bm-Tl
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 20:35:53 -0400
-Date: Wed, 27 Jun 2018 03:35:45 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180627033321-mutt-send-email-mst@kernel.org>
-References: <20180626135928.23950-1-clg@kaod.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1fXypE-0007gg-25
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:00:52 -0400
+Date: Wed, 27 Jun 2018 10:35:08 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180627003508.GF14434@umbus.fritz.box>
+References: <20180626142214.27801-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ULyIDA2m8JTe+TiX"
 Content-Disposition: inline
-In-Reply-To: <20180626135928.23950-1-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+In-Reply-To: <20180626142214.27801-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix pnv_core_realize() error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +25,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>
-
-On Tue, Jun 26, 2018 at 03:59:28PM +0200, C=E9dric Le Goater wrote:
-> diff --git a/include/hw/pci-host/pnv_phb3_regs.h b/include/hw/pci-host/=
-pnv_phb3_regs.h
-> new file mode 100644
-> index 000000000000..a1672726b908
-> --- /dev/null
-> +++ b/include/hw/pci-host/pnv_phb3_regs.h
-> @@ -0,0 +1,510 @@
-> +/* Copyright (c) 2013-2018, IBM Corporation.
-> + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
-> + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-> + * implied.
-> + *
-> + * See the License for the specific language governing permissions and
-> + * limitations under the License.
-> + */
-> +
-> +#ifndef PCI_HOST_PNV_PHB3_REGS_H
-> +#define PCI_HOST_PNV_PHB3_REGS_H
-> +
-> +/*
-> + * Duplicated from target/ppc/cpu.h
-> + */
-> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
-> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
-> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
-> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT=
-(bs))
-> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
-> +                                 PPC_BIT32(bs))
-> +#define PPC_BITLSHIFT(be)       (63 - (be))
-> +#define PPC_BITLSHIFT32(be)     (31 - (be))
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
+--ULyIDA2m8JTe+TiX
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +
-> +/* Extract field fname from val */
-> +#define GETFIELD(fname, val)                    \
-> +        (((val) & fname##_MASK) >> fname##_LSH)
-> +
-> +/* Set field fname of oval to fval
-> + * NOTE: oval isn't modified, the combined result is returned
-> + */
-> +#define SETFIELD(fname, oval, fval)                     \
-> +        (((oval) & ~fname##_MASK) | \
-> +         ((((typeof(oval))(fval)) << fname##_LSH) & fname##_MASK))
-> +
+On Tue, Jun 26, 2018 at 04:22:14PM +0200, C=E9dric Le Goater wrote:
+> commit d35aefa9ae15 ("ppc/pnv: introduce a new intc_create() operation
+> to the chip model") changed the object link in the pnv_core_realize()
+> routine but a return was forgotten in case of error, which can lead to
+> more problems afterwards (segv)
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Pls don't make up macros like these. We can't have each device do it.
+Applied to ppc-for-3.0, thanks.
 
-
-> @@ -1031,6 +1110,7 @@ static Property pnv_chip_properties[] =3D {
->      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
->      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
->      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
-> +    DEFINE_PROP_UINT32("num-phbs", PnvChip, num_phbs, 1),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-
-How about instanciating each extra phb using -device?
-Seems better than teaching everyone about platform-specific
-options.
+> ---
+>  hw/ppc/pnv_core.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index a9f129fc2c5f..9750464bf4a1 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -150,6 +150,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+>      if (!chip) {
+>          error_propagate(errp, local_err);
+>          error_prepend(errp, "required link 'chip' not found: ");
+> +        return;
+>      }
+> =20
+>      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
 
 --=20
-MST
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ULyIDA2m8JTe+TiX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsy27cACgkQbDjKyiDZ
+s5IycRAAk3TTN/zIYKYyRukmjPRksxa8+iCWGaV2fJy84kR/TJSEEHkuslYNGyai
+SpA9qFMLFHnE0tnsYxbIX0TQCHyN+K/fsiI6FE8w6h2ozlCBSitWYtyQoe8KSCef
+WBgjB6dRX4Vpxr/0qjzpJlkJzDfjUccd4rPJNoQl01mn87pI3MxSEB2pHWDgiG8R
+BiaZJTMFP9xcVDhdOlx9iNlyq6hg0nsKMZ8ODmVSaTCrKFOK7HctvQAO/ImisRKp
+3+TOR8fZWW+Us10VS1pgZyPwvGPHwOfCUZhg0ThNoItDQ/Y8u83SWio0BJ4nBo62
+E/zKUs7pTLAfJg/XR/daVzL9cu9aACcQPgU1JaGizUBn5MjrdcQp+PQcouMKGm9U
+KAZzamSuEZM5B4Bb7fChU6EvncPBc9b2yOp0vCVN4UQvvca1F2cZ4llR4nVNBbiJ
+FF4cWMJQo6B5zHZExfr0kL6IJ/Y96KMCiMASWC19m5Or/vMp8nH4GOCcO2ZAus4L
+KqmWTz5ML/+aBe7Uyy+dJx4pOVj7o9IdFnGrKno7OyaP1DBxyuYs3nYvo61pXZ6s
+94kSQuJ5hpzYC58xwazI3rqGb3yVT5zfcbHTYq4RBlqjsCrxG/FBFtxhAekjlvUB
+WUJRyJlQKVes1koLw885b/k+MYXSgPLMnYD3Y8ufvRIFIaLJFXE=
+=U3oV
+-----END PGP SIGNATURE-----
+
+--ULyIDA2m8JTe+TiX--
