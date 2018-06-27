@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fYA6w-0007PI-Gp
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:03:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYA8S-0000QZ-FL
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:05:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fYA6s-0000wO-E1
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:03:50 -0400
-Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:44393)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fYA6s-0000vh-72
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:03:46 -0400
-Received: from player797.ha.ovh.net (unknown [10.109.122.9])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 82EFCB8020
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 15:03:44 +0200 (CEST)
-References: <20180626135928.23950-1-clg@kaod.org>
-	<20180627033321-mutt-send-email-mst@kernel.org>
-	<1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
-	<20180627072825.GH14434@umbus.fritz.box>
-	<65c545f3-6279-62af-9bd8-2be93a3d7d18@kaod.org>
-	<9f9a4454bec8e7009a02d544d7a98f6215bd1fa0.camel@kernel.crashing.org>
-	<c071d87d3b3ad43c7c17de17ef5116ada666ef6f.camel@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <06a913d3-d694-0be4-c04b-bc6c8c8c88c6@kaod.org>
-Date: Wed, 27 Jun 2018 15:03:28 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYA8M-0002hL-RG
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:05:24 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180627035752.1425-1-famz@redhat.com>
+	<20180627035752.1425-2-famz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <56af7fda-18c4-b8ed-7462-3bef9583cc9c@amsat.org>
+Date: Wed, 27 Jun 2018 10:05:02 -0300
 MIME-Version: 1.0
-In-Reply-To: <c071d87d3b3ad43c7c17de17ef5116ada666ef6f.camel@redhat.com>
+In-Reply-To: <20180627035752.1425-2-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: Remove dead check on !ret
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 06/27/2018 12:40 PM, Andrea Bolognani wrote:
-> On Wed, 2018-06-27 at 18:41 +1000, Benjamin Herrenschmidt wrote:
->> On Wed, 2018-06-27 at 09:46 +0200, C=C3=A9dric Le Goater wrote:
->>> So the "IBM PHB3 PCIE Root Port" is already user createable.
->>>
->>> I can take a look at user createable PHB3s. I think this is OK from a=
- model
->>> perspective. The object is rather standalone, it needs the machine fo=
-r=20
->>> the XICS fabric and a couple of ids, phb id and chip id. These can co=
-me
->>> from the command line.
->>>
->>> We want at least one PHB3 per socket/chip though.=20
->>
->> We don't want the user to specify the SCOM addresses though (for the
->> MMIO windows we should get skiboot to assign them).
->>
->> If the user gets to specify a thing it would be which of the 3 or 4 HW
->> PHBs of the chip it is, the SCOM addresses gets deduced.
->=20
-> For pSeries guests libvirt will either automatically create, or
-> allow users to configure manually, PHBs with something like
->=20
->   <controller type=3D'pci' index=3D'1' model=3D'pci-root'>
->     <target index=3D'1'/>
->   </controller>
->=20
-> which is ultimately converted to
->=20
->   -device spapr-pci-host-bridge,index=3D1,id=3Dpci.1
->=20
-> Ideally the interface for PowerNV guests can be made to be similar
-> if not identical at the libvirt level, without having to add too
-> many hacks... It would certainly help a lot if the QEMU interface
-> for PowerNV PHBs didn't stray too far from the above.
->=20
+On 06/27/2018 12:57 AM, Fam Zheng wrote:
+> In the beginning of the function, we initialize the local variable to 0,
+> and in the body of the function, we check the assigned values and exit
+> the loop immediately. So here it can never be non-zero.
+> 
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-I think that we will need an extra attribute to specify the chip, but=20
-only in the case of a multichip system, which is not the common scenario.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-So the 'index' attribute should work fine.=20
-
-Thanks,
-
-C.=20
+> ---
+>  block/qcow2.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index a3a3aa2a97..ff23063616 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1772,7 +1772,7 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
+>      while (l2meta != NULL) {
+>          QCowL2Meta *next;
+>  
+> -        if (!ret && link_l2) {
+> +        if (link_l2) {
+>              ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+>              if (ret) {
+>                  goto out;
+> 
