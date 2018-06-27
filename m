@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fY9Ck-0003XQ-VS
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:05:51 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fY9Dx-0004BH-Fv
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fY9Cg-0005ni-SW
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:05:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fY9Cg-0005n8-K7
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:05:42 -0400
-Date: Wed, 27 Jun 2018 08:05:41 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <410633343.46328776.1530101141460.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180627112741.GH30628@redhat.com>
-References: <20180627112520.26085-1-pagupta@redhat.com>
-	<20180627112741.GH30628@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1fY9Dw-0007Nm-44
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:01 -0400
+Date: Wed, 27 Jun 2018 13:06:51 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180627120651.GM5955@stefanha-x1.localdomain>
+References: <20180622193700.6523-1-naravamudan@digitalocean.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] virtio-rng: process pending requests
- when driver is ready
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="nrXiCraHbXeog9mY"
+Content-Disposition: inline
+In-Reply-To: <20180622193700.6523-1-naravamudan@digitalocean.com>
+Subject: Re: [Qemu-devel] [PATCH v4] linux-aio: properly bubble up errors
+ from initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +24,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?Q?P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: amit@kernel.org, stefanha@redhat.com, qemu-devel@nongnu.org, slopezpa@redhat.com, mst@redhat.com
+To: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
 
-> 
-> On Wed, Jun 27, 2018 at 04:55:20PM +0530, Pankaj Gupta wrote:
-> >  virtio-rng device causing old guest kernels(2.6.32) to hang on latest
-> >  qemu.
-> >  The driver attempts to read from the virtio-rng device too early in it's
-> >  initialization. Qemu detects guest is not ready and returns, resulting in
-> >  hang.
-> 
-> Presumably this all worked previously at some point, so do you know what
-> change in QEMU has caused a regression in this regard.
+--nrXiCraHbXeog9mY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Latest qemu(2.x) has this issue with older guest kernel(2.6.32) versions.
-But it does work properly with upstream guest kernel because the way virtio-rng
-driver is reworked, it sends request to virtio-rng driver when(before) there is 
-read call. 
+On Fri, Jun 22, 2018 at 12:37:00PM -0700, Nishanth Aravamudan wrote:
+> laio_init() can fail for a couple of reasons, which will lead to a NULL
+> pointer dereference in laio_attach_aio_context().
+>=20
+> To solve this, add a aio_setup_linux_aio() function which is called
+> early in raw_open_common. If this fails, propagate the error up. The
+> signature of aio_get_linux_aio() was not modified, because it seems
+> preferable to return the actual errno from the possible failing
+> initialization calls.
+>=20
+> Additionally, when the AioContext changes, we need to associate a
+> LinuxAioState with the new AioContext. Use the bdrv_attach_aio_context
+> callback and call the new aio_setup_linux_aio(), which will allocate a
+> new AioContext if needed, and return errors on failures. If it fails for
+> any reason, fallback to threaded AIO with an error message, as the
+> device is already in-use by the guest.
+>=20
+> Add an assert that aio_get_linux_aio() cannot return NULL.
+>=20
+> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
+>=20
+> ---
+>=20
+> Test case 1:
+>     Set /proc/sys/fs/max-aio-nr to 0. Start a guest with an aio=3Dnative
+>     disk.
+>=20
+>     Result: laio_init() returns NULL due to not being able to allocate
+>     any AIO contexts. This NULL is assigned to ctx->linux_aio and
+>     dereferenced in aio_get_linux_aio.
+>=20
+> Test case 2:
+>     Set /proc/sys/fs/max-aio-nr to 128. Start a guest with an aio=3Dnative
+>     disk and one in-use I/O thread.
+>=20
+>     Result: laio_init() returns NULL due to not being able to allocate
+>     additional AIO contexts for the I/O thread. This NULL is assigned to
+>     ctx->linux_aio and dereferenced in aio_get_linux_aio.
+>=20
+> Changes from v3 -> v4 (thanks to Fam Zheng and Kevin Wolf for review):
+>=20
+> Squash patch 2/2 into 1/2.
+> Differentiate the possible reasons for laio_init() failing and use an
+> Error ** to propagate the errno to the caller.
+>=20
+> Changes from v2 -> v3 (thanks to Eric Blake and Kevin Wolf for review):
+>=20
+> Use a boolean false rather than 0 in assignment to use_linux_aio.
+> Drop ending '.' from error_report() calls.
+> Fix typo in commit message (propogates -> propagates).
+> Move aio_setup_linux_aio call to raw_open_common.
+>=20
+> Changes from v1 -> v2 (thanks to Kevin Wolf for review):
+>=20
+> Rather than affect virtio-scsi/blk at all, make all the changes internal
+> to file-posix.c. Thanks to Kevin Wolf for the suggested change.
+>=20
+>  block/file-posix.c      | 33 ++++++++++++++++++++++++++++-----
+>  block/linux-aio.c       | 12 +++++++++---
+>  include/block/aio.h     |  3 +++
+>  include/block/raw-aio.h |  2 +-
+>  stubs/linux-aio.c       |  2 +-
+>  util/async.c            | 14 +++++++++++---
+>  6 files changed, 53 insertions(+), 13 deletions(-)
 
-If guest driver is ready when it notifies qemu this works fine. There are number
-of changes in guest virtio/driver code infrastructure as well as qemu side, I don't 
-know exact commit after which this stopped working for older guest kernels. 
- 
-Thanks,
-Pankaj
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-> 
-> > 
-> >  Fix is to handle pending request when guest is running and driver status
-> >  is
-> >  set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
-> > 
-> > Reported-by: Sergio lopez <slopezpa@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> > v1->v2: Update new status value early only for virtio-rng (Stefan)
-> > 
-> >  hw/virtio/virtio-rng.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> > 
-> > diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-> > index 289bbcac03..855f1b41d1 100644
-> > --- a/hw/virtio/virtio-rng.c
-> > +++ b/hw/virtio/virtio-rng.c
-> > @@ -156,6 +156,19 @@ static void check_rate_limit(void *opaque)
-> >      vrng->activate_timer = true;
-> >  }
-> >  
-> > +static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
-> > +{
-> > +    VirtIORNG *vrng = VIRTIO_RNG(vdev);
-> > +
-> > +    if (!vdev->vm_running) {
-> > +        return;
-> > +    }
-> > +    vdev->status = status;
-> > +
-> > +    /* Something changed, try to process buffers */
-> > +    virtio_rng_process(vrng);
-> > +}
-> > +
-> >  static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> > @@ -261,6 +274,7 @@ static void virtio_rng_class_init(ObjectClass *klass,
-> > void *data)
-> >      vdc->realize = virtio_rng_device_realize;
-> >      vdc->unrealize = virtio_rng_device_unrealize;
-> >      vdc->get_features = get_features;
-> > +    vdc->set_status = virtio_rng_set_status;
-> >  }
-> >  
-> >  static const TypeInfo virtio_rng_info = {
-> > --
-> > 2.14.3
-> > 
-> > 
-> 
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange
-> |:|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com
-> |:|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange
-> |:|
-> 
-> 
+Stefan
+
+--nrXiCraHbXeog9mY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbM33bAAoJEJykq7OBq3PI4ssH/0Zqgidv8LhjN/ruNq54OdUV
+RG9hkhBCzGh0PMrktNmjr8UyydkCoA+9Aj/+L96ZKUKVuHKfOgkjGninKWh5kBtz
+EQv9GLdeZHnyUW07I1d33FxdePQLywISo7OBc1b6VME/LN9jql44RnV27U5Ii8y5
+zO4opb2/NvaEWtaBlK3AFKtYD7Qgk0TYI5cR/AE0dSQz1QEkyEozVyfL1hV/73EV
+NWI7Xczp2iDjNelRk4qRsnYtgsnrL8cFDwYmq5Ut/l4bJOOtpld0kOPLUQtRJrM7
+yVEULQz2G3NZ0a9tnjFJiRxUf+FYshz0EwKSd+RXOAqFSE9VYlpxopKR+j0tFqU=
+=U3HL
+-----END PGP SIGNATURE-----
+
+--nrXiCraHbXeog9mY--
