@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYGXr-0005hR-1N
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:56:04 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYGb4-0006e9-Pb
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYGXn-000525-Ve
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:56:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:33321)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYGXn-00051X-La
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:55:59 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue005 [212.227.15.167]) with ESMTPSA (Nemesis) id
-	0Mczwc-1fpFAF3guY-00IEKN for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018
-	21:55:58 +0200
-References: <20180625131253.11218-2-kraxel@redhat.com>
-	<6ad67e44-b002-1cd7-cfd1-2d98ebde1a7e@redhat.com>
-	<20180627065126.mwzdxshr3njzok7n@sirius.home.kraxel.org>
-	<0df8a05c-43fc-6e85-b13c-d3f5c4691964@redhat.com>
-	<87fu18ach6.fsf_-_@dusky.pond.sub.org>
-	<alpine.BSF.2.21.1806271010080.90116@zero.eik.bme.hu>
-	<20180627085217.blrsx5lmu4sau4fd@sirius.home.kraxel.org>
-	<5d591d6c-ccc4-cc86-ebbc-3c66a6817c70@redhat.com>
-	<db5529c6-7002-4b96-9d94-ca719e3845f8@amsat.org>
-	<4c86fb26-f7c3-e66e-33a2-dbbfe2e70960@vivier.eu>
-	<20180627184453.GC2424@work-vm>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e183c7e9-b8d4-2f61-327c-0ad29ad36b75@vivier.eu>
-Date: Wed, 27 Jun 2018 21:55:56 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYGb1-0000OD-Nw
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:59:22 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:54017
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fYGb1-0000FZ-G2
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 15:59:19 -0400
+References: <20180623085028.29553-1-mark.cave-ayland@ilande.co.uk>
+	<20180623085028.29553-2-mark.cave-ayland@ilande.co.uk>
+	<7ac656b2-374a-8591-08a6-8303aae1eba1@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <bde3e16f-e9e1-ace5-f324-83ef2042bc48@ilande.co.uk>
+Date: Wed, 27 Jun 2018 20:59:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180627184453.GC2424@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Drop support for 32bit hosts in qemu? (was: [PULL
- 1/6] audio/hda: create millisecond timers that handle IO)
+In-Reply-To: <7ac656b2-374a-8591-08a6-8303aae1eba1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] sysbus: always allow
+ explicit_ofw_unit_address() to override address generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,64 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com, mst@redhat.com
 
-Le 27/06/2018 à 20:44, Dr. David Alan Gilbert a écrit :
-> * Laurent Vivier (laurent@vivier.eu) wrote:
->> Le 27/06/2018 à 15:33, Philippe Mathieu-Daudé a écrit :
->>> On 06/27/2018 06:09 AM, Thomas Huth wrote:
->>>> On 27.06.2018 10:52, Gerd Hoffmann wrote:
->>>>>   Hi,
->>>>>
->>>>>>> Is QEMU still useful on 32-bit hosts?  Honest question!
->>>>>>
->>>>>> I guess it depends on what 32-bit hosts you consider. If you look at only
->>>>>> x86 vs. x86_64 then probably x86 is not that important any more but for some
->>>>>> embedded systems/SoCs 32bit might still be common and QEMU useful for those
->>>>>> (also as host not only emulated).
->>>>>
->>>>> Well.  I've used kvm with an 32bit arm soc (cubietruck).  It's very
->>>>> slow.  And all the arm architecture improvements to support kvm better
->>>>> are for aarch64 only.
->>>>>
->>>>>> Another option might be to not support audio/hda on 32bit hosts. It's not
->>>>>> nice either but a lot nicer than dropping support for 32bit hosts
->>>>>> alltogether to fix a problem in device emulation.
->>>>>
->>>>> But it also is not useful and a waste of resources to maintain 32bit
->>>>> host compatibility if nobody actually uses that ...
->>>>>
->>>>> For me testbuilds are the only reason to compile qemu for 32bit hosts.
->>>>> Since years.
->>>>
->>>> Well, while that's true for you, me and likely most of us developers,
->>>> you can not know whether this is also true for all users of qemu. Thus
->>>> this needs to be announced first for a couple of releases so that people
->>>> have a chance to speak up whether they still need this or not. As
->>>> mentioned earlier, embedded devices are often still 32-bit and I know
->>>> that there really are people who use QEMU on embedded devices.
->>>>
->>>> But I think we could at least announce now already that we intend to
->>>> drop support for 32-bit hosts in the future (maybe not in 2 releases
->>>> already, but, let's say in 2020? 2020 is already the EOL of Python 2, so
->>>> that will rule out a bunch of other legacy hosts, too).
->>>
->>> linux-user is certainly widely used on ARMv6 / ARMv7.
->>>
->>> Known user cases:
->>>
->>> - run ARMv7 binaries on ARMv6
->>> - run armhf binaries on armel
->>> - run x86-64 binaries on ARMv7
->>>
->>
->> I run i386 binaries on ARMv6.
+On 25/06/18 08:32, Laszlo Ersek wrote:
+
+Hi Laszlo,
+
+>> As any class defining explicit_ofw_unit_address() has explicitly requested a
+>> specialised behaviour then it should be used in preference to the default
+>> implementation rather than being used as a fallback.
 > 
-> Do you know if that model has the 64bit atomics (ldrexd/strexd)?
+> I disagree about the last paragraph, when put like this. I don't
+> disagree with the *goal* of the patch, however the original
+> justification for explicit_ofw_unit_address() was different.
+> 
+> It was meant as a fallback for distinguishing sysbus devices when those
+> sysbus devices had neither MMIO nor PIO resources. The issue wasn't that
+> MMIO/PIO-based identification was not "right", the issue was that unique
+> identification was impossible in the absence of such resources. Please
+> see commit 0b336b3b98d8 ("hw/core: explicit OFW unit address callback
+> for SysBusDeviceClass", 2015-06-23).
+> 
+> I don't have anything against repurposing explicit_ofw_unit_address()
+> like this -- as long as you check that it doesn't change behavior for
+> existing devices -- it's just that we shouldn't justify the new purpose
+> with the original intent. The original intent was different.
+> 
+> I suggest stating, "we can have explicit_ofw_unit_address() take
+> priority in a backwards-compatible manner, because no sysbus device
+> currently has both explicit_ofw_unit_address() and MMIO/PIO resources".
 
-http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0489e/Cihbghef.html
+Thanks for the feedback, I'm more than happy to update the commit 
+message to better describe the original intent of the patch. How does 
+the following sound to you?
 
-"ARM LDREXB, LDREXH, LDREXD, STREXB, STREXD, and STREXH are available in
-ARMv6K and above."
 
-Laurent
+Some SysBusDevices either use sysbus_init_mmio() without 
+sysbus_mmio_map() or the first MMIO memory region doesn't represent the 
+bus address, causing a firmware device path with an invalid address to 
+be generated.
+
+SysBusDeviceClass does provide a virtual explicit_ofw_unit_address() 
+method that can be used to override this process, but it is only 
+considered as a fallback option meaning that any existing MMIO memory 
+regions still take priority whilst determining the firmware device address.
+
+There is currently only one user of explicit_ofw_unit_address() and that 
+is the PCI expander bridge (PXB) device which has no MMIO/PIO resources 
+defined. This enables us to allow explicit_ofw_unit_address() to take 
+priority without affecting backwards compatibility, allowing the address 
+to be customised as required.
+
+> (Obviously checking the validity of this statement is up to you; I'm
+> just suggesting what I'd see as one more precise explanation.)
+  Yes, it seems correct to me - grep tells me the PXB device is the only 
+user of explicit_ofw_unit_address() in the whole code base, and there 
+are no sysbus_init_*() functions anywhere within pci_expander_bridge.c.
+
+
+ATB,
+
+Mark.
