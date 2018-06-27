@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fYJXq-00082k-H7
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:16 -0400
+	(envelope-from <shorne@gmail.com>) id 1fYJXt-00082q-2z
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fYJXn-0006Df-5s
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:14 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:50930)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1fYJXm-00067a-Rq
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:11 -0400
-Date: Wed, 27 Jun 2018 18:07:59 -0500
-From: Venu Busireddy <venu.busireddy@oracle.com>
-Message-ID: <20180627230758.GA14856@vbusired-vm>
-References: <20180627034935.20276-1-venu.busireddy@oracle.com>
-	<20180627034935.20276-4-venu.busireddy@oracle.com>
-	<20180627065943-mutt-send-email-mst@kernel.org>
-	<20180627040812.GA20446@troi>
+	(envelope-from <shorne@gmail.com>) id 1fYJXp-0006MJ-S0
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:17 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:37878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYJXp-0006KB-LH
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:13 -0400
+Received: by mail-pf0-x244.google.com with SMTP id y5-v6so1648882pfn.4
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 16:08:13 -0700 (PDT)
+Date: Thu, 28 Jun 2018 08:08:10 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20180627230810.GL24595@lianli.shorne-pla.net>
+References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	<20180618184046.6270-14-richard.henderson@linaro.org>
+	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
+	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
+	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
+	<20180627125953.GK24595@lianli.shorne-pla.net>
+	<ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180627040812.GA20446@troi>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 3/4] Add "Group
- Identifier" support to Red Hat PCI bridge.
+In-Reply-To: <ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,150 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 2018-06-26 23:08:12 -0500, Venu Busireddy wrote:
-> On 2018-06-27 07:02:36 +0300, Michael S. Tsirkin wrote:
-> > On Tue, Jun 26, 2018 at 10:49:33PM -0500, Venu Busireddy wrote:
-> > > Add the "Vendor-Specific" capability to the Red Hat PCI bridge device
-> > > "pci-bridge", to contain the "Group Identifier" (UUID) that will be
-> > > used to pair a virtio device with the passthrough device attached to
-> > > that bridge.
-> > > 
-> > > This capability is added to the bridge iff the "uuid" option is specified
-> > > for the bridge.
+On Wed, Jun 27, 2018 at 06:50:18AM -0700, Richard Henderson wrote:
+> On 06/27/2018 05:59 AM, Stafford Horne wrote:
+> > The index is negative... this patch should fix that.
 > > 
-> > I think the name should be more explicit. How about "failover-group-id"?
+> > @@ -78,6 +78,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr,
+> > target_ulong rb)
+> >      case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+> >          idx = (spr - 1024);
+> >          env->shadow_gpr[idx / 32][idx % 32] = rb;
+> > +        break;
+> >  
+> >      case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
 > 
-> I can change it. But don't you think it is bit long?
-> 
-> > > 
-> > > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
-> > 
-> > I'd like to also tweak the device id in this case,
-> > to make it easier for guests to know it's a grouping bridge.
-> 
-> Could you please recommend a name for the new ID'd definition? Something
-> in lines of PCI_DEVICE_ID_REDHAT_<blah blah>.
+> OMG.  That's embarrasing...
 
-How about these names and values for the device IDs?
+Yes, I thought so too, it's my bug.  I am little surprised it didn't cause
+issues before.
 
-  PCI_DEVICE_ID_REDHAT_PCI_BRIDGE_GRP (0x0010) for pci-bridge, and 
-  PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE_GRP (0x0011) for pcie-downstream
+I am still getting failures on SMP, this time the kernel is jumping to some
+unknown address, maybe an itlb issue, I will continue to debug.  Bisecting it is
+exposing some other issues (the mmu handlers were not getting init'd during one
+point in time).
 
-Thanks,
-
-Venu
-
-> > > ---
-> > >  hw/pci-bridge/pci_bridge_dev.c |  8 ++++++++
-> > >  hw/pci/pci_bridge.c            | 26 ++++++++++++++++++++++++++
-> > >  include/hw/pci/pcie.h          |  1 +
-> > >  3 files changed, 35 insertions(+)
-> > > 
-> > > diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-> > > index b2d861d216..bbbc6fa1c6 100644
-> > > --- a/hw/pci-bridge/pci_bridge_dev.c
-> > > +++ b/hw/pci-bridge/pci_bridge_dev.c
-> > > @@ -71,6 +71,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
-> > >          bridge_dev->msi = ON_OFF_AUTO_OFF;
-> > >      }
-> > >  
-> > > +    err = pci_bridge_vendor_init(dev, 0, errp);
-> > > +    if (err < 0) {
-> > > +        error_append_hint(errp, "Can't init group ID, error %d\n", err);
-> > > +        goto vendor_cap_err;
-> > > +    }
-> > > +
-> > >      err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
-> > >      if (err) {
-> > >          goto slotid_error;
-> > > @@ -109,6 +115,7 @@ slotid_error:
-> > >      if (shpc_present(dev)) {
-> > >          shpc_cleanup(dev, &bridge_dev->bar);
-> > >      }
-> > > +vendor_cap_err:
-> > >  shpc_error:
-> > >      pci_bridge_exitfn(dev);
-> > >  }
-> > > @@ -162,6 +169,7 @@ static Property pci_bridge_dev_properties[] = {
-> > >                              ON_OFF_AUTO_AUTO),
-> > >      DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
-> > >                      PCI_BRIDGE_DEV_F_SHPC_REQ, true),
-> > > +    DEFINE_PROP_UUID(COMPAT_PROP_UUID, PCIDevice, uuid, false),
-> > >      DEFINE_PROP_END_OF_LIST(),
-> > >  };
-> > >  
-> > > diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> > > index 40a39f57cb..cb8b3dad2a 100644
-> > > --- a/hw/pci/pci_bridge.c
-> > > +++ b/hw/pci/pci_bridge.c
-> > > @@ -34,12 +34,17 @@
-> > >  #include "hw/pci/pci_bus.h"
-> > >  #include "qemu/range.h"
-> > >  #include "qapi/error.h"
-> > > +#include "qemu/uuid.h"
-> > >  
-> > >  /* PCI bridge subsystem vendor ID helper functions */
-> > >  #define PCI_SSVID_SIZEOF        8
-> > >  #define PCI_SSVID_SVID          4
-> > >  #define PCI_SSVID_SSID          6
-> > >  
-> > > +#define PCI_VENDOR_SIZEOF             20
-> > > +#define PCI_VENDOR_CAP_LEN_OFFSET      2
-> > > +#define PCI_VENDOR_GROUP_ID_OFFSET     4
-> > > +
-> > >  int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
-> > >                            uint16_t svid, uint16_t ssid,
-> > >                            Error **errp)
-> > > @@ -57,6 +62,27 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
-> > >      return pos;
-> > >  }
-> > >  
-> > > +int pci_bridge_vendor_init(PCIDevice *d, uint8_t offset, Error **errp)
-> > > +{
-> > > +    int pos;
-> > > +
-> > > +    if (qemu_uuid_is_null(&d->uuid)) {
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    pos = pci_add_capability(d, PCI_CAP_ID_VNDR, offset, PCI_VENDOR_SIZEOF,
-> > > +            errp);
-> > > +    if (pos < 0) {
-> > > +        return pos;
-> > > +    }
-> > > +
-> > > +    pci_set_word(d->config + pos + PCI_VENDOR_CAP_LEN_OFFSET,
-> > > +            PCI_VENDOR_SIZEOF);
-> > > +    memcpy(d->config + pos + PCI_VENDOR_GROUP_ID_OFFSET, &d->uuid,
-> > > +            sizeof(QemuUUID));
-> > > +    return pos;
-> > > +}
-> > > +
-> > >  /* Accessor function to get parent bridge device from pci bus. */
-> > >  PCIDevice *pci_bridge_get_device(PCIBus *bus)
-> > >  {
-> > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > > index b71e369703..b4189d0ce3 100644
-> > > --- a/include/hw/pci/pcie.h
-> > > +++ b/include/hw/pci/pcie.h
-> > > @@ -82,6 +82,7 @@ struct PCIExpressDevice {
-> > >  };
-> > >  
-> > >  #define COMPAT_PROP_PCP "power_controller_present"
-> > > +#define COMPAT_PROP_UUID "uuid"
-> > >  
-> > >  /* PCI express capability helper functions */
-> > >  int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
-> > 
-> > ---------------------------------------------------------------------
-> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> > 
-> 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> 
+-Stafford
