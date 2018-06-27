@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fY72F-0008U4-TW
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:46:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fY78P-0002wX-96
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:53:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fY72C-00052e-00
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:46:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43198 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fY72B-000523-Qf
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:46:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0DBF781A4EA9
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 09:46:43 +0000 (UTC)
-Date: Wed, 27 Jun 2018 10:46:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180627094639.GB2423@work-vm>
-References: <20180626181932.11909-1-quintela@redhat.com>
-	<20180626181932.11909-4-quintela@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1fY78M-0003lk-0b
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 05:53:09 -0400
+Date: Wed, 27 Jun 2018 10:53:02 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180627095302.GD4325@stefanha-x1.localdomain>
+References: <20180627073351.856-1-contrib@steffen-goertz.de>
+	<20180627073351.856-2-contrib@steffen-goertz.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="J5MfuwkIyy7RmF4Q"
 Content-Disposition: inline
-In-Reply-To: <20180626181932.11909-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v16 04/14] migration: Abstract the number
- of bytes sent
+In-Reply-To: <20180627073351.856-2-contrib@steffen-goertz.de>
+Subject: Re: [Qemu-devel] [RFC 1/8] arm: NRF51/Microbit Memory container and
+ SOC variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +25,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
+Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Right now we use the "position" inside the QEMUFile, but things like
-> RDMA already do weird things to be able to maintain that counter
-> right, and multifd will have some similar problems.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--J5MfuwkIyy7RmF4Q
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jun 27, 2018 at 09:33:44AM +0200, Steffen G=F6rtz wrote:
+
+This looks like code that can be squashed into to Joel's 'microbit'
+machine type series.  Please agree with Joel how to include this in his
+upcoming v2 patch series.
+
+There are several things going on here and the patch could be split into
+several commits with commit descriptions that explain the rationale,
+making it easier to review.  But if Joel is happy to work this into his
+code as-is then there's no need to worry about structuring this patch
+right now.
+
+> Signed-off-by: Steffen G=F6rtz <contrib@steffen-goertz.de>
 > ---
->  migration/migration.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index d3e6da9bfe..264f3ce84e 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2704,9 +2704,15 @@ static MigThrError migration_detect_error(MigrationState *s)
->      }
+>  hw/arm/microbit.c          |  8 ++--
+>  hw/arm/nrf51_soc.c         | 98 +++++++++++++++++++++++++++-----------
+>  include/hw/arm/nrf51_soc.h | 24 ++++++++--
+>  3 files changed, 95 insertions(+), 35 deletions(-)
+>=20
+> diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
+> index b61d0747fe..9deb1a36ca 100644
+> --- a/hw/arm/microbit.c
+> +++ b/hw/arm/microbit.c
+> @@ -10,6 +10,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "hw/boards.h"
+> +#include "hw/arm/arm.h"
+> =20
+>  #include "hw/arm/nrf51_soc.h"
+> =20
+> @@ -18,10 +19,11 @@ static void microbit_init(MachineState *machine)
+>      DeviceState *dev;
+> =20
+>      dev =3D qdev_create(NULL, TYPE_NRF51_SOC);
+> -    if (machine->kernel_filename) {
+> -        qdev_prop_set_string(dev, "kernel-filename", machine->kernel_fil=
+ename);
+> -    }
+> +    qdev_prop_set_uint32(DEVICE(dev), "VARIANT", NRF51_VARIANT_AA);
+>      object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal=
+);
+> +
+> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+> +            0x00000000);
 >  }
->  
-> +/* How many bytes have we transferred since the beggining of the migration */
-> +static uint64_t migration_total_bytes(MigrationState *s)
+> =20
+>  static void microbit_machine_init(MachineClass *mc)
+> diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+> index b9f309aa6b..1f7c159edf 100644
+> --- a/hw/arm/nrf51_soc.c
+> +++ b/hw/arm/nrf51_soc.c
+> @@ -22,23 +22,33 @@
+>  #include "crypto/random.h"
+> =20
+>  #include "hw/arm/nrf51_soc.h"
+> -#include "hw/char/nrf51_uart.h"
+> =20
+>  #define IOMEM_BASE      0x40000000
+>  #define IOMEM_SIZE      0x20000000
+> =20
+>  #define FLASH_BASE      0x00000000
+> -#define FLASH_SIZE      (256 * 1024)
+> =20
+>  #define FICR_BASE       0x10000000
+>  #define FICR_SIZE       0x100
+> =20
+>  #define SRAM_BASE       0x20000000
+> -#define SRAM_SIZE       (16 * 1024)
+> =20
+>  #define UART_BASE       0x40002000
+>  #define UART_SIZE       0x1000
+> =20
+> +#define PAGE_SIZE       0x0400
+> +
+> +
+> +struct {
+> +  hwaddr ram_size;
+> +  hwaddr flash_size;
+> +} NRF51VariantAttributes[] =3D {
+> +        {.ram_size =3D 16, .flash_size =3D 256 },
+> +        {.ram_size =3D 16, .flash_size =3D 128 },
+> +        {.ram_size =3D 32, .flash_size =3D 256 },
+> +};
+> +
+> +
+>  static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
+>  {
+>      qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n", __func__, =
+addr, size);
+> @@ -101,62 +111,93 @@ static const MemoryRegionOps rng_ops =3D {
+>      .write =3D rng_write
+>  };
+> =20
+> +static void nrf51_soc_init(Object *obj)
 > +{
-> +    return qemu_ftell(s->to_dst_file);
+> +    NRF51State *s =3D NRF51_SOC(obj);
+> +
+> +    memory_region_init(&s->container, obj, "microbit-container",
+> +            UINT64_MAX);
+> +
+> +    /* TODO: Change to armv6m when cortex-m0 core is available */
+> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
+> +    object_property_add_child(obj, "armv7m", OBJECT(&s->armv7m), &error_=
+abort);
+> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
+> +    qdev_prop_set_string(DEVICE(&s->armv7m), "cpu-type",
+> +                         ARM_CPU_TYPE_NAME("cortex-m3"));
+> +
+> +    object_initialize(&s->uart, sizeof(s->uart), TYPE_NRF51_UART);
+> +    object_property_add_child(obj, "uart", OBJECT(&s->uart), &error_abor=
+t);
+> +    qdev_set_parent_bus(DEVICE(&s->uart), sysbus_get_default());
 > +}
 > +
->  static void migration_calculate_complete(MigrationState *s)
+> =20
+>  static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
 >  {
-> -    uint64_t bytes = qemu_ftell(s->to_dst_file);
-> +    uint64_t bytes = migration_total_bytes(s);
->      int64_t end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      int64_t transfer_time;
->  
-> @@ -2729,13 +2735,15 @@ static void migration_update_counters(MigrationState *s,
->                                        int64_t current_time)
->  {
->      uint64_t transferred, time_spent;
-> +    uint64_t current_bytes; /* bytes transferred since the beginning */
->      double bandwidth;
->  
->      if (current_time < s->iteration_start_time + BUFFER_DELAY) {
+>      NRF51State *s =3D NRF51_SOC(dev_soc);
+>      Error *err =3D NULL;
+> =20
+> -    /* IO space */
+> -    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
+> -
+> -    /* FICR */
+> -    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
+> +    if (!(s->part_variant > NRF51_VARIANT_INVALID
+> +            && s->part_variant < NRF51_VARIANT_MAX)) {
+> +        error_setg(errp, "VARIANT not set or invalid");
+> +        return;
+> +    }
+> =20
+> -    MemoryRegion *system_memory =3D get_system_memory();
+> -    MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+> -    MemoryRegion *flash =3D g_new(MemoryRegion, 1);
+> +    memory_region_init_ram(&s->sram, NULL, "nrf51_soc.sram",
+> +            NRF51VariantAttributes[s->part_variant].ram_size * PAGE_SIZE=
+, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
+> =20
+> -    memory_region_init_ram_nomigrate(flash, NULL, "nrf51.flash", FLASH_S=
+IZE,
+> +    memory_region_init_ram(&s->flash, NULL, "nrf51_soc.flash",
+> +            NRF51VariantAttributes[s->part_variant].flash_size * PAGE_SI=
+ZE,
+>              &err);
+>      if (err) {
+>          error_propagate(errp, err);
 >          return;
 >      }
->  
-> -    transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-> +    current_bytes = migration_total_bytes(s);
-> +    transferred = current_bytes - s->iteration_initial_bytes;
->      time_spent = current_time - s->iteration_start_time;
->      bandwidth = (double)transferred / time_spent;
->      s->threshold_size = bandwidth * s->parameters.downtime_limit;
-> @@ -2754,7 +2762,7 @@ static void migration_update_counters(MigrationState *s,
->      qemu_file_reset_rate_limit(s->to_dst_file);
->  
->      s->iteration_start_time = current_time;
-> -    s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
-> +    s->iteration_initial_bytes = current_bytes;
->  
->      trace_migrate_transferred(transferred, time_spent,
->                                bandwidth, s->threshold_size);
-> -- 
+> +    memory_region_add_subregion(&s->container, FLASH_BASE, &s->flash);
+> =20
+> -    vmstate_register_ram_global(flash);
+> -    memory_region_set_readonly(flash, true);
+> +    qdev_prop_set_uint32(DEVICE(&s->armv7m), "num-irq", 60);
+> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(&s->container),
+> +                                         "memory", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> =20
+> -    memory_region_add_subregion(system_memory, FLASH_BASE, flash);
+> =20
+> -    memory_region_init_ram_nomigrate(sram, NULL, "nrf51.sram", SRAM_SIZE,
+> -            &err);
+> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+>          return;
+>      }
+> -    vmstate_register_ram_global(sram);
+> -    memory_region_add_subregion(system_memory, SRAM_BASE, sram);
+> =20
+> -    /* TODO: implement a cortex m0 and update this */
+> -    s->nvic =3D armv7m_init(get_system_memory(), FLASH_SIZE, 96,
+> -               s->kernel_filename, ARM_CPU_TYPE_NAME("cortex-m3"));
+> +    /* IO space */
+> +    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
+> +
+> +    /* FICR */
+> +    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
+> =20
+> -    s->uart =3D nrf51_uart_create(UART_BASE, qdev_get_gpio_in(s->nvic, 2=
+),
+> -                                serial_hd(0));
+> +    qdev_prop_set_chr(DEVICE(&s->uart), "chardev", serial_hd(0));
+> +    qdev_init_nofail(DEVICE(&s->uart));
+> +/*    sysbus_mmio_map(s, 0, UART_BASE);
+> +    sysbus_connect_irq(s, 0, qdev_get_gpio_in(s->nvic, 2)); */
+> =20
+>      memory_region_init_io(&s->clock, NULL, &clock_ops, NULL, "nrf51_soc.=
+clock", 0x1000);
+> -    memory_region_add_subregion_overlap(get_system_memory(), IOMEM_BASE,=
+ &s->clock, -1);
+> +    memory_region_add_subregion_overlap(&s->container, IOMEM_BASE, &s->c=
+lock, -1);
+> =20
+>      memory_region_init_io(&s->nvmc, NULL, &nvmc_ops, NULL, "nrf51_soc.nv=
+mc", 0x1000);
+> -    memory_region_add_subregion_overlap(get_system_memory(), 0x4001E000,=
+ &s->nvmc, -1);
+> +    memory_region_add_subregion_overlap(&s->container, 0x4001E000, &s->n=
+vmc, -1);
+> =20
+>      memory_region_init_io(&s->rng, NULL, &rng_ops, NULL, "nrf51_soc.rng"=
+, 0x1000);
+> -    memory_region_add_subregion_overlap(get_system_memory(), 0x4000D000,=
+ &s->rng, -1);
+> +    memory_region_add_subregion_overlap(&s->container, 0x4000D000, &s->r=
+ng, -1);
+>  }
+> =20
+>  static Property nrf51_soc_properties[] =3D {
+> -    DEFINE_PROP_STRING("kernel-filename", NRF51State, kernel_filename),
+> +    DEFINE_PROP_INT32("VARIANT", NRF51State, part_variant,
+> +            NRF51_VARIANT_INVALID),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> @@ -172,6 +213,7 @@ static const TypeInfo nrf51_soc_info =3D {
+>      .name          =3D TYPE_NRF51_SOC,
+>      .parent        =3D TYPE_SYS_BUS_DEVICE,
+>      .instance_size =3D sizeof(NRF51State),
+> +    .instance_init =3D nrf51_soc_init,
+>      .class_init    =3D nrf51_soc_class_init,
+>  };
+> =20
+> diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+> index f81cbbe3ce..c9af9659e9 100644
+> --- a/include/hw/arm/nrf51_soc.h
+> +++ b/include/hw/arm/nrf51_soc.h
+> @@ -12,6 +12,8 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/arm/armv7m.h"
+> +#include "hw/char/nrf51_uart.h"
+> =20
+>  #define TYPE_NRF51_SOC "nrf51-soc"
+>  #define NRF51_SOC(obj) \
+> @@ -22,16 +24,30 @@ typedef struct NRF51State {
+>      SysBusDevice parent_obj;
+> =20
+>      /*< public >*/
+> -    char *kernel_filename;
+> -    DeviceState *nvic;
+> -    DeviceState *uart;
+> +    /* TODO: Change to armv6m when cortex-m0 core is available */
+> +    ARMv7MState armv7m;
+> =20
+> -    MemoryRegion iomem;
+> +    Nrf51UART uart;
+> =20
+> +    MemoryRegion container;
+> +    MemoryRegion sram;
+> +    MemoryRegion flash;
+> +    MemoryRegion iomem;
+>      MemoryRegion clock;
+>      MemoryRegion nvmc;
+>      MemoryRegion rng;
+> +
+> +    /* Properties */
+> +    int32_t part_variant;
+>  } NRF51State;
+> =20
+> +typedef enum {
+> +    NRF51_VARIANT_INVALID =3D -1,
+> +    NRF51_VARIANT_AA =3D 0,
+> +    NRF51_VARIANT_AB =3D 1,
+> +    NRF51_VARIANT_AC =3D 2,
+> +    NRF51_VARIANT_MAX =3D 3
+> +} NRF51Variants;
+> +
+>  #endif
+> =20
+> --=20
 > 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+
+--J5MfuwkIyy7RmF4Q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbM15+AAoJEJykq7OBq3PILDAH/i3Mwa5p9yUeiydb0BgT6tX8
+wB6YwBIa6sbWGSq5PMv45HQccpCud0wQEojZKtl0Ow1a3G9IkI0Vl5R64+OgYYpH
+G69VAezh5hN3JZNkJ5YhmAtotBv21ayDPL/yfqwT7c+feQGmjIVNcAOAySZ1YeL/
+raZ7AtTL82LiyXeflgq5UBO9Q6VR+sWuCIaFjMP4o/mGIuA0yg/lF7H0tiEmtwep
+Tnii6pdqGWIpU50Jhu2TNSWDQhvan6XoROLUM+SN/+Ws8X6cPJaq+2YAztwjUTmz
+JlwNUl0SPxBle9AFnEXqfCkRzMnvDGzDuShh93pnWftjhkGIy1kuy7nah2NBgiE=
+=3KbQ
+-----END PGP SIGNATURE-----
+
+--J5MfuwkIyy7RmF4Q--
