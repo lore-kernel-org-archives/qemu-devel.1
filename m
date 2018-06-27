@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fY8Yy-00048s-2t
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:24:41 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fY8Zm-0004g6-5O
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fY8Yt-0003sj-64
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:24:40 -0400
-Date: Wed, 27 Jun 2018 13:24:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180627132429.03e418ec@redhat.com>
-In-Reply-To: <20180625124238.25339-13-f4bug@amsat.org>
-References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-13-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 12/46] hw/tpm: Use the IEC binary prefix
- definitions
+	(envelope-from <pagupta@redhat.com>) id 1fY8Zh-0004po-6Q
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:25:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48222 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fY8Zg-0004oV-Tu
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:25:25 -0400
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Wed, 27 Jun 2018 16:55:20 +0530
+Message-Id: <20180627112520.26085-1-pagupta@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] virtio-rng: process pending requests when
+ driver is ready
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +22,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, slopezpa@redhat.com
 
-On Mon, 25 Jun 2018 09:42:04 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+ virtio-rng device causing old guest kernels(2.6.32) to hang on latest qemu.
+ The driver attempts to read from the virtio-rng device too early in it's
+ initialization. Qemu detects guest is not ready and returns, resulting in
+ hang.
 
-> It eases code review, unit is explicit.
->=20
-> Patch generated using:
->=20
->   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/h=
-w/
->=20
-> and modified manually.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+ Fix is to handle pending request when guest is running and driver status is
+ set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
 
-> ---
->  include/hw/acpi/tpm.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index 46ac4dc581..3580ffd50c 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -16,6 +16,7 @@
->  #ifndef HW_ACPI_TPM_H
->  #define HW_ACPI_TPM_H
-> =20
-> +#include "qemu/units.h"
->  #include "hw/registerfields.h"
-> =20
->  #define TPM_TIS_ADDR_BASE           0xFED40000
-> @@ -176,7 +177,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
->  #define TPM_CRB_ADDR_CTRL           (TPM_CRB_ADDR_BASE + A_CRB_CTRL_REQ)
->  #define TPM_CRB_R_MAX               R_CRB_DATA_BUFFER
-> =20
-> -#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * 1024)
-> +#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * KiB)
-> =20
->  #define TPM_TCPA_ACPI_CLASS_CLIENT  0
->  #define TPM_TCPA_ACPI_CLASS_SERVER  1
+Reported-by: Sergio lopez <slopezpa@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+v1->v2: Update new status value early only for virtio-rng (Stefan)
+
+ hw/virtio/virtio-rng.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+index 289bbcac03..855f1b41d1 100644
+--- a/hw/virtio/virtio-rng.c
++++ b/hw/virtio/virtio-rng.c
+@@ -156,6 +156,19 @@ static void check_rate_limit(void *opaque)
+     vrng->activate_timer = true;
+ }
+ 
++static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
++{
++    VirtIORNG *vrng = VIRTIO_RNG(vdev);
++
++    if (!vdev->vm_running) {
++        return;
++    }
++    vdev->status = status;
++
++    /* Something changed, try to process buffers */
++    virtio_rng_process(vrng);
++}
++
+ static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -261,6 +274,7 @@ static void virtio_rng_class_init(ObjectClass *klass, void *data)
+     vdc->realize = virtio_rng_device_realize;
+     vdc->unrealize = virtio_rng_device_unrealize;
+     vdc->get_features = get_features;
++    vdc->set_status = virtio_rng_set_status;
+ }
+ 
+ static const TypeInfo virtio_rng_info = {
+-- 
+2.14.3
