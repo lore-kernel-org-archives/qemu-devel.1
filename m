@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fY9Dx-0004BH-Fv
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:02 -0400
+	(envelope-from <peterx@redhat.com>) id 1fY9Ee-0004eZ-7o
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fY9Dw-0007Nm-44
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:01 -0400
-Date: Wed, 27 Jun 2018 13:06:51 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180627120651.GM5955@stefanha-x1.localdomain>
-References: <20180622193700.6523-1-naravamudan@digitalocean.com>
+	(envelope-from <peterx@redhat.com>) id 1fY9EZ-00084B-8S
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33168 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fY9EZ-000830-1V
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:07:39 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B6D97406EA4F
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:07:38 +0000 (UTC)
+Date: Wed, 27 Jun 2018 20:07:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180627120733.GD2516@xz-mi>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org>
+	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
+	<87wouk8vul.fsf@dusky.pond.sub.org>
+	<20180627102043.GD30628@redhat.com>
+	<8760248odg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="nrXiCraHbXeog9mY"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180622193700.6523-1-naravamudan@digitalocean.com>
-Subject: Re: [Qemu-devel] [PATCH v4] linux-aio: properly bubble up errors
- from initialization
+In-Reply-To: <8760248odg.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +38,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org
 
+On Wed, Jun 27, 2018 at 01:23:07PM +0200, Markus Armbruster wrote:
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+> > On Wed, Jun 27, 2018 at 10:41:38AM +0200, Markus Armbruster wrote:
+> >> Markus Armbruster <armbru@redhat.com> writes:
+> >>=20
+> >> > Markus Armbruster <armbru@redhat.com> writes:
+> >> >
+> >> >> I fooled around a bit, and I think there are a few lose ends.
+> >> > [...]
+> >> >> Talking to a QMP monitor that supports OOB:
+> >> >>
+> >> >>     $ socat UNIX:test-qmp READLINE,history=3D$HOME/.qmp_history,p=
+rompt=3D'QMP> '
+> >> >>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "majo=
+r": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
+> >> >>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": t=
+rue } }
+> >> >>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' =
+is unexpected"}}
+> >> >>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable"=
+: ["oob"] } }
+> >> >>     {"return": {}}
+> >> >>     QMP> { "execute": "query-qmp-schema" }
+> >> >>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capa=
+bility requires that every command contains an 'id' field"}}
+> >> >>
+> >> >> Why does every command require 'id'?
+> >> >
+> >> > I found one reason: event COMMAND_DROPPED wants it.  Any other rea=
+son?
+> >> >
+> >> > [...]
+> >>=20
+> >> Apropos COMMAND_DROPPED: we send an event rather than an error respo=
+nse
+> >> because we may send it out-of-order.  Makes sense.
+> >>=20
+> >> However, broadcasting it to all monitors doesn't make sense.  We cou=
+ld
+> >> use a way to send an event to just one monitor.
 
---nrXiCraHbXeog9mY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+True.
 
-On Fri, Jun 22, 2018 at 12:37:00PM -0700, Nishanth Aravamudan wrote:
-> laio_init() can fail for a couple of reasons, which will lead to a NULL
-> pointer dereference in laio_attach_aio_context().
->=20
-> To solve this, add a aio_setup_linux_aio() function which is called
-> early in raw_open_common. If this fails, propagate the error up. The
-> signature of aio_get_linux_aio() was not modified, because it seems
-> preferable to return the actual errno from the possible failing
-> initialization calls.
->=20
-> Additionally, when the AioContext changes, we need to associate a
-> LinuxAioState with the new AioContext. Use the bdrv_attach_aio_context
-> callback and call the new aio_setup_linux_aio(), which will allocate a
-> new AioContext if needed, and return errors on failures. If it fails for
-> any reason, fallback to threaded AIO with an error message, as the
-> device is already in-use by the guest.
->=20
-> Add an assert that aio_get_linux_aio() cannot return NULL.
->=20
-> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
->=20
-> ---
->=20
-> Test case 1:
->     Set /proc/sys/fs/max-aio-nr to 0. Start a guest with an aio=3Dnative
->     disk.
->=20
->     Result: laio_init() returns NULL due to not being able to allocate
->     any AIO contexts. This NULL is assigned to ctx->linux_aio and
->     dereferenced in aio_get_linux_aio.
->=20
-> Test case 2:
->     Set /proc/sys/fs/max-aio-nr to 128. Start a guest with an aio=3Dnative
->     disk and one in-use I/O thread.
->=20
->     Result: laio_init() returns NULL due to not being able to allocate
->     additional AIO contexts for the I/O thread. This NULL is assigned to
->     ctx->linux_aio and dereferenced in aio_get_linux_aio.
->=20
-> Changes from v3 -> v4 (thanks to Fam Zheng and Kevin Wolf for review):
->=20
-> Squash patch 2/2 into 1/2.
-> Differentiate the possible reasons for laio_init() failing and use an
-> Error ** to propagate the errno to the caller.
->=20
-> Changes from v2 -> v3 (thanks to Eric Blake and Kevin Wolf for review):
->=20
-> Use a boolean false rather than 0 in assignment to use_linux_aio.
-> Drop ending '.' from error_report() calls.
-> Fix typo in commit message (propogates -> propagates).
-> Move aio_setup_linux_aio call to raw_open_common.
->=20
-> Changes from v1 -> v2 (thanks to Kevin Wolf for review):
->=20
-> Rather than affect virtio-scsi/blk at all, make all the changes internal
-> to file-posix.c. Thanks to Kevin Wolf for the suggested change.
->=20
->  block/file-posix.c      | 33 ++++++++++++++++++++++++++++-----
->  block/linux-aio.c       | 12 +++++++++---
->  include/block/aio.h     |  3 +++
->  include/block/raw-aio.h |  2 +-
->  stubs/linux-aio.c       |  2 +-
->  util/async.c            | 14 +++++++++++---
->  6 files changed, 53 insertions(+), 13 deletions(-)
+(Sorry for the late responses; I was on Linuxcon China in the past few
+days)
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+> >
+> > Worse than that - broadcasting to all monitors is categorically broke=
+n.
+> > Different monitors make use the same "id" formatting scheme, so if yo=
+u
+> > broadcast COMMAND_DROPPED to a different monitor you might have clash=
+ing
+> > "id" and thus incorrectly tell a client its command was dropped when =
+in
+> > fact it was processed. You'd have to be fairly unlucky in timing, but
+> > it could happen.
+>=20
+> Right.  Must fix bug.
 
-Stefan
+Even more true.
 
---nrXiCraHbXeog9mY
-Content-Type: application/pgp-signature; name="signature.asc"
+>=20
+> I'm glad I went over this one more time, and in public!
 
------BEGIN PGP SIGNATURE-----
+I had a glance at current qmp-spec, it seems that we don't have any
+restriction currently on "we must send events to all the monitors".
+Does it mean that we should be free to have per-monitor events
+starting from this event?
 
-iQEcBAEBAgAGBQJbM33bAAoJEJykq7OBq3PI4ssH/0Zqgidv8LhjN/ruNq54OdUV
-RG9hkhBCzGh0PMrktNmjr8UyydkCoA+9Aj/+L96ZKUKVuHKfOgkjGninKWh5kBtz
-EQv9GLdeZHnyUW07I1d33FxdePQLywISo7OBc1b6VME/LN9jql44RnV27U5Ii8y5
-zO4opb2/NvaEWtaBlK3AFKtYD7Qgk0TYI5cR/AE0dSQz1QEkyEozVyfL1hV/73EV
-NWI7Xczp2iDjNelRk4qRsnYtgsnrL8cFDwYmq5Ut/l4bJOOtpld0kOPLUQtRJrM7
-yVEULQz2G3NZ0a9tnjFJiRxUf+FYshz0EwKSd+RXOAqFSE9VYlpxopKR+j0tFqU=
-=U3HL
------END PGP SIGNATURE-----
+My current plan is that I can touch up scripts/qapi/events.py and
+related stuff to allow QMPEventFuncEmit to take a monitor parameter,
+then we pass in NULL when we want to send the event to all monitors.
 
---nrXiCraHbXeog9mY--
+Would that work?
+
+Thanks,
+
+--=20
+Peter Xu
