@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY4qF-0005fa-3y
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:26:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fY4so-0006Pu-0l
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY4qB-000704-CE
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:26:15 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:42879)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY4qB-0006xW-6G
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:26:11 -0400
-Received: by mail-pl0-x243.google.com with SMTP id w17-v6so630444pll.9
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 00:26:11 -0700 (PDT)
-References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-38-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e45c5f02-bb42-2dc2-a898-32fef7fabee6@linaro.org>
-Date: Wed, 27 Jun 2018 00:26:07 -0700
+	(envelope-from <dgibson@ozlabs.org>) id 1fY4sm-000163-UT
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:28:54 -0400
+Date: Wed, 27 Jun 2018 17:28:25 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180627072825.GH14434@umbus.fritz.box>
+References: <20180626135928.23950-1-clg@kaod.org>
+	<20180627033321-mutt-send-email-mst@kernel.org>
+	<1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
 MIME-Version: 1.0
-In-Reply-To: <20180625124238.25339-38-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 37/46] hw/vfio: Use the IEC binary
- prefix definitions
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="WRT3RXLOp/bBMgTI"
+Content-Disposition: inline
+In-Reply-To: <1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: qemu-trivial@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-
-On 06/25/2018 05:42 AM, Philippe Mathieu-Daudé wrote:
-> It eases code review, unit is explicit.
-> 
-> Patch generated using:
-> 
->   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
-> 
-> and modified manually.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/vfio/pci-quirks.c | 9 +++++----
->  hw/vfio/pci.c        | 3 ++-
->  2 files changed, 7 insertions(+), 5 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>
 
 
-r~
+--WRT3RXLOp/bBMgTI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 27, 2018 at 11:38:17AM +1000, Benjamin Herrenschmidt wrote:
+> On Wed, 2018-06-27 at 03:35 +0300, Michael S. Tsirkin wrote:
+> >=20
+> > > +
+> > > +/* Extract field fname from val */
+> > > +#define GETFIELD(fname, val)                    \
+> > > +        (((val) & fname##_MASK) >> fname##_LSH)
+> > > +
+> > > +/* Set field fname of oval to fval
+> > > + * NOTE: oval isn't modified, the combined result is returned
+> > > + */
+> > > +#define SETFIELD(fname, oval, fval)                     \
+> > > +        (((oval) & ~fname##_MASK) | \
+> > > +         ((((typeof(oval))(fval)) << fname##_LSH) & fname##_MASK))
+> > > +
+> >=20
+> > Pls don't make up macros like these. We can't have each device do it.
+>=20
+> So what ? We move the macros in a generic place ? These are MUCH better
+> than open-coding the masks & shifts and much less error prone.
+
+There are already deposit32 and deposit64() functions which I think
+would cover this.
+
+>=20
+> > > @@ -1031,6 +1110,7 @@ static Property pnv_chip_properties[] =3D {
+> > >      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
+> > >      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
+> > >      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
+> > > +    DEFINE_PROP_UINT32("num-phbs", PnvChip, num_phbs, 1),
+> > >      DEFINE_PROP_END_OF_LIST(),
+> > >  };
+> >=20
+> > How about instanciating each extra phb using -device?
+> > Seems better than teaching everyone about platform-specific
+> > options.
+>=20
+> It's about which PHBs are enabled, not which are instanciated, if I
+> understand Cedric changes ...
+>=20
+> This aims are implementing the POWER8 chip correctly, it has a fixed
+> number of PHBs per-chip at very specific XSCOM addresses, that the
+> firwmare knows about.
+
+Yeah, this is a recurring design conflict, which I'm not sure how to
+address.  Usually instantiating things with -device works better, but
+when do we do when that allows more flexibility with hardware
+arrangement than is actually possible in the hardware.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--WRT3RXLOp/bBMgTI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlszPJcACgkQbDjKyiDZ
+s5I2nA/6A1Hw6r+HK+gr09TdBdRoRv52pu8AL+A/tg/yc5e+vMWLdTk6fUSqDes0
+lKqpwNZb5uYz7nGf5QlGT8FF2P5YaHZSiIm0r38a4NonoCnVddUyCHrn3SNQ/AN9
+RRhcA0t36OrRWgffXty6Nep+hBN9hwZfBe9JXHQs7tlyKWnRdl6cvizYovphsLxB
+MCa2ce8/XG9OU1NAx0DtB5mbo1H2BM4tSQMVTCMzQKEaEUpwg17ssmxx9HCaAtrF
+tj4PaTQ1KwiH2nDrtAHF15W+6AAg+8xDssMwfrlwuXoIwU9dDjqQG7AbVDhtEyFe
+7aVao/6TyQtWg3D+yUlKYsL6K8iGTFK/Tfh4LgNb/vrR3lDinR+I93JLDvlvrqnN
+XEMQdDbP0hQDa+zJHYlhUx4xaHRmBGlYjFWjHesQTdxLLKCykCKg+n9b2oVVXaoe
+Lz5dB4i/3aTus0aSDqlbCxZD3jSloTespyc0UscQ+spuqr80QhXFI0zwAtSIlMdp
+Js5mRs19t4CGXbGFRfjvcgynGcMFU0eXIOnbiHMb+N2n5Eig/mCYyzDfMpUlC6xf
+7PGEmUTVdpCxD2u08kZhfvwTf8SBHQtJqPlwmE7F4aFSFacQN/UlZksvGYScz2ag
+7rSWC24wfLpoRBa201NcFTiQpzdp2+3dIAchdkQGVGQcD39x4Aw=
+=KdbC
+-----END PGP SIGNATURE-----
+
+--WRT3RXLOp/bBMgTI--
