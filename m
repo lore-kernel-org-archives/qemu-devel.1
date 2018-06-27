@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fY8mT-0005TR-W7
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:38:40 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fY8sP-0007Uv-DN
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fY8mQ-0004NS-OS
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:38:38 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fY8mQ-0004MJ-CP
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:38:34 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id z137-v6so5148051wmc.0
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 04:38:34 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-4-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180621015359.12018-4-richard.henderson@linaro.org>
-Date: Wed, 27 Jun 2018 12:38:31 +0100
-Message-ID: <87efgswjbc.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1fY8sM-0002zZ-7G
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:44:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60742 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fY8sL-0002yK-W9
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:44:42 -0400
+Date: Wed, 27 Jun 2018 13:44:38 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180627134438.3016259b@redhat.com>
+In-Reply-To: <20180626122343.13473-3-marcandre.lureau@redhat.com>
+References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
+	<20180626122343.13473-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 03/35] target/arm: Implement SVE Memory
- Contiguous Store Group
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] tpm: implement virtual memory
+ device for TPM PPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,438 +28,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Tue, 26 Jun 2018 14:23:41 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>=20
+> Implement a virtual memory device for the TPM Physical Presence interface.
+> The memory is located at 0xFED45000 and used by ACPI to send messages to =
+the
+> firmware (BIOS) and by the firmware to provide parameters for each one of
+> the supported codes.
+>=20
+> This device should be used by all TPM interfaces on x86 and can be added
+> by calling tpm_ppi_init_io().
+>=20
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
 > ---
->  target/arm/helper-sve.h    |  29 +++++
->  target/arm/sve_helper.c    | 211 +++++++++++++++++++++++++++++++++++++
->  target/arm/translate-sve.c |  65 ++++++++++++
->  target/arm/sve.decode      |  38 +++++++
->  4 files changed, 343 insertions(+)
->
-> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-> index 7338abbbcf..b768128951 100644
-> --- a/target/arm/helper-sve.h
-> +++ b/target/arm/helper-sve.h
-> @@ -794,3 +794,32 @@ DEF_HELPER_FLAGS_4(sve_ldnf1sdu_r, TCG_CALL_NO_WG, v=
-oid, env, ptr, tl, i32)
->  DEF_HELPER_FLAGS_4(sve_ldnf1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i=
-32)
->
->  DEF_HELPER_FLAGS_4(sve_ldnf1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i3=
-2)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st4bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st2hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st3hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st4hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st2ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st3ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st4ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st2dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st3dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st4dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1bh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st1bs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st1bd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1hs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +DEF_HELPER_FLAGS_4(sve_st1hd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> +
-> +DEF_HELPER_FLAGS_4(sve_st1sd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-> index 6e1b539ce3..f20774e240 100644
-> --- a/target/arm/sve_helper.c
-> +++ b/target/arm/sve_helper.c
-> @@ -3119,3 +3119,214 @@ DO_LDNF1(sds_r)
->  DO_LDNF1(dd_r)
->
->  #undef DO_LDNF1
-> +
+>=20
+> v4 (Marc-Andr=C3=A9):
+>  - pass TPM_PPI_ADDR_BASE as argument to tpm_ppi_init_io()
+>  - only enable PPI if property is set
+>=20
+> v3 (Marc-Andr=C3=A9):
+>  - merge CRB support
+>  - use trace events instead of DEBUG printf
+>  - headers inclusion simplification
+>=20
+> v2:
+>  - moved to byte access since an infrequently used device;
+>    this simplifies code
+>  - increase size of device to 0x400
+>  - move device to 0xfffef000 since SeaBIOS has some code at 0xffff0000:
+>    'On the emulators, the bios at 0xf0000 is also at 0xffff0000'
+> ---
+>  hw/tpm/tpm_ppi.h      | 27 ++++++++++++++++++++
+>  include/hw/acpi/tpm.h |  6 +++++
+>  hw/tpm/tpm_crb.c      |  7 ++++++
+>  hw/tpm/tpm_ppi.c      | 57 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/tpm/tpm_tis.c      |  7 ++++++
+>  hw/tpm/Makefile.objs  |  2 +-
+>  hw/tpm/trace-events   |  4 +++
+>  7 files changed, 109 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/tpm/tpm_ppi.h
+>  create mode 100644 hw/tpm/tpm_ppi.c
+>=20
+> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+> new file mode 100644
+> index 0000000000..ac7ad47238
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ppi.h
+> @@ -0,0 +1,27 @@
 > +/*
-> + * Store contiguous data, protected by a governing predicate.
+> + * TPM Physical Presence Interface
+> + *
+> + * Copyright (C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Stefan Berger    <stefanb@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
 > + */
-> +#define DO_ST1(NAME, FN, TYPEE, TYPEM, H)                  \
-> +void HELPER(NAME)(CPUARMState *env, void *vg,              \
-> +                  target_ulong addr, uint32_t desc)        \
-> +{                                                          \
-> +    intptr_t i, oprsz =3D simd_oprsz(desc);                  \
-> +    intptr_t ra =3D GETPC();                                 \
-> +    unsigned rd =3D simd_data(desc);                         \
-> +    void *vd =3D &env->vfp.zregs[rd];                        \
-> +    for (i =3D 0; i < oprsz; ) {                             \
-> +        uint16_t pg =3D *(uint16_t *)(vg + H1_2(i >> 3));    \
-> +        do {                                               \
-> +            if (pg & 1) {                                  \
-> +                TYPEM m =3D *(TYPEE *)(vd + H(i));           \
-> +                FN(env, addr, m, ra);                      \
-> +            }                                              \
-> +            i +=3D sizeof(TYPEE), pg >>=3D sizeof(TYPEE);      \
-> +            addr +=3D sizeof(TYPEM);                         \
-> +        } while (i & 15);                                  \
-> +    }                                                      \
-> +}
+> +#ifndef TPM_TPM_PPI_H
+> +#define TPM_TPM_PPI_H
 > +
-> +#define DO_ST1_D(NAME, FN, TYPEM)                          \
-> +void HELPER(NAME)(CPUARMState *env, void *vg,              \
-> +                  target_ulong addr, uint32_t desc)        \
-> +{                                                          \
-> +    intptr_t i, oprsz =3D simd_oprsz(desc) / 8;              \
-> +    intptr_t ra =3D GETPC();                                 \
-> +    unsigned rd =3D simd_data(desc);                         \
-> +    uint64_t *d =3D &env->vfp.zregs[rd].d[0];                \
-> +    uint8_t *pg =3D vg;                                      \
-> +    for (i =3D 0; i < oprsz; i +=3D 1) {                       \
-> +        if (pg[H1(i)] & 1) {                               \
-> +            FN(env, addr, d[i], ra);                       \
-> +        }                                                  \
-> +        addr +=3D sizeof(TYPEM);                             \
-> +    }                                                      \
-> +}
+> +#include "hw/acpi/tpm.h"
+> +#include "exec/address-spaces.h"
 > +
-> +#define DO_ST2(NAME, FN, TYPEE, TYPEM, H)                  \
-> +void HELPER(NAME)(CPUARMState *env, void *vg,              \
-> +                  target_ulong addr, uint32_t desc)        \
-> +{                                                          \
-> +    intptr_t i, oprsz =3D simd_oprsz(desc);                  \
-> +    intptr_t ra =3D GETPC();                                 \
-> +    unsigned rd =3D simd_data(desc);                         \
-> +    void *d1 =3D &env->vfp.zregs[rd];                        \
-> +    void *d2 =3D &env->vfp.zregs[(rd + 1) & 31];             \
-> +    for (i =3D 0; i < oprsz; ) {                             \
-> +        uint16_t pg =3D *(uint16_t *)(vg + H1_2(i >> 3));    \
-> +        do {                                               \
-> +            if (pg & 1) {                                  \
-> +                TYPEM m1 =3D *(TYPEE *)(d1 + H(i));          \
-> +                TYPEM m2 =3D *(TYPEE *)(d2 + H(i));          \
-> +                FN(env, addr, m1, ra);                     \
-> +                FN(env, addr + sizeof(TYPEM), m2, ra);     \
-> +            }                                              \
-> +            i +=3D sizeof(TYPEE), pg >>=3D sizeof(TYPEE);      \
-> +            addr +=3D 2 * sizeof(TYPEM);                     \
-> +        } while (i & 15);                                  \
-> +    }                                                      \
-> +}
+> +typedef struct TPMPPI {
+> +    MemoryRegion mmio;
 > +
-> +#define DO_ST3(NAME, FN, TYPEE, TYPEM, H)                  \
-> +void HELPER(NAME)(CPUARMState *env, void *vg,              \
-> +                  target_ulong addr, uint32_t desc)        \
-> +{                                                          \
-> +    intptr_t i, oprsz =3D simd_oprsz(desc);                  \
-> +    intptr_t ra =3D GETPC();                                 \
-> +    unsigned rd =3D simd_data(desc);                         \
-> +    void *d1 =3D &env->vfp.zregs[rd];                        \
-> +    void *d2 =3D &env->vfp.zregs[(rd + 1) & 31];             \
-> +    void *d3 =3D &env->vfp.zregs[(rd + 2) & 31];             \
-> +    for (i =3D 0; i < oprsz; ) {                             \
-> +        uint16_t pg =3D *(uint16_t *)(vg + H1_2(i >> 3));    \
-> +        do {                                               \
-> +            if (pg & 1) {                                  \
-> +                TYPEM m1 =3D *(TYPEE *)(d1 + H(i));          \
-> +                TYPEM m2 =3D *(TYPEE *)(d2 + H(i));          \
-> +                TYPEM m3 =3D *(TYPEE *)(d3 + H(i));          \
-> +                FN(env, addr, m1, ra);                     \
-> +                FN(env, addr + sizeof(TYPEM), m2, ra);     \
-> +                FN(env, addr + 2 * sizeof(TYPEM), m3, ra); \
-> +            }                                              \
-> +            i +=3D sizeof(TYPEE), pg >>=3D sizeof(TYPEE);      \
-> +            addr +=3D 3 * sizeof(TYPEM);                     \
-> +        } while (i & 15);                                  \
-> +    }                                                      \
-> +}
+> +    uint8_t ram[TPM_PPI_ADDR_SIZE];
+> +} TPMPPI;
+I probably miss something obvious here,
+1st:
+commit message says that memory reion is supposed to be interface
+between FW and OSPM (i.e. totally guest internal thingy).
+So question is:
+  why do we register memory region at all?
+it should be dropped or explained in commit message.
+
+2nd:
+If region is really necessary, then where is subsection to migrate
+data stored there?
+
+
 > +
-> +#define DO_ST4(NAME, FN, TYPEE, TYPEM, H)                  \
-> +void HELPER(NAME)(CPUARMState *env, void *vg,              \
-> +                  target_ulong addr, uint32_t desc)        \
-> +{                                                          \
-> +    intptr_t i, oprsz =3D simd_oprsz(desc);                  \
-> +    intptr_t ra =3D GETPC();                                 \
-> +    unsigned rd =3D simd_data(desc);                         \
-> +    void *d1 =3D &env->vfp.zregs[rd];                        \
-> +    void *d2 =3D &env->vfp.zregs[(rd + 1) & 31];             \
-> +    void *d3 =3D &env->vfp.zregs[(rd + 2) & 31];             \
-> +    void *d4 =3D &env->vfp.zregs[(rd + 3) & 31];             \
-> +    for (i =3D 0; i < oprsz; ) {                             \
-> +        uint16_t pg =3D *(uint16_t *)(vg + H1_2(i >> 3));    \
-> +        do {                                               \
-> +            if (pg & 1) {                                  \
-> +                TYPEM m1 =3D *(TYPEE *)(d1 + H(i));          \
-> +                TYPEM m2 =3D *(TYPEE *)(d2 + H(i));          \
-> +                TYPEM m3 =3D *(TYPEE *)(d3 + H(i));          \
-> +                TYPEM m4 =3D *(TYPEE *)(d4 + H(i));          \
-> +                FN(env, addr, m1, ra);                     \
-> +                FN(env, addr + sizeof(TYPEM), m2, ra);     \
-> +                FN(env, addr + 2 * sizeof(TYPEM), m3, ra); \
-> +                FN(env, addr + 3 * sizeof(TYPEM), m4, ra); \
-> +            }                                              \
-> +            i +=3D sizeof(TYPEE), pg >>=3D sizeof(TYPEE);      \
-> +            addr +=3D 4 * sizeof(TYPEM);                     \
-> +        } while (i & 15);                                  \
-> +    }                                                      \
-> +}
+> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m,
+> +                     hwaddr addr, Object *obj);
 > +
-> +DO_ST1(sve_st1bh_r, cpu_stb_data_ra, uint16_t, uint8_t, H1_2)
-> +DO_ST1(sve_st1bs_r, cpu_stb_data_ra, uint32_t, uint8_t, H1_4)
-> +DO_ST1_D(sve_st1bd_r, cpu_stb_data_ra, uint8_t)
+> +#endif /* TPM_TPM_PPI_H */
+> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> index 46ac4dc581..c082df7d1d 100644
+> --- a/include/hw/acpi/tpm.h
+> +++ b/include/hw/acpi/tpm.h
+> @@ -187,4 +187,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>  #define TPM2_START_METHOD_MMIO      6
+>  #define TPM2_START_METHOD_CRB       7
+> =20
+> +/*
+> + * Physical Presence Interface
+> + */
+> +#define TPM_PPI_ADDR_SIZE           0x400
+> +#define TPM_PPI_ADDR_BASE           0xFED45000
 > +
-> +DO_ST1(sve_st1hs_r, cpu_stw_data_ra, uint32_t, uint16_t, H1_4)
-> +DO_ST1_D(sve_st1hd_r, cpu_stw_data_ra, uint16_t)
-> +
-> +DO_ST1_D(sve_st1sd_r, cpu_stl_data_ra, uint32_t)
-> +
-> +DO_ST1(sve_st1bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
-> +DO_ST2(sve_st2bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
-> +DO_ST3(sve_st3bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
-> +DO_ST4(sve_st4bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
-> +
-> +DO_ST1(sve_st1hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
-> +DO_ST2(sve_st2hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
-> +DO_ST3(sve_st3hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
-> +DO_ST4(sve_st4hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
-> +
-> +DO_ST1(sve_st1ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
-> +DO_ST2(sve_st2ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
-> +DO_ST3(sve_st3ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
-> +DO_ST4(sve_st4ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
-> +
-> +DO_ST1_D(sve_st1dd_r, cpu_stq_data_ra, uint64_t)
-> +
-> +void HELPER(sve_st2dd_r)(CPUARMState *env, void *vg,
-> +                         target_ulong addr, uint32_t desc)
-> +{
-> +    intptr_t i, oprsz =3D simd_oprsz(desc) / 8;
-> +    intptr_t ra =3D GETPC();
-> +    unsigned rd =3D simd_data(desc);
-> +    uint64_t *d1 =3D &env->vfp.zregs[rd].d[0];
-> +    uint64_t *d2 =3D &env->vfp.zregs[(rd + 1) & 31].d[0];
-> +    uint8_t *pg =3D vg;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D 1) {
-> +        if (pg[H1(i)] & 1) {
-> +            cpu_stq_data_ra(env, addr, d1[i], ra);
-> +            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
-> +        }
-> +        addr +=3D 2 * 8;
+>  #endif /* HW_ACPI_TPM_H */
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index d5b0ac5920..37c095f00f 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -29,6 +29,7 @@
+>  #include "sysemu/reset.h"
+>  #include "tpm_int.h"
+>  #include "tpm_util.h"
+> +#include "tpm_ppi.h"
+>  #include "trace.h"
+> =20
+>  typedef struct CRBState {
+> @@ -43,6 +44,7 @@ typedef struct CRBState {
+>      size_t be_buffer_size;
+> =20
+>      bool ppi_enabled;
+> +    TPMPPI ppi;
+>  } CRBState;
+> =20
+>  #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+> @@ -294,6 +296,11 @@ static void tpm_crb_realize(DeviceState *dev, Error =
+**errp)
+>      memory_region_add_subregion(get_system_memory(),
+>          TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
+> =20
+> +    if (s->ppi_enabled) {
+> +        tpm_ppi_init_io(&s->ppi, get_system_memory(),
+> +                        TPM_PPI_ADDR_BASE, OBJECT(s));
 > +    }
-> +}
 > +
-> +void HELPER(sve_st3dd_r)(CPUARMState *env, void *vg,
-> +                         target_ulong addr, uint32_t desc)
-> +{
-> +    intptr_t i, oprsz =3D simd_oprsz(desc) / 8;
-> +    intptr_t ra =3D GETPC();
-> +    unsigned rd =3D simd_data(desc);
-> +    uint64_t *d1 =3D &env->vfp.zregs[rd].d[0];
-> +    uint64_t *d2 =3D &env->vfp.zregs[(rd + 1) & 31].d[0];
-> +    uint64_t *d3 =3D &env->vfp.zregs[(rd + 2) & 31].d[0];
-> +    uint8_t *pg =3D vg;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D 1) {
-> +        if (pg[H1(i)] & 1) {
-> +            cpu_stq_data_ra(env, addr, d1[i], ra);
-> +            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
-> +            cpu_stq_data_ra(env, addr + 16, d3[i], ra);
-> +        }
-> +        addr +=3D 3 * 8;
-> +    }
-> +}
-> +
-> +void HELPER(sve_st4dd_r)(CPUARMState *env, void *vg,
-> +                         target_ulong addr, uint32_t desc)
-> +{
-> +    intptr_t i, oprsz =3D simd_oprsz(desc) / 8;
-> +    intptr_t ra =3D GETPC();
-> +    unsigned rd =3D simd_data(desc);
-> +    uint64_t *d1 =3D &env->vfp.zregs[rd].d[0];
-> +    uint64_t *d2 =3D &env->vfp.zregs[(rd + 1) & 31].d[0];
-> +    uint64_t *d3 =3D &env->vfp.zregs[(rd + 2) & 31].d[0];
-> +    uint64_t *d4 =3D &env->vfp.zregs[(rd + 3) & 31].d[0];
-> +    uint8_t *pg =3D vg;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D 1) {
-> +        if (pg[H1(i)] & 1) {
-> +            cpu_stq_data_ra(env, addr, d1[i], ra);
-> +            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
-> +            cpu_stq_data_ra(env, addr + 16, d3[i], ra);
-> +            cpu_stq_data_ra(env, addr + 24, d4[i], ra);
-> +        }
-> +        addr +=3D 4 * 8;
-> +    }
-> +}
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index 09f77b5405..b25fe96b77 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -3716,3 +3716,68 @@ static bool trans_LDNF1_zpri(DisasContext *s, arg_=
-rpri_load *a, uint32_t insn)
->      }
->      return true;
+>      qemu_register_reset(tpm_crb_reset, dev);
 >  }
+> =20
+> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> new file mode 100644
+> index 0000000000..79bec186c7
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ppi.c
+> @@ -0,0 +1,57 @@
+> +/*
+> + * tpm_ppi.c - TPM Physical Presence Interface
+> + *
+> + * Copyright (C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Stefan Berger <stefanb@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
 > +
-> +static void do_st_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
-> +                      int msz, int esz, int nreg)
+> +#include "qemu/osdep.h"
+> +
+> +#include "tpm_ppi.h"
+> +#include "trace.h"
+> +
+> +static uint64_t tpm_ppi_mmio_read(void *opaque, hwaddr addr,
+> +                                  unsigned size)
 > +{
-> +    static gen_helper_gvec_mem * const fn_single[4][4] =3D {
-> +        { gen_helper_sve_st1bb_r, gen_helper_sve_st1bh_r,
-> +          gen_helper_sve_st1bs_r, gen_helper_sve_st1bd_r },
-> +        { NULL,                   gen_helper_sve_st1hh_r,
-> +          gen_helper_sve_st1hs_r, gen_helper_sve_st1hd_r },
-> +        { NULL, NULL,
-> +          gen_helper_sve_st1ss_r, gen_helper_sve_st1sd_r },
-> +        { NULL, NULL, NULL, gen_helper_sve_st1dd_r },
-> +    };
-> +    static gen_helper_gvec_mem * const fn_multiple[3][4] =3D {
-> +        { gen_helper_sve_st2bb_r, gen_helper_sve_st2hh_r,
-> +          gen_helper_sve_st2ss_r, gen_helper_sve_st2dd_r },
-> +        { gen_helper_sve_st3bb_r, gen_helper_sve_st3hh_r,
-> +          gen_helper_sve_st3ss_r, gen_helper_sve_st3dd_r },
-> +        { gen_helper_sve_st4bb_r, gen_helper_sve_st4hh_r,
-> +          gen_helper_sve_st4ss_r, gen_helper_sve_st4dd_r },
-> +    };
-> +    gen_helper_gvec_mem *fn;
+> +    TPMPPI *s =3D opaque;
 > +
-> +    if (nreg =3D=3D 0) {
-> +        /* ST1 */
-> +        fn =3D fn_single[msz][esz];
-> +    } else {
-> +        /* ST2, ST3, ST4 -- msz =3D=3D esz, enforced by encoding */
-> +        assert(msz =3D=3D esz);
-> +        fn =3D fn_multiple[nreg - 1][msz];
-> +    }
-> +    assert(fn !=3D NULL);
-> +    do_mem_zpa(s, zt, pg, addr, fn);
+> +    trace_tpm_ppi_mmio_read(addr, size, s->ram[addr]);
+> +
+> +    return s->ram[addr];
 > +}
 > +
-> +static bool trans_ST_zprr(DisasContext *s, arg_rprr_store *a, uint32_t i=
-nsn)
+> +static void tpm_ppi_mmio_write(void *opaque, hwaddr addr,
+> +                               uint64_t val, unsigned size)
 > +{
-> +    if (a->rm =3D=3D 31 || a->msz > a->esz) {
-> +        return false;
-> +    }
-> +    if (sve_access_check(s)) {
-> +        TCGv_i64 addr =3D new_tmp_a64(s);
-> +        tcg_gen_muli_i64(addr, cpu_reg(s, a->rm), (a->nreg + 1) << a->ms=
-z);
-> +        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
-> +        do_st_zpa(s, a->rd, a->pg, addr, a->msz, a->esz, a->nreg);
-> +    }
-> +    return true;
+> +    TPMPPI *s =3D opaque;
+> +
+> +    trace_tpm_ppi_mmio_write(addr, size, val);
+> +
+> +    s->ram[addr] =3D val;
 > +}
 > +
-> +static bool trans_ST_zpri(DisasContext *s, arg_rpri_store *a, uint32_t i=
-nsn)
+> +static const MemoryRegionOps tpm_ppi_memory_ops =3D {
+> +    .read =3D tpm_ppi_mmio_read,
+> +    .write =3D tpm_ppi_mmio_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .valid =3D {
+> +        .min_access_size =3D 1,
+> +        .max_access_size =3D 1,
+> +    },
+> +};
+> +
+> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m,
+> +                     hwaddr addr, Object *obj)
 > +{
-> +    if (a->msz > a->esz) {
-> +        return false;
-> +    }
-> +    if (sve_access_check(s)) {
-> +        int vsz =3D vec_full_reg_size(s);
-> +        int elements =3D vsz >> a->esz;
-> +        TCGv_i64 addr =3D new_tmp_a64(s);
+> +    memory_region_init_io(&tpmppi->mmio, obj, &tpm_ppi_memory_ops,
+> +                          tpmppi, "tpm-ppi-mmio",
+> +                          TPM_PPI_ADDR_SIZE);
 > +
-> +        tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn),
-> +                         (a->imm * elements * (a->nreg + 1)) << a->msz);
-> +        do_st_zpa(s, a->rd, a->pg, addr, a->msz, a->esz, a->nreg);
-> +    }
-> +    return true;
+> +    memory_region_add_subregion(m, addr, &tpmppi->mmio);
 > +}
-> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-> index afbed57de1..6e159faaec 100644
-> --- a/target/arm/sve.decode
-> +++ b/target/arm/sve.decode
-> @@ -27,6 +27,7 @@
->  %imm7_22_16     22:2 16:5
->  %imm8_16_10     16:5 10:3
->  %imm9_16_10     16:s6 10:3
-> +%size_23        23:2
->
->  # A combination of tsz:imm3 -- extract esize.
->  %tszimm_esz     22:2 5:5 !function=3Dtszimm_esz
-> @@ -76,6 +77,8 @@
->  &incdec2_pred   rd rn pg esz d u
->  &rprr_load      rd pg rn rm dtype nreg
->  &rpri_load      rd pg rn imm dtype nreg
-> +&rprr_store     rd pg rn rm msz esz nreg
-> +&rpri_store     rd pg rn imm msz esz nreg
->
->  ########################################################################=
-###
->  # Named instruction formats.  These are generally used to
-> @@ -184,6 +187,12 @@
->  @rpri_load_msz  ....... .... . imm:s4 ... pg:3 rn:5 rd:5 \
->                  &rpri_load dtype=3D%msz_dtype
->
-> +# Stores; user must fill in ESZ, MSZ, NREG as needed.
-> +@rprr_store         ....... ..    ..     rm:5 ... pg:3 rn:5 rd:5    &rpr=
-r_store
-> +@rpri_store_msz     ....... msz:2 .. . imm:s4 ... pg:3 rn:5 rd:5    &rpr=
-i_store
-> +@rprr_store_esz_n0  ....... ..    esz:2  rm:5 ... pg:3 rn:5 rd:5 \
-> +                    &rprr_store nreg=3D0
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index d9ddf9b723..e7f45a05b9 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -31,6 +31,7 @@
+>  #include "sysemu/tpm_backend.h"
+>  #include "tpm_int.h"
+>  #include "tpm_util.h"
+> +#include "tpm_ppi.h"
+>  #include "trace.h"
+> =20
+>  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
+> @@ -83,6 +84,7 @@ typedef struct TPMState {
+>      size_t be_buffer_size;
+> =20
+>      bool ppi_enabled;
+> +    TPMPPI ppi;
+>  } TPMState;
+> =20
+>  #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> @@ -979,6 +981,11 @@ static void tpm_tis_realizefn(DeviceState *dev, Erro=
+r **errp)
+> =20
+>      memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+>                                  TPM_TIS_ADDR_BASE, &s->mmio);
 > +
->  ########################################################################=
-###
->  # Instruction patterns.  Grouped according to the SVE encodingindex.xhtm=
-l.
->
-> @@ -705,3 +714,32 @@ LD_zprr         1010010 .. nreg:2 ..... 110 ... ....=
-. .....     @rprr_load_msz
->  # SVE load multiple structures (scalar plus immediate)
->  # LD2B, LD2H, LD2W, LD2D; etc.
->  LD_zpri         1010010 .. nreg:2 0.... 111 ... ..... .....     @rpri_lo=
-ad_msz
+> +    if (s->ppi_enabled) {
+> +        tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
+> +                        TPM_PPI_ADDR_BASE, OBJECT(s));
+> +    }
+>  }
+> =20
+>  static void tpm_tis_initfn(Object *obj)
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 1dc9f8bf2c..eedd8b6858 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -common-obj-y +=3D tpm_util.o
+> +common-obj-y +=3D tpm_util.o tpm_ppi.o
+>  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+>  common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+>  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 25bee0cecf..81f9923401 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -8,6 +8,10 @@ tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_=
+t val) "CRB write 0x" TA
+>  tpm_passthrough_handle_request(void *cmd) "processing command %p"
+>  tpm_passthrough_reset(void) "reset"
+> =20
+> +# hw/tpm/tpm_ppi.c
+> +tpm_ppi_mmio_read(uint64_t addr, unsigned size, uint32_t val) "PPI read =
+0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> +tpm_ppi_mmio_write(uint64_t addr, unsigned size, uint32_t val) "PPI writ=
+e 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
 > +
-> +### SVE Memory Store Group
-> +
-> +# SVE contiguous store (scalar plus immediate)
-> +# ST1B, ST1H, ST1W, ST1D; require msz <=3D esz
-> +ST_zpri         1110010 .. esz:2  0.... 111 ... ..... ..... \
-> +                @rpri_store_msz nreg=3D0
-> +
-> +# SVE contiguous store (scalar plus scalar)
-> +# ST1B, ST1H, ST1W, ST1D; require msz <=3D esz
-> +# Enumerate msz lest we conflict with STR_zri.
-> +ST_zprr         1110010 00 ..     ..... 010 ... ..... ..... \
-> +                @rprr_store_esz_n0 msz=3D0
-> +ST_zprr         1110010 01 ..     ..... 010 ... ..... ..... \
-> +                @rprr_store_esz_n0 msz=3D1
-> +ST_zprr         1110010 10 ..     ..... 010 ... ..... ..... \
-> +                @rprr_store_esz_n0 msz=3D2
-> +ST_zprr         1110010 11 11     ..... 010 ... ..... ..... \
-> +                @rprr_store msz=3D3 esz=3D3 nreg=3D0
-> +
-> +# SVE contiguous non-temporal store (scalar plus immediate)  (nreg =3D=
-=3D 0)
-> +# SVE store multiple structures (scalar plus immediate)      (nreg !=3D =
-0)
-> +ST_zpri         1110010 .. nreg:2 1.... 111 ... ..... ..... \
-> +                @rpri_store_msz esz=3D%size_23
-> +
-> +# SVE contiguous non-temporal store (scalar plus scalar)     (nreg =3D=
-=3D 0)
-> +# SVE store multiple structures (scalar plus scalar)         (nreg !=3D =
-0)
-> +ST_zprr         1110010 msz:2 nreg:2 ..... 011 ... ..... ..... \
-> +                @rprr_store esz=3D%size_23
-
-
---
-Alex Benn=C3=A9e
+>  # hw/tpm/tpm_util.c
+>  tpm_util_get_buffer_size_hdr_len(uint32_t len, size_t expected) "tpm_res=
+p->hdr.len =3D %u, expected =3D %zu"
+>  tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp->l=
+en =3D %u, expected =3D %zu"
