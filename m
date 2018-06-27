@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fYDQc-0003Zc-76
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:36:26 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fYDQj-0003dj-Oj
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fYDQa-0003MG-Fa
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:36:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59222 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fYDQf-0003OI-LE
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:36:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57162 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fYDQa-0003LX-9w
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:36:20 -0400
+	id 1fYDQf-0003OC-GF
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 12:36:25 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 27 Jun 2018 18:35:48 +0200
-Message-Id: <20180627163551.31610-13-marcandre.lureau@redhat.com>
+Date: Wed, 27 Jun 2018 18:35:49 +0200
+Message-Id: <20180627163551.31610-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20180627163551.31610-1-marcandre.lureau@redhat.com>
 References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 12/15] qapi-types: add #if conditions to
- types & visitors
+Subject: [Qemu-devel] [PATCH v6 13/15] qapi: add 'If:' section to generated
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,176 +31,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, eblake@redhat.com, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-From: Markus Armbruster <armbru@redhat.com>
-
-Types & visitors are coupled and must be handled together to avoid
-temporary build regression.
-
-Wrap generated types/visitor code with #if/#endif using the context
-helpers.
+The documentation is generated only once, and doesn't know C
+pre-conditions. Add 'If:' sections for top-level entities.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/types.py | 48 ++++++++++++++++++++++++++-----------------
- scripts/qapi/visit.py | 33 ++++++++++++++++-------------
- 2 files changed, 48 insertions(+), 33 deletions(-)
+ scripts/qapi/doc.py             | 22 ++++++++++++----------
+ tests/qapi-schema/doc-good.json |  2 +-
+ tests/qapi-schema/doc-good.out  |  1 +
+ tests/qapi-schema/doc-good.texi |  2 ++
+ 4 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 659075f884..fd7808103c 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -55,7 +55,7 @@ def gen_struct_members(members):
-     return ret
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 4db6674dc3..987fd3c943 100755
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -174,7 +174,7 @@ def texi_members(doc, what, base, variants, member_fu=
+nc):
+     return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
 =20
 =20
--def gen_object(name, base, members, variants):
-+def gen_object(name, ifcond, base, members, variants):
-     if name in objects_seen:
-         return ''
-     objects_seen.add(name)
-@@ -64,11 +64,14 @@ def gen_object(name, base, members, variants):
-     if variants:
-         for v in variants.variants:
-             if isinstance(v.type, QAPISchemaObjectType):
--                ret +=3D gen_object(v.type.name, v.type.base,
-+                ret +=3D gen_object(v.type.name, v.type.ifcond, v.type.b=
-ase,
-                                   v.type.local_members, v.type.variants)
-=20
-     ret +=3D mcgen('''
-=20
-+''')
-+    ret +=3D gen_if(ifcond)
-+    ret +=3D mcgen('''
- struct %(c_name)s {
- ''',
-                  c_name=3Dc_name(name))
-@@ -101,6 +104,7 @@ struct %(c_name)s {
-     ret +=3D mcgen('''
- };
- ''')
-+    ret +=3D gen_endif(ifcond)
-=20
-     return ret
-=20
-@@ -209,33 +213,39 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVi=
-sitor):
-         self._genc.add(gen_type_cleanup(name))
-=20
-     def visit_enum_type(self, name, info, ifcond, values, prefix):
--        self._genh.preamble_add(gen_enum(name, values, prefix))
--        self._genc.add(gen_enum_lookup(name, values, prefix))
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._genh.preamble_add(gen_enum(name, values, prefix))
-+            self._genc.add(gen_enum_lookup(name, values, prefix))
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
--        self._genh.preamble_add(gen_fwd_object_or_array(name))
--        self._genh.add(gen_array(name, element_type))
--        self._gen_type_cleanup(name)
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._genh.preamble_add(gen_fwd_object_or_array(name))
-+            self._genh.add(gen_array(name, element_type))
-+            self._gen_type_cleanup(name)
-=20
-     def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
--        self._genh.preamble_add(gen_fwd_object_or_array(name))
--        self._genh.add(gen_object(name, base, members, variants))
--        if base and not base.is_implicit():
--            self._genh.add(gen_upcast(name, base))
--        # TODO Worth changing the visitor signature, so we could
--        # directly use rather than repeat type.is_implicit()?
--        if not name.startswith('q_'):
--            # implicit types won't be directly allocated/freed
--            self._gen_type_cleanup(name)
-+        with ifcontext(ifcond, self._genh):
-+            self._genh.preamble_add(gen_fwd_object_or_array(name))
-+        self._genh.add(gen_object(name, ifcond, base, members, variants)=
-)
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            if base and not base.is_implicit():
-+                self._genh.add(gen_upcast(name, base))
-+            # TODO Worth changing the visitor signature, so we could
-+            # directly use rather than repeat type.is_implicit()?
-+            if not name.startswith('q_'):
-+                # implicit types won't be directly allocated/freed
-+                self._gen_type_cleanup(name)
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
--        self._genh.preamble_add(gen_fwd_object_or_array(name))
--        self._genh.add(gen_object(name, None,
-+        with ifcontext(ifcond, self._genh):
-+            self._genh.preamble_add(gen_fwd_object_or_array(name))
-+        self._genh.add(gen_object(name, ifcond, None,
-                                   [variants.tag_member], variants))
--        self._gen_type_cleanup(name)
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._gen_type_cleanup(name)
+-def texi_sections(doc):
++def texi_sections(doc, ifcond):
+     """Format additional sections following arguments"""
+     body =3D ''
+     for section in doc.sections:
+@@ -185,14 +185,16 @@ def texi_sections(doc):
+             body +=3D texi_example(section.text)
+         else:
+             body +=3D texi_format(section.text)
++    if ifcond:
++        body +=3D '\n\n@b{If:} @code{%s}' % ", ".join(ifcond)
+     return body
 =20
 =20
- def gen_types(schema, output_dir, prefix, opt_builtins):
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 34fe1ef5eb..dd5034a66a 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -311,29 +311,34 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCV=
+-def texi_entity(doc, what, base=3DNone, variants=3DNone,
++def texi_entity(doc, what, ifcond, base=3DNone, variants=3DNone,
+                 member_func=3Dtexi_member):
+     return (texi_body(doc)
+             + texi_members(doc, what, base, variants, member_func)
+-            + texi_sections(doc))
++            + texi_sections(doc, ifcond))
+=20
+=20
+ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
+@@ -208,7 +210,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
 isitor):
-                                       types=3Dtypes))
-=20
-     def visit_enum_type(self, name, info, ifcond, values, prefix):
--        self._genh.add(gen_visit_decl(name, scalar=3DTrue))
--        self._genc.add(gen_visit_enum(name))
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._genh.add(gen_visit_decl(name, scalar=3DTrue))
-+            self._genc.add(gen_visit_enum(name))
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
--        self._genh.add(gen_visit_decl(name))
--        self._genc.add(gen_visit_list(name, element_type))
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._genh.add(gen_visit_decl(name))
-+            self._genc.add(gen_visit_list(name, element_type))
+         doc =3D self.cur_doc
+         self._gen.add(TYPE_FMT(type=3D'Enum',
+                                name=3Ddoc.symbol,
+-                               body=3Dtexi_entity(doc, 'Values',
++                               body=3Dtexi_entity(doc, 'Values', ifcond,
+                                                 member_func=3Dtexi_enum_=
+value)))
 =20
      def visit_object_type(self, name, info, ifcond, base, members, varia=
 nts):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
--        self._genh.add(gen_visit_members_decl(name))
--        self._genc.add(gen_visit_object_members(name, base, members, var=
-iants))
--        # TODO Worth changing the visitor signature, so we could
--        # directly use rather than repeat type.is_implicit()?
--        if not name.startswith('q_'):
--            # only explicit types need an allocating visit
--            self._genh.add(gen_visit_decl(name))
--            self._genc.add(gen_visit_object(name, base, members, variant=
-s))
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._genh.add(gen_visit_members_decl(name))
-+            self._genc.add(gen_visit_object_members(name, base,
-+                                                    members, variants))
-+            # TODO Worth changing the visitor signature, so we could
-+            # directly use rather than repeat type.is_implicit()?
-+            if not name.startswith('q_'):
-+                # only explicit types need an allocating visit
-+                self._genh.add(gen_visit_decl(name))
-+                self._genc.add(gen_visit_object(name, base, members, var=
-iants))
+@@ -217,14 +219,14 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
+aVisitor):
+             base =3D None
+         self._gen.add(TYPE_FMT(type=3D'Object',
+                                name=3Ddoc.symbol,
+-                               body=3Dtexi_entity(doc, 'Members',
++                               body=3Dtexi_entity(doc, 'Members', ifcond=
+,
+                                                 base, variants)))
 =20
      def visit_alternate_type(self, name, info, ifcond, variants):
--        self._genh.add(gen_visit_decl(name))
--        self._genc.add(gen_visit_alternate(name, variants))
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            self._genh.add(gen_visit_decl(name))
-+            self._genc.add(gen_visit_alternate(name, variants))
+         doc =3D self.cur_doc
+         self._gen.add(TYPE_FMT(type=3D'Alternate',
+                                name=3Ddoc.symbol,
+-                               body=3Dtexi_entity(doc, 'Members')))
++                               body=3Dtexi_entity(doc, 'Members', ifcond=
+)))
+=20
+     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+                       success_response, boxed, allow_oob, allow_preconfi=
+g):
+@@ -233,9 +235,9 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+             body =3D texi_body(doc)
+             body +=3D ('\n@b{Arguments:} the members of @code{%s}\n'
+                      % arg_type.name)
+-            body +=3D texi_sections(doc)
++            body +=3D texi_sections(doc, ifcond)
+         else:
+-            body =3D texi_entity(doc, 'Arguments')
++            body =3D texi_entity(doc, 'Arguments', ifcond)
+         self._gen.add(MSG_FMT(type=3D'Command',
+                               name=3Ddoc.symbol,
+                               body=3Dbody))
+@@ -244,7 +246,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+         doc =3D self.cur_doc
+         self._gen.add(MSG_FMT(type=3D'Event',
+                               name=3Ddoc.symbol,
+-                              body=3Dtexi_entity(doc, 'Arguments')))
++                              body=3Dtexi_entity(doc, 'Arguments', ifcon=
+d)))
+=20
+     def symbol(self, doc, entity):
+         if self._gen._body:
+@@ -257,7 +259,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+         assert not doc.args
+         if self._gen._body:
+             self._gen.add('\n')
+-        self._gen.add(texi_body(doc) + texi_sections(doc))
++        self._gen.add(texi_body(doc) + texi_sections(doc, None))
 =20
 =20
- def gen_visit(schema, output_dir, prefix, opt_builtins):
+ def gen_doc(schema, output_dir, prefix):
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
+.json
+index 97ab4625ff..984cd8ed06 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -55,7 +55,7 @@
+ #
+ # @two is undocumented
+ ##
+-{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
++{ 'enum': 'Enum', 'data': [ 'one', 'two' ], 'if': 'defined(IFCOND)' }
+=20
+ ##
+ # @Base:
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+index 9c8a4838e1..35f3f1164c 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -3,6 +3,7 @@ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', =
+'qlist', 'qbool']
+     prefix QTYPE
+ module doc-good.json
+ enum Enum ['one', 'two']
++    if ['defined(IFCOND)']
+ object Base
+     member base1: Enum optional=3DFalse
+ object Variant1
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
+.texi
+index 0aed2300a5..e42eace474 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -89,6 +89,8 @@ Not documented
+ @end table
+ @code{two} is undocumented
+=20
++
++@b{If:} @code{defined(IFCOND)}
+ @end deftp
+=20
+=20
 --=20
 2.18.0.rc1
