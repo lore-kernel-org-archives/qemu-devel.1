@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fY8Xd-0003GM-Kn
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:23:18 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fY8Yy-00048s-2t
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:24:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fY8XY-0001UU-MO
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:23:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY8XY-0001TM-Fr
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:23:12 -0400
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
-	[10.5.11.24])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A5D73307CF25
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 11:23:11 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
-	<87wouk8vul.fsf@dusky.pond.sub.org>
-	<20180627102043.GD30628@redhat.com>
-Date: Wed, 27 Jun 2018 13:23:07 +0200
-In-Reply-To: <20180627102043.GD30628@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Wed, 27 Jun 2018 11:20:43 +0100")
-Message-ID: <8760248odg.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1fY8Yt-0003sj-64
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 07:24:40 -0400
+Date: Wed, 27 Jun 2018 13:24:29 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180627132429.03e418ec@redhat.com>
+In-Reply-To: <20180625124238.25339-13-f4bug@amsat.org>
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-13-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+Subject: Re: [Qemu-devel] [PATCH v5 12/46] hw/tpm: Use the IEC binary prefix
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,54 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Mon, 25 Jun 2018 09:42:04 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-> On Wed, Jun 27, 2018 at 10:41:38AM +0200, Markus Armbruster wrote:
->> Markus Armbruster <armbru@redhat.com> writes:
->>=20
->> > Markus Armbruster <armbru@redhat.com> writes:
->> >
->> >> I fooled around a bit, and I think there are a few lose ends.
->> > [...]
->> >> Talking to a QMP monitor that supports OOB:
->> >>
->> >>     $ socat UNIX:test-qmp READLINE,history=3D$HOME/.qmp_history,promp=
-t=3D'QMP> '
->> >>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": =
-2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
->> >>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true =
-} }
->> >>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' is u=
-nexpected"}}
->> >>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["=
-oob"] } }
->> >>     {"return": {}}
->> >>     QMP> { "execute": "query-qmp-schema" }
->> >>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capabili=
-ty requires that every command contains an 'id' field"}}
->> >>
->> >> Why does every command require 'id'?
->> >
->> > I found one reason: event COMMAND_DROPPED wants it.  Any other reason?
->> >
->> > [...]
->>=20
->> Apropos COMMAND_DROPPED: we send an event rather than an error response
->> because we may send it out-of-order.  Makes sense.
->>=20
->> However, broadcasting it to all monitors doesn't make sense.  We could
->> use a way to send an event to just one monitor.
->
-> Worse than that - broadcasting to all monitors is categorically broken.
-> Different monitors make use the same "id" formatting scheme, so if you
-> broadcast COMMAND_DROPPED to a different monitor you might have clashing
-> "id" and thus incorrectly tell a client its command was dropped when in
-> fact it was processed. You'd have to be fairly unlucky in timing, but
-> it could happen.
+> It eases code review, unit is explicit.
+>=20
+> Patch generated using:
+>=20
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/h=
+w/
+>=20
+> and modified manually.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Right.  Must fix bug.
-
-I'm glad I went over this one more time, and in public!
+> ---
+>  include/hw/acpi/tpm.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> index 46ac4dc581..3580ffd50c 100644
+> --- a/include/hw/acpi/tpm.h
+> +++ b/include/hw/acpi/tpm.h
+> @@ -16,6 +16,7 @@
+>  #ifndef HW_ACPI_TPM_H
+>  #define HW_ACPI_TPM_H
+> =20
+> +#include "qemu/units.h"
+>  #include "hw/registerfields.h"
+> =20
+>  #define TPM_TIS_ADDR_BASE           0xFED40000
+> @@ -176,7 +177,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>  #define TPM_CRB_ADDR_CTRL           (TPM_CRB_ADDR_BASE + A_CRB_CTRL_REQ)
+>  #define TPM_CRB_R_MAX               R_CRB_DATA_BUFFER
+> =20
+> -#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * 1024)
+> +#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * KiB)
+> =20
+>  #define TPM_TCPA_ACPI_CLASS_CLIENT  0
+>  #define TPM_TCPA_ACPI_CLASS_SERVER  1
