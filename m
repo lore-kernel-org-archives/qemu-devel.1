@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fXypJ-0003z2-Nl
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:00:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fXzPf-0008Be-P6
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fXypE-0007gg-25
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:00:52 -0400
-Date: Wed, 27 Jun 2018 10:35:08 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180627003508.GF14434@umbus.fritz.box>
-References: <20180626142214.27801-1-clg@kaod.org>
+	(envelope-from <eblake@redhat.com>) id 1fXzPe-0004TE-Ho
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 21:38:27 -0400
+References: <20180626222226.27620-1-jsnow@redhat.com>
+	<20180626222226.27620-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <67381f57-d8a6-b8e2-ac70-9e0fa10cbd94@redhat.com>
+Date: Tue, 26 Jun 2018 20:38:16 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ULyIDA2m8JTe+TiX"
-Content-Disposition: inline
-In-Reply-To: <20180626142214.27801-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix pnv_core_realize() error
- handling
+In-Reply-To: <20180626222226.27620-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] block: allow blockdev-backup from
+ any source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+On 06/26/2018 05:22 PM, John Snow wrote:
+> In the case of image fleecing, the node we choose as the source
+> for a blockdev-backup is going to be both a root node AND the
+> backing node for the exported image. It does not qualify as a root
+> image in this case.
+> 
+> Loosen the restriction.
 
---ULyIDA2m8JTe+TiX
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Did we regress (and if so, when), or has this never worked?  But you are 
+right: visually, we are starting with:
 
-On Tue, Jun 26, 2018 at 04:22:14PM +0200, C=E9dric Le Goater wrote:
-> commit d35aefa9ae15 ("ppc/pnv: introduce a new intc_create() operation
-> to the chip model") changed the object link in the pnv_core_realize()
-> routine but a return was forgotten in case of error, which can lead to
-> more problems afterwards (segv)
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+                   Device
+Base (backing) <- Top (active)
 
-Applied to ppc-for-3.0, thanks.
+then want to add nodes for an NBD export:
+                   Device    NBD
+Base (backing) <- Top    <- Tmp
 
+with a blockdev-backup "sync":"none" from Top to Tmp (any writes from 
+the Device first copy the old data to Tmp; the NBD export sees a 
+read-only view of Tmp that is unchanging from the time the backup job 
+started, regardless of what the Device does in the meantime).
+
+Then when the fleece job ends, the NBD export is stopped, the 
+blockdev-backup job is canceled, and Tmp is thrown away as unneeded.
+
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  hw/ppc/pnv_core.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index a9f129fc2c5f..9750464bf4a1 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -150,6 +150,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
->      if (!chip) {
->          error_propagate(errp, local_err);
->          error_prepend(errp, "required link 'chip' not found: ");
-> +        return;
->      }
-> =20
->      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+>   blockdev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index 58d7570932..526f8b60be 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3517,7 +3517,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+>           backup->compress = false;
+>       }
+>   
+> -    bs = qmp_get_root_bs(backup->device, errp);
+> +    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
---ULyIDA2m8JTe+TiX
-Content-Type: application/pgp-signature; name="signature.asc"
+>       if (!bs) {
+>           return NULL;
+>       }
+> 
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsy27cACgkQbDjKyiDZ
-s5IycRAAk3TTN/zIYKYyRukmjPRksxa8+iCWGaV2fJy84kR/TJSEEHkuslYNGyai
-SpA9qFMLFHnE0tnsYxbIX0TQCHyN+K/fsiI6FE8w6h2ozlCBSitWYtyQoe8KSCef
-WBgjB6dRX4Vpxr/0qjzpJlkJzDfjUccd4rPJNoQl01mn87pI3MxSEB2pHWDgiG8R
-BiaZJTMFP9xcVDhdOlx9iNlyq6hg0nsKMZ8ODmVSaTCrKFOK7HctvQAO/ImisRKp
-3+TOR8fZWW+Us10VS1pgZyPwvGPHwOfCUZhg0ThNoItDQ/Y8u83SWio0BJ4nBo62
-E/zKUs7pTLAfJg/XR/daVzL9cu9aACcQPgU1JaGizUBn5MjrdcQp+PQcouMKGm9U
-KAZzamSuEZM5B4Bb7fChU6EvncPBc9b2yOp0vCVN4UQvvca1F2cZ4llR4nVNBbiJ
-FF4cWMJQo6B5zHZExfr0kL6IJ/Y96KMCiMASWC19m5Or/vMp8nH4GOCcO2ZAus4L
-KqmWTz5ML/+aBe7Uyy+dJx4pOVj7o9IdFnGrKno7OyaP1DBxyuYs3nYvo61pXZ6s
-94kSQuJ5hpzYC58xwazI3rqGb3yVT5zfcbHTYq4RBlqjsCrxG/FBFtxhAekjlvUB
-WUJRyJlQKVes1koLw885b/k+MYXSgPLMnYD3Y8ufvRIFIaLJFXE=
-=U3oV
------END PGP SIGNATURE-----
-
---ULyIDA2m8JTe+TiX--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
