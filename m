@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY9zv-0001Ia-J9
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1fY9zz-0001MW-KX
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY9zu-0001gD-Pz
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49570 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fY9zw-0001gt-4f
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36588 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY9zu-0001fq-Lb
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:34 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY9zv-0001gZ-Vz
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:36 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E215805A530
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:56:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 786D540131CD
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:56:35 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 27 Jun 2018 14:56:01 +0200
-Message-Id: <20180627125604.15275-14-quintela@redhat.com>
+Date: Wed, 27 Jun 2018 14:56:02 +0200
+Message-Id: <20180627125604.15275-15-quintela@redhat.com>
 In-Reply-To: <20180627125604.15275-1-quintela@redhat.com>
 References: <20180627125604.15275-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 13/16] migration: Remove not needed semaphore
- and quit
+Subject: [Qemu-devel] [PULL 14/16] migration: Stop sending whole pages
+ through main channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +33,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We know quit with shutdwon in the QIO.
+We have to flush() the QEMUFile because now we sent really few data
+through that channel.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
---
-Add comment
-Use shutdown() instead of unref()
 ---
- migration/ram.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ migration/ram.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 5d38d699f3..61f7313093 100644
+index 61f7313093..7d23b472cb 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -594,14 +594,10 @@ typedef struct {
-     QemuThread thread;
-     /* communication channel */
-     QIOChannel *c;
--    /* sem where to wait for more work */
--    QemuSemaphore sem;
-     /* this mutex protects the following parameters */
-     QemuMutex mutex;
-     /* is this channel thread running */
-     bool running;
--    /* should this thread finish */
--    bool quit;
-     /* array of pages to receive */
-     MultiFDPages_t *pages;
-     /* packet allocated len */
-@@ -1144,8 +1140,11 @@ static void multifd_recv_terminate_threads(Error *err)
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
+@@ -1817,15 +1817,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+ static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
+                                  ram_addr_t offset)
+ {
+-    uint8_t *p;
+-
+-    p = block->host + offset;
+-
+-    ram_counters.transferred += save_page_header(rs, rs->f, block,
+-                                                 offset | RAM_SAVE_FLAG_PAGE);
+     multifd_queue_page(block, offset);
+-    qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+-    ram_counters.transferred += TARGET_PAGE_SIZE;
+     ram_counters.normal++;
  
-         qemu_mutex_lock(&p->mutex);
--        p->quit = true;
--        qemu_sem_post(&p->sem);
-+        /* We could arrive here for two reasons:
-+           - normal quit, i.e. everything went fine, just finished
-+           - error quit: We close the channels so the channel threads
-+             finish the qio_channel_read_all_eof() */
-+        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-         qemu_mutex_unlock(&p->mutex);
-     }
+     return 1;
+@@ -3066,6 +3058,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+ 
+     multifd_send_sync_main();
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
++    qemu_fflush(f);
+ 
+     return 0;
  }
-@@ -1168,7 +1167,6 @@ int multifd_load_cleanup(Error **errp)
-         object_unref(OBJECT(p->c));
-         p->c = NULL;
-         qemu_mutex_destroy(&p->mutex);
--        qemu_sem_destroy(&p->sem);
-         qemu_sem_destroy(&p->sem_sync);
-         g_free(p->name);
-         p->name = NULL;
-@@ -1291,9 +1289,7 @@ int multifd_load_setup(void)
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
+@@ -3148,6 +3141,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+     multifd_send_sync_main();
+ out:
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
++    qemu_fflush(f);
+     ram_counters.transferred += 8;
  
-         qemu_mutex_init(&p->mutex);
--        qemu_sem_init(&p->sem, 0);
-         qemu_sem_init(&p->sem_sync, 0);
--        p->quit = false;
-         p->id = i;
-         p->pages = multifd_pages_init(page_count);
-         p->packet_len = sizeof(MultiFDPacket_t)
+     ret = qemu_file_get_error(f);
+@@ -3201,6 +3195,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+ 
+     multifd_send_sync_main();
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
++    qemu_fflush(f);
+ 
+     return 0;
+ }
 -- 
 2.17.1
