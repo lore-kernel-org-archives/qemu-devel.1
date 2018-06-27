@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fYJXt-00082q-2z
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:17 -0400
+	(envelope-from <shorne@gmail.com>) id 1fYJge-0001nR-U4
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:17:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fYJXp-0006MJ-S0
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:17 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:37878)
+	(envelope-from <shorne@gmail.com>) id 1fYJgb-0002CE-MA
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:17:20 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33016)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYJXp-0006KB-LH
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:08:13 -0400
-Received: by mail-pf0-x244.google.com with SMTP id y5-v6so1648882pfn.4
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 16:08:13 -0700 (PDT)
-Date: Thu, 28 Jun 2018 08:08:10 +0900
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYJgb-0002AH-GO
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 19:17:17 -0400
+Received: by mail-pl0-x242.google.com with SMTP id 6-v6so1768116plb.0
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 16:17:17 -0700 (PDT)
+Date: Thu, 28 Jun 2018 08:17:14 +0900
 From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20180627230810.GL24595@lianli.shorne-pla.net>
+Message-ID: <20180627231714.GM24595@lianli.shorne-pla.net>
 References: <20180618184046.6270-1-richard.henderson@linaro.org>
-	<20180618184046.6270-14-richard.henderson@linaro.org>
-	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
-	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
-	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
-	<20180627125953.GK24595@lianli.shorne-pla.net>
-	<ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
+	<20180618184046.6270-20-richard.henderson@linaro.org>
+	<66ecea9b-bc0b-371a-b834-0a9c0a4685ad@amsat.org>
+	<86822f08-52fb-7912-874b-b2f04d1d79b4@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86822f08-52fb-7912-874b-b2f04d1d79b4@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 19/22] target/openrisc: Add
+ print_insn_or1k
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +34,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Wed, Jun 27, 2018 at 06:50:18AM -0700, Richard Henderson wrote:
-> On 06/27/2018 05:59 AM, Stafford Horne wrote:
-> > The index is negative... this patch should fix that.
+On Wed, Jun 27, 2018 at 09:15:09AM -0700, Richard Henderson wrote:
+> On 06/27/2018 09:03 AM, Philippe Mathieu-Daudé wrote:
+> >> +INSN(nop,    "")
 > > 
-> > @@ -78,6 +78,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr,
-> > target_ulong rb)
-> >      case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
-> >          idx = (spr - 1024);
-> >          env->shadow_gpr[idx / 32][idx % 32] = rb;
-> > +        break;
-> >  
-> >      case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
+> > The nop previously displayed 'k', I suppose a left-over from sys/trap.
 > 
-> OMG.  That's embarrasing...
+> Yes, real nop has no argument.
 
-Yes, I thought so too, it's my bug.  I am little surprised it didn't cause
-issues before.
+Just for some history here, in case others are interested.  The nop in openrisc
+does have an argument, but it is not used in real hardware.  It is a
+hack/shortcut used by the old simulator to trigger debugging operations.  Its
+used a lot in a few tests and even in the kernel, but I dont think we want to
+carry it in QEMU.  I am happy to get rid of it.
 
-I am still getting failures on SMP, this time the kernel is jumping to some
-unknown address, maybe an itlb issue, I will continue to debug.  Bisecting it is
-exposing some other issues (the mmu handlers were not getting init'd during one
-point in time).
+ https://github.com/openrisc/or1ksim/blob/f75787f390cbd543b8ae49a2670ff338d6e9326a/cpu/or32/insnset.c#L766-L825
+
+Also in: cpu/or1k/spr-defs.h
+
+    #define NOP_NOP          0x0000      /* Normal nop instruction */
+    #define NOP_EXIT         0x0001      /* End of simulation */
+    #define NOP_REPORT       0x0002      /* Simple report */
+    /*#define NOP_PRINTF       0x0003       Simprintf instruction (obsolete)*/
+    #define NOP_PUTC         0x0004      /* JPB: Simputc instruction */
+    #define NOP_CNT_RESET    0x0005	     /* Reset statistics counters */
+    ...
 
 -Stafford
