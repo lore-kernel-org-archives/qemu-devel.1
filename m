@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYB2W-0004qE-Kd
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:03:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYB4f-0006Go-4y
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYB2S-0002rw-Lm
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:03:20 -0400
-Date: Wed, 27 Jun 2018 16:03:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180627160314.022e3f81@redhat.com>
-In-Reply-To: <20180625124238.25339-11-f4bug@amsat.org>
-References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-11-f4bug@amsat.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fYB4b-0005qz-Ht
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:05:32 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYB4b-0005qL-97
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:05:29 -0400
+Received: by mail-wr0-x241.google.com with SMTP id a12-v6so2202452wro.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:05:29 -0700 (PDT)
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-5-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180621015359.12018-5-richard.henderson@linaro.org>
+Date: Wed, 27 Jun 2018 15:05:26 +0100
+Message-ID: <878t70wcih.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 10/46] hw/smbios: Use the IEC binary
- prefix definitions
+Subject: Re: [Qemu-devel] [PATCH v5 04/35] target/arm: Implement SVE load
+ and broadcast quadword
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-
-On Mon, 25 Jun 2018 09:42:02 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-
-> It eases code review, unit is explicit.
->=20
-> Patch generated using:
->=20
->   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/h=
-w/
->=20
-> and modified manually.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  hw/smbios/smbios.c | 15 ++++++---------
->  1 file changed, 6 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index 27a07e96f4..a27e54b2fa 100644
-> --- a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ -16,6 +16,7 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "qapi/error.h"
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
-> @@ -625,10 +626,6 @@ static void smbios_build_type_11_table(void)
->      SMBIOS_BUILD_TABLE_POST;
+>  target/arm/translate-sve.c | 52 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      |  9 +++++++
+>  2 files changed, 61 insertions(+)
+>
+> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+> index b25fe96b77..83de87ee0e 100644
+> --- a/target/arm/translate-sve.c
+> +++ b/target/arm/translate-sve.c
+> @@ -3717,6 +3717,58 @@ static bool trans_LDNF1_zpri(DisasContext *s, arg_=
+rpri_load *a, uint32_t insn)
+>      return true;
 >  }
-> =20
-> -#define ONE_KB ((ram_addr_t)1 << 10)
-> -#define ONE_MB ((ram_addr_t)1 << 20)
-> -#define ONE_GB ((ram_addr_t)1 << 30)
-> -
->  #define MAX_T16_STD_SZ 0x80000000 /* 2T in Kilobytes */
-> =20
->  static void smbios_build_type_16_table(unsigned dimm_cnt)
-> @@ -640,7 +637,7 @@ static void smbios_build_type_16_table(unsigned dimm_=
-cnt)
->      t->location =3D 0x01; /* Other */
->      t->use =3D 0x03; /* System memory */
->      t->error_correction =3D 0x06; /* Multi-bit ECC (for Microsoft, per S=
-eaBIOS) */
-> -    size_kb =3D QEMU_ALIGN_UP(ram_size, ONE_KB) / ONE_KB;
-> +    size_kb =3D QEMU_ALIGN_UP(ram_size, KiB) / KiB;
->      if (size_kb < MAX_T16_STD_SZ) {
->          t->maximum_capacity =3D cpu_to_le32(size_kb);
->          t->extended_maximum_capacity =3D cpu_to_le64(0);
-> @@ -668,7 +665,7 @@ static void smbios_build_type_17_table(unsigned insta=
-nce, uint64_t size)
->      t->memory_error_information_handle =3D cpu_to_le16(0xFFFE); /* Not p=
-rovided */
->      t->total_width =3D cpu_to_le16(0xFFFF); /* Unknown */
->      t->data_width =3D cpu_to_le16(0xFFFF); /* Unknown */
-> -    size_mb =3D QEMU_ALIGN_UP(size, ONE_MB) / ONE_MB;
-> +    size_mb =3D QEMU_ALIGN_UP(size, MiB) / MiB;
->      if (size_mb < MAX_T17_STD_SZ) {
->          t->size =3D cpu_to_le16(size_mb);
->          t->extended_size =3D cpu_to_le32(0);
-> @@ -707,8 +704,8 @@ static void smbios_build_type_19_table(unsigned insta=
-nce,
-> =20
->      end =3D start + size - 1;
->      assert(end > start);
-> -    start_kb =3D start / ONE_KB;
-> -    end_kb =3D end / ONE_KB;
-> +    start_kb =3D start / KiB;
-> +    end_kb =3D end / KiB;
->      if (start_kb < UINT32_MAX && end_kb < UINT32_MAX) {
->          t->starting_address =3D cpu_to_le32(start_kb);
->          t->ending_address =3D cpu_to_le32(end_kb);
-> @@ -869,7 +866,7 @@ void smbios_get_tables(const struct smbios_phys_mem_a=
-rea *mem_array,
-> =20
->          smbios_build_type_11_table();
-> =20
-> -#define MAX_DIMM_SZ (16ll * ONE_GB)
-> +#define MAX_DIMM_SZ (16 * GiB)
->  #define GET_DIMM_SZ ((i < dimm_cnt - 1) ? MAX_DIMM_SZ \
->                                          : ((ram_size - 1) % MAX_DIMM_SZ)=
- + 1)
-> =20
+>
+> +static void do_ldrq(DisasContext *s, int zt, int pg, TCGv_i64 addr, int =
+msz)
+> +{
+> +    static gen_helper_gvec_mem * const fns[4] =3D {
+> +        gen_helper_sve_ld1bb_r, gen_helper_sve_ld1hh_r,
+> +        gen_helper_sve_ld1ss_r, gen_helper_sve_ld1dd_r,
+> +    };
+> +    unsigned vsz =3D vec_full_reg_size(s);
+> +    TCGv_ptr t_pg;
+> +    TCGv_i32 desc;
+> +
+> +    /* Load the first quadword using the normal predicated load helpers.=
+  */
+> +    desc =3D tcg_const_i32(simd_desc(16, 16, zt));
+> +    t_pg =3D tcg_temp_new_ptr();
+> +
+> +    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
+> +    fns[msz](cpu_env, t_pg, addr, desc);
+> +
+> +    tcg_temp_free_ptr(t_pg);
+> +    tcg_temp_free_i32(desc);
+> +
+> +    /* Replicate that first quadword.  */
+> +    if (vsz > 16) {
+> +        unsigned dofs =3D vec_full_reg_offset(s, zt);
+> +        tcg_gen_gvec_dup_mem(4, dofs + 16, dofs, vsz - 16, vsz - 16);
+> +    }
+> +}
+> +
+> +static bool trans_LD1RQ_zprr(DisasContext *s, arg_rprr_load *a, uint32_t=
+ insn)
+> +{
+> +    if (a->rm =3D=3D 31) {
+> +        return false;
+> +    }
+> +    if (sve_access_check(s)) {
+> +        int msz =3D dtype_msz(a->dtype);
+> +        TCGv_i64 addr =3D new_tmp_a64(s);
+> +        tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), msz);
+> +        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
+> +        do_ldrq(s, a->rd, a->pg, addr, msz);
+> +    }
+> +    return true;
+> +}
+> +
+> +static bool trans_LD1RQ_zpri(DisasContext *s, arg_rpri_load *a, uint32_t=
+ insn)
+> +{
+> +    if (sve_access_check(s)) {
+> +        TCGv_i64 addr =3D new_tmp_a64(s);
+> +        tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn), a->imm * 16);
+> +        do_ldrq(s, a->rd, a->pg, addr, dtype_msz(a->dtype));
+> +    }
+> +    return true;
+> +}
+> +
+>  static void do_st_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+>                        int msz, int esz, int nreg)
+>  {
+> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+> index 6e159faaec..606c4f623c 100644
+> --- a/target/arm/sve.decode
+> +++ b/target/arm/sve.decode
+> @@ -715,6 +715,15 @@ LD_zprr         1010010 .. nreg:2 ..... 110 ... ....=
+. .....     @rprr_load_msz
+>  # LD2B, LD2H, LD2W, LD2D; etc.
+>  LD_zpri         1010010 .. nreg:2 0.... 111 ... ..... .....     @rpri_lo=
+ad_msz
+>
+> +# SVE load and broadcast quadword (scalar plus scalar)
+> +LD1RQ_zprr      1010010 .. 00 ..... 000 ... ..... ..... \
+> +                @rprr_load_msz nreg=3D0
+> +
+> +# SVE load and broadcast quadword (scalar plus immediate)
+> +# LD1RQB, LD1RQH, LD1RQS, LD1RQD
+> +LD1RQ_zpri      1010010 .. 00 0.... 001 ... ..... ..... \
+> +                @rpri_load_msz nreg=3D0
+> +
+>  ### SVE Memory Store Group
+>
+>  # SVE contiguous store (scalar plus immediate)
+
+
+--
+Alex Benn=C3=A9e
