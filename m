@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fY82o-00060I-L0
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:51:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1fY82u-00064v-Iy
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fY82n-0002qZ-Ld
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:51:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40480 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fY82r-0002uL-IO
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:51:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47416 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fY82n-0002q1-Gw
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:51:25 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fY82r-0002u6-Dr
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 06:51:29 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0ADFC77888
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 10:51:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E4A62401EF04
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 10:51:28 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 27 Jun 2018 18:51:09 +0800
-Message-Id: <20180627105112.31401-3-peterx@redhat.com>
+Date: Wed, 27 Jun 2018 18:51:10 +0800
+Message-Id: <20180627105112.31401-4-peterx@redhat.com>
 In-Reply-To: <20180627105112.31401-1-peterx@redhat.com>
 References: <20180627105112.31401-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/5] migration: move income process out of
- multifd
+Subject: [Qemu-devel] [PATCH v2 3/5] migration: do explicit incoming setup
+ for rdma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +33,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Move the call to migration_incoming_process() out of multifd code.  It's
-a bit strange that we can migration generic calls in multifd code.
-Instead, let multifd_recv_new_channel() return a boolean showing whether
-it's ready to continue the incoming migration.
+RDMA does not support postcopy recovery, so no need to go into such
+logic.  Instead of calling migration_fd_process_incoming(), let's call
+the two functions that setup the incoming migration.  There should have
+no functional change at all.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.h       |  2 +-
- migration/migration.c |  5 ++++-
- migration/ram.c       | 11 +++++------
- 3 files changed, 10 insertions(+), 8 deletions(-)
+ migration/rdma.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/migration/ram.h b/migration/ram.h
-index d386f4d641..457bf54b8c 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -46,7 +46,7 @@ int multifd_save_cleanup(Error **errp);
- int multifd_load_setup(void);
- int multifd_load_cleanup(Error **errp);
- bool multifd_recv_all_channels_created(void);
--void multifd_recv_new_channel(QIOChannel *ioc);
-+bool multifd_recv_new_channel(QIOChannel *ioc);
- 
- uint64_t ram_pagesize_summary(void);
- int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
-diff --git a/migration/migration.c b/migration/migration.c
-index e1eaa97df4..6ecea2de30 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -507,7 +507,10 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
-         migration_incoming_setup(f);
-         return;
-     }
--    multifd_recv_new_channel(ioc);
-+
-+    if (multifd_recv_new_channel(ioc)) {
-+        migration_incoming_process();
-+    }
- }
- 
- /**
-diff --git a/migration/ram.c b/migration/ram.c
-index cd5f55117d..52167d5142 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -873,7 +873,8 @@ bool multifd_recv_all_channels_created(void)
-     return thread_count == atomic_read(&multifd_recv_state->count);
- }
- 
--void multifd_recv_new_channel(QIOChannel *ioc)
-+/* Return true if multifd is ready for the migration, otherwise false */
-+bool multifd_recv_new_channel(QIOChannel *ioc)
- {
-     MultiFDRecvParams *p;
-     Error *local_err = NULL;
-@@ -882,7 +883,7 @@ void multifd_recv_new_channel(QIOChannel *ioc)
-     id = multifd_recv_initial_packet(ioc, &local_err);
-     if (id < 0) {
-         multifd_recv_terminate_threads(local_err);
--        return;
-+        return false;
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 8bd7159059..217cdd7dd8 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -3687,7 +3687,8 @@ static void rdma_accept_incoming_migration(void *opaque)
      }
  
-     p = &multifd_recv_state->params[id];
-@@ -890,7 +891,7 @@ void multifd_recv_new_channel(QIOChannel *ioc)
-         error_setg(&local_err, "multifd: received id '%d' already setup'",
-                    id);
-         multifd_recv_terminate_threads(local_err);
--        return;
-+        return false;
-     }
-     p->c = ioc;
-     object_ref(OBJECT(ioc));
-@@ -899,9 +900,7 @@ void multifd_recv_new_channel(QIOChannel *ioc)
-     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-                        QEMU_THREAD_JOINABLE);
-     atomic_inc(&multifd_recv_state->count);
--    if (multifd_recv_state->count == migrate_multifd_channels()) {
--        migration_incoming_process();
--    }
-+    return multifd_recv_state->count == migrate_multifd_channels();
+     rdma->migration_started_on_destination = 1;
+-    migration_fd_process_incoming(f);
++    migration_incoming_setup(f);
++    migration_incoming_process();
  }
  
- /**
+ void rdma_start_incoming_migration(const char *host_port, Error **errp)
 -- 
 2.17.1
