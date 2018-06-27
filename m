@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCI-0007Kw-QG
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCI-0007Kx-Qb
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCG-0000o5-LQ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fYFCF-0000kL-DA
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:47458 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:47429 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fYFCG-0000ko-EL
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:40 -0400
+	id 1fYFCE-000089-Vk
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 14:29:39 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 27 Jun 2018 20:29:04 +0200
-Message-Id: <1530124149-3900-5-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1530124149-3900-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1530124149-3900-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 4/9] hw/pci-host/xilinx-pcie: don't make "io"
- region be RAM
+Date: Wed, 27 Jun 2018 20:29:00 +0200
+Message-Id: <1530124149-3900-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 0/9] MIPS queue 2018-06-27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Currently we use memory_region_init_rom_nomigrate() to create
-the "io" memory region to pass to pci_register_root_bus().
-This is a dummy region, because this PCI controller doesn't
-support accesses to PCI IO space.
+The following changes since commit 00928a421d47f49691cace1207481b7aad31b1=
+f1:
 
-There is no reason for the dummy region to be a RAM region;
-it is only used as a place where PCI BARs can be mapped,
-and if you could get a PCI card to do a bus master access
-to the IO space it should not get acts-like-RAM behaviour.
-Use a simple container memory region instead. (We do have
-one PCI card model which can do bus master accesses to IO
-space -- the LSI53C895A SCSI adaptor.)
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+80626' into staging (2018-06-26 18:23:49 +0100)
 
-This avoids the oddity of having a memory region which is
-RAM but where the RAM is not migrated.
+are available in the git repository at:
 
-Note that the size of the region we use here has no
-effect on behaviour.
+  https://github.com/AMarkovic/qemu.git tags/mips-queue-2018-06-27
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
----
- hw/pci-host/xilinx-pcie.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+for you to fetch changes up to 8e0b373f8aa4b9feec7b44029455587e2e3d2b0f:
 
-diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-index 044e312..b0a31b9 100644
---- a/hw/pci-host/xilinx-pcie.c
-+++ b/hw/pci-host/xilinx-pcie.c
-@@ -120,9 +120,8 @@ static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
-     memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
-     memory_region_set_enabled(&s->mmio, false);
- 
--    /* dummy I/O region */
--    memory_region_init_ram_nomigrate(&s->io, OBJECT(s), "io", 16, NULL);
--    memory_region_set_enabled(&s->io, false);
-+    /* dummy PCI I/O region (not visible to the CPU) */
-+    memory_region_init(&s->io, OBJECT(s), "io", 16);
- 
-     /* interrupt out */
-     qdev_init_gpio_out_named(dev, &s->irq, "interrupt_out", 1);
--- 
+  target/mips: Fix gdbstub to read/write 64 bit FP registers (2018-06-27 =
+20:13:50 +0200)
+
+Aleksandar Markovic (1):
+  MAINTAINERS: update target-mips maintainers
+
+Peter Maydell (3):
+  hw/mips/boston: don't make flash region 'nomigrate'
+  hw/mips/mips_malta: don't make bios region 'nomigrate'
+  hw/pci-host/xilinx-pcie: don't make "io" region be RAM
+
+Yongbok Kim (5):
+  target/mips: Raise a RI when given fs is n/a from CTC1
+  target/mips: Fix microMIPS on reset
+  target/mips: Update gen_flt_ldst()
+  target/mips: Fix data type for offset
+  target/mips: Fix gdbstub to read/write 64 bit FP registers
+
+ MAINTAINERS               |  6 +++---
+ hw/mips/boston.c          |  3 +--
+ hw/mips/mips_malta.c      |  2 +-
+ hw/pci-host/xilinx-pcie.c |  5 ++---
+ target/mips/gdbstub.c     |  3 ++-
+ target/mips/op_helper.c   |  3 +++
+ target/mips/translate.c   | 28 ++++++++++++++++------------
+ 7 files changed, 28 insertions(+), 22 deletions(-)
+
+--=20
 2.7.4
