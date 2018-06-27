@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY9zj-000172-QG
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1fY9zl-00018S-B3
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY9zj-0001Yj-2l
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49564 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fY9zk-0001ZE-D4
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49566 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY9zi-0001YY-U1
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:22 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY9zk-0001Z6-7z
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:24 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6BBE1805A530
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:56:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAB26805A530
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:56:23 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 27 Jun 2018 14:55:52 +0200
-Message-Id: <20180627125604.15275-5-quintela@redhat.com>
+Date: Wed, 27 Jun 2018 14:55:53 +0200
+Message-Id: <20180627125604.15275-6-quintela@redhat.com>
 In-Reply-To: <20180627125604.15275-1-quintela@redhat.com>
 References: <20180627125604.15275-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 04/16] migration: Abstract the number of bytes
- sent
+Subject: [Qemu-devel] [PULL 05/16] migration: Add multifd traces for
+ start/end thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +33,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Right now we use the "position" inside the QEMUFile, but things like
-RDMA already do weird things to be able to maintain that counter
-right, and multifd will have some similar problems.
+We want to know how many pages/packets each channel has sent.  Add
+counters for those.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index d3e6da9bfe..264f3ce84e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2704,9 +2704,15 @@ static MigThrError migration_detect_error(MigrationState *s)
+--
+sort trace-events (dave)
+---
+ migration/ram.c        | 22 ++++++++++++++++++++++
+ migration/trace-events |  4 ++++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index fd144fdf9a..5c040e3ae5 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -570,6 +570,11 @@ typedef struct {
+     uint32_t flags;
+     /* global number of generated multifd packets */
+     uint64_t packet_num;
++    /* thread local variables */
++    /* packets sent through this channel */
++    uint64_t num_packets;
++    /* pages sent through this channel */
++    uint64_t num_pages;
+ }  MultiFDSendParams;
+ 
+ typedef struct {
+@@ -600,6 +605,11 @@ typedef struct {
+     uint32_t flags;
+     /* global number of generated multifd packets */
+     uint64_t packet_num;
++    /* thread local variables */
++    /* packets sent through this channel */
++    uint64_t num_packets;
++    /* pages sent through this channel */
++    uint64_t num_pages;
+ } MultiFDRecvParams;
+ 
+ static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+@@ -856,9 +866,13 @@ static void *multifd_send_thread(void *opaque)
+     MultiFDSendParams *p = opaque;
+     Error *local_err = NULL;
+ 
++    trace_multifd_send_thread_start(p->id);
++
+     if (multifd_send_initial_packet(p, &local_err) < 0) {
+         goto out;
      }
++    /* initial packet */
++    p->num_packets = 1;
+ 
+     while (true) {
+         qemu_mutex_lock(&p->mutex);
+@@ -880,6 +894,8 @@ out:
+     p->running = false;
+     qemu_mutex_unlock(&p->mutex);
+ 
++    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
++
+     return NULL;
  }
  
-+/* How many bytes have we transferred since the beggining of the migration */
-+static uint64_t migration_total_bytes(MigrationState *s)
-+{
-+    return qemu_ftell(s->to_dst_file);
-+}
+@@ -1007,6 +1023,8 @@ static void *multifd_recv_thread(void *opaque)
+     Error *local_err = NULL;
+     int ret;
+ 
++    trace_multifd_recv_thread_start(p->id);
 +
- static void migration_calculate_complete(MigrationState *s)
- {
--    uint64_t bytes = qemu_ftell(s->to_dst_file);
-+    uint64_t bytes = migration_total_bytes(s);
-     int64_t end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-     int64_t transfer_time;
+     while (true) {
+         qemu_mutex_lock(&p->mutex);
+         if (false)  {
+@@ -1029,6 +1047,8 @@ static void *multifd_recv_thread(void *opaque)
+     p->running = false;
+     qemu_mutex_unlock(&p->mutex);
  
-@@ -2729,13 +2735,15 @@ static void migration_update_counters(MigrationState *s,
-                                       int64_t current_time)
- {
-     uint64_t transferred, time_spent;
-+    uint64_t current_bytes; /* bytes transferred since the beginning */
-     double bandwidth;
++    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
++
+     return NULL;
+ }
  
-     if (current_time < s->iteration_start_time + BUFFER_DELAY) {
-         return;
+@@ -1094,6 +1114,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
      }
+     p->c = ioc;
+     object_ref(OBJECT(ioc));
++    /* initial packet */
++    p->num_packets = 1;
  
--    transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-+    current_bytes = migration_total_bytes(s);
-+    transferred = current_bytes - s->iteration_initial_bytes;
-     time_spent = current_time - s->iteration_start_time;
-     bandwidth = (double)transferred / time_spent;
-     s->threshold_size = bandwidth * s->parameters.downtime_limit;
-@@ -2754,7 +2762,7 @@ static void migration_update_counters(MigrationState *s,
-     qemu_file_reset_rate_limit(s->to_dst_file);
- 
-     s->iteration_start_time = current_time;
--    s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
-+    s->iteration_initial_bytes = current_bytes;
- 
-     trace_migrate_transferred(transferred, time_spent,
-                               bandwidth, s->threshold_size);
+     p->running = true;
+     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+diff --git a/migration/trace-events b/migration/trace-events
+index 3f67758893..a80aaa8b3f 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -76,6 +76,10 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
+ migration_bitmap_sync_start(void) ""
+ migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+ migration_throttle(void) ""
++multifd_recv_thread_end(uint8_t id, uint64_t packets, uint64_t pages) "channel %d packets %" PRIu64 " pages %" PRIu64
++multifd_recv_thread_start(uint8_t id) "%d"
++multifd_send_thread_end(uint8_t id, uint64_t packets, uint64_t pages) "channel %d packets %" PRIu64 " pages %"  PRIu64
++multifd_send_thread_start(uint8_t id) "%d"
+ ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
+ ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: 0x%" PRIx64 " flags: 0x%x host: %p"
+ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
 -- 
 2.17.1
