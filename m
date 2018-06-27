@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29j-0004Z6-NW
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:14 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29i-0000xu-L7
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29i-0004Xf-NI
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:11 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38542)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29h-0000w3-8h
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:10 -0400
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:37612)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY29i-0000wq-GX
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:10 -0400
-Received: by mail-pf0-x241.google.com with SMTP id j17-v6so387475pfn.5
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:34:10 -0700 (PDT)
+	id 1fY29h-0000v4-1x
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:09 -0400
+Received: by mail-pf0-x22c.google.com with SMTP id y5-v6so388814pfn.4
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:34:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 21:33:20 -0700
-Message-Id: <20180627043328.11531-28-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 21:33:19 -0700
+Message-Id: <20180627043328.11531-27-richard.henderson@linaro.org>
 In-Reply-To: <20180627043328.11531-1-richard.henderson@linaro.org>
 References: <20180627043328.11531-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 27/35] target/arm: Implement SVE MOVPRFX
+Subject: [Qemu-devel] [PATCH v6 26/35] target/arm: Implement SVE
+ floating-point unary operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +32,108 @@ Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v6: Fix comment typos
----
- target/arm/translate-sve.c | 60 +++++++++++++++++++++++++++++++++++++-
- target/arm/sve.decode      |  7 +++++
- 2 files changed, 66 insertions(+), 1 deletion(-)
+ target/arm/helper-sve.h    | 14 ++++++++++++++
+ target/arm/sve_helper.c    |  8 ++++++++
+ target/arm/translate-sve.c | 26 ++++++++++++++++++++++++++
+ target/arm/sve.decode      |  4 ++++
+ 4 files changed, 52 insertions(+)
 
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 36168c5bb2..891346a5ac 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -999,6 +999,20 @@ DEF_HELPER_FLAGS_5(sve_frintx_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(sve_frintx_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_5(sve_frecpx_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_frecpx_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_frecpx_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve_fsqrt_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fsqrt_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fsqrt_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index af8221c714..83bd8c4269 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -3298,6 +3298,14 @@ DO_ZPZ_FP(sve_frintx_h, uint16_t, H1_2, float16_round_to_int)
+ DO_ZPZ_FP(sve_frintx_s, uint32_t, H1_4, float32_round_to_int)
+ DO_ZPZ_FP(sve_frintx_d, uint64_t,     , float64_round_to_int)
+ 
++DO_ZPZ_FP(sve_frecpx_h, uint16_t, H1_2, helper_frecpx_f16)
++DO_ZPZ_FP(sve_frecpx_s, uint32_t, H1_4, helper_frecpx_f32)
++DO_ZPZ_FP(sve_frecpx_d, uint64_t,     , helper_frecpx_f64)
++
++DO_ZPZ_FP(sve_fsqrt_h, uint16_t, H1_2, float16_sqrt)
++DO_ZPZ_FP(sve_fsqrt_s, uint32_t, H1_4, float32_sqrt)
++DO_ZPZ_FP(sve_fsqrt_d, uint64_t,     , float64_sqrt)
++
+ DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
+ DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
+ DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index ff8ae67e2b..4883de3fab 100644
+index 270bf9101b..ff8ae67e2b 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -351,6 +351,23 @@ static bool do_zpzz_ool(DisasContext *s, arg_rprr_esz *a, gen_helper_gvec_4 *fn)
-     return true;
+@@ -4117,6 +4117,32 @@ static bool trans_FRINTA(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+     return do_frint_mode(s, a, float_round_ties_away);
  }
  
-+/* Select active elememnts from Zn and inactive elements from Zm,
-+ * storing the result in Zd.
-+ */
-+static void do_sel_z(DisasContext *s, int rd, int rn, int rm, int pg, int esz)
++static bool trans_FRECPX(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    static gen_helper_gvec_4 * const fns[4] = {
-+        gen_helper_sve_sel_zpzz_b, gen_helper_sve_sel_zpzz_h,
-+        gen_helper_sve_sel_zpzz_s, gen_helper_sve_sel_zpzz_d
++    static gen_helper_gvec_3_ptr * const fns[3] = {
++        gen_helper_sve_frecpx_h,
++        gen_helper_sve_frecpx_s,
++        gen_helper_sve_frecpx_d
 +    };
-+    unsigned vsz = vec_full_reg_size(s);
-+    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       vec_full_reg_offset(s, rm),
-+                       pred_full_reg_offset(s, pg),
-+                       vsz, vsz, 0, fns[esz]);
-+}
-+
- #define DO_ZPZZ(NAME, name) \
- static bool trans_##NAME##_zpzz(DisasContext *s, arg_rprr_esz *a,         \
-                                 uint32_t insn)                            \
-@@ -401,7 +418,13 @@ static bool trans_UDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-     return do_zpzz_ool(s, a, fns[a->esz]);
- }
- 
--DO_ZPZZ(SEL, sel)
-+static bool trans_SEL_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        do_sel_z(s, a->rd, a->rn, a->rm, a->pg, a->esz);
++    if (a->esz == 0) {
++        return false;
 +    }
-+    return true;
-+}
- 
- #undef DO_ZPZZ
- 
-@@ -5035,3 +5058,38 @@ static bool trans_PRF_rr(DisasContext *s, arg_PRF_rr *a, uint32_t insn)
-     sve_access_check(s);
-     return true;
- }
-+
-+/*
-+ * Move Prefix
-+ *
-+ * TODO: The implementation so far could handle predicated merging movprfx.
-+ * The helper functions as written take an extra source register to
-+ * use in the operation, but the result is only written when predication
-+ * succeeds.  For unpredicated movprfx, we need to rearrange the helpers
-+ * to allow the final write back to the destination to be unconditional.
-+ * For predicated zeroing movprfx, we need to rearrange the helpers to
-+ * allow the final write back to zero inactives.
-+ *
-+ * In the meantime, just emit the moves.
-+ */
-+
-+static bool trans_MOVPRFX(DisasContext *s, arg_MOVPRFX *a, uint32_t insn)
-+{
-+    return do_mov_z(s, a->rd, a->rn);
++    return do_zpz_ptr(s, a->rd, a->rn, a->pg, a->esz == MO_16, fns[a->esz - 1]);
 +}
 +
-+static bool trans_MOVPRFX_m(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static bool trans_FSQRT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    if (sve_access_check(s)) {
-+        do_sel_z(s, a->rd, a->rn, a->rd, a->pg, a->esz);
++    static gen_helper_gvec_3_ptr * const fns[3] = {
++        gen_helper_sve_fsqrt_h,
++        gen_helper_sve_fsqrt_s,
++        gen_helper_sve_fsqrt_d
++    };
++    if (a->esz == 0) {
++        return false;
 +    }
-+    return true;
++    return do_zpz_ptr(s, a->rd, a->rn, a->pg, a->esz == MO_16, fns[a->esz - 1]);
 +}
 +
-+static bool trans_MOVPRFX_z(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        do_movz_zpz(s, a->rd, a->rn, a->pg, a->esz);
-+    }
-+    return true;
-+}
+ static bool trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+ {
+     return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_hh);
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 2aca9f0bb0..c725ee2584 100644
+index e45faaec3a..2aca9f0bb0 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -270,6 +270,10 @@ ORV             00000100 .. 011 000 001 ... ..... .....         @rd_pg_rn
- EORV            00000100 .. 011 001 001 ... ..... .....         @rd_pg_rn
- ANDV            00000100 .. 011 010 001 ... ..... .....         @rd_pg_rn
+@@ -854,6 +854,10 @@ FRINTA          01100101 .. 000 100 101 ... ..... .....         @rd_pg_rn
+ FRINTX          01100101 .. 000 110 101 ... ..... .....         @rd_pg_rn
+ FRINTI          01100101 .. 000 111 101 ... ..... .....         @rd_pg_rn
  
-+# SVE constructive prefix (predicated)
-+MOVPRFX_z       00000100 .. 010 000 001 ... ..... .....         @rd_pg_rn
-+MOVPRFX_m       00000100 .. 010 001 001 ... ..... .....         @rd_pg_rn
++# SVE floating-point unary operations
++FRECPX          01100101 .. 001 100 101 ... ..... .....         @rd_pg_rn
++FSQRT           01100101 .. 001 101 101 ... ..... .....         @rd_pg_rn
 +
- # SVE integer add reduction (predicated)
- # Note that saddv requires size != 3.
- UADDV           00000100 .. 000 001 001 ... ..... .....         @rd_pg_rn
-@@ -418,6 +422,9 @@ ADR_p64         00000100 11 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
- 
- ### SVE Integer Misc - Unpredicated Group
- 
-+# SVE constructive prefix (unpredicated)
-+MOVPRFX         00000100 00 1 00000 101111 rn:5 rd:5
-+
- # SVE floating-point exponential accelerator
- # Note esz != 0
- FEXPA           00000100 .. 1 00000 101110 ..... .....          @rd_rn
+ # SVE integer convert to floating-point
+ SCVTF_hh        01100101 01 010 01 0 101 ... ..... .....        @rd_pg_rn_e0
+ SCVTF_sh        01100101 01 010 10 0 101 ... ..... .....        @rd_pg_rn_e0
 -- 
 2.17.1
