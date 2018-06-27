@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYBI0-0000v1-Km
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:19:22 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fYBOi-0004xg-AQ
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYBHx-00056L-BX
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:19:20 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34273)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fYBHx-000557-0h
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:19:17 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id l15-v6so18186113wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:19:16 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-6-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180621015359.12018-6-richard.henderson@linaro.org>
-Date: Wed, 27 Jun 2018 15:19:14 +0100
-Message-ID: <877emkwbvh.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1fYBOd-0001yL-5J
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:26:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54766 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fYBOd-0001xd-0R
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:26:11 -0400
+Date: Wed, 27 Jun 2018 16:26:04 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180627162604.2fd0d92c@redhat.com>
+In-Reply-To: <ab5d510e-1308-f581-1e2b-12584391d53c@linux.vnet.ibm.com>
+References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
+	<20180626122343.13473-4-marcandre.lureau@redhat.com>
+	<20180627140129.4a751630@redhat.com>
+	<ab5d510e-1308-f581-1e2b-12584391d53c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 05/35] target/arm: Implement SVE integer
- convert to floating-point
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] acpi: add fw_cfg file for TPM and
+ PPI virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,301 +30,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Wed, 27 Jun 2018 08:59:55 -0400
+Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+> On 06/27/2018 08:01 AM, Igor Mammedov wrote:
+> > On Tue, 26 Jun 2018 14:23:42 +0200
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > =20
+> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> >>
+> >> To avoid having to hard code the base address of the PPI virtual
+> >> memory device we introduce a fw_cfg file etc/tpm/config that holds the
+> >> base address of the PPI device, the version of the PPI interface and
+> >> the version of the attached TPM.
+> >>
+> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> >> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document=
+ it ]
+> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>
+> >> ---
+> >>
+> >> v4:
+> >>   - add ACPI only if PPI is enabled
+> >> v3:
+> >>   - renamed to etc/tpm/config, made it static, document it
+> >> ---
+> >>   include/hw/acpi/tpm.h |  3 +++
+> >>   hw/i386/acpi-build.c  | 19 +++++++++++++++++++
+> >>   docs/specs/tpm.txt    | 20 ++++++++++++++++++++
+> >>   3 files changed, 42 insertions(+)
+> >>
+> >> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> >> index c082df7d1d..f79d68a77a 100644
+> >> --- a/include/hw/acpi/tpm.h
+> >> +++ b/include/hw/acpi/tpm.h
+> >> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+> >>   #define TPM_PPI_ADDR_SIZE           0x400
+> >>   #define TPM_PPI_ADDR_BASE           0xFED45000
+> >>  =20
+> >> +#define TPM_PPI_VERSION_NONE        0
+> >> +#define TPM_PPI_VERSION_1_30        1
+> >> +
+> >>   #endif /* HW_ACPI_TPM_H */
+> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> >> index 9bc6d97ea1..d9320845ed 100644
+> >> --- a/hw/i386/acpi-build.c
+> >> +++ b/hw/i386/acpi-build.c
+> >> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+> >>       bool pcihp_bridge_en;
+> >>   } AcpiBuildPciBusHotplugState;
+> >>  =20
+> >> +typedef struct FWCfgTPMConfig {
+> >> +    uint32_t tpmppi_address; =20
+> > is 32bit enough (what if on ARM or somewhere else area would be above 4=
+Gb)?
+> > to be future proof I'd make it 64bit field so we won't have to change A=
+BI
+> > later on.
+> > =20
+> >> +    uint8_t tpm_version;
+> >> +    uint8_t tpmppi_version;
+> >> +} QEMU_PACKED FWCfgTPMConfig;
+> >> +
+> >>   static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+> >>   {
+> >>       uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_B=
+ASE, NULL);
+> >> @@ -2873,6 +2879,8 @@ void acpi_setup(void)
+> >>       AcpiBuildTables tables;
+> >>       AcpiBuildState *build_state;
+> >>       Object *vmgenid_dev;
+> >> +    TPMIf *tpm;
+> >> +    static FWCfgTPMConfig tpm_config;
+> >>  =20
+> >>       if (!pcms->fw_cfg) {
+> >>           ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+> >> @@ -2907,6 +2915,17 @@ void acpi_setup(void) =20
+> > what about vart-arm machine?
+> > (it also has some TPM stuff but it doesn't use acpi_setup())
+> > maybe add common helper and reuse it for both? =20
+>=20
+> I have never used ARM with it. I am not sure whether the firmware on ARM=
+=20
+> is instrumented to have support for PPI. If someone wanted to enable=20
+> that, I would leave these parts up to them.
+>=20
+> >
+> > =20
+> >>       fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+> >>                       tables.tcpalog->data, acpi_data_len(tables.tcpal=
+og));
+> >>  =20
+> >> +    tpm =3D tpm_find();
+> >> +    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_ab=
+ort)) {
+> >> +        tpm_config =3D (FWCfgTPMConfig) {
+> >> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+> >> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find()))=
+, =20
+> > Have it actually been tested on big endian host? =20
+>=20
+> At some point I did, yes.
+>=20
+> > =20
+> >> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE) =20
+> > ditto
+> >
+> > (that's why I don't welcome packed structures in random places) =20
+>=20
+> I thought a packed structure at least ensures that the offsets of the=20
+> fields are agreed upon by 32 and 64bit, no ? So the firmware can use 64=20
+> bit or 32bit and the offsets would be ensured.
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+I think layout for this structure is:
+  0-3 : tpmppi_address
+    4 : tpm_version
+    5 : tpmppi_version
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+but that's not a problem,
 
-> ---
->  target/arm/helper-sve.h    | 30 +++++++++++++
->  target/arm/sve_helper.c    | 38 ++++++++++++++++
->  target/arm/translate-sve.c | 90 ++++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      | 22 ++++++++++
->  4 files changed, 180 insertions(+)
->
-> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-> index b768128951..185112e1d2 100644
-> --- a/target/arm/helper-sve.h
-> +++ b/target/arm/helper-sve.h
-> @@ -720,6 +720,36 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
->  DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
->                     void, ptr, ptr, ptr, ptr, i32)
->
-> +DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_scvt_dh, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_scvt_ss, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_scvt_sd, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_scvt_ds, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_scvt_dd, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +
-> +DEF_HELPER_FLAGS_5(sve_ucvt_hh, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_ucvt_sh, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_ucvt_dh, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_ucvt_ss, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_ucvt_sd, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_ucvt_ds, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(sve_ucvt_dd, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +
->  DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
->  DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
->  DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-> index f20774e240..a2f034820a 100644
-> --- a/target/arm/sve_helper.c
-> +++ b/target/arm/sve_helper.c
-> @@ -2811,6 +2811,44 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t coun=
-t, uint32_t pred_desc)
->      return predtest_ones(d, oprsz, esz_mask);
->  }
->
-> +/* Fully general two-operand expander, controlled by a predicate,
-> + * With the extra float_status parameter.
-> + */
-> +#define DO_ZPZ_FP(NAME, TYPE, H, OP)                                  \
-> +void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t d=
-esc) \
-> +{                                                                     \
-> +    intptr_t i =3D simd_oprsz(desc);                                    \
-> +    uint64_t *g =3D vg;                                                 \
-> +    do {                                                              \
-> +        uint64_t pg =3D g[(i - 1) >> 6];                                \
-> +        do {                                                          \
-> +            i -=3D sizeof(TYPE);                                        \
-> +            if (likely((pg >> (i & 63)) & 1)) {                       \
-> +                TYPE nn =3D *(TYPE *)(vn + H(i));                       \
-> +                *(TYPE *)(vd + H(i)) =3D OP(nn, status);                \
-> +            }                                                         \
-> +        } while (i & 63);                                             \
-> +    } while (i !=3D 0);                                                 \
-> +}
-> +
-> +DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
-> +DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
-> +DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
-> +DO_ZPZ_FP(sve_scvt_sd, uint64_t,     , int32_to_float64)
-> +DO_ZPZ_FP(sve_scvt_dh, uint64_t,     , int64_to_float16)
-> +DO_ZPZ_FP(sve_scvt_ds, uint64_t,     , int64_to_float32)
-> +DO_ZPZ_FP(sve_scvt_dd, uint64_t,     , int64_to_float64)
-> +
-> +DO_ZPZ_FP(sve_ucvt_hh, uint16_t, H1_2, uint16_to_float16)
-> +DO_ZPZ_FP(sve_ucvt_sh, uint32_t, H1_4, uint32_to_float16)
-> +DO_ZPZ_FP(sve_ucvt_ss, uint32_t, H1_4, uint32_to_float32)
-> +DO_ZPZ_FP(sve_ucvt_sd, uint64_t,     , uint32_to_float64)
-> +DO_ZPZ_FP(sve_ucvt_dh, uint64_t,     , uint64_to_float16)
-> +DO_ZPZ_FP(sve_ucvt_ds, uint64_t,     , uint64_to_float32)
-> +DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_float64)
-> +
-> +#undef DO_ZPZ_FP
-> +
->  /*
->   * Load contiguous data, protected by a governing predicate.
->   */
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index 83de87ee0e..7639e589f5 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -3425,6 +3425,96 @@ DO_FP3(FRSQRTS, rsqrts)
->
->  #undef DO_FP3
->
-> +
-> +/*
-> + *** SVE Floating Point Unary Operations Prediated Group
-> + */
-> +
-> +static bool do_zpz_ptr(DisasContext *s, int rd, int rn, int pg,
-> +                       bool is_fp16, gen_helper_gvec_3_ptr *fn)
-> +{
-> +    if (sve_access_check(s)) {
-> +        unsigned vsz =3D vec_full_reg_size(s);
-> +        TCGv_ptr status =3D get_fpstatus_ptr(is_fp16);
-> +        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-> +                           vec_full_reg_offset(s, rn),
-> +                           pred_full_reg_offset(s, pg),
-> +                           status, vsz, vsz, 0, fn);
-> +        tcg_temp_free_ptr(status);
-> +    }
-> +    return true;
-> +}
-> +
-> +static bool trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_=
-hh);
-> +}
-> +
-> +static bool trans_SCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_=
-sh);
-> +}
-> +
-> +static bool trans_SCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_=
-dh);
-> +}
-> +
-> +static bool trans_SCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
-_ss);
-> +}
-> +
-> +static bool trans_SCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
-_ds);
-> +}
-> +
-> +static bool trans_SCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
-_sd);
-> +}
-> +
-> +static bool trans_SCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt=
-_dd);
-> +}
-> +
-> +static bool trans_UCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_=
-hh);
-> +}
-> +
-> +static bool trans_UCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_=
-sh);
-> +}
-> +
-> +static bool trans_UCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_=
-dh);
-> +}
-> +
-> +static bool trans_UCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
-_ss);
-> +}
-> +
-> +static bool trans_UCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
-_ds);
-> +}
-> +
-> +static bool trans_UCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
-_sd);
-> +}
-> +
-> +static bool trans_UCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t ins=
-n)
-> +{
-> +    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt=
-_dd);
-> +}
-> +
->  /*
->   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
->   */
-> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-> index 606c4f623c..3abdb87cf5 100644
-> --- a/target/arm/sve.decode
-> +++ b/target/arm/sve.decode
-> @@ -133,6 +133,9 @@
->  @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
->  @rd_pg4_pn      ........ esz:2 ... ... .. pg:4 . rn:4 rd:5      &rpr_esz
->
-> +# One register operand, with governing predicate, no vector element size
-> +@rd_pg_rn_e0    ........ .. ... ... ... pg:3 rn:5 rd:5          &rpr_esz=
- esz=3D0
-> +
->  # Two register operands with a 6-bit signed immediate.
->  @rd_rn_i6       ........ ... rn:5 ..... imm:s6 rd:5             &rri
->
-> @@ -681,6 +684,25 @@ FTSMUL          01100101 .. 0 ..... 000 011 ..... ..=
-...         @rd_rn_rm
->  FRECPS          01100101 .. 0 ..... 000 110 ..... .....         @rd_rn_rm
->  FRSQRTS         01100101 .. 0 ..... 000 111 ..... .....         @rd_rn_rm
->
-> +### SVE FP Unary Operations Predicated Group
-> +
-> +# SVE integer convert to floating-point
-> +SCVTF_hh        01100101 01 010 01 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +SCVTF_sh        01100101 01 010 10 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +SCVTF_dh        01100101 01 010 11 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +SCVTF_ss        01100101 10 010 10 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +SCVTF_sd        01100101 11 010 00 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +SCVTF_ds        01100101 11 010 10 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +SCVTF_dd        01100101 11 010 11 0 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +
-> +UCVTF_hh        01100101 01 010 01 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +UCVTF_sh        01100101 01 010 10 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +UCVTF_dh        01100101 01 010 11 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +UCVTF_ss        01100101 10 010 10 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +UCVTF_sd        01100101 11 010 00 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +UCVTF_ds        01100101 11 010 10 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +UCVTF_dd        01100101 11 010 11 1 101 ... ..... .....        @rd_pg_r=
-n_e0
-> +
->  ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
->
->  # SVE load predicate register
+  unit8_t foo =3D cpu_to_le32(bar)
 
+wouldn't it produce different results depending on host endianness?
 
---
-Alex Benn=C3=A9e
+>=20
+> >
+> > how about adding unit-tests to series to make sure that it works
+> > across different hosts that travis builds on and that thing won't
+> > fall apart in future? =20
+>=20
+> >> +        };
+> >> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+> >> +                        &tpm_config, sizeof tpm_config);
+> >> +    }
+> >> +
+> >>       vmgenid_dev =3D find_vmgenid_dev();
+> >>       if (vmgenid_dev) {
+> >>           vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+> >> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> >> index c230c4c93e..2ddb768084 100644
+> >> --- a/docs/specs/tpm.txt
+> >> +++ b/docs/specs/tpm.txt
+> >> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
+> >>    - hw/tpm/tpm_tis.h
+> >>  =20
+> >>  =20
+> >> +=3D fw_cfg interface =3D
+> >> +
+> >> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
+> >> +configuring the guest appropriately.
+> >> +
+> >> +The entry of 6 bytes has the following content, in little-endian:
+> >> +
+> >> +    #define TPM_VERSION_UNSPEC          0
+> >> +    #define TPM_VERSION_1_2             1
+> >> +    #define TPM_VERSION_2_0             2
+> >> +
+> >> +    #define TPM_PPI_VERSION_NONE        0
+> >> +    #define TPM_PPI_VERSION_1_30        1
+> >> +
+> >> +    struct FWCfgTPMConfig {
+> >> +        uint32_t tpmppi_address;         /* PPI memory location */
+> >> +        uint8_t tpm_version;             /* TPM version */
+> >> +        uint8_t tpmppi_version;          /* PPI version */
+> >> +    };
+> >> +
+> >>   =3D ACPI Interface =3D
+> >>  =20
+> >>   The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT=
+ and passes =20
+>=20
+>=20
