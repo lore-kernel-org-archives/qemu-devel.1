@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY1fF-0005E4-GD
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:02:42 -0400
+	(envelope-from <mst@redhat.com>) id 1fY1jG-0006w7-Im
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY1fC-0001d9-FS
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:02:41 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:36166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY1fC-0001c3-6W
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:02:38 -0400
-Received: by mail-pl0-x243.google.com with SMTP id a7-v6so382932plp.3
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:02:37 -0700 (PDT)
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-24-richard.henderson@linaro.org>
-	<CAFEAcA9R-FWVVsrYESi3Nqkfs3FCetcK4L2KVFghtqDLBxUMHQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bc4c85b6-5525-0bc3-93ac-0cc5a3db4495@linaro.org>
-Date: Tue, 26 Jun 2018 21:02:33 -0700
+	(envelope-from <mst@redhat.com>) id 1fY1jB-0005nT-Ra
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:06:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54532 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fY1jB-0005ms-M1
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:06:45 -0400
+Date: Wed, 27 Jun 2018 07:06:42 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180627070354-mutt-send-email-mst@kernel.org>
+References: <20180627034935.20276-1-venu.busireddy@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9R-FWVVsrYESi3Nqkfs3FCetcK4L2KVFghtqDLBxUMHQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 23/35] target/arm: Implement SVE
- floating-point convert precision
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180627034935.20276-1-venu.busireddy@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for
+ pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +27,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Venu Busireddy <venu.busireddy@oracle.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 06/26/2018 03:44 AM, Peter Maydell wrote:
-> A comment to the effect that the SVE fp-to-fp conversion
-> routines always use IEEE format halfprec (ie ignore FPCR.AHP)
-> would be helpful.
+On Tue, Jun 26, 2018 at 10:49:30PM -0500, Venu Busireddy wrote:
+> The patch set "Enable virtio_net to act as a standby for a passthru
+> device" [1] deals with live migration of guests that use passthrough
+> devices. However, that scheme uses the MAC address for pairing
+> the virtio device and the passthrough device. The thread "netvsc:
+> refactor notifier/event handling code to use the failover framework"
+> [2] discusses an alternate mechanism, such as using an UUID, for pairing
+> the devices. Based on that discussion, proposals "Add "Group Identifier"
+> to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
+> store pairing information..." [4] were made.
+> 
+> The current patch set includes all the feedback received for proposals [3]
+> and [4]. For the sake of completeness, patch for the virtio specification
+> is also included here. Following is the updated proposal.
+> 
+> 1. Extend the virtio specification to include a new virtio PCI capability
+>    "VIRTIO_PCI_CAP_GROUP_ID_CFG".
 
-Ok.
+There's still discussion around whether it should be
+a virtio pci capability, a virtio net config field or
+a new kind of capability.
 
-> Are you sure we have the FPCR.FZ16 handling right here? That
-> is, do we need the same "use the not-fp16 fpstatus pointer,
-> and temporarily clear the flush flag for the fp16 end of
-> the conversion" behaviour that we have in vfp_fcvt_f16_to_f32
-> and friends ? The pseudocode FPConvertSVE() calls FPConvert(),
-> which is the "ignore FZ16" codepath I think. The test case would
-> be (eg) a conversion where the input f16 is denormal and
-> FPCR.FZ == 1: this should not do the flush-input-to-zero, right?
+> 2. Enhance the QEMU CLI to include a "uuid" option to the virtio device.
+>    The "uuid" is a string in UUID format.
+> 
+> 3. Enhance the QEMU CLI to include a "uuid" option to the bridge device.
+>    The "uuid" is a string in UUID format. Currently, PCIe bridge for
+>    the Q35 model is supported.
+> 
+> 4. The operator creates a unique identifier string using 'uuidgen'.
+> 
+> 5. When the virtio device is created, the operator uses the "uuid" option
+>    (for example, '-device virtio-net-pci,uuid="string"') and specifies
+>    the UUID created in step 4.
+> 
+>    QEMU stores the UUID in the virtio device's configuration space
+>    in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+> 
+> 6. When assigning a PCI device to the guest in passthrough mode, the
+>    operator first creates a bridge using the "uuid" option (for example,
+>    '-device pcie-downstream,uuid="string"') to specify the UUID created
+>    in step 4, and then attaches the passthrough device to the bridge.
+> 
+>    QEMU stores the UUID in the configuration space of the bridge as
+>    Vendor-Specific capability (0x09). The "Vendor" here is not to be
+>    confused with a specific organization. Instead, the vendor of the
+>    bridge is QEMU. To avoid mixing up with other bridges, the bridge
+>    will be created with vendor ID 0x1b36 (PCI_VENDOR_ID_REDHAT) and
+>    device ID 0x000e (PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE) if the "uuid"
+>    option is specified. Otherwise, current defaults are used.
+> 
+> 7. Patch 4 in patch series "Enable virtio_net to act as a standby for
+>    a passthru device" [1] needs to be modified to use the UUID values
+>    present in the bridge's configuration space and the virtio device's
+>    configuration space instead of the MAC address for pairing the devices.
+> 
+> Thanks!
+> 
+> Venu
 
-Yes, I read it the same way.  I guess both my and Alex's RISU
-test cases didn't exercise this?
+The part where the visibility of a vfio device is controlled by the
+virtio driver acknowledging the backup feature is missing here.
+ 
 
-
-r~
+> [1] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00156.html
+> [2] https://www.spinics.net/lists/netdev/msg499011.html
+> [3] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00118.html
+> [4] https://lists.oasis-open.org/archives/virtio-dev/201805/msg00204.html
+> 
+> Changes in v2:
+>   - As Michael Tsirkin suggested, changed the virtio specification
+>     to restrict the group identifier to be a 16-byte field, presented
+>     entirely in the virtio device's configuration space.
+>   - As Michael Tsirkin suggested, instead of tweaking the ioh3420
+>     device with Red Hat vendor ID, create a new PCIe bridge device
+>     named "pcie-downstream" with Red Hat Vendor ID, and include the
+>     group identifier in this device.
+>   - Added a new patch to enhance the "pci-bridge" device to support
+>     the group identifier (for the i440FX model).
+> 
+> Venu Busireddy (4):
+>   Add a true or false option to the DEFINE_PROP_UUID macro.
+>   Add "Group Identifier" support to virtio devices.
+>   Add "Group Identifier" support to Red Hat PCI bridge.
+>   Add "Group Identifier" support to Red Hat PCI Express bridge.
+> 
+>  default-configs/arm-softmmu.mak             |   1 +
+>  default-configs/i386-softmmu.mak            |   1 +
+>  default-configs/x86_64-softmmu.mak          |   1 +
+>  hw/acpi/vmgenid.c                           |   2 +-
+>  hw/pci-bridge/Makefile.objs                 |   1 +
+>  hw/pci-bridge/pci_bridge_dev.c              |   8 +
+>  hw/pci-bridge/pcie_downstream.c             | 215 ++++++++++++++++++++
+>  hw/pci-bridge/pcie_downstream.h             |  10 +
+>  hw/pci/pci_bridge.c                         |  26 +++
+>  hw/virtio/virtio-pci.c                      |  15 ++
+>  hw/virtio/virtio-pci.h                      |   3 +-
+>  include/hw/pci/pci.h                        |   3 +
+>  include/hw/pci/pcie.h                       |   1 +
+>  include/hw/qdev-properties.h                |   4 +-
+>  include/standard-headers/linux/virtio_pci.h |   8 +
+>  15 files changed, 295 insertions(+), 4 deletions(-)
+>  create mode 100644 hw/pci-bridge/pcie_downstream.c
+>  create mode 100644 hw/pci-bridge/pcie_downstream.h
