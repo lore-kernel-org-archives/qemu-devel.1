@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29m-0004dI-Pc
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29o-0004fK-F8
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fY29j-0000ye-VZ
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:14 -0400
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:43393)
+	(envelope-from <richard.henderson@linaro.org>) id 1fY29m-000120-Mm
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:16 -0400
+Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:37558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fY29j-0000yA-Of
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:11 -0400
-Received: by mail-pf0-x236.google.com with SMTP id y8-v6so382645pfm.10
-	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:34:11 -0700 (PDT)
+	id 1fY29m-000119-Ei
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 00:34:14 -0400
+Received: by mail-pl0-x233.google.com with SMTP id 31-v6so416411plc.4
+	for <qemu-devel@nongnu.org>; Tue, 26 Jun 2018 21:34:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 26 Jun 2018 21:33:21 -0700
-Message-Id: <20180627043328.11531-29-richard.henderson@linaro.org>
+Date: Tue, 26 Jun 2018 21:33:23 -0700
+Message-Id: <20180627043328.11531-31-richard.henderson@linaro.org>
 In-Reply-To: <20180627043328.11531-1-richard.henderson@linaro.org>
 References: <20180627043328.11531-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 28/35] target/arm: Implement SVE
- floating-point complex add
+Subject: [Qemu-devel] [PATCH v6 30/35] target/arm: Pass index to AdvSIMD
+ FCMLA (indexed)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,193 +30,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper-sve.h    |   7 +++
- target/arm/sve_helper.c    | 100 +++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c |  24 +++++++++
- target/arm/sve.decode      |   4 ++
- 4 files changed, 135 insertions(+)
+For aa64 advsimd, we had been passing the pre-indexed vector.
+However, sve applies the index to each 128-bit segment, so we
+need to pass in the index separately.
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 891346a5ac..0bd9fe2f28 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -1092,6 +1092,13 @@ DEF_HELPER_FLAGS_6(sve_facgt_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_6(sve_facgt_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_6(sve_fcadd_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fcadd_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fcadd_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 83bd8c4269..bdb7565779 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3657,6 +3657,106 @@ void HELPER(sve_ftmad_d)(void *vd, void *vn, void *vm, void *vs, uint32_t desc)
+For aa32 advsimd, the fp32 operation always has index 0, but
+we failed to interpret the fp16 index correctly.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+---
+v6:
+  * Fix double-indexing in translate-a64.c
+  * Fix non-indexing of fp16 in translate.c.
+---
+ target/arm/translate-a64.c | 21 ++++++++++++---------
+ target/arm/translate.c     | 32 +++++++++++++++++++++++---------
+ target/arm/vec_helper.c    | 10 ++++++----
+ 3 files changed, 41 insertions(+), 22 deletions(-)
+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 8d8a4cecb0..eb3a4ab2f0 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -12669,15 +12669,18 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+     case 0x13: /* FCMLA #90 */
+     case 0x15: /* FCMLA #180 */
+     case 0x17: /* FCMLA #270 */
+-        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
+-                           vec_full_reg_offset(s, rn),
+-                           vec_reg_offset(s, rm, index, size), fpst,
+-                           is_q ? 16 : 8, vec_full_reg_size(s),
+-                           extract32(insn, 13, 2), /* rot */
+-                           size == MO_64
+-                           ? gen_helper_gvec_fcmlas_idx
+-                           : gen_helper_gvec_fcmlah_idx);
+-        tcg_temp_free_ptr(fpst);
++        {
++            int rot = extract32(insn, 13, 2);
++            int data = (index << 2) | rot;
++            tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
++                               vec_full_reg_offset(s, rn),
++                               vec_full_reg_offset(s, rm), fpst,
++                               is_q ? 16 : 8, vec_full_reg_size(s), data,
++                               size == MO_64
++                               ? gen_helper_gvec_fcmlas_idx
++                               : gen_helper_gvec_fcmlah_idx);
++            tcg_temp_free_ptr(fpst);
++        }
+         return;
      }
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 2a3e4f5d4c..a7a980b1f2 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -7826,26 +7826,42 @@ static int disas_neon_insn_3same_ext(DisasContext *s, uint32_t insn)
+ 
+ static int disas_neon_insn_2reg_scalar_ext(DisasContext *s, uint32_t insn)
+ {
+-    int rd, rn, rm, rot, size, opr_sz;
++    gen_helper_gvec_3_ptr *fn_gvec_ptr;
++    int rd, rn, rm, opr_sz, data;
+     TCGv_ptr fpst;
+     bool q;
+ 
+     q = extract32(insn, 6, 1);
+     VFP_DREG_D(rd, insn);
+     VFP_DREG_N(rn, insn);
+-    VFP_DREG_M(rm, insn);
+     if ((rd | rn) & q) {
+         return 1;
+     }
+ 
+     if ((insn & 0xff000f10) == 0xfe000800) {
+         /* VCMLA (indexed) -- 1111 1110 S.RR .... .... 1000 ...0 .... */
+-        rot = extract32(insn, 20, 2);
+-        size = extract32(insn, 23, 1);
+-        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)
+-            || (!size && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))) {
++        int rot = extract32(insn, 20, 2);
++        int size = extract32(insn, 23, 1);
++        int index;
++
++        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)) {
+             return 1;
+         }
++        if (size == 0) {
++            if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++                return 1;
++            }
++            /* For fp16, rm is just Vm, and index is M.  */
++            rm = extract32(insn, 0, 4);
++            index = extract32(insn, 5, 1);
++        } else {
++            /* For fp32, rm is the usual M:Vm, and index is 0.  */
++            VFP_DREG_M(rm, insn);
++            index = 0;
++        }
++        data = (index << 2) | rot;
++        fn_gvec_ptr = (size ? gen_helper_gvec_fcmlas_idx
++                       : gen_helper_gvec_fcmlah_idx);
+     } else {
+         return 1;
+     }
+@@ -7864,9 +7880,7 @@ static int disas_neon_insn_2reg_scalar_ext(DisasContext *s, uint32_t insn)
+     tcg_gen_gvec_3_ptr(vfp_reg_offset(1, rd),
+                        vfp_reg_offset(1, rn),
+                        vfp_reg_offset(1, rm), fpst,
+-                       opr_sz, opr_sz, rot,
+-                       size ? gen_helper_gvec_fcmlas_idx
+-                       : gen_helper_gvec_fcmlah_idx);
++                       opr_sz, opr_sz, data, fn_gvec_ptr);
+     tcg_temp_free_ptr(fpst);
+     return 0;
  }
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 073e5c58e7..8f2dc4b989 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -317,10 +317,11 @@ void HELPER(gvec_fcmlah_idx)(void *vd, void *vn, void *vm,
+     float_status *fpst = vfpst;
+     intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
+     uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    intptr_t index = extract32(desc, SIMD_DATA_SHIFT + 2, 2);
+     uint32_t neg_real = flip ^ neg_imag;
+     uintptr_t i;
+-    float16 e1 = m[H2(flip)];
+-    float16 e3 = m[H2(1 - flip)];
++    float16 e1 = m[H2(2 * index + flip)];
++    float16 e3 = m[H2(2 * index + 1 - flip)];
  
-+/*
-+ * FP Complex Add
-+ */
-+
-+void HELPER(sve_fcadd_h)(void *vd, void *vn, void *vm, void *vg,
-+                         void *vs, uint32_t desc)
-+{
-+    intptr_t j, i = simd_oprsz(desc);
-+    uint64_t *g = vg;
-+    float16 neg_imag = float16_set_sign(0, simd_data(desc));
-+    float16 neg_real = float16_chs(neg_imag);
-+
-+    do {
-+        uint64_t pg = g[(i - 1) >> 6];
-+        do {
-+            float16 e0, e1, e2, e3;
-+
-+            /* I holds the real index; J holds the imag index.  */
-+            j = i - sizeof(float16);
-+            i -= 2 * sizeof(float16);
-+
-+            e0 = *(float16 *)(vn + H1_2(i));
-+            e1 = *(float16 *)(vm + H1_2(j)) ^ neg_real;
-+            e2 = *(float16 *)(vn + H1_2(j));
-+            e3 = *(float16 *)(vm + H1_2(i)) ^ neg_imag;
-+
-+            if (likely((pg >> (i & 63)) & 1)) {
-+                *(float16 *)(vd + H1_2(i)) = float16_add(e0, e1, vs);
-+            }
-+            if (likely((pg >> (j & 63)) & 1)) {
-+                *(float16 *)(vd + H1_2(j)) = float16_add(e2, e3, vs);
-+            }
-+        } while (i & 63);
-+    } while (i != 0);
-+}
-+
-+void HELPER(sve_fcadd_s)(void *vd, void *vn, void *vm, void *vg,
-+                         void *vs, uint32_t desc)
-+{
-+    intptr_t j, i = simd_oprsz(desc);
-+    uint64_t *g = vg;
-+    float32 neg_imag = float32_set_sign(0, simd_data(desc));
-+    float32 neg_real = float32_chs(neg_imag);
-+
-+    do {
-+        uint64_t pg = g[(i - 1) >> 6];
-+        do {
-+            float32 e0, e1, e2, e3;
-+
-+            /* I holds the real index; J holds the imag index.  */
-+            j = i - sizeof(float32);
-+            i -= 2 * sizeof(float32);
-+
-+            e0 = *(float32 *)(vn + H1_2(i));
-+            e1 = *(float32 *)(vm + H1_2(j)) ^ neg_real;
-+            e2 = *(float32 *)(vn + H1_2(j));
-+            e3 = *(float32 *)(vm + H1_2(i)) ^ neg_imag;
-+
-+            if (likely((pg >> (i & 63)) & 1)) {
-+                *(float32 *)(vd + H1_2(i)) = float32_add(e0, e1, vs);
-+            }
-+            if (likely((pg >> (j & 63)) & 1)) {
-+                *(float32 *)(vd + H1_2(j)) = float32_add(e2, e3, vs);
-+            }
-+        } while (i & 63);
-+    } while (i != 0);
-+}
-+
-+void HELPER(sve_fcadd_d)(void *vd, void *vn, void *vm, void *vg,
-+                         void *vs, uint32_t desc)
-+{
-+    intptr_t j, i = simd_oprsz(desc);
-+    uint64_t *g = vg;
-+    float64 neg_imag = float64_set_sign(0, simd_data(desc));
-+    float64 neg_real = float64_chs(neg_imag);
-+
-+    do {
-+        uint64_t pg = g[(i - 1) >> 6];
-+        do {
-+            float64 e0, e1, e2, e3;
-+
-+            /* I holds the real index; J holds the imag index.  */
-+            j = i - sizeof(float64);
-+            i -= 2 * sizeof(float64);
-+
-+            e0 = *(float64 *)(vn + H1_2(i));
-+            e1 = *(float64 *)(vm + H1_2(j)) ^ neg_real;
-+            e2 = *(float64 *)(vn + H1_2(j));
-+            e3 = *(float64 *)(vm + H1_2(i)) ^ neg_imag;
-+
-+            if (likely((pg >> (i & 63)) & 1)) {
-+                *(float64 *)(vd + H1_2(i)) = float64_add(e0, e1, vs);
-+            }
-+            if (likely((pg >> (j & 63)) & 1)) {
-+                *(float64 *)(vd + H1_2(j)) = float64_add(e2, e3, vs);
-+            }
-+        } while (i & 63);
-+    } while (i != 0);
-+}
-+
- /*
-  * Load contiguous data, protected by a governing predicate.
-  */
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 4883de3fab..b1764f099b 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3895,6 +3895,30 @@ DO_FPCMP(FACGT, facgt)
+     /* Shift boolean to the sign bit so we can xor to negate.  */
+     neg_real <<= 15;
+@@ -377,10 +378,11 @@ void HELPER(gvec_fcmlas_idx)(void *vd, void *vn, void *vm,
+     float_status *fpst = vfpst;
+     intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
+     uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
++    intptr_t index = extract32(desc, SIMD_DATA_SHIFT + 2, 2);
+     uint32_t neg_real = flip ^ neg_imag;
+     uintptr_t i;
+-    float32 e1 = m[H4(flip)];
+-    float32 e3 = m[H4(1 - flip)];
++    float32 e1 = m[H4(2 * index + flip)];
++    float32 e3 = m[H4(2 * index + 1 - flip)];
  
- #undef DO_FPCMP
- 
-+static bool trans_FCADD(DisasContext *s, arg_FCADD *a, uint32_t insn)
-+{
-+    static gen_helper_gvec_4_ptr * const fns[3] = {
-+        gen_helper_sve_fcadd_h,
-+        gen_helper_sve_fcadd_s,
-+        gen_helper_sve_fcadd_d
-+    };
-+
-+    if (a->esz == 0) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-+        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vec_full_reg_offset(s, a->rm),
-+                           pred_full_reg_offset(s, a->pg),
-+                           status, vsz, vsz, a->rot, fns[a->esz - 1]);
-+        tcg_temp_free_ptr(status);
-+    }
-+    return true;
-+}
-+
- typedef void gen_helper_sve_fmla(TCGv_env, TCGv_ptr, TCGv_i32);
- 
- static bool do_fmla(DisasContext *s, arg_rprrr_esz *a, gen_helper_sve_fmla *fn)
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index c725ee2584..e5f8f43254 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -725,6 +725,10 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
- # SVE integer multiply immediate (unpredicated)
- MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
- 
-+# SVE floating-point complex add (predicated)
-+FCADD           01100100 esz:2 00000 rot:1 100 pg:3 rm:5 rd:5 \
-+                rn=%reg_movprfx
-+
- ### SVE FP Multiply-Add Indexed Group
- 
- # SVE floating-point multiply-add (indexed)
+     /* Shift boolean to the sign bit so we can xor to negate.  */
+     neg_real <<= 31;
 -- 
 2.17.1
