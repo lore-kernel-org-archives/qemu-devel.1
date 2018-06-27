@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fYAof-0001U6-M4
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:49:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fYAq3-0002ZK-33
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:50:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fYAoa-000211-RY
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:49:01 -0400
-References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-30-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8ced7c8b-94f4-6378-0b2d-39158726e2ee@redhat.com>
-Date: Wed, 27 Jun 2018 15:48:52 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1fYApy-0003hc-UL
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:50:26 -0400
+Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:46778)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fYApy-0003gI-Av
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:50:22 -0400
+Received: by mail-pl0-x229.google.com with SMTP id 30-v6so1064022pld.13
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 06:50:22 -0700 (PDT)
+References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	<20180618184046.6270-14-richard.henderson@linaro.org>
+	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
+	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
+	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
+	<20180627125953.GK24595@lianli.shorne-pla.net>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
+Date: Wed, 27 Jun 2018 06:50:18 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180625124238.25339-30-f4bug@amsat.org>
+In-Reply-To: <20180627125953.GK24595@lianli.shorne-pla.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 29/46] hw/mips/r4k: Constify params_size
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +35,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Stefan Weil <sw@weilnetz.de>
-Cc: qemu-trivial@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+To: Stafford Horne <shorne@gmail.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 25.06.2018 14:42, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/mips/mips_r4k.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-> index e5cf8ed1a3..fc38b4bf99 100644
-> --- a/hw/mips/mips_r4k.c
-> +++ b/hw/mips/mips_r4k.c
-> @@ -79,8 +79,9 @@ typedef struct ResetData {
-> =20
->  static int64_t load_kernel(void)
->  {
-> +    const size_t params_size =3D 264;
->      int64_t entry, kernel_high;
-> -    long kernel_size, initrd_size, params_size;
-> +    long kernel_size, initrd_size;
->      ram_addr_t initrd_offset;
->      uint32_t *params_buf;
->      int big_endian;
-> @@ -128,7 +129,6 @@ static int64_t load_kernel(void)
->      }
-> =20
->      /* Store command line.  */
-> -    params_size =3D 264;
->      params_buf =3D g_malloc(params_size);
-> =20
->      params_buf[0] =3D tswap32(ram_size);
-> @@ -143,7 +143,7 @@ static int64_t load_kernel(void)
->      }
-> =20
->      rom_add_blob_fixed("params", params_buf, params_size,
-> -                       (16 << 20) - 264);
-> +                       (16 << 20) - params_size);
-> =20
->      g_free(params_buf);
->      return entry;
+On 06/27/2018 05:59 AM, Stafford Horne wrote:
+> The index is negative... this patch should fix that.
+> 
+> @@ -78,6 +78,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr,
+> target_ulong rb)
+>      case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+>          idx = (spr - 1024);
+>          env->shadow_gpr[idx / 32][idx % 32] = rb;
+> +        break;
+>  
+>      case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+OMG.  That's embarrasing...
+
+
+r~
