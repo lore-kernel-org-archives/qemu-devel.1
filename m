@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fY0Mo-0006UN-16
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:39:35 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Su-0006eN-9p
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fY0Mk-0006C1-TK
-	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 22:39:34 -0400
-Date: Wed, 27 Jun 2018 05:39:28 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180627053846-mutt-send-email-mst@kernel.org>
-References: <20180626135928.23950-1-clg@kaod.org>
-	<20180627033321-mutt-send-email-mst@kernel.org>
-	<1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1d70c0f9179990cd33d7c82c5190179e60ae4ce3.camel@kernel.crashing.org>
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+	(envelope-from <venu.busireddy@oracle.com>) id 1fY1Sr-00061a-6r
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:56 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:59414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1fY1Sq-0005wt-Th
+	for qemu-devel@nongnu.org; Tue, 26 Jun 2018 23:49:53 -0400
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Date: Tue, 26 Jun 2018 22:49:31 -0500
+Message-Id: <20180627034935.20276-2-venu.busireddy@oracle.com>
+In-Reply-To: <20180627034935.20276-1-venu.busireddy@oracle.com>
+References: <20180627034935.20276-1-venu.busireddy@oracle.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] Add a true or false option to the
+ DEFINE_PROP_UUID macro.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Andrea Bolognani <abologna@redhat.com>
+To: venu.busireddy@oracle.com, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On Wed, Jun 27, 2018 at 11:38:17AM +1000, Benjamin Herrenschmidt wrote:
-> On Wed, 2018-06-27 at 03:35 +0300, Michael S. Tsirkin wrote:
-> > 
-> > > +
-> > > +/* Extract field fname from val */
-> > > +#define GETFIELD(fname, val)                    \
-> > > +        (((val) & fname##_MASK) >> fname##_LSH)
-> > > +
-> > > +/* Set field fname of oval to fval
-> > > + * NOTE: oval isn't modified, the combined result is returned
-> > > + */
-> > > +#define SETFIELD(fname, oval, fval)                     \
-> > > +        (((oval) & ~fname##_MASK) | \
-> > > +         ((((typeof(oval))(fval)) << fname##_LSH) & fname##_MASK))
-> > > +
-> > 
-> > Pls don't make up macros like these. We can't have each device do it.
-> 
-> So what ? We move the macros in a generic place ? These are MUCH better
-> than open-coding the masks & shifts and much less error prone.
+It may not always be desirable to have a random UUID stuffed into the
+'_field' member. Add a new boolean option '_default' that will allow
+the caller to specify if a random UUID needs be generated or not.
 
-include/qemu/bitops.h has a ton of handy macros.
+Also modified the instance where this macro is used.
 
-> > > @@ -1031,6 +1110,7 @@ static Property pnv_chip_properties[] = {
-> > >      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
-> > >      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
-> > >      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
-> > > +    DEFINE_PROP_UINT32("num-phbs", PnvChip, num_phbs, 1),
-> > >      DEFINE_PROP_END_OF_LIST(),
-> > >  };
-> > 
-> > How about instanciating each extra phb using -device?
-> > Seems better than teaching everyone about platform-specific
-> > options.
-> 
-> It's about which PHBs are enabled, not which are instanciated, if I
-> understand Cedric changes ...
-> 
-> This aims are implementing the POWER8 chip correctly, it has a fixed
-> number of PHBs per-chip at very specific XSCOM addresses, that the
-> firwmare knows about.
-> 
-> Cheers,
-> Ben.
+Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+---
+ hw/acpi/vmgenid.c            | 2 +-
+ include/hw/qdev-properties.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index d78b579a20..6d53757ee5 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -215,7 +215,7 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static Property vmgenid_device_properties[] = {
+-    DEFINE_PROP_UUID(VMGENID_GUID, VmGenIdState, guid),
++    DEFINE_PROP_UUID(VMGENID_GUID, VmGenIdState, guid, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 4f60cc88f3..7d39a4bdcd 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -218,12 +218,12 @@ extern const PropertyInfo qdev_prop_off_auto_pcibar;
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_off_auto_pcibar, \
+                         OffAutoPCIBAR)
+ 
+-#define DEFINE_PROP_UUID(_name, _state, _field) {                  \
++#define DEFINE_PROP_UUID(_name, _state, _field, _default) {        \
+         .name      = (_name),                                      \
+         .info      = &qdev_prop_uuid,                              \
+         .offset    = offsetof(_state, _field)                      \
+             + type_check(QemuUUID, typeof_field(_state, _field)),  \
+-        .set_default = true,                                       \
++        .set_default = _default,                                   \
+         }
+ 
+ #define DEFINE_PROP_END_OF_LIST()               \
