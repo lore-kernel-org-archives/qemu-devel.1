@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYAq3-0002ZK-33
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:50:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fYAqt-0003Ju-RU
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYApy-0003hc-UL
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:50:26 -0400
-Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:46778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYApy-0003gI-Av
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:50:22 -0400
-Received: by mail-pl0-x229.google.com with SMTP id 30-v6so1064022pld.13
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 06:50:22 -0700 (PDT)
-References: <20180618184046.6270-1-richard.henderson@linaro.org>
-	<20180618184046.6270-14-richard.henderson@linaro.org>
-	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
-	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
-	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
-	<20180627125953.GK24595@lianli.shorne-pla.net>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
-Date: Wed, 27 Jun 2018 06:50:18 -0700
+	(envelope-from <kraxel@redhat.com>) id 1fYAqs-000556-OS
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:51:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48720 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fYAqs-00053u-Jg
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:51:18 -0400
+Date: Wed, 27 Jun 2018 15:51:15 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180627135115.jk3d4mcuhmlznkc7@sirius.home.kraxel.org>
+References: <20180627115836.25092-1-kraxel@redhat.com>
+	<20180627115836.25092-2-kraxel@redhat.com>
+	<10b74818-155c-bdc8-ca0e-c7239be35673@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180627125953.GK24595@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <10b74818-155c-bdc8-ca0e-c7239be35673@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] warn about two vga cards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On 06/27/2018 05:59 AM, Stafford Horne wrote:
-> The index is negative... this patch should fix that.
-> 
-> @@ -78,6 +78,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr,
-> target_ulong rb)
->      case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
->          idx = (spr - 1024);
->          env->shadow_gpr[idx / 32][idx % 32] = rb;
-> +        break;
->  
->      case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
+On Wed, Jun 27, 2018 at 10:10:17AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Hi Gerd,
+>=20
+> On 06/27/2018 08:58 AM, Gerd Hoffmann wrote:
+> > Two vga cards will listen on the same legacy (isa) ioports.  Due to t=
+his
+> > conflict only one of the two cards will work correctly in vga mode.
+>=20
+> The last one registered...
+>=20
+> > Print a warning message in that case.
+> >=20
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  hw/display/vga.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >=20
+> > diff --git a/hw/display/vga.c b/hw/display/vga.c
+> > index c82e6d240a..a6c246f76b 100644
+> > --- a/hw/display/vga.c
+> > +++ b/hw/display/vga.c
+> > @@ -2273,6 +2273,7 @@ MemoryRegion *vga_init_io(VGACommonState *s, Ob=
+ject *obj,
+> >  void vga_init(VGACommonState *s, Object *obj, MemoryRegion *address_=
+space,
+> >                MemoryRegion *address_space_io, bool init_vga_ports)
+> >  {
+> > +    static bool vgaports_registered;
+> >      MemoryRegion *vga_io_memory;
+> >      const MemoryRegionPortio *vga_ports, *vbe_ports;
+> > =20
+> > @@ -2289,6 +2290,11 @@ void vga_init(VGACommonState *s, Object *obj, =
+MemoryRegion *address_space,
+> >                                          1);
+> >      memory_region_set_coalescing(vga_io_memory);
+> >      if (init_vga_ports) {
+> > +        if (vgaports_registered) {
+> > +            warn_report("multiple vga cards may not work as expected=
+");
+> > +        } else {
+> > +            vgaports_registered =3D true;
+> > +        }
+> >          portio_list_init(&s->vga_port_list, obj, vga_ports, s, "vga"=
+);
+>=20
+> Here we leak s->vga_port_list->regions from the 1st card.
+> Can we call portio_list_destroy() in the if (vgaports_registered) block=
+?
 
-OMG.  That's embarrasing...
+We don't have a pointer at hand.  Easier would be to only register
+the ports in the else block.
 
+Or throw an error in the if (vgaports_registered) block instead of
+printing a warning only.
 
-r~
+Hmm ...
+
+cheers,
+  Gerd
