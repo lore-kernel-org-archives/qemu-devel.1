@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fY5n8-0005C5-Lm
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:27:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1fY5v7-00074c-7J
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fY5n5-0002gM-Dc
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:27:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34472 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fY5v4-0006ik-EY
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:35:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60084 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fY5n5-0002bg-8Q
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:27:03 -0400
-References: <1528895946-28677-1-git-send-email-eric.auger@redhat.com>
-	<9830d5df-c36d-1bb3-799b-bfe1f7b93b29@redhat.com>
-	<8108c63d-c755-c682-7529-91ac0c676bf3@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <81654d37-6ae4-2dbd-b50e-7222d6c97e66@redhat.com>
-Date: Wed, 27 Jun 2018 10:26:58 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fY5v4-0006Yu-8n
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 04:35:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 49A86857AB
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 08:35:17 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org>
+	<87po0cad8n.fsf_-_@dusky.pond.sub.org>
+Date: Wed, 27 Jun 2018 10:35:15 +0200
+In-Reply-To: <87po0cad8n.fsf_-_@dusky.pond.sub.org> (Markus Armbruster's
+	message of "Wed, 27 Jun 2018 09:40:40 +0200")
+Message-ID: <871scsaapo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <8108c63d-c755-c682-7529-91ac0c676bf3@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] exec: Fix MAP_RAM for cached access
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org
-Cc: peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 
-Hi Paolo,
+Markus Armbruster <armbru@redhat.com> writes:
 
-On 06/27/2018 10:26 AM, Paolo Bonzini wrote:
-> On 26/06/2018 22:29, Auger Eric wrote:
->>>
->>> Fixes: 48564041a73a (exec: reintroduce MemoryRegion caching)
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> gentle reminder, just to make sure someone is going to pick up this
->> patch before the freeze ;-) Or please let me know if I miss some concerns.
-> 
-> Yes, it's already queued.
+> Another lose end: event COMMAND_DROPPED seems to lack test coverage.
 
-Ok thanks!
+Hmm, dropping commands serves to limit the request queue.  What limits
+the response queue?
 
-Eric
-> 
-> Paolo
-> 
+Before OOB, the monitor read at most one command, and wrote its response
+with monitor_puts().
+
+For input, this leaves queueing to the kernel: if the client sends
+commands faster than the server can execute them, eventually the kernel
+refuses to buffer more, and the client's send either blocks or fails
+with EAGAIN.
+
+Output is a mess.  monitor_puts() uses an output buffer.  It tries to
+flush at newline.  Issues:
+
+* If flushing runs into a partial write, the unwritten remainder remains
+  in the output buffer until the next newline.  That newline may take
+  its own sweet time to arrive.  Could even lead to deadlocks, where a
+  client awaits complete output before it sends more input.  Bug,
+  predates OOB, doesn't block this series.
+
+* If the client fails to read, the output buffer can grow without bound.
+  Not a security issue; the client is trusted.  Just bad workmanship.
+
+OOB doesn't change this for monitors running in the main thread.  Only
+mux chardevs run there.
+
+Aside: keeping special case code around just for mux is a really bad
+idea.  We need to get rid of it.
+
+For monitors running in an I/O thread, we add another buffer: the
+response queue.  It's drained by monitor_qmp_bh_responder().  I guess
+that means the response queue is effectively bounded by timely draining.
+Correct?
+
+Buffering twice seems silly, but that could be addressed in follow-up
+patches.
