@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fY9WD-0004Xp-IS
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:25:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fY9Wq-0004r4-B3
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fY9WA-00024g-EB
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:25:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44350 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fY9WA-00023t-95
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:25:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E154C77888
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:25:49 +0000 (UTC)
-Date: Wed, 27 Jun 2018 13:25:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180627122544.GG2423@work-vm>
-References: <20180627105112.31401-1-peterx@redhat.com>
-	<20180627105112.31401-4-peterx@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fY9Wn-0002pq-5N
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:26:32 -0400
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-2-f4bug@amsat.org>
+	<20180627132747.76773eb9@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3dd9341a-f4e6-c107-2f1f-0745d039f03e@redhat.com>
+Date: Wed, 27 Jun 2018 07:26:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180627105112.31401-4-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: do explicit incoming
- setup for rdma
+In-Reply-To: <20180627132747.76773eb9@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 01/46] include: Add IEC binary prefixes
+ in "qemu/units.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> RDMA does not support postcopy recovery, so no need to go into such
-> logic.  Instead of calling migration_fd_process_incoming(), let's call
-> the two functions that setup the incoming migration.  There should have
-> no functional change at all.
+On 06/27/2018 06:27 AM, Igor Mammedov wrote:
+> On Mon, 25 Jun 2018 09:41:53 -0300
+> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+>=20
+>> Loosely based on 076b35b5a56.
+>>
+>> Suggested-by: Stefan Weil <sw@weilnetz.de>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
 
-Can you explain why we need to though?  The reason I ask is that there
-is Lidong Chen's work that gets postcopy partially working with RDMA, so
-then the next question is bound to be recovery.
+>> +#ifndef QEMU_UNITS_H
+>> +#define QEMU_UNITS_H
+>> +
+>> +#define KiB     (INT64_C(1) << 10)
+>> +#define MiB     (INT64_C(1) << 20)
+>> +#define GiB     (INT64_C(1) << 30)
+>> +#define TiB     (INT64_C(1) << 40)
+>> +#define PiB     (INT64_C(1) << 50)
+>> +#define EiB     (INT64_C(1) << 60)
+> Shouldn't above use UINT64_C()
 
-Dave
+Since the decision of signed vs. unsigned was intentional based on=20
+review on earlier versions, it may be worth a comment in this file that=20
+these constants are intentionally signed (in usage patterns, these tend=20
+to be multiplied by another value; and while it is easy to go to=20
+unsigned by doing '1U * KiB', you can't go in the opposite direction if=20
+you want a signed number for '1 * KiB' unless KiB is signed).
 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/rdma.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 8bd7159059..217cdd7dd8 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -3687,7 +3687,8 @@ static void rdma_accept_incoming_migration(void *opaque)
->      }
->  
->      rdma->migration_started_on_destination = 1;
-> -    migration_fd_process_incoming(f);
-> +    migration_incoming_setup(f);
-> +    migration_incoming_process();
->  }
->  
->  void rdma_start_incoming_migration(const char *host_port, Error **errp)
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
