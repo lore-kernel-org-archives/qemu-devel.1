@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fY4y3-0007iq-Ei
+	(envelope-from <contrib@steffen-goertz.de>) id 1fY4y2-0007i2-Eg
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <contrib@steffen-goertz.de>) id 1fY4y2-0005rX-Jk
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:34:19 -0400
+	(envelope-from <contrib@steffen-goertz.de>) id 1fY4xz-0005oZ-RR
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:34:18 -0400
+Received: from steffen-goertz.de ([88.198.119.201]:51480)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <contrib@steffen-goertz.de>) id 1fY4xz-0005o2-Eq
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 03:34:15 -0400
 From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Date: Wed, 27 Jun 2018 09:33:47 +0200
-Message-Id: <20180627073351.856-5-contrib@steffen-goertz.de>
+Date: Wed, 27 Jun 2018 09:33:48 +0200
+Message-Id: <20180627073351.856-6-contrib@steffen-goertz.de>
 In-Reply-To: <20180627073351.856-1-contrib@steffen-goertz.de>
 References: <20180627073351.856-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC 4/8] arm: NRF51 Calculate peripheral id from base
- address
+Subject: [Qemu-devel] [RFC 5/8] arm: Add NRF51 random number generator
+ peripheral
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +28,376 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
 
-The base address determines a peripherals id, which identifies its
-interrupt line, see NRF51 reference manual section 10 peripheral
-interface. This little gem calculates the peripheral id based
-on its base address.
+Add a model of the NRF51 random number generator peripheral.
+
+Changes since v2:
+  - Add missing 'qapi/error.h' for error_abort
+
+Changes since v1:
+  - Add implementation access size hints to MemoryRegionOps
+  - Fail on error if qcrypto_random_bytes fails
+  - Add references to Nrf51 datasheets
 
 Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 ---
- hw/arm/nrf51_soc.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ hw/misc/Makefile.objs       |   1 +
+ hw/misc/nrf51_rng.c         | 243 ++++++++++++++++++++++++++++++++++++
+ include/hw/misc/nrf51_rng.h |  73 +++++++++++
+ 3 files changed, 317 insertions(+)
+ create mode 100644 hw/misc/nrf51_rng.c
+ create mode 100644 include/hw/misc/nrf51_rng.h
 
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index bfcacdf447..e93699a4b0 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -23,8 +23,6 @@
-=20
- #include "hw/arm/nrf51_soc.h"
-=20
--#define IOMEM_BASE      0x40000000
--#define IOMEM_SIZE      0x20000000
-=20
- #define FLASH_BASE      0x00000000
-=20
-@@ -33,12 +31,19 @@
-=20
- #define SRAM_BASE       0x20000000
-=20
-+#define IOMEM_BASE      0x40000000
-+#define IOMEM_SIZE      0x20000000
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 00e834d0f0..fd8cc97249 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -70,3 +70,4 @@ obj-$(CONFIG_AUX) +=3D auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
+ obj-y +=3D mmio_interface.o
+ obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
++obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o
+diff --git a/hw/misc/nrf51_rng.c b/hw/misc/nrf51_rng.c
+new file mode 100644
+index 0000000000..46bdb21850
+--- /dev/null
++++ b/hw/misc/nrf51_rng.c
+@@ -0,0 +1,243 @@
++/*
++ * nrf51_rng.c
++ *
++ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ */
 +
- #define UART_BASE       0x40002000
- #define UART_SIZE       0x1000
- #define UART_INT        2
-=20
-+#define RNG_BASE        0x4000D000
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "hw/misc/nrf51_rng.h"
++#include "crypto/random.h"
 +
- #define PAGE_SIZE       1024
-=20
-+#define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
++#define NRF51_RNG_SIZE         0x1000
 +
-=20
- struct {
-   hwaddr ram_size;
-@@ -177,7 +182,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
-rror **errp)
-         return;
-     }
-=20
--
-     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err)=
-;
-     if (err) {
-         error_propagate(errp, err);
-@@ -204,7 +208,7 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
-rror **errp)
-     mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart), 0);
-     memory_region_add_subregion_overlap(&s->container, UART_BASE, mr, 0)=
-;
-     qdev_connect_gpio_out_named(DEVICE(&s->uart), "irq", 0,
--            qdev_get_gpio_in(DEVICE(&s->armv7m), UART_INT));
-+            qdev_get_gpio_in(DEVICE(&s->armv7m), BASE_TO_IRQ(UART_BASE))=
++#define NRF51_RNG_TASK_START   0x000
++#define NRF51_RNG_TASK_STOP    0x004
++#define NRF51_RNG_EVENT_VALRDY 0x100
++#define NRF51_RNG_REG_SHORTS   0x200
++#define NRF51_RNG_REG_SHORTS_VALRDY_STOP 0
++#define NRF51_RNG_REG_INTEN    0x300
++#define NRF51_RNG_REG_INTEN_VALRDY 0
++#define NRF51_RNG_REG_INTENSET 0x304
++#define NRF51_RNG_REG_INTENCLR 0x308
++#define NRF51_RNG_REG_CONFIG   0x504
++#define NRF51_RNG_REG_CONFIG_DECEN 0
++#define NRF51_RNG_REG_VALUE    0x508
++
++#define NRF51_TRIGGER_TASK 0x01
++#define NRF51_EVENT_CLEAR  0x00
++
++
++static uint64_t rng_read(void *opaque, hwaddr offset, unsigned int size)
++{
++    Nrf51RNGState *s =3D NRF51_RNG(opaque);
++    uint64_t r =3D 0;
++
++    switch (offset) {
++    case NRF51_RNG_EVENT_VALRDY:
++        r =3D s->state.event_valrdy;
++        break;
++    case NRF51_RNG_REG_SHORTS:
++        r =3D s->state.shortcut_stop_on_valrdy;
++        break;
++    case NRF51_RNG_REG_INTEN:
++    case NRF51_RNG_REG_INTENSET:
++    case NRF51_RNG_REG_INTENCLR:
++        r =3D s->state.interrupt_enabled;
++        break;
++    case NRF51_RNG_REG_CONFIG:
++        r =3D s->state.filter_enabled;
++        break;
++    case NRF51_RNG_REG_VALUE:
++        r =3D s->value;
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
++                      __func__, offset);
++    }
++
++    return r;
++}
++
++static int64_t calc_next_timeout(Nrf51RNGState *s)
++{
++    int64_t timeout =3D qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
++    if (s->state.filter_enabled) {
++        timeout +=3D s->period_filtered_us;
++    } else {
++        timeout +=3D s->period_unfiltered_us;
++    }
++
++    return timeout;
++}
++
++
++static void rng_update_timer(Nrf51RNGState *s)
++{
++    if (s->state.active) {
++        timer_mod(&s->timer, calc_next_timeout(s));
++    } else {
++        timer_del(&s->timer);
++    }
++}
++
++
++static void rng_write(void *opaque, hwaddr offset,
++                       uint64_t value, unsigned int size)
++{
++    Nrf51RNGState *s =3D NRF51_RNG(opaque);
++
++    switch (offset) {
++    case NRF51_RNG_TASK_START:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            s->state.active =3D 1;
++            rng_update_timer(s);
++        }
++        break;
++    case NRF51_RNG_TASK_STOP:
++        if (value =3D=3D NRF51_TRIGGER_TASK) {
++            s->state.active =3D 0;
++            rng_update_timer(s);
++        }
++        break;
++    case NRF51_RNG_EVENT_VALRDY:
++        if (value =3D=3D NRF51_EVENT_CLEAR) {
++            s->state.event_valrdy =3D 0;
++            qemu_set_irq(s->eep_valrdy, 0);
++        }
++        break;
++    case NRF51_RNG_REG_SHORTS:
++        s->state.shortcut_stop_on_valrdy =3D
++                (value & BIT_MASK(NRF51_RNG_REG_SHORTS_VALRDY_STOP)) ? 1=
+ : 0;
++        break;
++    case NRF51_RNG_REG_INTEN:
++        s->state.interrupt_enabled =3D
++                (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) ? 1 : 0;
++        break;
++    case NRF51_RNG_REG_INTENSET:
++        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
++            s->state.interrupt_enabled =3D 1;
++        }
++        break;
++    case NRF51_RNG_REG_INTENCLR:
++        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
++            s->state.interrupt_enabled =3D 0;
++        }
++        break;
++    case NRF51_RNG_REG_CONFIG:
++        s->state.filter_enabled =3D
++                      (value & BIT_MASK(NRF51_RNG_REG_CONFIG_DECEN)) ? 1=
+ : 0;
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
++                      __func__, offset);
++    }
++}
++
++static const MemoryRegionOps rng_ops =3D {
++    .read =3D  rng_read,
++    .write =3D rng_write,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
++    .impl.min_access_size =3D 4,
++    .impl.max_access_size =3D 4
++};
++
++static void nrf51_rng_timer_expire(void *opaque)
++{
++    Nrf51RNGState *s =3D NRF51_RNG(opaque);
++
++    qcrypto_random_bytes(&s->value, 1, &error_abort);
++
++    s->state.event_valrdy =3D 1;
++    qemu_set_irq(s->eep_valrdy, 1);
++
++    if (s->state.interrupt_enabled) {
++        qemu_irq_pulse(s->irq);
++    }
++
++    if (s->state.shortcut_stop_on_valrdy) {
++        s->state.active =3D 0;
++    }
++
++    rng_update_timer(s);
++}
++
++static void nrf51_rng_tep_start(void *opaque, int n, int level)
++{
++    Nrf51RNGState *s =3D NRF51_RNG(opaque);
++
++    if (level) {
++        s->state.active =3D 1;
++        rng_update_timer(s);
++    }
++}
++
++static void nrf51_rng_tep_stop(void *opaque, int n, int level)
++{
++    Nrf51RNGState *s =3D NRF51_RNG(opaque);
++
++    if (level) {
++        s->state.active =3D 0;
++        rng_update_timer(s);
++    }
++}
++
++
++static void nrf51_rng_init(Object *obj)
++{
++    Nrf51RNGState *s =3D NRF51_RNG(obj);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
++
++    memory_region_init_io(&s->mmio, obj, &rng_ops, s,
++            TYPE_NRF51_RNG, NRF51_RNG_SIZE);
++    sysbus_init_mmio(sbd, &s->mmio);
++
++    timer_init_us(&s->timer, QEMU_CLOCK_VIRTUAL, nrf51_rng_timer_expire,=
+ s);
++
++    qdev_init_gpio_out_named(DEVICE(s), &s->irq, "irq", 1);
++
++    /* Tasks */
++    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_start, "tep_start",=
+ 1);
++    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_stop, "tep_stop", 1=
 );
-=20
-     /* STUB Peripherals */
-     memory_region_init_io(&s->clock, NULL, &clock_ops, NULL, "nrf51_soc.=
-clock", 0x1000);
++
++    /* Events */
++    qdev_init_gpio_out_named(DEVICE(s), &s->eep_valrdy, "eep_valrdy", 1)=
+;
++}
++
++static Property nrf51_rng_properties[] =3D {
++    DEFINE_PROP_UINT16("period_unfiltered_us", Nrf51RNGState,
++            period_unfiltered_us, 167),
++    DEFINE_PROP_UINT16("period_filtered_us", Nrf51RNGState,
++            period_filtered_us, 660),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void nrf51_rng_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props =3D nrf51_rng_properties;
++}
++
++static const TypeInfo nrf51_rng_info =3D {
++    .name =3D TYPE_NRF51_RNG,
++    .parent =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(Nrf51RNGState),
++    .instance_init =3D nrf51_rng_init,
++    .class_init =3D nrf51_rng_class_init
++};
++
++static void nrf51_rng_register_types(void)
++{
++    type_register_static(&nrf51_rng_info);
++}
++
++type_init(nrf51_rng_register_types)
+diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
+new file mode 100644
+index 0000000000..a8f0630a98
+--- /dev/null
++++ b/include/hw/misc/nrf51_rng.h
+@@ -0,0 +1,73 @@
++/*
++ * nrf51_rng.h
++ *
++ * Copyright 2018 Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ *
++ * See NRF51 reference manual section 21 Random Number Generator
++ * See NRF51 product specification section 8.16 Random Number Generator
++ *
++ * QEMU interface:
++ * + Property "period_unfiltered_us": Time between two biased values in
++ *   microseconds.
++ * + Property "period_filtered_us": Time between two unbiased values in
++ *   microseconds.
++ * + sysbus MMIO regions 0: Memory Region with tasks, events and registe=
+rs
++ *   to be mapped to the peripherals instance address by the SOC.
++ * + Named GPIO output "irq": Interrupt line of the peripheral. Must be
++ *   connected to the associated peripheral interrupt line of the NVIC.
++ * + Named GPIO output "eep_valrdy": Event set when new random value is =
+ready
++ *   to be read.
++ * + Named GPIO input "tep_start": Task that triggers start of continuou=
+s
++ *   generation of random values.
++ * + Named GPIO input "tep_stop": Task that ends continuous generation o=
+f
++ *   random values.
++ *
++ * Accuracy of the peripheral model:
++ * + Stochastic properties of different configurations of the random sou=
+rce
++ *   are not modeled.
++ * + Generation of unfiltered and filtered random values take at least t=
+he
++ *   average generation time stated in the production specification;
++ *   non-deterministic generation times are not modeled.
++ *
++ */
++#ifndef NRF51_RNG_H
++#define NRF51_RNG_H
++
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++#define TYPE_NRF51_RNG "nrf51_soc.rng"
++#define NRF51_RNG(obj) OBJECT_CHECK(Nrf51RNGState, (obj), TYPE_NRF51_RNG=
+)
++
++typedef struct Nrf51RNGState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion mmio;
++    qemu_irq irq;
++
++    /* Event End Points */
++    qemu_irq eep_valrdy;
++
++    QEMUTimer timer;
++
++    /* Time between generation of successive unfiltered values in us */
++    uint16_t period_unfiltered_us;
++    /* Time between generation of successive filtered values in us */
++    uint16_t period_filtered_us;
++
++    uint8_t value;
++
++    struct {
++        uint32_t active:1;
++        uint32_t event_valrdy:1;
++        uint32_t shortcut_stop_on_valrdy:1;
++        uint32_t interrupt_enabled:1;
++        uint32_t filter_enabled:1;
++    } state;
++
++} Nrf51RNGState;
++
++
++#endif /* NRF51_RNG_H_ */
 --=20
 2.17.1
