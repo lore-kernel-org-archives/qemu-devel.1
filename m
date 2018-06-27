@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYBSA-0006Hd-13
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:29:51 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fYBSE-0006Kd-BO
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:29:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYBS4-0004X3-SM
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:29:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55112 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fYBS4-0004Ww-Mg
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:29:44 -0400
-Date: Wed, 27 Jun 2018 16:29:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180627162941.5664796e@redhat.com>
-In-Reply-To: <d267de24-a62b-c1b8-bc4f-c8049a447772@linux.vnet.ibm.com>
-References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
-	<20180626122343.13473-5-marcandre.lureau@redhat.com>
-	<20180627151948.5779e60b@redhat.com>
-	<d267de24-a62b-c1b8-bc4f-c8049a447772@linux.vnet.ibm.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fYBSD-0004ar-6R
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:29:54 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fYBSC-0004aX-Sa
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 10:29:53 -0400
+Received: by mail-wr0-x243.google.com with SMTP id c5-v6so2264901wrs.10
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 07:29:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180627161914.024ddd2b@redhat.com>
+References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
+	<20180626122343.13473-3-marcandre.lureau@redhat.com>
+	<20180627134438.3016259b@redhat.com>
+	<d5dd8b75-377a-4e68-59e6-49b1d3e2176e@linux.vnet.ibm.com>
+	<20180627161914.024ddd2b@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 27 Jun 2018 16:29:51 +0200
+Message-ID: <CAJ+F1C+5nS6DbFO4a2==j4b2w__Uh3WySEDqCyoEcMcCqWdY+Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] acpi: build TPM Physical Presence
- interface
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] tpm: implement virtual memory
+ device for TPM PPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +34,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 27 Jun 2018 10:06:18 -0400
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+On Wed, Jun 27, 2018 at 4:19 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Wed, 27 Jun 2018 08:53:28 -0400
+> Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+>
+>> On 06/27/2018 07:44 AM, Igor Mammedov wrote:
+>> > On Tue, 26 Jun 2018 14:23:41 +0200
+>> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>> >
+>> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> >>
+>> >> Implement a virtual memory device for the TPM Physical Presence inter=
+face.
+>> >> The memory is located at 0xFED45000 and used by ACPI to send messages=
+ to the
+>> >> firmware (BIOS) and by the firmware to provide parameters for each on=
+e of
+>> >> the supported codes.
+>> >>
+>> >> This device should be used by all TPM interfaces on x86 and can be ad=
+ded
+>> >> by calling tpm_ppi_init_io().
+>> >>
+>> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> >>
+>> >> ---
+>> >>
+>> >> v4 (Marc-Andr=C3=A9):
+>> >>   - pass TPM_PPI_ADDR_BASE as argument to tpm_ppi_init_io()
+>> >>   - only enable PPI if property is set
+>> >>
+>> >> v3 (Marc-Andr=C3=A9):
+>> >>   - merge CRB support
+>> >>   - use trace events instead of DEBUG printf
+>> >>   - headers inclusion simplification
+>> >>
+>> >> v2:
+>> >>   - moved to byte access since an infrequently used device;
+>> >>     this simplifies code
+>> >>   - increase size of device to 0x400
+>> >>   - move device to 0xfffef000 since SeaBIOS has some code at 0xffff00=
+00:
+>> >>     'On the emulators, the bios at 0xf0000 is also at 0xffff0000'
+>> >> ---
+>> >>   hw/tpm/tpm_ppi.h      | 27 ++++++++++++++++++++
+>> >>   include/hw/acpi/tpm.h |  6 +++++
+>> >>   hw/tpm/tpm_crb.c      |  7 ++++++
+>> >>   hw/tpm/tpm_ppi.c      | 57 ++++++++++++++++++++++++++++++++++++++++=
++++
+>> >>   hw/tpm/tpm_tis.c      |  7 ++++++
+>> >>   hw/tpm/Makefile.objs  |  2 +-
+>> >>   hw/tpm/trace-events   |  4 +++
+>> >>   7 files changed, 109 insertions(+), 1 deletion(-)
+>> >>   create mode 100644 hw/tpm/tpm_ppi.h
+>> >>   create mode 100644 hw/tpm/tpm_ppi.c
+>> >>
+>> >> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+>> >> new file mode 100644
+>> >> index 0000000000..ac7ad47238
+>> >> --- /dev/null
+>> >> +++ b/hw/tpm/tpm_ppi.h
+>> >> @@ -0,0 +1,27 @@
+>> >> +/*
+>> >> + * TPM Physical Presence Interface
+>> >> + *
+>> >> + * Copyright (C) 2018 IBM Corporation
+>> >> + *
+>> >> + * Authors:
+>> >> + *  Stefan Berger    <stefanb@us.ibm.com>
+>> >> + *
+>> >> + * This work is licensed under the terms of the GNU GPL, version 2 o=
+r later.
+>> >> + * See the COPYING file in the top-level directory.
+>> >> + */
+>> >> +#ifndef TPM_TPM_PPI_H
+>> >> +#define TPM_TPM_PPI_H
+>> >> +
+>> >> +#include "hw/acpi/tpm.h"
+>> >> +#include "exec/address-spaces.h"
+>> >> +
+>> >> +typedef struct TPMPPI {
+>> >> +    MemoryRegion mmio;
+>> >> +
+>> >> +    uint8_t ram[TPM_PPI_ADDR_SIZE];
+>> >> +} TPMPPI;
+>> > I probably miss something obvious here,
+>> > 1st:
+>> > commit message says that memory reion is supposed to be interface
+>> > between FW and OSPM (i.e. totally guest internal thingy).
+>> > So question is:
+>> >    why do we register memory region at all?
+>>
+>> One reason for the device itself was being able to debug the interaction
+>> of the guest with ACPI though I had additional instrumentation for that
+>> showing register contents.
+>> We need it to have some memory in the region where we place it. I
+>> suppose a memory_region_init_ram() would provide migration support
+>> automatically but cannot be used on memory where we have
+>> MemoryRegionOps. So we could drop most parts of the device and only run
+>> memory_region_init_ram() ?
+> if QEMU doesn't need to touch it ever, you could do even better.
+> Use bios_linker to make FW allocate a reserved portion if guest RAM and
+> patch TPM aml code with allocated address. Then you won't have to worry
+> about migration as reserved area is already migrated as part of RAM.
 
-> On 06/27/2018 09:19 AM, Igor Mammedov wrote:
-> > On Tue, 26 Jun 2018 14:23:43 +0200
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > =20
-> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >>
-> >> The TPM Physical Presence interface consists of an ACPI part, a shared
-> >> memory part, and code in the firmware. Users can send messages to the
-> >> firmware by writing a code into the shared memory through invoking the
-> >> ACPI code. When a reboot happens, the firmware looks for the code and
-> >> acts on it by sending sequences of commands to the TPM.
-> >>
-> >> This patch adds the ACPI code. It is similar to the one in EDK2 but do=
-esn't
-> >> assume that SMIs are necessary to use. It uses a similar datastructure=
- for
-> >> the shared memory as EDK2 does so that EDK2 and SeaBIOS could both mak=
-e use
-> >> of it. I extended the shared memory data structure with an array of 256
-> >> bytes, one for each code that could be implemented. The array contains
-> >> flags describing the individual codes. This decouples the ACPI impleme=
-ntation
-> >> from the firmware implementation.
-> >>
-> >> The underlying TCG specification is accessible from the following page.
-> >>
-> >> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spec=
-ification/
-> >>
-> >> This patch implements version 1.30. =20
-> > I've made several suggestions below how to improve aml part of patch a =
-bit,
-> > will review v6 once it's done
-> > /hopefully it would be more readable, considering that ASM language is =
-horrible to begin with/
-> > =20
-> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >>
-> >> ---
-> >>
-> >> v6:
-> >>   - more code documentation (Marc-Andr=C3=A9)
-> >>   - use some explicit named variables to ease reading (Marc-Andr=C3=A9)
-> >>   - use fixed size fields/memory regions, remove PPI struct (Marc-Andr=
-=C3=A9)
-> >>   - only add PPI ACPI methods if PPI is enabled (Marc-Andr=C3=A9)
-> >>   - document the qemu/firmware ACPI memory region (Stefan)
-> >>
-> >> v5 (Marc-Andr=C3=A9):
-> >>   - /struct tpm_ppi/struct TPMPPIData
-> >>
-> >> v4 (Marc-Andr=C3=A9):
-> >>   - replace 'DerefOf (FUNC [N])' with a function, to fix Windows ACPI
-> >>      handling.
-> >>   - replace 'return Package (..) {} ' with scoped variables, to fix
-> >>     Windows ACPI handling.
-> >>
-> >> v3:
-> >>   - add support for PPI to CRB
-> >>   - split up OperationRegion TPPI into two parts, one containing
-> >>     the registers (TPP1) and the other one the flags (TPP2); switched
-> >>     the order of the flags versus registers in the code
-> >>   - adapted ACPI code to small changes to the array of flags where
-> >>     previous flag 0 was removed and now shifting right wasn't always
-> >>     necessary anymore
-> >>
-> >> v2:
-> >>   - get rid of FAIL variable; function 5 was using it and always
-> >>     returns 0; the value is related to the ACPI function call not
-> >>     a possible failure of the TPM function call.
-> >>   - extend shared memory data structure with per-opcode entries
-> >>     holding flags and use those flags to determine what to return
-> >>     to caller
-> >>   - implement interface version 1.3
-> >> ---
-> >>   include/hw/acpi/tpm.h |   8 +
-> >>   hw/i386/acpi-build.c  | 423 ++++++++++++++++++++++++++++++++++++++++=
-+-
-> >>   docs/specs/tpm.txt    |  79 ++++++++
-> >>   3 files changed, 509 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> >> index f79d68a77a..e0bd07862e 100644
-> >> --- a/include/hw/acpi/tpm.h
-> >> +++ b/include/hw/acpi/tpm.h
-> >> @@ -196,4 +196,12 @@ REG32(CRB_DATA_BUFFER, 0x80)
-> >>   #define TPM_PPI_VERSION_NONE        0
-> >>   #define TPM_PPI_VERSION_1_30        1
-> >>  =20
-> >> +/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
-> >> +#define TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
-> >> +#define TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
-> >> +#define TPM_PPI_FUNC_BLOCKED             (2 << 0)
-> >> +#define TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
-> >> +#define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
-> >> +#define TPM_PPI_FUNC_MASK                (7 << 0)
-> >> +
-> >>   #endif /* HW_ACPI_TPM_H */
-> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >> index d9320845ed..d815af4eef 100644
-> >> --- a/hw/i386/acpi-build.c
-> >> +++ b/hw/i386/acpi-build.c
-> >> @@ -43,6 +43,7 @@
-> >>   #include "hw/acpi/memory_hotplug.h"
-> >>   #include "sysemu/tpm.h"
-> >>   #include "hw/acpi/tpm.h"
-> >> +#include "hw/tpm/tpm_ppi.h"
-> >>   #include "hw/acpi/vmgenid.h"
-> >>   #include "sysemu/tpm_backend.h"
-> >>   #include "hw/timer/mc146818rtc_regs.h"
-> >> @@ -1789,6 +1790,421 @@ static Aml *build_q35_osc_method(void)
-> >>       return method;
-> >>   }
-> >>  =20
-> >> +static void
-> >> +build_tpm_ppi(Aml *dev)
-> >> +{
-> >> +    Aml *method, *name, *field, *ifctx, *ifctx2, *ifctx3, *pak;
-> >> +    int i;
-> >> +
-> >> +    if (!object_property_get_bool(OBJECT(tpm_find()), "ppi", &error_a=
-bort)) { =20
-> > if tpm_find() =3D=3D NULL -> BAAM??? =20
->=20
-> This function wouldn't be called if there's no TPM.
-it happens not to be called now,
-I'd suggest do look up once (QOM tree walk expensive)
-and pass found value as an argument down call chain.
+The location needs to be fixed across reboots (or content moved
+somehow..) And timing-wise, I am not sure the ACPI tables are
+installed and processed by firmware before the TPM PPI operation must
+be handled.
+
+>
+> Huge benefit here is that QEMU doesn't dictate address so no chance
+> of conflicts and related compat hacks in case we have to move it.
+>
+> To do it easily, I'd suggest to extract TPM from DSDT into a dedicated
+> SSDT table (see vmgenid_build_acpi() as example /you don't need
+> bios_linker_loader_write_pointer() part, later we can use it if
+> it would be necessary for QEMU to know address/)
+>
+>>     Stefan
+>>
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
