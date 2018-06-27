@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY9zz-0001MX-Kb
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:40 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fYA28-0003Y8-Lf
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fY9zx-0001iz-Ks
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49578 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fYA27-0003qG-PN
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:58:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42198 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fY9zx-0001iD-FU
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:56:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F068F814F0B7
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 12:56:36 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 27 Jun 2018 14:56:03 +0200
-Message-Id: <20180627125604.15275-16-quintela@redhat.com>
-In-Reply-To: <20180627125604.15275-1-quintela@redhat.com>
-References: <20180627125604.15275-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 15/16] postcopy: drop ram_pages parameter from
- postcopy_ram_incoming_init()
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fYA27-0003pm-KS
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 08:58:51 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 27 Jun 2018 13:58:41 +0100
+Message-Id: <20180627125847.5413-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +25,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: David Hildenbrand <david@redhat.com>
+The following changes since commit 00928a421d47f49691cace1207481b7aad31b1=
+f1:
 
-Not needed. Don't expose last_ram_page().
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+80626' into staging (2018-06-26 18:23:49 +0100)
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180620202736.21399-1-david@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- exec.c                   | 2 +-
- include/exec/ram_addr.h  | 1 -
- migration/postcopy-ram.c | 4 ++--
- migration/postcopy-ram.h | 2 +-
- migration/ram.c          | 4 +---
- 5 files changed, 5 insertions(+), 8 deletions(-)
+are available in the Git repository at:
 
-diff --git a/exec.c b/exec.c
-index 88edb59060..1e37f7586b 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1930,7 +1930,7 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
-     return offset;
- }
- 
--unsigned long last_ram_page(void)
-+static unsigned long last_ram_page(void)
- {
-     RAMBlock *block;
-     ram_addr_t last = 0;
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index cf2446a176..33c361cad5 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -71,7 +71,6 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
- }
- 
- long qemu_getrampagesize(void);
--unsigned long last_ram_page(void);
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    bool share, const char *mem_path,
-                                    Error **errp);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 48e51556a7..932f188949 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -500,7 +500,7 @@ static int cleanup_range(const char *block_name, void *host_addr,
-  * postcopy later; must be called prior to any precopy.
-  * called from arch_init's similarly named ram_postcopy_incoming_init
-  */
--int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
-+int postcopy_ram_incoming_init(MigrationIncomingState *mis)
- {
-     if (qemu_ram_foreach_migratable_block(init_range, NULL)) {
-         return -1;
-@@ -1265,7 +1265,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
-     return false;
- }
- 
--int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
-+int postcopy_ram_incoming_init(MigrationIncomingState *mis)
- {
-     error_report("postcopy_ram_incoming_init: No OS support");
-     return -1;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index d900d9c34f..9d55536fd1 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -27,7 +27,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis);
-  * postcopy later; must be called prior to any precopy.
-  * called from ram.c's similarly named ram_postcopy_incoming_init
-  */
--int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages);
-+int postcopy_ram_incoming_init(MigrationIncomingState *mis);
- 
- /*
-  * At the end of a migration where postcopy_ram_incoming_init was called.
-diff --git a/migration/ram.c b/migration/ram.c
-index 7d23b472cb..1cd98d6398 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3564,9 +3564,7 @@ static int ram_load_cleanup(void *opaque)
-  */
- int ram_postcopy_incoming_init(MigrationIncomingState *mis)
- {
--    unsigned long ram_pages = last_ram_page();
--
--    return postcopy_ram_incoming_init(mis, ram_pages);
-+    return postcopy_ram_incoming_init(mis);
- }
- 
- /**
--- 
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
+
+for you to fetch changes up to ec09f877532210e28e1d4b6b12896d3eb6d8e8d1:
+
+  trace: forbid floating point types (2018-06-27 11:09:29 +0100)
+
+----------------------------------------------------------------
+Pull request
+
+ * Trace TCG atomic memory accesses
+ * Document that trace event arguments cannot be floating point
+
+----------------------------------------------------------------
+
+Emilio G. Cota (5):
+  trace: fix misreporting of TCG access sizes for user-space
+  trace: simplify trace_mem functions
+  trace: expand mem_info:size_shift to 3 bits
+  trace: add trace_mem_build_info_no_se_be/le
+  trace: enable tracing of TCG atomics
+
+Stefan Hajnoczi (1):
+  trace: forbid floating point types
+
+ docs/devel/tracing.txt                    |  5 ++
+ accel/tcg/atomic_template.h               | 87 +++++++++++++++++++++--
+ include/exec/cpu_ldst_useronly_template.h | 11 ++-
+ trace/mem-internal.h                      | 58 ++++++++-------
+ trace/mem.h                               |  2 +-
+ migration/trace-events                    |  2 +-
+ qapi/trace-events                         |  2 +-
+ scripts/tracetool/__init__.py             |  2 -
+ 8 files changed, 130 insertions(+), 39 deletions(-)
+
+--=20
 2.17.1
