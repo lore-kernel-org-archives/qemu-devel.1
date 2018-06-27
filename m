@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fYAax-0007DZ-0u
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:34:53 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fYAbl-0007sk-9s
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fYAat-0003wh-Uv
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:34:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37758 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fYAbg-0004jQ-3O
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:35:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51597)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fYAat-0003vu-PF
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:34:47 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1130140150F5
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 13:34:47 +0000 (UTC)
-Date: Wed, 27 Jun 2018 21:34:42 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180627133442.GB2455@xz-mi>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
-	<87wouk8vul.fsf@dusky.pond.sub.org>
-	<87h8lo74oa.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYAbf-0004he-D9
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 09:35:35 -0400
+Date: Wed, 27 Jun 2018 10:34:49 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180627133449.GW7451@localhost.localdomain>
+References: <20180627021423.18404-1-ehabkost@redhat.com>
+	<20180627021423.18404-7-ehabkost@redhat.com>
+	<6c6da5dd-0ab4-b4c4-9411-169f9dfbbdfc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87h8lo74oa.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+In-Reply-To: <6c6da5dd-0ab4-b4c4-9411-169f9dfbbdfc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/6] docker: Open dockerfiles in text mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,63 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Jun 27, 2018 at 03:13:57PM +0200, Markus Armbruster wrote:
-> Monitor behavior changes even when the client rejects capability "oob".
+On Wed, Jun 27, 2018 at 07:51:01AM -0500, Eric Blake wrote:
+> On 06/26/2018 09:14 PM, Eduardo Habkost wrote:
+> > Instead of treating dockerfile contents as byte sequences, always
+> > open dockerfiles in text mode and treat it as text.
+> > 
+> > This is not strictly required to make the script compatible with
+> > Python 3, but it's a simpler and safer way than opening
+> > dockerfiles in binary mode and decoding the data data later.
 > 
-> Traditionally, the monitor reads, executes and responds to one command
-> after the other.  If the client sends in-band commands faster than the
-> server can execute them, the kernel will eventually refuse to buffer
-> more, and sending blocks or fails with EAGAIN.
+> s/data data/data/
+
+Thanks.
+
 > 
-> To make OOB possible, we need to read and queue commands as we receive
-> them.  If the client sends in-band commands faster than the server can
-> execute them, the server will eventually drop commands to limit the
-> queue length.  The sever sends event COMMAND_DROPPED then.
+> > 
+> > To make the code compatible with both Python 2 and 3, use
+> > io.open(), which accepts a 'encoding' argument on both versions.
 > 
-> However, we get the new behavior even when the client rejects capability
-> "oob".  We get the traditional behavior only when the server doesn't
-> offer "oob".
-> 
-> Is this what we want?
+> How does this compare to the recent change to the QAPI generators in commit
+> de685ae5e?  Should we be trying to use similar mechanisms in both places?
 
-Not really.  But I thought we kept that old behavior, haven't we?
+We could do the same and use io.open(..., encoding='utf-8')
+unconditionally on QAPI too, but it may be harder because of its
+usage of insinstance() and the 'str' type[1] everywhere.
 
-In handle_qmp_command() we have this:
+One solution I considered on QAPI was using
+'__future__.unicode_literals' and the 'builtins.str' type from
+python-future, but I don't think QAPI's specific case justify
+adding a new build dependency on Python 2.7 hosts.
 
-    /*
-     * If OOB is not enabled on the current monitor, we'll emulate the
-     * old behavior that we won't process the current monitor any more
-     * until it has responded.  This helps make sure that as long as
-     * OOB is not enabled, the server will never drop any command.
-     */
-    if (!qmp_oob_enabled(mon)) {
-        monitor_suspend(mon);
-        req_obj->need_resume = true;
-    } else {
-        /* Drop the request if queue is full. */
-        if (mon->qmp.qmp_requests->length >= QMP_REQ_QUEUE_LEN_MAX) {
-            qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-            qapi_event_send_command_dropped(id,
-                                            COMMAND_DROP_REASON_QUEUE_FULL,
-                                            &error_abort);
-            qmp_request_free(req_obj);
-            return;
-        }
-    }
+Adding type annotations to the QAPI code may help us sort out the
+mess more easily.
 
-Here assuming that we are not enabling OOB, then since we will suspend
-the monitor when we receive one command, then monitor_can_read() later
-will check with a result that "we should not read the chardev", then
-it'll leave all the data in the input buffer.  Then AFAIU the QMP
-client that didn't enable OOB will have similar behavior as before.
-
-Also, we will never receive a COMMAND_DROPPED event in that legacy
-mode as well since it's in the "else" block.   Am I right?
-
-Regards,
+[1] 'str' on Python 2.7 is more similar to the 'bytes' type on
+    Python 3, but io.open(..., encoding=...) on Python 2.7
+    returns 'unicode' objects (that that are more similar to the
+    native 'str' type from Python 3).
 
 -- 
-Peter Xu
+Eduardo
