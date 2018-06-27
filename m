@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fYHXI-00008k-M7
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 16:59:33 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYHtF-0007Zd-9K
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 17:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fYHXF-0004ft-JP
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 16:59:32 -0400
-Received: from bh-25.webhostbox.net ([208.91.199.152]:48605)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linux@roeck-us.net>) id 1fYHXF-0004Lw-Bc
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 16:59:29 -0400
-Date: Wed, 27 Jun 2018 13:59:15 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180627205915.GA22693@roeck-us.net>
-References: <20180627185248.GA19743@roeck-us.net>
-	<96809884-2f46-ed63-48fd-9fd4c5050e20@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <96809884-2f46-ed63-48fd-9fd4c5050e20@amsat.org>
-Subject: Re: [Qemu-devel] Linux kernel configurations for various Microblaze
- systems
+	(envelope-from <laurent@vivier.eu>) id 1fYHtB-0005eY-9u
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 17:22:13 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:49363)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYHtB-0005dH-0E
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 17:22:09 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Wed, 27 Jun 2018 23:21:52 +0200
+Message-Id: <20180627212152.26525-3-laurent@vivier.eu>
+In-Reply-To: <20180627212152.26525-1-laurent@vivier.eu>
+References: <20180627212152.26525-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 2/2] linux-user: update do_setsockopt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Michal Simek <monstr@monstr.eu>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On Wed, Jun 27, 2018 at 05:01:34PM -0300, Philippe Mathieu-Daudé wrote:
-> Hi Guenter,
-> 
-> On 06/27/2018 03:52 PM, Guenter Roeck wrote:
-> > Hi,
-> > 
-> > I would like to add Microblaze "petalogix-ml605" and "xlnx-zynqmp-pmu"
-> > to my list of qemu boot tests of upstream and stable release kernels.
-> 
-> Do you mind sharing your tests on this thread?
-> 
-Nothing secret about it. The test results are always available at
-http://kerneltests.org/. The scripts are published at
-https://github.com/groeck/linux-build-test. My qemu clone (I carry a few
-patches on top of upstream qemu) is at https://github.com/groeck/qemu.
+add IPV6_MULTICAST_HOPS and IPV6_MULTICAST_LOOP that need
+32bit value conversion
 
-> "Who is running QEMU automated tests, and when?"
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg04695.html
-> 
-> > Unfortunately I have been unable to locate working kernel configurations
-> > for the those systems, nor working qemu command lines. I found a few links,
-> > but they are all dead.
-> 
-> I got more lucky using the Xilinx downstream code from:
-> https://github.com/Xilinx
-> 
-> In particular using their downstream DeviceTree:
-> 
-> https://github.com/Xilinx/device-tree-xlnx
-> 
-> I also used those links:
-> 
-> http://www.wiki.xilinx.com/MicroBlaze
-> http://www.wiki.xilinx.com/Build%20kernel
-> 
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-AFAICS they are all generic, and don't reference specific boards
-(other than maybe the possibility to configure those boards). There are
-comments such as "start with mmu_defconfig and modify all parameters
-which are special on your board". That is great, but trying to do that
-for an evaluation board that I don't own and just try to get running
-under qemu is a bit difficult since I don't really know what I am doing.
-
-The best I was able to accomplish was to boot petalogix-ml605 without crash,
-but with no console output either. I could try to debug further, but I don't
-really want to waste my time.
-
-Thanks,
-Guenter
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 4460f1e39a..50e20fb659 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -3019,6 +3019,8 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+         case IPV6_V6ONLY:
+         case IPV6_RECVPKTINFO:
+         case IPV6_UNICAST_HOPS:
++        case IPV6_MULTICAST_HOPS:
++        case IPV6_MULTICAST_LOOP:
+         case IPV6_RECVERR:
+         case IPV6_RECVHOPLIMIT:
+         case IPV6_2292HOPLIMIT:
+-- 
+2.14.4
