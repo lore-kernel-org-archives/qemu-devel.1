@@ -1,16 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYeQL-0007uI-Jp
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:25:55 -0400
+	(envelope-from <shorne@gmail.com>) id 1fYeRz-0000zD-TV
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYeQK-0006eS-3T
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:25:53 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Thu, 28 Jun 2018 17:25:44 -0400
-Message-Id: <20180628212544.21854-3-jsnow@redhat.com>
-In-Reply-To: <20180628212544.21854-1-jsnow@redhat.com>
-References: <20180628212544.21854-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] iotests: add 222 to test basic fleecing
+	(envelope-from <shorne@gmail.com>) id 1fYeRv-0001kB-W9
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:27:35 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40288)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYeRv-0001ic-Oo
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:27:31 -0400
+Received: by mail-pg0-x241.google.com with SMTP id w8-v6so3016372pgp.7
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 14:27:31 -0700 (PDT)
+Date: Fri, 29 Jun 2018 06:27:28 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20180628212728.GN24595@lianli.shorne-pla.net>
+References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	<20180618184046.6270-14-richard.henderson@linaro.org>
+	<CAAfxs74pe4BnScaFdmUBbX=-kD5qp2pQN-JgnFy4QGfGXNe9oQ@mail.gmail.com>
+	<CAAfxs77w97-8iNRf_XfqDewrgm61SroT-WcCedM9hvg8E+kMYQ@mail.gmail.com>
+	<d80aae07-404e-ada2-9a9b-4d1d96c9e63b@linaro.org>
+	<20180627125953.GK24595@lianli.shorne-pla.net>
+	<ad0fc460-02ee-ca79-de48-ab01e19f0ce7@linaro.org>
+	<20180627230810.GL24595@lianli.shorne-pla.net>
+	<2dab347e-6253-b70a-9615-8156ea375a22@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2dab347e-6253-b70a-9615-8156ea375a22@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,256 +36,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/222     | 152 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/222.out |  66 ++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 219 insertions(+)
- create mode 100644 tests/qemu-iotests/222
- create mode 100644 tests/qemu-iotests/222.out
+On Wed, Jun 27, 2018 at 06:36:20PM -0700, Richard Henderson wrote:
+> On 06/27/2018 04:08 PM, Stafford Horne wrote:
+> > I am still getting failures on SMP, this time the kernel is jumping to some
+> > unknown address, maybe an itlb issue, I will continue to debug.  Bisecting it is
+> > exposing some other issues (the mmu handlers were not getting init'd during one
+> > point in time).
+> 
+> Fixed, I think.  I traced it down to the l.mtspr rewrite.
 
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-new file mode 100644
-index 0000000000..bd84dfa379
---- /dev/null
-+++ b/tests/qemu-iotests/222
-@@ -0,0 +1,152 @@
-+#!/usr/bin/env python
-+#
-+# This test covers the basic fleecing workflow, which provides a
-+# point-in-time snapshot of a node that can be queried over NBD.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+# John helped, too.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: John Snow <jsnow@redhat.com>
-+
-+import iotests
-+from iotests import log, qemu_img, qemu_io, qemu_io_silent
-+
-+iotests.verify_platform(['linux'])
-+
-+patterns = [("0x5d", "0",         "64k"),
-+            ("0xd5", "1M",        "64k"),
-+            ("0xdc", "32M",       "64k"),
-+            ("0xcd", "0x3ff0000", "64k")]  # 64M - 64K
-+
-+overwrite = [("0xab", "0",         "64k"), # Full overwrite
-+             ("0xad", "0x00f8000", "64k"), # Partial-left (1M-32K)
-+             ("0x1d", "0x2008000", "64k"), # Partial-right (32M+32K)
-+             ("0xea", "0x3fe0000", "64k")] # Adjacent-left (64M - 128K)
-+
-+zeroes = [("0", "0x00f8000", "32k"), # Left-end of partial-left (1M-32K)
-+          ("0", "0x2010000", "32k"), # Right-end of partial-right (32M+64K)
-+          ("0", "0x3fe0000", "64k")] # overwrite[3]
-+
-+remainder = [("0xd5", "0x108000",  "32k"), # Right-end of partial-left [1]
-+             ("0xdc", "32M",       "32k"), # Left-end of partial-right [2]
-+             ("0xcd", "0x3ff0000", "64k")] # patterns[3]
-+
-+with iotests.FilePath('base.img') as base_img_path, \
-+     iotests.FilePath('fleece.img') as fleece_img_path, \
-+     iotests.FilePath('nbd.sock') as nbd_sock_path, \
-+     iotests.VM() as vm:
-+
-+    log('--- Setting up images ---')
-+    log('')
-+
-+    assert qemu_img('create', '-f', iotests.imgfmt, base_img_path, '64M') == 0
-+    assert qemu_img('create', '-f', "qcow2", fleece_img_path, '64M') == 0
-+
-+    for p in patterns:
-+        qemu_io('-c', 'write -P%s %s %s' % p, base_img_path)
-+
-+    log('Done')
-+
-+    log('')
-+    log('--- Launching VM ---')
-+    log('')
-+
-+    vm.add_drive(base_img_path)
-+    vm.launch()
-+    log('Done')
-+
-+    log('')
-+    log('--- Setting up Fleecing Graph ---')
-+    log('')
-+
-+    srcNode = "drive0"
-+    tgtNode = "fleeceNode"
-+
-+    # create tgtNode backed by srcNode
-+    log(vm.qmp("blockdev-add", **{
-+        "driver": "qcow2",
-+        "node-name": tgtNode,
-+        "file": {
-+            "driver": "file",
-+            "filename": fleece_img_path,
-+        },
-+        "backing": srcNode,
-+    }))
-+
-+    # Establish COW from source to fleecing node
-+    log(vm.qmp("blockdev-backup",
-+               device=srcNode,
-+               target=tgtNode,
-+               sync="none"))
-+
-+    log('')
-+    log('--- Setting up NBD Export ---')
-+    log('')
-+
-+    nbd_uri = 'nbd+unix:///%s?socket=%s' % (tgtNode, nbd_sock_path)
-+    log(vm.qmp("nbd-server-start",
-+               **{"addr": { "type": "unix",
-+                            "data": { "path": nbd_sock_path } } }))
-+
-+    log(vm.qmp("nbd-server-add", device=tgtNode))
-+
-+    log('')
-+    log('--- Sanity Check ---')
-+    log('')
-+
-+    for p in (patterns + zeroes):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-+
-+    log('')
-+    log('--- Testing COW ---')
-+    log('')
-+
-+    for p in overwrite:
-+        cmd = "write -P%s %s %s" % p
-+        log(cmd)
-+        log(vm.hmp_qemu_io(srcNode, cmd))
-+
-+    log('')
-+    log('--- Verifying Data ---')
-+    log('')
-+
-+    for p in (patterns + zeroes):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-+
-+    log('')
-+    log('--- Cleanup ---')
-+    log('')
-+
-+    log(vm.qmp('block-job-cancel', device=srcNode))
-+    log(vm.qmp('nbd-server-stop'))
-+    log(vm.qmp('blockdev-del', node_name=tgtNode))
-+    vm.shutdown()
-+
-+    log('')
-+    log('--- Confirming writes ---')
-+    log('')
-+
-+    for p in (overwrite + remainder):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent(base_img_path, '-c', cmd) == 0
-+
-+    log('')
-+    log('Done')
-diff --git a/tests/qemu-iotests/222.out b/tests/qemu-iotests/222.out
-new file mode 100644
-index 0000000000..be925601a8
---- /dev/null
-+++ b/tests/qemu-iotests/222.out
-@@ -0,0 +1,66 @@
-+--- Setting up images ---
-+
-+Done
-+
-+--- Launching VM ---
-+
-+Done
-+
-+--- Setting up Fleecing Graph ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Setting up NBD Export ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Sanity Check ---
-+
-+read -P0x5d 0 64k
-+read -P0xd5 1M 64k
-+read -P0xdc 32M 64k
-+read -P0xcd 0x3ff0000 64k
-+read -P0 0x00f8000 32k
-+read -P0 0x2010000 32k
-+read -P0 0x3fe0000 64k
-+
-+--- Testing COW ---
-+
-+write -P0xab 0 64k
-+{u'return': u''}
-+write -P0xad 0x00f8000 64k
-+{u'return': u''}
-+write -P0x1d 0x2008000 64k
-+{u'return': u''}
-+write -P0xea 0x3fe0000 64k
-+{u'return': u''}
-+
-+--- Verifying Data ---
-+
-+read -P0x5d 0 64k
-+read -P0xd5 1M 64k
-+read -P0xdc 32M 64k
-+read -P0xcd 0x3ff0000 64k
-+read -P0 0x00f8000 32k
-+read -P0 0x2010000 32k
-+read -P0 0x3fe0000 64k
-+
-+--- Cleanup ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Confirming writes ---
-+
-+read -P0xab 0 64k
-+read -P0xad 0x00f8000 64k
-+read -P0x1d 0x2008000 64k
-+read -P0xea 0x3fe0000 64k
-+read -P0xd5 0x108000 32k
-+read -P0xdc 32M 32k
-+read -P0xcd 0x3ff0000 64k
-+
-+Done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index eea75819d2..8019a9f721 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -220,3 +220,4 @@
- 218 rw auto quick
- 219 rw auto
- 221 rw auto quick
-+222 rw auto quick
--- 
-2.14.4
+Thanks, the new series works for me.
+
+-Stafford
