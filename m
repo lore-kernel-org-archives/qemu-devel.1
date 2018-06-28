@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAr-0007UD-E6
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:50 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAs-0007VG-91
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAq-0000ou-Ed
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:49 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37435)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAr-0000pz-Bs
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:50 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43836)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAq-0000oF-7u
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:48 -0400
-Received: by mail-wm0-x242.google.com with SMTP id n17-v6so9764067wmh.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:48 -0700 (PDT)
+	id 1fYdAr-0000p7-5B
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:49 -0400
+Received: by mail-wr0-x244.google.com with SMTP id c5-v6so6681814wrs.10
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:49 -0700 (PDT)
 Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
 	127-v6sm6211110wmd.18.2018.06.28.13.05.46 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 28 Jun 2018 13:05:46 -0700 (PDT)
+	Thu, 28 Jun 2018 13:05:47 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:44 +0200
-Message-Id: <1530216310-52873-35-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:45 +0200
+Message-Id: <1530216310-52873-36-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 34/60] pr-manager-helper: avoid SIGSEGV when
- writing to the socket fail
+Subject: [Qemu-devel] [PULL 35/60] pr-manager: put stubs in .c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +33,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-When writing to the qemu-pr-helper socket failed, the persistent
-reservation manager was correctly disconnecting the socket, but it
-did not clear pr_mgr->ioc.  So the rest of the code did not know
-that the socket had been disconnected, accessed pr_mgr->ioc and
-happily caused a crash.
-
-To reproduce, it is enough to stop qemu-pr-helper between QEMU
-startup and executing e.g. sg_persist -k /dev/sdb.
-
-Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scsi/pr-manager-helper.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/scsi/pr-manager.h |  9 ---------
+ scsi/Makefile.objs        |  1 +
+ scsi/pr-manager-stub.c    | 24 ++++++++++++++++++++++++
+ 3 files changed, 25 insertions(+), 9 deletions(-)
+ create mode 100644 scsi/pr-manager-stub.c
 
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index 82ff6b6..0c0fe38 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -71,6 +71,7 @@ static int pr_manager_helper_write(PRManagerHelper *pr_mgr,
-         if (n_written <= 0) {
-             assert(n_written != QIO_CHANNEL_ERR_BLOCK);
-             object_unref(OBJECT(pr_mgr->ioc));
-+            pr_mgr->ioc = NULL;
-             return n_written < 0 ? -EINVAL : 0;
-         }
+diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
+index 5d2f13a..71971ae 100644
+--- a/include/scsi/pr-manager.h
++++ b/include/scsi/pr-manager.h
+@@ -41,15 +41,6 @@ BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
+                                BlockCompletionFunc *complete,
+                                void *opaque);
  
+-#ifdef CONFIG_LINUX
+ PRManager *pr_manager_lookup(const char *id, Error **errp);
+-#else
+-static inline PRManager *pr_manager_lookup(const char *id, Error **errp)
+-{
+-    /* The classes do not exist at all!  */
+-    error_setg(errp, "No persistent reservation manager with id '%s'", id);
+-    return NULL;
+-}
+-#endif
+ 
+ #endif
+diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
+index 4d25e47..bb8789c 100644
+--- a/scsi/Makefile.objs
++++ b/scsi/Makefile.objs
+@@ -1,3 +1,4 @@
+ block-obj-y += utils.o
+ 
+ block-obj-$(CONFIG_LINUX) += pr-manager.o pr-manager-helper.o
++block-obj-$(call lnot,$(CONFIG_LINUX)) += pr-manager-stub.o
+diff --git a/scsi/pr-manager-stub.c b/scsi/pr-manager-stub.c
+new file mode 100644
+index 0000000..632f17c
+--- /dev/null
++++ b/scsi/pr-manager-stub.c
+@@ -0,0 +1,24 @@
++/*
++ * Persistent reservation manager - stub for non-Linux platforms
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * Author: Paolo Bonzini <pbonzini@redhat.com>
++ *
++ * This code is licensed under the LGPL.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "scsi/pr-manager.h"
++#include "trace.h"
++#include "qapi/qapi-types-block.h"
++#include "qapi/qapi-commands-block.h"
++
++PRManager *pr_manager_lookup(const char *id, Error **errp)
++{
++    /* The classes do not exist at all!  */
++    error_setg(errp, "No persistent reservation manager with id '%s'", id);
++        return NULL;
++}
 -- 
 1.8.3.1
