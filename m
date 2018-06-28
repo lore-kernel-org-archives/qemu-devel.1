@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYZMy-0003El-Lm
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:02:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1fYZRR-0006V2-1i
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYZMu-0002Hg-3P
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:02:04 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:50325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fYZMt-0002GH-P7
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:02:00 -0400
-Received: by mail-wm0-x243.google.com with SMTP id e16-v6so10271498wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:01:59 -0700 (PDT)
-References: <20180622004435.10291-1-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180622004435.10291-1-f4bug@amsat.org>
-Date: Thu, 28 Jun 2018 17:01:55 +0100
-Message-ID: <87lgayvr0s.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1fYZRN-0003X9-0W
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:06:41 -0400
+Date: Thu, 28 Jun 2018 17:06:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180628160620.GS3513@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180628132211.8795-1-rjones@redhat.com>
+	<20180628132211.8795-2-rjones@redhat.com>
+	<cf457707-eaab-16f9-d1c9-3a3f6423958e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Avocado: start multi-arch tests,
- add a Travis job
+Content-Disposition: inline
+In-Reply-To: <cf457707-eaab-16f9-d1c9-3a3f6423958e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] crypto: Implement TLS Pre-Shared Keys
+ (PSK).
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+
+On Thu, Jun 28, 2018 at 09:42:18AM -0500, Eric Blake wrote:
+> On 06/28/2018 08:22 AM, Richard W.M. Jones wrote:
+> 
+> In the subject line: most commit summaries don't have a trailing '.'.
+> 
+> > Pre-Shared Keys (PSK) is a simpler mechanism for enabling TLS
+> > connections than using certificates.  It requires only a simple secret
+> > key:
+> > 
+> >    $ mkdir -m 0700 /tmp/keys
+> >    $ psktool -u rjones -p /tmp/keys/keys.psk
+> >    $ cat /tmp/keys/keys.psk
+> >    rjones:d543770c15ad93d76443fb56f501a31969235f47e999720ae8d2336f6a13fcbc
+> > 
+> > The key can be secretly shared between clients and servers.  Clients
+> > must specify the directory containing the "keys.psk" file and a
+> > username (defaults to "qemu").  Servers must specify only the
+> > directory.
+> > 
+> > Example NBD client:
+> > 
+> >    $ qemu-img info \
+> >      --object tls-creds-psk,id=tls0,dir=/tmp/keys,username=rjones,endpoint=client \
+> >      --image-opts \
+> >      file.driver=nbd,file.host=localhost,file.port=10809,file.tls-creds=tls0,file.export=/
+> 
+> Not your problem, but it would be nice if someday our --object command line
+> arguments also had QMP counterparts to better document what key/value pairs
+> each particular object type permits/requires (yeah, you can do it via QMP
+> now, but object-add is an untyped command that just passes a raw dict
+> through rather than benefitting from type-safe parsing).
+> 
+> > Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+> > ---
+> >   crypto/Makefile.objs           |   1 +
+> >   crypto/tlscredspsk.c           | 300 +++++++++++++++++++++++++++++++++
+> >   crypto/tlssession.c            |  50 +++++-
+> >   crypto/trace-events            |   3 +
+> >   include/crypto/tlscredspsk.h   | 106 ++++++++++++
+> >   qemu-doc.texi                  |  37 ++++
+> >   qemu-options.hx                |  24 +++
+> >   tests/Makefile.include         |   4 +-
+> >   tests/crypto-tls-psk-helpers.c |  50 ++++++
+> >   tests/crypto-tls-psk-helpers.h |  29 ++++
+> >   tests/test-crypto-tlssession.c | 185 +++++++++++++++++---
+> >   11 files changed, 763 insertions(+), 26 deletions(-)
+> 
+> > +static int
+> > +lookup_key(const char *pskfile, const char *username, gnutls_datum_t *key,
+> > +           Error **errp)
+> > +{
+> > +    FILE *fp;
+> > +    char line[1024]; /* Maximum key length in psktool is 512 bytes. */
+> 
+> That's true for a valid file produced by psktool, but...
+> 
+> > +    size_t ulen = strlen(username);
+> > +    size_t len;
+> > +
+> > +    fp = fopen(pskfile, "r");
+> 
+> Do we want to consider the use of qemu_open() to allow qemu to read from a
+> pre-opened fd, rather than requiring the ability to open() from the file
+> system? (May matter if we want to combine crypto usage with a locked-down
+> qemu that has seccomp or selinux preventing bare open).  But that gets
+> tricky since there may be more than one file within the directory to open,
+> and the existing x509 certificate handling is also impacted by such a design
+> decision, so that's more a question for Dan and not necessarily a problem in
+> this patch.
+
+Yeah, given our approach of passing in a dir, not a file, I don't think it is
+viable to expect to use qemu_open() and FD passing. 
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+> > +static void
+> > +qcrypto_tls_creds_psk_prop_set_username(Object *obj,
+> > +                                        const char *value,
+> > +                                        Error **errp G_GNUC_UNUSED)
+> > +{
+> > +    QCryptoTLSCredsPSK *creds = QCRYPTO_TLS_CREDS_PSK(obj);
+> > +
+> > +    creds->username = g_strdup(value);
+> 
+> Does it make sense to forbid this operation on servers (since it only makes
+> sense for clients)?
 
-> Hi,
->
-> Another neanderthal approach to add multi-arch acceptance tests using
-> Avocado.
->
-> Since Cleber Rosa work got merged [0], I can restart my previous attempt =
-[1]
-> at using Avocado in QEMU.
-> Cleber Rosa rewrote my previous v1 [1], in good python, now this v2 pushes
-> a bit further:
-> - we can now run other archs
-> - Avocado is integrated into Travis CI
->
-> I'm not sure Travis is the best CI available for those tests, but it runs
-> quite fast:
->
->       ...
->       LINK    x86_64-softmmu/qemu-system-x86_64
->     JOB ID     : a3a56af3c02d193e862ce660aae1d9c72926dcb6
->     JOB LOG    : /home/travis/avocado/job-results/job-2018-06-21T23.49-a3=
-a56af/job.log
->      (1/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleX86_64.=
-test:  PASS (3.89 s)
->      (2/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleMips.te=
-st:  PASS (1.83 s)
->      (3/7) tests/acceptance/version.py:Version.test_qmp_human_info_versio=
-n:  PASS (0.05 s)
->      (4/7) tests/acceptance/vnc.py:Vnc.test_no_vnc:  PASS (0.04 s)
->      (5/7) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password:  PASS=
- (0.04 s)
->      (6/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_=
-a_password:  PASS (0.05 s)
->      (7/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password:  PASS (0=
-.05 s)
->     RESULTS    : PASS 7 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 |
->       INTERRUPT 0 | CANCEL 0
-
-That said on my AArch64 server it fairs better:
-
-15:59:19 [alex.bennee@libgomp-d05-dev:~/l/qemu.git] review/avocado-v2 + avo=
-cado run tests/acceptance
-JOB ID     : f40e814204ff007c58073ca75abb38bd575f39f2
-JOB LOG    : /home/alex.bennee/avocado/job-results/job-2018-06-28T15.59-f40=
-e814/job.log
- (1/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleX86_64.test: =
-CANCEL (0.00 s)
- (2/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleMips.test: PA=
-SS (2.03 s)
- (3/7) tests/acceptance/version.py:Version.test_qmp_human_info_version: CAN=
-CEL (0.00 s)
- (4/7) tests/acceptance/vnc.py:Vnc.test_no_vnc: CANCEL (0.00 s)
- (5/7) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password: CANCEL (0.0=
-0 s)
- (6/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_pass=
-word: CANCEL (0.00 s)
- (7/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password: CANCEL (0.00 s)
-RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CA=
-NCEL 6
-JOB TIME   : 2.47 s
-
-Although given the errors in the logs I'm surprised at ERROR 0
-
->     JOB TIME   : 6.21 s
->
->     Done. Your build exited with 0.
->
->     Job ran for 5 min 34 sec
->
-> I couldn't add the Alpha tests because all the vmlinux kernels I found
-> online are gzipped, so I'm waiting some upstream Avocado merges before.
->
-> Cleber: I hope you can help me pythonizing this series :p
->
-> Regards,
->
-> Phil.
->
-> [0]: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg04531.html
-> [1]: http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg03076.html
->
-> Philippe Mathieu-Daud=C3=A9 (6):
->   avocado: Add a Test.arch property
->   tests/acceptance: Rename the x86-64 specific BootLinuxConsole test
->   tests/acceptance: Improve the Avocado tags
->   tests/acceptance: Add a BootLinuxConsoleMips test
->   tests/acceptance: Add a kludge to not use the default console
->   travis: Add Avocado tests
->
->  .travis.yml                               |  8 +++++
->  scripts/qemu.py                           |  6 ++--
->  tests/acceptance/avocado_qemu/__init__.py | 17 ++++++---
->  tests/acceptance/boot_linux_console.py    | 44 +++++++++++++++++++++--
->  4 files changed, 67 insertions(+), 8 deletions(-)
+We can't validate that here, because we can't guarantee that 'endpoint'
+is set before 'username' is set.
 
 
---
-Alex Benn=C3=A9e
+We could enforce it in the setter for the "loaded" property as that is
+set only after every other property is set.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
