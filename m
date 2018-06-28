@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYNDt-00051E-Ai
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:03:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fYNDy-000573-Ez
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYNDr-0007xk-OC
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:03:52 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:37548)
+	(envelope-from <richard.henderson@linaro.org>) id 1fYNDu-00080z-Hk
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:03:58 -0400
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:42720)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYNDr-0007wI-I5
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:03:51 -0400
-Received: by mail-pf0-x244.google.com with SMTP id y5-v6so1890337pfn.4
-	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 20:03:51 -0700 (PDT)
+	id 1fYNDu-000800-Ck
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:03:54 -0400
+Received: by mail-pg0-x236.google.com with SMTP id c10-v6so1794446pgu.9
+	for <qemu-devel@nongnu.org>; Wed, 27 Jun 2018 20:03:54 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 27 Jun 2018 20:03:20 -0700
-Message-Id: <20180628030330.15615-14-richard.henderson@linaro.org>
+Date: Wed, 27 Jun 2018 20:03:22 -0700
+Message-Id: <20180628030330.15615-16-richard.henderson@linaro.org>
 In-Reply-To: <20180628030330.15615-1-richard.henderson@linaro.org>
 References: <20180628030330.15615-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 13/23] target/openrisc: Merge mmu_helper.c
- into mmu.c
+Subject: [Qemu-devel] [PATCH v3 15/23] target/openrisc: Fix tlb flushing in
+ mtspr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +30,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: shorne@gmail.com
 
-With tlb_fill in mmu.c, we can simplify things further.
+The previous code was confused, avoiding the flush of the old entry
+if the new entry is invalid.  We need to flush the old page if the
+old entry is valid and the new page if the new entry is valid.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This bug was masked by over-flushing elsewhere.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/mmu.c         | 11 ++++++++++
- target/openrisc/mmu_helper.c  | 40 -----------------------------------
- target/openrisc/Makefile.objs |  2 +-
- 3 files changed, 12 insertions(+), 41 deletions(-)
- delete mode 100644 target/openrisc/mmu_helper.c
+ target/openrisc/sys_helper.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-index b2effaa6d7..9b4b5cf04f 100644
---- a/target/openrisc/mmu.c
-+++ b/target/openrisc/mmu.c
-@@ -240,4 +240,15 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         return phys_addr;
-     }
- }
-+
-+void tlb_fill(CPUState *cs, target_ulong addr, int size,
-+              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
-+{
-+    int ret = openrisc_cpu_handle_mmu_fault(cs, addr, size,
-+                                            access_type, mmu_idx);
-+    if (ret) {
-+        /* Raise Exception.  */
-+        cpu_loop_exit_restore(cs, retaddr);
-+    }
-+}
- #endif
-diff --git a/target/openrisc/mmu_helper.c b/target/openrisc/mmu_helper.c
-deleted file mode 100644
-index 97e1d17b5a..0000000000
---- a/target/openrisc/mmu_helper.c
-+++ /dev/null
-@@ -1,40 +0,0 @@
--/*
-- * OpenRISC MMU helper routines
-- *
-- * Copyright (c) 2011-2012 Jia Liu <proljc@gmail.com>
-- *                         Zhizhou Zhang <etouzh@gmail.com>
-- *
-- * This library is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU Lesser General Public
-- * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-- *
-- * This library is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * Lesser General Public License for more details.
-- *
-- * You should have received a copy of the GNU Lesser General Public
-- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-- */
--
--#include "qemu/osdep.h"
--#include "cpu.h"
--#include "exec/exec-all.h"
--#include "exec/cpu_ldst.h"
--
--#ifndef CONFIG_USER_ONLY
--
--void tlb_fill(CPUState *cs, target_ulong addr, int size,
--              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
--{
--    int ret;
--
--    ret = openrisc_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--
--    if (ret) {
--        /* Raise Exception.  */
--        cpu_loop_exit_restore(cs, retaddr);
--    }
--}
--#endif
-diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.objs
-index 8b8a890c59..b5432f4684 100644
---- a/target/openrisc/Makefile.objs
-+++ b/target/openrisc/Makefile.objs
-@@ -1,7 +1,7 @@
- obj-$(CONFIG_SOFTMMU) += machine.o
- obj-y += cpu.o exception.o interrupt.o mmu.o translate.o disas.o
- obj-y += exception_helper.o fpu_helper.o \
--         interrupt_helper.o mmu_helper.o sys_helper.o
-+         interrupt_helper.o sys_helper.o
- obj-y += gdbstub.o
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 7f458b0d17..c9702cd26c 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -32,6 +32,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ #ifndef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
++    target_ulong mr;
+     int idx;
  
- DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+     switch (spr) {
+@@ -85,12 +86,15 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ 
+     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
+-        if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb.dtlb[idx].mr & TARGET_PAGE_MASK);
++        mr = env->tlb.dtlb[idx].mr;
++        if (mr & 1) {
++            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
++        }
++        if (rb & 1) {
++            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
+         }
+         env->tlb.dtlb[idx].mr = rb;
+         break;
+-
+     case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
+         idx = spr - TO_SPR(1, 640);
+         env->tlb.dtlb[idx].tr = rb;
+@@ -102,14 +106,18 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(1, 1280) ... TO_SPR(1, 1407): /* DTLBW3MR 0-127 */
+     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
+         break;
++
+     case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
+         idx = spr - TO_SPR(2, 512);
+-        if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb.itlb[idx].mr & TARGET_PAGE_MASK);
++        mr = env->tlb.itlb[idx].mr;
++        if (mr & 1) {
++            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
++        }
++        if (rb & 1) {
++            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
+         }
+         env->tlb.itlb[idx].mr = rb;
+         break;
+-
+     case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
+         idx = spr - TO_SPR(2, 640);
+         env->tlb.itlb[idx].tr = rb;
+@@ -121,6 +129,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(2, 1280) ... TO_SPR(2, 1407): /* ITLBW3MR 0-127 */
+     case TO_SPR(2, 1408) ... TO_SPR(2, 1535): /* ITLBW3TR 0-127 */
+         break;
++
+     case TO_SPR(5, 1):  /* MACLO */
+         env->mac = deposit64(env->mac, 0, 32, rb);
+         break;
 -- 
 2.17.1
