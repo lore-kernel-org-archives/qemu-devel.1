@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYZSr-0007WQ-CO
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:08:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYZVQ-0000H3-Oq
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYZSq-0006ql-Hq
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:08:09 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:37085)
+	(envelope-from <alex.bennee@linaro.org>) id 1fYZVM-00058z-Of
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:10:48 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33924)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYZSq-0006p5-By
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:08:08 -0400
-Received: by mail-ot0-x242.google.com with SMTP id q11-v6so4516030otk.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:08:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYZVM-000558-Hb
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:10:44 -0400
+Received: by mail-wm0-x241.google.com with SMTP id l15-v6so21143989wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:10:44 -0700 (PDT)
+References: <20180622004435.10291-1-f4bug@amsat.org>
+	<20180622004435.10291-2-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180622004435.10291-2-f4bug@amsat.org>
+Date: Thu, 28 Jun 2018 17:10:42 +0100
+Message-ID: <87k1qivqm5.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8c0706a5-6601-9945-9312-c3a0775c3d83@linaro.org>
-References: <20180627043328.11531-1-richard.henderson@linaro.org>
-	<20180627043328.11531-34-richard.henderson@linaro.org>
-	<CAFEAcA_ZfQ1y0=sWBqLGSbd5qoBvhSthUy_udDi-aE5U66DLLg@mail.gmail.com>
-	<8c0706a5-6601-9945-9312-c3a0775c3d83@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 17:07:46 +0100
-Message-ID: <CAFEAcA9zoojsDy+5NRSd693GVfVCqQOVCQ=15jhFWx8bXB_FFQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 33/35] target/arm: Implement SVE dot
- product (indexed)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/6] avocado: Add a Test.arch
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-On 28 June 2018 at 16:57, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 06/28/2018 06:07 AM, Peter Maydell wrote:
->>>  # SVE integer dot product (unpredicated)
->>> -DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5
->>> +DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5 ra=%reg_movprfx
->>
->> Shouldn't this have been in a different patch ?
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Tests can change this property to run tests in other
+> architectures than the host one.
 >
-> Dammit, you pointed this out last time and I missed it
-> when going back through all of the nits.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  tests/acceptance/avocado_qemu/__init__.py | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 >
-> Do you want me to re-spin all or part of the patch set?
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+> index 1e54fd5932..6e9601f5e9 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -13,6 +13,7 @@ import sys
+>
+>  import avocado
+>
+> +HOST_ARCH =3D os.uname()[4]
 
-No, I've just made the fix locally in target-arm.next.
+The python docs seem to point to platform as a more stable way of
+querying this stuff:
 
--- PMM
+  platform.machine() =3D> 'x86_64' or 'aarch64'
+
+>  SRC_ROOT_DIR =3D os.path.dirname(os.path.dirname(os.path.dirname(__file_=
+_)))
+>  SRC_ROOT_DIR =3D os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
+>  sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
+> @@ -23,12 +24,11 @@ def is_readable_executable_file(path):
+>      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
+>
+>
+> -def pick_default_qemu_bin():
+> +def pick_default_qemu_bin(arch):
+>      """
+>      Picks the path of a QEMU binary, starting either in the current work=
+ing
+>      directory or in the source tree root directory.
+>      """
+> -    arch =3D os.uname()[4]
+>      qemu_bin_relative_path =3D os.path.join("%s-softmmu" % arch,
+>                                            "qemu-system-%s" % arch)
+>      if is_readable_executable_file(qemu_bin_relative_path):
+> @@ -41,10 +41,19 @@ def pick_default_qemu_bin():
+>
+>
+>  class Test(avocado.Test):
+> +    _arch =3D HOST_ARCH
+> +
+> +    @property
+> +    def arch(self):
+> +        """
+> +        Returns the architecture required to run the current test
+> +        """
+> +        return self._arch
+> +
+>      def setUp(self):
+>          self.vm =3D None
+> -        self.qemu_bin =3D self.params.get('qemu_bin',
+> -                                        default=3Dpick_default_qemu_bin(=
+))
+> +        qemu_bin =3D pick_default_qemu_bin(self.arch)
+> +        self.qemu_bin =3D self.params.get('qemu_bin', default=3Dqemu_bin)
+>          if self.qemu_bin is None:
+>              self.cancel("No QEMU binary defined or found in the source t=
+ree")
+>          self.vm =3D QEMUMachine(self.qemu_bin)
+
+
+--
+Alex Benn=C3=A9e
