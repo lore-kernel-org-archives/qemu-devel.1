@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYUNL-0003Od-Nd
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:42:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYUQu-0004Nw-07
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYUNH-0007Er-PV
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:42:07 -0400
-References: <20180618144800.555-1-david@redhat.com>
-	<20180618144800.555-3-david@redhat.com>
-	<20180619175940.00ae5e70@redhat.com>
-	<1c0de15c-0bbd-1714-782a-00928f3064fe@redhat.com>
-	<20180626170328.221939e6@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <391b91f3-3641-fbea-8320-375e68c8cad9@redhat.com>
-Date: Thu, 28 Jun 2018 12:41:58 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fYUQq-0004gF-21
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:45:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59512 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYUQp-0004fG-SX
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:45:43 -0400
+References: <20180626143538.5390-1-alex.bennee@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f085e4db-2409-ec41-b3b6-32ec1025d151@redhat.com>
+Date: Thu, 28 Jun 2018 12:45:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180626170328.221939e6@redhat.com>
+In-Reply-To: <20180626143538.5390-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] machine: factor out
- enforce_aligned_dimm into memory_device_align
+Subject: Re: [Qemu-devel] [PATCH] blogposts: add post about the new
+ check-tcg infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +28,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On 26.06.2018 17:03, Igor Mammedov wrote:
-> On Tue, 19 Jun 2018 19:06:38 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> On 19.06.2018 17:59, Igor Mammedov wrote:
->>> On Mon, 18 Jun 2018 16:47:58 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>  =20
->>>> We want to handle memory device address assignment without passing
->>>> compatibility parameters ("*align").
->>>>
->>>> As x86 and Power use different strategies to determine an alignment =
-and
->>>> we need clean support for compat handling, let's introduce an enum o=
-n
->>>> the machine class level. This is the machine configuration on how to
->>>> align memory devices in guest physical memory.
->>>>
->>>> The three introduced types represent what is being done on x86 and P=
-ower
->>>> right now. =20
->>>
->>> commit message doesn't deliver purpose of the path, =20
->>
->> "We want to handle memory device address assignment without passing
->> compatibility parameters ("*align")."
->>
->> So in order to do patch nr 4 without this, I would basically have to
->> move the align parameter to pc_dimm_pre_plug, along with the code for
->> "detecting" the alignment in e.g. pc_memory_plug. And I want to avoid
->> this because ...
->>
->>> So I'm no conviced it's necessary.
->>> we probably discussed it in previous revisions but could you reiterat=
-e
->>> it here WHY do you need this and 3/4
->>>  =20
->>
->> .. I want to get rid of the align parameter in the long run. Alignment
->> is some memory device specific property that can be easily detected
->> using a detection configuration (this patch). This approach looks much
->> cleaner to me. This way we can use the same alignment strategy for all
->> memory devices.
->>
->> In follow up series I want to factor out address assignment completely
->> into memory_device_pre_plug(). And I also don't want to have an align
->> parameter at that function. I want to avoid moving the same code aroun=
-d
->> two times (pc.c).
->=20
-> Lets look at what we have currently:
->=20
->   1.1 PC: RAM backend target page size alignment (bug fixed by 92a37a04=
-d
->       as non aligned addr is not valid at all)
->             align =3D TARGET_PAGE_SIZE
->=20
->       but immediately following up commits a2b257d62 / 0c0de1b68
->       overwrites it unconditionally to QEMU_VMALLOC_ALIGN for 2.2 and l=
-ater
->=20
->       so
->       ..v2.1
->             address/size =3D not multiple of TARGET_PAGE_SIZE in QEMU-2=
-.1 is broken
->                            (a2b257d62) and we don't care
->=20
->             align =3D TARGET_PAGE_SIZE since QEMU-2.2 binary even for o=
-lder machine types
->       and later
->             align =3D QEMU_VMALLOC_ALIGN
->=20
->   1.2 SPAPR: RAM backend. memhotplug came after 1.1 so it has
->          v2.5
->             align =3D QEMU_VMALLOC_ALIGN
->=20
->   2.1 PC: file backend
->           v2.1
->             align =3D TARGET_PAGE_SIZE
->           v2.2 .. 2.11
->             align =3D qemu_fd_getpagesize(fd)
->           v2.12 adds one more invariant
->             align =3D MAX(qemu_fd_getpagesize(fd), 'filebackend.align' =
-option)
->            =20
->   2.2 SPAPR: file backend
->           v2.5..2.11
->             align =3D qemu_fd_getpagesize(fd)
->           v2.12
->             align =3D MAX(qemu_fd_getpagesize(fd), 'filebackend.align' =
-option)
->=20
-> also there is s390 kvm invariant for file backend see: file_ram_alloc()
->=20
->            block->mr->align =3D MAX(qemu_fd_getpagesize(fd), 'filebacke=
-nd.align' option)
->            if (vkm)
->               block->mr->align =3D MAX(block->mr->align, QEMU_VMALLOC_A=
-LIGN);
->=20
->=20
-> to sum up they all have memory region based alignment except of v2.1 PC=
- machine
-> which is compat trick that I don't expect to be used anywhere else.
-> So taking in account above and fact that it's backend property,
-> I'm against of pushing it up to generic machine level, I'd try to keep
-> compat hack local to PC machine along with enforce_aligned_dimm.
+On 26/06/2018 16:35, Alex Benn=C3=A9e wrote:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Problematic case is win32 qemu_anon_ram_alloc(), which does not fixup
-the alignment. As far as I can see, the alignment will stay 0. So it
-could happen that we have a 0 alignment, but I'll send a fix for that (I
-don't think we have to worry about compat in windows here (changing
-alignment from 0 to getpagesize())).
+Pushed with a little bit of editing, thanks!
 
->=20
-> Moreover 3/4 patch where you are making memory-device.c build per targe=
-t is no go,
-> we are trying to minimize number of such files and not to add any witho=
-ut
-> a good reason.
-
-I agree, this is to be avoided.
-
->=20
-> Pushing align detection into common helper would be sufficient,=20
-> following could do the job with explicit comment inside that *align
-> is compat hack for pc machine.
->=20
->    memory_device_pre_plug(.... int *align)
->      use non null for pc-2.1 compat hack and NULL in all other cases
->=20
-
-Okay, in the first shot I'll do
-
-pcdimm_pre_plug(... uint64_t *enforced_align ...)
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+diff --git a/_posts/2018-06-21-tcg-testing.md b/_posts/2018-06-28-tcg-tes=
+ting.md
+similarity index 83%
+rename from _posts/2018-06-21-tcg-testing.md
+rename to _posts/2018-06-28-tcg-testing.md
+index e61312e..026e726 100644
+--- a/_posts/2018-06-21-tcg-testing.md
++++ b/_posts/2018-06-28-tcg-testing.md
+@@ -7,39 +7,39 @@ author: Alex Benn=C3=83=C2=A9e
+ categories: [testing, docker, compilation, tcg]
+ ---
+=20
+-Ever since I started working on QEMU there was a small directory
+-called tests/tcg that was in a perpetually broken state. It contains
++Ever since I started working on QEMU, a small directory
++called `tests/tcg` has been in a perpetually broken state. It contains
+ tests that exercise QEMU's ability to work across architectures using
+ the power of the Tiny Code Generator. However as these tests needed to
+ be compiled for the *guest* architectures and not the *host*
+-architecture - known as cross-compiling - most developers never ran
+-them. As the tests were hardly ever built inevitably a certain amount
+-of bit-rot set in.
++architecture&mdash;this is known as cross-compiling&mdash;most developer=
+s
++never ran them. As the tests were hardly ever built inevitably a certain
++amount of bit-rot set in.
+=20
+ # Cross Compilers
+=20
+-In the old days cross-compilation setups were almost all hand-crafted
++In the old days, cross-compilation setups were almost all hand-crafted
+ affairs which involved building versions of binutils, gcc and a basic
+-libc. If you couldn't get someone to give you a pre-built tarball it
++libc. If you couldn't get someone to give you a pre-built tarball, it
+ was something you laboured through once and hopefully never had to
+ touch again. There were even dedicated scripts like crosstool-ng which
+ attempted to make the process of patching and configuring your
+ toolchain easier.
+=20
+ While the distributions have improved their support for cross
+-compilers over the years there are still plenty of variations in how
++compilers over the years, there are still plenty of variations in how
+ they are deployed. It is hard for a project like QEMU which has to
+ build on a wide range of operating systems and architectures to
+ seamlessly use any given distributions compiler setup. However for
+-those with cross compilers to hand `configure` now accepts two
++those with cross compilers at hand `configure` now accepts two
+ additional flags:
+=20
+     --cross-cc-$(ARCH)
+     --cross-cc-flags-$(ARCH)
+=20
+ With a compiler specified for each guest architecture you want to test
+-the build system can now build and run the tests. However for
+-developers that don't have cross compilers around they can now take
++the build system can now build and run the tests. For
++developers that don't have cross compilers around, they can take
+ advantage of QEMU's docker images.
+=20
+ # Enter Docker Containers
+@@ -66,11 +66,11 @@ instead of tracking down a piece of ARM hardware to a=
+ctually build on.
+ Run `make docker` in your source tree to see the range of builds and
+ tests it can support.
+=20
+-# make check-tcg
++# `make check-tcg`
+=20
+ With the latest work [merged into
+ master](https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dde44c044420d11=
+39480fa50c2d5be19223391218) we can now
+-take advantage of both hand configured and docker based cross
++take advantage of either hand-configured and Docker-based cross
+ compilers to build test cases for TCG again. To run the TCG tests
+ after you have built QEMU:
+=20
+@@ -79,16 +79,16 @@ after you have built QEMU:
+ and the build system will build and run all the tests it can for your
+ configured targets.
+=20
+-# Rules for tests/tcg
++# Rules for `tests/tcg`
+=20
+ So now we have the infrastructure in place to add new tests what rules
+ need to be followed to add new tests?=20
+=20
+-Well the first thing to note is currently all the tests are for
+-linux-user versions of QEMU. This means the tests are all currently
++Well the first thing to note is currently all the tests are for the
++`linux-user` variant of QEMU. This means the tests are all currently
+ user-space tests that have access to the Linux syscall ABI.
+=20
+-Another thing to note is the tests are standalone from the rest of the
++Another thing to note is the tests are separate from the rest of the
+ QEMU test infrastructure. To keep things simple they are compiled as
+ standalone "static" binaries. As the cross-compilation setup can be
+ quite rudimentary for some of the rarer architectures we only compile
+@@ -99,10 +99,10 @@ glibc so shouldn't be a problem.
+ Finally when writing new tests consider if it really is architecture
+ specific or can be added to `tests/tcg/multiarch`. The multiarch tests
+ are re-built for every supported architecture and should be the
+-default place for anything explicitly testing syscalls and other
++default place for anything that tests syscalls or other
+ common parts of the code base.
+=20
+-# What's Next
++# What's next
+=20
+ My hope with this work is we can start adding more tests to
+ systematically defend functionality in linux-user. In fact I hope the
+@@ -135,5 +135,3 @@ status over a simple serial link which will need to b=
+e parsed and
+ handled in custom versions of the
+ [`run-%:`](https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dtests/tcg/Mak=
+efile;h=3Dbf064153900a438e4ad8e2d79eaaac8a27d66062;hb=3DHEAD#l95)
+ rule.
+-
+-
