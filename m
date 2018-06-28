@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAW-00079Y-87
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAW-00079f-Cx
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAT-0000Fu-VZ
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:27 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38580)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAU-0000HF-Sn
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:28 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:55461)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAT-0000EY-GJ
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:25 -0400
-Received: by mail-wr0-x243.google.com with SMTP id e18-v6so6690684wrs.5
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:25 -0700 (PDT)
+	id 1fYdAU-0000Fy-KB
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:26 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id v16-v6so11054850wmv.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:26 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:20 +0200
-Message-Id: <1530216310-52873-11-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:21 +0200
+Message-Id: <1530216310-52873-12-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 10/60] kvm: Delete the slot if and only if the
- KVM_MEM_READONLY flag is changed
+Subject: [Qemu-devel] [PULL 11/60] tests/atomic_add-bench: add -m option to
+ use mutexes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +29,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: "Emilio G. Cota" <cota@braap.org>, Peter Xu <peterx@redhat.com>
 
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
-According to KVM commit 75d61fbc, it needs to delete the slot before
-changing the KVM_MEM_READONLY flag. But QEMU commit 235e8982 only check
-whether KVM_MEM_READONLY flag is set instead of changing. It doesn't
-need to delete the slot if the KVM_MEM_READONLY flag is not changed.
+This allows us to use atomic-add-bench as a microbenchmark
+for evaluating qemu_mutex_lock's performance.
 
-This fixes a issue that migrating a VM at the OVMF startup stage and
-VM is executing the codes in rom. Between the deleting and adding the
-slot in kvm_set_user_memory_region, there is a chance that guest access
-rom and trap to KVM, then KVM can't find the corresponding memslot.
-While KVM (on ARM) injects an abort to guest due to the broken hva, then
-guest will get stuck.
-
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-Message-Id: <1526462314-19720-1-git-send-email-zhaoshenglong@huawei.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[cherry picked from https://github.com/cota/qemu/commit/f04f34df]
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180425025459.5258-2-peterx@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c      | 17 ++++++++---------
- include/sysemu/kvm_int.h |  1 +
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ tests/atomic_add-bench.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index ffee68e..eb7db92 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -256,7 +256,7 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
-     return 0;
- }
+diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
+index caa1e8e..f96d448 100644
+--- a/tests/atomic_add-bench.c
++++ b/tests/atomic_add-bench.c
+@@ -8,6 +8,7 @@ struct thread_info {
+ } QEMU_ALIGNED(64);
  
--static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
-+static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
- {
-     KVMState *s = kvm_state;
-     struct kvm_userspace_memory_region mem;
-@@ -267,7 +267,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
-     mem.userspace_addr = (unsigned long)slot->ram;
-     mem.flags = slot->flags;
+ struct count {
++    QemuMutex lock;
+     unsigned long val;
+ } QEMU_ALIGNED(64);
  
--    if (slot->memory_size && mem.flags & KVM_MEM_READONLY) {
-+    if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-         /* Set the slot size to 0 before setting the slot to the desired
-          * value. This is needed based on KVM commit 75d61fbc. */
-         mem.memory_size = 0;
-@@ -275,6 +275,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
+@@ -18,11 +19,13 @@ static unsigned int n_ready_threads;
+ static struct count *counts;
+ static unsigned int duration = 1;
+ static unsigned int range = 1024;
++static bool use_mutex;
+ static bool test_start;
+ static bool test_stop;
+ 
+ static const char commands_string[] =
+     " -n = number of threads\n"
++    " -m = use mutexes instead of atomic increments\n"
+     " -d = duration in seconds\n"
+     " -r = range (will be rounded up to pow2)";
+ 
+@@ -59,7 +62,13 @@ static void *thread_func(void *arg)
+ 
+         info->r = xorshift64star(info->r);
+         index = info->r & (range - 1);
+-        atomic_inc(&counts[index].val);
++        if (use_mutex) {
++            qemu_mutex_lock(&counts[index].lock);
++            counts[index].val += 1;
++            qemu_mutex_unlock(&counts[index].lock);
++        } else {
++            atomic_inc(&counts[index].val);
++        }
      }
-     mem.memory_size = slot->memory_size;
-     ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-+    slot->old_flags = mem.flags;
-     trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
-                               mem.memory_size, mem.userspace_addr, ret);
-     return ret;
-@@ -391,17 +392,14 @@ static int kvm_mem_flags(MemoryRegion *mr)
- static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
-                                  MemoryRegion *mr)
- {
--    int old_flags;
--
--    old_flags = mem->flags;
-     mem->flags = kvm_mem_flags(mr);
- 
-     /* If nothing changed effectively, no need to issue ioctl */
--    if (mem->flags == old_flags) {
-+    if (mem->flags == mem->old_flags) {
-         return 0;
-     }
- 
--    return kvm_set_user_memory_region(kml, mem);
-+    return kvm_set_user_memory_region(kml, mem, false);
+     return NULL;
  }
+@@ -91,6 +100,9 @@ static void create_threads(void)
+     th_info = g_new(struct thread_info, n_threads);
+     counts = qemu_memalign(64, sizeof(*counts) * range);
+     memset(counts, 0, sizeof(*counts) * range);
++    for (i = 0; i < range; i++) {
++        qemu_mutex_init(&counts[i].lock);
++    }
  
- static int kvm_section_update_flags(KVMMemoryListener *kml,
-@@ -755,7 +753,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+     for (i = 0; i < n_threads; i++) {
+         struct thread_info *info = &th_info[i];
+@@ -131,7 +143,7 @@ static void parse_args(int argc, char *argv[])
+     int c;
  
-         /* unregister the slot */
-         mem->memory_size = 0;
--        err = kvm_set_user_memory_region(kml, mem);
-+        mem->flags = 0;
-+        err = kvm_set_user_memory_region(kml, mem, false);
-         if (err) {
-             fprintf(stderr, "%s: error unregistering slot: %s\n",
-                     __func__, strerror(-err));
-@@ -771,7 +770,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     mem->ram = ram;
-     mem->flags = kvm_mem_flags(mr);
- 
--    err = kvm_set_user_memory_region(kml, mem);
-+    err = kvm_set_user_memory_region(kml, mem, true);
-     if (err) {
-         fprintf(stderr, "%s: error registering slot: %s\n", __func__,
-                 strerror(-err));
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 888557a..f838412 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -20,6 +20,7 @@ typedef struct KVMSlot
-     void *ram;
-     int slot;
-     int flags;
-+    int old_flags;
- } KVMSlot;
- 
- typedef struct KVMMemoryListener {
+     for (;;) {
+-        c = getopt(argc, argv, "hd:n:r:");
++        c = getopt(argc, argv, "hd:n:mr:");
+         if (c < 0) {
+             break;
+         }
+@@ -145,6 +157,9 @@ static void parse_args(int argc, char *argv[])
+         case 'n':
+             n_threads = atoi(optarg);
+             break;
++        case 'm':
++            use_mutex = true;
++            break;
+         case 'r':
+             range = pow2ceil(atoi(optarg));
+             break;
 -- 
 1.8.3.1
