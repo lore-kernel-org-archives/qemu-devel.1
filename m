@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYTxd-0008Ui-UV
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:35 -0400
+	(envelope-from <groug@kaod.org>) id 1fYTxw-0000IK-7g
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYTxa-0005wF-Nz
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:33 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:44888)
+	(envelope-from <groug@kaod.org>) id 1fYTxt-0006BK-2u
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:52 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:43264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYTxa-0005v1-B7
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:30 -0400
-Received: from player159.ha.ovh.net (unknown [10.109.108.57])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id C9496C753B
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 12:15:28 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYTxs-00069j-P8
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:49 -0400
+Received: from player687.ha.ovh.net (unknown [10.109.105.112])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1079913E300
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 12:15:46 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Thu, 28 Jun 2018 12:15:14 +0200
-Message-ID: <153018091454.336571.7311461748726927045.stgit@bahia>
+Date: Thu, 28 Jun 2018 12:15:33 +0200
+Message-ID: <153018093372.336571.7266716996862582164.stgit@bahia>
 In-Reply-To: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
 References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2/3] spapr: compute default value of
- "hpt-max-page-size" later
+Subject: [Qemu-devel] [PATCH 3/3] accel: forbid early use of kvm_enabled()
+ and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +33,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-It is currently not possible to run a pseries-2.12 or older machine
-with HV KVM. QEMU prints the following and exits right away.
+It is unsafe to rely on *_enabled() helpers before the accelerator has
+been initialized, ie, accel_init_machine() has succeeded, because they
+always return false. But it is still possible to end up calling them
+indirectly by inadvertance, and cause QEMU to misbehave.
 
-qemu-system-ppc64: KVM doesn't support for base page shift 34
-
-The "hpt-max-page-size" capability was recently added to spapr to hide
-host configuration details from HPT mode guests. Its default value for
-newer machine types is 64k.
-
-For backwards compatibility, pseries-2.12 and older machine types need
-a different value. This is handled as usual in a class init function.
-The default value is 16G, ie, all page sizes supported by POWER7 and
-newer CPUs, but HV KVM requires guest pages to be hpa contiguous as
-well as gpa contiguous. The default value is the page size used to
-back the guest RAM in this case.
-
-Unfortunately kvmppc_hpt_needs_host_contiguous_pages()->kvm_enabled() is
-called way before KVM init and returns false, even if the user requested
-KVM. We thus end up selecting 16G, which isn't supported by HV KVM.
-
-We fix this by moving the logic to spapr_machine_init() because this
-is the earliest call where we're sure kvm_enabled() can be trusted.
-Since the user cannot pass cap-hpt-max-page-size=0, we set the default
-to 0 in the pseries-2.12 class init function and use that as a flag
-in spapr_machine_init() to do the real work.
+This patch causes QEMU to abort if we try to check for an accelerator
+before it has been set up. This will help to catch bugs earlier.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c |   25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ accel/accel.c          |    7 +++++++
+ include/qemu-common.h  |    3 ++-
+ include/sysemu/accel.h |    1 +
+ include/sysemu/kvm.h   |    3 ++-
+ qom/cpu.c              |    1 +
+ stubs/Makefile.objs    |    1 +
+ stubs/accel.c          |   14 ++++++++++++++
+ target/i386/hax-all.c  |    2 +-
+ target/i386/whpx-all.c |    2 +-
+ 9 files changed, 30 insertions(+), 4 deletions(-)
+ create mode 100644 stubs/accel.c
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8cc996d0b822..1eb45cd8c424 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2527,6 +2527,18 @@ static void spapr_machine_init(MachineState *machine)
-     QLIST_INIT(&spapr->phbs);
-     QTAILQ_INIT(&spapr->pending_dimm_unplugs);
- 
-+    /* This is for pseries-2.12 and older machine types */
-+    if (!smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
-+        uint8_t mps;
-+
-+        if (kvmppc_hpt_needs_host_contiguous_pages()) {
-+            mps = ctz64(qemu_getrampagesize());
-+        } else {
-+            mps = 34; /* allow everything up to 16GiB, i.e. everything */
-+        }
-+        smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
-+    }
-+
-     /* Determine capabilities to run with */
-     spapr_caps_init(spapr);
- 
-@@ -4103,17 +4115,16 @@ static void spapr_machine_2_12_instance_options(MachineState *machine)
- static void spapr_machine_2_12_class_options(MachineClass *mc)
- {
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
--    uint8_t mps;
- 
-     spapr_machine_3_0_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
- 
--    if (kvmppc_hpt_needs_host_contiguous_pages()) {
--        mps = ctz64(qemu_getrampagesize());
--    } else {
--        mps = 34; /* allow everything up to 16GiB, i.e. everything */
--    }
--    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
-+    /* We depend on kvm_enabled() to choose a default value for the
-+     * hpt-max-page-size capability. Of course we can't do it here
-+     * because this is too early and the HW accelerator isn't initialzed
-+     * yet. Postpone this to spapr_machine_init().
-+     */
-+    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 0;
+diff --git a/accel/accel.c b/accel/accel.c
+index 966b2d8f536c..27900aac9cc5 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -51,6 +51,13 @@ static AccelClass *accel_find(const char *opt_name)
+     return ac;
  }
  
- DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
++bool assert_accelerator_initialized(bool allowed)
++{
++    assert(current_machine != NULL);
++    assert(current_machine->accelerator != NULL);
++    return allowed;
++}
++
+ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+ {
+     ObjectClass *oc = OBJECT_CLASS(acc);
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 85f4749aefb7..01d5e4d97dbf 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -82,7 +82,8 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
+ extern bool tcg_allowed;
+ void tcg_exec_init(unsigned long tb_size);
+ #ifdef CONFIG_TCG
+-#define tcg_enabled() (tcg_allowed)
++#include "sysemu/accel.h"
++#define tcg_enabled() (assert_accelerator_initialized(tcg_allowed))
+ #else
+ #define tcg_enabled() 0
+ #endif
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 637358f43014..76965cb69cc9 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -71,5 +71,6 @@ void configure_accelerator(MachineState *ms);
+ void accel_register_compat_props(AccelState *accel);
+ /* Called just before os_setup_post (ie just before drop OS privs) */
+ void accel_setup_post(MachineState *ms);
++bool assert_accelerator_initialized(bool allowed);
+ 
+ #endif
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 0b64b8e06786..ac4dbb2d6d6d 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -18,6 +18,7 @@
+ #include "qom/cpu.h"
+ #include "exec/memattrs.h"
+ #include "hw/irq.h"
++#include "sysemu/accel.h"
+ 
+ #ifdef NEED_CPU_H
+ # ifdef CONFIG_KVM
+@@ -46,7 +47,7 @@ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
+ 
+-#define kvm_enabled()           (kvm_allowed)
++#define kvm_enabled()           (assert_accelerator_initialized(kvm_allowed))
+ /**
+  * kvm_irqchip_in_kernel:
+  *
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 92599f35413b..65a8f03a66a4 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -23,6 +23,7 @@
+ #include "qemu-common.h"
+ #include "qom/cpu.h"
+ #include "sysemu/hw_accel.h"
++#include "sysemu/accel.h"
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+ #include "exec/log.h"
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 53d3f32cb258..2d5142287525 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -43,3 +43,4 @@ stub-obj-y += xen-common.o
+ stub-obj-y += xen-hvm.o
+ stub-obj-y += pci-host-piix.o
+ stub-obj-y += ram-block.o
++stub-obj-y += accel.o
+diff --git a/stubs/accel.c b/stubs/accel.c
+new file mode 100644
+index 000000000000..4f480f2d3f29
+--- /dev/null
++++ b/stubs/accel.c
+@@ -0,0 +1,14 @@
++/*
++ * accel stubs
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/accel.h"
++
++bool assert_accelerator_initialized(bool allowed)
++{
++    return allowed;
++}
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index d2e512856bb8..7c78bd7d094d 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -57,7 +57,7 @@ static int hax_arch_get_registers(CPUArchState *env);
+ 
+ int hax_enabled(void)
+ {
+-    return hax_allowed;
++    return assert_accelerator_initialized(hax_allowed);
+ }
+ 
+ int valid_hax_tunnel_size(uint16_t size)
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 6b42096698ee..e7f6bc5958e7 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -1422,7 +1422,7 @@ static int whpx_accel_init(MachineState *ms)
+ 
+ int whpx_enabled(void)
+ {
+-    return whpx_allowed;
++    return assert_accelerator_initialized(whpx_allowed);
+ }
+ 
+ static void whpx_accel_class_init(ObjectClass *oc, void *data)
