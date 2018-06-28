@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAi-0007Hn-95
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:41 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAk-0007Jx-45
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAh-0000cJ-6P
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:40 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35986)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAi-0000f6-UQ
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:42 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:51036)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAg-0000b0-VV
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:39 -0400
-Received: by mail-wm0-x235.google.com with SMTP id u18-v6so10302528wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:38 -0700 (PDT)
+	id 1fYdAi-0000dP-Nb
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:40 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id e16-v6so10987406wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:40 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:34 +0200
-Message-Id: <1530216310-52873-25-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:36 +0200
+Message-Id: <1530216310-52873-27-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 24/60] pc-dimm: merge
- get_(vmstate_)memory_region()
+Subject: [Qemu-devel] [PULL 26/60] nvdimm: convert nvdimm_mr into a pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +32,88 @@ Cc: David Hildenbrand <david@redhat.com>
 
 From: David Hildenbrand <david@redhat.com>
 
-Importantly, get_vmstate_memory_region() should also fail with a proper
-error if called before the device is realized. For a PCDIMM, both functions
-are to return the same thing, so share the implementation.
+This way we can easily check if the region has already been inititalized
+without having to rely on the size of an uninitialized region being 0.
 
-All current users are called after the device has been realized, so we
-can expect the calls to succeed.
+Free the region in nvdimm_finalize() and not in unrealize() as we will
+allow to create the region before realization in following patches.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180619134141.29478-9-david@redhat.com>
+Message-Id: <20180619134141.29478-11-david@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/mem/pc-dimm.c         | 13 +++++--------
- include/hw/mem/pc-dimm.h |  3 ++-
- 2 files changed, 7 insertions(+), 9 deletions(-)
+ hw/mem/nvdimm.c         | 17 +++++++++++++----
+ include/hw/mem/nvdimm.h |  2 +-
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 73f0eee..4ff39b5 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -35,7 +35,8 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
-     int slot;
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-+    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-+                                                              &error_abort);
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 7260c9c..afd3912 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -43,7 +43,7 @@ static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
      Error *local_err = NULL;
-     MemoryRegion *mr;
-     uint64_t addr;
-@@ -90,7 +91,8 @@ void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
- {
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-+    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-+                                                              &error_abort);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     uint64_t value;
  
-     memory_device_unplug_region(machine, mr);
-@@ -229,11 +231,6 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-     return host_memory_backend_get_memory(dimm->hostmem);
+-    if (memory_region_size(&nvdimm->nvdimm_mr)) {
++    if (nvdimm->nvdimm_mr) {
+         error_setg(&local_err, "cannot change property value");
+         goto out;
+     }
+@@ -71,11 +71,18 @@ static void nvdimm_init(Object *obj)
+                         NULL, NULL);
  }
  
--static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
--{
--    return host_memory_backend_get_memory(dimm->hostmem);
--}
--
- static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
++static void nvdimm_finalize(Object *obj)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++
++    g_free(nvdimm->nvdimm_mr);
++}
++
+ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
  {
-     const PCDIMMDevice *dimm = PC_DIMM(md);
-@@ -298,7 +295,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     dc->desc = "DIMM memory module";
+     NVDIMMDevice *nvdimm = NVDIMM(dimm);
  
-     ddc->get_memory_region = pc_dimm_get_memory_region;
--    ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-+    ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+-    return &nvdimm->nvdimm_mr;
++    return nvdimm->nvdimm_mr;
+ }
  
-     mdc->get_addr = pc_dimm_md_get_addr;
-     /* for a dimm plugged_size == region_size */
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index cf71247..5679a80 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -73,7 +73,8 @@ typedef struct PCDIMMDeviceClass {
-     /* public */
-     void (*realize)(PCDIMMDevice *dimm, Error **errp);
-     MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
--    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
-+    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm,
-+                                               Error **errp);
- } PCDIMMDeviceClass;
+ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+@@ -102,9 +109,10 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+         return;
+     }
  
- void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+-    memory_region_init_alias(&nvdimm->nvdimm_mr, OBJECT(dimm),
++    nvdimm->nvdimm_mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(nvdimm->nvdimm_mr, OBJECT(dimm),
+                              "nvdimm-memory", mr, 0, pmem_size);
+-    nvdimm->nvdimm_mr.align = align;
++    nvdimm->nvdimm_mr->align = align;
+ }
+ 
+ /*
+@@ -167,6 +175,7 @@ static TypeInfo nvdimm_info = {
+     .class_init    = nvdimm_class_init,
+     .instance_size = sizeof(NVDIMMDevice),
+     .instance_init = nvdimm_init,
++    .instance_finalize = nvdimm_finalize,
+ };
+ 
+ static void nvdimm_register_types(void)
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 9340631..c5c9b3c 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -74,7 +74,7 @@ struct NVDIMMDevice {
+      * it's the PMEM region in NVDIMM device, which is presented to
+      * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
+      */
+-    MemoryRegion nvdimm_mr;
++    MemoryRegion *nvdimm_mr;
+ 
+     /*
+      * The 'on' value results in the unarmed flag set in ACPI NFIT,
 -- 
 1.8.3.1
