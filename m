@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYdBH-0007yc-8r
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:16 -0400
+	(envelope-from <david@redhat.com>) id 1fYdHF-0004wG-9s
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYdBF-0001f0-Uu
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:15 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:35744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYdBF-0001dw-OY
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:13 -0400
-Received: by mail-ot0-x241.google.com with SMTP id j8-v6so4754140otl.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:06:13 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fYdHC-0000qI-22
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:12:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54398 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fYdHB-0000Sh-TS
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:12:21 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B3217A2CDC
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 20:12:15 +0000 (UTC)
+References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
+	<1530216310-52873-30-git-send-email-pbonzini@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <84e14f63-7722-a791-d3a5-b6b9dd6098e5@redhat.com>
+Date: Thu, 28 Jun 2018 22:12:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <a46a8b06-c780-0c22-b9f7-8eaae73dd26d@vivier.eu>
-References: <20180626165658.31394-1-peter.maydell@linaro.org>
-	<20180626165658.31394-24-peter.maydell@linaro.org>
-	<50e46f22-1e3d-10ce-5b5b-a10af49a95f1@vivier.eu>
-	<CAFEAcA8141WC556H1fZLM4AEaz62o4qb7JOOVB-+75N9vugi+g@mail.gmail.com>
-	<a46a8b06-c780-0c22-b9f7-8eaae73dd26d@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 21:05:52 +0100
-Message-ID: <CAFEAcA8gKWG9O7rjhC1+n_Bqce+CGQvUEiM+mc7wu-1C7no2ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 23/32] tcg: Support MMU protection regions
- smaller than TARGET_PAGE_SIZE
+In-Reply-To: <1530216310-52873-30-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 29/60] numa: report all DIMM/NVDIMMs as
+ plugged memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,95 +35,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 28 June 2018 at 20:23, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 28/06/2018 =C3=A0 15:23, Peter Maydell a =C3=A9crit :
->> On 28 June 2018 at 14:03, Laurent Vivier <laurent@vivier.eu> wrote:
->>> Le 26/06/2018 =C3=A0 18:56, Peter Maydell a =C3=A9crit :
->>>> Add support for MMU protection regions that are smaller than
->>>> TARGET_PAGE_SIZE. We do this by marking the TLB entry for those
->>>> pages with a flag TLB_RECHECK. This flag causes us to always
->>>> take the slow-path for accesses. In the slow path we can then
->>>> special case them to always call tlb_fill() again, so we have
->>>> the correct information for the exact address being accessed.
->>>>
->>>> This change allows us to handle reading and writing from small
->>>> regions; we cannot deal with execution from the small region.
->>>>
->>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>>> Message-id: 20180620130619.11362-2-peter.maydell@linaro.org
->>>> ---
->>>>  accel/tcg/softmmu_template.h |  24 ++++---
->>>>  include/exec/cpu-all.h       |   5 +-
->>>>  accel/tcg/cputlb.c           | 131 +++++++++++++++++++++++++++++-----=
--
->>>>  3 files changed, 130 insertions(+), 30 deletions(-)
->>>
->>> This patch breaks Quadra 800 emulation, any idea why?
->>>
->>> ABCFGHIJK
->>> qemu: fatal: Unable to handle guest executing from RAM within a small
->>> MPU region at 0x0014cb5a
->>
->> Hmm, that shouldn't happen unless your target code was
->> incorrectly returning a too-small page size. (I say
->> "incorrectly" because before this patchseries that was
->> unsupported and would have had weird effects depending on
->> exactly what the order of guest accesses to the page was.)
->>
->> You could look at whether the m68k code is calling tlb_set_page()
->> with a wrong page_size value and why that happens. You can
->> get back the old behaviour by having your code do
->>    if (page_size < TARGET_PAGE_SIZE) {
->>        page_size =3D TARGET_PAGE_SIZE;
->>    }
->>
->> but that is definitely a bit of a hack.
->
-> Thank you to have had a look at this.
->
-> I've added traces and tlb_set_page() is always called with page_size =3D=
-=3D
-> TARGET_PAGE_SIZE.
->
-> m68k linux kernel always use 4 kB page that is the value of
-> TARGET_PAGE_SIZE.
-> 68040 MMU can also use 8 kB page, but in our case it doesn't (and of
-> course 8 kB > TARGET_PAGE_SIZE).
+On 28.06.2018 22:04, Paolo Bonzini wrote:
+> From: David Hildenbrand <david@redhat.com>
+> 
+> Right now, there is some inconsistency between hotplugged and
+> coldplugged memory. DIMMs added via "-device" result in different stats
+> than DIMMs added using "device_add".
+> 
+> E.g.
+>     [...]
+>     -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
+>     -m 4G,maxmem=20G,slots=2 \
+>     -object memory-backend-ram,id=mem0,size=8G \
+>     -device pc-dimm,id=dimm0,memdev=mem0 \
+>     -object memory-backend-ram,id=mem1,size=8G \
+>     -device nvdimm,id=dimm1,memdev=mem1,node=1
+> 
+> Results in NUMA info
+>     (qemu) info numa
+>     info numa
+>     2 nodes
+>     node 0 cpus: 0 1
+>     node 0 size: 10240 MB
+>     node 0 plugged: 0 MB
+>     node 1 cpus: 2 3
+>     node 1 size: 10240 MB
+>     node 1 plugged: 0 MB
+> 
+> But in memory size summary:
+>     (qemu) info memory_size_summary
+>     info memory_size_summary
+>     base memory: 4294967296
+>     plugged memory: 17179869184
+> 
+> Make this consistent by reporting all hot and coldplugged
+> memory a.k.a. DIMM and NVDIMM as "plugged".
+> 
+> Fixes: 31959e82fb0 ("hmp: extend "info numa" with hotplugged memory information")
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Message-Id: <20180622144045.737-1-david@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  numa.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/numa.c b/numa.c
+> index 94f758c..5f6367b 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -566,10 +566,8 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+>  
+>              if (pcdimm_info) {
+>                  node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
+> -                if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
+> -                    node_mem[pcdimm_info->node].node_plugged_mem +=
+> -                        pcdimm_info->size;
+> -                }
+> +                node_mem[pcdimm_info->node].node_plugged_mem +=
+> +                    pcdimm_info->size;
+>              }
+>          }
+>      }
+> 
 
-> I'm not aware of subpage in m68k MMU. but we have TLB entries that are
-> separated between code and data: does it change something in your code?
-> Accessing an address as a data access and then as an instruction access
-> could appear like a TLB_RECHECK?
+There was a v2 with a tweaked description, but the content remained the
+same.
 
-If you never pass a page_size < TARGET_PAGE_SIZE to
-tlb_set_page() then we should never mark anything as TLB_RECHECK:
-the theory was no behaviour change for the currently-being-used case.
+-- 
 
-Do you have a repro case (images, command line) that I can
-use to investigate ?
+Thanks,
 
->> In fact it's not clear to me at all that PTEST should be
->> updating the QEMU TLB: it only needs to update the MMU
->> status registers. (The 68030 manual I have says that in
->> hardware PTEST doesn't update the ATC, which is the h/w
->> equivalent to doing a TLB update.)
->
-> In QEMU, we emulate for the moment the 68040 MMU, and PTEST for 68040 is
-> not defined as the one for 68030.
->
-> For 68040, we have:
->
-> "A matching entry in the address translation cache (data or instruction)
-> specified by the function code will be flushed by PTEST. Completion of
-> PTEST results in the creation of a new address translation cache entry"
-
-Oh, OK. Since the QEMU TLB isn't really the same as the hardware
-TLB then it isn't strictly required to update our TLB here, but
-if the hardware does that then it doesn't hurt.
-
-thanks
--- PMM
+David / dhildenb
