@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYVMt-0006Ig-NQ
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:45:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYVSh-0007rz-0M
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYVMq-0006vl-Hf
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:45:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37386)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYVMq-0006ux-6r
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:45:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYVMo-0000PA-Lv
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:45:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A3BEF2E8198
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:45:38 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1fYVSd-0004CV-Tw
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:51:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35886 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYVSd-0004BQ-NO
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:51:39 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06FCE4001868
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:51:39 +0000 (UTC)
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org> <20180627115919.GC2516@xz-mi>
+	<87po0b48i9.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <523d3ced-5527-6474-43d5-78ebde7f01a4@redhat.com>
+Date: Thu, 28 Jun 2018 06:51:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Jun 2018 11:28:15 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1587065@bugs.launchpad.net>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153018529601.12646.7100861219492240431.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+In-Reply-To: <87po0b48i9.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] your mail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,316 +35,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-** Description changed:
-
-+ [Impact]
-+ =
-
-+  * An explanation of the effects of the bug on users and
-+ =
-
-+  * justification for backporting the fix to the stable release.
-+ =
-
-+  * In addition, it is helpful, but not required, to include an
-+    explanation of how the upload fixes this bug.
-+ =
-
-+ [Test Case]
-+ =
-
-+  * Prepare a guest
-+    $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
-s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
-+ uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
-abel=3Ddaily
-+ =
-
-+  * Shut it down and use virsh edit to add a channel for the agent
-+ <channel type=3D'unix'>
-+    <source mode=3D'bind'/>
-+    <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-+ </channel>
-+ =
-
-+   * Start the guest again, in it install qemu-guest-agent
-+ =
-
-+   *
-+ =
-
-+   * On the Host then freeze and thaw the guest
-+     $ virsh domfsfreeze x-freeze
-+     $ virsh domfsthaw x-freeze
-+ =
-
-+   # The above works, then trigger the issue, in the guest do
-+     $ sudo mkdir /mnt/test
-+     $ sudo mount -o bind / /mnt/test/
-+ =
-
-+   * Now the freeze/thaw will fail unless the fix is applied.
-+ =
-
-+ [Regression Potential]
-+ =
-
-+  * From looking at the code alone I could think of a different cause that =
-
-+    makes it return EBUSY.
-+    The biggest risk I could see due to that is the agent reporting a =
-
-+    successful freeze due to accepting EBUSY which is not actually true.
-+    But we have that in Ubuntu since Artful and =
-
-+    upstream since January 2017 and there are no such reports.
-+ =
-
-+ [Other Info]
-+  =
-
-+  * n/a
-+ =
-
-+ =
-
-+ ---
-+ =
-
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-  =
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-- =
-
-  =
-
-  Below more information about how we encountered this issue...
-  =
-
-  Message send to qemu-discuss@nongnu.org:
-  =
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-  =
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-  =
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-  =
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-  =
-
-  This is the only entry of the qemu guest agent in syslog.
-  =
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-  =
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-  =
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-  =
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
--  may have bind-mounts that let a device appear multiple times in the moun=
-t list. Unfortunately the guest agent is not smart enough to consider a dev=
-ice that has been frozen as succesfull and keep going. This causes this spe=
-cific error.
-+ =C2=A0may have bind-mounts that let a device appear multiple times in the=
- mount list. Unfortunately the guest agent is not smart enough to consider =
-a device that has been frozen as succesfull and keep going. This causes thi=
-s specific error.
-  =
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-  =
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
-
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  In Progress
-
-Bug description:
-  [Impact]
-
-   * An explanation of the effects of the bug on users and
-
-   * justification for backporting the fix to the stable release.
-
-   * In addition, it is helpful, but not required, to include an
-     explanation of how the upload fixes this bug.
-
-  [Test Case]
-
-   * Prepare a guest
-     $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
-s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
-  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
-abel=3Ddaily
-
-   * Shut it down and use virsh edit to add a channel for the agent
-  <channel type=3D'unix'>
-     <source mode=3D'bind'/>
-     <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-  </channel>
-
-    * Start the guest again, in it install qemu-guest-agent
-
-    *
-
-    * On the Host then freeze and thaw the guest
-      $ virsh domfsfreeze x-freeze
-      $ virsh domfsthaw x-freeze
-
-    # The above works, then trigger the issue, in the guest do
-      $ sudo mkdir /mnt/test
-      $ sudo mount -o bind / /mnt/test/
-
-    * Now the freeze/thaw will fail unless the fix is applied.
-
-  [Regression Potential]
-
-   * From looking at the code alone I could think of a different cause that =
-
-     makes it return EBUSY.
-     The biggest risk I could see due to that is the agent reporting a =
-
-     successful freeze due to accepting EBUSY which is not actually true.
-     But we have that in Ubuntu since Artful and =
-
-     upstream since January 2017 and there are no such reports.
-
-  [Other Info]
-   =
-
-   * n/a
-
-  =
-
-  ---
-
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-  =C2=A0may have bind-mounts that let a device appear multiple times in the=
- mount list. Unfortunately the guest agent is not smart enough to consider =
-a device that has been frozen as succesfull and keep going. This causes thi=
-s specific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
+
+On 06/28/2018 03:31 AM, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+>> On Tue, Jun 26, 2018 at 07:21:49PM +0200, Markus Armbruster wrote:
+>>> I fooled around a bit, and I think there are a few lose ends.
+> [...]
+>>> Talking to a QMP monitor that supports OOB:
+>>>
+>>>      $ socat UNIX:test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>>>      {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
+>>>      QMP> { "execute": "qmp_capabilities", "arguments": { "oob": true } }
+>>>      {"error": {"class": "GenericError", "desc": "Parameter 'oob' is unexpected"}}
+>>>      QMP> { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
+>>>      {"return": {}}
+>>>      QMP> { "execute": "query-qmp-schema" }
+>>>      {"error": {"class": "GenericError", "desc": "Out-Of-Band capability requires that every command contains an 'id' field"}}
+>>>
+>>> Why does every command require 'id'?
+> 
+> Why am I asking?  Requiring 'id' is rather onerous when you play with
+> QMP by hand.
+> 
+
+> Possible solutions other than requiring "id":
+> 
+> 1. Make out-of-band responses recognizable
+> 
+>     Just like we copy "id" to the response, we could copy "run-oob", or
+>     maybe "control".
+> 
+>     Solves the "match response to command" problem, doesn't solve the
+>     "match COMMAND_DROPPED event to command" problem.
+> 
+>     Permit me a digression.  "control": { "run-oob": true } is awfully
+>     verbose.  Back when we hashed out the OOB design, I proposed to use
+>     "exec-oob" instead of "execute" to run a command OOB.  I missed when
+>     that morphed into flag "run-oob" wrapped in object "control".  Was it
+>     in response to reviewer feedback?  Can you give me a pointer?
+
+It's not too late to change back.  Since OOB is still new to 3.0, we 
+could indeed go with a shorter invocation of 'exec-oob' (and I'd 
+actually be in favor of such a change).
+
+> 
+>     The counterpart to "exec-oob" would be "return-oob" and "error-oob".
+>     Hmm.
+
+In other words, the change in the keyword of the response will let you 
+know that it is replying to the most recent oob command.  This works 
+well if we guarantee that we never have more than one unprocessed oob 
+command in the pipeline at a time; but fails if oob commands can be 
+threaded against one another and start replying in a different order 
+than original submission.  Or, we could state that if you use 
+'exec-oob', then 'id' is mandatory (and 'id' in the 'return' or 'error' 
+is then sufficient to tie it back); but when using plain 'execute', 'id' 
+remains optional.
+
+> 
+> 2. Do nothing; it's the client's problem
+> 
+>     If the client needs to match responses and events to commands, it
+>     should use the feature that was expressly designed for helping with
+>     that: "id".
+> 
+>     Note that QMP's initial design assumed asynchronous commands,
+>     i.e. respones that may arrive in any order.  Nevertheless, it did not
+>     require "id".  Same reasoning: if the client needs to match, it can
+>     use "id".
+> 
+> As so often when "do nothing" is a viable solution, it looks mighty
+> attractive to me :)
+
+Indeed, although the documentation should still be explicit on 
+recommending the use of 'id' when oob is enabled.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
