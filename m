@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fYZl9-0007gj-Le
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:27:08 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYZls-00082V-5V
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fYZl6-0005xU-Gj
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:27:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55196 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fYZl6-0005vD-B5
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:27:00 -0400
-References: <20180622004435.10291-1-f4bug@amsat.org>
-	<87muvevrqt.fsf@linaro.org>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <8f45f2f0-0e3e-7b0d-ff92-9fd21f1cb8f7@redhat.com>
-Date: Thu, 28 Jun 2018 12:26:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYZlo-0006p1-U8
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:27:48 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:50849)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYZlo-0006np-KH
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:27:44 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id e16-v6so10362632wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:27:44 -0700 (PDT)
+References: <20180605160541.10664-1-alex.bennee@linaro.org>
+	<20180605160541.10664-4-alex.bennee@linaro.org>
+	<e52bc79e-6d12-743f-f1ae-fc1a1ac8969a@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <e52bc79e-6d12-743f-f1ae-fc1a1ac8969a@redhat.com>
+Date: Thu, 28 Jun 2018 17:27:42 +0100
+Message-ID: <87h8lmvptt.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87muvevrqt.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Avocado: start multi-arch tests,
- add a Travis job
+Subject: Re: [Qemu-devel] [PULL 3/6] Makefile: Rename TARGET_DIRS to
+ TARGET_LIST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +32,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 06/28/2018 11:46 AM, Alex Benn=C3=A9e wrote:
->=20
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->=20
->> Hi,
+> On 05/06/2018 18:05, Alex Benn=C3=A9e wrote:
+>> From: Fam Zheng <famz@redhat.com>
 >>
->> Another neanderthal approach to add multi-arch acceptance tests using
->> Avocado.
->>
->> Since Cleber Rosa work got merged [0], I can restart my previous attem=
-pt [1]
->> at using Avocado in QEMU.
->> Cleber Rosa rewrote my previous v1 [1], in good python, now this v2 pu=
-shes
->> a bit further:
->> - we can now run other archs
->> - Avocado is integrated into Travis CI
->>
->> I'm not sure Travis is the best CI available for those tests, but it r=
-uns
->> quite fast:
->>
->>       ...
->>       LINK    x86_64-softmmu/qemu-system-x86_64
->>     JOB ID     : a3a56af3c02d193e862ce660aae1d9c72926dcb6
->>     JOB LOG    : /home/travis/avocado/job-results/job-2018-06-21T23.49=
--a3a56af/job.log
->>      (1/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleX86_=
-64.test:  PASS (3.89 s)
->>      (2/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleMips=
-.test:  PASS (1.83 s)
->>      (3/7) tests/acceptance/version.py:Version.test_qmp_human_info_ver=
-sion:  PASS (0.05 s)
->>      (4/7) tests/acceptance/vnc.py:Vnc.test_no_vnc:  PASS (0.04 s)
->>      (5/7) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password:  P=
-ASS (0.04 s)
->>      (6/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requir=
-es_a_password:  PASS (0.05 s)
->>      (7/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password:  PASS=
- (0.05 s)
->>     RESULTS    : PASS 7 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRU=
-PT 0 | CANCEL 0
->>     JOB TIME   : 6.21 s
->=20
-> Hmm however if I do:
->=20
->    pip install --user avocado-framework
->    avocado run tests/acceptance
->=20
-> I get:
->=20
->    Failed to load plugin from module "avocado_vt.plugins.vt_list": Impo=
-rtError('No module named netaddr',)
->    Failed to load plugin from module "avocado_vt.plugins.vt": ImportErr=
-or('No module named netaddr',)
->    Failed to load plugin from module "avocado_vt.plugins.vt_bootstrap":=
- OSError(13, 'Permission denied')
+>> To be more accurate on its purpose and make code that looks for a certain
+>> target out of this variable more readable.
+>
+> This breaks the Docker mingw build, because the full list of targets
+> used on the host is passed to the container.  This includes linux-user
+> targets which do not exist on non-Linux.
 
-Alex,
+Ahh I hadn't noticed because we are not building the fill set on
+shippable:
 
-These are errors related to your installation of Avocado-*VT*[1].
+  https://app.shippable.com/github/qemu/qemu/runs/1046/2/console
 
->    Error running method "run" of plugin "virt": 'Namespace' object has =
-no attribute 'default_avocado_params'
->    Avocado crashed unexpectedly: [Errno 13] Permission denied: '/var/li=
-b/libvirt/images/avocado_sg6NRi'
->    You can find details in /var/tmp/avocado-traceback-2018-06-28_16:44:=
-25-DGb1CG.log
->=20
+>
+> Paolo
+>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 6d588d1f71..023b3437ec 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can =
+fix this by running \
+>>  endif
+>>  endif
+>>
+>> -CONFIG_SOFTMMU :=3D $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
+>> -CONFIG_USER_ONLY :=3D $(if $(filter %-user,$(TARGET_DIRS)),y)
+>> +CONFIG_SOFTMMU :=3D $(if $(filter %-softmmu,$(TARGET_LIST)),y)
+>> +CONFIG_USER_ONLY :=3D $(if $(filter %-user,$(TARGET_LIST)),y)
+>>  CONFIG_XEN :=3D $(CONFIG_XEN_BACKEND)
+>>  CONFIG_ALL=3Dy
+>>  -include config-all-devices.mak
+>> @@ -366,8 +366,8 @@ DOCS=3D
+>>  endif
+>>
+>>  SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory --quiet) BUILD_DIR=
+=3D$(BUILD_DIR)
+>> -SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
+>> -SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGET=
+_DIRS))
+>> +SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
+>> +SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGET=
+_LIST))
+>>
+>>  ifeq ($(SUBDIR_DEVICES_MAK),)
+>>  config-all-devices.mak:
+>> @@ -470,7 +470,7 @@ config-host.h-timestamp: config-host.mak
+>>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
+"$@")
+>>
+>> -SUBDIR_RULES=3D$(patsubst %,subdir-%, $(TARGET_DIRS))
+>> +SUBDIR_RULES=3D$(patsubst %,subdir-%, $(TARGET_LIST))
+>>  SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_RULES))
+>>
+>>  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+>> @@ -514,7 +514,7 @@ ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+>>  romsubdir-%:
+>>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V=3D"$(=
+V)" TARGET_DIR=3D"$*/" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
+>>
+>> -ALL_SUBDIRS=3D$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
+>> +ALL_SUBDIRS=3D$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
+>>
+>>  recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+>>
+>> @@ -772,7 +772,7 @@ distclean: clean
+>>  	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+>>  	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+>>  	rm -f docs/qemu-block-drivers.7
+>> -	for d in $(TARGET_DIRS); do \
+>> +	for d in $(TARGET_LIST); do \
+>>  	rm -rf $$d || exit 1 ; \
+>>          done
+>>  	rm -Rf .sdk
+>> @@ -873,7 +873,7 @@ endif
+>>  		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_dat=
+adir)/keymaps"; \
+>>  	done
+>>  	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadi=
+r)/trace-events-all"
+>> -	for d in $(TARGET_DIRS); do \
+>> +	for d in $(TARGET_LIST); do \
+>>  	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=3D$$d/ -C $$d $@ || exit 1 ; \
+>>          done
+>>
+>> @@ -1071,9 +1071,9 @@ endif
+>>  	@echo  '  ctags/TAGS      - Generate tags file for editors'
+>>  	@echo  '  cscope          - Generate cscope index'
+>>  	@echo  ''
+>> -	@$(if $(TARGET_DIRS), \
+>> +	@$(if $(TARGET_LIST), \
+>>  		echo 'Architecture specific targets:'; \
+>> -		$(foreach t, $(TARGET_DIRS), \
+>> +		$(foreach t, $(TARGET_LIST), \
+>>  		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);)=
+ \
+>>  		echo '')
+>>  	@echo  'Cleaning targets:'
+>> diff --git a/configure b/configure
+>> index db8c9d8288..14b11130a7 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -6128,7 +6128,7 @@ qemu_version=3D$(head $source_path/VERSION)
+>>  echo "VERSION=3D$qemu_version" >>$config_host_mak
+>>  echo "PKGVERSION=3D$pkgversion" >>$config_host_mak
+>>  echo "SRC_PATH=3D$source_path" >> $config_host_mak
+>> -echo "TARGET_DIRS=3D$target_list" >> $config_host_mak
+>> +echo "TARGET_LIST=3D$target_list" >> $config_host_mak
+>>  if [ "$docs" =3D "yes" ] ; then
+>>    echo "BUILD_DOCS=3Dyes" >> $config_host_mak
+>>  fi
+>> diff --git a/scripts/create_config b/scripts/create_config
+>> index d727e5e36e..58948a67a4 100755
+>> --- a/scripts/create_config
+>> +++ b/scripts/create_config
+>> @@ -107,7 +107,7 @@ case $line in
+>>      target_name=3D${line#*=3D}
+>>      echo "#define TARGET_NAME \"$target_name\""
+>>      ;;
+>> - TARGET_DIRS=3D*)
+>> + TARGET_LIST=3D*)
+>>      # do nothing
+>>      ;;
+>>   TARGET_*=3Dy) # configuration
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 86f90c0cb0..9854e7794b 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -858,7 +858,7 @@ endif
+>>
+>>  # QTest rules
+>>
+>> -TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+>> +TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
+>>  ifeq ($(CONFIG_POSIX),y)
+>>  QTEST_TARGETS =3D $(TARGETS)
+>>  check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
+>>
 
-And these from Avocado-*Virt*[2].  Neither of those are used in the
-tests under "tests/acceptance".
 
-> Which I seem to remember from last time I looked into this. I think
-> avocado makes a bunch of assumptions about the filesystem and OS layout
-> which is hard to gloss over for something you should be able to run
-> straight out of the source tree.
->=20
->=20
-
-These Avocado-*VT* issues deserve a better look indeed.  Would you
-please describe (if not here, under a GH issue) your environment?
-
-Thanks,
-- Cleber.
-
-[1] - https://github.com/avocado-framework/avocado-vt
-[2] - https://github.com/avocado-framework/avocado-virt
-
->>
->>     Done. Your build exited with 0.
->>
->>     Job ran for 5 min 34 sec
->>
->> I couldn't add the Alpha tests because all the vmlinux kernels I found
->> online are gzipped, so I'm waiting some upstream Avocado merges before=
-.
->>
->> Cleber: I hope you can help me pythonizing this series :p
->>
->> Regards,
->>
->> Phil.
->>
->> [0]: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg04531.=
-html
->> [1]: http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg03076.=
-html
->>
->> Philippe Mathieu-Daud=C3=A9 (6):
->>   avocado: Add a Test.arch property
->>   tests/acceptance: Rename the x86-64 specific BootLinuxConsole test
->>   tests/acceptance: Improve the Avocado tags
->>   tests/acceptance: Add a BootLinuxConsoleMips test
->>   tests/acceptance: Add a kludge to not use the default console
->>   travis: Add Avocado tests
->>
->>  .travis.yml                               |  8 +++++
->>  scripts/qemu.py                           |  6 ++--
->>  tests/acceptance/avocado_qemu/__init__.py | 17 ++++++---
->>  tests/acceptance/boot_linux_console.py    | 44 +++++++++++++++++++++-=
--
->>  4 files changed, 67 insertions(+), 8 deletions(-)
->=20
->=20
-> --
-> Alex Benn=C3=A9e
->=20
-
---=20
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+--
+Alex Benn=C3=A9e
