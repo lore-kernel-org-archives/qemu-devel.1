@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYeiF-00076l-OC
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:44:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYemI-0000KA-Fd
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYeiC-0006l8-JU
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:44:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37876 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYeiC-0006iA-Du
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:44:20 -0400
-References: <20180626151038.24771-1-sameeh@daynix.com>
-	<20180626151038.24771-2-sameeh@daynix.com>
+	(envelope-from <eblake@redhat.com>) id 1fYemH-0005Tl-GQ
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:48:34 -0400
+References: <20180628000745.4477-1-mreitz@redhat.com>
+	<20180628000745.4477-2-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <5e9b9ca6-b493-d10b-be98-9b9eb480c685@redhat.com>
-Date: Thu, 28 Jun 2018 16:44:18 -0500
+Message-ID: <6a7f4509-3a89-f35e-9505-c2a3481b9a2c@redhat.com>
+Date: Thu, 28 Jun 2018 16:48:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180626151038.24771-2-sameeh@daynix.com>
+In-Reply-To: <20180628000745.4477-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] qga-win: prevent crash when executing
- fsinfo command
+Subject: Re: [Qemu-devel] [PATCH v9 01/31] block: Use
+ bdrv_refresh_filename() to pull
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On 06/26/2018 10:10 AM, Sameeh Jubran wrote:
-> From: Sameeh Jubran <sjubran@redhat.com>
+On 06/27/2018 07:07 PM, Max Reitz wrote:
+> Before this patch, bdrv_refresh_filename() is used in a pushing manner:
+> Whenever the BDS graph is modified, the parents of the modified edges
+> are supposed to be updated (recursively upwards).  However, that is
+> unviable, considering that we want child changes not to concern parents.
+
+s/unviable/nonviable/
+
 > 
-> The fsinfo command is currently implemented for Windows only and it's disk
-> parameter can be enabled by adding the define "CONFIG_QGA_NTDDSCSI" to the qga
-> code. When enabled and executed the qemu-ga crashed with the following message:
+> Also, in the long run we want a pull model anyway: Here, we would have a
+> bdrv_filename() function which returns a BDS's filename, freshly
+> constructed.
 > 
-> ------------------------------------------------
-> File qapi/qapi-visit-core.c, Line 49
+> This patch is an intermediate step.  It adds bdrv_refresh_filename()
+> calls before every place a BDS.filename value is used.  The only
+> exceptions are protocol drivers that use their own filename, which
+> clearly would not profit from refreshing that filename before.
 > 
-> Expression: !(v->type & VISITOR_OUTPUT) || *obj)
-> ------------------------------------------------
+> Also, bdrv_get_encrypted_filename() is removed along the way (as a user
+> of BDS.filename), since it is completely unused.
 > 
-> After some digging, turns out that the GuestPCIAddress is null and the
-> qapi visitor doesn't like that, so we can always allocate it instead and
-> initiate all it's members to -1.
-
-Adding Markus for a qapi back-compat question.
-
-Is faking an invalid address better than making the output optional instead?
-
-> +++ b/qga/commands-win32.c
-> @@ -485,6 +485,11 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
->       char *buffer = NULL;
->       GuestPCIAddress *pci = NULL;
->       char *name = g_strdup(&guid[4]);
-> +    pci = g_malloc0(sizeof(*pci));
-> +    pci->domain = -1;
-> +    pci->slot = -1;
-> +    pci->function = -1;
-> +    pci->bus = -1;
-
-Right now, we have:
-
-##
-# @GuestDiskAddress:
-#
-# @pci-controller: controller's PCI address
-# @bus-type: bus type
-# @bus: bus id
-# @target: target id
-# @unit: unit id
-#
-# Since: 2.2
-##
-{ 'struct': 'GuestDiskAddress',
-   'data': {'pci-controller': 'GuestPCIAddress',
-            'bus-type': 'GuestDiskBusType',
-            'bus': 'int', 'target': 'int', 'unit': 'int'} }
-
-and the problem you ran into is that under certain conditions, we have 
-no idea what to populate in GuestPCIAddress.  Your patch populates 
-garbage instead; but I'm wondering if it would be better to instead mark 
-pci-controller as optional, where code that CAN populate it would set 
-has_pci_controller=true, and the code that crashed will now work by 
-leaving the struct NULL (and has_pci_controller=false).  But that 
-removes output that the client may expect to be present, hence, this is 
-a back-compat question of the best way to approach this.
+> In turn, all of the calls to bdrv_refresh_filename() before this patch
+> are removed, because we no longer have to call this function on graph
+> changes.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
