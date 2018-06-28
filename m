@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fYUQu-0004Nw-07
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:45:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYUSG-000517-Ad
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fYUQq-0004gF-21
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:45:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59512 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fYUSF-0006uq-88
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:47:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39124 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYUQp-0004fG-SX
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:45:43 -0400
-References: <20180626143538.5390-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYUSF-0006tn-2P
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:47:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9C57187A80
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 10:47:10 +0000 (UTC)
+References: <1529917512-10528-1-git-send-email-thuth@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f085e4db-2409-ec41-b3b6-32ec1025d151@redhat.com>
-Date: Thu, 28 Jun 2018 12:45:40 +0200
+Message-ID: <b287e286-d1b6-eed0-5d97-98277305384a@redhat.com>
+Date: Thu, 28 Jun 2018 12:47:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180626143538.5390-1-alex.bennee@linaro.org>
+In-Reply-To: <1529917512-10528-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] blogposts: add post about the new
- check-tcg infrastructure
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] hw/i386: Deprecate the machine types
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,128 +34,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
-On 26/06/2018 16:35, Alex Benn=C3=A9e wrote:
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On 25/06/2018 11:05, Thomas Huth wrote:
+> The oldest machine type which is still used in a still maintained distro
+> is a pc-0.12 based machine type in RHEL6, so everything that is older
+> than pc-0.12 should not be used anymore. Thus let's deprecate pc-0.10
+> and pc-0.11 so that we can finally remove them in a future release.
+> 
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  This is based on a patch that I already sent in 2017. But back then, we
+>  were still in progress of discussing our deprecation policies (e.g. auto-
+>  matic deprecation for old machine types), and there was no clear consensus
+>  whether we should deprecate 0.10 - 0.11, all 0.x or even up to version 1.2.
+>  After some iterations and too much discussion, I've forgotten about this
+>  patch. Anyway, I think we agreed that at least 0.10 and 0.11 can certainly
+>  be removed nowadays, so let's finally get at least those two machine types
+>  marked as deprecated! If there is not too much bikeshed-painting discussions
+>  anymore and the patch gets finally accepted and we will finally have removed
+>  these two types in v3.2, we can resume the discussion about newer machine
+>  types afterwards.
+> 
+>  Note: I don't want to add a QMP interface for this in this patch here,
+>  let's keep this small and simple! If we decide that we need a QMP interface,
+>  we can do that with a separate patch later.
 
-Pushed with a little bit of editing, thanks!
+Queued, thanks.
 
-diff --git a/_posts/2018-06-21-tcg-testing.md b/_posts/2018-06-28-tcg-tes=
-ting.md
-similarity index 83%
-rename from _posts/2018-06-21-tcg-testing.md
-rename to _posts/2018-06-28-tcg-testing.md
-index e61312e..026e726 100644
---- a/_posts/2018-06-21-tcg-testing.md
-+++ b/_posts/2018-06-28-tcg-testing.md
-@@ -7,39 +7,39 @@ author: Alex Benn=C3=83=C2=A9e
- categories: [testing, docker, compilation, tcg]
- ---
-=20
--Ever since I started working on QEMU there was a small directory
--called tests/tcg that was in a perpetually broken state. It contains
-+Ever since I started working on QEMU, a small directory
-+called `tests/tcg` has been in a perpetually broken state. It contains
- tests that exercise QEMU's ability to work across architectures using
- the power of the Tiny Code Generator. However as these tests needed to
- be compiled for the *guest* architectures and not the *host*
--architecture - known as cross-compiling - most developers never ran
--them. As the tests were hardly ever built inevitably a certain amount
--of bit-rot set in.
-+architecture&mdash;this is known as cross-compiling&mdash;most developer=
-s
-+never ran them. As the tests were hardly ever built inevitably a certain
-+amount of bit-rot set in.
-=20
- # Cross Compilers
-=20
--In the old days cross-compilation setups were almost all hand-crafted
-+In the old days, cross-compilation setups were almost all hand-crafted
- affairs which involved building versions of binutils, gcc and a basic
--libc. If you couldn't get someone to give you a pre-built tarball it
-+libc. If you couldn't get someone to give you a pre-built tarball, it
- was something you laboured through once and hopefully never had to
- touch again. There were even dedicated scripts like crosstool-ng which
- attempted to make the process of patching and configuring your
- toolchain easier.
-=20
- While the distributions have improved their support for cross
--compilers over the years there are still plenty of variations in how
-+compilers over the years, there are still plenty of variations in how
- they are deployed. It is hard for a project like QEMU which has to
- build on a wide range of operating systems and architectures to
- seamlessly use any given distributions compiler setup. However for
--those with cross compilers to hand `configure` now accepts two
-+those with cross compilers at hand `configure` now accepts two
- additional flags:
-=20
-     --cross-cc-$(ARCH)
-     --cross-cc-flags-$(ARCH)
-=20
- With a compiler specified for each guest architecture you want to test
--the build system can now build and run the tests. However for
--developers that don't have cross compilers around they can now take
-+the build system can now build and run the tests. For
-+developers that don't have cross compilers around, they can take
- advantage of QEMU's docker images.
-=20
- # Enter Docker Containers
-@@ -66,11 +66,11 @@ instead of tracking down a piece of ARM hardware to a=
-ctually build on.
- Run `make docker` in your source tree to see the range of builds and
- tests it can support.
-=20
--# make check-tcg
-+# `make check-tcg`
-=20
- With the latest work [merged into
- master](https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dde44c044420d11=
-39480fa50c2d5be19223391218) we can now
--take advantage of both hand configured and docker based cross
-+take advantage of either hand-configured and Docker-based cross
- compilers to build test cases for TCG again. To run the TCG tests
- after you have built QEMU:
-=20
-@@ -79,16 +79,16 @@ after you have built QEMU:
- and the build system will build and run all the tests it can for your
- configured targets.
-=20
--# Rules for tests/tcg
-+# Rules for `tests/tcg`
-=20
- So now we have the infrastructure in place to add new tests what rules
- need to be followed to add new tests?=20
-=20
--Well the first thing to note is currently all the tests are for
--linux-user versions of QEMU. This means the tests are all currently
-+Well the first thing to note is currently all the tests are for the
-+`linux-user` variant of QEMU. This means the tests are all currently
- user-space tests that have access to the Linux syscall ABI.
-=20
--Another thing to note is the tests are standalone from the rest of the
-+Another thing to note is the tests are separate from the rest of the
- QEMU test infrastructure. To keep things simple they are compiled as
- standalone "static" binaries. As the cross-compilation setup can be
- quite rudimentary for some of the rarer architectures we only compile
-@@ -99,10 +99,10 @@ glibc so shouldn't be a problem.
- Finally when writing new tests consider if it really is architecture
- specific or can be added to `tests/tcg/multiarch`. The multiarch tests
- are re-built for every supported architecture and should be the
--default place for anything explicitly testing syscalls and other
-+default place for anything that tests syscalls or other
- common parts of the code base.
-=20
--# What's Next
-+# What's next
-=20
- My hope with this work is we can start adding more tests to
- systematically defend functionality in linux-user. In fact I hope the
-@@ -135,5 +135,3 @@ status over a simple serial link which will need to b=
-e parsed and
- handled in custom versions of the
- [`run-%:`](https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dtests/tcg/Mak=
-efile;h=3Dbf064153900a438e4ad8e2d79eaaac8a27d66062;hb=3DHEAD#l95)
- rule.
--
--
+Paolo
+
+>  v4:
+>  - Shorten the deprecation message as requested by Markus
+>  - Added Eduardo's Reviewed-by
+> 
+>  v3:
+>  - Do not print the deprecation messages if qtest_enabled()
+> 
+>  v2:
+>  - Renamed deprecation_msg to deprecation_reason
+>  - Added information about that field to the MachineClass comment
+> 
+>  hw/i386/pc_piix.c   |  1 +
+>  include/hw/boards.h |  3 +++
+>  qemu-doc.texi       |  5 +++++
+>  vl.c                | 10 ++++++++--
+>  4 files changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index e9b6f06..d357907 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -956,6 +956,7 @@ static void pc_i440fx_0_11_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_0_12_machine_options(m);
+>      m->hw_version = "0.11";
+> +    m->deprecation_reason = "use a newer machine type instead";
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+>  }
+>  
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index ef7457f..79069dd 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -107,6 +107,8 @@ typedef struct {
+>  
+>  /**
+>   * MachineClass:
+> + * @deprecation_reason: If set, the machine is marked as deprecated. The
+> + *    string should provide some clear information about what to use instead.
+>   * @max_cpus: maximum number of CPUs supported. Default: 1
+>   * @min_cpus: minimum number of CPUs supported. Default: 1
+>   * @default_cpus: number of CPUs instantiated if none are specified. Default: 1
+> @@ -166,6 +168,7 @@ struct MachineClass {
+>      char *name;
+>      const char *alias;
+>      const char *desc;
+> +    const char *deprecation_reason;
+>  
+>      void (*init)(MachineState *state);
+>      void (*reset)(void);
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 282bc3d..16fcb47 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2943,6 +2943,11 @@ support page sizes < 4096 any longer.
+>  
+>  @section System emulator machines
+>  
+> +@subsection pc-0.10 and pc-0.11 (since 3.0)
+> +
+> +These machine types are very old and likely can not be used for live migration
+> +from old QEMU versions anymore. A newer machine type should be used instead.
+> +
+>  @section Device options
+>  
+>  @subsection Block device options
+> diff --git a/vl.c b/vl.c
+> index d451f45..5d8a9df 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2560,8 +2560,9 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+>              if (mc->alias) {
+>                  printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
+>              }
+> -            printf("%-20s %s%s\n", mc->name, mc->desc,
+> -                   mc->is_default ? " (default)" : "");
+> +            printf("%-20s %s%s%s\n", mc->name, mc->desc,
+> +                   mc->is_default ? " (default)" : "",
+> +                   mc->deprecation_reason ? " (deprecated)" : "");
+>          }
+>      }
+>  
+> @@ -4257,6 +4258,11 @@ int main(int argc, char **argv, char **envp)
+>  
+>      configure_accelerator(current_machine);
+>  
+> +    if (!qtest_enabled() && machine_class->deprecation_reason) {
+> +        error_report("Machine type '%s' is deprecated: %s",
+> +                     machine_class->name, machine_class->deprecation_reason);
+> +    }
+> +
+>      /*
+>       * Register all the global properties, including accel properties,
+>       * machine properties, and user-specified ones.
+> 
