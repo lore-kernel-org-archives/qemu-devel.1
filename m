@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fYVIO-0003jb-AI
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:41:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYVKN-0005Ca-0k
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:43:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fYVIL-0002ym-6X
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:41:04 -0400
-Message-ID: <597423567e18da819be8174ff593a2cb4b08517d.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 28 Jun 2018 13:40:55 +0200
-In-Reply-To: <f1175077-6eab-036f-7aa2-d06f2f4dfa1e@kaod.org>
-References: <20180626135928.23950-1-clg@kaod.org>
-	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
-	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
-	<8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
-	<20180628035909.GE23134@umbus.fritz.box>
-	<b84cc6b91f3af188c3eece0713f849031c5256c8.camel@redhat.com>
-	<f1175077-6eab-036f-7aa2-d06f2f4dfa1e@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
- Host bridge
+	(envelope-from <eblake@redhat.com>) id 1fYVKK-0004jW-6E
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:43:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35652 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYVKK-0004iK-1S
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:43:04 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D04FF407529E
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:43:02 +0000 (UTC)
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org>
+	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
+	<87wouk8vul.fsf@dusky.pond.sub.org> <20180627102043.GD30628@redhat.com>
+	<8760248odg.fsf@dusky.pond.sub.org> <20180627120733.GD2516@xz-mi>
+	<877emj5rij.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ae282736-b3bd-d1ac-142e-d7394b5efbb6@redhat.com>
+Date: Thu, 28 Jun 2018 06:43:01 -0500
+MIME-Version: 1.0
+In-Reply-To: <877emj5rij.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +38,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, 2018-06-28 at 12:04 +0200, C=C3=A9dric Le Goater wrote:
-> On 06/28/2018 10:00 AM, Andrea Bolognani wrote:
-> > On Thu, 2018-06-28 at 13:59 +1000, David Gibson wrote:
-> > > Well.. sure.. but it doesn't.  pSeries is a virtual platform, so we
-> > > have a reasonable amount of flexibility to define it as we want.
-> > > PowerNV is an emulation of existing hardware which has a specific
-> > > behaviour which we need to match.
-> >=20
-> > Sure, that's something to keep in mind.
-> >=20
-> > But the thing is, you still need to have *some* flexibility in
-> > the number of PHBs, since there is variation among real Power8
-> > and Power9 chips; in the current incarnation, that flexibility
-> > is provided by the num_phbs parameter, which is an entirely new
-> > interface that's exclusive to PowerNV.
-> >=20
-> > What I'm suggesting is that the same amount of flexibility is
-> > offered through a standard interface, namely -device, instead.
->=20
-> Yes. I don't know to be honest. Adding support for -device is not=20
-> complex.
->=20
-> v2 proposes to initialize a fixed set of PHBs 2, 3, 4 depending on=20
-> the CPU. I think this is the best modeling option to fit the HW.
+On 06/28/2018 01:55 AM, Markus Armbruster wrote:
 
-That approach would require even more hacks in libvirt if we ever
-wanted to support PowerNV - basing the PCI address allocation on
-the CPU model is not something that's really ever happened before.
+> Changing an existing event from broadcast to unicast is an observable
+> change in existing behavior.  Compatibility break unless we can show
+> nobody can use / uses the observation.
 
-To make it somewhat reasonable, information about the number of
-PHBs created for each CPU model would have to be exposed through
-QMP. And I wonder what a multi-chip guest would look like...
+And no one could have been relying on the broadcast COMMAND_DROPPED 
+event semantics, since OOB was previously experimental and since we just 
+proved that they are wrong if not limited to one monitor.
 
-Plus, as soon as you try something like
+> 
+> Creating a new event is not a compatibility break by itself[*],
+> regardless of broadcast vs. unicast.
+> 
+>> My current plan is that I can touch up scripts/qapi/events.py and
+>> related stuff to allow QMPEventFuncEmit to take a monitor parameter,
+>> then we pass in NULL when we want to send the event to all monitors.
+>>
+>> Would that work?
+> 
+> Think so.
+> 
+> Alternatively, a pair of functions:
+> 
+>      void qapi_event_bcast_EVENT(... event params ..., Error **errp);
+>      void qapi_event_send_EVENT(Monitor *mon, ... event params ..., Error **errp);
+> 
+> Slightly more compact in the broadcast case, might be a bit easier to
+> read.
 
-  $ qemu-system-ppc64 \
-    -nodefaults -display none \
-    -machine powernv -cpu POWER8E \
-    -device pci-bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1 \
-    -device megasas,id=3Dscsi0,bus=3Dpci.1,addr=3D0x1
+Also, fewer NULL arguments to add into existing call sites (although 
+existing call sites would change to use the _bcast_ form, so you're 
+already touching all call sites, which brings back the topic from the 
+other mail on dropping useless errp while at it).
 
-very interesting things will start happening :)
+> 
+> 
+> [*] In the case of COMMAND_DROPPED, the compatibility break is dropping
+> commands (the event's trigger), caused by the command queuing feature.
+> That's why command queuing has to be opt-in.  Details discussed
+> elsewhere in this thread.
 
---=20
-Andrea Bolognani / Red Hat / Virtualization
+Indeed, and I thought the conclusion there was that we DO promise that 
+COMMAND_DROPPED (and dropped commands in general) won't happen unless 
+you negotiate oob at initial connection.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
