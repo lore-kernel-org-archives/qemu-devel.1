@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYXho-0000Ao-30
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:15:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYXjW-0000td-UY
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYXhm-0007qy-Ui
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:15:27 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44135)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYXjS-00024E-00
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:17:14 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:42852)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYXhm-0007pm-PR
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:15:26 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s198-v6so1448695oih.11
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 07:15:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYXjR-00023i-RO
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:17:09 -0400
+Received: by mail-qt0-x242.google.com with SMTP id y31-v6so4833249qty.9
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 07:17:09 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180627212152.26525-1-laurent@vivier.eu>
+	<20180627212152.26525-2-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0f465bb6-317e-b664-3dc7-688471482673@amsat.org>
+Date: Thu, 28 Jun 2018 11:16:32 -0300
 MIME-Version: 1.0
-In-Reply-To: <1530044492-24921-1-git-send-email-eric.auger@redhat.com>
-References: <1530044492-24921-1-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 15:15:05 +0100
-Message-ID: <CAFEAcA9v4J8v8Z35LzqfeVBFRa6Vsbp0jfddk8Tg1yzZpJSjig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] ARM virt: Silence dtc warnings
+In-Reply-To: <20180627212152.26525-2-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: add netlink
+ CARRIER_UP_COUNT/CARRIER_DOWN_COUNT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +36,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-On 26 June 2018 at 21:21, Eric Auger <eric.auger@redhat.com> wrote:
-> When running dtc on the guest /proc/device-tree, we get the
-> following warnings: "Warning (unit_address_vs_reg): Node <name>
-> has a reg or ranges property, but no unit name", with name:
-> /intc, /intc/its, /intc/v2m, /memory.
->
-> This series removes those warnings by adding the unit address to
-> the corresponding node names.
->
-> This is based on Peter's target-arm.next
->
-> Best Regards
->
+On 06/27/2018 06:21 PM, Laurent Vivier wrote:
+> Error is reported with libuv test suite:
+> 
+>  not ok 311 - udp_multicast_interface6
+>  # exit code 134
+>  # Output from process `udp_multicast_interface6`:
+>  # Unknown host QEMU_IFLA type: 47
+>  # Unknown host QEMU_IFLA type: 48
+>  # Unknown host QEMU_IFLA type: 47
+>  # Unknown host QEMU_IFLA type: 48
+>  # Unknown host QEMU_IFLA type: 47
+>  # Unknown host QEMU_IFLA type: 48
+>  # Unknown host QEMU_IFLA type: 47
+>  # Unknown host QEMU_IFLA type: 48
+>  # Unknown host QEMU_IFLA type: 47
+>  # Unknown host QEMU_IFLA type: 48
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Applied to target-arm.next, thanks.
-
--- PMM
+> ---
+>  linux-user/syscall.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 2117fb13b4..4460f1e39a 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2522,6 +2522,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+>      case QEMU_IFLA_NUM_VF:
+>      case QEMU_IFLA_GSO_MAX_SEGS:
+>      case QEMU_IFLA_GSO_MAX_SIZE:
+> +    case QEMU_IFLA_CARRIER_UP_COUNT:
+> +    case QEMU_IFLA_CARRIER_DOWN_COUNT:
+>          u32 = RTA_DATA(rtattr);
+>          *u32 = tswap32(*u32);
+>          break;
+> 
