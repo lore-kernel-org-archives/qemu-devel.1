@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fYTF9-0001bd-Qv
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:29:37 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fYTGC-0002GT-Me
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fYTF6-0000wY-Jl
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:29:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43724 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fYTF6-0000ve-Dc
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:29:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4CCC4007861
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:29:31 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87po0cad8n.fsf_-_@dusky.pond.sub.org>
-	<871scsaapo.fsf@dusky.pond.sub.org> <20180627123228.GE2516@xz-mi>
-Date: Thu, 28 Jun 2018 11:29:30 +0200
-In-Reply-To: <20180627123228.GE2516@xz-mi> (Peter Xu's message of "Wed, 27 Jun
-	2018 20:32:28 +0800")
-Message-ID: <87r2kr2r9h.fsf@dusky.pond.sub.org>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fYTGA-0002b6-9E
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:30:40 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36732)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fYTG9-0002a7-Qy
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:30:38 -0400
+Received: by mail-it0-x242.google.com with SMTP id j135-v6so11555001itj.1
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 02:30:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+In-Reply-To: <20180628081216.GA2536@work-vm>
+References: <1530094388-607-1-git-send-email-hongbo.zhang@linaro.org>
+	<20180627123116.GB2424@work-vm>
+	<CAHmQWvB2tPRXHOm08CQ+2R34gepULw8+pvKPa693coFbs-YvZg@mail.gmail.com>
+	<20180628081216.GA2536@work-vm>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 28 Jun 2018 17:30:36 +0800
+Message-ID: <CAHmQWvDnzxv1yJrisu1mF0o-p+Pfnq_q5s9ZbzAn--Zhdnf_ww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Add SBSA machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,168 +31,459 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, jsnow@redhat.com
 
-Peter Xu <peterx@redhat.com> writes:
-
-> On Wed, Jun 27, 2018 at 10:35:15AM +0200, Markus Armbruster wrote:
->> Markus Armbruster <armbru@redhat.com> writes:
->> 
->> > Another lose end: event COMMAND_DROPPED seems to lack test coverage.
->> 
->> Hmm, dropping commands serves to limit the request queue.  What limits
->> the response queue?
+On 28 June 2018 at 16:12, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> * Hongbo Zhang (hongbo.zhang@linaro.org) wrote:
+>> On 27 June 2018 at 20:31, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>> > * Hongbo Zhang (hongbo.zhang@linaro.org) wrote:
+>> >> This patch introduces a new Arm machine type 'SBSA' with features:
+>> >>  - Based on legacy 'virt' machine type.
+>> >>  - Newly designed memory map.
+>> >>  - EL2 and EL3 are enabled by default.
+>> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
+>> >>    can be added to it.
+>> >>  - EHCI controller attached to system bus, with USB mouse and key board
+>> >>    installed by default.
+>> >>  - E1000 ethernet card on PCIE bus.
+>> >>  - VGA display adaptor on PCIE bus.
+>> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+>> >>  - No virtio functions enabled, since this is to emulate real hardware.
+>> >
+>> > I'm a bit confused; do you have real modern ARM hardware that has an
+>> > e1000 on it?  If I understand correctly, e1000 is the old PCI version
+>> > and the e1000e is at least the more modern PCIe version which makes
+>> > more sense if you're building on PCIe.
+>> > However, if you:
+>> >   a) Don't have real hardware with the e1000 on
+>> >   b) Do have PCIe
+>> >
+>> Thanks for review.
+>>
+>> Yes, e1000e is used on modern hardware PCIe, using e1000e can reflect
+>> the real world.
+>> I like e1000e too, but I checked q35, it still uses an e1000 attached
+>> to pcie bus.
 >
-> As long as we have a request queue limitation, that'll somehow be
-> "part of" the limitation of response queue.  Since the real responses
-> (let's not consider the events first) should be no more than the
-> maximum QMP requests that we allow in the request queue (one response
-> for one request).  In that sense it seems fine to me.
-
-"Normal" flow of the request through the server (QEMU):
-
-    receive
- -> handle_qmp_command()
-
- -> request queue: mon->qmp.qmp_requests
-
- -> monitor_qmp_bh_dispatcher()
- -> monitor_qmp_dispatch_one()
- -> monitor_qmp_respond()
- -> monitor_json_emitter()
-
- -> response queue: mon->qmp.qmp_requests
-
- -> monitor_qmp_response_pop_one()
- -> monitor_qmp_bh_responder()
- -> monitor_json_emitter_raw()
- -> monitor_puts()
-
- -> output buffer: mon->outbuf
-
- -> monitor_flush_locked()
-
-The purpose of event COMMAND_DROPPED is flow control notification: when
-the client sends more than we're willing to buffer, we drop the excess
-and notify the client.
-
-If the client sends too many requests too quickly, the request queue
-fills up, and flow control kicks in.  Good.
-
-As long as the client sends requests at a moderate pace, the request
-queue never fills up: the dispatch & execute code sitting between
-request queue and response queue drains it just fine.
-
-The response queue proper also doesn't fill up: the emitter code sitting
-between response queue and output buffer drains it just fine.
-
-However, output buffer can still grow without bounds!
-monitor_flush_locked() requires the client to keep up to make progress.
-Our flow control fails then.
-
-Extreme case: a (misbehaving!) client that keeps sending requests at a
-moderate pace while not reading any responses.  output buffer grows
-without bounds.
-
-Less extreme case: a client sends a small number of requests quickly,
-then reads responses very slowly or not at all for some reason, say
-because the network goes bad right at this time.  Here, the size of the
-request queue does limit the size of output buffer, as you proposed, but
-the size multiplier isn't really known.
-
-My point is: the idea "limiting the request queue also limits the
-response queue + output buffer" isn't entirely wrong, but it's not
-entirely right, either.
-
-Can we improve flow control to cover the complete flow, not just the
-flow into the request queue?
-
->> Before OOB, the monitor read at most one command, and wrote its response
->> with monitor_puts().
->> 
->> For input, this leaves queueing to the kernel: if the client sends
->> commands faster than the server can execute them, eventually the kernel
->> refuses to buffer more, and the client's send either blocks or fails
->> with EAGAIN.
->> 
->> Output is a mess.  monitor_puts() uses an output buffer.  It tries to
->> flush at newline.  Issues:
->> 
->> * If flushing runs into a partial write, the unwritten remainder remains
->>   in the output buffer until the next newline.  That newline may take
->>   its own sweet time to arrive.
-
-Hmm, it's also flushed via mon->out_watch.  If that works how I guess it
-does, there's no deadlock.
-
->>                                  Could even lead to deadlocks, where a
->>   client awaits complete output before it sends more input.  Bug,
->>   predates OOB, doesn't block this series.
+> I think we think of that choice on q35 as a mistake / or we didn't
+> have e1000e at the time.  If you used an e1000e then people could
+> actually buy an e1000e card to plug into the test system to compare.
 >
-> True.  Though I noticed that we have a "hackish" line in
-> monitor_json_emitter_raw():
+Yes q35 is old, I just wanted some reference at the beginning.
+I re-checked latest kernel just now, arm64 defconfig has already added
+e1000e support, so considering use e1000e too in next iteration.
+
+Thanks.
+
+>> Another fact is, when compile the arm64 kernel by defconfig, the e1000
+>> isn't selected by default, but e1000e is.
+>> That is why I still chose e1000 here.
+>> (Maybe we can change the kernel defconfig to e1000e, then we chose
+>> e1000e here too)
+>>
+>> > then to my mind it makes sense to use virtio-net-pci rather than
+>> > an e1000e.
+>> >
+>> Well, this is to emulate a 'true' hardware for firmware etc
+>> development, primary purpose it to emulate hardware functions, not for
+>> performance, so virtio is disabled, some firmware, boot loaders etc
+>> may not work with virtio either, if people want virtio, they can use
+>> the legacy 'virt' machine.
 >
->     qstring_append_chr(json, '\n');
+> The virtio-mmio that the 'virt' machine has is quite odd; however
+> virtio-pci devices are much less special.
 >
-> So it seems that at least we should never encounter a deadlock, after
-> all there will always be a newline there. But I'd say I agree with you
-> on that it's at least not that "beautiful". :-)
-
-The newline ensures responses arrive on their own line.  JSON doesn't
-care about lines (makes sense), and qmp-spec.txt doesn't care, either
-(that's wrong, in my opinion).  Anyone playing with QMP by hand will
-definitely care.  Even QMP clients might.
-
-The newline also triggers the actual write(), because monitor_puts() is
-line-buffered.  That buffering makes sense for HMP, but it's useless for
-QMP.  Let's not worry about that right now.
-
-The flushing, however, is not guaranteed to write anything!  If
-qemu_chr_fe_write() fails with EAGAIN, mon->outbuf remains unchanged.
-
->> * If the client fails to read, the output buffer can grow without bound.
->>   Not a security issue; the client is trusted.  Just bad workmanship.
+> Dave
 >
-> True.
->
->> 
->> OOB doesn't change this for monitors running in the main thread.  Only
->> mux chardevs run there.
->> 
->> Aside: keeping special case code around just for mux is a really bad
->> idea.  We need to get rid of it.
->
-> We should be running the same code path even for MUX-ed typed, right?
-> Do you mean to put MUX-ed typed handling onto iothreads as well when
-> you say "get rid of it"?
-
-I figure I'll cover this in my reply to Daniel.  If not, I'll reply to
-this one again.
-
->> For monitors running in an I/O thread, we add another buffer: the
->> response queue.  It's drained by monitor_qmp_bh_responder().  I guess
->> that means the response queue is effectively bounded by timely draining.
->> Correct?
->
-> I don't see a timely manner to flush it, but as long as we queue
-> anything (including events) onto the response queue, we'll poke the
-> bottom half (in monitor_json_emitter() we call qemu_bh_schedule()) so
-> we'll possibly drain the queue very soon, and there should be no
-> chance to have a stale message in that queue.
-
-As long as bottom halves work, the response queue remains small.  That's
-okay.
-
->> Buffering twice seems silly, but that could be addressed in follow-up
->> patches.
->
-> Do you mean that we can write the response immediately into
-> Monitor.outbuf, then only flush it in iothread?  IMHO that's fine -
-> after all, the response queue, as mentioned above, should have a
-> natural restriction as well due to the request queue, then we won't
-> waste too much resources for that.  Meanwhile using a queue with QMP
-> response objects seems to be a bit more cleaner to me from design pov
-> (though I might be wrong).
-
-Again, let's not worry about this right now.
+>> > Dave
+>> >
+>> >> This is the prototype, more features can be added in futrue.
+>> >>
+>> >> Purpose of this is to have a standard QEMU platform for Arm firmware
+>> >> developement etc. where the legacy machines cannot meets requirements.
+>> >>
+>> >> Arm Trusted Firmware and UEFI porting to this are done seperately.
+>> >>
+>> >> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
+>> >> ---
+>> >>  hw/arm/virt-acpi-build.c |  59 +++++++++++++-
+>> >>  hw/arm/virt.c            | 196 ++++++++++++++++++++++++++++++++++++++++++++++-
+>> >>  include/hw/arm/virt.h    |   3 +
+>> >>  3 files changed, 254 insertions(+), 4 deletions(-)
+>> >>
+>> >> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> >> index 6ea47e2..60af414 100644
+>> >> --- a/hw/arm/virt-acpi-build.c
+>> >> +++ b/hw/arm/virt-acpi-build.c
+>> >> @@ -84,6 +84,52 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
+>> >>      aml_append(scope, dev);
+>> >>  }
+>> >>
+>> >> +static void acpi_dsdt_add_ahci(Aml *scope, const MemMapEntry *ahci_memmap,
+>> >> +                                           uint32_t ahci_irq)
+>> >> +{
+>> >> +    Aml *dev = aml_device("AHC0");
+>> >> +    aml_append(dev, aml_name_decl("_HID", aml_string("LNRO001E")));
+>> >> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+>> >> +    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+>> >> +
+>> >> +    Aml *crs = aml_resource_template();
+>> >> +    aml_append(crs, aml_memory32_fixed(ahci_memmap->base,
+>> >> +                                       ahci_memmap->size, AML_READ_WRITE));
+>> >> +    aml_append(crs,
+>> >> +               aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+>> >> +                             AML_EXCLUSIVE, &ahci_irq, 1));
+>> >> +    aml_append(dev, aml_name_decl("_CRS", crs));
+>> >> +
+>> >> +    Aml *pkg = aml_package(3);
+>> >> +    aml_append(pkg, aml_int(0x1));
+>> >> +    aml_append(pkg, aml_int(0x6));
+>> >> +    aml_append(pkg, aml_int(0x1));
+>> >> +
+>> >> +    /* append the SATA class id */
+>> >> +    aml_append(dev, aml_name_decl("_CLS", pkg));
+>> >> +
+>> >> +    aml_append(scope, dev);
+>> >> +}
+>> >> +
+>> >> +static void acpi_dsdt_add_ehci(Aml *scope, const MemMapEntry *ehci_memmap,
+>> >> +                                           uint32_t ehci_irq)
+>> >> +{
+>> >> +    Aml *dev = aml_device("EHC0");
+>> >> +    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0D20")));
+>> >> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+>> >> +    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+>> >> +
+>> >> +    Aml *crs = aml_resource_template();
+>> >> +    aml_append(crs, aml_memory32_fixed(ehci_memmap->base,
+>> >> +                                       ehci_memmap->size, AML_READ_WRITE));
+>> >> +    aml_append(crs,
+>> >> +               aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+>> >> +                             AML_EXCLUSIVE, &ehci_irq, 1));
+>> >> +    aml_append(dev, aml_name_decl("_CRS", crs));
+>> >> +
+>> >> +    aml_append(scope, dev);
+>> >> +}
+>> >> +
+>> >>  static void acpi_dsdt_add_fw_cfg(Aml *scope, const MemMapEntry *fw_cfg_memmap)
+>> >>  {
+>> >>      Aml *dev = aml_device("FWCF");
+>> >> @@ -768,14 +814,23 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>> >>                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
+>> >>      acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+>> >>      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+>> >> -    acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+>> >> -                    (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+>> >> +    if (!vms->sbsa) {
+>> >> +        acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+>> >> +                   (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+>> >> +    }
+>> >>      acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
+>> >>                        vms->highmem, vms->highmem_ecam);
+>> >>      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+>> >>                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+>> >>      acpi_dsdt_add_power_button(scope);
+>> >>
+>> >> +    if (vms->sbsa) {
+>> >> +        acpi_dsdt_add_ahci(scope, &memmap[VIRT_AHCI],
+>> >> +                           (irqmap[VIRT_AHCI] + ARM_SPI_BASE));
+>> >> +        acpi_dsdt_add_ehci(scope, &memmap[VIRT_EHCI],
+>> >> +                           (irqmap[VIRT_EHCI] + ARM_SPI_BASE));
+>> >> +    }
+>> >> +
+>> >>      aml_append(dsdt, scope);
+>> >>
+>> >>      /* copy AML table into ACPI tables blob and patch header there */
+>> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> >> index 742f68a..491f23b 100644
+>> >> --- a/hw/arm/virt.c
+>> >> +++ b/hw/arm/virt.c
+>> >> @@ -59,6 +59,10 @@
+>> >>  #include "qapi/visitor.h"
+>> >>  #include "standard-headers/linux/input.h"
+>> >>  #include "hw/arm/smmuv3.h"
+>> >> +#include "hw/ide/internal.h"
+>> >> +#include "hw/ide/ahci_internal.h"
+>> >> +#include "hw/usb.h"
+>> >> +#include "qemu/cutils.h"
+>> >>
+>> >>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>> >>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>> >> @@ -94,6 +98,8 @@
+>> >>
+>> >>  #define PLATFORM_BUS_NUM_IRQS 64
+>> >>
+>> >> +#define SATA_NUM_PORTS 6
+>> >> +
+>> >>  /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+>> >>   * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>> >>   * address space unallocated and free for future use between 256G and 512G.
+>> >> @@ -168,6 +174,47 @@ static const int a15irqmap[] = {
+>> >>      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+>> >>  };
+>> >>
+>> >> +static const MemMapEntry sbsa_memmap[] = {
+>> >> +    /* Space up to 0x8000000 is reserved for a boot ROM */
+>> >> +    [VIRT_FLASH] =              {          0, 0x08000000 },
+>> >> +    [VIRT_CPUPERIPHS] =         { 0x08000000, 0x00020000 },
+>> >> +    /* GIC distributor and CPU interfaces sit inside the CPU peripheral space */
+>> >> +    [VIRT_GIC_DIST] =           { 0x08000000, 0x00010000 },
+>> >> +    [VIRT_GIC_CPU] =            { 0x08010000, 0x00010000 },
+>> >> +    [VIRT_GIC_V2M] =            { 0x08020000, 0x00001000 },
+>> >> +    /* The space in between here is reserved for GICv3 CPU/vCPU/HYP */
+>> >> +    [VIRT_GIC_ITS] =            { 0x08080000, 0x00020000 },
+>> >> +    /* This redistributor space allows up to 2*64kB*123 CPUs */
+>> >> +    [VIRT_GIC_REDIST] =         { 0x080A0000, 0x00F60000 },
+>> >> +    [VIRT_UART] =               { 0x09000000, 0x00001000 },
+>> >> +    [VIRT_RTC] =                { 0x09010000, 0x00001000 },
+>> >> +    [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
+>> >> +    [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+>> >> +    [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+>> >> +    [VIRT_AHCI] =               { 0x09050000, 0x00010000 },
+>> >> +    [VIRT_EHCI] =               { 0x09060000, 0x00010000 },
+>> >> +    [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+>> >> +    [VIRT_SECURE_MEM] =         { 0x0e000000, 0x01000000 },
+>> >> +    [VIRT_PCIE_MMIO] =          { 0x10000000, 0x7fff0000 },
+>> >> +    [VIRT_PCIE_PIO] =           { 0x8fff0000, 0x00010000 },
+>> >> +    [VIRT_PCIE_ECAM] =          { 0x90000000, 0x10000000 },
+>> >> +    /* Second PCIe window, 508GB wide at the 4GB boundary */
+>> >> +    [VIRT_PCIE_MMIO_HIGH] =     { 0x100000000ULL, 0x7F00000000ULL },
+>> >> +    [VIRT_MEM] =                { 0x8000000000ULL, RAMLIMIT_BYTES },
+>> >> +};
+>> >> +
+>> >> +static const int sbsa_irqmap[] = {
+>> >> +    [VIRT_UART] = 1,
+>> >> +    [VIRT_RTC] = 2,
+>> >> +    [VIRT_PCIE] = 3, /* ... to 6 */
+>> >> +    [VIRT_GPIO] = 7,
+>> >> +    [VIRT_SECURE_UART] = 8,
+>> >> +    [VIRT_AHCI] = 9,
+>> >> +    [VIRT_EHCI] = 10,
+>> >> +    [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
+>> >> +    [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+>> >> +};
+>> >> +
+>> >>  static const char *valid_cpus[] = {
+>> >>      ARM_CPU_TYPE_NAME("cortex-a15"),
+>> >>      ARM_CPU_TYPE_NAME("cortex-a53"),
+>> >> @@ -696,6 +743,72 @@ static void create_rtc(const VirtMachineState *vms, qemu_irq *pic)
+>> >>      g_free(nodename);
+>> >>  }
+>> >>
+>> >> +static void create_ahci(const VirtMachineState *vms, qemu_irq *pic)
+>> >> +{
+>> >> +    char *nodename;
+>> >> +    hwaddr base = vms->memmap[VIRT_AHCI].base;
+>> >> +    hwaddr size = vms->memmap[VIRT_AHCI].size;
+>> >> +    int irq = vms->irqmap[VIRT_AHCI];
+>> >> +    const char compat[] = "qemu,mach-virt-ahci\0generic-ahci";
+>> >> +    DeviceState *dev;
+>> >> +    DriveInfo *hd[SATA_NUM_PORTS];
+>> >> +    SysbusAHCIState *sysahci;
+>> >> +    AHCIState *ahci;
+>> >> +    int i;
+>> >> +
+>> >> +    dev = qdev_create(NULL, "sysbus-ahci");
+>> >> +    qdev_prop_set_uint32(dev, "num-ports", SATA_NUM_PORTS);
+>> >> +    qdev_init_nofail(dev);
+>> >> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+>> >> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irq]);
+>> >> +
+>> >> +    sysahci = SYSBUS_AHCI(dev);
+>> >> +    ahci = &sysahci->ahci;
+>> >> +    ide_drive_get(hd, ARRAY_SIZE(hd));
+>> >> +    for (i = 0; i < ahci->ports; i++) {
+>> >> +        if (hd[i] == NULL) {
+>> >> +            continue;
+>> >> +        }
+>> >> +        ide_create_drive(&ahci->dev[i].port, 0, hd[i]);
+>> >> +    }
+>> >> +
+>> >> +    nodename = g_strdup_printf("/sata@%" PRIx64, base);
+>> >> +    qemu_fdt_add_subnode(vms->fdt, nodename);
+>> >> +    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
+>> >> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+>> >> +                                 2, base, 2, size);
+>> >> +    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
+>> >> +                           GIC_FDT_IRQ_TYPE_SPI, irq,
+>> >> +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+>> >> +    g_free(nodename);
+>> >> +}
+>> >> +
+>> >> +static void create_ehci(const VirtMachineState *vms, qemu_irq *pic)
+>> >> +{
+>> >> +    char *nodename;
+>> >> +    hwaddr base = vms->memmap[VIRT_EHCI].base;
+>> >> +    hwaddr size = vms->memmap[VIRT_EHCI].size;
+>> >> +    int irq = vms->irqmap[VIRT_EHCI];
+>> >> +    const char compat[] = "qemu,mach-virt-ehci\0generic-ehci";
+>> >> +    USBBus *usb_bus;
+>> >> +
+>> >> +    sysbus_create_simple("exynos4210-ehci-usb", base, pic[irq]);
+>> >> +
+>> >> +    usb_bus = usb_bus_find(-1);
+>> >> +    usb_create_simple(usb_bus, "usb-kbd");
+>> >> +    usb_create_simple(usb_bus, "usb-mouse");
+>> >> +
+>> >> +    nodename = g_strdup_printf("/ehci@%" PRIx64, base);
+>> >> +    qemu_fdt_add_subnode(vms->fdt, nodename);
+>> >> +    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
+>> >> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+>> >> +                                 2, base, 2, size);
+>> >> +    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
+>> >> +                           GIC_FDT_IRQ_TYPE_SPI, irq,
+>> >> +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+>> >> +    g_free(nodename);
+>> >> +}
+>> >> +
+>> >>  static DeviceState *gpio_key_dev;
+>> >>  static void virt_powerdown_req(Notifier *n, void *opaque)
+>> >>  {
+>> >> @@ -1107,13 +1220,21 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+>> >>              NICInfo *nd = &nd_table[i];
+>> >>
+>> >>              if (!nd->model) {
+>> >> -                nd->model = g_strdup("virtio");
+>> >> +                if (vms->sbsa) {
+>> >> +                    nd->model = g_strdup("e1000");
+>> >> +                } else {
+>> >> +                    nd->model = g_strdup("virtio");
+>> >> +                }
+>> >>              }
+>> >>
+>> >>              pci_nic_init_nofail(nd, pci->bus, nd->model, NULL);
+>> >>          }
+>> >>      }
+>> >>
+>> >> +    if (vms->sbsa) {
+>> >> +        pci_create_simple(pci->bus, -1, "VGA");
+>> >> +    }
+>> >> +
+>> >>      nodename = g_strdup_printf("/pcie@%" PRIx64, base);
+>> >>      qemu_fdt_add_subnode(vms->fdt, nodename);
+>> >>      qemu_fdt_setprop_string(vms->fdt, nodename,
+>> >> @@ -1502,11 +1623,18 @@ static void machvirt_init(MachineState *machine)
+>> >>
+>> >>      create_gpio(vms, pic);
+>> >>
+>> >> +    if (vms->sbsa) {
+>> >> +        create_ahci(vms, pic);
+>> >> +        create_ehci(vms, pic);
+>> >> +    }
+>> >> +
+>> >>      /* Create mmio transports, so the user can create virtio backends
+>> >>       * (which will be automatically plugged in to the transports). If
+>> >>       * no backend is created the transport will just sit harmlessly idle.
+>> >>       */
+>> >> -    create_virtio_devices(vms, pic);
+>> >> +    if (!vms->sbsa) {
+>> >> +        create_virtio_devices(vms, pic);
+>> >> +    }
+>> >>
+>> >>      vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
+>> >>      rom_set_fw(vms->fw_cfg);
+>> >> @@ -1818,6 +1946,7 @@ static void virt_3_0_instance_init(Object *obj)
+>> >>
+>> >>      vms->memmap = a15memmap;
+>> >>      vms->irqmap = a15irqmap;
+>> >> +    vms->sbsa = false;
+>> >>  }
+>> >>
+>> >>  static void virt_machine_3_0_options(MachineClass *mc)
+>> >> @@ -1950,3 +2079,66 @@ static void virt_machine_2_6_options(MachineClass *mc)
+>> >>      vmc->no_pmu = true;
+>> >>  }
+>> >>  DEFINE_VIRT_MACHINE(2, 6)
+>> >> +
+>> >> +static void sbsa_instance_init(Object *obj)
+>> >> +{
+>> >> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+>> >> +
+>> >> +    vms->secure = true;
+>> >> +    object_property_add_bool(obj, "secure", virt_get_secure,
+>> >> +                             virt_set_secure, NULL);
+>> >> +    object_property_set_description(obj, "secure",
+>> >> +                                    "Set on/off to enable/disable the ARM "
+>> >> +                                    "Security Extensions (TrustZone)",
+>> >> +                                    NULL);
+>> >> +
+>> >> +    vms->virt = true;
+>> >> +    object_property_add_bool(obj, "virtualization", virt_get_virt,
+>> >> +                             virt_set_virt, NULL);
+>> >> +    object_property_set_description(obj, "virtualization",
+>> >> +                                    "Set on/off to enable/disable emulating a "
+>> >> +                                    "guest CPU which implements the ARM "
+>> >> +                                    "Virtualization Extensions",
+>> >> +                                    NULL);
+>> >> +
+>> >> +    vms->highmem = true;
+>> >> +
+>> >> +    /* This can be changed to GICv3 when firmware is ready*/
+>> >> +    vms->gic_version = 2;
+>> >> +    object_property_add_str(obj, "gic-version", virt_get_gic_version,
+>> >> +                        virt_set_gic_version, NULL);
+>> >> +    object_property_set_description(obj, "gic-version",
+>> >> +                                    "Set GIC version. "
+>> >> +                                    "Valid values are 2, 3, host, max", NULL);
+>> >> +    vms->its = true;
+>> >> +
+>> >> +    vms->memmap = sbsa_memmap;
+>> >> +    vms->irqmap = sbsa_irqmap;
+>> >> +    vms->sbsa = true;
+>> >> +}
+>> >> +
+>> >> +static void sbsa_class_init(ObjectClass *oc, void *data)
+>> >> +{
+>> >> +    MachineClass *mc = MACHINE_CLASS(oc);
+>> >> +
+>> >> +    mc->max_cpus = 246;
+>> >> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a57");
+>> >> +    mc->block_default_type = IF_IDE;
+>> >> +    mc->default_ram_size = 1 * G_BYTE;
+>> >> +    mc->default_cpus = 4;
+>> >> +    mc->desc = "QEMU 'SBSA' ARM Virtual Machine";
+>> >> +}
+>> >> +
+>> >> +static const TypeInfo sbsa_info = {
+>> >> +    .name          = MACHINE_TYPE_NAME("sbsa"),
+>> >> +    .parent        = TYPE_VIRT_MACHINE,
+>> >> +    .instance_init = sbsa_instance_init,
+>> >> +    .class_init    = sbsa_class_init,
+>> >> +};
+>> >> +
+>> >> +static void sbsa_machine_init(void)
+>> >> +{
+>> >> +    type_register_static(&sbsa_info);
+>> >> +}
+>> >> +
+>> >> +type_init(sbsa_machine_init);
+>> >> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+>> >> index 9a870cc..619473e 100644
+>> >> --- a/include/hw/arm/virt.h
+>> >> +++ b/include/hw/arm/virt.h
+>> >> @@ -78,6 +78,8 @@ enum {
+>> >>      VIRT_GPIO,
+>> >>      VIRT_SECURE_UART,
+>> >>      VIRT_SECURE_MEM,
+>> >> +    VIRT_AHCI,
+>> >> +    VIRT_EHCI,
+>> >>  };
+>> >>
+>> >>  typedef enum VirtIOMMUType {
+>> >> @@ -124,6 +126,7 @@ typedef struct {
+>> >>      uint32_t msi_phandle;
+>> >>      uint32_t iommu_phandle;
+>> >>      int psci_conduit;
+>> >> +    bool sbsa;
+>> >>  } VirtMachineState;
+>> >>
+>> >>  #define VIRT_ECAM_ID(high) (high ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM)
+>> >> --
+>> >> 2.7.4
+>> >>
+>> >>
+>> > --
+>> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
