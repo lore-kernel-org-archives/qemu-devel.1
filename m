@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fYKU6-0004mR-6a
+	(envelope-from <mreitz@redhat.com>) id 1fYKU5-0004m4-Vh
 	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fYKU5-0004U0-1A
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fYKU5-0004Tt-0c
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:25 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 28 Jun 2018 02:07:31 +0200
-Message-Id: <20180628000745.4477-18-mreitz@redhat.com>
+Date: Thu, 28 Jun 2018 02:07:30 +0200
+Message-Id: <20180628000745.4477-17-mreitz@redhat.com>
 In-Reply-To: <20180628000745.4477-1-mreitz@redhat.com>
 References: <20180628000745.4477-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 17/31] block/nbd: Make bdrv_dirname() return
+Subject: [Qemu-devel] [PATCH v9 16/31] quorum: Make bdrv_dirname() return
  NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,61 +23,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-The generic bdrv_dirname() implementation would be able to generate some
-form of directory name for many NBD nodes, but it would be always wrong.
-Therefore, we have to explicitly make it an error (until NBD has some
-form of specification for export paths, if it ever will).
+While the common implementation for bdrv_dirname() should return NULL
+for quorum BDSs already (because they do not have a file node and their
+exact_filename field should be empty), there is no reason not to make
+that explicit.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/nbd.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/quorum.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 13db4030e6..0cd5865558 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -558,6 +558,16 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+diff --git a/block/quorum.c b/block/quorum.c
+index 03388590f3..beec8209d1 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1101,6 +1101,16 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
      bs->full_open_options = opts;
  }
  
-+static char *nbd_dirname(BlockDriverState *bs, Error **errp)
++static char *quorum_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    /* The generic bdrv_dirname() implementation is able to work out some
-+     * directory name for NBD nodes, but that would be wrong. So far there is no
-+     * specification for how "export paths" would work, so NBD does not have
-+     * directory names. */
-+    error_setg(errp, "Cannot generate a base directory for NBD nodes");
++    /* In general, there are multiple BDSs with different dirnames below this
++     * one; so there is no unique dirname we could return (unless all are equal
++     * by chance, or there is only one). Therefore, to be consistent, just
++     * always return NULL. */
++    error_setg(errp, "Cannot generate a base directory for quorum nodes");
 +    return NULL;
 +}
 +
- static BlockDriver bdrv_nbd = {
-     .format_name                = "nbd",
-     .protocol_name              = "nbd",
-@@ -576,6 +586,7 @@ static BlockDriver bdrv_nbd = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-+    .bdrv_dirname               = nbd_dirname,
- };
+ static BlockDriver bdrv_quorum = {
+     .format_name                        = "quorum",
  
- static BlockDriver bdrv_nbd_tcp = {
-@@ -596,6 +607,7 @@ static BlockDriver bdrv_nbd_tcp = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-+    .bdrv_dirname               = nbd_dirname,
- };
+@@ -1109,6 +1119,7 @@ static BlockDriver bdrv_quorum = {
+     .bdrv_open                          = quorum_open,
+     .bdrv_close                         = quorum_close,
+     .bdrv_refresh_filename              = quorum_refresh_filename,
++    .bdrv_dirname                       = quorum_dirname,
  
- static BlockDriver bdrv_nbd_unix = {
-@@ -616,6 +628,7 @@ static BlockDriver bdrv_nbd_unix = {
-     .bdrv_attach_aio_context    = nbd_attach_aio_context,
-     .bdrv_refresh_filename      = nbd_refresh_filename,
-     .bdrv_co_block_status       = nbd_client_co_block_status,
-+    .bdrv_dirname               = nbd_dirname,
- };
+     .bdrv_co_flush_to_disk              = quorum_co_flush,
  
- static void bdrv_nbd_init(void)
 -- 
 2.17.1
