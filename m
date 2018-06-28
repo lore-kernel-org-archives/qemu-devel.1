@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYZ90-00025t-ND
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYZB3-0003BB-OZ
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:49:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYZ8x-0000TV-Ko
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:38 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:41963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYZ8x-0000T1-Fc
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:35 -0400
-Received: by mail-qt0-x243.google.com with SMTP id y20-v6so5121610qto.8
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:47:35 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180628153535.1411-1-f4bug@amsat.org>
-	<20180628153535.1411-3-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <69f84ead-55d4-4a55-eb67-e4d6ba09549b@amsat.org>
-Date: Thu, 28 Jun 2018 12:47:23 -0300
+	(envelope-from <eblake@redhat.com>) id 1fYZB2-0001Q6-O1
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:49:45 -0400
+References: <20180628153937.26097-1-kwolf@redhat.com>
+	<20180628153937.26097-3-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b0aa3ea2-c91e-3534-248e-b64791fb39ae@redhat.com>
+Date: Thu, 28 Jun 2018 10:49:38 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180628153535.1411-3-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180628153937.26097-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] tests/vm: Add a dependency to qemu-img
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] qcow2: Free allocated clusters on
+ write error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: berto@igalia.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 06/28/2018 12:35 PM, Philippe Mathieu-Daudé wrote:
-> Before the first use, the VM image are resized with qemu-img.
+On 06/28/2018 10:39 AM, Kevin Wolf wrote:
+> If we managed to allocate the clusters, but then failed to write the
+> data, there's a good chance that we'll still be able to free the
+> clusters again in order to avoid cluster leaks (the refcounts are
+> cached, so even if we can't write them out right now, we may be able to
+> do so when the VM is resumed after a werror=stop/enospc pause).
 > 
-> Add a dependency to the qemu-img tool to fix:
-> 
->   $ make vm-build-ubuntu.i386
->   Traceback (most recent call last):
->     File "source/qemu/tests/vm/basevm.py", line 236, in main
->       return vm.build_image(args.image)
->     File "tests/vm/ubuntu.i386", line 67, in build_image
->       subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
->   OSError: [Errno 2] No such file or directory
->   tests/vm/Makefile.include:23: recipe for target 'tests/vm/ubuntu.i386.img' failed
->   make: *** [tests/vm/ubuntu.i386.img] Error 2
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  tests/vm/Makefile.include | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index 5daa2a3b73..e5e8146267 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -17,10 +17,13 @@ vm-test:
->  
->  vm-build-all: $(addprefix vm-build-, $(IMAGES))
->  
-> +$(IMAGE_FILES): qemu-img$(EXESUF)
-> +
->  tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
->  		$(SRC_PATH)/tests/vm/basevm.py \
->  		$(SRC_PATH)/tests/vm/Makefile.include
->  	$(call quiet-command, \
-> +		PATH=$(PATH):. \
+>   block/qcow2.h         |  1 +
+>   block/qcow2-cluster.c | 11 +++++++++++
+>   block/qcow2.c         |  2 ++
+>   3 files changed, 14 insertions(+)
 
-Oh since we want to use the shell PATH and not a make variable, it could
-be cleaner to rather use:
+Hmm, I wonder if this interacts poorly with my proposed test addition 
+for HUGE images, which is still pending review:
+https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05488.html
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg04542.html
 
-+		PATH=$$PATH:. \
+(time for me to go testing...)
 
->  		$< \
->  		$(if $(V)$(DEBUG), --debug) \
->  		--image "$@" \
-> 
+> +++ b/block/qcow2.c
+> @@ -1777,6 +1777,8 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
+>               if (ret) {
+>                   goto out;
+>               }
+> +        } else {
+> +            qcow2_alloc_cluster_abort(bs, l2meta);
+>           }
+
+None of our existing tests caught this? But it looks right to me.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
