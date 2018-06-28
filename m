@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYWjf-0005Yw-Cx
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:13:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYWmB-0007Mh-Uw
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYWjc-0002OS-5i
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:13:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45406 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fYWm8-00060X-ND
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:15:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50958 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYWjc-0002Ne-0S
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:13:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29EC0B5C6
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:13:15 +0000 (UTC)
-Date: Thu, 28 Jun 2018 14:13:11 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180628131311.GA13361@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180418171151.5263-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYWm8-0005zw-Gr
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:15:52 -0400
+References: <20180608131604.16826-1-berrange@redhat.com>
+	<20180628130959.GA13043@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0da81870-5036-209e-0202-6a240fd18491@redhat.com>
+Date: Thu, 28 Jun 2018 15:15:47 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180628130959.GA13043@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180418171151.5263-1-berrange@redhat.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] configure: add sanity check to catch
- builds from "git archive"
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] glib: update the min required
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,72 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>
 
-Opps, forgot to CC Paolo on this patch for the "misc" queue.
+On 28/06/2018 15:09, Daniel P. Berrang=C3=A9 wrote:
+> Ping, Paolo:
+>=20
+> Peter confirmed he'd updated his mingw cross env now, so should be
+> safe to include this in a PULL before soft-freeze on tuesday.
 
-On Wed, Apr 18, 2018 at 06:11:51PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> The "git archive" feature creates tarballs which are missing all
-> submodule content. GitHub unhelpfully provides users with "Download"
-> links that claim to give them valid source release tarballs. These
-> GitHub archives will not be buildable as they are created by the
-> "git archive" feature and so are missing content. The user gets
-> unhelpful messages from make such as:
->=20
->   fatal error: ui/input-keymap-atset1-to-qcode.c: No such file or direc=
-tory
->=20
-> By adding a sanity check we can give users an informative message about
-> what they've done wrong.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  configure | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->=20
-> diff --git a/configure b/configure
-> index 0a19b033bc..089b00068c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -296,6 +296,24 @@ then
->  else
->      git_update=3Dno
->      git_submodules=3D""
-> +
-> +    if ! test -f "$source_path/ui/keycodemapdb/README"
-> +    then
-> +        echo
-> +        echo "ERROR: missing file $source_path/ui/keycodemapdb/README"
-> +        echo
-> +        echo "This is not a GIT checkout but module content appears to=
-"
-> +        echo "be missing. Do not use 'git archive' or GitHub download =
-links"
-> +        echo "to acquire QEMU source archives. Non-GIT builds are only=
-"
-> +        echo "supported with source archives linked from:"
-> +        echo
-> +        echo "  https://www.qemu.org/download/"
-> +        echo
-> +        echo "Developers working with GIT can use scripts/archive-sour=
-ce.sh"
-> +        echo "if they need to create valid source archives."
-> +        echo
-> +        exit 1
-> +    fi
->  fi
->  git=3D"git"
-> =20
-> --=20
-> 2.14.3
->=20
+Go ahead and send it yourself, mine is already big enough and this would
+be more risky than everything else together.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks,
+
+Paolo
+
+> On Fri, Jun 08, 2018 at 02:16:01PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+>> The previous patch to bump glib to 2.42 hit problems with Peter's buil=
+d
+>> environment for testing merge:
+>>
+>>   https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02557.html
+>>
+>> This posting drops back to 2.40, which allows Ubuntu 14.04 from GLibC
+>> compile farm to be supported.
+>>
+>> It does NOT try to go back to 2.34, because it is hoped that the mxe.c=
+c
+>> Debian packages will be suitable for Peter to test Windows
+>> cross-compile. Alternatively the docker environments provided in tree
+>> can be used for mingw build testing on any host able to run docker.
+>>
+>> I also dropped some more GLIB_CHECK_VERSION checks that are redundant
+>> given the new min version.
+>>
+>> Changed in v3:
+>>
+>>  - Use #pragma instead of _Pragma
+>>  - Move dockerfile deletion to earlier patch
+>>  - Add missing osdep.h include
+>>  - Reorder patches to preserve bisectability
+>>
+>> Daniel P. Berrang=C3=A9 (3):
+>>   util: remove redundant include of glib.h and add osdep.h
+>>   glib: bump min required glib library version to 2.40
+>>   glib: enforce the minimum required version and warn about old APIs
+>>
+>>  configure                                |   6 +-
+>>  crypto/hash-glib.c                       |   4 -
+>>  crypto/hmac-glib.c                       |  36 ---
+>>  include/glib-compat.h                    | 373 ++++------------------=
+-
+>>  include/qemu/iova-tree.h                 |   1 -
+>>  qga/commands.c                           |  11 +-
+>>  tests/docker/dockerfiles/centos6.docker  |  30 --
+>>  tests/docker/dockerfiles/min-glib.docker |   8 -
+>>  tests/ivshmem-test.c                     |   6 -
+>>  tests/test-qga.c                         |   2 -
+>>  tests/test-qmp-event.c                   |   8 +-
+>>  tests/tpm-emu.h                          |   4 +-
+>>  tests/vhost-user-test.c                  |  26 +-
+>>  trace/simple.c                           |   6 +-
+>>  util/iova-tree.c                         |   2 +-
+>>  util/osdep.c                             |  14 -
+>>  16 files changed, 73 insertions(+), 464 deletions(-)
+>>  delete mode 100644 tests/docker/dockerfiles/centos6.docker
+>>  delete mode 100644 tests/docker/dockerfiles/min-glib.docker
+>>
+>> --=20
+>> 2.17.0
+>>
+>=20
+> Regards,
+> Daniel
+>=20
