@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYVff-00052d-BO
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:05:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYVfl-00056Z-Ii
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYVfb-0008UY-JK
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:05:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36220 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYVfb-0008Tc-DT
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:05:03 -0400
-Date: Thu, 28 Jun 2018 13:04:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180628120458.GG3513@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180628110254.6725-1-berrange@redhat.com>
-	<20180628110254.6725-3-berrange@redhat.com>
-	<f4be1ffd-3bd4-f8f8-c283-b59993971ca3@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYVfk-0000M1-2M
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:05:13 -0400
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<720156db-7910-2825-5485-6ce328a68ba3@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <a65f10c6-3ec5-3501-8cfb-0a31e0b64a72@virtuozzo.com>
+Date: Thu, 28 Jun 2018 15:04:56 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f4be1ffd-3bd4-f8f8-c283-b59993971ca3@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 2/2] Delete AF_UNIX socket after close
+In-Reply-To: <720156db-7910-2825-5485-6ce328a68ba3@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Pavel Balaev <mail@void.so>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Thu, Jun 28, 2018 at 07:02:38AM -0500, Eric Blake wrote:
-> On 06/28/2018 06:02 AM, Daniel P. Berrang=C3=A9 wrote:
-> > From: Pavel Balaev <mail@void.so>
-> >=20
-> > This is a second attempt at sending this patch:
-> >=20
-> > http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg04697.html
->=20
-> I'm not stopping the pull request, but this particular commit message i=
-s not
-> very useful. A year from now, looking through 'git log' will tell us no=
-thing
-> about the "why" for this patch (the subject line only covers the "what"=
-).
-> And at that time, no one will care how many failed attempts went throug=
-h the
-> list, but only what actually got committed.  Better would have been jus=
-t
-> directly using the message from that mail:
->=20
-> > > Since version 2.12.0 AF_UNIX socket created for QMP exchange is not
-> > > deleted on instance shutdown.
-> > >=20
-> > > This is due to the fact that function qio_channel_socket_finalize()=
- is
-> > > called after qio_channel_socket_close().
->=20
-> As a hint for future patches, mentioning that a post is a second versio=
-n and
-> replaces an earlier post to the list is best done after the --- line (w=
-here
-> it is still readable on list as an aid to reviewers, but dropped by the
-> maintainer using 'git am' as unnecessary fluff for the git log). More p=
-atch
-> submission tips at: https://wiki.qemu.org/Contribute/SubmitAPatch
+26.06.2018 21:22, John Snow wrote:
+>
+> On 06/26/2018 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all.
+>>
+>> To continue talk about correct loading of persistent bitmaps here is
+>> a patch (04), with some surrounding.
+>>
+>> Patch 04 contains new (and I hope, more clean) logic of bitmaps
+>> loading/inactivation/invalidation/migration, with the whole description.
+>> Let me not duplicate it here, you can safely start reading from 04
+>> commit message and internal big comment.
+>>
+>> Vladimir Sementsov-Ogievskiy (6):
+>>    iotests: 169: drop deprecated 'autoload' parameter
+>>    block/qcow2: improve error message in qcow2_inactivate
+>>    bloc/qcow2: drop dirty_bitmaps_loaded state variable
+>>    dirty-bitmaps: clean-up bitmaps loading and migration logic
+>>    iotests: improve 169
+>>    iotests: 169: add cases for source vm resuming
+>>
+>>   block/qcow2.h                  |  1 -
+>>   include/block/dirty-bitmap.h   |  2 +-
+>>   block.c                        | 11 ++++--
+>>   block/dirty-bitmap.c           | 36 +++++++-----------
+>>   block/qcow2-bitmap.c           | 16 ++++++++
+>>   block/qcow2.c                  | 86 ++++++++++++++++++++++++++++++++----------
+>>   migration/block-dirty-bitmap.c | 10 ++++-
+>>   tests/qemu-iotests/169         | 70 +++++++++++++++++++++++++++++++++-
+>>   tests/qemu-iotests/169.out     |  4 +-
+>>   9 files changed, 182 insertions(+), 54 deletions(-)
+>>
+>
+> Does this effectively supersede "[PATCH] block/qcow2: fix logic around
+> dirty_bitmaps_loaded"?
+>
+> (I'll review it in just a moment, regardless, but I'm trying to keep my
+> notes tidy.)
+>
+> --js
 
-Yeah, sorry my bad - i had intended to fix up the commit message but
-completely forgot.
+Yes, "fix logic" should be dropped.
 
-Peter, please ignore this PR, I will resend.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+Best regards,
+Vladimir
