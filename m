@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYbDy-00084H-EF
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:00:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYbIG-00022r-Pk
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYbDw-0003s2-Sq
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:00:54 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Thu, 28 Jun 2018 14:00:42 -0400
-Message-Id: <20180628180042.3881-3-jsnow@redhat.com>
-In-Reply-To: <20180628180042.3881-1-jsnow@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fYbIF-0008Ip-L7
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:05:20 -0400
 References: <20180628180042.3881-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] iotests: add 222 to test basic fleecing
+	<20180628180042.3881-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3a32f921-7800-a4f3-12ac-195212cbe828@redhat.com>
+Date: Thu, 28 Jun 2018 13:05:11 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180628180042.3881-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: allow blockdev-backup from
+ any source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,247 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/222     | 149 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/222.out |  60 ++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 210 insertions(+)
- create mode 100644 tests/qemu-iotests/222
- create mode 100644 tests/qemu-iotests/222.out
+On 06/28/2018 01:00 PM, John Snow wrote:
+> In the case of image fleecing, the node we choose as the source
+> for a blockdev-backup is going to be both a root node AND the
+> backing node for the exported image. It does not qualify as a root
+> image in this case.
+> 
+> Loosen the restriction.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   blockdev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-new file mode 100644
-index 0000000000..4a1bf1fba3
---- /dev/null
-+++ b/tests/qemu-iotests/222
-@@ -0,0 +1,149 @@
-+#!/usr/bin/env python
-+#
-+# This test covers the basic fleecing workflow, which provides a
-+# point-in-time snapshot of a node that can be queried over NBD.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+# John helped, too.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: John Snow <jsnow@redhat.com>
-+
-+import iotests
-+from iotests import log, qemu_img, qemu_io, qemu_io_silent
-+
-+iotests.verify_platform(['linux'])
-+
-+patterns = [("0x5d", "0",         "64k"),
-+            ("0xd5", "1M",        "64k"),
-+            ("0xdc", "32M",       "64k"),
-+            ("0xcd", "0x3ff0000", "64k")]  # 64M - 64K
-+
-+overwrite = [("0xab", "0",         "64k"), # Full overwrite
-+             ("0xad", "0x00f8000", "64k"), # Partial-left (1M-32K)
-+             ("0x1d", "0x2008000", "64k"), # Partial-right (32M+32K)
-+             ("0xea", "0x3fe0000", "64k")] # Adjacent-left (64M - 128K)
-+
-+remainder = [("0xd5", "0x108000",  "32K"), # Right-end of partial-left [1]
-+             ("0xdc", "32M",       "32k"), # Left-end of partial-right [2]
-+             ("0xcd", "0x3ff0000", "64k")] # patterns[3]
-+
-+with iotests.FilePath('base.img') as base_img_path, \
-+     iotests.FilePath('fleece.img') as fleece_img_path, \
-+     iotests.FilePath('nbd.sock') as nbd_sock_path, \
-+     iotests.VM() as vm:
-+
-+    log('--- Setting up images ---')
-+    log('')
-+
-+    assert qemu_img('create', '-f', iotests.imgfmt, base_img_path, '64M') == 0
-+    assert qemu_img('create', '-f', "qcow2", fleece_img_path, '64M') == 0
-+
-+    for p in patterns:
-+        qemu_io('-c', 'write -P%s %s %s' % p, base_img_path)
-+
-+    log('Done')
-+
-+    log('')
-+    log('--- Launching VM ---')
-+    log('')
-+
-+    vm.add_drive(base_img_path)
-+    vm.launch()
-+    log('Done')
-+
-+    log('')
-+    log('--- Setting up Fleecing Graph ---')
-+    log('')
-+
-+    srcNode = "drive0"
-+    tgtNode = "fleeceNode"
-+
-+    # create tgtNode backed by srcNode
-+    log(vm.qmp("blockdev-add", **{
-+        "driver": "qcow2",
-+        "node-name": tgtNode,
-+        "file": {
-+            "driver": "file",
-+            "filename": fleece_img_path,
-+        },
-+        "backing": srcNode,
-+    }))
-+
-+    # Establish COW from source to fleecing node
-+    log(vm.qmp("blockdev-backup",
-+               device=srcNode,
-+               target=tgtNode,
-+               sync="none"))
-+
-+    log('')
-+    log('--- Setting up NBD Export ---')
-+    log('')
-+
-+    nbd_uri = 'nbd+unix:///%s?socket=%s' % (tgtNode, nbd_sock_path)
-+    log(vm.qmp("nbd-server-start",
-+               **{"addr": { "type": "unix",
-+                            "data": { "path": nbd_sock_path } } }))
-+
-+    log(vm.qmp("nbd-server-add", device=tgtNode))
-+
-+    log('')
-+    log('--- Sanity Check ---')
-+    log('')
-+
-+    for p in patterns:
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-+
-+    log('')
-+    log('--- Testing COW ---')
-+    log('')
-+
-+    for p in overwrite:
-+        cmd = "write -P%s %s %s" % p
-+        log(cmd)
-+        log(vm.hmp_qemu_io(srcNode, cmd))
-+
-+    log('')
-+    log('--- Verifying Data ---')
-+    log('')
-+
-+    for p in patterns:
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-+
-+    log('')
-+    log('--- Cleanup ---')
-+    log('')
-+
-+    #log(vm.hmp_qemu_io(srcNode, 'flush'))
-+    log(vm.qmp('block-job-cancel', device=srcNode))
-+    log(vm.qmp('nbd-server-stop'))
-+    log(vm.qmp('blockdev-del', node_name=tgtNode))
-+    vm.shutdown()
-+
-+    log('')
-+    log('--- Confirming writes ---')
-+    log('')
-+
-+    for p in (overwrite + remainder):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent(base_img_path, '-c', cmd) == 0
-+
-+    log('')
-+    log('Done')
-diff --git a/tests/qemu-iotests/222.out b/tests/qemu-iotests/222.out
-new file mode 100644
-index 0000000000..533fb6bc61
---- /dev/null
-+++ b/tests/qemu-iotests/222.out
-@@ -0,0 +1,60 @@
-+--- Setting up images ---
-+
-+Done
-+
-+--- Launching VM ---
-+
-+Done
-+
-+--- Setting up Fleecing Graph ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Setting up NBD Export ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Sanity Check ---
-+
-+read -P0x5d 0 64k
-+read -P0xd5 1M 64k
-+read -P0xdc 32M 64k
-+read -P0xcd 0x3ff0000 64k
-+
-+--- Testing COW ---
-+
-+write -P0xab 0 64k
-+{u'return': u''}
-+write -P0xad 0x00f8000 64k
-+{u'return': u''}
-+write -P0x1d 0x2008000 64k
-+{u'return': u''}
-+write -P0xea 0x3fe0000 64k
-+{u'return': u''}
-+
-+--- Verifying Data ---
-+
-+read -P0x5d 0 64k
-+read -P0xd5 1M 64k
-+read -P0xdc 32M 64k
-+read -P0xcd 0x3ff0000 64k
-+
-+--- Cleanup ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Confirming writes ---
-+
-+read -P0xab 0 64k
-+read -P0xad 0x00f8000 64k
-+read -P0x1d 0x2008000 64k
-+read -P0xea 0x3fe0000 64k
-+read -P0xd5 0x108000 32K
-+read -P0xdc 32M 32k
-+read -P0xcd 0x3ff0000 64k
-+
-+Done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index eea75819d2..8019a9f721 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -220,3 +220,4 @@
- 218 rw auto quick
- 219 rw auto
- 221 rw auto quick
-+222 rw auto quick
+In v1, you mentioned that this used to work but then regressed, 
+pinpointing that detail in the commit message might be nice, but not 
+essential (since we didn't test it until now).  So,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.14.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
