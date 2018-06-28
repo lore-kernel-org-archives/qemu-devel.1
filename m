@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fYNb4-0004GD-J9
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:27:52 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fYNt8-0007Vw-0y
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fYNaz-0004JP-KI
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:27:50 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:44364)
+	(envelope-from <venu.busireddy@oracle.com>) id 1fYNt4-0008MD-1m
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:46:30 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:56908)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1fYNaz-0004Hn-8x
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:27:45 -0400
-Date: Wed, 27 Jun 2018 22:27:33 -0500
+	id 1fYNt3-0008LD-N1
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 23:46:25 -0400
+Date: Wed, 27 Jun 2018 22:46:16 -0500
 From: Venu Busireddy <venu.busireddy@oracle.com>
-Message-ID: <20180628032733.GA32239@troi>
+Message-ID: <20180628034616.GA32266@troi>
 References: <20180627034935.20276-1-venu.busireddy@oracle.com>
-	<20180627122457.GA19714@rkaganb.sw.ru>
-	<20180627192958.GA17236@vbusired-vm>
-	<20180627224418-mutt-send-email-mst@kernel.org>
-	<20180627195901.GA11772@vbusired-vm>
-	<20180627230536-mutt-send-email-mst@kernel.org>
-	<20180627223417.GA17004@vbusired-vm>
-	<20180628045305-mutt-send-email-mst@kernel.org>
+	<20180627034935.20276-4-venu.busireddy@oracle.com>
+	<20180627065943-mutt-send-email-mst@kernel.org>
+	<20180627040812.GA20446@troi> <20180627230758.GA14856@vbusired-vm>
+	<20180628045539-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180628045305-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for
- pairing virtio and passthrough devices...
+In-Reply-To: <20180628045539-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 3/4] Add "Group
+ Identifier" support to Red Hat PCI bridge.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,146 +33,192 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Roman Kagan <rkagan@virtuozzo.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 2018-06-28 04:54:16 +0300, Michael S. Tsirkin wrote:
-> On Wed, Jun 27, 2018 at 05:34:17PM -0500, Venu Busireddy wrote:
-> > On 2018-06-27 23:12:12 +0300, Michael S. Tsirkin wrote:
-> > > On Wed, Jun 27, 2018 at 02:59:01PM -0500, Venu Busireddy wrote:
-> > > > On 2018-06-27 22:47:05 +0300, Michael S. Tsirkin wrote:
-> > > > > On Wed, Jun 27, 2018 at 02:29:58PM -0500, Venu Busireddy wrote:
-> > > > > > On 2018-06-27 15:24:58 +0300, Roman Kagan wrote:
-> > > > > > > On Tue, Jun 26, 2018 at 10:49:30PM -0500, Venu Busireddy wrote:
-> > > > > > > > The patch set "Enable virtio_net to act as a standby for a passthru
-> > > > > > > > device" [1] deals with live migration of guests that use passthrough
-> > > > > > > > devices. However, that scheme uses the MAC address for pairing
-> > > > > > > > the virtio device and the passthrough device. The thread "netvsc:
-> > > > > > > > refactor notifier/event handling code to use the failover framework"
-> > > > > > > > [2] discusses an alternate mechanism, such as using an UUID, for pairing
-> > > > > > > > the devices. Based on that discussion, proposals "Add "Group Identifier"
-> > > > > > > > to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
-> > > > > > > > store pairing information..." [4] were made.
-> > > > > > > 
-> > > > > > > I must have missed something in those threads, but where does this UUID
-> > > > > > > thing come about?  AFAICS this identifier doesn't need to be
-> > > > > > > "universally" unique, nor persistent; it only has to be unique across
-> > > > > > > the VM and stable throughout the VM lifetime.
-> > > > > > 
-> > > > > > The notion of using UUID came up in the thread
-> > > > > > 
-> > > > > >    https://www.spinics.net/lists/netdev/msg499011.html
+On 2018-06-28 05:14:50 +0300, Michael S. Tsirkin wrote:
+> On Wed, Jun 27, 2018 at 06:07:59PM -0500, Venu Busireddy wrote:
+> > On 2018-06-26 23:08:12 -0500, Venu Busireddy wrote:
+> > > On 2018-06-27 07:02:36 +0300, Michael S. Tsirkin wrote:
+> > > > On Tue, Jun 26, 2018 at 10:49:33PM -0500, Venu Busireddy wrote:
+> > > > > Add the "Vendor-Specific" capability to the Red Hat PCI bridge device
+> > > > > "pci-bridge", to contain the "Group Identifier" (UUID) that will be
+> > > > > used to pair a virtio device with the passthrough device attached to
+> > > > > that bridge.
 > > > > > 
-> > > > > That's probably because it was expected one of standard serial number capabilities
-> > > > > (VPD or PCI Express serial #) will be used, which are expected to be unique.
-> > > > > 
-> > > > > If you are rolling your own vendor specific one, it's just an ID and
-> > > > > does not have to be unique.
-> > > > > 
-> > > > > > > FWIW Hyper-V uses a 32-bit integer for this purpose, not a UUID as seems
-> > > > > > > to be implied in the thread you refer to.
-> > > > > > 
-> > > > > > Yes, Hyper-V uses a serial number (but I think it is 64-bit value).
-> > > > > > However, what we are doing is similar to that. Instead of 32 bits,
-> > > > > > we are using 128 bits.
-> > > > > 
-> > > > > That's OK. The name is confusing though. It's a failover group id,
-> > > > > not a UUID.
+> > > > > This capability is added to the bridge iff the "uuid" option is specified
+> > > > > for the bridge.
 > > > > 
-> > > > Sure, we can name it whatever we want. I can change it to
-> > > > "failover-group-id", if that is what we want to call it.
-> > > > 
-> > > > But what is more important is, what is represented by that name? I thought
-> > > > we were going to use UUID. The QEMU command line changes in this patch
-> > > > set expect the user to specify an UUID as the value for this option
-> > > > (whatever we name it). Are we still in agreement about that, or do you
-> > > > propose something else to be used? If so, what is it? A 32-bit number, a
-> > > > 64-bit number, or an arbitrary string?
-> > > > 
-> > > > Regards,
-> > > > 
-> > > > Venu
+> > > > I think the name should be more explicit. How about "failover-group-id"?
 > > > 
-> > > If we don't really need a UUID, I'd avoid that requirement.
+> > > I can change it. But don't you think it is bit long?
+> > > 
+> > > > > 
+> > > > > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> > > > 
+> > > > I'd like to also tweak the device id in this case,
+> > > > to make it easier for guests to know it's a grouping bridge.
+> > > 
+> > > Could you please recommend a name for the new ID'd definition? Something
+> > > in lines of PCI_DEVICE_ID_REDHAT_<blah blah>.
 > > 
-> > I don't see the need for a 128-bit UUID. I just took that approach because
-> > UUID was mentioned in "https://www.spinics.net/lists/netdev/msg499011.html".
-> > Since it is unlikely to have more than 4 billion devices in the system,
-> > a 32-bit value would be more than enough to uniquely identify devices!
+> > How about these names and values for the device IDs?
 > > 
-> > I am looking for direction from you :-). Roman already opined that UUID
-> > may be an overkill. It appears that you too are leaning that way. Would
-> > it be acceptable if I change the group identifier ("failover-group-id")
-> > to a 32-bit value? If you concur, I will start reworking my patch. Could
-> > you please confirm?
+> >   PCI_DEVICE_ID_REDHAT_PCI_BRIDGE_GRP (0x0010) for pci-bridge, and 
+> 
+> You do not need the second PCI, and group is one of the
+> functions of bridge anyway.
+> 
+> PCI_DEVICE_ID_REDHAT_BRIDGE_FAILOVER?
+
+Sounds good.
+
+> >   PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE_GRP (0x0011) for pcie-downstream
 > > 
 > > Thanks,
 > > 
 > > Venu
 > 
-> I would do a 64 bit one, just in case we want to use PCI Express Device
-> Serial Number down the road.
+> PCI_DEVICE_ID_REDHAT_DOWNPORT_FAILOVER?
 
-Will do.
+Sounds good.
+
+> It's becoming annoying though - we'll need one for each type :(
+> 
+> Ideas/options:
+> - use revision ID to distinguish from regular bridge
+
+What would we use for the revision? For example, "pci-bridge" (default
+one) currently uses revision 0. Should we use revision 1 for the group
+bridge? If we do that, what if in the future we need to up the revision
+for the default bridge?
+
+> - use device serial # cap for the bridge when it's an express device
+
+We could do that. But if we are defining a new Device ID for the PCI
+case, we might as well do so for the PCIe case too, and be consistent?
+The other advantage in defining a new ID is, 'lspci' could right away
+tell what type of bridge it is (if we update PCI IDs). No need to map
+the revision to a bridge type!
+
+Unless you have strong reservations against, I think the notion of
+different Device ID for the grouping bridge sounds cleaner. Do you agree?
 
 Venu
 
-> > > 
-> > > 
+> 
+> > > > > ---
+> > > > >  hw/pci-bridge/pci_bridge_dev.c |  8 ++++++++
+> > > > >  hw/pci/pci_bridge.c            | 26 ++++++++++++++++++++++++++
+> > > > >  include/hw/pci/pcie.h          |  1 +
+> > > > >  3 files changed, 35 insertions(+)
 > > > > > 
-> > > > > > > > The current patch set includes all the feedback received for proposals [3]
-> > > > > > > > and [4]. For the sake of completeness, patch for the virtio specification
-> > > > > > > > is also included here. Following is the updated proposal.
-> > > > > > > > 
-> > > > > > > > 1. Extend the virtio specification to include a new virtio PCI capability
-> > > > > > > >    "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-> > > > > > > > 
-> > > > > > > > 2. Enhance the QEMU CLI to include a "uuid" option to the virtio device.
-> > > > > > > >    The "uuid" is a string in UUID format.
-> > > > > > > > 
-> > > > > > > > 3. Enhance the QEMU CLI to include a "uuid" option to the bridge device.
-> > > > > > > >    The "uuid" is a string in UUID format. Currently, PCIe bridge for
-> > > > > > > >    the Q35 model is supported.
-> > > > > > > > 
-> > > > > > > > 4. The operator creates a unique identifier string using 'uuidgen'.
-> > > > > > > > 
-> > > > > > > > 5. When the virtio device is created, the operator uses the "uuid" option
-> > > > > > > >    (for example, '-device virtio-net-pci,uuid="string"') and specifies
-> > > > > > > >    the UUID created in step 4.
-> > > > > > > > 
-> > > > > > > >    QEMU stores the UUID in the virtio device's configuration space
-> > > > > > > >    in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-> > > > > > > > 
-> > > > > > > > 6. When assigning a PCI device to the guest in passthrough mode, the
-> > > > > > > >    operator first creates a bridge using the "uuid" option (for example,
-> > > > > > > >    '-device pcie-downstream,uuid="string"') to specify the UUID created
-> > > > > > > >    in step 4, and then attaches the passthrough device to the bridge.
-> > > > > > > > 
-> > > > > > > >    QEMU stores the UUID in the configuration space of the bridge as
-> > > > > > > >    Vendor-Specific capability (0x09). The "Vendor" here is not to be
-> > > > > > > >    confused with a specific organization. Instead, the vendor of the
-> > > > > > > >    bridge is QEMU. To avoid mixing up with other bridges, the bridge
-> > > > > > > >    will be created with vendor ID 0x1b36 (PCI_VENDOR_ID_REDHAT) and
-> > > > > > > >    device ID 0x000e (PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE) if the "uuid"
-> > > > > > > >    option is specified. Otherwise, current defaults are used.
-> > > > > > > 
-> > > > > > > I wonder if it makes more sense to drop the concept of failover groups,
-> > > > > > > and just refer to the standby device by device-id, like 
-> > > > > > > 
-> > > > > > >   -device virtio-net-pci,id=foo \
-> > > > > > >   -device pcie-downstream,failover=foo
-> > > > > > 
-> > > > > > Isn't this the same as what this patch series proposes? In your
-> > > > > > suggestion, "foo" is the entity that connects the passthrough device
-> > > > > > and the failover device. In this patch set, that "foo" is the UUID,
-> > > > > > and the options "id" and "failover" are replaced by "uuid". Do you agree?
-> > > > > > 
-> > > > > > Regards,
-> > > > > > 
-> > > > > > Venu
-> > > > > > 
-> > > > > > > The bridge device will then lookup the failover device, figure out the
-> > > > > > > common identifier to expose to the guest, and defer the visibility of
-> > > > > > > the PT device behind the bridge until the guest acknowledged the support
-> > > > > > > for failover on the PV device.
-> > > > > > > 
-> > > > > > > Roman.
+> > > > > diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+> > > > > index b2d861d216..bbbc6fa1c6 100644
+> > > > > --- a/hw/pci-bridge/pci_bridge_dev.c
+> > > > > +++ b/hw/pci-bridge/pci_bridge_dev.c
+> > > > > @@ -71,6 +71,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
+> > > > >          bridge_dev->msi = ON_OFF_AUTO_OFF;
+> > > > >      }
+> > > > >  
+> > > > > +    err = pci_bridge_vendor_init(dev, 0, errp);
+> > > > > +    if (err < 0) {
+> > > > > +        error_append_hint(errp, "Can't init group ID, error %d\n", err);
+> > > > > +        goto vendor_cap_err;
+> > > > > +    }
+> > > > > +
+> > > > >      err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+> > > > >      if (err) {
+> > > > >          goto slotid_error;
+> > > > > @@ -109,6 +115,7 @@ slotid_error:
+> > > > >      if (shpc_present(dev)) {
+> > > > >          shpc_cleanup(dev, &bridge_dev->bar);
+> > > > >      }
+> > > > > +vendor_cap_err:
+> > > > >  shpc_error:
+> > > > >      pci_bridge_exitfn(dev);
+> > > > >  }
+> > > > > @@ -162,6 +169,7 @@ static Property pci_bridge_dev_properties[] = {
+> > > > >                              ON_OFF_AUTO_AUTO),
+> > > > >      DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
+> > > > >                      PCI_BRIDGE_DEV_F_SHPC_REQ, true),
+> > > > > +    DEFINE_PROP_UUID(COMPAT_PROP_UUID, PCIDevice, uuid, false),
+> > > > >      DEFINE_PROP_END_OF_LIST(),
+> > > > >  };
+> > > > >  
+> > > > > diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> > > > > index 40a39f57cb..cb8b3dad2a 100644
+> > > > > --- a/hw/pci/pci_bridge.c
+> > > > > +++ b/hw/pci/pci_bridge.c
+> > > > > @@ -34,12 +34,17 @@
+> > > > >  #include "hw/pci/pci_bus.h"
+> > > > >  #include "qemu/range.h"
+> > > > >  #include "qapi/error.h"
+> > > > > +#include "qemu/uuid.h"
+> > > > >  
+> > > > >  /* PCI bridge subsystem vendor ID helper functions */
+> > > > >  #define PCI_SSVID_SIZEOF        8
+> > > > >  #define PCI_SSVID_SVID          4
+> > > > >  #define PCI_SSVID_SSID          6
+> > > > >  
+> > > > > +#define PCI_VENDOR_SIZEOF             20
+> > > > > +#define PCI_VENDOR_CAP_LEN_OFFSET      2
+> > > > > +#define PCI_VENDOR_GROUP_ID_OFFSET     4
+> > > > > +
+> > > > >  int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+> > > > >                            uint16_t svid, uint16_t ssid,
+> > > > >                            Error **errp)
+> > > > > @@ -57,6 +62,27 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+> > > > >      return pos;
+> > > > >  }
+> > > > >  
+> > > > > +int pci_bridge_vendor_init(PCIDevice *d, uint8_t offset, Error **errp)
+> > > > > +{
+> > > > > +    int pos;
+> > > > > +
+> > > > > +    if (qemu_uuid_is_null(&d->uuid)) {
+> > > > > +        return 0;
+> > > > > +    }
+> > > > > +
+> > > > > +    pos = pci_add_capability(d, PCI_CAP_ID_VNDR, offset, PCI_VENDOR_SIZEOF,
+> > > > > +            errp);
+> > > > > +    if (pos < 0) {
+> > > > > +        return pos;
+> > > > > +    }
+> > > > > +
+> > > > > +    pci_set_word(d->config + pos + PCI_VENDOR_CAP_LEN_OFFSET,
+> > > > > +            PCI_VENDOR_SIZEOF);
+> > > > > +    memcpy(d->config + pos + PCI_VENDOR_GROUP_ID_OFFSET, &d->uuid,
+> > > > > +            sizeof(QemuUUID));
+> > > > > +    return pos;
+> > > > > +}
+> > > > > +
+> > > > >  /* Accessor function to get parent bridge device from pci bus. */
+> > > > >  PCIDevice *pci_bridge_get_device(PCIBus *bus)
+> > > > >  {
+> > > > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> > > > > index b71e369703..b4189d0ce3 100644
+> > > > > --- a/include/hw/pci/pcie.h
+> > > > > +++ b/include/hw/pci/pcie.h
+> > > > > @@ -82,6 +82,7 @@ struct PCIExpressDevice {
+> > > > >  };
+> > > > >  
+> > > > >  #define COMPAT_PROP_PCP "power_controller_present"
+> > > > > +#define COMPAT_PROP_UUID "uuid"
+> > > > >  
+> > > > >  /* PCI express capability helper functions */
+> > > > >  int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
+> > > > 
+> > > > ---------------------------------------------------------------------
+> > > > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > > > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> > > > 
+> > > 
+> > > ---------------------------------------------------------------------
+> > > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> > > 
+> 
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> 
