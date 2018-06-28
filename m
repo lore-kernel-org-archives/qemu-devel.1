@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fYS0Z-0004nB-Sb
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:10:29 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fYS23-0005Wk-8z
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fYS0Y-0001KM-0u
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:10:27 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:38790)
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fYS21-00029e-V9
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:11:59 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:42548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fYS0X-0001Jv-Qg
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:10:25 -0400
-Received: by mail-it0-x242.google.com with SMTP id v83-v6so11231949itc.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 01:10:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fYS21-00028n-ON
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:11:57 -0400
+Received: by mail-io0-x241.google.com with SMTP id r24-v6so4381515ioh.9
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 01:11:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180628045539-mutt-send-email-mst@kernel.org>
-References: <20180627034935.20276-1-venu.busireddy@oracle.com>
-	<20180627034935.20276-4-venu.busireddy@oracle.com>
-	<20180627065943-mutt-send-email-mst@kernel.org>
-	<20180627040812.GA20446@troi> <20180627230758.GA14856@vbusired-vm>
-	<20180628045539-mutt-send-email-mst@kernel.org>
-From: Siwei Liu <loseweigh@gmail.com>
-Date: Thu, 28 Jun 2018 01:10:24 -0700
-Message-ID: <CADGSJ23AV1p39Wfid1MWUbq=puZz2r_2ScXko0GDuJ3Y8Gm=Gg@mail.gmail.com>
+In-Reply-To: <20180627165616.34d36aaf@redhat.com>
+References: <1530094388-607-1-git-send-email-hongbo.zhang@linaro.org>
+	<20180627165616.34d36aaf@redhat.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Thu, 28 Jun 2018 16:11:56 +0800
+Message-ID: <CAHmQWvDAHmDvamC8tUF8JbLjbssAax+5Hza6S+w_go=YbM4wDA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 3/4] Add "Group
- Identifier" support to Red Hat PCI bridge.
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Add SBSA machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,180 +29,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Jun 27, 2018 at 7:14 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Wed, Jun 27, 2018 at 06:07:59PM -0500, Venu Busireddy wrote:
->> On 2018-06-26 23:08:12 -0500, Venu Busireddy wrote:
->> > On 2018-06-27 07:02:36 +0300, Michael S. Tsirkin wrote:
->> > > On Tue, Jun 26, 2018 at 10:49:33PM -0500, Venu Busireddy wrote:
->> > > > Add the "Vendor-Specific" capability to the Red Hat PCI bridge device
->> > > > "pci-bridge", to contain the "Group Identifier" (UUID) that will be
->> > > > used to pair a virtio device with the passthrough device attached to
->> > > > that bridge.
->> > > >
->> > > > This capability is added to the bridge iff the "uuid" option is specified
->> > > > for the bridge.
->> > >
->> > > I think the name should be more explicit. How about "failover-group-id"?
->> >
->> > I can change it. But don't you think it is bit long?
->> >
->> > > >
->> > > > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
->> > >
->> > > I'd like to also tweak the device id in this case,
->> > > to make it easier for guests to know it's a grouping bridge.
->> >
->> > Could you please recommend a name for the new ID'd definition? Something
->> > in lines of PCI_DEVICE_ID_REDHAT_<blah blah>.
->>
->> How about these names and values for the device IDs?
->>
->>   PCI_DEVICE_ID_REDHAT_PCI_BRIDGE_GRP (0x0010) for pci-bridge, and
+On 27 June 2018 at 22:56, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Wed, 27 Jun 2018 18:13:08 +0800
+> Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
 >
-> You do not need the second PCI, and group is one of the
-> functions of bridge anyway.
+>> This patch introduces a new Arm machine type 'SBSA' with features:
+>>  - Based on legacy 'virt' machine type.
+>>  - Newly designed memory map.
+>>  - EL2 and EL3 are enabled by default.
+>>  - AHCI controller attached to system bus, and then CDROM and hard disc
+>>    can be added to it.
+>>  - EHCI controller attached to system bus, with USB mouse and key board
+>>    installed by default.
+>>  - E1000 ethernet card on PCIE bus.
+>>  - VGA display adaptor on PCIE bus.
+>>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
+>>  - No virtio functions enabled, since this is to emulate real hardware.
+> I'd drop all default (convenience) devices unless they are specified in SBSA,
+> and make management explicitly provide needed devices on CLI.
 >
-> PCI_DEVICE_ID_REDHAT_BRIDGE_FAILOVER?
->
->
->>   PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE_GRP (0x0011) for pcie-downstream
->>
->> Thanks,
->>
->> Venu
->
-> PCI_DEVICE_ID_REDHAT_DOWNPORT_FAILOVER?
->
->
-> It's becoming annoying though - we'll need one for each type :(
->
-> Ideas/options:
-> - use revision ID to distinguish from regular bridge
-> - use device serial # cap for the bridge when it's an express device
->
-IMO, from guest implementation point of view, it would be the best to
-use a single consistent mechanism all across. The serial number cap is
-too PCIE specific.
+Thanks for review.
 
--Siwei
+I mentioned these default values because they are different from the
+'virt' machine from which this sbsa machine derives. (sbsa has uart
+too, it is same with 'virt' PL011).
+Qemu implementation should has such default values, if the sbsa
+machine does not offer them, they fallback to the parent machine's.
+The parent 'virt' machine's default cpu type is cortext-a15, that is
+not proper for a armv8 server, and its default memory is 128M, that is
+not enough to load uefi, even 512M cannot either, so I set the sbsa
+defualt minimal memory to 1G.
+
+The core numbers, is a new default. Server is smp in common sense,
+single core isn't like a server, so some even want to set to max
+capability as default, but this isn't good either I think, because
+gicv3 memory space in Qemu can even support more than 200 cores, that
+is too much.
+(gicv2 currently support 8 cores, but there are issues to boot smp for
+both gicv2 and gicv3 now, it should be another thread)
+
+>>
+>> This is the prototype, more features can be added in futrue.
+>>
+>> Purpose of this is to have a standard QEMU platform for Arm firmware
+>> developement etc. where the legacy machines cannot meets requirements.
+>>
+>> Arm Trusted Firmware and UEFI porting to this are done seperately.
+>>
+>> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
+>> ---
+> [...]
+>
+>> @@ -94,6 +98,8 @@
+>>
+>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>
+>> +#define SATA_NUM_PORTS 6
+>> +
+>>  /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+>>   * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>>   * address space unallocated and free for future use between 256G and 512G.
+>> @@ -168,6 +174,47 @@ static const int a15irqmap[] = {
+>>      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+>>  };
+>>
+>> +static const MemMapEntry sbsa_memmap[] = {
+>> +    /* Space up to 0x8000000 is reserved for a boot ROM */
+>> +    [VIRT_FLASH] =              {          0, 0x08000000 },
+>> +    [VIRT_CPUPERIPHS] =         { 0x08000000, 0x00020000 },
+>> +    /* GIC distributor and CPU interfaces sit inside the CPU peripheral space */
+>> +    [VIRT_GIC_DIST] =           { 0x08000000, 0x00010000 },
+>> +    [VIRT_GIC_CPU] =            { 0x08010000, 0x00010000 },
+>> +    [VIRT_GIC_V2M] =            { 0x08020000, 0x00001000 },
+>> +    /* The space in between here is reserved for GICv3 CPU/vCPU/HYP */
+>> +    [VIRT_GIC_ITS] =            { 0x08080000, 0x00020000 },
+>> +    /* This redistributor space allows up to 2*64kB*123 CPUs */
+>> +    [VIRT_GIC_REDIST] =         { 0x080A0000, 0x00F60000 },
+>> +    [VIRT_UART] =               { 0x09000000, 0x00001000 },
+>> +    [VIRT_RTC] =                { 0x09010000, 0x00001000 },
+>> +    [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
+>> +    [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+>> +    [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+>> +    [VIRT_AHCI] =               { 0x09050000, 0x00010000 },
+>> +    [VIRT_EHCI] =               { 0x09060000, 0x00010000 },
+>> +    [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+>> +    [VIRT_SECURE_MEM] =         { 0x0e000000, 0x01000000 },
+>> +    [VIRT_PCIE_MMIO] =          { 0x10000000, 0x7fff0000 },
+>> +    [VIRT_PCIE_PIO] =           { 0x8fff0000, 0x00010000 },
+>> +    [VIRT_PCIE_ECAM] =          { 0x90000000, 0x10000000 },
+>> +    /* Second PCIe window, 508GB wide at the 4GB boundary */
+>> +    [VIRT_PCIE_MMIO_HIGH] =     { 0x100000000ULL, 0x7F00000000ULL },
+>> +    [VIRT_MEM] =                { 0x8000000000ULL, RAMLIMIT_BYTES },
+> does spec require support for 32-bit guest or is it only 64bit,
+> if the later I'd put it somewhere high where we can increase region
+> to terrabytes.
+>
+Spec only requires it to be compliant with armv8.
+Designed purpose of this is to run 64bit guests, because in practice
+an arm server is usually 64bit.
+
+> another idea that was floating around (considering we don't care about legacy)
+> is to use flexible base address and tell firmware[*] via register where it's.
+> Then it would be able to support 32 guest with small amount of RAM
+> and 64 bit guests with huge amount of RAM using a single memory range.
+> (to keep memory management simple). It's also future friendly, as in case
+> if we need to move it we could do easily by changing base address for new machine
+> type only and firmware would automatically pick it up from register
+> (without all compat nightmare we have with 2 regions in pc/q35 machines).
+>
+> [*] When I've talked with Laszlo about it he said it was not easy to do in uefi
+> but still possible.
+Sounds not easy.
+I think the first step is to get this merged, and then we can add more
+features if necessary.
+I've already seen some points in trusted firmware and uefi need to be fixed.
 
 >
->> > > > ---
->> > > >  hw/pci-bridge/pci_bridge_dev.c |  8 ++++++++
->> > > >  hw/pci/pci_bridge.c            | 26 ++++++++++++++++++++++++++
->> > > >  include/hw/pci/pcie.h          |  1 +
->> > > >  3 files changed, 35 insertions(+)
->> > > >
->> > > > diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
->> > > > index b2d861d216..bbbc6fa1c6 100644
->> > > > --- a/hw/pci-bridge/pci_bridge_dev.c
->> > > > +++ b/hw/pci-bridge/pci_bridge_dev.c
->> > > > @@ -71,6 +71,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
->> > > >          bridge_dev->msi = ON_OFF_AUTO_OFF;
->> > > >      }
->> > > >
->> > > > +    err = pci_bridge_vendor_init(dev, 0, errp);
->> > > > +    if (err < 0) {
->> > > > +        error_append_hint(errp, "Can't init group ID, error %d\n", err);
->> > > > +        goto vendor_cap_err;
->> > > > +    }
->> > > > +
->> > > >      err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
->> > > >      if (err) {
->> > > >          goto slotid_error;
->> > > > @@ -109,6 +115,7 @@ slotid_error:
->> > > >      if (shpc_present(dev)) {
->> > > >          shpc_cleanup(dev, &bridge_dev->bar);
->> > > >      }
->> > > > +vendor_cap_err:
->> > > >  shpc_error:
->> > > >      pci_bridge_exitfn(dev);
->> > > >  }
->> > > > @@ -162,6 +169,7 @@ static Property pci_bridge_dev_properties[] = {
->> > > >                              ON_OFF_AUTO_AUTO),
->> > > >      DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
->> > > >                      PCI_BRIDGE_DEV_F_SHPC_REQ, true),
->> > > > +    DEFINE_PROP_UUID(COMPAT_PROP_UUID, PCIDevice, uuid, false),
->> > > >      DEFINE_PROP_END_OF_LIST(),
->> > > >  };
->> > > >
->> > > > diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->> > > > index 40a39f57cb..cb8b3dad2a 100644
->> > > > --- a/hw/pci/pci_bridge.c
->> > > > +++ b/hw/pci/pci_bridge.c
->> > > > @@ -34,12 +34,17 @@
->> > > >  #include "hw/pci/pci_bus.h"
->> > > >  #include "qemu/range.h"
->> > > >  #include "qapi/error.h"
->> > > > +#include "qemu/uuid.h"
->> > > >
->> > > >  /* PCI bridge subsystem vendor ID helper functions */
->> > > >  #define PCI_SSVID_SIZEOF        8
->> > > >  #define PCI_SSVID_SVID          4
->> > > >  #define PCI_SSVID_SSID          6
->> > > >
->> > > > +#define PCI_VENDOR_SIZEOF             20
->> > > > +#define PCI_VENDOR_CAP_LEN_OFFSET      2
->> > > > +#define PCI_VENDOR_GROUP_ID_OFFSET     4
->> > > > +
->> > > >  int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
->> > > >                            uint16_t svid, uint16_t ssid,
->> > > >                            Error **errp)
->> > > > @@ -57,6 +62,27 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
->> > > >      return pos;
->> > > >  }
->> > > >
->> > > > +int pci_bridge_vendor_init(PCIDevice *d, uint8_t offset, Error **errp)
->> > > > +{
->> > > > +    int pos;
->> > > > +
->> > > > +    if (qemu_uuid_is_null(&d->uuid)) {
->> > > > +        return 0;
->> > > > +    }
->> > > > +
->> > > > +    pos = pci_add_capability(d, PCI_CAP_ID_VNDR, offset, PCI_VENDOR_SIZEOF,
->> > > > +            errp);
->> > > > +    if (pos < 0) {
->> > > > +        return pos;
->> > > > +    }
->> > > > +
->> > > > +    pci_set_word(d->config + pos + PCI_VENDOR_CAP_LEN_OFFSET,
->> > > > +            PCI_VENDOR_SIZEOF);
->> > > > +    memcpy(d->config + pos + PCI_VENDOR_GROUP_ID_OFFSET, &d->uuid,
->> > > > +            sizeof(QemuUUID));
->> > > > +    return pos;
->> > > > +}
->> > > > +
->> > > >  /* Accessor function to get parent bridge device from pci bus. */
->> > > >  PCIDevice *pci_bridge_get_device(PCIBus *bus)
->> > > >  {
->> > > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
->> > > > index b71e369703..b4189d0ce3 100644
->> > > > --- a/include/hw/pci/pcie.h
->> > > > +++ b/include/hw/pci/pcie.h
->> > > > @@ -82,6 +82,7 @@ struct PCIExpressDevice {
->> > > >  };
->> > > >
->> > > >  #define COMPAT_PROP_PCP "power_controller_present"
->> > > > +#define COMPAT_PROP_UUID "uuid"
->> > > >
->> > > >  /* PCI express capability helper functions */
->> > > >  int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
->> > >
->> > > ---------------------------------------------------------------------
->> > > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
->> > > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->> > >
->> >
->> > ---------------------------------------------------------------------
->> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
->> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->> >
+> same applies to GIG regions/mmio/ecam where we are twisting our hands when trying to
+> increase number of things.
 >
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> [...]
 >
