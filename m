@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYZVQ-0000H3-Oq
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:10:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYZVq-0000XF-B1
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYZVM-00058z-Of
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:10:48 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33924)
+	(envelope-from <pbonzini@redhat.com>) id 1fYZVm-0006Xp-9X
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:11:14 -0400
+Received: from mail-wr0-f179.google.com ([209.85.128.179]:42529)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fYZVM-000558-Hb
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:10:44 -0400
-Received: by mail-wm0-x241.google.com with SMTP id l15-v6so21143989wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:10:44 -0700 (PDT)
-References: <20180622004435.10291-1-f4bug@amsat.org>
-	<20180622004435.10291-2-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180622004435.10291-2-f4bug@amsat.org>
-Date: Thu, 28 Jun 2018 17:10:42 +0100
-Message-ID: <87k1qivqm5.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYZVl-0006Un-V5
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:11:10 -0400
+Received: by mail-wr0-f179.google.com with SMTP id p1-v6so6093110wrs.9
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:11:09 -0700 (PDT)
+References: <20180605160541.10664-1-alex.bennee@linaro.org>
+	<20180605160541.10664-4-alex.bennee@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e52bc79e-6d12-743f-f1ae-fc1a1ac8969a@redhat.com>
+Date: Thu, 28 Jun 2018 18:11:05 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180605160541.10664-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/6] avocado: Add a Test.arch
- property
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 3/6] Makefile: Rename TARGET_DIRS to
+ TARGET_LIST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +31,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
+On 05/06/2018 18:05, Alex Bennée wrote:
+> From: Fam Zheng <famz@redhat.com>
+> 
+> To be more accurate on its purpose and make code that looks for a certain
+> target out of this variable more readable.
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+This breaks the Docker mingw build, because the full list of targets
+used on the host is passed to the container.  This includes linux-user
+targets which do not exist on non-Linux.
 
-> Tests can change this property to run tests in other
-> architectures than the host one.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  tests/acceptance/avocado_qemu/__init__.py | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
->
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-> index 1e54fd5932..6e9601f5e9 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -13,6 +13,7 @@ import sys
->
->  import avocado
->
-> +HOST_ARCH =3D os.uname()[4]
+Paolo
 
-The python docs seem to point to platform as a more stable way of
-querying this stuff:
-
-  platform.machine() =3D> 'x86_64' or 'aarch64'
-
->  SRC_ROOT_DIR =3D os.path.dirname(os.path.dirname(os.path.dirname(__file_=
-_)))
->  SRC_ROOT_DIR =3D os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
->  sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
-> @@ -23,12 +24,11 @@ def is_readable_executable_file(path):
->      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
->
->
-> -def pick_default_qemu_bin():
-> +def pick_default_qemu_bin(arch):
->      """
->      Picks the path of a QEMU binary, starting either in the current work=
-ing
->      directory or in the source tree root directory.
->      """
-> -    arch =3D os.uname()[4]
->      qemu_bin_relative_path =3D os.path.join("%s-softmmu" % arch,
->                                            "qemu-system-%s" % arch)
->      if is_readable_executable_file(qemu_bin_relative_path):
-> @@ -41,10 +41,19 @@ def pick_default_qemu_bin():
->
->
->  class Test(avocado.Test):
-> +    _arch =3D HOST_ARCH
-> +
-> +    @property
-> +    def arch(self):
-> +        """
-> +        Returns the architecture required to run the current test
-> +        """
-> +        return self._arch
-> +
->      def setUp(self):
->          self.vm =3D None
-> -        self.qemu_bin =3D self.params.get('qemu_bin',
-> -                                        default=3Dpick_default_qemu_bin(=
-))
-> +        qemu_bin =3D pick_default_qemu_bin(self.arch)
-> +        self.qemu_bin =3D self.params.get('qemu_bin', default=3Dqemu_bin)
->          if self.qemu_bin is None:
->              self.cancel("No QEMU binary defined or found in the source t=
-ree")
->          self.vm =3D QEMUMachine(self.qemu_bin)
-
-
---
-Alex Benn=C3=A9e
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> diff --git a/Makefile b/Makefile
+> index 6d588d1f71..023b3437ec 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can fix this by running \
+>  endif
+>  endif
+>  
+> -CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
+> -CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
+> +CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
+> +CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
+>  CONFIG_XEN := $(CONFIG_XEN_BACKEND)
+>  CONFIG_ALL=y
+>  -include config-all-devices.mak
+> @@ -366,8 +366,8 @@ DOCS=
+>  endif
+>  
+>  SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
+> -SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
+> -SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
+> +SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
+> +SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
+>  
+>  ifeq ($(SUBDIR_DEVICES_MAK),)
+>  config-all-devices.mak:
+> @@ -470,7 +470,7 @@ config-host.h-timestamp: config-host.mak
+>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+>  
+> -SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
+> +SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
+>  SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
+>  
+>  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+> @@ -514,7 +514,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+>  romsubdir-%:
+>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
+>  
+> -ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
+> +ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
+>  
+>  recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+>  
+> @@ -772,7 +772,7 @@ distclean: clean
+>  	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+>  	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+>  	rm -f docs/qemu-block-drivers.7
+> -	for d in $(TARGET_DIRS); do \
+> +	for d in $(TARGET_LIST); do \
+>  	rm -rf $$d || exit 1 ; \
+>          done
+>  	rm -Rf .sdk
+> @@ -873,7 +873,7 @@ endif
+>  		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
+>  	done
+>  	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
+> -	for d in $(TARGET_DIRS); do \
+> +	for d in $(TARGET_LIST); do \
+>  	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
+>          done
+>  
+> @@ -1071,9 +1071,9 @@ endif
+>  	@echo  '  ctags/TAGS      - Generate tags file for editors'
+>  	@echo  '  cscope          - Generate cscope index'
+>  	@echo  ''
+> -	@$(if $(TARGET_DIRS), \
+> +	@$(if $(TARGET_LIST), \
+>  		echo 'Architecture specific targets:'; \
+> -		$(foreach t, $(TARGET_DIRS), \
+> +		$(foreach t, $(TARGET_LIST), \
+>  		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
+>  		echo '')
+>  	@echo  'Cleaning targets:'
+> diff --git a/configure b/configure
+> index db8c9d8288..14b11130a7 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6128,7 +6128,7 @@ qemu_version=$(head $source_path/VERSION)
+>  echo "VERSION=$qemu_version" >>$config_host_mak
+>  echo "PKGVERSION=$pkgversion" >>$config_host_mak
+>  echo "SRC_PATH=$source_path" >> $config_host_mak
+> -echo "TARGET_DIRS=$target_list" >> $config_host_mak
+> +echo "TARGET_LIST=$target_list" >> $config_host_mak
+>  if [ "$docs" = "yes" ] ; then
+>    echo "BUILD_DOCS=yes" >> $config_host_mak
+>  fi
+> diff --git a/scripts/create_config b/scripts/create_config
+> index d727e5e36e..58948a67a4 100755
+> --- a/scripts/create_config
+> +++ b/scripts/create_config
+> @@ -107,7 +107,7 @@ case $line in
+>      target_name=${line#*=}
+>      echo "#define TARGET_NAME \"$target_name\""
+>      ;;
+> - TARGET_DIRS=*)
+> + TARGET_LIST=*)
+>      # do nothing
+>      ;;
+>   TARGET_*=y) # configuration
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 86f90c0cb0..9854e7794b 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -858,7 +858,7 @@ endif
+>  
+>  # QTest rules
+>  
+> -TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+> +TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
+>  ifeq ($(CONFIG_POSIX),y)
+>  QTEST_TARGETS = $(TARGETS)
+>  check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
+> 
