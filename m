@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAh-0007Hk-Jq
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:40 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAj-0007JL-HT
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAg-0000bA-DV
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:39 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:42010)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAi-0000eE-DD
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:41 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:34779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAg-0000aB-2x
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:38 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id p1-v6so6689204wrs.9
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:37 -0700 (PDT)
+	id 1fYdAi-0000cG-5G
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:40 -0400
+Received: by mail-wm0-x236.google.com with SMTP id l15-v6so240633wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:40 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:33 +0200
-Message-Id: <1530216310-52873-24-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:35 +0200
+Message-Id: <1530216310-52873-26-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/60] hostmem: drop error variable from
- host_memory_backend_get_memory()
+Subject: [Qemu-devel] [PULL 25/60] nvdimm: convert "unarmed" into a static
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,118 +33,78 @@ Cc: David Hildenbrand <david@redhat.com>
 
 From: David Hildenbrand <david@redhat.com>
 
-Unused, so let's remove it.
+We don't allow to modify it after realization. So we can simply turn
+it into a static property.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180619134141.29478-8-david@redhat.com>
+Message-Id: <20180619134141.29478-10-david@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- backends/hostmem.c       | 3 +--
- hw/mem/nvdimm.c          | 4 ++--
- hw/mem/pc-dimm.c         | 4 ++--
- hw/misc/ivshmem.c        | 3 +--
- include/sysemu/hostmem.h | 3 +--
- numa.c                   | 3 +--
- 6 files changed, 8 insertions(+), 12 deletions(-)
+ hw/mem/nvdimm.c | 32 +++++++-------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 3627e61..4908946 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -247,8 +247,7 @@ bool host_memory_backend_mr_inited(HostMemoryBackend *backend)
-     return memory_region_size(&backend->mr) != 0;
- }
- 
--MemoryRegion *
--host_memory_backend_get_memory(HostMemoryBackend *backend, Error **errp)
-+MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend)
- {
-     return host_memory_backend_mr_inited(backend) ? &backend->mr : NULL;
- }
 diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index f974acc..df97162 100644
+index df97162..7260c9c 100644
 --- a/hw/mem/nvdimm.c
 +++ b/hw/mem/nvdimm.c
-@@ -105,7 +105,7 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+@@ -64,36 +64,11 @@ out:
+     error_propagate(errp, local_err);
+ }
  
- static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+-static bool nvdimm_get_unarmed(Object *obj, Error **errp)
+-{
+-    NVDIMMDevice *nvdimm = NVDIMM(obj);
+-
+-    return nvdimm->unarmed;
+-}
+-
+-static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
+-{
+-    NVDIMMDevice *nvdimm = NVDIMM(obj);
+-    Error *local_err = NULL;
+-
+-    if (memory_region_size(&nvdimm->nvdimm_mr)) {
+-        error_setg(&local_err, "cannot change property value");
+-        goto out;
+-    }
+-
+-    nvdimm->unarmed = value;
+-
+- out:
+-    error_propagate(errp, local_err);
+-}
+-
+ static void nvdimm_init(Object *obj)
  {
--    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem, errp);
-+    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
-     NVDIMMDevice *nvdimm = NVDIMM(dimm);
-     uint64_t align, pmem_size, size = memory_region_size(mr);
+     object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
+-    object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
+-                             nvdimm_get_unarmed, nvdimm_set_unarmed, NULL);
+ }
  
-@@ -161,7 +161,7 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
- 
-     memcpy(nvdimm->label_data + offset, buf, size);
- 
--    mr = host_memory_backend_get_memory(dimm->hostmem, &error_abort);
-+    mr = host_memory_backend_get_memory(dimm->hostmem);
-     backend_offset = memory_region_size(mr) - nvdimm->label_size + offset;
+ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+@@ -166,13 +141,20 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
      memory_region_set_dirty(mr, backend_offset, size);
  }
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 7387963..73f0eee 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -226,12 +226,12 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-         return NULL;
-     }
  
--    return host_memory_backend_get_memory(dimm->hostmem, errp);
-+    return host_memory_backend_get_memory(dimm->hostmem);
- }
- 
- static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
++static Property nvdimm_properties[] = {
++    DEFINE_PROP_BOOL(NVDIMM_UNARMED_PROP, NVDIMMDevice, unarmed, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void nvdimm_class_init(ObjectClass *oc, void *data)
  {
--    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
-+    return host_memory_backend_get_memory(dimm->hostmem);
- }
+     PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
+     NVDIMMClass *nvc = NVDIMM_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
  
- static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 16f0370..ee01c5e 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -909,8 +909,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     if (s->hostmem != NULL) {
-         IVSHMEM_DPRINTF("using hostmem\n");
+     ddc->realize = nvdimm_realize;
+     ddc->get_memory_region = nvdimm_get_memory_region;
++    dc->props = nvdimm_properties;
  
--        s->ivshmem_bar2 = host_memory_backend_get_memory(s->hostmem,
--                                                         &error_abort);
-+        s->ivshmem_bar2 = host_memory_backend_get_memory(s->hostmem);
-     } else {
-         Chardev *chr = qemu_chr_fe_get_driver(&s->server_chr);
-         assert(chr);
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 5beb0ef..6e6bd2c 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -62,8 +62,7 @@ struct HostMemoryBackend {
- };
- 
- bool host_memory_backend_mr_inited(HostMemoryBackend *backend);
--MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
--                                             Error **errp);
-+MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend);
- 
- void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool mapped);
- bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
-diff --git a/numa.c b/numa.c
-index 33572bf..94f758c 100644
---- a/numa.c
-+++ b/numa.c
-@@ -523,8 +523,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
-         if (!backend) {
-             continue;
-         }
--        MemoryRegion *seg = host_memory_backend_get_memory(backend,
--                                                           &error_fatal);
-+        MemoryRegion *seg = host_memory_backend_get_memory(backend);
- 
-         if (memory_region_is_mapped(seg)) {
-             char *path = object_get_canonical_path_component(OBJECT(backend));
+     nvc->read_label_data = nvdimm_read_label_data;
+     nvc->write_label_data = nvdimm_write_label_data;
 -- 
 1.8.3.1
