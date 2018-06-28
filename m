@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYVVr-0000hw-4t
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:55:00 -0400
+	(envelope-from <clg@kaod.org>) id 1fYVYH-00021x-IF
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:57:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYVVn-0006sM-Ea
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:54:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYVVn-0006rV-6x
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:54:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYVVl-0000tf-50
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:54:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1459C2E802D
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:54:53 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1fYVYC-0001aF-LI
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:57:29 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:49871)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fYVYC-0001OH-5T
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:57:24 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.122.111])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 9462FE95D2
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:57:15 +0200 (CEST)
+References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
+	<153018089136.336571.15410439376219137880.stgit@bahia>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <22d24364-67cf-8bfc-a10c-53c0f999a985@kaod.org>
+Date: Thu, 28 Jun 2018 13:56:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <153018089136.336571.15410439376219137880.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Jun 2018 11:45:18 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1587065@bugs.launchpad.net>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153018631973.13494.17050161919459981949.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc/kvm: don't pass cpu to
+ kvm_get_smmu_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,154 +32,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-** Changed in: qemu (Ubuntu Xenial)
-       Status: Confirmed =3D> In Progress
+On 06/28/2018 12:14 PM, Greg Kurz wrote:
+> In a future patch the machine code will need to retrieve the MMU
+> information from KVM during machine initialization before the CPUs
+> are created.
+>=20
+> Actually, KVM_PPC_GET_SMMU_INFO is a VM class ioctl, and thus, it only
+> needs the kvm_state global variable to be set. The fallback code only
+> needs informations from the machine's CPU model class.
+>=20
+> So this patch basically drops the CPU argument to kvm_get_smmu_info()
+> and kvm_get_fallback_smmu_info(). The kvm_state and current_machine
+> globals are used instead to reach out to KVM and CPU model details
+> respectively.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
--- =
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
+one question below,
 
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
+Thanks,
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  In Progress
+C.
 
-Bug description:
-  [Impact]
+> ---
+>  target/ppc/kvm.c        |   37 ++++++++++++++++++-------------------
+>  target/ppc/mmu-hash64.h |    8 +++++++-
+>  2 files changed, 25 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 4df4ff6cbff2..9fae89ff8175 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -248,11 +248,12 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
+> =20
+> =20
+>  #if defined(TARGET_PPC64)
+> -static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
+> -                                       struct kvm_ppc_smmu_info *info)
+> +static void kvm_get_fallback_smmu_info(struct kvm_ppc_smmu_info *info)
+>  {
+> -    CPUPPCState *env =3D &cpu->env;
+> -    CPUState *cs =3D CPU(cpu);
+> +    const PowerPCCPUClass *pcc;
+> +
+> +    assert(current_machine !=3D NULL);
 
-   * An explanation of the effects of the bug on users and
+can that ever happen ?=20
 
-   * justification for backporting the fix to the stable release.
-
-   * In addition, it is helpful, but not required, to include an
-     explanation of how the upload fixes this bug.
-
-  [Test Case]
-
-   * Prepare a guest
-     $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
-s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
-  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
-abel=3Ddaily
-
-   * Shut it down and use virsh edit to add a channel for the agent
-  <channel type=3D'unix'>
-     <source mode=3D'bind'/>
-     <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-  </channel>
-
-    * Start the guest again, in it install qemu-guest-agent
-
-    *
-
-    * On the Host then freeze and thaw the guest
-      $ virsh domfsfreeze x-freeze
-      $ virsh domfsthaw x-freeze
-
-    # The above works, then trigger the issue, in the guest do
-      $ sudo mkdir /mnt/test
-      $ sudo mount -o bind / /mnt/test/
-
-    * Now the freeze/thaw will fail unless the fix is applied.
-
-  [Regression Potential]
-
-   * From looking at the code alone I could think of a different cause that =
-
-     makes it return EBUSY.
-     The biggest risk I could see due to that is the agent reporting a =
-
-     successful freeze due to accepting EBUSY which is not actually true.
-     But we have that in Ubuntu since Artful and =
-
-     upstream since January 2017 and there are no such reports.
-
-  [Other Info]
-   =
-
-   * n/a
-
-  =
-
-  ---
-
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-  =C2=A0may have bind-mounts that let a device appear multiple times in the=
- mount list. Unfortunately the guest agent is not smart enough to consider =
-a device that has been frozen as succesfull and keep going. This causes thi=
-s specific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+> +    pcc =3D POWERPC_CPU_CLASS(object_class_by_name(current_machine->cp=
+u_type));
+> =20
+>      memset(info, 0, sizeof(*info));
+> =20
+> @@ -278,7 +279,7 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *=
+cpu,
+>       *   implements KVM_CAP_PPC_GET_SMMU_INFO and thus doesn't hit
+>       *   this fallback.
+>       */
+> -    if (kvmppc_is_pr(cs->kvm_state)) {
+> +    if (kvmppc_is_pr(kvm_state)) {
+>          /* No flags */
+>          info->flags =3D 0;
+>          info->slb_size =3D 64;
+> @@ -300,12 +301,12 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU=
+ *cpu,
+>          /* HV KVM has backing store size restrictions */
+>          info->flags =3D KVM_PPC_PAGE_SIZES_REAL;
+> =20
+> -        if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+> +        if (hash64_opts_has(pcc->hash64_opts, PPC_HASH64_1TSEG)) {
+>              info->flags |=3D KVM_PPC_1T_SEGMENTS;
+>          }
+> =20
+> -        if (env->mmu_model =3D=3D POWERPC_MMU_2_06 ||
+> -            env->mmu_model =3D=3D POWERPC_MMU_2_07) {
+> +        if (pcc->mmu_model =3D=3D POWERPC_MMU_2_06 ||
+> +            pcc->mmu_model =3D=3D POWERPC_MMU_2_07) {
+>              info->slb_size =3D 32;
+>          } else {
+>              info->slb_size =3D 64;
+> @@ -319,8 +320,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *=
+cpu,
+>          i++;
+> =20
+>          /* 64K on MMU 2.06 and later */
+> -        if (env->mmu_model =3D=3D POWERPC_MMU_2_06 ||
+> -            env->mmu_model =3D=3D POWERPC_MMU_2_07) {
+> +        if (pcc->mmu_model =3D=3D POWERPC_MMU_2_06 ||
+> +            pcc->mmu_model =3D=3D POWERPC_MMU_2_07) {
+>              info->sps[i].page_shift =3D 16;
+>              info->sps[i].slb_enc =3D 0x110;
+>              info->sps[i].enc[0].page_shift =3D 16;
+> @@ -336,19 +337,18 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU=
+ *cpu,
+>      }
+>  }
+> =20
+> -static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_inf=
+o *info)
+> +static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info)
+>  {
+> -    CPUState *cs =3D CPU(cpu);
+>      int ret;
+> =20
+> -    if (kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO))=
+ {
+> -        ret =3D kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, inf=
+o);
+> +    if (kvm_check_extension(kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
+> +        ret =3D kvm_vm_ioctl(kvm_state, KVM_PPC_GET_SMMU_INFO, info);
+>          if (ret =3D=3D 0) {
+>              return;
+>          }
+>      }
+> =20
+> -    kvm_get_fallback_smmu_info(cpu, info);
+> +    kvm_get_fallback_smmu_info(info);
+>  }
+> =20
+>  struct ppc_radix_page_info *kvm_get_radix_page_info(void)
+> @@ -408,14 +408,13 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *=
+cpu,
+> =20
+>  bool kvmppc_hpt_needs_host_contiguous_pages(void)
+>  {
+> -    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+>      static struct kvm_ppc_smmu_info smmu_info;
+> =20
+>      if (!kvm_enabled()) {
+>          return false;
+>      }
+> =20
+> -    kvm_get_smmu_info(cpu, &smmu_info);
+> +    kvm_get_smmu_info(&smmu_info);
+>      return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
+>  }
+> =20
+> @@ -429,7 +428,7 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
+>          return;
+>      }
+> =20
+> -    kvm_get_smmu_info(cpu, &smmu_info);
+> +    kvm_get_smmu_info(&smmu_info);
+> =20
+>      if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)
+>          && !(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+> @@ -2168,7 +2167,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, u=
+nsigned int hash_shift)
+> =20
+>      /* Find the largest hardware supported page size that's less than
+>       * or equal to the (logical) backing page size of guest RAM */
+> -    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
+> +    kvm_get_smmu_info(&info);
+>      rampagesize =3D qemu_getrampagesize();
+>      best_page_shift =3D 0;
+> =20
+> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> index f11efc9cbc1f..00a249f26bc3 100644
+> --- a/target/ppc/mmu-hash64.h
+> +++ b/target/ppc/mmu-hash64.h
+> @@ -169,9 +169,15 @@ struct PPCHash64Options {
+>  extern const PPCHash64Options ppc_hash64_opts_basic;
+>  extern const PPCHash64Options ppc_hash64_opts_POWER7;
+> =20
+> +static inline bool hash64_opts_has(const PPCHash64Options *opts,
+> +                                   unsigned feature)
+> +{
+> +    return !!(opts->flags & feature);
+> +}
+> +
+>  static inline bool ppc_hash64_has(PowerPCCPU *cpu, unsigned feature)
+>  {
+> -    return !!(cpu->hash64_opts->flags & feature);
+> +    return hash64_opts_has(cpu->hash64_opts, feature);
+>  }
+> =20
+>  #endif /* CONFIG_USER_ONLY */
+>=20
