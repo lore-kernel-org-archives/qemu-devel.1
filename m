@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYWgc-0003Oy-CU
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:10:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1fYWhK-00041D-Cv
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYWgY-0007RA-6Q
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:10:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50756 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYWgY-0007Qh-08
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:10:06 -0400
-Date: Thu, 28 Jun 2018 14:09:59 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180628130959.GA13043@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180608131604.16826-1-berrange@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fYWhH-0008GA-0O
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:10:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34792)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fYWhG-0008FE-Q4
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:10:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fYWhE-00061d-TY
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:10:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D9A332E8198
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:10:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180608131604.16826-1-berrange@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] glib: update the min required
- version
+Date: Thu, 28 Jun 2018 13:01:13 -0000
+From: Stefan Hajnoczi <1779120@bugs.launchpad.net>
+Reply-To: Bug 1779120 <1779120@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153018930547.7042.8204279860342554943.malonedeb@soybean.canonical.com>
+Message-Id: <153019087311.6638.5931161413177474259.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779120] Re: disk missing in the guest
+ contingently when hotplug several virtio scsi disks consecutively
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +38,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>
 
-Ping, Paolo:
+Please post the following information:
+(host)# rpm -qa | grep qemu-kvm
+(guest)# uname -r
 
-Peter confirmed he'd updated his mingw cross env now, so should be
-safe to include this in a PULL before soft-freeze on tuesday.
+What are the exact steps to reproduce this issue (virsh command-lines
+and XML)?
 
-On Fri, Jun 08, 2018 at 02:16:01PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> The previous patch to bump glib to 2.42 hit problems with Peter's build
-> environment for testing merge:
->=20
->   https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02557.html
->=20
-> This posting drops back to 2.40, which allows Ubuntu 14.04 from GLibC
-> compile farm to be supported.
->=20
-> It does NOT try to go back to 2.34, because it is hoped that the mxe.cc
-> Debian packages will be suitable for Peter to test Windows
-> cross-compile. Alternatively the docker environments provided in tree
-> can be used for mingw build testing on any host able to run docker.
->=20
-> I also dropped some more GLIB_CHECK_VERSION checks that are redundant
-> given the new min version.
->=20
-> Changed in v3:
->=20
->  - Use #pragma instead of _Pragma
->  - Move dockerfile deletion to earlier patch
->  - Add missing osdep.h include
->  - Reorder patches to preserve bisectability
->=20
-> Daniel P. Berrang=C3=A9 (3):
->   util: remove redundant include of glib.h and add osdep.h
->   glib: bump min required glib library version to 2.40
->   glib: enforce the minimum required version and warn about old APIs
->=20
->  configure                                |   6 +-
->  crypto/hash-glib.c                       |   4 -
->  crypto/hmac-glib.c                       |  36 ---
->  include/glib-compat.h                    | 373 ++++-------------------
->  include/qemu/iova-tree.h                 |   1 -
->  qga/commands.c                           |  11 +-
->  tests/docker/dockerfiles/centos6.docker  |  30 --
->  tests/docker/dockerfiles/min-glib.docker |   8 -
->  tests/ivshmem-test.c                     |   6 -
->  tests/test-qga.c                         |   2 -
->  tests/test-qmp-event.c                   |   8 +-
->  tests/tpm-emu.h                          |   4 +-
->  tests/vhost-user-test.c                  |  26 +-
->  trace/simple.c                           |   6 +-
->  util/iova-tree.c                         |   2 +-
->  util/osdep.c                             |  14 -
->  16 files changed, 73 insertions(+), 464 deletions(-)
->  delete mode 100644 tests/docker/dockerfiles/centos6.docker
->  delete mode 100644 tests/docker/dockerfiles/min-glib.docker
->=20
-> --=20
-> 2.17.0
->=20
+-- =
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779120
+
+Title:
+  disk missing in the guest contingently when hotplug several virtio
+  scsi disks consecutively
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi, I found a bug that disk missing (not all disks missing ) in the
+  guest contingently when hotplug several virtio scsi disks
+  consecutively.  After rebooting the guest,the missing disks appear
+  again.
+
+  The guest is centos7.3 running on a centos7.3 host and the scsi
+  controllers are configed with iothread.  The scsi controller xml is
+  below:
+
+  =C2=A0=C2=A0=C2=A0=C2=A0<controller type=3D'scsi' index=3D'0' model=3D'vi=
+rtio-scsi'>
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0<driver iothread=3D'26'/>
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0<alias name=3D'scsi0'/>
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0<address type=3D'pci' domain=3D'0x000=
+0' bus=3D'0x00' slot=3D'0x07' function=3D'0x0'/>
+  =C2=A0=C2=A0=C2=A0=C2=A0</controller>
+
+  If the scsi controllers are configed without iothread,  disks are all
+  can be seen in the guest when hotplug several virtio scsi disks
+  consecutively.
+
+  I think the biggest difference between them is that scsi controllers
+  with iothread call virtio_notify_irqfd to notify guest and scsi
+  controllers without iothread call virtio_notify instead.  What make it
+  difference? Will interrupts are lost when call virtio_notify_irqfd
+  due to  race condition for some unknow reasons? Maybe guys more
+  familiar with scsi dataplane can help. Thanks for your reply!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779120/+subscriptions
