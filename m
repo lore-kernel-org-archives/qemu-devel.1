@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYaUW-0002Wt-DE
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:13:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYaYA-000518-Vl
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:17:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYaUV-0001Jn-Hi
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:13:56 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:35826)
+	(envelope-from <alex.bennee@linaro.org>) id 1fYaY6-0007Z7-E2
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:17:42 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYaUV-0001IO-DD
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:13:55 -0400
-Received: by mail-ot0-x242.google.com with SMTP id j8-v6so4200182otl.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 10:13:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYaY6-0007WY-6p
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:17:38 -0400
+Received: by mail-wr0-x244.google.com with SMTP id c5-v6so6276618wrs.10
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 10:17:38 -0700 (PDT)
+References: <20180622004435.10291-1-f4bug@amsat.org>
+	<20180622004435.10291-3-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180622004435.10291-3-f4bug@amsat.org>
+Date: Thu, 28 Jun 2018 18:17:35 +0100
+Message-ID: <87d0wavnio.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180509034658.26455-2-f4bug@amsat.org>
-References: <20180509034658.26455-1-f4bug@amsat.org>
-	<20180509034658.26455-2-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 18:13:34 +0100
-Message-ID: <CAFEAcA-7xnkKYKP0YeY5GFuaknVpaUSiCaFiyUGQJOuRSgm05A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/14] sdcard: Use the ldst API
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] tests/acceptance: Rename the x86-64
+ specific BootLinuxConsole test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>, Michael Walle <michael@walle.cc>, "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-On 9 May 2018 at 04:46, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote=
-:
-> The load/store API will ease further code movement.
->
-> Per the Physical Layer Simplified Spec. "3.6 Bus Protocol":
->
->   "In the CMD line the Most Significant Bit (MSB) is transmitted
->    first, the Least Significant Bit (LSB) is the last."
->
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index 98324f7591..f6a34d75a5 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -13,7 +13,7 @@ import logging
+>  from avocado_qemu import Test
+>
+>
+> -class BootLinuxConsole(Test):
+> +class BootLinuxConsoleX86_64(Test):
+>      """
+>      Boots a x86_64 Linux kernel and checks that the console is operation=
+al
+>      and the kernel command line is properly passed from QEMU to the kern=
+el
 
-This is a nice cleanup so I'm just going to fish this patch
-out of the series and apply it to target-arm.next.
+Not your bug but it also needs to be better at choosing a QEMU to run:
 
-thanks
--- PMM
+2018-06-28 16:10:24,736 download         L0066 INFO | Fetching https://mirr=
+ors.kernel.org/fedora/releases/28/Everything/x86_64/os/images/pxeboot/vmlin=
+uz -> /home/alex.bennee/avocado/data/cache/vmlinuz.gqWhs5
+2018-06-28 16:10:40,841 qemu             L0268 DEBUG| Error launching VM
+2018-06-28 16:10:40,841 qemu             L0270 DEBUG| Command: 'aarch64-sof=
+tmmu/qemu-system-aarch64 -chardev socket,id=3Dmon,path=3D/var/tmp/tmpdXbtIA=
+/qemu-16646-monitor.sock -mon chardev=3Dmon,mode=3Dcontrol -display none -v=
+ga none -machine pc -chardev socket,id=3Dconsole,path=3D/var/tmp/tmpdXbtIA/=
+qemu-16646-console.sock,server,nowait -device isa-serial,chardev=3Dconsole =
+-kernel /home/alex.bennee/avocado/data/cache/vmlinuz -append console=3DttyS=
+0'
+
+
+--
+Alex Benn=C3=A9e
