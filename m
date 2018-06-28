@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAb-0007CA-1o
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:36 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAe-0007Fc-BR
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAZ-0000Oi-Bd
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:32 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:39705)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAd-0000VT-3d
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:36 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36281)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAZ-0000My-4p
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:31 -0400
-Received: by mail-wm0-x234.google.com with SMTP id p11-v6so10223452wmc.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:31 -0700 (PDT)
+	id 1fYdAc-0000UE-Sf
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:35 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id f16-v6so6686837wrm.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:26 +0200
-Message-Id: <1530216310-52873-17-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:30 +0200
+Message-Id: <1530216310-52873-21-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/60] qemu-options: Add missing newline to
- -accel help text
+Subject: [Qemu-devel] [PULL 20/60] pc-dimm: remove pc_dimm_get_free_slot()
+ from header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Cc: David Hildenbrand <david@redhat.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-The newline was removed by commit c97d6d2c, and broke -help output:
+Not used outside of pc-dimm.c and there shouldn't be other users. If
+other devices (e.g. memory devices) ever have to also use slots, then we
+will have to factor this out.
 
-Before this patch:
-
-  $ qemu-system-x86_64 -help | grep smp
-                  thread=single|multi (enable multi-threaded TCG)-smp [...]
-
-After this patch:
-
-  $ qemu-system-x86_64 -help  | grep smp
-  -smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
-
-Fixes: c97d6d2cdf97edb4aebe832fdba65d701ad7bcb6
-Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180611195607.3015-1-ehabkost@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20180619134141.29478-5-david@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-options.hx | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/mem/pc-dimm.c         | 4 +++-
+ include/hw/mem/pc-dimm.h | 2 --
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index d5b0c26..2707728 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -130,7 +130,7 @@ ETEXI
- DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "-accel [accel=]accelerator[,thread=single|multi]\n"
-     "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
--    "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
-+    "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
- STEXI
- @item -accel @var{name}[,prop=@var{value}[,...]]
- @findex -accel
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 9e0c83e..7387963 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -27,6 +27,8 @@
+ #include "sysemu/numa.h"
+ #include "trace.h"
+ 
++static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
++
+ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+                   Error **errp)
+ {
+@@ -111,7 +113,7 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
+     return 0;
+ }
+ 
+-int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
++static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
+ {
+     unsigned long *bitmap;
+     int slot = 0;
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 860343d..cf71247 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -76,8 +76,6 @@ typedef struct PCDIMMDeviceClass {
+     MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
+ } PCDIMMDeviceClass;
+ 
+-int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+-
+ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+                   Error **errp);
+ void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
 -- 
 1.8.3.1
