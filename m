@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAw-0007aN-LN
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAw-0007aL-LE
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAu-0000tv-IU
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAt-0000sT-GH
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:54 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:45170)
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37463)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAu-0000so-As
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:52 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id u7-v6so6680497wrn.12
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:52 -0700 (PDT)
+	id 1fYdAt-0000rh-9X
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:51 -0400
+Received: by mail-wr0-x243.google.com with SMTP id k6-v6so6688251wrp.4
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:51 -0700 (PDT)
+Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
+	127-v6sm6211110wmd.18.2018.06.28.13.05.48 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 28 Jun 2018 13:05:49 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:48 +0200
-Message-Id: <1530216310-52873-39-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:47 +0200
+Message-Id: <1530216310-52873-38-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 38/60] hw/mips/jazz: create ESP device directly
- via qdev
+Subject: [Qemu-devel] [PULL 37/60] pr-manager-helper: report event on
+ connection/disconnection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +33,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Let management know if there were any problems communicating with
+qemu-pr-helper.  The event is edge-triggered, and is sent every time
+the connection status of the pr-manager-helper object changes.
 
-MIPS jazz is the last user of the legacy esp_init() function so move creation
-of the ESP device over to use qdev.
-
-Note that the esp_reset and dma_enable qemu_irqs are currently unused and so
-we do not wire these up and instead remove the variables to prevent the
-compiler emitting unused variable warnings.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20180613094727.11326-2-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Tested-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/mips/mips_jazz.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ qapi/block.json          | 24 ++++++++++++++++++++++++
+ scsi/pr-manager-helper.c | 14 ++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 90cb306..1afbe3c 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -145,10 +145,10 @@ static void mips_jazz_init(MachineState *machine,
-     ISABus *isa_bus;
-     ISADevice *pit;
-     DriveInfo *fds[MAX_FD];
--    qemu_irq esp_reset, dma_enable;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *bios = g_new(MemoryRegion, 1);
-     MemoryRegion *bios2 = g_new(MemoryRegion, 1);
-+    SysBusESPState *sysbus_esp;
-     ESPState *esp;
+diff --git a/qapi/block.json b/qapi/block.json
+index 8765c29..11f01f2 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -359,6 +359,30 @@
+   'data': { 'device': 'str', 'id': 'str', 'tray-open': 'bool' } }
  
-     /* init CPUs */
-@@ -281,8 +281,21 @@ static void mips_jazz_init(MachineState *machine,
+ ##
++# @PR_MANAGER_STATUS_CHANGED:
++#
++# Emitted whenever the connected status of a persistent reservation
++# manager changes.
++#
++# @id: The id of the PR manager object
++#
++# @connected: true if the PR manager is connected to a backend
++#
++# Since: 3.0
++#
++# Example:
++#
++# <- { "event": "PR_MANAGER_STATUS_CHANGED",
++#      "data": { "id": "pr-helper0",
++#                "connected": true
++#      },
++#      "timestamp": { "seconds": 1519840375, "microseconds": 450486 } }
++#
++##
++{ 'event': 'PR_MANAGER_STATUS_CHANGED',
++  'data': { 'id': 'str', 'connected': 'bool' } }
++
++##
+ # @QuorumOpType:
+ #
+ # An enumeration of the quorum operation types
+diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
+index b11481b..519a296 100644
+--- a/scsi/pr-manager-helper.c
++++ b/scsi/pr-manager-helper.c
+@@ -17,6 +17,7 @@
+ #include "io/channel.h"
+ #include "io/channel-socket.h"
+ #include "pr-helper.h"
++#include "qapi/qapi-events-block.h"
+ 
+ #include <scsi/sg.h>
+ 
+@@ -38,6 +39,16 @@ typedef struct PRManagerHelper {
+     QIOChannel *ioc;
+ } PRManagerHelper;
+ 
++static void pr_manager_send_status_changed_event(PRManagerHelper *pr_mgr)
++{
++    char *id = object_get_canonical_path_component(OBJECT(pr_mgr));
++
++    if (id) {
++        qapi_event_send_pr_manager_status_changed(id, !!pr_mgr->ioc,
++                                                  &error_abort);
++    }
++}
++
+ /* Called with lock held.  */
+ static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
+                                   void *buf, int sz, Error **errp)
+@@ -47,6 +58,7 @@ static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
+     if (r < 0) {
+         object_unref(OBJECT(pr_mgr->ioc));
+         pr_mgr->ioc = NULL;
++        pr_manager_send_status_changed_event(pr_mgr);
+         return -EINVAL;
      }
  
-     /* SCSI adapter */
--    esp = esp_init(0x80002000, 0, rc4030_dma_read, rc4030_dma_write, dmas[0],
--                   qdev_get_gpio_in(rc4030, 5), &esp_reset, &dma_enable);
-+    dev = qdev_create(NULL, TYPE_ESP);
-+    sysbus_esp = ESP_STATE(dev);
-+    esp = &sysbus_esp->esp;
-+    esp->dma_memory_read = rc4030_dma_read;
-+    esp->dma_memory_write = rc4030_dma_write;
-+    esp->dma_opaque = dmas[0];
-+    sysbus_esp->it_shift = 0;
-+    /* XXX for now until rc4030 has been changed to use DMA enable signal */
-+    esp->dma_enabled = 1;
-+    qdev_init_nofail(dev);
-+
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(rc4030, 5));
-+    sysbus_mmio_map(sysbus, 0, 0x80002000);
-+
-     scsi_bus_legacy_handle_cmdline(&esp->bus);
+@@ -72,6 +84,7 @@ static int pr_manager_helper_write(PRManagerHelper *pr_mgr,
+             assert(n_written != QIO_CHANNEL_ERR_BLOCK);
+             object_unref(OBJECT(pr_mgr->ioc));
+             pr_mgr->ioc = NULL;
++            pr_manager_send_status_changed_event(pr_mgr);
+             return n_written < 0 ? -EINVAL : 0;
+         }
  
-     /* Floppy */
+@@ -127,6 +140,7 @@ static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
+         goto out_close;
+     }
+ 
++    pr_manager_send_status_changed_event(pr_mgr);
+     return 0;
+ 
+ out_close:
 -- 
 1.8.3.1
