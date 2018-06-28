@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYZ8s-000225-2A
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYZ90-00025t-ND
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYZ8p-0000LC-0C
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:30 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:32979)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYZ8x-0000TV-Ko
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:38 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:41963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYZ8o-0000KY-QX
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:26 -0400
-Received: by mail-pf0-x241.google.com with SMTP id b17-v6so2796622pfi.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:47:26 -0700 (PDT)
-References: <20180627043328.11531-1-richard.henderson@linaro.org>
-	<20180627043328.11531-34-richard.henderson@linaro.org>
-	<87sh57uhva.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a6a72cd5-d4c9-ee47-434d-1576a5e455d3@linaro.org>
-Date: Thu, 28 Jun 2018 08:47:23 -0700
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYZ8x-0000T1-Fc
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:35 -0400
+Received: by mail-qt0-x243.google.com with SMTP id y20-v6so5121610qto.8
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:47:35 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180628153535.1411-1-f4bug@amsat.org>
+	<20180628153535.1411-3-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <69f84ead-55d4-4a55-eb67-e4d6ba09549b@amsat.org>
+Date: Thu, 28 Jun 2018 12:47:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <87sh57uhva.fsf@linaro.org>
+In-Reply-To: <20180628153535.1411-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 33/35] target/arm: Implement
- SVE dot product (indexed)
+Subject: Re: [Qemu-devel] [PATCH 2/4] tests/vm: Add a dependency to qemu-img
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,15 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 06/28/2018 07:04 AM, Alex Bennée wrote:
-> Looking at the dissembler output I guess the metrics don't make it worth
-> the compiler vectorising any of this which is a shame.
+On 06/28/2018 12:35 PM, Philippe Mathieu-Daudé wrote:
+> Before the first use, the VM image are resized with qemu-img.
+> 
+> Add a dependency to the qemu-img tool to fix:
+> 
+>   $ make vm-build-ubuntu.i386
+>   Traceback (most recent call last):
+>     File "source/qemu/tests/vm/basevm.py", line 236, in main
+>       return vm.build_image(args.image)
+>     File "tests/vm/ubuntu.i386", line 67, in build_image
+>       subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
+>   OSError: [Errno 2] No such file or directory
+>   tests/vm/Makefile.include:23: recipe for target 'tests/vm/ubuntu.i386.img' failed
+>   make: *** [tests/vm/ubuntu.i386.img] Error 2
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  tests/vm/Makefile.include | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> index 5daa2a3b73..e5e8146267 100644
+> --- a/tests/vm/Makefile.include
+> +++ b/tests/vm/Makefile.include
+> @@ -17,10 +17,13 @@ vm-test:
+>  
+>  vm-build-all: $(addprefix vm-build-, $(IMAGES))
+>  
+> +$(IMAGE_FILES): qemu-img$(EXESUF)
+> +
+>  tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
+>  		$(SRC_PATH)/tests/vm/basevm.py \
+>  		$(SRC_PATH)/tests/vm/Makefile.include
+>  	$(call quiet-command, \
+> +		PATH=$(PATH):. \
 
-I think dot product pattern recognition is still being worked on.  At least
-that's what I recall from a conversation from Richard Sandiford a few weeks ago.
+Oh since we want to use the shell PATH and not a make variable, it could
+be cleaner to rather use:
 
++		PATH=$$PATH:. \
 
-r~
+>  		$< \
+>  		$(if $(V)$(DEBUG), --debug) \
+>  		--image "$@" \
+> 
