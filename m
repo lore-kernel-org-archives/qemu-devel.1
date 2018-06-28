@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYYcE-0004Cf-RV
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:13:47 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fYYka-0005yT-NZ
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYYcD-000683-Ts
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:13:46 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33412)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYYcD-00066B-Nh
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:13:45 -0400
-Received: by mail-oi0-x243.google.com with SMTP id c6-v6so5535094oiy.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:13:45 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fYYkW-0004EG-OR
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:22:24 -0400
+Date: Thu, 28 Jun 2018 17:22:15 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180628172215.142ed114.cohuck@redhat.com>
+In-Reply-To: <20180628113817.30814-1-david@redhat.com>
+References: <20180628113817.30814-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180626215955.18933-1-jcd@tribudubois.net>
-References: <20180626215955.18933-1-jcd@tribudubois.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 16:13:24 +0100
-Message-ID: <CAFEAcA_w7XjKyQZAB91ma-X89H5YhG-EU63RM+8E-hYbX02iaw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] i.mx7d fixes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/kvm: legacy_s390_alloc() fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +22,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe Dubois <jcd@tribudubois.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Andrey Smirnov <andrew.smirnov@gmail.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 26 June 2018 at 22:59, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
-> Small fixes in the i.mx7d code.
->
-> Jean-Christophe Dubois (3):
->   i.mx7d: Remove unused header files
->   i.mx7d: Change SRC unimpleted device name from sdma to src
->   i.mx7d: Change IRQ number type from hwaddr to int
->
->  hw/arm/fsl-imx7.c      | 8 ++++----
->  hw/arm/mcimx7d-sabre.c | 2 --
->  2 files changed, 4 insertions(+), 6 deletions(-)
+On Thu, 28 Jun 2018 13:38:15 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Thanks, applied all to target-arm.next.
+> Two patches for legacy_s390_alloc(), only relevant under old z/VM versions.
 
-Something seems to have gone wrong with posting of this series:
-the patches didn't get sent as followups to the cover letter
-(missing In-reply-to: headers). You might want to look into that
-for future patch postings.
+Those teddy bears are really looking a bit scruffy... but the patches
+look sane.
 
--- PMM
+> 
+> Patch #1 is relevant when trying to allocate memory for more than one
+> memory region. Patch #2 is only for completeness, to make it behave
+> more similar to qemu_anon_ram_alloc().
+> 
+> David Hildenbrand (2):
+>   s390x/kvm: legacy_s390_alloc() only supports one allocation
+>   s390x/kvm: indicate alignment in legacy_s390_alloc()
+> 
+>  target/s390x/kvm.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+> 
+
+Thanks, applied.
