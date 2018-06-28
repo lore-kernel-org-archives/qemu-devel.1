@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fYa8k-0001rN-Kn
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:51:27 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYaAW-0002yn-2G
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fYa8j-0005mL-Nu
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:51:26 -0400
-Date: Thu, 28 Jun 2018 17:51:18 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180628165118.GH1455@redhat.com>
-References: <20180628132211.8795-1-rjones@redhat.com>
-	<20180628132211.8795-2-rjones@redhat.com>
-	<cf457707-eaab-16f9-d1c9-3a3f6423958e@redhat.com>
-	<20180628160620.GS3513@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYaAS-0001Jo-W1
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:53:16 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 28 Jun 2018 13:52:54 -0300
+Message-Id: <20180628165254.10374-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180628160620.GS3513@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] crypto: Implement TLS Pre-Shared Keys
- (PSK).
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] milkymist-minimac2: Use
+ qemu_log_mask(GUEST_ERROR) instead of error_report
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Michael Walle <michael@walle.cc>, Jason Wang <jasowang@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Thu, Jun 28, 2018 at 05:06:20PM +0100, Daniel P. Berrang=E9 wrote:
-> On Thu, Jun 28, 2018 at 09:42:18AM -0500, Eric Blake wrote:
-> > Does it make sense to forbid this operation on servers (since it only=
- makes
-> > sense for clients)?
->=20
-> We can't validate that here, because we can't guarantee that 'endpoint'
-> is set before 'username' is set.
->=20
->=20
-> We could enforce it in the setter for the "loaded" property as that is
-> set only after every other property is set.
+qemu_log_mask(GUEST_ERROR) is more appropriate:
 
-As far as I can see we could only warn here, since the set_loaded
-function returns void.
+  $ qemu -d help
+  Log items (comma separated):
+  guest_errors    log when the guest OS does something invalid (eg accessing a non-existent register)
 
-Rich.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/net/milkymist-minimac2.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-top is 'top' for virtual machines.  Tiny program with many
-powerful monitoring features, net stats, disk stats, logging, etc.
-http://people.redhat.com/~rjones/virt-top
+diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
+index 3eaa19dfde..94c3bc6595 100644
+--- a/hw/net/milkymist-minimac2.c
++++ b/hw/net/milkymist-minimac2.c
+@@ -30,7 +30,7 @@
+ #include "hw/sysbus.h"
+ #include "trace.h"
+ #include "net/net.h"
+-#include "qemu/error-report.h"
++#include "qemu/log.h"
+ 
+ #include <zlib.h>
+ 
+@@ -214,7 +214,8 @@ static size_t assemble_frame(uint8_t *buf, size_t size,
+     uint32_t crc;
+ 
+     if (size < payload_size + 12) {
+-        error_report("milkymist_minimac2: received too big ethernet frame");
++        qemu_log_mask(LOG_GUEST_ERROR, "milkymist_minimac2: frame too big "
++                      "(%zd bytes)\n", payload_size);
+         return 0;
+     }
+ 
+@@ -347,8 +348,9 @@ minimac2_read(void *opaque, hwaddr addr, unsigned size)
+         break;
+ 
+     default:
+-        error_report("milkymist_minimac2: read access to unknown register 0x"
+-                TARGET_FMT_plx, addr << 2);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "milkymist_minimac2_rd%d: 0x%" HWADDR_PRIx "\n",
++                      size, addr << 2);
+         break;
+     }
+ 
+@@ -413,8 +415,9 @@ minimac2_write(void *opaque, hwaddr addr, uint64_t value,
+         break;
+ 
+     default:
+-        error_report("milkymist_minimac2: write access to unknown register 0x"
+-                TARGET_FMT_plx, addr << 2);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "milkymist_minimac2_wr%d: 0x%" HWADDR_PRIx " = 0x%lx\n",
++                      size, addr << 2, value);
+         break;
+     }
+ }
+-- 
+2.18.0
