@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYUhc-0000Sj-QO
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1fYUhf-0000U9-S8
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYUhZ-0003g4-05
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59888 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fYUhd-0003mj-Gd
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59894 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYUhY-0003fD-S4
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:00 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYUhd-0003ly-Bl
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:05 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 28 Jun 2018 12:02:52 +0100
-Message-Id: <20180628110254.6725-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] Qio next patches
+Date: Thu, 28 Jun 2018 12:02:54 +0100
+Message-Id: <20180628110254.6725-3-berrange@redhat.com>
+In-Reply-To: <20180628110254.6725-1-berrange@redhat.com>
+References: <20180628110254.6725-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL 2/2] Delete AF_UNIX socket after close
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +24,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Pavel Balaev <mail@void.so>
 
-The following changes since commit 00928a421d47f49691cace1207481b7aad31b1=
-f1:
+From: Pavel Balaev <mail@void.so>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-80626' into staging (2018-06-26 18:23:49 +0100)
+This is a second attempt at sending this patch:
 
-are available in the Git repository at:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg04697.html
 
-  https://github.com/berrange/qemu tags/qio-next-pull-request
+Signed-off-by: Pavel Balaev <mail@void.so>
+---
+ io/channel-socket.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-for you to fetch changes up to 39321d9ed89eccdde73bb7b20cb834506c3bd750:
-
-  Delete AF_UNIX socket after close (2018-06-28 11:59:51 +0100)
-
-----------------------------------------------------------------
-Merge qio 2018-06-28
-
-Misc bug fixes for sockets channels
-
-----------------------------------------------------------------
-
-Pavel Balaev (1):
-  Delete AF_UNIX socket after close
-
-linzhecheng (1):
-  socket: dont't free msgfds if error equals EAGAIN
-
- chardev/char-socket.c |  4 ++--
- io/channel-socket.c   | 18 +++++++++++++++++-
- 2 files changed, 19 insertions(+), 3 deletions(-)
-
---=20
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index 57cfb4d3a6..b50e63a053 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -685,8 +685,10 @@ qio_channel_socket_close(QIOChannel *ioc,
+                          Error **errp)
+ {
+     QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(ioc);
++    int rc = 0;
+ 
+     if (sioc->fd != -1) {
++        SocketAddress *addr = socket_local_address(sioc->fd, errp);
+ #ifdef WIN32
+         WSAEventSelect(sioc->fd, NULL, 0);
+ #endif
+@@ -697,8 +699,22 @@ qio_channel_socket_close(QIOChannel *ioc,
+             return -1;
+         }
+         sioc->fd = -1;
++
++        if (addr && addr->type == SOCKET_ADDRESS_TYPE_UNIX
++            && addr->u.q_unix.path) {
++            if (unlink(addr->u.q_unix.path) < 0 && errno != ENOENT) {
++                error_setg_errno(errp, errno,
++                                 "Failed to unlink socket %s",
++                                 addr->u.q_unix.path);
++                rc = -1;
++            }
++        }
++
++        if (addr) {
++            qapi_free_SocketAddress(addr);
++        }
+     }
+-    return 0;
++    return rc;
+ }
+ 
+ static int
+-- 
 2.17.1
