@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fYUJw-0001T0-Kv
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:39 -0400
+	(envelope-from <david@redhat.com>) id 1fYUNL-0003Od-Nd
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fYUJu-0001CB-30
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:36 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1fYUJt-0001BF-SX
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:34 -0400
-Received: by mail-it0-x243.google.com with SMTP id l16-v6so11068405ita.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 03:38:33 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fYUNH-0007Er-PV
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:42:07 -0400
+References: <20180618144800.555-1-david@redhat.com>
+	<20180618144800.555-3-david@redhat.com>
+	<20180619175940.00ae5e70@redhat.com>
+	<1c0de15c-0bbd-1714-782a-00928f3064fe@redhat.com>
+	<20180626170328.221939e6@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <391b91f3-3641-fbea-8320-375e68c8cad9@redhat.com>
+Date: Thu, 28 Jun 2018 12:41:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <208784f8-ad5a-ee6c-0322-e4206c4fa11b@redhat.com>
-References: <1530094388-607-1-git-send-email-hongbo.zhang@linaro.org>
-	<208784f8-ad5a-ee6c-0322-e4206c4fa11b@redhat.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Thu, 28 Jun 2018 18:38:32 +0800
-Message-ID: <CAHmQWvA3LmsDhFB05uRXacxJ8RRL9TSuG3XP57=J5nkAXhN9nw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm: Add SBSA machine type
+In-Reply-To: <20180626170328.221939e6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 2/4] machine: factor out
+ enforce_aligned_dimm into memory_device_align
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,456 +28,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On 28 June 2018 at 17:31, Laszlo Ersek <lersek@redhat.com> wrote:
-> On 06/27/18 12:13, Hongbo Zhang wrote:
->> This patch introduces a new Arm machine type 'SBSA' with features:
->>  - Based on legacy 'virt' machine type.
->
-> My understanding is that this new machine type serves a different use
-> case than the "virt" machine type; i.e. it is not primarily meant to run
-> on KVM and execute virtualization workloads. Instead, it is meant to
-> provide an environment as faithful as possible to physical hardware, for
-> supporting firmware and OS development for physical ARM64 machines.
->
-> In other words, this machine type is not a "goal" for running production
-> workloads (on KVM); instead it is a development and testbed "means",
-> where the end-goal is writing OS and firmware code for physical machines
-> that conform to the SBSA spec. Thus, the machine type is similar to e.g.
-> the "vexpress" machine types, except the emulated hardware platform is
-> "SBSA".
->
-> Can you please confirm that?
->
-Yes, yes, yes.
-You describe much better than me, thanks.
+On 26.06.2018 17:03, Igor Mammedov wrote:
+> On Tue, 19 Jun 2018 19:06:38 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 19.06.2018 17:59, Igor Mammedov wrote:
+>>> On Mon, 18 Jun 2018 16:47:58 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>  =20
+>>>> We want to handle memory device address assignment without passing
+>>>> compatibility parameters ("*align").
+>>>>
+>>>> As x86 and Power use different strategies to determine an alignment =
+and
+>>>> we need clean support for compat handling, let's introduce an enum o=
+n
+>>>> the machine class level. This is the machine configuration on how to
+>>>> align memory devices in guest physical memory.
+>>>>
+>>>> The three introduced types represent what is being done on x86 and P=
+ower
+>>>> right now. =20
+>>>
+>>> commit message doesn't deliver purpose of the path, =20
+>>
+>> "We want to handle memory device address assignment without passing
+>> compatibility parameters ("*align")."
+>>
+>> So in order to do patch nr 4 without this, I would basically have to
+>> move the align parameter to pc_dimm_pre_plug, along with the code for
+>> "detecting" the alignment in e.g. pc_memory_plug. And I want to avoid
+>> this because ...
+>>
+>>> So I'm no conviced it's necessary.
+>>> we probably discussed it in previous revisions but could you reiterat=
+e
+>>> it here WHY do you need this and 3/4
+>>>  =20
+>>
+>> .. I want to get rid of the align parameter in the long run. Alignment
+>> is some memory device specific property that can be easily detected
+>> using a detection configuration (this patch). This approach looks much
+>> cleaner to me. This way we can use the same alignment strategy for all
+>> memory devices.
+>>
+>> In follow up series I want to factor out address assignment completely
+>> into memory_device_pre_plug(). And I also don't want to have an align
+>> parameter at that function. I want to avoid moving the same code aroun=
+d
+>> two times (pc.c).
+>=20
+> Lets look at what we have currently:
+>=20
+>   1.1 PC: RAM backend target page size alignment (bug fixed by 92a37a04=
+d
+>       as non aligned addr is not valid at all)
+>             align =3D TARGET_PAGE_SIZE
+>=20
+>       but immediately following up commits a2b257d62 / 0c0de1b68
+>       overwrites it unconditionally to QEMU_VMALLOC_ALIGN for 2.2 and l=
+ater
+>=20
+>       so
+>       ..v2.1
+>             address/size =3D not multiple of TARGET_PAGE_SIZE in QEMU-2=
+.1 is broken
+>                            (a2b257d62) and we don't care
+>=20
+>             align =3D TARGET_PAGE_SIZE since QEMU-2.2 binary even for o=
+lder machine types
+>       and later
+>             align =3D QEMU_VMALLOC_ALIGN
+>=20
+>   1.2 SPAPR: RAM backend. memhotplug came after 1.1 so it has
+>          v2.5
+>             align =3D QEMU_VMALLOC_ALIGN
+>=20
+>   2.1 PC: file backend
+>           v2.1
+>             align =3D TARGET_PAGE_SIZE
+>           v2.2 .. 2.11
+>             align =3D qemu_fd_getpagesize(fd)
+>           v2.12 adds one more invariant
+>             align =3D MAX(qemu_fd_getpagesize(fd), 'filebackend.align' =
+option)
+>            =20
+>   2.2 SPAPR: file backend
+>           v2.5..2.11
+>             align =3D qemu_fd_getpagesize(fd)
+>           v2.12
+>             align =3D MAX(qemu_fd_getpagesize(fd), 'filebackend.align' =
+option)
+>=20
+> also there is s390 kvm invariant for file backend see: file_ram_alloc()
+>=20
+>            block->mr->align =3D MAX(qemu_fd_getpagesize(fd), 'filebacke=
+nd.align' option)
+>            if (vkm)
+>               block->mr->align =3D MAX(block->mr->align, QEMU_VMALLOC_A=
+LIGN);
+>=20
+>=20
+> to sum up they all have memory region based alignment except of v2.1 PC=
+ machine
+> which is compat trick that I don't expect to be used anywhere else.
+> So taking in account above and fact that it's backend property,
+> I'm against of pushing it up to generic machine level, I'd try to keep
+> compat hack local to PC machine along with enforce_aligned_dimm.
 
-> If that's the case, then please remove the word "legacy" from the commit
-> message (multiple instances). This machine type does not obsolete or
-> replace "virt", for "virt"'s stated use case; this machine type is for
-> an independent use case.
->
-Good suggestion.
-I didn't want make 'virt' obsolete at all, English isn't my mother
-language, this should be my misunderstanding of term 'legacy' some
-how, I just meant SBSA based on 'virt' :)
+Problematic case is win32 qemu_anon_ram_alloc(), which does not fixup
+the alignment. As far as I can see, the alignment will stay 0. So it
+could happen that we have a 0 alignment, but I'll send a fix for that (I
+don't think we have to worry about compat in windows here (changing
+alignment from 0 to getpagesize())).
 
-> One consequence of this would be that performance isn't as important.
->
-> Another consequence is that paravirt devices are less desirable.
->
-> I have another question:
->
->>  - Newly designed memory map.
->>  - EL2 and EL3 are enabled by default.
->>  - AHCI controller attached to system bus, and then CDROM and hard disc
->>    can be added to it.
->>  - EHCI controller attached to system bus, with USB mouse and key board
->>    installed by default.
->>  - E1000 ethernet card on PCIE bus.
->>  - VGA display adaptor on PCIE bus.
->>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
->>  - No virtio functions enabled, since this is to emulate real hardware.
->>
->> This is the prototype, more features can be added in futrue.
->>
->> Purpose of this is to have a standard QEMU platform for Arm firmware
->> developement etc. where the legacy machines cannot meets requirements.
->>
->> Arm Trusted Firmware and UEFI porting to this are done seperately.
->>
->> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
->> ---
->>  hw/arm/virt-acpi-build.c |  59 +++++++++++++-
->>  hw/arm/virt.c            | 196 ++++++++++++++++++++++++++++++++++++++++++++++-
->>  include/hw/arm/virt.h    |   3 +
->>  3 files changed, 254 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 6ea47e2..60af414 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -84,6 +84,52 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
->>      aml_append(scope, dev);
->>  }
->>
->> +static void acpi_dsdt_add_ahci(Aml *scope, const MemMapEntry *ahci_memmap,
->> +                                           uint32_t ahci_irq)
->> +{
->> +    Aml *dev = aml_device("AHC0");
->> +    aml_append(dev, aml_name_decl("_HID", aml_string("LNRO001E")));
->> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->> +    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
->> +
->> +    Aml *crs = aml_resource_template();
->> +    aml_append(crs, aml_memory32_fixed(ahci_memmap->base,
->> +                                       ahci_memmap->size, AML_READ_WRITE));
->> +    aml_append(crs,
->> +               aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
->> +                             AML_EXCLUSIVE, &ahci_irq, 1));
->> +    aml_append(dev, aml_name_decl("_CRS", crs));
->> +
->> +    Aml *pkg = aml_package(3);
->> +    aml_append(pkg, aml_int(0x1));
->> +    aml_append(pkg, aml_int(0x6));
->> +    aml_append(pkg, aml_int(0x1));
->> +
->> +    /* append the SATA class id */
->> +    aml_append(dev, aml_name_decl("_CLS", pkg));
->> +
->> +    aml_append(scope, dev);
->> +}
->> +
->> +static void acpi_dsdt_add_ehci(Aml *scope, const MemMapEntry *ehci_memmap,
->> +                                           uint32_t ehci_irq)
->> +{
->> +    Aml *dev = aml_device("EHC0");
->> +    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0D20")));
->> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->> +    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
->> +
->> +    Aml *crs = aml_resource_template();
->> +    aml_append(crs, aml_memory32_fixed(ehci_memmap->base,
->> +                                       ehci_memmap->size, AML_READ_WRITE));
->> +    aml_append(crs,
->> +               aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
->> +                             AML_EXCLUSIVE, &ehci_irq, 1));
->> +    aml_append(dev, aml_name_decl("_CRS", crs));
->> +
->> +    aml_append(scope, dev);
->> +}
->> +
->>  static void acpi_dsdt_add_fw_cfg(Aml *scope, const MemMapEntry *fw_cfg_memmap)
->>  {
->>      Aml *dev = aml_device("FWCF");
->> @@ -768,14 +814,23 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->>                         (irqmap[VIRT_UART] + ARM_SPI_BASE));
->>      acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
->>      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
->> -    acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
->> -                    (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
->> +    if (!vms->sbsa) {
->> +        acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
->> +                   (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
->> +    }
->>      acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
->>                        vms->highmem, vms->highmem_ecam);
->>      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
->>                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
->>      acpi_dsdt_add_power_button(scope);
->>
->> +    if (vms->sbsa) {
->> +        acpi_dsdt_add_ahci(scope, &memmap[VIRT_AHCI],
->> +                           (irqmap[VIRT_AHCI] + ARM_SPI_BASE));
->> +        acpi_dsdt_add_ehci(scope, &memmap[VIRT_EHCI],
->> +                           (irqmap[VIRT_EHCI] + ARM_SPI_BASE));
->> +    }
->> +
->>      aml_append(dsdt, scope);
->>
->>      /* copy AML table into ACPI tables blob and patch header there */
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 742f68a..491f23b 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -59,6 +59,10 @@
->>  #include "qapi/visitor.h"
->>  #include "standard-headers/linux/input.h"
->>  #include "hw/arm/smmuv3.h"
->> +#include "hw/ide/internal.h"
->> +#include "hw/ide/ahci_internal.h"
->> +#include "hw/usb.h"
->> +#include "qemu/cutils.h"
->>
->>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
->> @@ -94,6 +98,8 @@
->>
->>  #define PLATFORM_BUS_NUM_IRQS 64
->>
->> +#define SATA_NUM_PORTS 6
->> +
->>  /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
->>   * RAM can go up to the 256GB mark, leaving 256GB of the physical
->>   * address space unallocated and free for future use between 256G and 512G.
->> @@ -168,6 +174,47 @@ static const int a15irqmap[] = {
->>      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
->>  };
->>
->> +static const MemMapEntry sbsa_memmap[] = {
->> +    /* Space up to 0x8000000 is reserved for a boot ROM */
->> +    [VIRT_FLASH] =              {          0, 0x08000000 },
->> +    [VIRT_CPUPERIPHS] =         { 0x08000000, 0x00020000 },
->> +    /* GIC distributor and CPU interfaces sit inside the CPU peripheral space */
->> +    [VIRT_GIC_DIST] =           { 0x08000000, 0x00010000 },
->> +    [VIRT_GIC_CPU] =            { 0x08010000, 0x00010000 },
->> +    [VIRT_GIC_V2M] =            { 0x08020000, 0x00001000 },
->> +    /* The space in between here is reserved for GICv3 CPU/vCPU/HYP */
->> +    [VIRT_GIC_ITS] =            { 0x08080000, 0x00020000 },
->> +    /* This redistributor space allows up to 2*64kB*123 CPUs */
->> +    [VIRT_GIC_REDIST] =         { 0x080A0000, 0x00F60000 },
->> +    [VIRT_UART] =               { 0x09000000, 0x00001000 },
->> +    [VIRT_RTC] =                { 0x09010000, 0x00001000 },
->> +    [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
->
-> It's hard for any device to be *more* paravirtual than fw_cfg is --
-> given that (to my understanding) paravirtualization is an explicit
-> non-goal for this machine type, what do you need fw_cfg for? Is it an
-> oversight in the memory map, or is it an exception -- a limited paravirt
-> info channel -- because you need *some* way for passing information from
-> QEMU to a small subset of guest code?
->
-Well, when design discussed, fw_cfg wasn't mentioned at all, so I
-didn't pay much attention to it.
-Will double check, I think this should be removed.
+>=20
+> Moreover 3/4 patch where you are making memory-device.c build per targe=
+t is no go,
+> we are trying to minimize number of such files and not to add any witho=
+ut
+> a good reason.
 
-Thanks for review.
+I agree, this is to be avoided.
 
-> Thanks
-> Laszlo
->
->> +    [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->> +    [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->> +    [VIRT_AHCI] =               { 0x09050000, 0x00010000 },
->> +    [VIRT_EHCI] =               { 0x09060000, 0x00010000 },
->> +    [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
->> +    [VIRT_SECURE_MEM] =         { 0x0e000000, 0x01000000 },
->> +    [VIRT_PCIE_MMIO] =          { 0x10000000, 0x7fff0000 },
->> +    [VIRT_PCIE_PIO] =           { 0x8fff0000, 0x00010000 },
->> +    [VIRT_PCIE_ECAM] =          { 0x90000000, 0x10000000 },
->> +    /* Second PCIe window, 508GB wide at the 4GB boundary */
->> +    [VIRT_PCIE_MMIO_HIGH] =     { 0x100000000ULL, 0x7F00000000ULL },
->> +    [VIRT_MEM] =                { 0x8000000000ULL, RAMLIMIT_BYTES },
->> +};
->> +
->> +static const int sbsa_irqmap[] = {
->> +    [VIRT_UART] = 1,
->> +    [VIRT_RTC] = 2,
->> +    [VIRT_PCIE] = 3, /* ... to 6 */
->> +    [VIRT_GPIO] = 7,
->> +    [VIRT_SECURE_UART] = 8,
->> +    [VIRT_AHCI] = 9,
->> +    [VIRT_EHCI] = 10,
->> +    [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
->> +    [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
->> +};
->> +
->>  static const char *valid_cpus[] = {
->>      ARM_CPU_TYPE_NAME("cortex-a15"),
->>      ARM_CPU_TYPE_NAME("cortex-a53"),
->> @@ -696,6 +743,72 @@ static void create_rtc(const VirtMachineState *vms, qemu_irq *pic)
->>      g_free(nodename);
->>  }
->>
->> +static void create_ahci(const VirtMachineState *vms, qemu_irq *pic)
->> +{
->> +    char *nodename;
->> +    hwaddr base = vms->memmap[VIRT_AHCI].base;
->> +    hwaddr size = vms->memmap[VIRT_AHCI].size;
->> +    int irq = vms->irqmap[VIRT_AHCI];
->> +    const char compat[] = "qemu,mach-virt-ahci\0generic-ahci";
->> +    DeviceState *dev;
->> +    DriveInfo *hd[SATA_NUM_PORTS];
->> +    SysbusAHCIState *sysahci;
->> +    AHCIState *ahci;
->> +    int i;
->> +
->> +    dev = qdev_create(NULL, "sysbus-ahci");
->> +    qdev_prop_set_uint32(dev, "num-ports", SATA_NUM_PORTS);
->> +    qdev_init_nofail(dev);
->> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
->> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irq]);
->> +
->> +    sysahci = SYSBUS_AHCI(dev);
->> +    ahci = &sysahci->ahci;
->> +    ide_drive_get(hd, ARRAY_SIZE(hd));
->> +    for (i = 0; i < ahci->ports; i++) {
->> +        if (hd[i] == NULL) {
->> +            continue;
->> +        }
->> +        ide_create_drive(&ahci->dev[i].port, 0, hd[i]);
->> +    }
->> +
->> +    nodename = g_strdup_printf("/sata@%" PRIx64, base);
->> +    qemu_fdt_add_subnode(vms->fdt, nodename);
->> +    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
->> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
->> +                                 2, base, 2, size);
->> +    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
->> +                           GIC_FDT_IRQ_TYPE_SPI, irq,
->> +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
->> +    g_free(nodename);
->> +}
->> +
->> +static void create_ehci(const VirtMachineState *vms, qemu_irq *pic)
->> +{
->> +    char *nodename;
->> +    hwaddr base = vms->memmap[VIRT_EHCI].base;
->> +    hwaddr size = vms->memmap[VIRT_EHCI].size;
->> +    int irq = vms->irqmap[VIRT_EHCI];
->> +    const char compat[] = "qemu,mach-virt-ehci\0generic-ehci";
->> +    USBBus *usb_bus;
->> +
->> +    sysbus_create_simple("exynos4210-ehci-usb", base, pic[irq]);
->> +
->> +    usb_bus = usb_bus_find(-1);
->> +    usb_create_simple(usb_bus, "usb-kbd");
->> +    usb_create_simple(usb_bus, "usb-mouse");
->> +
->> +    nodename = g_strdup_printf("/ehci@%" PRIx64, base);
->> +    qemu_fdt_add_subnode(vms->fdt, nodename);
->> +    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
->> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
->> +                                 2, base, 2, size);
->> +    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
->> +                           GIC_FDT_IRQ_TYPE_SPI, irq,
->> +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
->> +    g_free(nodename);
->> +}
->> +
->>  static DeviceState *gpio_key_dev;
->>  static void virt_powerdown_req(Notifier *n, void *opaque)
->>  {
->> @@ -1107,13 +1220,21 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
->>              NICInfo *nd = &nd_table[i];
->>
->>              if (!nd->model) {
->> -                nd->model = g_strdup("virtio");
->> +                if (vms->sbsa) {
->> +                    nd->model = g_strdup("e1000");
->> +                } else {
->> +                    nd->model = g_strdup("virtio");
->> +                }
->>              }
->>
->>              pci_nic_init_nofail(nd, pci->bus, nd->model, NULL);
->>          }
->>      }
->>
->> +    if (vms->sbsa) {
->> +        pci_create_simple(pci->bus, -1, "VGA");
->> +    }
->> +
->>      nodename = g_strdup_printf("/pcie@%" PRIx64, base);
->>      qemu_fdt_add_subnode(vms->fdt, nodename);
->>      qemu_fdt_setprop_string(vms->fdt, nodename,
->> @@ -1502,11 +1623,18 @@ static void machvirt_init(MachineState *machine)
->>
->>      create_gpio(vms, pic);
->>
->> +    if (vms->sbsa) {
->> +        create_ahci(vms, pic);
->> +        create_ehci(vms, pic);
->> +    }
->> +
->>      /* Create mmio transports, so the user can create virtio backends
->>       * (which will be automatically plugged in to the transports). If
->>       * no backend is created the transport will just sit harmlessly idle.
->>       */
->> -    create_virtio_devices(vms, pic);
->> +    if (!vms->sbsa) {
->> +        create_virtio_devices(vms, pic);
->> +    }
->>
->>      vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
->>      rom_set_fw(vms->fw_cfg);
->> @@ -1818,6 +1946,7 @@ static void virt_3_0_instance_init(Object *obj)
->>
->>      vms->memmap = a15memmap;
->>      vms->irqmap = a15irqmap;
->> +    vms->sbsa = false;
->>  }
->>
->>  static void virt_machine_3_0_options(MachineClass *mc)
->> @@ -1950,3 +2079,66 @@ static void virt_machine_2_6_options(MachineClass *mc)
->>      vmc->no_pmu = true;
->>  }
->>  DEFINE_VIRT_MACHINE(2, 6)
->> +
->> +static void sbsa_instance_init(Object *obj)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +    vms->secure = true;
->> +    object_property_add_bool(obj, "secure", virt_get_secure,
->> +                             virt_set_secure, NULL);
->> +    object_property_set_description(obj, "secure",
->> +                                    "Set on/off to enable/disable the ARM "
->> +                                    "Security Extensions (TrustZone)",
->> +                                    NULL);
->> +
->> +    vms->virt = true;
->> +    object_property_add_bool(obj, "virtualization", virt_get_virt,
->> +                             virt_set_virt, NULL);
->> +    object_property_set_description(obj, "virtualization",
->> +                                    "Set on/off to enable/disable emulating a "
->> +                                    "guest CPU which implements the ARM "
->> +                                    "Virtualization Extensions",
->> +                                    NULL);
->> +
->> +    vms->highmem = true;
->> +
->> +    /* This can be changed to GICv3 when firmware is ready*/
->> +    vms->gic_version = 2;
->> +    object_property_add_str(obj, "gic-version", virt_get_gic_version,
->> +                        virt_set_gic_version, NULL);
->> +    object_property_set_description(obj, "gic-version",
->> +                                    "Set GIC version. "
->> +                                    "Valid values are 2, 3, host, max", NULL);
->> +    vms->its = true;
->> +
->> +    vms->memmap = sbsa_memmap;
->> +    vms->irqmap = sbsa_irqmap;
->> +    vms->sbsa = true;
->> +}
->> +
->> +static void sbsa_class_init(ObjectClass *oc, void *data)
->> +{
->> +    MachineClass *mc = MACHINE_CLASS(oc);
->> +
->> +    mc->max_cpus = 246;
->> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a57");
->> +    mc->block_default_type = IF_IDE;
->> +    mc->default_ram_size = 1 * G_BYTE;
->> +    mc->default_cpus = 4;
->> +    mc->desc = "QEMU 'SBSA' ARM Virtual Machine";
->> +}
->> +
->> +static const TypeInfo sbsa_info = {
->> +    .name          = MACHINE_TYPE_NAME("sbsa"),
->> +    .parent        = TYPE_VIRT_MACHINE,
->> +    .instance_init = sbsa_instance_init,
->> +    .class_init    = sbsa_class_init,
->> +};
->> +
->> +static void sbsa_machine_init(void)
->> +{
->> +    type_register_static(&sbsa_info);
->> +}
->> +
->> +type_init(sbsa_machine_init);
->> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->> index 9a870cc..619473e 100644
->> --- a/include/hw/arm/virt.h
->> +++ b/include/hw/arm/virt.h
->> @@ -78,6 +78,8 @@ enum {
->>      VIRT_GPIO,
->>      VIRT_SECURE_UART,
->>      VIRT_SECURE_MEM,
->> +    VIRT_AHCI,
->> +    VIRT_EHCI,
->>  };
->>
->>  typedef enum VirtIOMMUType {
->> @@ -124,6 +126,7 @@ typedef struct {
->>      uint32_t msi_phandle;
->>      uint32_t iommu_phandle;
->>      int psci_conduit;
->> +    bool sbsa;
->>  } VirtMachineState;
->>
->>  #define VIRT_ECAM_ID(high) (high ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM)
->>
->
+>=20
+> Pushing align detection into common helper would be sufficient,=20
+> following could do the job with explicit comment inside that *align
+> is compat hack for pc machine.
+>=20
+>    memory_device_pre_plug(.... int *align)
+>      use non null for pc-2.1 compat hack and NULL in all other cases
+>=20
+
+Okay, in the first shot I'll do
+
+pcdimm_pre_plug(... uint64_t *enforced_align ...)
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
