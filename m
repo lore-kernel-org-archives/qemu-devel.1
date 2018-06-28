@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60588)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYYxq-0002Iz-W2
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:36:09 -0400
+	id 1fYYxz-0002Os-Pu
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYYxn-0001By-Ro
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:36:07 -0400
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:36176)
+	id 1fYYxy-0001cf-RC
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:36:15 -0400
+Received: from mail-qt0-x22b.google.com ([2607:f8b0:400d:c0d::22b]:41317)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYYxn-0001B9-Np
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:36:03 -0400
-Received: by mail-qt0-x231.google.com with SMTP id o9-v6so5102220qtp.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:36:03 -0700 (PDT)
+	id 1fYYxy-0001bq-MS
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:36:14 -0400
+Received: by mail-qt0-x22b.google.com with SMTP id y20-v6so5087029qto.8
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:36:14 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 28 Jun 2018 12:35:33 -0300
-Message-Id: <20180628153535.1411-3-f4bug@amsat.org>
+Date: Thu, 28 Jun 2018 12:35:35 -0300
+Message-Id: <20180628153535.1411-5-f4bug@amsat.org>
 In-Reply-To: <20180628153535.1411-1-f4bug@amsat.org>
 References: <20180628153535.1411-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/4] tests/vm: Add a dependency to qemu-img
+Subject: [Qemu-devel] [PATCH 4/4] tests/vm: Add flex and bison to the vm
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +37,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Before the first use, the VM image are resized with qemu-img.
+Similar to 79f24568e5e70, this fixes the following warnings:
 
-Add a dependency to the qemu-img tool to fix:
-
-  $ make vm-build-ubuntu.i386
-  Traceback (most recent call last):
-    File "source/qemu/tests/vm/basevm.py", line 236, in main
-      return vm.build_image(args.image)
-    File "tests/vm/ubuntu.i386", line 67, in build_image
-      subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
-  OSError: [Errno 2] No such file or directory
-  tests/vm/Makefile.include:23: recipe for target 'tests/vm/ubuntu.i386.img' failed
-  make: *** [tests/vm/ubuntu.i386.img] Error 2
+           CHK version_gen.h
+           LEX convert-dtsv0-lexer.lex.c
+  make[1]: flex: Command not found
+           BISON dtc-parser.tab.c
+  make[1]: bison: Command not found
+           LEX dtc-lexer.lex.c
+  make[1]: flex: Command not found
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/vm/Makefile.include | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/vm/ubuntu.i386 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 5daa2a3b73..e5e8146267 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -17,10 +17,13 @@ vm-test:
- 
- vm-build-all: $(addprefix vm-build-, $(IMAGES))
- 
-+$(IMAGE_FILES): qemu-img$(EXESUF)
-+
- tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
- 		$(SRC_PATH)/tests/vm/basevm.py \
- 		$(SRC_PATH)/tests/vm/Makefile.include
- 	$(call quiet-command, \
-+		PATH=$(PATH):. \
- 		$< \
- 		$(if $(V)$(DEBUG), --debug) \
- 		--image "$@" \
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index be16ceed50..88b661b6d8 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -81,7 +81,7 @@ class UbuntuX86VM(basevm.BaseVM):
+         # The previous update sometimes doesn't survive a reboot, so do it again
+         self.ssh_root_check("apt-get update")
+         self.ssh_root_check("apt-get build-dep -y qemu")
+-        self.ssh_root_check("apt-get install -y libfdt-dev")
++        self.ssh_root_check("apt-get install -y libfdt-dev flex bison")
+         self.ssh_root("poweroff")
+         self.wait()
+         if os.path.exists(img):
 -- 
 2.18.0
