@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYTxw-0000IK-7g
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:53 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fYTzS-0001R5-QW
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYTxt-0006BK-2u
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:52 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:43264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYTxs-00069j-P8
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:15:49 -0400
-Received: from player687.ha.ovh.net (unknown [10.109.105.112])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1079913E300
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 12:15:46 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 28 Jun 2018 12:15:33 +0200
-Message-ID: <153018093372.336571.7266716996862582164.stgit@bahia>
-In-Reply-To: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
-References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
+	(envelope-from <rkagan@virtuozzo.com>) id 1fYTzM-00005K-Qy
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:17:26 -0400
+Received: from mail-db5eur03hn0214.outbound.protection.outlook.com
+	([104.47.10.214]:65133
+	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1fYTzM-0008Tg-15
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:17:20 -0400
+Date: Thu, 28 Jun 2018 13:17:05 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180628101704.GA9389@rkaganb.sw.ru>
+References: <20180627034935.20276-1-venu.busireddy@oracle.com>
+	<20180627122457.GA19714@rkaganb.sw.ru>
+	<20180627192958.GA17236@vbusired-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 3/3] accel: forbid early use of kvm_enabled()
- and friends
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180627192958.GA17236@vbusired-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Use of unique identifier for
+ pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,159 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+To: Venu Busireddy <venu.busireddy@oracle.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-It is unsafe to rely on *_enabled() helpers before the accelerator has
-been initialized, ie, accel_init_machine() has succeeded, because they
-always return false. But it is still possible to end up calling them
-indirectly by inadvertance, and cause QEMU to misbehave.
+On Wed, Jun 27, 2018 at 02:29:58PM -0500, Venu Busireddy wrote:
+> On 2018-06-27 15:24:58 +0300, Roman Kagan wrote:
+> > I must have missed something in those threads, but where does this UUID
+> > thing come about?  AFAICS this identifier doesn't need to be
+> > "universally" unique, nor persistent; it only has to be unique across
+> > the VM and stable throughout the VM lifetime.
+> 
+> The notion of using UUID came up in the thread
+> 
+>    https://www.spinics.net/lists/netdev/msg499011.html
 
-This patch causes QEMU to abort if we try to check for an accelerator
-before it has been set up. This will help to catch bugs earlier.
+Yes I saw it and it looks like UUID came out of miscommunication:
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- accel/accel.c          |    7 +++++++
- include/qemu-common.h  |    3 ++-
- include/sysemu/accel.h |    1 +
- include/sysemu/kvm.h   |    3 ++-
- qom/cpu.c              |    1 +
- stubs/Makefile.objs    |    1 +
- stubs/accel.c          |   14 ++++++++++++++
- target/i386/hax-all.c  |    2 +-
- target/i386/whpx-all.c |    2 +-
- 9 files changed, 30 insertions(+), 4 deletions(-)
- create mode 100644 stubs/accel.c
+>> >> As Stephen said, Hyper-V supports the serial UUID thing from
+>> >> day-one.
 
-diff --git a/accel/accel.c b/accel/accel.c
-index 966b2d8f536c..27900aac9cc5 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -51,6 +51,13 @@ static AccelClass *accel_find(const char *opt_name)
-     return ac;
- }
- 
-+bool assert_accelerator_initialized(bool allowed)
-+{
-+    assert(current_machine != NULL);
-+    assert(current_machine->accelerator != NULL);
-+    return allowed;
-+}
-+
- static int accel_init_machine(AccelClass *acc, MachineState *ms)
- {
-     ObjectClass *oc = OBJECT_CLASS(acc);
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 85f4749aefb7..01d5e4d97dbf 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -82,7 +82,8 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
- extern bool tcg_allowed;
- void tcg_exec_init(unsigned long tb_size);
- #ifdef CONFIG_TCG
--#define tcg_enabled() (tcg_allowed)
-+#include "sysemu/accel.h"
-+#define tcg_enabled() (assert_accelerator_initialized(tcg_allowed))
- #else
- #define tcg_enabled() 0
- #endif
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 637358f43014..76965cb69cc9 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -71,5 +71,6 @@ void configure_accelerator(MachineState *ms);
- void accel_register_compat_props(AccelState *accel);
- /* Called just before os_setup_post (ie just before drop OS privs) */
- void accel_setup_post(MachineState *ms);
-+bool assert_accelerator_initialized(bool allowed);
- 
- #endif
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 0b64b8e06786..ac4dbb2d6d6d 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -18,6 +18,7 @@
- #include "qom/cpu.h"
- #include "exec/memattrs.h"
- #include "hw/irq.h"
-+#include "sysemu/accel.h"
- 
- #ifdef NEED_CPU_H
- # ifdef CONFIG_KVM
-@@ -46,7 +47,7 @@ extern bool kvm_direct_msi_allowed;
- extern bool kvm_ioeventfd_any_length_allowed;
- extern bool kvm_msi_use_devid;
- 
--#define kvm_enabled()           (kvm_allowed)
-+#define kvm_enabled()           (assert_accelerator_initialized(kvm_allowed))
- /**
-  * kvm_irqchip_in_kernel:
-  *
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 92599f35413b..65a8f03a66a4 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -23,6 +23,7 @@
- #include "qemu-common.h"
- #include "qom/cpu.h"
- #include "sysemu/hw_accel.h"
-+#include "sysemu/accel.h"
- #include "qemu/notify.h"
- #include "qemu/log.h"
- #include "exec/log.h"
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 53d3f32cb258..2d5142287525 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -43,3 +43,4 @@ stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
- stub-obj-y += pci-host-piix.o
- stub-obj-y += ram-block.o
-+stub-obj-y += accel.o
-diff --git a/stubs/accel.c b/stubs/accel.c
-new file mode 100644
-index 000000000000..4f480f2d3f29
---- /dev/null
-+++ b/stubs/accel.c
-@@ -0,0 +1,14 @@
-+/*
-+ * accel stubs
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/accel.h"
-+
-+bool assert_accelerator_initialized(bool allowed)
-+{
-+    return allowed;
-+}
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index d2e512856bb8..7c78bd7d094d 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -57,7 +57,7 @@ static int hax_arch_get_registers(CPUArchState *env);
- 
- int hax_enabled(void)
- {
--    return hax_allowed;
-+    return assert_accelerator_initialized(hax_allowed);
- }
- 
- int valid_hax_tunnel_size(uint16_t size)
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 6b42096698ee..e7f6bc5958e7 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -1422,7 +1422,7 @@ static int whpx_accel_init(MachineState *ms)
- 
- int whpx_enabled(void)
- {
--    return whpx_allowed;
-+    return assert_accelerator_initialized(whpx_allowed);
- }
- 
- static void whpx_accel_class_init(ObjectClass *oc, void *data)
+but I don't see Stephen's message where he claims that.  In reality
+
+> > FWIW Hyper-V uses a 32-bit integer for this purpose, not a UUID as seems
+> > to be implied in the thread you refer to.
+> 
+> Yes, Hyper-V uses a serial number (but I think it is 64-bit value).
+
+It's u32, see
+
+drivers/pci/controller/pci-hyperv.c:struct pci_function_description::ser
+
+and 
+
+drivers/net/hyperv/hyperv_net.h:struct nvsp_4_send_vf_association::serial
+
+> However, what we are doing is similar to that. Instead of 32 bits,
+> we are using 128 bits.
+
+UUID is far less convenient to handle than an integer.  But anyway I
+think this should rather be transport-specific, see below.
+
+> > I wonder if it makes more sense to drop the concept of failover groups,
+> > and just refer to the standby device by device-id, like 
+> > 
+> >   -device virtio-net-pci,id=foo \
+> >   -device pcie-downstream,failover=foo
+> 
+> Isn't this the same as what this patch series proposes? In your
+> suggestion, "foo" is the entity that connects the passthrough device
+> and the failover device. In this patch set, that "foo" is the UUID,
+> and the options "id" and "failover" are replaced by "uuid". Do you agree?
+
+No it's not the same.
+
+I think this whole "failover group" concept is a misnomer: there can
+only be two participating devices, they need a tighter coupling to each
+other than just sharing a common identifier exposed to the guest, and
+their relationship is strongly asymmetric.
+
+Rather, the two devices
+
+  - need to be of matching types to be able to do failover (like
+    a virtio-net-pci and a pcie-downstream, or a hv-net and a
+    hv-pci-bridge, etc.)
+
+  - need to communicate status information, adressing Michael's concern
+    re. PT visibility: as I wrote
+> > The bridge device will [...] defer the visibility of the PT device
+> > behind the bridge until the guest acknowledged the support for
+> > failover on the PV device.
+
+  - need to communicate a common identifier and have a
+    transport-specific scheme to present it to the guest, but this
+    common identifier *doesn't* generally have to be
+
+    * of the same type for all transports[*]
+    * globally unique
+    * persistent
+    * provided by / visible to the management layer
+
+Now linking two devices in QEMU by making one of them know the device-id
+of the other seems to be the most natural thing.
+
+[*] e.g. for Hyper-V it's u32 (set by the third party); virtio may
+define different schemes depending on the kind of PT device, e.g. u64 if
+using a PCIe device (and put it in its device serial number cap),
+something else otherwise.
+
+Roman.
