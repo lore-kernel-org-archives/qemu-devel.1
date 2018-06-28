@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fYahK-0007RQ-Fc
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:27:14 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYaui-0003w8-0G
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fYahJ-0003zM-69
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:27:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57462 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fYahJ-0003xx-0R
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:27:09 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 28 Jun 2018 19:26:56 +0200
-Message-Id: <20180628172657.11646-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20180628172657.11646-1-marcandre.lureau@redhat.com>
-References: <20180628172657.11646-1-marcandre.lureau@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYaue-0002Bw-QE
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:41:00 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:39207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYaue-0002BI-Kk
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 13:40:56 -0400
+Received: by mail-qt0-x244.google.com with SMTP id q12-v6so1556589qtp.6
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 10:40:56 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180622004435.10291-1-f4bug@amsat.org>
+	<20180622004435.10291-5-f4bug@amsat.org> <87in62vq15.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <543f19ab-385c-4e77-b243-d6740b456360@amsat.org>
+Date: Thu, 28 Jun 2018 14:40:49 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 3/4] acpi: add fw_cfg file for TPM and PPI
- virtual memory device
+In-Reply-To: <87in62vq15.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] tests/acceptance: Add a
+ BootLinuxConsoleMips test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +36,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On 06/28/2018 01:23 PM, Alex Bennée wrote:
+> 
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Similar to the BootLinuxConsoleX86_64 test:
+>> boot a Linux kernel on a Malta board and verify the serial is working.
+>>
+>> This test can be run using:
+>>
+>>     $ avocado run -t endian:big tests/acceptance
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  tests/acceptance/boot_linux_console.py | 38 ++++++++++++++++++++++++++
+>>  1 file changed, 38 insertions(+)
+>>
+>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+>> index 17dc8d58c1..72cf5e943c 100644
+>> --- a/tests/acceptance/boot_linux_console.py
+>> +++ b/tests/acceptance/boot_linux_console.py
+>> @@ -46,3 +46,41 @@ class BootLinuxConsoleX86_64(Test):
+>>                  break
+>>              if 'Kernel panic - not syncing' in msg:
+>>                  self.fail("Kernel panic reached")
+>> +
+>> +
+>> +class BootLinuxConsoleMips(Test):
+>> +    """
+>> +    Boots a mips Linux kernel and checks that the console is operational
+>> +    and the kernel command line is properly passed from QEMU to the kernel
+>> +
+>> +    :avocado: enable
+>> +    :avocado: tags=endian:big
+>> +    :avocado: tags=arch:mips
+>> +    :avocado: tags=board:malta
+>> +    """
+>> +
+>> +    arch = "mips"
+>> +    timeout = 60
+>> +
+>> +    def test(self):
+>> +        kernel_url = ('http://people.debian.org/~aurel32/qemu/mips/'
+>> +                      'vmlinux-3.2.0-4-4kc-malta')
+>> +        kernel_hash = '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
+>> +        kernel_path = self.fetch_asset(kernel_url,
+>> asset_hash=kernel_hash)
+> 
+> I'm uncomfortable using "random" binaries of websites as the source of
+> our test kernels. I can see the justification for distro kernels as they
+> at least have the infrastructure to rebuild from source if you really
+> want to, but even then the distros don't cover a lot of the
+> architectures.
 
-To avoid having to hard code the base address of the PPI virtual
-memory device we introduce a fw_cfg file etc/tpm/config that holds the
-base address of the PPI device, the version of the PPI interface and
-the version of the attached TPM.
+And now I notice I made an mistake here :) I guess remember the Avocado
+team started using the SHA-1 hash as default and I suggested them to be
+able to use other hashes for this particular case, since Aurelien
+provided the MD5 hashes signed by his GPG key, which is signed/trusted
+by Peter and used to merge mips32 pulls.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
- ]
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+That would verify the QEMU community circle of trust right?
 
----
+I don't think Avocado should parse the FTP/HTTP signed indexes, but a
+manual verification when merging this series should suffice.
 
-v5:
- - fix endianess issues on 8bit fields
-v4:
- - add ACPI only if PPI is enabled
-v3:
- - renamed to etc/tpm/config, made it static, document it
----
- include/hw/acpi/tpm.h |  3 +++
- hw/i386/acpi-build.c  | 19 +++++++++++++++++++
- docs/specs/tpm.txt    | 20 ++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+> 
+> I had experimented with using docker based builds for building test
+> fixtures (see tests/docker/dockerbuilds):
+> 
+>    https://github.com/stsquad/qemu/tree/docker/linux-user-and-ltp-builds-v2
+> 
+> As these tests are fairly simple boot tests that just need kernels maybe
+> we could look at tooling up the generation of these images in a
+> repeatable way - similar to the way vmtest builds VMs.
 
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index c082df7d1d..f79d68a77a 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
- #define TPM_PPI_ADDR_SIZE           0x400
- #define TPM_PPI_ADDR_BASE           0xFED45000
-=20
-+#define TPM_PPI_VERSION_NONE        0
-+#define TPM_PPI_VERSION_1_30        1
-+
- #endif /* HW_ACPI_TPM_H */
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9bc6d97ea1..ebd64c4818 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
-     bool pcihp_bridge_en;
- } AcpiBuildPciBusHotplugState;
-=20
-+typedef struct FWCfgTPMConfig {
-+    uint32_t tpmppi_address;
-+    uint8_t tpm_version;
-+    uint8_t tpmppi_version;
-+} QEMU_PACKED FWCfgTPMConfig;
-+
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
- {
-     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
- NULL);
-@@ -2873,6 +2879,8 @@ void acpi_setup(void)
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
-     Object *vmgenid_dev;
-+    TPMIf *tpm;
-+    static FWCfgTPMConfig tpm_config;
-=20
-     if (!pcms->fw_cfg) {
-         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
-@@ -2907,6 +2915,17 @@ void acpi_setup(void)
-     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
-;
-=20
-+    tpm =3D tpm_find();
-+    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
-)) {
-+        tpm_config =3D (FWCfgTPMConfig) {
-+            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
-+            .tpm_version =3D tpm_get_version(tpm_find()),
-+            .tpmppi_version =3D TPM_PPI_VERSION_NONE
-+        };
-+        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
-+                        &tpm_config, sizeof tpm_config);
-+    }
-+
-     vmgenid_dev =3D find_vmgenid_dev();
-     if (vmgenid_dev) {
-         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index c230c4c93e..2ddb768084 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
-  - hw/tpm/tpm_tis.h
-=20
-=20
-+=3D fw_cfg interface =3D
-+
-+The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
-+configuring the guest appropriately.
-+
-+The entry of 6 bytes has the following content, in little-endian:
-+
-+    #define TPM_VERSION_UNSPEC          0
-+    #define TPM_VERSION_1_2             1
-+    #define TPM_VERSION_2_0             2
-+
-+    #define TPM_PPI_VERSION_NONE        0
-+    #define TPM_PPI_VERSION_1_30        1
-+
-+    struct FWCfgTPMConfig {
-+        uint32_t tpmppi_address;         /* PPI memory location */
-+        uint8_t tpm_version;             /* TPM version */
-+        uint8_t tpmppi_version;          /* PPI version */
-+    };
-+
- =3D ACPI Interface =3D
-=20
- The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and=
- passes
---=20
-2.18.0.rc1
+Yes, I have another acceptance branch where I cross-build an old mipssim
+kernel to test the board, using the following:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg04071.html
+
+But preparing a Docker cross image, fetching the Linux kernel source,
+building it, takes a lot of time/storage I'd rather avoid; at least with
+Aurelien kernels, since they are known to work since years.
+
+>> +
+>> +        self.vm.set_machine('malta')
+>> +        self.vm.set_console()
+>> +        kernel_command_line = 'console=ttyS0 printk.time=0'
+>> +        self.vm.add_args('-m', "64",
+>> +                         '-kernel', kernel_path,
+>> +                         '-append', kernel_command_line)
+>> +        self.vm.launch()
+>> +        console = self.vm.console_socket.makefile()
+>> +        console_logger = logging.getLogger('console')
+>> +        while True:
+>> +            msg = console.readline()
+>> +            console_logger.debug(msg.strip())
+>> +            if 'Kernel command line: %s' % kernel_command_line in msg:
+>> +                break
+>> +            if 'Kernel panic - not syncing' in msg:
+>> +                self.fail("Kernel panic reached")
+> 
+> Of course for bonus points a simple rootfs with hackbench or some such
+> in it would be nice. But I appreciate this makes the building job a lot
+> more complex than just a kernel.
+
+My idea is to use the rootfs for larger tests, and tag the "Kernel
+panic" tests as "quick", so we can have a "make acceptance-speed" or
+similar.
+
+We can already test than many devices were initialized correctly quickly
+looking at this console output.
+
+Regards,
+
+Phil.
