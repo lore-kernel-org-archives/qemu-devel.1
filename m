@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYS4X-00075z-6D
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:14:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1fYSFJ-0000uv-AX
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:25:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYS4S-0003ia-6O
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:14:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32818 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fYSFF-0002Qr-JX
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:25:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40556 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fYS4S-0003iJ-0l
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:14:28 -0400
-References: <20180622144045.737-1-david@redhat.com>
-	<20180627132156.02c77c07@redhat.com>
-	<a262a687-6107-e9a4-413e-f11caf584619@redhat.com>
-	<20180627155425.1d40ca20@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ed680d1b-a41f-5681-6bc3-2a6452876b79@redhat.com>
-Date: Thu, 28 Jun 2018 10:14:25 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYSFF-0002Q2-DU
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:25:37 -0400
+Date: Thu, 28 Jun 2018 09:25:32 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180628082532.GB17326@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180627034935.20276-1-venu.busireddy@oracle.com>
+	<20180627034935.20276-4-venu.busireddy@oracle.com>
+	<20180627065943-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180627155425.1d40ca20@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] numa: report all DIMM/NVDIMMs as
- plugged memory
+Content-Disposition: inline
+In-Reply-To: <20180627065943-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] Add "Group Identifier" support to
+ Red Hat PCI bridge.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eugene Crosser <evgenii.cherkashin@profitbricks.com>, Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 27.06.2018 15:54, Igor Mammedov wrote:
-> On Wed, 27 Jun 2018 15:38:23 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On Wed, Jun 27, 2018 at 07:02:36AM +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 26, 2018 at 10:49:33PM -0500, Venu Busireddy wrote:
+> > Add the "Vendor-Specific" capability to the Red Hat PCI bridge device
+> > "pci-bridge", to contain the "Group Identifier" (UUID) that will be
+> > used to pair a virtio device with the passthrough device attached to
+> > that bridge.
+> > 
+> > This capability is added to the bridge iff the "uuid" option is specified
+> > for the bridge.
 > 
->> On 27.06.2018 13:21, Igor Mammedov wrote:
->>> On Fri, 22 Jun 2018 16:40:45 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> Right now, there is some inconsistency between hotplugged and
->>>> coldplugged memory. DIMMs added via "-device" result in different stats
->>>> than DIMMs added using "device_add".
->>>>
->>>> E.g.
->>>>     [...]
->>>>     -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
->>>>     -m 4G,maxmem=20G,slots=2 \
->>>>     -object memory-backend-ram,id=mem0,size=8G \
->>>>     -device pc-dimm,id=dimm0,memdev=mem0 \
->>>>     -object memory-backend-ram,id=mem1,size=8G \
->>>>     -device nvdimm,id=dimm1,memdev=mem1,node=1
->>>>
->>>> Results in NUMA info
->>>>     (qemu) info numa
->>>>     info numa
->>>>     2 nodes
->>>>     node 0 cpus: 0 1
->>>>     node 0 size: 10240 MB
->>>>     node 0 plugged: 0 MB
->>>>     node 1 cpus: 2 3
->>>>     node 1 size: 10240 MB
->>>>     node 1 plugged: 0 MB  
->>> ...   
->>>> But in memory size summary:
->>>>     (qemu) info memory_size_summary
->>>>     info memory_size_summary
->>>>     base memory: 4294967296
->>>>     plugged memory: 17179869184  
->>> this looks like right amount wrt used CLI,
->>> is this supposed to be correct output or broken one?
->>> ('but' implies incorrect one)  
->>
->> 'but' just highlights the inconsistency here. As explained above, all
->> dimms should be reported as plugged (hot and coldplugged).
->>
->> So in my opinion "memory size summary" does the right thing right now.
-> maybe add to commit message that says what exactly is being fixed,
-> otherwise it's not clear what is expected/wrong beside of output being inconsistent.
-
-I will add some more details.
-
+> I think the name should be more explicit. How about "failover-group-id"?
 > 
->>
->>>   
->>>>
->>>> Make this consistent by reporting all hot and coldplugged
->>>> memory a.k.a. DIMM and NVDIMM as "plugged".
-> maybe mention 'info numa' and maybe QMP equivalent if it exists,
-> otherwise above text is a bit vague for bystander (could be /me|you in a day-month-year)
+> > 
+> > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> 
+> I'd like to also tweak the device id in this case,
+> to make it easier for guests to know it's a grouping bridge.
 
-Yes, will do, thanks!
+I tend to think this proposal is rather too narrow. The need to tell
+the guest OS about the intended usage of devices is a pretty common use
+case, of which setting up bonding NIC pair is just one example.
 
+OpenStack already has this problem & took the approach of providing some
+structured JSON metadata to the guest that lists all devices  (well NICs
+and disks at least) with identifying metadata (eg PCI address, MAC addr,
+disk serial and anything else relevant), and also assigns freeform string
+"tags" against each.  eg the host admin could specify tags "lanA" and "lanB"
+for two NICs, so the guest knows which NIC to use for which purpose. This
+kind of tagging could easily cover setting up bonded pairs. Or for a disk
+they could tag it  "oracledata" or "apachecache" to indicate what kind of
+data to use on the disk, etc
+
+  https://specs.openstack.org/openstack/nova-specs/specs/mitaka/approved/virt-device-role-tagging.html
+
+I'm not suggesting the impl used in OpenStack is perfect - there's a number
+of pain points in it, but I think it shows the need for a general solution
+to the problem of the host admin informing the guest OS about the intended
+usage of devices being provided. I think freeform string tags do this
+pretty well. The key problem is how to expose such tags - openstack took
+approach of an out of band JSON doc exposed from its metadata service and
+or cloud init config drive, because that was its only viable option.
+
+Perhaps there is a way to expose tags at a low level though if we can
+integrate with QEMU somehow ?
+
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
