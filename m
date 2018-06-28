@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYZ7o-0001Vd-Dn
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:46:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fYZ8s-000225-2A
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYZ7l-0007se-9x
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:46:24 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38203)
+	(envelope-from <richard.henderson@linaro.org>) id 1fYZ8p-0000LC-0C
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:30 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:32979)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fYZ7l-0007rI-0B
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:46:21 -0400
-Received: by mail-wm0-x243.google.com with SMTP id 69-v6so9530490wmf.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:46:20 -0700 (PDT)
-References: <20180622004435.10291-1-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180622004435.10291-1-f4bug@amsat.org>
-Date: Thu, 28 Jun 2018 16:46:18 +0100
-Message-ID: <87muvevrqt.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fYZ8o-0000KY-QX
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:47:26 -0400
+Received: by mail-pf0-x241.google.com with SMTP id b17-v6so2796622pfi.0
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:47:26 -0700 (PDT)
+References: <20180627043328.11531-1-richard.henderson@linaro.org>
+	<20180627043328.11531-34-richard.henderson@linaro.org>
+	<87sh57uhva.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a6a72cd5-d4c9-ee47-434d-1576a5e455d3@linaro.org>
+Date: Thu, 28 Jun 2018 08:47:23 -0700
 MIME-Version: 1.0
+In-Reply-To: <87sh57uhva.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Avocado: start multi-arch tests,
- add a Travis job
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 33/35] target/arm: Implement
+ SVE dot product (indexed)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+
+On 06/28/2018 07:04 AM, Alex Bennée wrote:
+> Looking at the dissembler output I guess the metrics don't make it worth
+> the compiler vectorising any of this which is a shame.
+
+I think dot product pattern recognition is still being worked on.  At least
+that's what I recall from a conversation from Richard Sandiford a few weeks ago.
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> Hi,
->
-> Another neanderthal approach to add multi-arch acceptance tests using
-> Avocado.
->
-> Since Cleber Rosa work got merged [0], I can restart my previous attempt =
-[1]
-> at using Avocado in QEMU.
-> Cleber Rosa rewrote my previous v1 [1], in good python, now this v2 pushes
-> a bit further:
-> - we can now run other archs
-> - Avocado is integrated into Travis CI
->
-> I'm not sure Travis is the best CI available for those tests, but it runs
-> quite fast:
->
->       ...
->       LINK    x86_64-softmmu/qemu-system-x86_64
->     JOB ID     : a3a56af3c02d193e862ce660aae1d9c72926dcb6
->     JOB LOG    : /home/travis/avocado/job-results/job-2018-06-21T23.49-a3=
-a56af/job.log
->      (1/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleX86_64.=
-test:  PASS (3.89 s)
->      (2/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleMips.te=
-st:  PASS (1.83 s)
->      (3/7) tests/acceptance/version.py:Version.test_qmp_human_info_versio=
-n:  PASS (0.05 s)
->      (4/7) tests/acceptance/vnc.py:Vnc.test_no_vnc:  PASS (0.04 s)
->      (5/7) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password:  PASS=
- (0.04 s)
->      (6/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_=
-a_password:  PASS (0.05 s)
->      (7/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password:  PASS (0=
-.05 s)
->     RESULTS    : PASS 7 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT =
-0 | CANCEL 0
->     JOB TIME   : 6.21 s
-
-Hmm however if I do:
-
-   pip install --user avocado-framework
-   avocado run tests/acceptance
-
-I get:
-
-   Failed to load plugin from module "avocado_vt.plugins.vt_list": ImportEr=
-ror('No module named netaddr',)
-   Failed to load plugin from module "avocado_vt.plugins.vt": ImportError('=
-No module named netaddr',)
-   Failed to load plugin from module "avocado_vt.plugins.vt_bootstrap": OSE=
-rror(13, 'Permission denied')
-   Error running method "run" of plugin "virt": 'Namespace' object has no a=
-ttribute 'default_avocado_params'
-   Avocado crashed unexpectedly: [Errno 13] Permission denied: '/var/lib/li=
-bvirt/images/avocado_sg6NRi'
-   You can find details in /var/tmp/avocado-traceback-2018-06-28_16:44:25-D=
-Gb1CG.log
-
-Which I seem to remember from last time I looked into this. I think
-avocado makes a bunch of assumptions about the filesystem and OS layout
-which is hard to gloss over for something you should be able to run
-straight out of the source tree.
-
-
->
->     Done. Your build exited with 0.
->
->     Job ran for 5 min 34 sec
->
-> I couldn't add the Alpha tests because all the vmlinux kernels I found
-> online are gzipped, so I'm waiting some upstream Avocado merges before.
->
-> Cleber: I hope you can help me pythonizing this series :p
->
-> Regards,
->
-> Phil.
->
-> [0]: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg04531.html
-> [1]: http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg03076.html
->
-> Philippe Mathieu-Daud=C3=A9 (6):
->   avocado: Add a Test.arch property
->   tests/acceptance: Rename the x86-64 specific BootLinuxConsole test
->   tests/acceptance: Improve the Avocado tags
->   tests/acceptance: Add a BootLinuxConsoleMips test
->   tests/acceptance: Add a kludge to not use the default console
->   travis: Add Avocado tests
->
->  .travis.yml                               |  8 +++++
->  scripts/qemu.py                           |  6 ++--
->  tests/acceptance/avocado_qemu/__init__.py | 17 ++++++---
->  tests/acceptance/boot_linux_console.py    | 44 +++++++++++++++++++++--
->  4 files changed, 67 insertions(+), 8 deletions(-)
-
-
---
-Alex Benn=C3=A9e
+r~
