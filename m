@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYd39-0002EZ-IU
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:57:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYd9g-0006dI-HN
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYd38-0000dN-Ac
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:57:51 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYd38-0000bS-4T
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:57:50 -0400
-Received: by mail-wm0-x233.google.com with SMTP id n17-v6so9744001wmh.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 12:57:49 -0700 (PDT)
-Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
-	d102-v6sm12516646wma.10.2018.06.28.12.57.47
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 28 Jun 2018 12:57:48 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fYd9d-0006tr-Dy
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:04:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51918 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYd9d-0006se-9W
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:04:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 45B9B406AE3F
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 20:04:32 +0000 (UTC)
+References: <20180607101019.14958-1-berrange@redhat.com>
+	<20180628131722.GA13766@redhat.com>
+	<8964dea3-042d-2eac-0198-d50c9c8947fc@redhat.com>
+	<03c1e60e-6f5b-51cb-afe1-9f4e26a2c56b@redhat.com>
+	<20180628162941.GT3513@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 21:57:38 +0200
-Message-Id: <1530215858-1525-7-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1530215858-1525-1-git-send-email-pbonzini@redhat.com>
-References: <1530215858-1525-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/6] pr-manager-helper: report event on
- connection/disconnection
+Message-ID: <11e8e519-e378-02f4-a88d-329e16915432@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:30 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180628162941.GT3513@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] doc: switch to modern syntx for VNC TLS
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +38,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-Let management know if there were any problems communicating with
-qemu-pr-helper.  The event is edge-triggered, and is sent every time
-the connection status of the pr-manager-helper object changes.
+On 28/06/2018 18:29, Daniel P. Berrang=C3=A9 wrote:
+> Yeah, in this case I'd rather stick with single dash, for consistency,
+> since this example is not applicable to non-system emulators anyway.
+>=20
+>> I honestly don't understand the crusade against single-dashed options.
+> It does cause confusion in some documentation contexts with -object,
+> since qemu-nbd/qemu-img/qemu-io all mandated --object instead.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- qapi/block.json          | 24 ++++++++++++++++++++++++
- scsi/pr-manager-helper.c | 14 ++++++++++++++
- 2 files changed, 38 insertions(+)
+It's okay if you're documenting --object.  But I think consistency
+should win when you are showing examples for QEMU; then all options
+should use either single or double dashes.
 
-diff --git a/qapi/block.json b/qapi/block.json
-index 8765c29..11f01f2 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -359,6 +359,30 @@
-   'data': { 'device': 'str', 'id': 'str', 'tray-open': 'bool' } }
- 
- ##
-+# @PR_MANAGER_STATUS_CHANGED:
-+#
-+# Emitted whenever the connected status of a persistent reservation
-+# manager changes.
-+#
-+# @id: The id of the PR manager object
-+#
-+# @connected: true if the PR manager is connected to a backend
-+#
-+# Since: 3.0
-+#
-+# Example:
-+#
-+# <- { "event": "PR_MANAGER_STATUS_CHANGED",
-+#      "data": { "id": "pr-helper0",
-+#                "connected": true
-+#      },
-+#      "timestamp": { "seconds": 1519840375, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'PR_MANAGER_STATUS_CHANGED',
-+  'data': { 'id': 'str', 'connected': 'bool' } }
-+
-+##
- # @QuorumOpType:
- #
- # An enumeration of the quorum operation types
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index b11481b..519a296 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -17,6 +17,7 @@
- #include "io/channel.h"
- #include "io/channel-socket.h"
- #include "pr-helper.h"
-+#include "qapi/qapi-events-block.h"
- 
- #include <scsi/sg.h>
- 
-@@ -38,6 +39,16 @@ typedef struct PRManagerHelper {
-     QIOChannel *ioc;
- } PRManagerHelper;
- 
-+static void pr_manager_send_status_changed_event(PRManagerHelper *pr_mgr)
-+{
-+    char *id = object_get_canonical_path_component(OBJECT(pr_mgr));
-+
-+    if (id) {
-+        qapi_event_send_pr_manager_status_changed(id, !!pr_mgr->ioc,
-+                                                  &error_abort);
-+    }
-+}
-+
- /* Called with lock held.  */
- static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
-                                   void *buf, int sz, Error **errp)
-@@ -47,6 +58,7 @@ static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
-     if (r < 0) {
-         object_unref(OBJECT(pr_mgr->ioc));
-         pr_mgr->ioc = NULL;
-+        pr_manager_send_status_changed_event(pr_mgr);
-         return -EINVAL;
-     }
- 
-@@ -72,6 +84,7 @@ static int pr_manager_helper_write(PRManagerHelper *pr_mgr,
-             assert(n_written != QIO_CHANNEL_ERR_BLOCK);
-             object_unref(OBJECT(pr_mgr->ioc));
-             pr_mgr->ioc = NULL;
-+            pr_manager_send_status_changed_event(pr_mgr);
-             return n_written < 0 ? -EINVAL : 0;
-         }
- 
-@@ -127,6 +140,7 @@ static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
-         goto out_close;
-     }
- 
-+    pr_manager_send_status_changed_event(pr_mgr);
-     return 0;
- 
- out_close:
--- 
-1.8.3.1
+Paolo
