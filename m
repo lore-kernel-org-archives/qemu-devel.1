@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYUhb-0000SY-Jp
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:04 -0400
+	(envelope-from <quintela@redhat.com>) id 1fYUhc-0000Sc-6O
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYUha-0003j0-Qj
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39662 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fYUhW-0003cq-8z
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60100 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYUha-0003iT-NR
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:03:02 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 28 Jun 2018 12:02:53 +0100
-Message-Id: <20180628110254.6725-2-berrange@redhat.com>
-In-Reply-To: <20180628110254.6725-1-berrange@redhat.com>
-References: <20180628110254.6725-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fYUhW-0003a9-3h
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:02:58 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180628095547.GA24412@localhost.localdomain> (Balamuruhan S.'s
+	message of "Thu, 28 Jun 2018 15:25:47 +0530")
+References: <20180627125604.15275-1-quintela@redhat.com>
+	<20180627125604.15275-17-quintela@redhat.com>
+	<20180628095547.GA24412@localhost.localdomain>
+Reply-To: quintela@redhat.com
+Date: Thu, 28 Jun 2018 13:06:25 +0200
+Message-ID: <87h8lnw4pa.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] socket: dont't free msgfds if error equals
- EAGAIN
+Subject: Re: [Qemu-devel] [PULL 16/16] migration: fix crash in when incoming
+ client channel setup fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, linzhecheng <linzhecheng@huawei.com>
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-From: linzhecheng <linzhecheng@huawei.com>
+Balamuruhan S <bala24@linux.vnet.ibm.com> wrote:
+> On Wed, Jun 27, 2018 at 02:56:04PM +0200, Juan Quintela wrote:
+>> From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-If we see EAGAIN, no data was sent over the socket, so we still have to
-retry sending of msgfds next time.
+....
 
-Signed-off-by: linzhecheng <linzhecheng@huawei.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- chardev/char-socket.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> Hi Juan,
+>
+> I tried to perform multifd enabled migration and from qemu monitor
+> enabled mutlifd capability on source and target,
+> (qemu) migrate_set_capability x-multifd on
+> (qemu) migrate -d tcp:127.0.0.1:4444
+>
+> The migration succeeds and its cool to have the feature :)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 159e69c3b1..17519ec589 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -134,8 +134,8 @@ static int tcp_chr_write(Chardev *chr, const uint8_t =
-*buf, int len)
-                                         s->write_msgfds,
-                                         s->write_msgfds_num);
-=20
--        /* free the written msgfds, no matter what */
--        if (s->write_msgfds_num) {
-+        /* free the written msgfds in any cases other than errno=3D=3DEA=
-GAIN */
-+        if (EAGAIN !=3D errno && s->write_msgfds_num) {
-             g_free(s->write_msgfds);
-             s->write_msgfds =3D 0;
-             s->write_msgfds_num =3D 0;
---=20
-2.17.1
+Thanks.
+
+> (qemu) info migrate
+> globals:
+> store-global-state: on
+> only-migratable: off
+> send-configuration: on
+> send-section-footer: on
+> decompress-error-check: on
+> capabilities: xbzrle: off rdma-pin-all: off auto-converge: off
+> zero-blocks: off compress: off events: off postcopy-ram: off x-colo:
+> off release-ram: off block: off return-path: off
+> pause-before-switchover: off x-multifd: on dirty-bitmaps: off
+> postcopy-blocktime: off late-block-activate: off
+> Migration status: completed
+> total time: 1051 milliseconds
+> downtime: 260 milliseconds
+> setup: 17 milliseconds
+> transferred ram: 8270 kbytes
+
+What is your setup?  This value looks really small.  I can see that you
+have 4GB of RAM, it should be a bit higher.  And setup time is also
+quite low from my experience.
+
+> throughput: 143.91 mbps
+
+I don't know what networking are you using, but my experience is that
+increasing packet_count to 64 or so helps a lot to increase bandwidth.
+
+What is your networking, page_count and number of channels?
+
+> remaining ram: 0 kbytes
+> total ram: 4194560 kbytes
+> duplicate: 940989 pages
+> skipped: 0 pages
+> normal: 109635 pages
+> normal bytes: 438540 kbytes
+> dirty sync count: 3
+> page size: 4 kbytes
+>
+>
+> But when I just enable the multifd in souce but not in target
+>
+> source:
+> x-multifd: on
+>
+> target:
+> x-multifd: off
+>
+> when migration is triggered with,
+> migrate -d tcp:127.0.0.1:4444 (port I used)
+>
+> The VM is lost in source with Segmentation fault.
+>
+> I think the correct way is to enable multifd on both source and target
+> similar to postcopy, but in this negative scenario we should consider
+> the right way of handling not to loose the VM instead error out
+> appropriately.
+
+It is necesary to enable both sides.  And it "used" to be that it
+dectected correctly when it was not enable on one of the sides.  Check
+should be lost in some rebase, or any other change.
+
+Will take a look.
+
+> Please correct me if I miss something.
+
+Sure, thanks for the report.
+
+Later, Juan.
