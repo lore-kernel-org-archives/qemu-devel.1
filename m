@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fYVSm-0007uE-HL
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:51:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1fYVVr-0000hv-4l
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fYVSj-0004I9-Eb
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:51:48 -0400
-Received: from mga03.intel.com ([134.134.136.65]:31976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fYVSj-0004F2-4L
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:51:45 -0400
-Message-ID: <5B34CCB9.5040406@intel.com>
-Date: Thu, 28 Jun 2018 19:55:37 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1fYVVm-0006rR-89
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:54:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fYVVm-0006qi-0a
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:54:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fYVVj-0000tN-Ok
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:54:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B849E2E81AA
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:54:51 +0000 (UTC)
 MIME-Version: 1.0
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-10-xiaoguangrong@tencent.com>
-	<20180620045203.GE18985@xz-mi>
-	<6f871708-d38b-2acf-350a-985c8a23a013@gmail.com>
-In-Reply-To: <6f871708-d38b-2acf-350a-985c8a23a013@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 09/12] ring: introduce lockless ring buffer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Jun 2018 11:40:30 -0000
+From: Launchpad Bug Tracker <1587065@bugs.launchpad.net>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <153018603169.24781.14734480427968103982.launchpad@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +37,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>, Peter Xu <peterx@redhat.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, Xiao Guangrong <xiaoguangrong@tencent.com>, peterz@infradead.org, stefani@seibold.net, paulmck@linux.vnet.ibm.com, Lai Jiangshan <jiangshanlai@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 06/28/2018 06:02 PM, Xiao Guangrong wrote:
->
-> CC: Paul, Peter Zijlstra, Stefani, Lai who are all good at memory 
-> barrier.
->
->
-> On 06/20/2018 12:52 PM, Peter Xu wrote:
->> On Mon, Jun 04, 2018 at 05:55:17PM +0800, guangrong.xiao@gmail.com 
->> wrote:
->>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>>
->>> It's the simple lockless ring buffer implement which supports both
->>> single producer vs. single consumer and multiple producers vs.
->>> single consumer.
->>>
->>> Many lessons were learned from Linux Kernel's kfifo (1) and DPDK's
->>> rte_ring (2) before i wrote this implement. It corrects some bugs of
->>> memory barriers in kfifo and it is the simpler lockless version of
->>> rte_ring as currently multiple access is only allowed for producer.
->>
->> Could you provide some more information about the kfifo bug? Any
->> pointer would be appreciated.
->>
->
-> Sure, i reported one of the memory barrier issue to linux kernel:
->    https://lkml.org/lkml/2018/5/11/58
->
-> Actually, beside that, there is another memory barrier issue in kfifo,
-> please consider this case:
->
->    at the beginning
->    ring->size = 4
->    ring->out = 0
->    ring->in = 4
->
->      Consumer                            Producer
->  ---------------                     --------------
->    index = ring->out; /* index == 0 */
->    ring->out++; /* ring->out == 1 */
->    < Re-Order >
->                                     out = ring->out;
->                                     if (ring->in - out >= ring->mask)
->                                         return -EFULL;
->                                     /* see the ring is not full */
->                                     index = ring->in & ring->mask; /* 
-> index == 0 */
->                                     ring->data[index] = new_data;
-> 　　　　　　　　　　　　　　　　　　　　　ring->in++;
->
->    data = ring->data[index];
->    !!!!!! the old data is lost !!!!!!
->
-> So we need to make sure:
-> 1) for the consumer, we should read the ring->data[] out before 
-> updating ring->out
-> 2) for the producer, we should read ring->out before updating 
-> ring->data[]
->
-> as followings:
->       Producer                                       Consumer
->   ------------------------------------ ------------------------
->       Reading ring->out                            Reading 
-> ring->data[index]
->       smp_mb()                                     smp_mb()
->       Setting ring->data[index] = data ring->out++
->
-> [ i used atomic_store_release() and atomic_load_acquire() instead of 
-> smp_mb() in the
->   patch. ]
->
-> But i am not sure if we can use smp_acquire__after_ctrl_dep() in the 
-> producer?
+** Merge proposal linked:
+   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
+/348672
 
+-- =
 
-I wonder if this could be solved by simply tweaking the above consumer 
-implementation:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
 
-[1] index = ring->out;
-[2] data = ring->data[index];
-[3] index++;
-[4] ring->out = index;
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
 
-Now [2] and [3] forms a WAR dependency, which avoids the reordering.
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
 
+Bug description:
+  [Impact]
 
-Best,
-Wei
+   * An explanation of the effects of the bug on users and
+
+   * justification for backporting the fix to the stable release.
+
+   * In addition, it is helpful, but not required, to include an
+     explanation of how the upload fixes this bug.
+
+  [Test Case]
+
+   * Prepare a guest
+     $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
+s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
+  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
+abel=3Ddaily
+
+   * Shut it down and use virsh edit to add a channel for the agent
+  <channel type=3D'unix'>
+     <source mode=3D'bind'/>
+     <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
+  </channel>
+
+    * Start the guest again, in it install qemu-guest-agent
+
+    *
+
+    * On the Host then freeze and thaw the guest
+      $ virsh domfsfreeze x-freeze
+      $ virsh domfsthaw x-freeze
+
+    # The above works, then trigger the issue, in the guest do
+      $ sudo mkdir /mnt/test
+      $ sudo mount -o bind / /mnt/test/
+
+    * Now the freeze/thaw will fail unless the fix is applied.
+
+  [Regression Potential]
+
+   * From looking at the code alone I could think of a different cause that =
+
+     makes it return EBUSY.
+     The biggest risk I could see due to that is the agent reporting a =
+
+     successful freeze due to accepting EBUSY which is not actually true.
+     But we have that in Ubuntu since Artful and =
+
+     upstream since January 2017 and there are no such reports.
+
+  [Other Info]
+   =
+
+   * n/a
+
+  =
+
+  ---
+
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+  =C2=A0may have bind-mounts that let a device appear multiple times in the=
+ mount list. Unfortunately the guest agent is not smart enough to consider =
+a device that has been frozen as succesfull and keep going. This causes thi=
+s specific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
