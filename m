@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYTMM-00069T-7Q
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:37:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1fYTQ7-00077t-Ad
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYTMK-000146-L6
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:37:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43904 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYTMK-00013b-F9
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:37:00 -0400
-Date: Thu, 28 Jun 2018 10:36:50 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180628093650.GB3513@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-7-xiaoguangrong@tencent.com>
-	<20180619073034.GA14814@xz-mi>
-	<e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1fYTQ2-0004gT-Jo
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:40:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57666)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fYTQ2-0004eQ-CK
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:40:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fYTQ0-000680-II
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 84AE92E819C
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:40:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
- for compression
+Date: Thu, 28 Jun 2018 09:32:08 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1779017 <1779017@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153014968219.17704.367188786620032253.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153017832820.29724.9161733546630236086.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779017] Re: qemu-system-arm: crashes raspian
+ kernels with divide-by-zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,130 +37,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, dgilbert@redhat.com, qemu-devel@nongnu.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-On Thu, Jun 28, 2018 at 05:12:39PM +0800, Xiao Guangrong wrote:
->=20
-> Hi Peter,
->=20
-> Sorry for the delay as i was busy on other things.
->=20
-> On 06/19/2018 03:30 PM, Peter Xu wrote:
-> > On Mon, Jun 04, 2018 at 05:55:14PM +0800, guangrong.xiao@gmail.com wr=
-ote:
-> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > >=20
-> > > Detecting zero page is not a light work, we can disable it
-> > > for compression that can handle all zero data very well
-> >=20
-> > Is there any number shows how the compression algo performs better
-> > than the zero-detect algo?  Asked since AFAIU buffer_is_zero() might
-> > be fast, depending on how init_accel() is done in util/bufferiszero.c=
-.
->=20
-> This is the comparison between zero-detection and compression (the targ=
-et
-> buffer is all zero bit):
->=20
-> Zero 810 ns Compression: 26905 ns.
-> Zero 417 ns Compression: 8022 ns.
-> Zero 408 ns Compression: 7189 ns.
-> Zero 400 ns Compression: 7255 ns.
-> Zero 412 ns Compression: 7016 ns.
-> Zero 411 ns Compression: 7035 ns.
-> Zero 413 ns Compression: 6994 ns.
-> Zero 399 ns Compression: 7024 ns.
-> Zero 416 ns Compression: 7053 ns.
-> Zero 405 ns Compression: 7041 ns.
->=20
-> Indeed, zero-detection is faster than compression.
->=20
-> However during our profiling for the live_migration thread (after rever=
-ted this patch),
-> we noticed zero-detection cost lots of CPU:
->=20
->  12.01%  kqemu  qemu-system-x86_64            [.] buffer_zero_sse2     =
-                                                                         =
-                                                                         =
-                    =E2=97=86
->   7.60%  kqemu  qemu-system-x86_64            [.] ram_bytes_total      =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   6.56%  kqemu  qemu-system-x86_64            [.] qemu_event_set       =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   5.61%  kqemu  qemu-system-x86_64            [.] qemu_put_qemu_file   =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   5.00%  kqemu  qemu-system-x86_64            [.] __ring_put           =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   4.89%  kqemu  [kernel.kallsyms]             [k] copy_user_enhanced_fa=
-st_string                                                                =
-                                                                         =
-                    =E2=96=92
->   4.71%  kqemu  qemu-system-x86_64            [.] compress_thread_data_=
-done                                                                     =
-                                                                         =
-                    =E2=96=92
->   3.63%  kqemu  qemu-system-x86_64            [.] ring_is_full         =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   2.89%  kqemu  qemu-system-x86_64            [.] __ring_is_full       =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   2.68%  kqemu  qemu-system-x86_64            [.] threads_submit_reques=
-t_prepare                                                                =
-                                                                         =
-                    =E2=96=92
->   2.60%  kqemu  qemu-system-x86_64            [.] ring_mp_get          =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   2.25%  kqemu  qemu-system-x86_64            [.] ring_get             =
-                                                                         =
-                                                                         =
-                    =E2=96=92
->   1.96%  kqemu  libc-2.12.so                  [.] memcpy
->=20
-> After this patch, the workload is moved to the worker thread, is it
-> acceptable?
+This isn't a kernel crash, it's just a warning (which I think is safely
+ignorable). The problem is that QEMU doesn't implement the 'cprman'
+clock control hardware, which means Linux thinks the UART is running at
+a zero baud rate. Unfortunately the cprman hardware is as far as I can
+determine undocumented, so it's not really possible to write an
+emulation of it.
 
-It depends on your point of view. If you have spare / idle CPUs on the ho=
-st,
-then moving workload to a thread is ok, despite the CPU cost of compressi=
-on
-in that thread being much higher what what was replaced, since you won't =
-be
-taking CPU resources away from other contending workloads.
+I'm not sure your bisection has landed on the right thing, as
+d9f8bbd8eb4e95 should be a no-behaviour-change commit.
 
-I'd venture to suggest though that we should probably *not* be optimizing=
- for
-the case of idle CPUs on the host. More realistic is to expect that the h=
-ost
-CPUs are near fully committed to work, and thus the (default) goal should=
- be
-to minimize CPU overhead for the host as a whole. From this POV, zero-pag=
-e
-detection is better than compression due to > x10 better speed.
+-- =
 
-Given the CPU overheads of compression, I think it has fairly narrow use
-in migration in general when considering hosts are often highly committed
-on CPU.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779017
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Title:
+  qemu-system-arm: crashes raspian kernels with divide-by-zero
+
+Status in QEMU:
+  New
+
+Bug description:
+  While trying to boot a arm kernel for a raspi2 machine (kernel7-4.9.41-st=
+retch.img in my case, but applies to other versions, too) the kernel crash =
+with a division by zero. The output on the sreial console is:
+  [   10.022377] [<8011d344>] (__warn) from [<8011d42c>] (warn_slowpath_nul=
+l+0x30/0x38)
+  [   10.024726] [<8011d42c>] (warn_slowpath_null) from [<804da378>] (uart_=
+get_baud_rate+0xf8/0x160)
+
+  ...
+
+  [   10.094933] Hardware name: BCM2835
+  [   10.101507] [<8010fb3c>] (unwind_backtrace) from [<8010c058>] (show_st=
+ack+0x20/0x24)
+  [   10.105413] [<8010c058>] (show_stack) from [<80455f84>] (dump_stack+0x=
+d4/0x118)
+  [   10.140268] [<80455f84>] (dump_stack) from [<8010bed4>] (__div0+0x24/0=
+x28)
+  [   10.143065] [<8010bed4>] (__div0) from [<8045498c>] (Ldiv0+0x8/0x14)
+  [   10.145553] [<8045498c>] (Ldiv0) from [<804e5538>] (pl011_set_termios+=
+0x9c/0x37c)
+  [   10.148017] [<804e5538>] (pl011_set_termios) from [<804da954>] (uart_c=
+hange_speed+0x40/0xfc)
+  [   10.185887] [<804da954>] (uart_change_speed) from [<804ddedc>] (uart_s=
+tartup.part.3+0xa4/0x13c)
+  [   10.222187] [<804ddedc>] (uart_startup.part.3) from [<804ddfcc>] (uart=
+_port_activate+0x58/0x64)
+  [   10.226014] [<804ddfcc>] (uart_port_activate) from [<804c93b8>] (tty_p=
+ort_open+0xa0/0xe0)
+  [   10.228398] [<804c93b8>] (tty_port_open) from [<804dce64>] (uart_open+=
+0x40/0x48)
+  [   10.264254] [<804dce64>] (uart_open) from [<804c1d70>] (tty_open+0xc0/=
+0x678)
+  [   10.266697] [<804c1d70>] (tty_open) from [<802753f0>] (chrdev_open+0xe=
+0/0x1a0)
+  [   10.269049] [<802753f0>] (chrdev_open) from [<8026d964>] (do_dentry_op=
+en+0x1f4/0x314)
+  [   10.271620] [<8026d964>] (do_dentry_open) from [<8026ec00>] (vfs_open+=
+0x60/0x8c)
+  [   10.275245] [<8026ec00>] (vfs_open) from [<8027f39c>] (path_openat+0x2=
+bc/0x1040)
+  [   10.312827] [<8027f39c>] (path_openat) from [<80281040>] (do_filp_open=
++0x70/0xd4)
+  [   10.317860] [<80281040>] (do_filp_open) from [<8026efd8>] (do_sys_open=
++0x120/0x1d0)
+  [   10.320370] [<8026efd8>] (do_sys_open) from [<8026f0b4>] (SyS_open+0x2=
+c/0x30)
+  [   10.357033] [<8026f0b4>] (SyS_open) from [<801080c0>] (ret_fast_syscal=
+l+0x0/0x1c)
+
+  Tracking that down in the linux kernel source, it looks like somehow
+  uart_get_baud_rate() returns 0.
+
+  The same kernel could be booted without problem with qemu version 2.11.
+  Trying to bisecting the issue revealed commit @d9f8bbd8eb4e95db97cf02bd03=
+af86a3d606f4f1 as the culprit.
+
+  Commandline to run was:
+  qemu-system-arm -M raspi2 \
+  	-kernel "$KERNEL" \
+  	-m 1024 \
+  	-d guest_errors,unimp \
+  	-dtb bcm2709-rpi-2-b.dtb \
+  	-drive file=3D"$IMG,if=3Dsd,format=3Draw"
+
+  Distribution is SuSE tumbleweed (x86_64, kernel 4.17.2), but same
+  problem also happens with a freshly compiled qemu from git repository.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779017/+subscriptions
