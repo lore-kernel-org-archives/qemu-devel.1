@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYcGv-0001ss-KZ
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:08:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYcGx-0001wb-U1
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYcGm-0001fl-0k
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:08:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYcGo-0001j4-0d
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:08:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 28 Jun 2018 14:07:22 -0500
-Message-Id: <20180628190723.276458-6-eblake@redhat.com>
+Date: Thu, 28 Jun 2018 14:07:23 -0500
+Message-Id: <20180628190723.276458-7-eblake@redhat.com>
 In-Reply-To: <20180628190723.276458-1-eblake@redhat.com>
 References: <20180628190723.276458-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 5/6] iotests: Add new test 220 for max
- compressed cluster offset
+Subject: [Qemu-devel] [PATCH v7 6/6] qcow2: Avoid memory over-allocation on
+ compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,204 +23,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, berto@igalia.com
 
-If you have a capable file system (tmpfs is good, ext4 not so much;
-run ./check with TEST_DIR pointing to a good location so as not
-to skip the test), it's actually possible to create a qcow2 file
-that expands to a sparse 512T image with just over 38M of content.
-The test is not the world's fastest (qemu crawling through 256M
-bits of refcount table to find the next cluster to allocate takes
-several seconds, as does qemu-img check reporting millions of
-leaked clusters); but it DOES catch the problem that the previous
-patch just fixed where writing a compressed cluster to a full
-image ended up overwriting the wrong cluster.
+When reading a compressed image, we were allocating s->cluster_data
+to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
+with 2M clusters).  Let's check out the history:
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
+Back when qcow2 was first written, we used s->cluster_data for
+everything, including copy_sectors() and encryption, where we want
+to operate on more than one cluster at once.  Obviously, at that
+point, the buffer had to be aligned for other users, even though
+compression itself doesn't require any alignment (the fact that
+the compressed data generally starts mid-sector means that aligning
+our buffer buys us nothing - either the protocol already supports
+byte-based access into whatever offset we want, or we are already
+using a bounce buffer to read a full sector, and copying into
+our destination no longer requires alignment).
+
+But commit 1b9f1491 (v1.1!) changed things to allocate parallel
+buffers on demand rather than sharing a single buffer, for encryption
+and COW, leaving compression as the final client of s->cluster_data.
+That use was still preserved, because if a single compressed cluster
+is read more than once, we reuse the cache instead of decompressing
+it a second time (someday, we may come up with better caching to
+avoid wasting repeated decompressions while still being more parallel,
+but that is a task for another patch; the XXX comment in
+qcow2_co_preadv for QCOW2_CLUSTER_COMPRESSED is telling).
+
+Much later, in commit de82815d (v2.2), we noticed that a 64M
+allocation is prone to failure, so we switched over to a graceful
+memory allocation error message.  Elsewhere in the code, we do
+g_malloc(2 * cluster_size) without ever checking for failure, but
+even 4M starts to be large enough that trying to be nice is worth
+the effort, so we want to keep that aspect.
+
+Then even later, in 3e4c7052 (2.11), we realized that allocating
+a large buffer up front for every qcow2 image is expensive, and
+switched to lazy allocation only for images that actually had
+compressed clusters.  But in the process, we never even bothered
+to check whether what we were allocating still made sense in its
+new context!
+
+So, it's time to cut back on the waste.  A compressed cluster
+written by qemu will NEVER occupy more than an uncompressed
+cluster, but based on mid-sector alignment, we may still need
+to read 1 cluster + 1 sector in order to recover enough bytes
+for the decompression.  Meanwhile, third-party producers of
+qcow2 may not be as smart, and gzip DOES document that because
+the compression stream adds metadata, and because of the
+pigeonhole principle, there are worst case scenarios where
+attempts to compress will actually inflate an image, by up to
+0.015% (at most 1 sector larger for an unfortunate 2M
+compression), meaning we should realistically expect to
+sometimes need to read 1 cluster + 2 sectors.
+
+However, the qcow2 spec permits an all-ones sector count, plus
+a full sector containing the initial offset, for a maximum read
+of 2 full clusters.  Thanks to the way decompression works, even
+though such a value is too large for the actual compressed data
+(for all but 512-byte clusters), it really doesn't matter if we
+read too much (gzip ignores slop, once it has decoded a full
+cluster).  So it's easier to just allocate cluster_data to be as
+large as we can ever possibly see; even if it still wastes up to
+2M on any image created by qcow2, that's still an improvment of
+60M less waste than pre-patch.
+
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 
 ---
-v7: s/214/220/
-v6: new patch; took over 90 seconds to run on my setup, using tmpfs
+v5: fix math error in commit message [Max]
+v4: fix off-by-one in assertion and commit message [Berto]
+v3: tighten allocation [Berto]
+v2: actually check allocation failure (previous version meant
+to use g_malloc, but ended up posted with g_try_malloc without
+checking); add assertions outside of conditional, improve
+commit message to better match reality now that qcow2 spec bug
+has been fixed
 ---
- tests/qemu-iotests/220     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/220.out | 54 ++++++++++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 152 insertions(+)
- create mode 100755 tests/qemu-iotests/220
- create mode 100644 tests/qemu-iotests/220.out
+ block/qcow2-cluster.c | 27 ++++++++++++++++++---------
+ block/qcow2.c         |  2 +-
+ 2 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qemu-iotests/220 b/tests/qemu-iotests/220
-new file mode 100755
-index 00000000000..b4127facd12
---- /dev/null
-+++ b/tests/qemu-iotests/220
-@@ -0,0 +1,97 @@
-+#!/bin/bash
-+#
-+# max limits on compression in huge qcow2 files
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.pattern
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+echo "== Creating huge file =="
-+
-+# Sanity check: We require a file system that permits the creation
-+# of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
-+if ! truncate --size=513T "$TEST_IMG"; then
-+    _notrun "file system on $TEST_DIR does not support large enough files"
-+fi
-+rm "$TEST_IMG"
-+IMGOPTS='cluster_size=2M,refcount_bits=1' _make_test_img 513T
-+
-+echo "== Populating refcounts =="
-+# We want an image with 256M refcounts * 2M clusters = 512T referenced.
-+# Each 2M cluster holds 16M refcounts; the refcount table initially uses
-+# 1 refblock, so we need to add 15 more.  The refcount table lives at 2M,
-+# first refblock at 4M, L2 at 6M, so our remaining additions start at 8M.
-+# Then, for each refblock, mark it as fully populated.
-+to_hex() {
-+    printf %016x\\n $1 | sed 's/\(..\)/\\x\1/g'
-+}
-+truncate --size=38m "$TEST_IMG"
-+entry=$((0x200000))
-+$QEMU_IO_PROG -f raw -c "w -P 0xff 4m 2m" "$TEST_IMG" | _filter_qemu_io
-+for i in {1..15}; do
-+    offs=$((0x600000 + i*0x200000))
-+    poke_file "$TEST_IMG" $((i*8 + entry)) $(to_hex $offs)
-+    $QEMU_IO_PROG -f raw -c "w -P 0xff $offs 2m" "$TEST_IMG" | _filter_qemu_io
-+done
-+
-+echo "== Checking file before =="
-+# FIXME: 'qemu-img check' doesn't diagnose refcounts beyond the end of
-+# the file as leaked clusters
-+_check_test_img 2>&1 | sed '/^Leaked cluster/d'
-+stat -c 'image size %s' "$TEST_IMG"
-+
-+echo "== Trying to write compressed cluster =="
-+# Given our file size, the next available cluster at 512T lies beyond the
-+# maximum offset that a compressed 2M cluster can reside in
-+$QEMU_IO_PROG -c 'w -c 0 2m' "$TEST_IMG" | _filter_qemu_io
-+# The attempt failed, but ended up allocating a new refblock
-+stat -c 'image size %s' "$TEST_IMG"
-+
-+echo "== Writing normal cluster =="
-+# The failed write should not corrupt the image, so a normal write succeeds
-+$QEMU_IO_PROG -c 'w 0 2m' "$TEST_IMG" | _filter_qemu_io
-+
-+echo "== Checking file after =="
-+# qemu-img now sees the millions of leaked clusters, thanks to the allocations
-+# at 512T.  Undo many of our faked references to speed up the check.
-+$QEMU_IO_PROG -f raw -c "w -z 5m 1m" -c "w -z 8m 30m" "$TEST_IMG" |
-+    _filter_qemu_io
-+_check_test_img 2>&1 | sed '/^Leaked cluster/d'
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/220.out b/tests/qemu-iotests/220.out
-new file mode 100644
-index 00000000000..af3021fd883
---- /dev/null
-+++ b/tests/qemu-iotests/220.out
-@@ -0,0 +1,54 @@
-+QA output created by 220
-+== Creating huge file ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=564049465049088
-+== Populating refcounts ==
-+wrote 2097152/2097152 bytes at offset 4194304
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 8388608
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 10485760
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 12582912
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 14680064
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 16777216
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 18874368
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 20971520
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 23068672
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 25165824
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 27262976
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 29360128
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 31457280
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 33554432
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 35651584
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 37748736
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+== Checking file before ==
-+No errors were found on the image.
-+image size 39845888
-+== Trying to write compressed cluster ==
-+write failed: Input/output error
-+image size 562949957615616
-+== Writing normal cluster ==
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+== Checking file after ==
-+wrote 1048576/1048576 bytes at offset 5242880
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 31457280/31457280 bytes at offset 8388608
-+30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+8388589 leaked clusters were found on the image.
-+This means waste of disk space, but no harm to data.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index eea75819d2a..6eed45ff572 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -219,4 +219,5 @@
- 217 rw auto quick
- 218 rw auto quick
- 219 rw auto
-+220 rw auto
- 221 rw auto quick
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 4701fbc7a12..b98fe683726 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1599,20 +1599,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+         sector_offset = coffset & 511;
+         csize = nb_csectors * 512 - sector_offset;
+
+-        /* Allocate buffers on first decompress operation, most images are
+-         * uncompressed and the memory overhead can be avoided.  The buffers
+-         * are freed in .bdrv_close().
++        /* Allocate buffers on the first decompress operation; most
++         * images are uncompressed and the memory overhead can be
++         * avoided.  The buffers are freed in .bdrv_close().  qemu
++         * never writes an inflated cluster, and gzip itself never
++         * inflates a problematic cluster by more than 0.015%, but the
++         * qcow2 format allows up to 1 byte short of 2 full clusters
++         * when including the sector containing offset.  gzip ignores
++         * trailing slop, so just allocate that much up front rather
++         * than reject third-party images with overlarge csize.
+          */
++        assert(!!s->cluster_data == !!s->cluster_cache);
++        assert(csize <= 2 * s->cluster_size);
+         if (!s->cluster_data) {
+-            /* one more sector for decompressed data alignment */
+-            s->cluster_data = qemu_try_blockalign(bs->file->bs,
+-                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
++            s->cluster_data = g_try_malloc(2 * s->cluster_size);
+             if (!s->cluster_data) {
+                 return -ENOMEM;
+             }
+-        }
+-        if (!s->cluster_cache) {
+-            s->cluster_cache = g_malloc(s->cluster_size);
++            s->cluster_cache = g_try_malloc(s->cluster_size);
++            if (!s->cluster_cache) {
++                g_free(s->cluster_data);
++                s->cluster_data = NULL;
++                return -ENOMEM;
++            }
+         }
+
+         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index da54b2c8f84..e90ef804cdb 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2165,7 +2165,7 @@ static void qcow2_close(BlockDriverState *bs)
+     g_free(s->image_backing_format);
+
+     g_free(s->cluster_cache);
+-    qemu_vfree(s->cluster_data);
++    g_free(s->cluster_data);
+     qcow2_refcount_close(bs);
+     qcow2_free_snapshots(bs);
+ }
 -- 
 2.14.4
