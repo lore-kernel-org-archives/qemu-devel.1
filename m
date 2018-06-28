@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYVoq-0001LG-4H
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:14:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1fYVpW-0001z8-38
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYVoo-0002gR-MT
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:14:36 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 28 Jun 2018 14:14:17 +0200
-Message-Id: <20180628121417.1980-5-david@redhat.com>
-In-Reply-To: <20180628121417.1980-1-david@redhat.com>
-References: <20180628121417.1980-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] pc-dimm: assign and verify the "addr"
- property during pre_plug
+	(envelope-from <armbru@redhat.com>) id 1fYVpU-0003TY-7n
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49070 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fYVpU-0003So-2B
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B218640255D7
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 12:15:15 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180625101216.GE18277@paraplu>
+Date: Thu, 28 Jun 2018 14:15:14 +0200
+In-Reply-To: <20180625101216.GE18277@paraplu> (Kashyap Chamarthy's message of
+	"Mon, 25 Jun 2018 12:12:16 +0200")
+Message-ID: <87y3ez150t.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] RNG: Any reason QEMU doesn't default to
+ `/dev/urandom`?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,209 +34,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, David Hildenbrand <david@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, dgilbert@redhat.com, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 
-We can assign and verify the slot before realizing and trying to plug.
-reading/writing the address property should never fail, so let's reduce
-error handling a bit by using &error_abort. Getting access to the memory
-region now might however fail. So forward errors from
-get_memory_region() properly.
+Kashyap Chamarthy <kchamart@redhat.com> writes:
 
-Keep tracing the assigned address for now in the plug code, as that's the
-point we are sure plugging succeeded and the address willa ctually be
-used.
+> QEMU still defaults to /dev/random as entropy source.  Any reason why
+> not default to /dev/urandom?
+>
+> The other day Dan Berrang=C3=A9 explained elsewhere that /dev/urandom is
+> recommended -- as it is non-blocking; and doesn't have the same
+> limitations of /dev/random, which is a legacy interface.  (And other
+> applications[*] are any way overriding the QEMU default to
+> /dev/urandom.)
+>
+> `random(4)` says the following about the blocking nature of /dev/random:
+>
+>        The /dev/random device is a legacy interface which dates back to
+>        a time where the cryptographic primitives used in the
+>        implementation of /dev/urandom were not widely trusted.  It will
+>        return random bytes only within the estimated number of bits of
+>        fresh noise in the entropy pool, blocking if necessary.
+>        /dev/random is suitable for applications  that  need high quality
+>        randomness, and can afford indeterminate delays.
+>
+> And its "Usage" section says:
+>
+>        The  /dev/random  interface is considered a legacy interface, and
+>        /dev/urandom is preferred and sufficient in all use cases, with
+>        the exception of applications which require ran=E2=80=90 domness d=
+uring
+>        early boot time; for these applications, getrandom(2) must be
+>        used instead, because it will block until the entropy pool is
+>        initialized.
+>
+>        If a seed file is saved across reboots as recommended below (all
+>        major Linux distributions have done this since 2000 at least),
+>        the output  is  cryptographically  secure  against attackers
+>        without local root access as soon as it is reloaded in the boot
+>        sequence, and perfectly adequate for network encryption session
+>        keys.  Since reads from /dev/random may block, users will usually
+>        want to open it in nonblocking mode (or perform a read with
+>        timeout), and provide some sort of user notification if the
+>        desired entropy is  not  immedi=E2=80=90 ately available.
+>
+> [*] E.g. libguestfs:
+>     https://github.com/libguestfs/libguestfs/blob/master/lib/launch-direc=
+t.c#L592
 
-As all memory devices should use the alignment of the underlying memory
-region for guest physical address asignment, do detection of the
-alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
-alignment for compatibility handling.
+There's also getrandom(2).
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/i386/pc.c             | 16 ++++--------
- hw/mem/pc-dimm.c         | 53 +++++++++++++++++++++++-----------------
- hw/ppc/spapr.c           |  7 +++---
- include/hw/mem/pc-dimm.h |  6 ++---
- 4 files changed, 41 insertions(+), 41 deletions(-)
+See random(7) for a comparison between getrandom(), /dev/urandom,
+/dev/random.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 934b7155b1..16e4b5baff 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1678,7 +1678,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
- {
-     const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-+    const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-+    const uint64_t compat_align = TARGET_PAGE_SIZE;
- 
-     /*
-      * When -no-acpi is used with Q35 machine type, no ACPI is built,
-@@ -1696,7 +1698,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
-+    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev),
-+                     pcmc->enforce_aligned_dimm ? NULL : &compat_align, errp);
- }
- 
- static void pc_memory_plug(HotplugHandler *hotplug_dev,
-@@ -1705,18 +1708,9 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
-     HotplugHandlerClass *hhc;
-     Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
--    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
--    PCDIMMDevice *dimm = PC_DIMM(dev);
--    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
--    uint64_t align = TARGET_PAGE_SIZE;
-     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
- 
--    if (pcmc->enforce_aligned_dimm) {
--        align = memory_region_get_alignment(mr);
--    }
--
--    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
-+    pc_dimm_plug(dev, MACHINE(pcms), &local_err);
-     if (local_err) {
-         goto out;
-     }
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index e56c4daef2..8e2e8549dc 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -29,9 +29,14 @@
- 
- static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
-+void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
-+                      const uint64_t *compat_align, Error **errp)
- {
-+    PCDIMMDevice *dimm = PC_DIMM(dev);
-+    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     Error *local_err = NULL;
-+    MemoryRegion *mr;
-+    uint64_t addr, align;
-     int slot;
- 
-     slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
-@@ -43,44 +48,46 @@ void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
-     }
-     object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
-     trace_mhp_pc_dimm_assigned_slot(slot);
-+
-+    mr = ddc->get_memory_region(dimm, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+
-+    if (compat_align) {
-+        align = *compat_align;
-+    } else {
-+        align = memory_region_get_alignment(mr);
-+    }
-+
-+    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
-+                                    &error_abort);
-+    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
-+                                       memory_region_size(mr), &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP,
-+                             &error_abort);
- out:
-     error_propagate(errp, local_err);
- }
- 
--void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
--                  Error **errp)
-+void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp)
- {
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-                                                               &error_abort);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
--    Error *local_err = NULL;
-     uint64_t addr;
- 
--    addr = object_property_get_uint(OBJECT(dimm),
--                                    PC_DIMM_ADDR_PROP, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
--                                       memory_region_size(mr), &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP, &local_err);
--    if (local_err) {
--        goto out;
--    }
-+    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
-+                                    &error_abort);
-     trace_mhp_pc_dimm_assigned_address(addr);
- 
-     memory_device_plug_region(machine, mr, addr);
-     vmstate_register_ram(vmstate_mr, dev);
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bf012235b6..33543c6373 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3150,13 +3150,12 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
--    uint64_t align, size, addr;
-+    uint64_t size, addr;
-     uint32_t node;
- 
--    align = memory_region_get_alignment(mr);
-     size = memory_region_size(mr);
- 
--    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
-+    pc_dimm_plug(dev, MACHINE(ms), &local_err);
-     if (local_err) {
-         goto out;
-     }
-@@ -3223,7 +3222,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
-+    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), NULL, errp);
- }
- 
- struct sPAPRDIMMState {
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 7b120416d1..6457b2a25f 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -79,8 +79,8 @@ typedef struct PCDIMMDeviceClass {
-                                                Error **errp);
- } PCDIMMDeviceClass;
- 
--void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
--void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
--                  Error **errp);
-+void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
-+                      const uint64_t *compat_align, Error **errp);
-+void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp);
- void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
- #endif
--- 
-2.17.1
+As you wrote, Linux's /dev/random blocks when the kernel entropy pool
+has been depleted, while /dev/urandom doesn't.  There are systems where
+both devices behave exactly the same, or only /dev/random exists.
+Trying /dev/urandom first, and /dev/random as fallback is simple and
+works okay across a wide range of hosts.  That said, getrandom(2) or
+getentropy(3) are even nicer when available.
+
+I can see two uses of /dev/random in QEMU outside tests:
+
+* crypto/random-platform.c
+
+    int qcrypto_random_init(Error **errp)
+    {
+    #ifndef _WIN32
+        /* TBD perhaps also add support for BSD getentropy / Linux
+         * getrandom syscalls directly */
+        fd =3D open("/dev/urandom", O_RDONLY);
+        if (fd =3D=3D -1 && errno =3D=3D ENOENT) {
+            fd =3D open("/dev/random", O_RDONLY);
+        }
+
+        if (fd < 0) {
+            error_setg(errp, "No /dev/urandom or /dev/random found");
+            return -1;
+        }
+    #else
+    [...]
+    #endif
+
+        return 0;
+    }
+
+  Looks good to me.  Resolving the TBD would be nice.
+
+* backends/rng-random.c
+
+    static void rng_random_init(Object *obj)
+    {
+        RngRandom *s =3D RNG_RANDOM(obj);
+
+        object_property_add_str(obj, "filename",
+                                rng_random_get_filename,
+                                rng_random_set_filename,
+                                NULL);
+
+        s->filename =3D g_strdup("/dev/random");
+        s->fd =3D -1;
+    }
+
+   This is TYPE_RNG_RANDOM's instance_init() method.  Doesn't look so
+   good, but it's "only" a default.
+
+   What TYPE_RNG_RANDOM's intended use?  The manual suggests "backend
+   for virtio-rng":
+
+    @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+
+    Creates a random number generator backend which obtains entropy from
+    a device on the host. The @option{id} parameter is a unique ID that
+    will be used to reference this entropy backend from the @option{virtio-=
+rng}
+    device. The @option{filename} parameter specifies which file to obtain
+    entropy from and if omitted defaults to @option{/dev/random}.
+
+Regardless of other considerations, duplicating something as hairy as
+getting high-quality random numbers from the host in a portable manner
+is a Bad Idea.
