@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYVKN-0005Ca-0k
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:43:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fYVMt-0006Ig-NQ
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYVKK-0004jW-6E
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:43:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35652 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYVKK-0004iK-1S
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:43:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D04FF407529E
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:43:02 +0000 (UTC)
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
-	<87wouk8vul.fsf@dusky.pond.sub.org> <20180627102043.GD30628@redhat.com>
-	<8760248odg.fsf@dusky.pond.sub.org> <20180627120733.GD2516@xz-mi>
-	<877emj5rij.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ae282736-b3bd-d1ac-142e-d7394b5efbb6@redhat.com>
-Date: Thu, 28 Jun 2018 06:43:01 -0500
+	(envelope-from <bounces@canonical.com>) id 1fYVMq-0006vl-Hf
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:45:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fYVMq-0006ux-6r
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:45:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fYVMo-0000PA-Lv
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:45:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A3BEF2E8198
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:45:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <877emj5rij.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Jun 2018 11:28:15 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1587065@bugs.launchpad.net>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <153018529601.12646.7100861219492240431.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +38,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 06/28/2018 01:55 AM, Markus Armbruster wrote:
+** Description changed:
 
-> Changing an existing event from broadcast to unicast is an observable
-> change in existing behavior.  Compatibility break unless we can show
-> nobody can use / uses the observation.
++ [Impact]
++ =
 
-And no one could have been relying on the broadcast COMMAND_DROPPED 
-event semantics, since OOB was previously experimental and since we just 
-proved that they are wrong if not limited to one monitor.
++  * An explanation of the effects of the bug on users and
++ =
 
-> 
-> Creating a new event is not a compatibility break by itself[*],
-> regardless of broadcast vs. unicast.
-> 
->> My current plan is that I can touch up scripts/qapi/events.py and
->> related stuff to allow QMPEventFuncEmit to take a monitor parameter,
->> then we pass in NULL when we want to send the event to all monitors.
->>
->> Would that work?
-> 
-> Think so.
-> 
-> Alternatively, a pair of functions:
-> 
->      void qapi_event_bcast_EVENT(... event params ..., Error **errp);
->      void qapi_event_send_EVENT(Monitor *mon, ... event params ..., Error **errp);
-> 
-> Slightly more compact in the broadcast case, might be a bit easier to
-> read.
++  * justification for backporting the fix to the stable release.
++ =
 
-Also, fewer NULL arguments to add into existing call sites (although 
-existing call sites would change to use the _bcast_ form, so you're 
-already touching all call sites, which brings back the topic from the 
-other mail on dropping useless errp while at it).
++  * In addition, it is helpful, but not required, to include an
++    explanation of how the upload fixes this bug.
++ =
 
-> 
-> 
-> [*] In the case of COMMAND_DROPPED, the compatibility break is dropping
-> commands (the event's trigger), caused by the command queuing feature.
-> That's why command queuing has to be opt-in.  Details discussed
-> elsewhere in this thread.
++ [Test Case]
++ =
 
-Indeed, and I thought the conclusion there was that we DO promise that 
-COMMAND_DROPPED (and dropped commands in general) won't happen unless 
-you negotiate oob at initial connection.
++  * Prepare a guest
++    $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
+s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
++ uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
+abel=3Ddaily
++ =
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
++  * Shut it down and use virsh edit to add a channel for the agent
++ <channel type=3D'unix'>
++    <source mode=3D'bind'/>
++    <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
++ </channel>
++ =
+
++   * Start the guest again, in it install qemu-guest-agent
++ =
+
++   *
++ =
+
++   * On the Host then freeze and thaw the guest
++     $ virsh domfsfreeze x-freeze
++     $ virsh domfsthaw x-freeze
++ =
+
++   # The above works, then trigger the issue, in the guest do
++     $ sudo mkdir /mnt/test
++     $ sudo mount -o bind / /mnt/test/
++ =
+
++   * Now the freeze/thaw will fail unless the fix is applied.
++ =
+
++ [Regression Potential]
++ =
+
++  * From looking at the code alone I could think of a different cause that =
+
++    makes it return EBUSY.
++    The biggest risk I could see due to that is the agent reporting a =
+
++    successful freeze due to accepting EBUSY which is not actually true.
++    But we have that in Ubuntu since Artful and =
+
++    upstream since January 2017 and there are no such reports.
++ =
+
++ [Other Info]
++  =
+
++  * n/a
++ =
+
++ =
+
++ ---
++ =
+
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+  =
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+- =
+
+  =
+
+  Below more information about how we encountered this issue...
+  =
+
+  Message send to qemu-discuss@nongnu.org:
+  =
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+  =
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+  =
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+  =
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+  =
+
+  This is the only entry of the qemu guest agent in syslog.
+  =
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+  =
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+  =
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+  =
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+-  may have bind-mounts that let a device appear multiple times in the moun=
+t list. Unfortunately the guest agent is not smart enough to consider a dev=
+ice that has been frozen as succesfull and keep going. This causes this spe=
+cific error.
++ =C2=A0may have bind-mounts that let a device appear multiple times in the=
+ mount list. Unfortunately the guest agent is not smart enough to consider =
+a device that has been frozen as succesfull and keep going. This causes thi=
+s specific error.
+  =
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+  =
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
+
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
+
+Bug description:
+  [Impact]
+
+   * An explanation of the effects of the bug on users and
+
+   * justification for backporting the fix to the stable release.
+
+   * In addition, it is helpful, but not required, to include an
+     explanation of how the upload fixes this bug.
+
+  [Test Case]
+
+   * Prepare a guest
+     $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
+s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
+  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
+abel=3Ddaily
+
+   * Shut it down and use virsh edit to add a channel for the agent
+  <channel type=3D'unix'>
+     <source mode=3D'bind'/>
+     <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
+  </channel>
+
+    * Start the guest again, in it install qemu-guest-agent
+
+    *
+
+    * On the Host then freeze and thaw the guest
+      $ virsh domfsfreeze x-freeze
+      $ virsh domfsthaw x-freeze
+
+    # The above works, then trigger the issue, in the guest do
+      $ sudo mkdir /mnt/test
+      $ sudo mount -o bind / /mnt/test/
+
+    * Now the freeze/thaw will fail unless the fix is applied.
+
+  [Regression Potential]
+
+   * From looking at the code alone I could think of a different cause that =
+
+     makes it return EBUSY.
+     The biggest risk I could see due to that is the agent reporting a =
+
+     successful freeze due to accepting EBUSY which is not actually true.
+     But we have that in Ubuntu since Artful and =
+
+     upstream since January 2017 and there are no such reports.
+
+  [Other Info]
+   =
+
+   * n/a
+
+  =
+
+  ---
+
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+  =C2=A0may have bind-mounts that let a device appear multiple times in the=
+ mount list. Unfortunately the guest agent is not smart enough to consider =
+a device that has been frozen as succesfull and keep going. This causes thi=
+s specific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
