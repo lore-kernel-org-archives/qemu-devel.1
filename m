@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYcy4-0000af-Hk
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:52:37 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fYd0l-0001Wq-Tb
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYcy1-0006DN-BB
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:52:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYcy1-0006B1-1b
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:52:33 -0400
-Received: from smtp.corp.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com
-	[10.5.11.26])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0D94D3081D82
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 19:52:32 +0000 (UTC)
-Date: Thu, 28 Jun 2018 16:52:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180628195227.GH7451@localhost.localdomain>
-References: <20180628154502.GO3513@redhat.com>
+	(envelope-from <hpoussin@reactos.org>) id 1fYd0j-0004f8-Qf
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:55:23 -0400
+References: <20180627232951.14725-1-laurent@vivier.eu>
+	<20180627232951.14725-9-laurent@vivier.eu>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <57e73d94-893c-28d2-72ab-b8cce1ad9cf3@reactos.org>
+Date: Thu, 28 Jun 2018 21:55:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180628154502.GO3513@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] CPU model versioning separate from machine type
- versioning ?
+In-Reply-To: <20180627232951.14725-9-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC v3 08/10] hw/m68k: add a dummy SWIM floppy
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,106 +25,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, Jun 28, 2018 at 04:45:02PM +0100, Daniel P. Berrang=E9 wrote:
-[...]
-> What if we can borrow the concept of versioning from machine types and =
-apply
-> it to CPU models directly. For example, considering the history of "Has=
-well"
-> in QEMU, if we had versioned things, we would by now have:
->=20
->      Haswell-1.3.0 - first version (37507094f350b75c62dc059f998e7185de3=
-ab60a)
->      Haswell-2.2.0 - added 'rdrand' (78a611f1936b3eac8ed78a2be2146a742a=
-85212c_
->      Haswell-2.3.0 - removed 'hle' & 'rtm' (a356850b80b3d13b2ef737dad2a=
-cb05e6da03753)
->      Haswell-2.5.0 - added 'abm' (becb66673ec30cb604926d247ab9449a60ad8=
-b11
->      Haswell-2.12.0 - added 'spec-ctrl' (ac96c41354b7e4c70b756342d9b686=
-e31ab87458)
->      Haswell-3.0.0  - added 'ssbd' (never done)
->=20
-> If we followed the machine type approach, then a bare "Haswell" would
-> statically resolve at build time to the most recent Haswell-X.X.X versi=
-on
-> associated with the QEMU release. This is unhelpful as we have a direct
-> dependancy on the host hardware features. Better would be for a bare
-> "Haswell" to be dynamically resolved at runtime, picking the most recen=
-t
-> version that is capable of launching given the current hardware, KVM/TC=
-G impl
-> and QEMU version.
->=20
->   ie -cpu  Haswell
->=20
-> should use Haswell-2.5.0  if on silicon with the TSX errata applied,
-> but use Haswell-2.12.0 if the Spectre errata is applied in microcode,
-> and use Haswell-3.0.0 once Intel finally releases SSBD microcode errata=
-.
+Le 28/06/2018 à 01:29, Laurent Vivier a écrit :
+> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   hw/block/Makefile.objs  |   1 +
+>   hw/block/swim.c         | 284 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   include/hw/block/swim.h |  53 +++++++++
+>   3 files changed, 338 insertions(+)
+>   create mode 100644 hw/block/swim.c
+>   create mode 100644 include/hw/block/swim.h
+> 
+> diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+> index 53ce5751ae..068de3f0c9 100644
+> --- a/hw/block/Makefile.objs
+> +++ b/hw/block/Makefile.objs
+> @@ -8,6 +8,7 @@ common-obj-$(CONFIG_XEN) += xen_disk.o
+>   common-obj-$(CONFIG_ECC) += ecc.o
+>   common-obj-$(CONFIG_ONENAND) += onenand.o
+>   common-obj-$(CONFIG_NVME_PCI) += nvme.o
+> +common-obj-$(CONFIG_SWIM) += swim.o
+>   
+>   obj-$(CONFIG_SH4) += tc58128.o
+>   
+> diff --git a/hw/block/swim.c b/hw/block/swim.c
+> new file mode 100644
+> index 0000000000..6b1d0371e8
+> --- /dev/null
+> +++ b/hw/block/swim.c
+> @@ -0,0 +1,284 @@
+> +/*
+> + * QEMU Macintosh floppy disk controller emulator (SWIM)
+> + *
+> + * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/block/swim.h"
+> +
+> +/* IWM registers */
+> +
+> +#define IWM_PH0L                0
+> +#define IWM_PH0H                1
+> +#define IWM_PH1L                2
+> +#define IWM_PH1H                3
+> +#define IWM_PH2L                4
+> +#define IWM_PH2H                5
+> +#define IWM_PH3L                6
+> +#define IWM_PH3H                7
+> +#define IWM_MTROFF              8
+> +#define IWM_MTRON               9
+> +#define IWM_INTDRIVE            10
+> +#define IWM_EXTDRIVE            11
+> +#define IWM_Q6L                 12
+> +#define IWM_Q6H                 13
+> +#define IWM_Q7L                 14
+> +#define IWM_Q7H                 15
+> +
+> +/* SWIM registers */
+> +
+> +#define SWIM_WRITE_DATA         0
+> +#define SWIM_WRITE_MARK         1
+> +#define SWIM_WRITE_CRC          2
+> +#define SWIM_WRITE_PARAMETER    3
+> +#define SWIM_WRITE_PHASE        4
+> +#define SWIM_WRITE_SETUP        5
+> +#define SWIM_WRITE_MODE0        6
+> +#define SWIM_WRITE_MODE1        7
+> +
+> +#define SWIM_READ_DATA          8
+> +#define SWIM_READ_MARK          9
+> +#define SWIM_READ_ERROR         10
+> +#define SWIM_READ_PARAMETER     11
+> +#define SWIM_READ_PHASE         12
+> +#define SWIM_READ_SETUP         13
+> +#define SWIM_READ_STATUS        14
+> +#define SWIM_READ_HANDSHAKE     15
+> +
+> +#define REG_SHIFT               9
+> +
+> +#define SWIM_MODE_IWM  0
+> +#define SWIM_MODE_SWIM 1
+> +
+> +/* bits in phase register */
+> +
+> +#define SWIM_SEEK_NEGATIVE   0x074
+> +#define SWIM_STEP            0x071
+> +#define SWIM_MOTOR_ON        0x072
+> +#define SWIM_MOTOR_OFF       0x076
+> +#define SWIM_INDEX           0x073
+> +#define SWIM_EJECT           0x077
+> +#define SWIM_SETMFM          0x171
+> +#define SWIM_SETGCR          0x175
+> +#define SWIM_RELAX           0x033
+> +#define SWIM_LSTRB           0x008
+> +#define SWIM_CA_MASK         0x077
+> +
+> +/* Select values for swim_select and swim_readbit */
+> +
+> +#define SWIM_READ_DATA_0     0x074
+> +#define SWIM_TWOMEG_DRIVE    0x075
+> +#define SWIM_SINGLE_SIDED    0x076
+> +#define SWIM_DRIVE_PRESENT   0x077
+> +#define SWIM_DISK_IN         0x170
+> +#define SWIM_WRITE_PROT      0x171
+> +#define SWIM_TRACK_ZERO      0x172
+> +#define SWIM_TACHO           0x173
+> +#define SWIM_READ_DATA_1     0x174
+> +#define SWIM_MFM_MODE        0x175
+> +#define SWIM_SEEK_COMPLETE   0x176
+> +#define SWIM_ONEMEG_MEDIA    0x177
+> +
+> +/* Bits in handshake register */
+> +
+> +#define SWIM_MARK_BYTE       0x01
+> +#define SWIM_CRC_ZERO        0x02
+> +#define SWIM_RDDATA          0x04
+> +#define SWIM_SENSE           0x08
+> +#define SWIM_MOTEN           0x10
+> +#define SWIM_ERROR           0x20
+> +#define SWIM_DAT2BYTE        0x40
+> +#define SWIM_DAT1BYTE        0x80
+> +
+> +/* bits in setup register */
+> +
+> +#define SWIM_S_INV_WDATA     0x01
+> +#define SWIM_S_3_5_SELECT    0x02
+> +#define SWIM_S_GCR           0x04
+> +#define SWIM_S_FCLK_DIV2     0x08
+> +#define SWIM_S_ERROR_CORR    0x10
+> +#define SWIM_S_IBM_DRIVE     0x20
+> +#define SWIM_S_GCR_WRITE     0x40
+> +#define SWIM_S_TIMEOUT       0x80
+> +
+> +/* bits in mode register */
+> +
+> +#define SWIM_CLFIFO          0x01
+> +#define SWIM_ENBL1           0x02
+> +#define SWIM_ENBL2           0x04
+> +#define SWIM_ACTION          0x08
+> +#define SWIM_WRITE_MODE      0x10
+> +#define SWIM_HEDSEL          0x20
+> +#define SWIM_MOTON           0x80
+> +
+> +
+> +static void iwmctrl_write(void *opaque, hwaddr reg, uint64_t value,
+> +                          unsigned size)
+> +{
+> +    SWIMCtrl *swimctrl = opaque;
+> +
+> +    reg >>= REG_SHIFT;
+> +
+> +    swimctrl->regs[reg >> 1] = reg & 1;
+> +
+> +    if (swimctrl->regs[IWM_Q6] &&
+> +        swimctrl->regs[IWM_Q7]) {
+> +        if (swimctrl->regs[IWM_MTR]) {
+> +            /* data register */
+> +            swimctrl->iwm_data = value;
+> +        } else {
+> +            /* mode register */
+> +            swimctrl->iwm_mode = value;
+> +            /* detect sequence to switch from IWM mode to SWIM mode */
+> +            switch (swimctrl->iwm_switch) {
+> +            case 0:
+> +                if (value == 0x57) {
+> +                    swimctrl->iwm_switch++;
+> +                }
+> +                break;
+> +            case 1:
+> +                if (value == 0x17) {
+> +                    swimctrl->iwm_switch++;
+> +                }
+> +                break;
+> +            case 2:
+> +                if (value == 0x57) {
+> +                    swimctrl->iwm_switch++;
+> +                }
+> +                break;
+> +            case 3:
+> +                if (value == 0x57) {
+> +                    swimctrl->mode = SWIM_MODE_SWIM;
+> +                    swimctrl->iwm_switch = 0;
+> +                }
+> +                break;
+> +            }
 
-Doing this unconditionally would make
-"-machine pc-q35-3.1 -cpu Haswell" unsafe for live migration, and
-break existing usage.  But this behavior could be enabled
-explicitly somehow.
+I assume that the values of the sequence must be contiguous. If you don't follow it, you have to restart from scratch.
+In that case, you're missing the "else { swimctrl->iwm_switch = 0; }" in the cases 1 to 3.
 
->=20
-> Versioning of CPU models as opposed to using arbitrary string suffixes
-> (-noTSX, -IBRS) has a number of usability improvements that we would
-> gain with versioned machine types, while avoiding exploding the machine
-> type matrix. With versioned CPU models we can
->=20
->  - Automatically tailor the best model based on hardware support
->=20
->  - Users always get the best model if they use the bare CPU name
->=20
->  - It is obvious to users which is the "best" / "newest" CPU model
->=20
->  - Avoid combinatorial expansion of machines since same CPU model
->    version can be added to all releases without adding machine types.
->=20
->  - Users can still force a specific downgraded model by using the
->    fully versioned name.
->=20
-> Such versioning of CPU models would largely "just work" with existing
-> libvirt versions, but to libvirt would really want to expand the bare
-> CPU name to a versioned CPU name when recording new guest XML, so the
-> ABI is preserved long term.
->=20
-> An application like virt-manager which wants a simple UI can forever be
-> happy simply giving users a list of bare CPU model names, and allowing
-> libvirt / QEMU to automatically expand to the best versioned model for
-> their host.
->=20
-> An application like oVirt/OpenStack which wants direct control can allo=
-w
-> the admin to choice if a bare name, or explicitly picking a versioned n=
-ame
-> if they need to cope with possibility of outdated hosts.
->=20
+You may also use the following pattern:
+     static const uint8_t iwm_switch_sequence[] = { 0x57, 0x17, 0x57, 0x57 };
+     if (value == iwm_switch_sequence[swimctrl->iwm_switch]) {
+         swimctrl->iwm_switch++;
+         if (swimctrl->iwm_switch == ARRAY_SIZE(iwm_switch_sequence)) {
+             swimctrl->mode = SWIM_MODE_SWIM;
+             swimctrl->iwm_switch = 0;
+         }
+     } else {
+         swimctrl->iwm_switch = 0;
+     }
 
-The proposal makes sense, and I think most of it can be already
-implemented on top of existing query-cpu-model-* commands.
-query-cpu-model-expansion type=3Dstatic can expand to a versioned
-CPU model.
 
-We will probably need to make query-cpu-model-expansion accept a
-machine-type name as input, and/or add a new flag meaning "please
-give me the best CPU version you have, not the one defined by the
-current machine-type".
+Hervé
 
-I'm not sure what would be the best way to encode two types of
-information, though:
-
-* Fallback/alternatives info, e.g.: "It makes sense to use
-  Haswell-{3.0,2.12,2.5,...} if Haswell-3.1 is not runnable and the
-  user asked for Haswell".
-
-* Ordering/preference info, e.g.: "Haswell-3.1 is better than
-  Haswell-3.0, prefer the latter"
-
---=20
-Eduardo
+> +        }
+> +    }
+> +}
+> +
+> +static uint64_t iwmctrl_read(void *opaque, hwaddr reg, unsigned size)
+> +{
+> +    SWIMCtrl *swimctrl = opaque;
+> +
+> +    reg >>= REG_SHIFT;
+> +
+> +    swimctrl->regs[reg >> 1] = reg & 1;
+> +
+> +    return 0;
+> +}
+> +
+> +static void swimctrl_write(void *opaque, hwaddr reg, uint64_t value,
+> +                           unsigned size)
+> +{
+> +    SWIMCtrl *swimctrl = opaque;
+> +
+> +    if (swimctrl->mode == SWIM_MODE_IWM) {
+> +        iwmctrl_write(opaque, reg, value, size);
+> +        return;
+> +    }
+> +
+> +    reg >>= REG_SHIFT;
+> +
+> +    switch (reg) {
+> +    case SWIM_WRITE_PHASE:
+> +        swimctrl->swim_phase = value;
+> +        break;
+> +    case SWIM_WRITE_MODE0:
+> +        swimctrl->swim_mode &= ~value;
+> +        break;
+> +    case SWIM_WRITE_MODE1:
+> +        swimctrl->swim_mode |= value;
+> +        break;
+> +    case SWIM_WRITE_DATA:
+> +    case SWIM_WRITE_MARK:
+> +    case SWIM_WRITE_CRC:
+> +    case SWIM_WRITE_PARAMETER:
+> +    case SWIM_WRITE_SETUP:
+> +        break;
+> +    }
+> +}
+> +
+> +static uint64_t swimctrl_read(void *opaque, hwaddr reg, unsigned size)
+> +{
+> +    SWIMCtrl *swimctrl = opaque;
+> +    uint32_t value = 0;
+> +
+> +    if (swimctrl->mode == SWIM_MODE_IWM) {
+> +        return iwmctrl_read(opaque, reg, size);
+> +    }
+> +
+> +    reg >>= REG_SHIFT;
+> +
+> +    switch (reg) {
+> +    case SWIM_READ_PHASE:
+> +        value = swimctrl->swim_phase;
+> +        break;
+> +    case SWIM_READ_HANDSHAKE:
+> +        if (swimctrl->swim_phase == SWIM_DRIVE_PRESENT) {
+> +            /* always answer "no drive present" */
+> +            value = SWIM_SENSE;
+> +        }
+> +        break;
+> +    case SWIM_READ_DATA:
+> +    case SWIM_READ_MARK:
+> +    case SWIM_READ_ERROR:
+> +    case SWIM_READ_PARAMETER:
+> +    case SWIM_READ_SETUP:
+> +    case SWIM_READ_STATUS:
+> +        break;
+> +    }
+> +
+> +    return value;
+> +}
+> +
+> +static const MemoryRegionOps swimctrl_mem_ops = {
+> +    .write = swimctrl_write,
+> +    .read = swimctrl_read,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void swim_init(Object *obj)
+> +{
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +    SWIMCtrl *swimctrl = SWIM(obj);
+> +
+> +    memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
+> +                          "swim", 0x2000);
+> +    sysbus_init_mmio(sbd, &swimctrl->iomem);
+> +}
+> +
+> +static Property swim_properties[] = {
+> +    DEFINE_PROP_DRIVE("driveA", SWIMCtrl, drives[0].blk),
+> +    DEFINE_PROP_DRIVE("driveB", SWIMCtrl, drives[1].blk),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void swim_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->props = swim_properties;
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> +}
+> +
+> +static const TypeInfo swim_info = {
+> +    .name          = TYPE_SWIM,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(SWIMCtrl),
+> +    .instance_init = swim_init,
+> +    .class_init    = swim_class_init,
+> +};
+> +
+> +static void swim_register_types(void)
+> +{
+> +    type_register_static(&swim_info);
+> +}
+> +
+> +type_init(swim_register_types)
+> diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
+> new file mode 100644
+> index 0000000000..2c0258967c
+> --- /dev/null
+> +++ b/include/hw/block/swim.h
+> @@ -0,0 +1,53 @@
+> +/*
+> + * QEMU Macintosh floppy disk controller emulator (SWIM)
+> + *
+> + * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#ifndef SWIM_H
+> +#define SWIM_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +
+> +#define MAX_FD                  2
+> +
+> +typedef struct SWIMCtrl SWIMCtrl;
+> +
+> +typedef struct FDrive {
+> +    SWIMCtrl *swimctrl;
+> +    BlockBackend *blk;
+> +} FDrive;
+> +
+> +#define TYPE_SWIM "swim"
+> +#define SWIM(obj) OBJECT_CHECK(SWIMCtrl, (obj), TYPE_SWIM)
+> +
+> +typedef struct SWIMCtrl {
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion iomem;
+> +    FDrive drives[MAX_FD];
+> +    int mode;
+> +    /* IWM mode */
+> +    int iwm_switch;
+> +    int regs[8];
+> +#define IWM_PH0   0
+> +#define IWM_PH1   1
+> +#define IWM_PH2   2
+> +#define IWM_PH3   3
+> +#define IWM_MTR   4
+> +#define IWM_DRIVE 5
+> +#define IWM_Q6    6
+> +#define IWM_Q7    7
+> +    uint8_t iwm_data;
+> +    uint8_t iwm_mode;
+> +    /* SWIM mode */
+> +    uint8_t swim_phase;
+> +    uint8_t swim_mode;
+> +} SWIMCtrl;
+> +
+> +#endif
+> 
