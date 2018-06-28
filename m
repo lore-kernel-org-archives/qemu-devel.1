@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYZIS-0008Bj-G5
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:57:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1fYZJz-0000sv-W5
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:59:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYZIN-0002wZ-M3
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:57:24 -0400
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:35765)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYZIN-0002vn-72
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:57:19 -0400
-Received: by mail-pg0-x233.google.com with SMTP id i7-v6so2659771pgp.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:57:19 -0700 (PDT)
-References: <20180627043328.11531-1-richard.henderson@linaro.org>
-	<20180627043328.11531-34-richard.henderson@linaro.org>
-	<CAFEAcA_ZfQ1y0=sWBqLGSbd5qoBvhSthUy_udDi-aE5U66DLLg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8c0706a5-6601-9945-9312-c3a0775c3d83@linaro.org>
-Date: Thu, 28 Jun 2018 08:57:15 -0700
+	(envelope-from <berrange@redhat.com>) id 1fYZJz-0005GJ-6s
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:59:00 -0400
+Date: Thu, 28 Jun 2018 16:58:47 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180628155847.GQ3513@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180628132211.8795-1-rjones@redhat.com>
+	<20180628132211.8795-2-rjones@redhat.com>
+	<cf457707-eaab-16f9-d1c9-3a3f6423958e@redhat.com>
+	<20180628155404.GF1455@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_ZfQ1y0=sWBqLGSbd5qoBvhSthUy_udDi-aE5U66DLLg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 33/35] target/arm: Implement SVE dot
- product (indexed)
+Content-Disposition: inline
+In-Reply-To: <20180628155404.GF1455@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] crypto: Implement TLS Pre-Shared Keys
+ (PSK).
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 06/28/2018 06:07 AM, Peter Maydell wrote:
->>  # SVE integer dot product (unpredicated)
->> -DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5
->> +DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5 ra=%reg_movprfx
+On Thu, Jun 28, 2018 at 04:54:04PM +0100, Richard W.M. Jones wrote:
+> On Thu, Jun 28, 2018 at 09:42:18AM -0500, Eric Blake wrote:
+> > On 06/28/2018 08:22 AM, Richard W.M. Jones wrote:
+> > >+    while (fgets(line, sizeof line, fp) != NULL) {
+> > >+        if (strncmp(line, username, ulen) == 0 && line[ulen] == ':') {
+> > 
+> > ...can't this misbehave if the user accidentally points to some
+> > other file (rather than one produced by psktool)?  I'm wondering if
+> > a getline() loop would be smarter than trying to use a fixed-length
+> > buffer.
 > 
-> Shouldn't this have been in a different patch ?
+> I would definitely have used getline, but after examining the qemu
+> source I wasn't sure if it was permitted.  It's only used in qga now.
+> Is it available on Win32 for example?
+> 
+> Thanks for the rest of the comments.  I'll modify those where required
+> in the next version.
 
-Dammit, you pointed this out last time and I missed it
-when going back through all of the nits.
+These key files are fairly small so IMHO it would be acceptable to just
+read the entire file into memory in one go using g_file_get_contents(),
+and then g_str_split() on "\n"
 
-Do you want me to re-spin all or part of the patch set?
-
-
-r~
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
