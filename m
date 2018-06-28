@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYZRR-0006V2-1i
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:06:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fYZSr-0007WQ-CO
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYZRN-0003X9-0W
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:06:41 -0400
-Date: Thu, 28 Jun 2018 17:06:20 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180628160620.GS3513@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180628132211.8795-1-rjones@redhat.com>
-	<20180628132211.8795-2-rjones@redhat.com>
-	<cf457707-eaab-16f9-d1c9-3a3f6423958e@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fYZSq-0006ql-Hq
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:08:09 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:37085)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fYZSq-0006p5-By
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:08:08 -0400
+Received: by mail-ot0-x242.google.com with SMTP id q11-v6so4516030otk.4
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:08:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cf457707-eaab-16f9-d1c9-3a3f6423958e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] crypto: Implement TLS Pre-Shared Keys
- (PSK).
+In-Reply-To: <8c0706a5-6601-9945-9312-c3a0775c3d83@linaro.org>
+References: <20180627043328.11531-1-richard.henderson@linaro.org>
+	<20180627043328.11531-34-richard.henderson@linaro.org>
+	<CAFEAcA_ZfQ1y0=sWBqLGSbd5qoBvhSthUy_udDi-aE5U66DLLg@mail.gmail.com>
+	<8c0706a5-6601-9945-9312-c3a0775c3d83@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Jun 2018 17:07:46 +0100
+Message-ID: <CAFEAcA9zoojsDy+5NRSd693GVfVCqQOVCQ=15jhFWx8bXB_FFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 33/35] target/arm: Implement SVE dot
+ product (indexed)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Jun 28, 2018 at 09:42:18AM -0500, Eric Blake wrote:
-> On 06/28/2018 08:22 AM, Richard W.M. Jones wrote:
-> 
-> In the subject line: most commit summaries don't have a trailing '.'.
-> 
-> > Pre-Shared Keys (PSK) is a simpler mechanism for enabling TLS
-> > connections than using certificates.  It requires only a simple secret
-> > key:
-> > 
-> >    $ mkdir -m 0700 /tmp/keys
-> >    $ psktool -u rjones -p /tmp/keys/keys.psk
-> >    $ cat /tmp/keys/keys.psk
-> >    rjones:d543770c15ad93d76443fb56f501a31969235f47e999720ae8d2336f6a13fcbc
-> > 
-> > The key can be secretly shared between clients and servers.  Clients
-> > must specify the directory containing the "keys.psk" file and a
-> > username (defaults to "qemu").  Servers must specify only the
-> > directory.
-> > 
-> > Example NBD client:
-> > 
-> >    $ qemu-img info \
-> >      --object tls-creds-psk,id=tls0,dir=/tmp/keys,username=rjones,endpoint=client \
-> >      --image-opts \
-> >      file.driver=nbd,file.host=localhost,file.port=10809,file.tls-creds=tls0,file.export=/
-> 
-> Not your problem, but it would be nice if someday our --object command line
-> arguments also had QMP counterparts to better document what key/value pairs
-> each particular object type permits/requires (yeah, you can do it via QMP
-> now, but object-add is an untyped command that just passes a raw dict
-> through rather than benefitting from type-safe parsing).
-> 
-> > Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> > ---
-> >   crypto/Makefile.objs           |   1 +
-> >   crypto/tlscredspsk.c           | 300 +++++++++++++++++++++++++++++++++
-> >   crypto/tlssession.c            |  50 +++++-
-> >   crypto/trace-events            |   3 +
-> >   include/crypto/tlscredspsk.h   | 106 ++++++++++++
-> >   qemu-doc.texi                  |  37 ++++
-> >   qemu-options.hx                |  24 +++
-> >   tests/Makefile.include         |   4 +-
-> >   tests/crypto-tls-psk-helpers.c |  50 ++++++
-> >   tests/crypto-tls-psk-helpers.h |  29 ++++
-> >   tests/test-crypto-tlssession.c | 185 +++++++++++++++++---
-> >   11 files changed, 763 insertions(+), 26 deletions(-)
-> 
-> > +static int
-> > +lookup_key(const char *pskfile, const char *username, gnutls_datum_t *key,
-> > +           Error **errp)
-> > +{
-> > +    FILE *fp;
-> > +    char line[1024]; /* Maximum key length in psktool is 512 bytes. */
-> 
-> That's true for a valid file produced by psktool, but...
-> 
-> > +    size_t ulen = strlen(username);
-> > +    size_t len;
-> > +
-> > +    fp = fopen(pskfile, "r");
-> 
-> Do we want to consider the use of qemu_open() to allow qemu to read from a
-> pre-opened fd, rather than requiring the ability to open() from the file
-> system? (May matter if we want to combine crypto usage with a locked-down
-> qemu that has seccomp or selinux preventing bare open).  But that gets
-> tricky since there may be more than one file within the directory to open,
-> and the existing x509 certificate handling is also impacted by such a design
-> decision, so that's more a question for Dan and not necessarily a problem in
-> this patch.
+On 28 June 2018 at 16:57, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 06/28/2018 06:07 AM, Peter Maydell wrote:
+>>>  # SVE integer dot product (unpredicated)
+>>> -DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5
+>>> +DOT_zzz         01000100 1 sz:1 0 rm:5 00000 u:1 rn:5 rd:5 ra=%reg_movprfx
+>>
+>> Shouldn't this have been in a different patch ?
+>
+> Dammit, you pointed this out last time and I missed it
+> when going back through all of the nits.
+>
+> Do you want me to re-spin all or part of the patch set?
 
-Yeah, given our approach of passing in a dir, not a file, I don't think it is
-viable to expect to use qemu_open() and FD passing. 
+No, I've just made the fix locally in target-arm.next.
 
-
-> > +static void
-> > +qcrypto_tls_creds_psk_prop_set_username(Object *obj,
-> > +                                        const char *value,
-> > +                                        Error **errp G_GNUC_UNUSED)
-> > +{
-> > +    QCryptoTLSCredsPSK *creds = QCRYPTO_TLS_CREDS_PSK(obj);
-> > +
-> > +    creds->username = g_strdup(value);
-> 
-> Does it make sense to forbid this operation on servers (since it only makes
-> sense for clients)?
-
-We can't validate that here, because we can't guarantee that 'endpoint'
-is set before 'username' is set.
-
-
-We could enforce it in the setter for the "loaded" property as that is
-set only after every other property is set.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
