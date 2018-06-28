@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fYVpW-0001z8-38
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:19 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1fYVpa-000258-9V
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fYVpU-0003TY-7n
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49070 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fYVpU-0003So-2B
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B218640255D7
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 12:15:15 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180625101216.GE18277@paraplu>
-Date: Thu, 28 Jun 2018 14:15:14 +0200
-In-Reply-To: <20180625101216.GE18277@paraplu> (Kashyap Chamarthy's message of
-	"Mon, 25 Jun 2018 12:12:16 +0200")
-Message-ID: <87y3ez150t.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <benh@kernel.crashing.org>) id 1fYVpW-0003Vw-2r
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:15:22 -0400
+Message-ID: <0149df21ce3f5506c3384e51a20da9f94cf313a6.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Thu, 28 Jun 2018 22:14:53 +1000
+In-Reply-To: <b84cc6b91f3af188c3eece0713f849031c5256c8.camel@redhat.com>
+References: <20180626135928.23950-1-clg@kaod.org>
+	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
+	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
+	<8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
+	<20180628035909.GE23134@umbus.fritz.box>
+	<b84cc6b91f3af188c3eece0713f849031c5256c8.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] RNG: Any reason QEMU doesn't default to
- `/dev/urandom`?
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,123 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, rjones@redhat.com, dgilbert@redhat.com, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Kashyap Chamarthy <kchamart@redhat.com> writes:
+On Thu, 2018-06-28 at 10:00 +0200, Andrea Bolognani wrote:
+> On Thu, 2018-06-28 at 13:59 +1000, David Gibson wrote:
+> > On Wed, Jun 27, 2018 at 12:22:31PM +0200, Andrea Bolognani wrote:
+> > > On Tue, 2018-06-26 at 19:02 +0200, C=C3=A9dric Le Goater wrote:
+> > > > I didn't follow that discussion but this is "another" kind of PHB.
+> > > > This one models the baremetal controller as found on OpenPOWER an=
+d
+> > > > IBM Power machines. pSeries has a virtual PHB.
+> > >=20
+> > > I understand that, and of course libvirt will need to learn about
+> > > this new type of PHB and make sure both pSeries and PowerNV guests
+> > > get the correct one assigned to them.
+> >=20
+> > Hmm.. does it?  I would have thought pnv could act more like x86, in
+> > that libvirt doesn't attempt to create PHBs at all and just use the
+> > ones that are built in.
+>=20
+> AFAIK x86 guests have a single PHB and additional ones cannot be
+> created in any way, which means we don't have to do any additional
+> second-guessing when assigning IDs to additional PCI controllers.
 
-> QEMU still defaults to /dev/random as entropy source.  Any reason why
-> not default to /dev/urandom?
->
-> The other day Dan Berrang=C3=A9 explained elsewhere that /dev/urandom is
-> recommended -- as it is non-blocking; and doesn't have the same
-> limitations of /dev/random, which is a legacy interface.  (And other
-> applications[*] are any way overriding the QEMU default to
-> /dev/urandom.)
->
-> `random(4)` says the following about the blocking nature of /dev/random:
->
->        The /dev/random device is a legacy interface which dates back to
->        a time where the cryptographic primitives used in the
->        implementation of /dev/urandom were not widely trusted.  It will
->        return random bytes only within the estimated number of bits of
->        fresh noise in the entropy pool, blocking if necessary.
->        /dev/random is suitable for applications  that  need high quality
->        randomness, and can afford indeterminate delays.
->
-> And its "Usage" section says:
->
->        The  /dev/random  interface is considered a legacy interface, and
->        /dev/urandom is preferred and sufficient in all use cases, with
->        the exception of applications which require ran=E2=80=90 domness d=
-uring
->        early boot time; for these applications, getrandom(2) must be
->        used instead, because it will block until the entropy pool is
->        initialized.
->
->        If a seed file is saved across reboots as recommended below (all
->        major Linux distributions have done this since 2000 at least),
->        the output  is  cryptographically  secure  against attackers
->        without local root access as soon as it is reloaded in the boot
->        sequence, and perfectly adequate for network encryption session
->        keys.  Since reads from /dev/random may block, users will usually
->        want to open it in nonblocking mode (or perform a read with
->        timeout), and provide some sort of user notification if the
->        desired entropy is  not  immedi=E2=80=90 ately available.
->
-> [*] E.g. libguestfs:
->     https://github.com/libguestfs/libguestfs/blob/master/lib/launch-direc=
-t.c#L592
+That's a surprising limitation. A single PHB only supports a limited
+number of MSIs no ? And only 256 bus numbers...
 
-There's also getrandom(2).
+> > Though, come to that, I wouldn't think pnv support for libvirt would
+> > be much of a priority anyway.  The machine type is still very much in
+> > flux, and it's designed primarily for testing and development, not
+> > "real world" usage.
+>=20
+> Can you *guarantee* that someone won't ask for PowerNV support in
+> libvirt at some point? Because if you can't (and I don't think you
+> can ;) then this is still a valuable conversation to have.
 
-See random(7) for a comparison between getrandom(), /dev/urandom,
-/dev/random.
+It's rather unlikely for now as there is no KVM suport for it (it's
+tricky, our chips aren't designed for full virtualization). That might
+change in the future but not soon.
 
-As you wrote, Linux's /dev/random blocks when the kernel entropy pool
-has been depleted, while /dev/urandom doesn't.  There are systems where
-both devices behave exactly the same, or only /dev/random exists.
-Trying /dev/urandom first, and /dev/random as fallback is simple and
-works okay across a wide range of hosts.  That said, getrandom(2) or
-getentropy(3) are even nicer when available.
+> > > What I meant is that pSeries guests get a single PHB by default,
+> > > with additional ones being instantiable through -device; this is
+> > > also consistent with how PCI controllers are added to other guest
+> > > types including pc, q35 and aarch64/virt, so it would be really
+> > > nice if PowerNV behaved the same way.
+> >=20
+> > Well.. sure.. but it doesn't.  pSeries is a virtual platform, so we
+> > have a reasonable amount of flexibility to define it as we want.
+> > PowerNV is an emulation of existing hardware which has a specific
+> > behaviour which we need to match.
+>=20
+> Sure, that's something to keep in mind.
+>=20
+> But the thing is, you still need to have *some* flexibility in
+> the number of PHBs, since there is variation among real Power8
+> and Power9 chips; in the current incarnation, that flexibility
+> is provided by the num_phbs parameter, which is an entirely new
+> interface that's exclusive to PowerNV.
+>=20
+> What I'm suggesting is that the same amount of flexibility is
+> offered through a standard interface, namely -device, instead.
 
-I can see two uses of /dev/random in QEMU outside tests:
+But that's harder internally to qemu to properly "bind" to the chip
+where the PHB resides etc...=20
 
-* crypto/random-platform.c
-
-    int qcrypto_random_init(Error **errp)
-    {
-    #ifndef _WIN32
-        /* TBD perhaps also add support for BSD getentropy / Linux
-         * getrandom syscalls directly */
-        fd =3D open("/dev/urandom", O_RDONLY);
-        if (fd =3D=3D -1 && errno =3D=3D ENOENT) {
-            fd =3D open("/dev/random", O_RDONLY);
-        }
-
-        if (fd < 0) {
-            error_setg(errp, "No /dev/urandom or /dev/random found");
-            return -1;
-        }
-    #else
-    [...]
-    #endif
-
-        return 0;
-    }
-
-  Looks good to me.  Resolving the TBD would be nice.
-
-* backends/rng-random.c
-
-    static void rng_random_init(Object *obj)
-    {
-        RngRandom *s =3D RNG_RANDOM(obj);
-
-        object_property_add_str(obj, "filename",
-                                rng_random_get_filename,
-                                rng_random_set_filename,
-                                NULL);
-
-        s->filename =3D g_strdup("/dev/random");
-        s->fd =3D -1;
-    }
-
-   This is TYPE_RNG_RANDOM's instance_init() method.  Doesn't look so
-   good, but it's "only" a default.
-
-   What TYPE_RNG_RANDOM's intended use?  The manual suggests "backend
-   for virtio-rng":
-
-    @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-
-    Creates a random number generator backend which obtains entropy from
-    a device on the host. The @option{id} parameter is a unique ID that
-    will be used to reference this entropy backend from the @option{virtio-=
-rng}
-    device. The @option{filename} parameter specifies which file to obtain
-    entropy from and if omitted defaults to @option{/dev/random}.
-
-Regardless of other considerations, duplicating something as hairy as
-getting high-quality random numbers from the host in a portable manner
-is a Bad Idea.
+Cheers,
+Ben.
