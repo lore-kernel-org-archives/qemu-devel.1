@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYSXr-0007Kl-ME
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:44:52 -0400
+	(envelope-from <david@redhat.com>) id 1fYSmq-00011b-0o
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYSXq-0001be-U5
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 04:44:51 -0400
-Date: Thu, 28 Jun 2018 10:44:37 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180628084437.GA4833@localhost.localdomain>
-References: <20180627232334.14142-1-laurent@vivier.eu>
-	<20180627232334.14142-9-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180627232334.14142-9-laurent@vivier.eu>
-Subject: Re: [Qemu-devel] [C v2 08/10] hw/m68k: add a dummy SWIM floppy
- controller
+	(envelope-from <david@redhat.com>) id 1fYSml-0008IM-1b
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:00:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55698 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fYSmk-0008Ho-RY
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:00:14 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 28 Jun 2018 11:00:11 +0200
+Message-Id: <20180628090011.14879-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] numa: report all DIMM/NVDIMMs as plugged in
+ "info numa"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Reitz <mreitz@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eugene Crosser <evgenii.cherkashin@profitbricks.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Am 28.06.2018 um 01:23 hat Laurent Vivier geschrieben:
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Right now, there is some inconsistency between hotplugged and
+coldplugged memory. DIMMs added via "-device" result in different stats
+than DIMMs added using "device_add".
 
-> +static Property swim_properties[] = {
-> +    DEFINE_PROP_DRIVE("driveA", SWIMCtrl, drives[0].blk),
-> +    DEFINE_PROP_DRIVE("driveB", SWIMCtrl, drives[1].blk),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
+E.g. with the following QEMU cmdline:
+    [...]
+    -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
+    -m 4G,maxmem=20G,slots=2 \
+    -object memory-backend-ram,id=mem0,size=8G \
+    -device pc-dimm,id=dimm0,memdev=mem0 \
+    -object memory-backend-ram,id=mem1,size=8G \
+    -device nvdimm,id=dimm1,memdev=mem1,node=1
 
-This is not the right way to model things. The floppy controller needs
-to expose a bus and floppy drives need to be created with a separate
--device option.
+"info memory_size_summary" will correctly report:
+    (qemu) info memory_size_summary
+    info memory_size_summary
+    base memory: 4294967296
+    plugged memory: 17179869184
 
-isa-fdc still has these options, but that's only for compatibility and
-their implementation is basically a wrapper around the modern qdev way.
+While "info numa" will not report DIMM/NVDIMMs as (cold)plugged memory.
+    (qemu) info numa
+    info numa
+    2 nodes
+    node 0 cpus: 0 1
+    node 0 size: 10240 MB
+    node 0 plugged: 0 MB
+    node 1 cpus: 2 3
+    node 1 size: 10240 MB
+    node 1 plugged: 0 MB
 
-Kevin
+Make this consistent by reporting all hot and coldplugged memory a.k.a.
+DIMM and NVDIMM as "plugged".
+
+With this change, the output of "info numa" is now:
+    (qemu) info numa
+    info numa
+    2 nodes
+    node 0 cpus: 0 1
+    node 0 size: 10240 MB
+    node 0 plugged: 8192 MB
+    node 1 cpus: 2 3
+    node 1 size: 10240 MB
+    node 1 plugged: 8192 MB
+
+Fixes: 31959e82fb0 ("hmp: extend "info numa" with hotplugged memory information")
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+
+v1 -> v2:
+- Tweaked patch description/sibject as requested by Igor.
+
+ numa.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/numa.c b/numa.c
+index 94f758c757..5f6367b989 100644
+--- a/numa.c
++++ b/numa.c
+@@ -566,10 +566,8 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+ 
+             if (pcdimm_info) {
+                 node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
+-                if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
+-                    node_mem[pcdimm_info->node].node_plugged_mem +=
+-                        pcdimm_info->size;
+-                }
++                node_mem[pcdimm_info->node].node_plugged_mem +=
++                    pcdimm_info->size;
+             }
+         }
+     }
+-- 
+2.17.1
