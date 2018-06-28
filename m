@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fYYMb-0008LR-0Y
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:57:38 -0400
+	(envelope-from <bishara@daynix.com>) id 1fYYNO-0000Mx-3f
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fYYMW-0004sP-4b
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:57:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42560 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fYYMV-0004qQ-Vf
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:57:32 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
-	<20180627163551.31610-2-marcandre.lureau@redhat.com>
-Date: Thu, 28 Jun 2018 16:57:26 +0200
-In-Reply-To: <20180627163551.31610-2-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 27 Jun 2018 18:35:37 +0200")
-Message-ID: <871scrgdrd.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/15] qapi: add 'if' to top-level
- expressions
+	(envelope-from <bishara@daynix.com>) id 1fYYNJ-0007Uk-R0
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:58:26 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:44984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1fYYNJ-0007RZ-Ib
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:58:21 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id p12-v6so5839971wrn.11
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 07:58:21 -0700 (PDT)
+From: Bishara AbuHattoum <bishara@daynix.com>
+Date: Thu, 28 Jun 2018 17:58:16 +0300
+Message-Id: <20180628145816.30339-1-bishara@daynix.com>
+Subject: [Qemu-devel] [PATCH v3] qga-win: Fixing msi upgrade disallow in WiX
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Issue: When upgrading qemu-ga using the msi from an old version
+       to a newer one, the upgrade is not allowed by the msi
+       showing this error message "Another version of this product
+       is already installed."
 
-> Accept 'if' key in top-level elements, accepted as string or list of
-> string type. The following patches will modify the test visitor to
-> check the value is correctly saved, and generate #if/#endif code (as a
-> single #if/endif line or a series for a list).
->
-> Example of 'if' key:
-> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
->   'if': 'defined(TEST_IF_STRUCT)' }
->
-> The generated code is for now *unconditional*. Later patches generate
-> the conditionals.
->
-> A following patch for qapi-code-gen.txt will provide more complete
-> documentation for 'if' usage.
+BZ# 1536331: https://bugzilla.redhat.com/show_bug.cgi?id=1536331
 
-This paragraph looks obsolete now, because...
+Fix: For the upgrade to be allowed by the msi the WiX file must
+     provide three things:
+      1. Changing product's Id. (assigning it to "*")
+      2. Constant product's UpgradeId. (exists)
+      3. Changing version. (exists)
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi/common.py                   | 35 ++++++++++++++++++++----
->  tests/test-qmp-cmds.c                    |  6 ++++
->  docs/devel/qapi-code-gen.txt             | 22 +++++++++++++++
+Reference: http://wixtoolset.org/documentation/manual/v3/howtos/updates/major_upgrade.html
 
-... you update documentation right in this patch (I like that).
+Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
+---
+ qga/installer/qemu-ga.wxs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[...]
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 88a70e4d45..7af60b48f3 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -739,6 +739,28 @@ Example: Red Hat, Inc. controls redhat.com, and may =
-therefore add a
->  downstream command __com.redhat_drive-mirror.
->=20=20
->=20=20
-> +=3D=3D=3D Configuring the schema =3D=3D=3D
-> +
-> +Top-level QAPI expressions.
-
-This sentence no verb :)  I suspect an editing accident ate "can take an
-'if' key".
-
->                               The value must be a string or a list of
-> +string.
-
-s/string/strings/
-
->           The corresponding generated code will then guard the inclusion
-> +of that member in the larger struct or function with #if IFCOND
-> +(or several #if lines for a list), where IFCOND is the value of the
-> +'if' key.
-
-"that member" makes little sense; top-level expressions aren't members.
-
-> +
-> +'struct', 'enum', 'union', 'alternate', 'command' and 'event'
-> +top-level QAPI expressions can take an 'if' keyword like:
-> +
-> +{ 'struct': 'IfStruct', 'data': { 'foo': 'int' },
-> +  'if': 'defined(IFCOND)' }
-
-Repetitive.
-
-Moreover, I'd like to see the example spell out how conditions affect
-generated code.
-
-Here's my try:
-
-=3D=3D=3D Configuring the schema =3D=3D=3D
-
-The 'struct', 'enum', 'union', 'alternate', 'command' and 'event'
-top-level expressions can take an 'if' key.  Its value must be a string
-or a list of strings.  A string is shorthand for a list containing just
-that string.  The code generated for the top-level expression will then
-be guarded by #if COND for each COND in the list.
-
-Example: a conditional struct
-
- { 'struct': 'IfStruct', 'data': { 'foo': 'int' },
-   'if': ['defined(CONFIG_FOO)', 'defined(HAVE_BAR)'] }
-
-gets its generated code guarded like this:
-
- #if defined(CONFIG_FOO)
- #if defined(HAVE_BAR)
- ... generated code ...
- #endif /* defined(HAVE_BAR) */
- #endif /* defined(CONFIG_FOO) */
-
-> +
-> +Please note that you are responsible to ensure that the C code will
-> +compile with an arbitrary combination of conditions, since the
-> +generators are unable to check it at this point.
-> +
-> +The presence of 'if' keys in the schema is reflected through to the
-> +introspection output depending on the build configuration.
-> +
-> +
->  =3D=3D Client JSON Protocol introspection =3D=3D
->=20=20
->  Clients of a Client JSON Protocol commonly need to figure out what
-[...]
-
-I'm happy to apply these proposals without a respin, if you like them.
+diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
+index 5af11627f8..f751a7e9f7 100644
+--- a/qga/installer/qemu-ga.wxs
++++ b/qga/installer/qemu-ga.wxs
+@@ -41,7 +41,7 @@
+ 
+   <Product
+     Name="QEMU guest agent"
+-    Id="{DF9974AD-E41A-4304-81AD-69AA8F299766}"
++    Id="*"
+     UpgradeCode="{EB6B8302-C06E-4BEC-ADAC-932C68A3A98D}"
+     Manufacturer="$(env.QEMU_GA_MANUFACTURER)"
+     Version="$(env.QEMU_GA_VERSION)"
+-- 
+2.13.6
