@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYWtT-0003UA-VA
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:23:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYWvj-00059U-1d
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYWtS-0003Or-VH
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:23:27 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45823)
+	(envelope-from <alex.bennee@linaro.org>) id 1fYWve-0005O9-0h
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:25:47 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:37973)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYWtS-0003Nw-Q0
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:23:26 -0400
-Received: by mail-ot0-x242.google.com with SMTP id k3-v6so6083109otl.12
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 06:23:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYWvd-0005NI-DN
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:25:41 -0400
+Received: by mail-wr0-x234.google.com with SMTP id e18-v6so5525816wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 06:25:41 -0700 (PDT)
+References: <20180627043328.11531-1-richard.henderson@linaro.org>
+	<20180627043328.11531-31-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180627043328.11531-31-richard.henderson@linaro.org>
+Date: Thu, 28 Jun 2018 14:25:38 +0100
+Message-ID: <87vaa3ujot.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <50e46f22-1e3d-10ce-5b5b-a10af49a95f1@vivier.eu>
-References: <20180626165658.31394-1-peter.maydell@linaro.org>
-	<20180626165658.31394-24-peter.maydell@linaro.org>
-	<50e46f22-1e3d-10ce-5b5b-a10af49a95f1@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 14:23:05 +0100
-Message-ID: <CAFEAcA8141WC556H1fZLM4AEaz62o4qb7JOOVB-+75N9vugi+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 23/32] tcg: Support MMU protection regions
- smaller than TARGET_PAGE_SIZE
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 30/35] target/arm: Pass index
+ to AdvSIMD FCMLA (indexed)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +31,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On 28 June 2018 at 14:03, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 26/06/2018 =C3=A0 18:56, Peter Maydell a =C3=A9crit :
->> Add support for MMU protection regions that are smaller than
->> TARGET_PAGE_SIZE. We do this by marking the TLB entry for those
->> pages with a flag TLB_RECHECK. This flag causes us to always
->> take the slow-path for accesses. In the slow path we can then
->> special case them to always call tlb_fill() again, so we have
->> the correct information for the exact address being accessed.
->>
->> This change allows us to handle reading and writing from small
->> regions; we cannot deal with execution from the small region.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Message-id: 20180620130619.11362-2-peter.maydell@linaro.org
->> ---
->>  accel/tcg/softmmu_template.h |  24 ++++---
->>  include/exec/cpu-all.h       |   5 +-
->>  accel/tcg/cputlb.c           | 131 +++++++++++++++++++++++++++++------
->>  3 files changed, 130 insertions(+), 30 deletions(-)
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> For aa64 advsimd, we had been passing the pre-indexed vector.
+> However, sve applies the index to each 128-bit segment, so we
+> need to pass in the index separately.
 >
-> This patch breaks Quadra 800 emulation, any idea why?
+> For aa32 advsimd, the fp32 operation always has index 0, but
+> we failed to interpret the fp16 index correctly.
 >
-> ABCFGHIJK
-> qemu: fatal: Unable to handle guest executing from RAM within a small
-> MPU region at 0x0014cb5a
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Hmm, that shouldn't happen unless your target code was
-incorrectly returning a too-small page size. (I say
-"incorrectly" because before this patchseries that was
-unsupported and would have had weird effects depending on
-exactly what the order of guest accesses to the page was.)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-You could look at whether the m68k code is calling tlb_set_page()
-with a wrong page_size value and why that happens. You can
-get back the old behaviour by having your code do
-   if (page_size < TARGET_PAGE_SIZE) {
-       page_size =3D TARGET_PAGE_SIZE;
-   }
+>
+> ---
+> v6:
+>   * Fix double-indexing in translate-a64.c
+>   * Fix non-indexing of fp16 in translate.c.
+> ---
+>  target/arm/translate-a64.c | 21 ++++++++++++---------
+>  target/arm/translate.c     | 32 +++++++++++++++++++++++---------
+>  target/arm/vec_helper.c    | 10 ++++++----
+>  3 files changed, 41 insertions(+), 22 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 8d8a4cecb0..eb3a4ab2f0 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -12669,15 +12669,18 @@ static void disas_simd_indexed(DisasContext *s,=
+ uint32_t insn)
+>      case 0x13: /* FCMLA #90 */
+>      case 0x15: /* FCMLA #180 */
+>      case 0x17: /* FCMLA #270 */
+> -        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
+> -                           vec_full_reg_offset(s, rn),
+> -                           vec_reg_offset(s, rm, index, size), fpst,
+> -                           is_q ? 16 : 8, vec_full_reg_size(s),
+> -                           extract32(insn, 13, 2), /* rot */
+> -                           size =3D=3D MO_64
+> -                           ? gen_helper_gvec_fcmlas_idx
+> -                           : gen_helper_gvec_fcmlah_idx);
+> -        tcg_temp_free_ptr(fpst);
+> +        {
+> +            int rot =3D extract32(insn, 13, 2);
+> +            int data =3D (index << 2) | rot;
+> +            tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
+> +                               vec_full_reg_offset(s, rn),
+> +                               vec_full_reg_offset(s, rm), fpst,
+> +                               is_q ? 16 : 8, vec_full_reg_size(s), data,
+> +                               size =3D=3D MO_64
+> +                               ? gen_helper_gvec_fcmlas_idx
+> +                               : gen_helper_gvec_fcmlah_idx);
+> +            tcg_temp_free_ptr(fpst);
+> +        }
+>          return;
+>      }
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 2a3e4f5d4c..a7a980b1f2 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -7826,26 +7826,42 @@ static int disas_neon_insn_3same_ext(DisasContext=
+ *s, uint32_t insn)
+>
+>  static int disas_neon_insn_2reg_scalar_ext(DisasContext *s, uint32_t ins=
+n)
+>  {
+> -    int rd, rn, rm, rot, size, opr_sz;
+> +    gen_helper_gvec_3_ptr *fn_gvec_ptr;
+> +    int rd, rn, rm, opr_sz, data;
+>      TCGv_ptr fpst;
+>      bool q;
+>
+>      q =3D extract32(insn, 6, 1);
+>      VFP_DREG_D(rd, insn);
+>      VFP_DREG_N(rn, insn);
+> -    VFP_DREG_M(rm, insn);
+>      if ((rd | rn) & q) {
+>          return 1;
+>      }
+>
+>      if ((insn & 0xff000f10) =3D=3D 0xfe000800) {
+>          /* VCMLA (indexed) -- 1111 1110 S.RR .... .... 1000 ...0 .... */
+> -        rot =3D extract32(insn, 20, 2);
+> -        size =3D extract32(insn, 23, 1);
+> -        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)
+> -            || (!size && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))) {
+> +        int rot =3D extract32(insn, 20, 2);
+> +        int size =3D extract32(insn, 23, 1);
+> +        int index;
+> +
+> +        if (!arm_dc_feature(s, ARM_FEATURE_V8_FCMA)) {
+>              return 1;
+>          }
+> +        if (size =3D=3D 0) {
+> +            if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
+> +                return 1;
+> +            }
+> +            /* For fp16, rm is just Vm, and index is M.  */
+> +            rm =3D extract32(insn, 0, 4);
+> +            index =3D extract32(insn, 5, 1);
+> +        } else {
+> +            /* For fp32, rm is the usual M:Vm, and index is 0.  */
+> +            VFP_DREG_M(rm, insn);
+> +            index =3D 0;
+> +        }
+> +        data =3D (index << 2) | rot;
+> +        fn_gvec_ptr =3D (size ? gen_helper_gvec_fcmlas_idx
+> +                       : gen_helper_gvec_fcmlah_idx);
+>      } else {
+>          return 1;
+>      }
+> @@ -7864,9 +7880,7 @@ static int disas_neon_insn_2reg_scalar_ext(DisasCon=
+text *s, uint32_t insn)
+>      tcg_gen_gvec_3_ptr(vfp_reg_offset(1, rd),
+>                         vfp_reg_offset(1, rn),
+>                         vfp_reg_offset(1, rm), fpst,
+> -                       opr_sz, opr_sz, rot,
+> -                       size ? gen_helper_gvec_fcmlas_idx
+> -                       : gen_helper_gvec_fcmlah_idx);
+> +                       opr_sz, opr_sz, data, fn_gvec_ptr);
+>      tcg_temp_free_ptr(fpst);
+>      return 0;
+>  }
+> diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+> index 073e5c58e7..8f2dc4b989 100644
+> --- a/target/arm/vec_helper.c
+> +++ b/target/arm/vec_helper.c
+> @@ -317,10 +317,11 @@ void HELPER(gvec_fcmlah_idx)(void *vd, void *vn, vo=
+id *vm,
+>      float_status *fpst =3D vfpst;
+>      intptr_t flip =3D extract32(desc, SIMD_DATA_SHIFT, 1);
+>      uint32_t neg_imag =3D extract32(desc, SIMD_DATA_SHIFT + 1, 1);
+> +    intptr_t index =3D extract32(desc, SIMD_DATA_SHIFT + 2, 2);
+>      uint32_t neg_real =3D flip ^ neg_imag;
+>      uintptr_t i;
+> -    float16 e1 =3D m[H2(flip)];
+> -    float16 e3 =3D m[H2(1 - flip)];
+> +    float16 e1 =3D m[H2(2 * index + flip)];
+> +    float16 e3 =3D m[H2(2 * index + 1 - flip)];
+>
+>      /* Shift boolean to the sign bit so we can xor to negate.  */
+>      neg_real <<=3D 15;
+> @@ -377,10 +378,11 @@ void HELPER(gvec_fcmlas_idx)(void *vd, void *vn, vo=
+id *vm,
+>      float_status *fpst =3D vfpst;
+>      intptr_t flip =3D extract32(desc, SIMD_DATA_SHIFT, 1);
+>      uint32_t neg_imag =3D extract32(desc, SIMD_DATA_SHIFT + 1, 1);
+> +    intptr_t index =3D extract32(desc, SIMD_DATA_SHIFT + 2, 2);
+>      uint32_t neg_real =3D flip ^ neg_imag;
+>      uintptr_t i;
+> -    float32 e1 =3D m[H4(flip)];
+> -    float32 e3 =3D m[H4(1 - flip)];
+> +    float32 e1 =3D m[H4(2 * index + flip)];
+> +    float32 e3 =3D m[H4(2 * index + 1 - flip)];
+>
+>      /* Shift boolean to the sign bit so we can xor to negate.  */
+>      neg_real <<=3D 31;
 
-but that is definitely a bit of a hack.
 
-Does the m68k MMU let you specify permissions and mappings
-for sub-page sizes ?
-
-I do notice an oddity:
-in m68k_cpu_handle_mmu_fault() we call get_physical_address()
-but then ignore the page_size it returns when we call tlb_set_page()
-and instead use TARGET_PAGE_SIZE. But in the ptest helper function
-we use the page_size from get_physical_address() directly.
-Are these bits of code deliberately different?
-
-In fact it's not clear to me at all that PTEST should be
-updating the QEMU TLB: it only needs to update the MMU
-status registers. (The 68030 manual I have says that in
-hardware PTEST doesn't update the ATC, which is the h/w
-equivalent to doing a TLB update.)
-
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
