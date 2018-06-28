@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYesz-0003TX-Kn
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:55:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYevz-0004p9-9U
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYesy-0005MJ-I0
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:55:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYevy-0003X5-DY
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:58:35 -0400
 References: <20180628000745.4477-1-mreitz@redhat.com>
-	<20180628000745.4477-5-mreitz@redhat.com>
+	<20180628000745.4477-6-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c442199b-d0e9-7efa-1b61-a724f753ebe5@redhat.com>
-Date: Thu, 28 Jun 2018 16:55:20 -0500
+Message-ID: <823163f4-aaec-e550-a7fd-4f2c510c80de@redhat.com>
+Date: Thu, 28 Jun 2018 16:58:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180628000745.4477-5-mreitz@redhat.com>
+In-Reply-To: <20180628000745.4477-6-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 04/31] block: Add BDS.auto_backing_file
+Subject: Re: [Qemu-devel] [PATCH v9 05/31] block: Respect backing bs in
+ bdrv_refresh_filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +29,30 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 On 06/27/2018 07:07 PM, Max Reitz wrote:
-> If the backing file is overridden, this most probably does change the
-> guest-visible data of a BDS.  Therefore, we will need to consider this
-> in bdrv_refresh_filename().
+> Basically, bdrv_refresh_filename() should respect all children of a
+> BlockDriverState. However, generally those children are driver-specific,
+> so this function cannot handle the general case. On the other hand,
+> there are only few drivers which use other children than @file and
+> @backing (that being vmdk, quorum, and blkverify).
 > 
-
-> So all in all, there will be false negatives where (as of a future
-> patch) bdrv_refresh_filename() will assume that the backing file differs
-> from what was specified in the image header, even though it really does
-> not.  However, these cases should be limited to where (1) the user
-> actually did override something in the backing chain (e.g. by specifying
-> options for the backing file), or (2) the user executed a QMP command to
-> change some node's backing file (e.g. change-backing-file or
-> block-commit with @backing-file given) where the given filename does not
-> happen to coincide with qemu's idea of the backing BDS's filename.
+> Most block drivers only use @file and/or @backing (if they use any
+> children at all). Both can be implemented directly in
+> bdrv_refresh_filename.
 > 
-> Then again, (1) really is limited to -drive.  With -blockdev or
-> blockdev-add, you have to adhere to the schema, so a user cannot give
-> partial "unimportant" options (e.g. by just setting backing.node-name
-> and leaving the rest to the image header).  Therefore, trying to fix
-> this would mean trying to fix something for -drive only.
+> The user overriding the file's filename is already handled, however, the
+> user overriding the backing file is not. If this is done, opening the
+> BDS with the plain filename of its file will not be correct, so we may
+> not set bs->exact_filename in that case.
 > 
-> To improve on (2), we would need a full infrastructure to "canonicalize"
-> an arbitrary filename (+ options), so it can be compared against
-> another.  That seems a bit over the top, considering that filenames
-> nowadays are there mostly for the user's entertainment.
-
-Lengthy commit message, but the rationale is sound and useful.
+> iotest 051 contains test cases for overriding the backing file, and so
+> its output changes with this patch applied.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block.c                       | 30 +++++++++++++++++++++++++++++-
+>   tests/qemu-iotests/051.out    |  8 ++++----
+>   tests/qemu-iotests/051.pc.out |  8 ++++----
+>   3 files changed, 37 insertions(+), 9 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
