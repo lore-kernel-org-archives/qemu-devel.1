@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYeK6-0005tg-7m
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:19:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fYeKQ-00064Z-HL
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:19:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYeK2-00020r-1E
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:19:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38352 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYeK1-0001yv-Sh
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:19:21 -0400
-References: <20180627204136.4177-1-zhangckid@gmail.com>
-	<20180627204136.4177-12-zhangckid@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3464fd15-6b1c-b524-0445-58fb352c1b42@redhat.com>
-Date: Thu, 28 Jun 2018 16:19:18 -0500
+	(envelope-from <jsnow@redhat.com>) id 1fYeKP-00031F-Ok
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:19:46 -0400
+References: <20180628180042.3881-1-jsnow@redhat.com>
+	<20180628180042.3881-2-jsnow@redhat.com>
+	<3a32f921-7800-a4f3-12ac-195212cbe828@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <05a181af-5038-826f-2873-dec4a04f22e9@redhat.com>
+Date: Thu, 28 Jun 2018 17:19:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180627204136.4177-12-zhangckid@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <3a32f921-7800-a4f3-12ac-195212cbe828@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V9 11/20] qapi/migration.json: Rename COLO
- unknown mode to none mode.
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: allow blockdev-backup from
+ any source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>
 
-On 06/27/2018 03:41 PM, Zhang Chen wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
-> 
-> Suggested by Markus Armbruster rename COLO unknown mode to none mode.
-> 
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->   migration/colo-failover.c |  2 +-
->   migration/colo.c          |  2 +-
->   qapi/migration.json       | 10 +++++-----
->   3 files changed, 7 insertions(+), 7 deletions(-)
 
->   # Since: 2.8
->   ##
->   { 'enum': 'COLOMode',
-> -  'data': [ 'unknown', 'primary', 'secondary'] }
-> +  'data': [ 'none', 'primary', 'secondary'] }
 
-The deletion of 'unknown' could potentially be a user-visible regression 
-visible if COLOMode were in a QMP command; but thankfully the generated 
-qapi/qapi-introspect.c does not seem to cover this enum, so it just 
-affects internal code for now.
+On 06/28/2018 02:05 PM, Eric Blake wrote:
+> On 06/28/2018 01:00 PM, John Snow wrote:
+>> In the case of image fleecing, the node we choose as the source
+>> for a blockdev-backup is going to be both a root node AND the
+>> backing node for the exported image. It does not qualify as a root
+>> image in this case.
+>>
+>> Loosen the restriction.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 blockdev.c | 2 +-
+>> =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> In v1, you mentioned that this used to work but then regressed,
+> pinpointing that detail in the commit message might be nice, but not
+> essential (since we didn't test it until now).=C2=A0 So,
+>=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Really not sure when it regressed; I consider it unimportant as nothing
+uses it presently: no docs, no tests, nothing in libvirt.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+My guess, though, is that it worked prior to
+cef34eebf3d0f252a3b3e9a2a459b6c3ecc56f68.
+
+In 2.8, possibly?
+
+Kashyap might know, I think he's experimented with this sometime in that
+timezone.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
