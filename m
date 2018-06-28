@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYV3a-0006OG-AM
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:25:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fYV85-000865-AB
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:30:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYV3W-0005Qx-7m
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:25:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60330)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYV3W-0005QB-18
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:25:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYV3U-0005k7-NQ
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:25:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF2BB2E8199
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:25:40 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1fYV81-0004Fs-2K
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:30:25 -0400
+Date: Thu, 28 Jun 2018 12:30:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180628113003.GC2536@work-vm>
+References: <20180627232951.14725-1-laurent@vivier.eu>
+	<20180627232951.14725-3-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Jun 2018 11:13:42 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1587065@bugs.launchpad.net>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153018442295.12646.6028347888270232214.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180627232951.14725-3-laurent@vivier.eu>
+Subject: Re: [Qemu-devel] [RFC v3 02/10] ADB: VIA probes ADB bus when it is
+ idle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,131 +24,335 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Jason Wang <jasowang@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Steps to reproduce
+* Laurent Vivier (laurent@vivier.eu) wrote:
+> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  hw/input/adb-kbd.c        |   4 ++
+>  hw/input/adb-mouse.c      |   4 ++
+>  hw/input/adb.c            | 115 ++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/misc/mac_via.c         |  56 ++++++++++++++++++++++
+>  include/hw/input/adb.h    |  10 ++++
+>  include/hw/misc/mac_via.h |   1 +
+>  6 files changed, 190 insertions(+)
+> 
+> diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+> index b026e9d49f..f439e106bb 100644
+> --- a/hw/input/adb-kbd.c
+> +++ b/hw/input/adb-kbd.c
+> @@ -195,6 +195,10 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
+>      int keycode;
+>      int olen;
+>  
+> +    if (obuf == NULL) {
+> +        return s->count;
+> +    }
+> +
+>      olen = 0;
+>      if (s->count == 0) {
+>          return 0;
+> diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+> index 83833b0035..7615c252d5 100644
+> --- a/hw/input/adb-mouse.c
+> +++ b/hw/input/adb-mouse.c
+> @@ -73,6 +73,10 @@ static int adb_mouse_poll(ADBDevice *d, uint8_t *obuf)
+>          return 0;
+>      }
+>  
+> +    if (obuf == NULL) {
+> +        return 2;
+> +    }
+> +
 
-uvt-simplestreams-libvirt --verbose sync --source http://cloud-images.ubunt=
-u.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
-uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial lab=
-el=3Ddaily
+I guess that's not entirely obvious; but I guess
+what you're doing is returning the amount that would be returned
+if someone passed you a buffer to return it in.
 
-Add this to the guest definition and restart it
-<channel type=3D'unix'>
-   <source mode=3D'bind'/>
-   <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-</channel>
+>      dx = s->dx;
+>      if (dx < -63) {
+>          dx = -63;
+> diff --git a/hw/input/adb.c b/hw/input/adb.c
+> index bbb40aeef1..99852879d8 100644
+> --- a/hw/input/adb.c
+> +++ b/hw/input/adb.c
+> @@ -25,6 +25,17 @@
+>  #include "hw/input/adb.h"
+>  #include "adb-internal.h"
+>  
+> +#define ADB_POLL_FREQ 50
+> +
+> +/* Apple Macintosh Family Hardware Refenece
+                                          ^^^^
 
->From the host freeze and thaw it:
-$ virsh domfsfreeze x-freeze
-$ virsh domfsthaw x-freeze
+typo
 
-# The above works
+> + * Table 19-10 ADB transaction states
+> + */
+> +
+> +#define STATE_NEW       0
+> +#define STATE_EVEN      1
+> +#define STATE_ODD       2
+> +#define STATE_IDLE      3
+> +
+>  /* error codes */
+>  #define ADB_RET_NOTPRESENT (-2)
+>  
+> @@ -84,6 +95,110 @@ int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
+>      return olen;
+>  }
+>  
+> +int adb_via_poll(ADBBusState *adb, int state, uint8_t *data)
+> +{
+> +    if (state != STATE_IDLE) {
+> +        return 0;
+> +    }
+> +    if (adb->data_in_size < adb->data_in_index) {
+> +        return 0;
+> +    }
+> +    if (adb->data_out_index != 0) {
+> +        return 0;
+> +    }
+> +    adb->data_in_index = 0;
+> +    adb->data_out_index = 0;
+> +    adb->data_in_size = adb_poll(adb, adb->data_in, 0xffff);
+> +    if (adb->data_in_size) {
+> +        *data = adb->data_in[adb->data_in_index++];
+> +        qemu_irq_raise(adb->data_ready);
+> +    }
+> +    return adb->data_in_size;
+> +}
+> +
+> +int adb_send(ADBBusState *adb, int state, uint8_t data)
+> +{
+> +    switch (state) {
+> +    case STATE_NEW:
+> +        adb->data_out_index = 0;
+> +        break;
+> +    case STATE_EVEN:
+> +        if ((adb->data_out_index & 1) == 0) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_ODD:
+> +        if (adb->data_out_index & 1) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_IDLE:
+> +        return 0;
+> +    }
+> +    adb->data_out[adb->data_out_index++] = data;
 
-In the Guest then add a bind mount to trigger the issue
-$ sudo mkdir /mnt/test
-$ sudo mount -o bind / /mnt/test/
+What guards that against running over the end of the buffer?
 
-Then again try to freeze/unfreeze
-$ virsh domfsfreeze x-freeze
-error: Unable to freeze filesystems
-error: internal error: unable to execute QEMU agent command 'guest-fsfreeze=
--freeze': failed to freeze /: Device or resource busy
+> +    qemu_irq_raise(adb->data_ready);
+> +    return 1;
+> +}
+> +
+> +int adb_receive(ADBBusState *adb, int state, uint8_t *data)
+> +{
+> +    switch (state) {
+> +    case STATE_NEW:
+> +        return 0;
+> +    case STATE_EVEN:
+> +        if (adb->data_in_size <= 0) {
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 0;
+> +        }
+> +        if (adb->data_in_index >= adb->data_in_size) {
+> +            *data = 0;
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 1;
+> +        }
+> +        if ((adb->data_in_index & 1) == 0) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_ODD:
+> +        if (adb->data_in_size <= 0) {
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 0;
+> +        }
+> +        if (adb->data_in_index >= adb->data_in_size) {
+> +            *data = 0;
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 1;
+> +        }
+> +        if (adb->data_in_index & 1) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_IDLE:
+> +        if (adb->data_out_index == 0) {
+> +            return 0;
+> +        }
+> +        adb->data_in_size = adb_request(adb, adb->data_in,
+> +                                        adb->data_out, adb->data_out_index);
+> +        adb->data_out_index = 0;
+> +        adb->data_in_index = 0;
+> +        if (adb->data_in_size < 0) {
+> +            *data = 0xff;
+> +            qemu_irq_raise(adb->data_ready);
+> +            return -1;
+> +        }
+> +        if (adb->data_in_size == 0) {
+> +            return 0;
+> +        }
+> +        break;
+> +    }
+> +    *data = adb->data_in[adb->data_in_index++];
+> +    qemu_irq_raise(adb->data_ready);
+> +    if (*data == 0xff || *data == 0) {
+> +        return 0;
+> +    }
+> +    return 1;
+> +}
+> +
+>  static const TypeInfo adb_bus_type_info = {
+>      .name = TYPE_ADB_BUS,
+>      .parent = TYPE_BUS,
+> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+> index 586477ca9e..200121f798 100644
+> --- a/hw/misc/mac_via.c
+> +++ b/hw/misc/mac_via.c
+> @@ -424,6 +424,53 @@ static void via1_rtc_update(MacVIAState *m)
+>      }
+>  }
+>  
+> +static void via1_adb_update(MacVIAState *m)
+> +{
+> +    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
+> +    MOS6522State *s = MOS6522(v1s);
+> +    int state;
+> +    int ret;
+> +
+> +    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
+> +
+> +    if (s->acr & VIA1ACR_vShiftOut) {
+> +        /* output mode */
+> +        ret = adb_send(&m->adb_bus, state, s->sr);
+> +        if (ret > 0) {
+> +            s->b &= ~VIA1B_vADBInt;
+> +        } else {
+> +            s->b |= VIA1B_vADBInt;
+> +        }
+> +    } else {
+> +        /* input mode */
+> +        ret = adb_receive(&m->adb_bus, state, &s->sr);
+> +        if (ret > 0 && s->sr != 0xff) {
+> +            s->b &= ~VIA1B_vADBInt;
+> +        } else {
+> +            s->b |= VIA1B_vADBInt;
+> +        }
+> +    }
+> +}
+> +
+> +static void via_adb_poll(void *opaque)
+> +{
+> +    MacVIAState *m = opaque;
+> +    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
+> +    MOS6522State *s = MOS6522(v1s);
+> +    int state;
+> +
+> +    if (s->b & VIA1B_vADBInt) {
+> +        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
+> +        if (adb_via_poll(&m->adb_bus, state, &s->sr)) {
+> +            s->b &= ~VIA1B_vADBInt;
+> +        }
+> +    }
+> +
+> +    timer_mod(m->adb_poll_timer,
+> +              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> +              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
+> +}
+> +
+>  static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
+>  {
+>      MOS6522Q800VIA1State *s = opaque;
+> @@ -486,6 +533,10 @@ static void mac_via_reset(DeviceState *dev)
+>  {
+>      MacVIAState *m = MAC_VIA(dev);
+>  
+> +    timer_mod(m->adb_poll_timer,
+> +              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> +              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
+> +
+>      timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
+>                / 16630 * 16630);
+>  
+> @@ -504,6 +555,7 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+>  
+>      qemu_get_timedate(&tm, 0);
+>      m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+> +    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
+>  }
+>  
+>  static void mac_via_init(Object *obj)
+> @@ -553,6 +605,9 @@ static void mac_via_init(Object *obj)
+>      /* ADB */
+>      qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+>                          TYPE_ADB_BUS, DEVICE(obj), "adb.0");
+> +
+> +    m->adb_bus.data_ready = qdev_get_gpio_in_named(DEVICE(obj), "via1-irq",
+> +                                                   VIA1_IRQ_ADB_READY_BIT);
+>  }
+>  
+>  static void mac_via_class_init(ObjectClass *oc, void *data)
+> @@ -579,6 +634,7 @@ static void mos6522_q800_via1_portB_write(MOS6522State *s)
+>      MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
+>  
+>      via1_rtc_update(m);
+> +    via1_adb_update(m);
+>  
+>      v1s->last_b = s->b;
+>  }
+> diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+> index f99d478252..1888c5aab7 100644
+> --- a/include/hw/input/adb.h
+> +++ b/include/hw/input/adb.h
+> @@ -76,6 +76,12 @@ struct ADBBusState {
+>      ADBDevice *devices[MAX_ADB_DEVICES];
+>      int nb_devices;
+>      int poll_index;
+> +    qemu_irq data_ready;
+> +    int data_in_size;
+> +    int data_in_index;
+> +    int data_out_index;
 
+Given they're array indexes, unsigned?
 
-I installed a fix from my PPA [1] and with that it works just fine now.
-Proposing an MP for review by the team, to afterwards move on into SRU proc=
-essing.
-
-[1]: https://launchpad.net/~ci-train-ppa-service/+archive/ubuntu/3310
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
-
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Confirmed
-
-Bug description:
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  =
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-   may have bind-mounts that let a device appear multiple times in the moun=
-t list. Unfortunately the guest agent is not smart enough to consider a dev=
-ice that has been frozen as succesfull and keep going. This causes this spe=
-cific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+> +    uint8_t data_in[128];
+> +    uint8_t data_out[16];
+>  };
+>  
+>  int adb_request(ADBBusState *s, uint8_t *buf_out,
+> @@ -85,4 +91,8 @@ int adb_poll(ADBBusState *s, uint8_t *buf_out, uint16_t poll_mask);
+>  #define TYPE_ADB_KEYBOARD "adb-keyboard"
+>  #define TYPE_ADB_MOUSE "adb-mouse"
+>  
+> +int adb_via_poll(ADBBusState *s, int state, uint8_t *data);
+> +int adb_send(ADBBusState *adb, int state, uint8_t data);
+> +int adb_receive(ADBBusState *adb, int state, uint8_t *data);
+> +
+>  #endif /* ADB_H */
+> diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
+> index a3a972ccc5..85d8715b12 100644
+> --- a/include/hw/misc/mac_via.h
+> +++ b/include/hw/misc/mac_via.h
+> @@ -96,6 +96,7 @@ typedef struct MacVIAState {
+>  
+>      /* ADB */
+>      ADBBusState adb_bus;
+> +    QEMUTimer *adb_poll_timer;
+>  
+>      /* external timers */
+>      QEMUTimer *one_second_timer;
+> -- 
+> 2.14.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
