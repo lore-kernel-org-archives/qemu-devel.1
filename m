@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYcGm-0001k9-8a
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:07:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYcGm-0001kG-BU
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYcGe-0001Uo-KV
+	(envelope-from <eblake@redhat.com>) id 1fYcGd-0001TY-Ry
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 15:07:52 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 28 Jun 2018 14:07:18 -0500
-Message-Id: <20180628190723.276458-2-eblake@redhat.com>
-In-Reply-To: <20180628190723.276458-1-eblake@redhat.com>
-References: <20180628190723.276458-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 1/6] qcow2: Prefer byte-based calls into
- bs->file
+Date: Thu, 28 Jun 2018 14:07:17 -0500
+Message-Id: <20180628190723.276458-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 0/6] minor qcow2 compression improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +20,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, berto@igalia.com
 
-We had only a few sector-based stragglers left; convert them to use
-our preferred byte-based accesses.
+v5 was here:
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg04542.html
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+since then:
+- 5/6: update iotest number, add R-b
 
----
-v5: commit message tweak
-v2: indentation fix
----
- block/qcow2-cluster.c  | 5 ++---
- block/qcow2-refcount.c | 6 +++---
- 2 files changed, 5 insertions(+), 6 deletions(-)
+(git-backport-diff doesn't handle renames well)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 0d74584c9b4..4701fbc7a12 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1616,13 +1616,12 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-         }
+001/6:[----] [--] 'qcow2: Prefer byte-based calls into bs->file'
+002/6:[----] [--] 'qcow2: Document some maximum size constraints'
+003/6:[----] [--] 'qcow2: Reduce REFT_OFFSET_MASK'
+004/6:[----] [--] 'qcow2: Don't allow overflow during cluster allocation'
+005/6:[down] 'iotests: Add new test 220 for max compressed cluster offset'
+006/6:[----] [--] 'qcow2: Avoid memory over-allocation on compressed images'
 
-         BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
--        ret = bdrv_read(bs->file, coffset >> 9, s->cluster_data,
--                        nb_csectors);
-+        ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
-         if (ret < 0) {
-             return ret;
-         }
-         if (decompress_buffer(s->cluster_cache, s->cluster_size,
--                              s->cluster_data + sector_offset, csize) < 0) {
-+                              s->cluster_data, csize) < 0) {
-             return -EIO;
-         }
-         s->cluster_cache_offset = coffset;
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 18c729aa276..20e6f2e29fc 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2368,8 +2368,8 @@ write_refblocks:
-         on_disk_refblock = (void *)((char *) *refcount_table +
-                                     refblock_index * s->cluster_size);
+Eric Blake (6):
+  qcow2: Prefer byte-based calls into bs->file
+  qcow2: Document some maximum size constraints
+  qcow2: Reduce REFT_OFFSET_MASK
+  qcow2: Don't allow overflow during cluster allocation
+  iotests: Add new test 220 for max compressed cluster offset
+  qcow2: Avoid memory over-allocation on compressed images
 
--        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
--                         on_disk_refblock, s->cluster_sectors);
-+        ret = bdrv_pwrite(bs->file, refblock_offset, on_disk_refblock,
-+                          s->cluster_size);
-         if (ret < 0) {
-             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
-             goto fail;
-@@ -2591,7 +2591,7 @@ fail:
-  * - 0 if writing to this offset will not affect the mentioned metadata
-  * - a positive QCow2MetadataOverlap value indicating one overlapping section
-  * - a negative value (-errno) indicating an error while performing a check,
-- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
-+ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
-  */
- int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-                                  int64_t size)
+ docs/interop/qcow2.txt     | 40 +++++++++++++++++--
+ block/qcow2.h              |  8 +++-
+ block/qcow2-cluster.c      | 32 +++++++++------
+ block/qcow2-refcount.c     | 27 ++++++++-----
+ block/qcow2.c              |  2 +-
+ tests/qemu-iotests/220     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/220.out | 54 ++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 8 files changed, 234 insertions(+), 27 deletions(-)
+ create mode 100755 tests/qemu-iotests/220
+ create mode 100644 tests/qemu-iotests/220.out
+
 -- 
 2.14.4
