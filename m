@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYbTj-0004FO-HC
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:17:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fYbed-0006cN-60
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYbTi-0002gb-HY
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:17:11 -0400
-References: <20180628180042.3881-1-jsnow@redhat.com>
-	<20180628180042.3881-3-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8a183b22-b934-13b9-f5ab-2d0c6bfbad77@redhat.com>
-Date: Thu, 28 Jun 2018 13:17:00 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1fYbeZ-0004SY-U8
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:28:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYbeZ-0004QW-Mw
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:28:23 -0400
+Date: Thu, 28 Jun 2018 15:28:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180628182820.GE914@localhost.localdomain>
+References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
+	<1530098844-236851-3-git-send-email-robert.hu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180628180042.3881-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: add 222 to test basic
- fleecing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1530098844-236851-3-git-send-email-robert.hu@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] i386: Add CPUID bit and feature
+ words for IA32_ARCH_CAPABILITIES MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Robert Hoo <robert.hu@linux.intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, robert.hu@intel.com
 
-On 06/28/2018 01:00 PM, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On Wed, Jun 27, 2018 at 07:27:21PM +0800, Robert Hoo wrote:
+> Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
+> SPEC_CTRL.
+> 
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+
+Based on kernel commit 1eaafe91, it looks like we must always set
+IA32_ARCH_CAPABILITIES.RSBA[bit 2] unless we're really sure the
+VM will not be migrated to a vulnerable processor.
+
+Considering this, I'd like to make "+arch-capabilities" set
+IA32_ARCH_CAPABILITIES.RSBA by default, unless RSBA is explicitly
+disabled by management software.
+
 > ---
->   tests/qemu-iotests/222     | 149 +++++++++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/222.out |  60 ++++++++++++++++++
->   tests/qemu-iotests/group   |   1 +
->   3 files changed, 210 insertions(+)
->   create mode 100644 tests/qemu-iotests/222
->   create mode 100644 tests/qemu-iotests/222.out
+>  target/i386/cpu.c | 2 +-
+>  target/i386/cpu.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index e6c2f8a..953098c 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1002,7 +1002,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, "spec-ctrl", NULL,
+> -            NULL, NULL, NULL, "ssbd",
+> +            NULL, "arch-capabilities", NULL, "ssbd",
+>          },
+>          .cpuid_eax = 7,
+>          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 734a73e..1ef2040 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -688,6 +688,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+>  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+> +#define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities of RDCL_NO and IBRS_ALL*/
+>  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+>  
+>  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+> -- 
+> 1.8.3.1
+> 
 > 
 
-> +iotests.verify_platform(['linux'])
-> +
-> +patterns = [("0x5d", "0",         "64k"),
-> +            ("0xd5", "1M",        "64k"),
-> +            ("0xdc", "32M",       "64k"),
-> +            ("0xcd", "0x3ff0000", "64k")]  # 64M - 64K
-> +
-> +overwrite = [("0xab", "0",         "64k"), # Full overwrite
-> +             ("0xad", "0x00f8000", "64k"), # Partial-left (1M-32K)
-> +             ("0x1d", "0x2008000", "64k"), # Partial-right (32M+32K)
-> +             ("0xea", "0x3fe0000", "64k")] # Adjacent-left (64M - 128K)
-> +
-> +remainder = [("0xd5", "0x108000",  "32K"), # Right-end of partial-left [1]
-> +             ("0xdc", "32M",       "32k"), # Left-end of partial-right [2]
-> +             ("0xcd", "0x3ff0000", "64k")] # patterns[3]
-
-What if you also add:
-
-zeroes =  [("0x00", "0x108000",  "32K"), # Right-end of partial-left [1]
-            ("0x00", "32M",       "32k"), # Left-end of partial-right [2]
-            ("0x00", "0x3ff0000", "64k")] # patterns[3]
-
-then...
-
-> +    log('')
-> +    log('--- Sanity Check ---')
-> +    log('')
-> +
-> +    for p in patterns:
-
-for p in (patterns + zeroes)
-
-> +        cmd = "read -P%s %s %s" % p
-> +        log(cmd)
-> +        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-> +
-> +    log('')
-> +    log('--- Testing COW ---')
-> +    log('')
-> +
-> +    for p in overwrite:
-> +        cmd = "write -P%s %s %s" % p
-> +        log(cmd)
-> +        log(vm.hmp_qemu_io(srcNode, cmd))
-> +
-> +    log('')
-> +    log('--- Verifying Data ---')
-> +    log('')
-> +
-> +    for p in patterns:
-
-for p in (patterns + zeroes)
-
-> +        cmd = "read -P%s %s %s" % p
-> +        log(cmd)
-> +        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-> +
-> +    log('')
-> +    log('--- Cleanup ---')
-> +    log('')
-> +
-> +    #log(vm.hmp_qemu_io(srcNode, 'flush'))
-> +    log(vm.qmp('block-job-cancel', device=srcNode))
-> +    log(vm.qmp('nbd-server-stop'))
-> +    log(vm.qmp('blockdev-del', node_name=tgtNode))
-> +    vm.shutdown()
-> +
-> +    log('')
-> +    log('--- Confirming writes ---')
-> +    log('')
-> +
-> +    for p in (overwrite + remainder):
-
-so that reads of both the fleeced point in time and of the final image 
-cover the same set of byte ranges.
-
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
