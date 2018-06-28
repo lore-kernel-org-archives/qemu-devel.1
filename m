@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAe-0007Fc-BR
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:37 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAi-0007Hn-95
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAd-0000VT-3d
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:36 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36281)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAh-0000cJ-6P
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:40 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35986)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAc-0000UE-Sf
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:35 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id f16-v6so6686837wrm.3
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:34 -0700 (PDT)
+	id 1fYdAg-0000b0-VV
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:39 -0400
+Received: by mail-wm0-x235.google.com with SMTP id u18-v6so10302528wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:38 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:30 +0200
-Message-Id: <1530216310-52873-21-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:34 +0200
+Message-Id: <1530216310-52873-25-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 20/60] pc-dimm: remove pc_dimm_get_free_slot()
- from header
+Subject: [Qemu-devel] [PULL 24/60] pc-dimm: merge
+ get_(vmstate_)memory_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +33,81 @@ Cc: David Hildenbrand <david@redhat.com>
 
 From: David Hildenbrand <david@redhat.com>
 
-Not used outside of pc-dimm.c and there shouldn't be other users. If
-other devices (e.g. memory devices) ever have to also use slots, then we
-will have to factor this out.
+Importantly, get_vmstate_memory_region() should also fail with a proper
+error if called before the device is realized. For a PCDIMM, both functions
+are to return the same thing, so share the implementation.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+All current users are called after the device has been realized, so we
+can expect the calls to succeed.
+
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180619134141.29478-5-david@redhat.com>
+Message-Id: <20180619134141.29478-9-david@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/mem/pc-dimm.c         | 4 +++-
- include/hw/mem/pc-dimm.h | 2 --
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ hw/mem/pc-dimm.c         | 13 +++++--------
+ include/hw/mem/pc-dimm.h |  3 ++-
+ 2 files changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 9e0c83e..7387963 100644
+index 73f0eee..4ff39b5 100644
 --- a/hw/mem/pc-dimm.c
 +++ b/hw/mem/pc-dimm.c
-@@ -27,6 +27,8 @@
- #include "sysemu/numa.h"
- #include "trace.h"
- 
-+static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
-+
- void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
-                   Error **errp)
+@@ -35,7 +35,8 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+     int slot;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
++    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
++                                                              &error_abort);
+     Error *local_err = NULL;
+     MemoryRegion *mr;
+     uint64_t addr;
+@@ -90,7 +91,8 @@ void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
  {
-@@ -111,7 +113,7 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
-     return 0;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
++    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
++                                                              &error_abort);
+     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+ 
+     memory_device_unplug_region(machine, mr);
+@@ -229,11 +231,6 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+     return host_memory_backend_get_memory(dimm->hostmem);
  }
  
--int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
-+static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
+-static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
+-{
+-    return host_memory_backend_get_memory(dimm->hostmem);
+-}
+-
+ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
  {
-     unsigned long *bitmap;
-     int slot = 0;
+     const PCDIMMDevice *dimm = PC_DIMM(md);
+@@ -298,7 +295,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+     dc->desc = "DIMM memory module";
+ 
+     ddc->get_memory_region = pc_dimm_get_memory_region;
+-    ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
++    ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+ 
+     mdc->get_addr = pc_dimm_md_get_addr;
+     /* for a dimm plugged_size == region_size */
 diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 860343d..cf71247 100644
+index cf71247..5679a80 100644
 --- a/include/hw/mem/pc-dimm.h
 +++ b/include/hw/mem/pc-dimm.h
-@@ -76,8 +76,6 @@ typedef struct PCDIMMDeviceClass {
-     MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
+@@ -73,7 +73,8 @@ typedef struct PCDIMMDeviceClass {
+     /* public */
+     void (*realize)(PCDIMMDevice *dimm, Error **errp);
+     MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
+-    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
++    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm,
++                                               Error **errp);
  } PCDIMMDeviceClass;
  
--int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
--
  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
-                   Error **errp);
- void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
 -- 
 1.8.3.1
