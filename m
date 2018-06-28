@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fYg2l-0005Of-Ec
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 19:09:42 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fYg2p-0005R2-2V
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 19:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fYg2g-0005Qk-JN
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 19:09:39 -0400
-Message-Id: <e2122f3e97b73bc2c65290776f319983265f2795.1530225513.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1fYg2n-0005h2-GR
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 19:09:43 -0400
+Message-Id: <beba73ec147c790500c6a57e405d5c5f83899af1.1530225513.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1530225513.git.balaton@eik.bme.hu>
 References: <cover.1530225513.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Fri, 29 Jun 2018 00:38:33 +0200
-Subject: [Qemu-devel] [PATCH v6 1/5] ppc4xx_i2c: Rewrite to model hardware
- more closely
+Subject: [Qemu-devel] [PATCH v6 4/5] ppc440_uc: Basic emulation of PPC440
+ DMA controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,443 +23,285 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>
 
-Rewrite to make it closer to how real device works so that guest OS
-drivers can access I2C devices. Previously this was only a hack to
-allow U-Boot to get past accessing SPD EEPROMs but to support other
-I2C devices and allow guests to access them we need to model real
-device more properly.
+PPC440 SoCs such as the AMCC 460EX have a DMA controller which is used
+by AmigaOS on the sam460ex. Implement the parts used by AmigaOS so it
+can get further booting on the sam460ex machine.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
 ---
-v6: Added some more defines
+v6:
+- CamelCase type names
+- Check return value of cpu_physical_memory_map
 
- hw/i2c/ppc4xx_i2c.c         | 299 +++++++++++++++++++++++---------------------
- include/hw/i2c/ppc4xx_i2c.h |   3 +-
- 2 files changed, 159 insertions(+), 143 deletions(-)
+ hw/ppc/ppc440.h    |   1 +
+ hw/ppc/ppc440_uc.c | 221 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/sam460ex.c  |   3 +
+ 3 files changed, 225 insertions(+)
 
-diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-index fca80d6..d6dfafa 100644
---- a/hw/i2c/ppc4xx_i2c.c
-+++ b/hw/i2c/ppc4xx_i2c.c
-@@ -34,16 +34,50 @@
+diff --git a/hw/ppc/ppc440.h b/hw/ppc/ppc440.h
+index ad27db1..7cef936 100644
+--- a/hw/ppc/ppc440.h
++++ b/hw/ppc/ppc440.h
+@@ -21,6 +21,7 @@ void ppc440_sdram_init(CPUPPCState *env, int nbanks,
+                        hwaddr *ram_bases, hwaddr *ram_sizes,
+                        int do_init);
+ void ppc4xx_ahb_init(CPUPPCState *env);
++void ppc4xx_dma_init(CPUPPCState *env, int dcr_base);
+ void ppc460ex_pcie_init(CPUPPCState *env);
  
- #define PPC4xx_I2C_MEM_SIZE 18
- 
-+enum {
-+    IIC_MDBUF = 0,
-+    /* IIC_SDBUF = 2, */
-+    IIC_LMADR = 4,
-+    IIC_HMADR,
-+    IIC_CNTL,
-+    IIC_MDCNTL,
-+    IIC_STS,
-+    IIC_EXTSTS,
-+    IIC_LSADR,
-+    IIC_HSADR,
-+    IIC_CLKDIV,
-+    IIC_INTRMSK,
-+    IIC_XFRCNT,
-+    IIC_XTCNTLSS,
-+    IIC_DIRECTCNTL
-+    /* IIC_INTR */
-+};
-+
- #define IIC_CNTL_PT         (1 << 0)
- #define IIC_CNTL_READ       (1 << 1)
- #define IIC_CNTL_CHT        (1 << 2)
- #define IIC_CNTL_RPST       (1 << 3)
-+#define IIC_CNTL_AMD        (1 << 6)
-+#define IIC_CNTL_HMT        (1 << 7)
-+
-+#define IIC_MDCNTL_EINT     (1 << 2)
-+#define IIC_MDCNTL_ESM      (1 << 3)
-+#define IIC_MDCNTL_FMDB     (1 << 6)
- 
- #define IIC_STS_PT          (1 << 0)
-+#define IIC_STS_IRQA        (1 << 1)
- #define IIC_STS_ERR         (1 << 2)
-+#define IIC_STS_MDBF        (1 << 4)
- #define IIC_STS_MDBS        (1 << 5)
- 
- #define IIC_EXTSTS_XFRA     (1 << 0)
-+#define IIC_EXTSTS_BCS_FREE (4 << 4)
-+#define IIC_EXTSTS_BCS_BUSY (5 << 4)
-+
-+#define IIC_INTRMSK_EIMTC   (1 << 0)
-+#define IIC_INTRMSK_EITA    (1 << 1)
-+#define IIC_INTRMSK_EIIC    (1 << 2)
-+#define IIC_INTRMSK_EIHE    (1 << 3)
- 
- #define IIC_XTCNTLSS_SRST   (1 << 0)
- 
-@@ -56,130 +90,83 @@ static void ppc4xx_i2c_reset(DeviceState *s)
- {
-     PPC4xxI2CState *i2c = PPC4xx_I2C(s);
- 
--    /* FIXME: Should also reset bus?
--     *if (s->address != ADDR_RESET) {
--     *    i2c_end_transfer(s->bus);
--     *}
--     */
--
--    i2c->mdata = 0;
--    i2c->lmadr = 0;
--    i2c->hmadr = 0;
-+    i2c->mdidx = -1;
-+    memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
-+    /* [hl][ms]addr are not affected by reset */
-     i2c->cntl = 0;
-     i2c->mdcntl = 0;
-     i2c->sts = 0;
--    i2c->extsts = 0x8f;
--    i2c->lsadr = 0;
--    i2c->hsadr = 0;
-+    i2c->extsts = IIC_EXTSTS_BCS_FREE;
-     i2c->clkdiv = 0;
-     i2c->intrmsk = 0;
-     i2c->xfrcnt = 0;
-     i2c->xtcntlss = 0;
--    i2c->directcntl = 0xf;
--}
--
--static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
--{
--    return true;
-+    i2c->directcntl = 0xf; /* all non-reserved bits set */
+ #endif /* PPC440_H */
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index 123f4ac..97808ce 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -13,6 +13,7 @@
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "exec/address-spaces.h"
+@@ -803,6 +804,226 @@ void ppc4xx_ahb_init(CPUPPCState *env)
  }
  
- static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
- {
-     PPC4xxI2CState *i2c = PPC4xx_I2C(opaque);
-     uint64_t ret;
-+    int i;
- 
-     switch (addr) {
--    case 0:
--        ret = i2c->mdata;
--        if (ppc4xx_i2c_is_master(i2c)) {
-+    case IIC_MDBUF:
-+        if (i2c->mdidx < 0) {
-             ret = 0xff;
--
--            if (!(i2c->sts & IIC_STS_MDBS)) {
--                qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Trying to read "
--                              "without starting transfer\n",
--                              TYPE_PPC4xx_I2C, __func__);
--            } else {
--                int pending = (i2c->cntl >> 4) & 3;
--
--                /* get the next byte */
--                int byte = i2c_recv(i2c->bus);
--
--                if (byte < 0) {
--                    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: read failed "
--                                  "for device 0x%02x\n", TYPE_PPC4xx_I2C,
--                                  __func__, i2c->lmadr);
--                    ret = 0xff;
--                } else {
--                    ret = byte;
--                    /* Raise interrupt if enabled */
--                    /*ppc4xx_i2c_raise_interrupt(i2c)*/;
--                }
--
--                if (!pending) {
--                    i2c->sts &= ~IIC_STS_MDBS;
--                    /*i2c_end_transfer(i2c->bus);*/
--                /*} else if (i2c->cntl & (IIC_CNTL_RPST | IIC_CNTL_CHT)) {*/
--                } else if (pending) {
--                    /* current smbus implementation doesn't like
--                       multibyte xfer repeated start */
--                    i2c_end_transfer(i2c->bus);
--                    if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 1)) {
--                        /* if non zero is returned, the adress is not valid */
--                        i2c->sts &= ~IIC_STS_PT;
--                        i2c->sts |= IIC_STS_ERR;
--                        i2c->extsts |= IIC_EXTSTS_XFRA;
--                    } else {
--                        /*i2c->sts |= IIC_STS_PT;*/
--                        i2c->sts |= IIC_STS_MDBS;
--                        i2c->sts &= ~IIC_STS_ERR;
--                        i2c->extsts = 0;
--                    }
--                }
--                pending--;
--                i2c->cntl = (i2c->cntl & 0xcf) | (pending << 4);
--            }
--        } else {
--            qemu_log_mask(LOG_UNIMP, "[%s]%s: slave mode not implemented\n",
--                          TYPE_PPC4xx_I2C, __func__);
+ /*****************************************************************************/
++/* DMA controller */
++
++#define DMA0_CR_CE  (1 << 31)
++#define DMA0_CR_PW  (1 << 26 | 1 << 25)
++#define DMA0_CR_DAI (1 << 24)
++#define DMA0_CR_SAI (1 << 23)
++#define DMA0_CR_DEC (1 << 2)
++
++enum {
++    DMA0_CR  = 0x00,
++    DMA0_CT,
++    DMA0_SAH,
++    DMA0_SAL,
++    DMA0_DAH,
++    DMA0_DAL,
++    DMA0_SGH,
++    DMA0_SGL,
++
++    DMA0_SR  = 0x20,
++    DMA0_SGC = 0x23,
++    DMA0_SLP = 0x25,
++    DMA0_POL = 0x26,
++};
++
++typedef struct {
++    uint32_t cr;
++    uint32_t ct;
++    uint64_t sa;
++    uint64_t da;
++    uint64_t sg;
++} PPC4xxDmaChnl;
++
++typedef struct {
++    int base;
++    PPC4xxDmaChnl ch[4];
++    uint32_t sr;
++} PPC4xxDmaState;
++
++static uint32_t dcr_read_dma(void *opaque, int dcrn)
++{
++    PPC4xxDmaState *dma = opaque;
++    uint32_t val = 0;
++    int addr = dcrn - dma->base;
++    int chnl = addr / 8;
++
++    switch (addr) {
++    case 0x00 ... 0x1f:
++        switch (addr % 8) {
++        case DMA0_CR:
++            val = dma->ch[chnl].cr;
++            break;
++        case DMA0_CT:
++            val = dma->ch[chnl].ct;
++            break;
++        case DMA0_SAH:
++            val = dma->ch[chnl].sa >> 32;
++            break;
++        case DMA0_SAL:
++            val = dma->ch[chnl].sa;
++            break;
++        case DMA0_DAH:
++            val = dma->ch[chnl].da >> 32;
++            break;
++        case DMA0_DAL:
++            val = dma->ch[chnl].da;
++            break;
++        case DMA0_SGH:
++            val = dma->ch[chnl].sg >> 32;
++            break;
++        case DMA0_SGL:
++            val = dma->ch[chnl].sg;
 +            break;
 +        }
-+        ret = i2c->mdata[0];
-+        if (i2c->mdidx == 3) {
-+            i2c->sts &= ~IIC_STS_MDBF;
-+        } else if (i2c->mdidx == 0) {
-+            i2c->sts &= ~IIC_STS_MDBS;
-+        }
-+        for (i = 0; i < i2c->mdidx; i++) {
-+            i2c->mdata[i] = i2c->mdata[i + 1];
-+        }
-+        if (i2c->mdidx >= 0) {
-+            i2c->mdidx--;
-         }
-         break;
--    case 4:
-+    case IIC_LMADR:
-         ret = i2c->lmadr;
-         break;
--    case 5:
-+    case IIC_HMADR:
-         ret = i2c->hmadr;
-         break;
--    case 6:
-+    case IIC_CNTL:
-         ret = i2c->cntl;
-         break;
--    case 7:
-+    case IIC_MDCNTL:
-         ret = i2c->mdcntl;
-         break;
--    case 8:
-+    case IIC_STS:
-         ret = i2c->sts;
-         break;
--    case 9:
--        ret = i2c->extsts;
-+    case IIC_EXTSTS:
-+        ret = i2c_bus_busy(i2c->bus) ?
-+              IIC_EXTSTS_BCS_BUSY : IIC_EXTSTS_BCS_FREE;
-         break;
--    case 10:
-+    case IIC_LSADR:
-         ret = i2c->lsadr;
-         break;
--    case 11:
-+    case IIC_HSADR:
-         ret = i2c->hsadr;
-         break;
--    case 12:
-+    case IIC_CLKDIV:
-         ret = i2c->clkdiv;
-         break;
--    case 13:
-+    case IIC_INTRMSK:
-         ret = i2c->intrmsk;
-         break;
--    case 14:
-+    case IIC_XFRCNT:
-         ret = i2c->xfrcnt;
-         break;
--    case 15:
-+    case IIC_XTCNTLSS:
-         ret = i2c->xtcntlss;
-         break;
--    case 16:
-+    case IIC_DIRECTCNTL:
-         ret = i2c->directcntl;
-         break;
-     default:
-@@ -202,99 +189,127 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-     PPC4xxI2CState *i2c = opaque;
- 
-     switch (addr) {
--    case 0:
--        i2c->mdata = value;
--        if (!i2c_bus_busy(i2c->bus)) {
--            /* assume we start a write transfer */
--            if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 0)) {
--                /* if non zero is returned, the adress is not valid */
--                i2c->sts &= ~IIC_STS_PT;
--                i2c->sts |= IIC_STS_ERR;
--                i2c->extsts |= IIC_EXTSTS_XFRA;
--            } else {
--                i2c->sts |= IIC_STS_PT;
--                i2c->sts &= ~IIC_STS_ERR;
--                i2c->extsts = 0;
--            }
-+    case IIC_MDBUF:
-+        if (i2c->mdidx >= 3) {
-+            break;
-         }
--        if (i2c_bus_busy(i2c->bus)) {
--            if (i2c_send(i2c->bus, i2c->mdata)) {
--                /* if the target return non zero then end the transfer */
--                i2c->sts &= ~IIC_STS_PT;
--                i2c->sts |= IIC_STS_ERR;
--                i2c->extsts |= IIC_EXTSTS_XFRA;
--                i2c_end_transfer(i2c->bus);
--            }
-+        i2c->mdata[++i2c->mdidx] = value;
-+        if (i2c->mdidx == 3) {
-+            i2c->sts |= IIC_STS_MDBF;
-+        } else if (i2c->mdidx == 0) {
-+            i2c->sts |= IIC_STS_MDBS;
-         }
-         break;
--    case 4:
-+    case IIC_LMADR:
-         i2c->lmadr = value;
--        if (i2c_bus_busy(i2c->bus)) {
--            i2c_end_transfer(i2c->bus);
--        }
-         break;
--    case 5:
-+    case IIC_HMADR:
-         i2c->hmadr = value;
-         break;
--    case 6:
--        i2c->cntl = value;
--        if (i2c->cntl & IIC_CNTL_PT) {
--            if (i2c->cntl & IIC_CNTL_READ) {
--                if (i2c_bus_busy(i2c->bus)) {
--                    /* end previous transfer */
--                    i2c->sts &= ~IIC_STS_PT;
--                    i2c_end_transfer(i2c->bus);
-+    case IIC_CNTL:
-+        i2c->cntl = value & ~IIC_CNTL_PT;
-+        if (value & IIC_CNTL_AMD) {
-+            qemu_log_mask(LOG_UNIMP, "%s: only 7 bit addresses supported\n",
-+                          __func__);
-+        }
-+        if (value & IIC_CNTL_HMT && i2c_bus_busy(i2c->bus)) {
-+            i2c_end_transfer(i2c->bus);
-+            if (i2c->mdcntl & IIC_MDCNTL_EINT &&
-+                i2c->intrmsk & IIC_INTRMSK_EIHE) {
-+                i2c->sts |= IIC_STS_IRQA;
-+                qemu_irq_raise(i2c->irq);
-+            }
-+        } else if (value & IIC_CNTL_PT) {
-+            int recv = (value & IIC_CNTL_READ) >> 1;
-+            int tct = value >> 4 & 3;
-+            int i;
++        break;
++    case DMA0_SR:
++        val = dma->sr;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d, %x)\n",
++                      __func__, dcrn, chnl, addr);
++    }
 +
-+            if (recv && (i2c->lmadr >> 1) >= 0x50 && (i2c->lmadr >> 1) < 0x58) {
-+                /* smbus emulation does not like multi byte reads w/o restart */
-+                value |= IIC_CNTL_RPST;
-+            }
++    return val;
++}
 +
-+            for (i = 0; i <= tct; i++) {
-+                if (!i2c_bus_busy(i2c->bus)) {
-+                    i2c->extsts = IIC_EXTSTS_BCS_FREE;
-+                    if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, recv)) {
-+                        i2c->sts |= IIC_STS_ERR;
-+                        i2c->extsts |= IIC_EXTSTS_XFRA;
-+                        break;
-+                    } else {
-+                        i2c->sts &= ~IIC_STS_ERR;
++static void dcr_write_dma(void *opaque, int dcrn, uint32_t val)
++{
++    PPC4xxDmaState *dma = opaque;
++    int addr = dcrn - dma->base;
++    int chnl = addr / 8;
++
++    switch (addr) {
++    case 0x00 ... 0x1f:
++        switch (addr % 8) {
++        case DMA0_CR:
++            dma->ch[chnl].cr = val;
++            if (val & DMA0_CR_CE) {
++                int count = dma->ch[chnl].ct & 0xffff;
++
++                if (count) {
++                    int width, i, sidx, didx;
++                    uint8_t *rptr, *wptr;
++                    hwaddr rlen, wlen;
++
++                    width = 1 << ((val & DMA0_CR_PW) >> 25);
++                    rptr = cpu_physical_memory_map(dma->ch[chnl].sa, &rlen, 0);
++                    wptr = cpu_physical_memory_map(dma->ch[chnl].da, &wlen, 1);
++                    if (rptr && wptr) {
++                        if (!(val & DMA0_CR_DEC) &&
++                            val & DMA0_CR_SAI && val & DMA0_CR_DAI) {
++                            /* optimise common case */
++                            memmove(wptr, rptr, count * width);
++                            sidx = didx = count * width;
++                        } else {
++                            /* do it the slow way */
++                            for (sidx = didx = i = 0; i < count; i++) {
++                                uint64_t v = ldn_le_p(rptr + sidx, width);
++                                stn_le_p(wptr + didx, width, v);
++                                if (val & DMA0_CR_SAI) {
++                                    sidx += width;
++                                }
++                                if (val & DMA0_CR_DAI) {
++                                    didx += width;
++                                }
++                            }
++                        }
 +                    }
-                 }
--                if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 1)) {
--                    /* if non zero is returned, the adress is not valid */
--                    i2c->sts &= ~IIC_STS_PT;
-+                if (!(i2c->sts & IIC_STS_ERR) &&
-+                    i2c_send_recv(i2c->bus, &i2c->mdata[i], !recv)) {
-                     i2c->sts |= IIC_STS_ERR;
-                     i2c->extsts |= IIC_EXTSTS_XFRA;
--                } else {
--                    /*i2c->sts |= IIC_STS_PT;*/
--                    i2c->sts |= IIC_STS_MDBS;
--                    i2c->sts &= ~IIC_STS_ERR;
--                    i2c->extsts = 0;
-+                    break;
++                    if (wptr) {
++                        cpu_physical_memory_unmap(wptr, wlen, 1, didx);
++                    }
++                    if (wptr) {
++                        cpu_physical_memory_unmap(rptr, rlen, 0, sidx);
++                    }
 +                }
-+                if (value & IIC_CNTL_RPST || !(value & IIC_CNTL_CHT)) {
-+                    i2c_end_transfer(i2c->bus);
-                 }
--            } else {
--                /* we actually already did the write transfer... */
--                i2c->sts &= ~IIC_STS_PT;
 +            }
-+            i2c->xfrcnt = i;
-+            i2c->mdidx = i - 1;
-+            if (recv && i2c->mdidx >= 0) {
-+                i2c->sts |= IIC_STS_MDBS;
-+            }
-+            if (recv && i2c->mdidx == 3) {
-+                i2c->sts |= IIC_STS_MDBF;
-+            }
-+            if (i && i2c->mdcntl & IIC_MDCNTL_EINT &&
-+                i2c->intrmsk & IIC_INTRMSK_EIMTC) {
-+                i2c->sts |= IIC_STS_IRQA;
-+                qemu_irq_raise(i2c->irq);
-             }
-         }
-         break;
--    case 7:
--        i2c->mdcntl = value & 0xdf;
-+    case IIC_MDCNTL:
-+        i2c->mdcntl = value & 0x3d;
-+        if (value & IIC_MDCNTL_ESM) {
-+            qemu_log_mask(LOG_UNIMP, "%s: slave mode not implemented\n",
-+                          __func__);
++            break;
++        case DMA0_CT:
++            dma->ch[chnl].ct = val;
++            break;
++        case DMA0_SAH:
++            dma->ch[chnl].sa &= 0xffffffffULL;
++            dma->ch[chnl].sa |= (uint64_t)val << 32;
++            break;
++        case DMA0_SAL:
++            dma->ch[chnl].sa &= 0xffffffff00000000ULL;
++            dma->ch[chnl].sa |= val;
++            break;
++        case DMA0_DAH:
++            dma->ch[chnl].da &= 0xffffffffULL;
++            dma->ch[chnl].da |= (uint64_t)val << 32;
++            break;
++        case DMA0_DAL:
++            dma->ch[chnl].da &= 0xffffffff00000000ULL;
++            dma->ch[chnl].da |= val;
++            break;
++        case DMA0_SGH:
++            dma->ch[chnl].sg &= 0xffffffffULL;
++            dma->ch[chnl].sg |= (uint64_t)val << 32;
++            break;
++        case DMA0_SGL:
++            dma->ch[chnl].sg &= 0xffffffff00000000ULL;
++            dma->ch[chnl].sg |= val;
++            break;
 +        }
-+        if (value & IIC_MDCNTL_FMDB) {
-+            i2c->mdidx = -1;
-+            memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
-+            i2c->sts &= ~(IIC_STS_MDBF | IIC_STS_MDBS);
-+        }
-         break;
--    case 8:
--        i2c->sts &= ~(value & 0xa);
-+    case IIC_STS:
-+        i2c->sts &= ~(value & 0x0a);
-+        if (value & IIC_STS_IRQA && i2c->mdcntl & IIC_MDCNTL_EINT) {
-+            qemu_irq_lower(i2c->irq);
-+        }
-         break;
--    case 9:
-+    case IIC_EXTSTS:
-         i2c->extsts &= ~(value & 0x8f);
-         break;
--    case 10:
-+    case IIC_LSADR:
-         i2c->lsadr = value;
-         break;
--    case 11:
-+    case IIC_HSADR:
-         i2c->hsadr = value;
-         break;
--    case 12:
-+    case IIC_CLKDIV:
-         i2c->clkdiv = value;
-         break;
--    case 13:
-+    case IIC_INTRMSK:
-         i2c->intrmsk = value;
-         break;
--    case 14:
-+    case IIC_XFRCNT:
-         i2c->xfrcnt = value & 0x77;
-         break;
--    case 15:
-+    case IIC_XTCNTLSS:
-+        i2c->xtcntlss &= ~(value & 0xf0);
-         if (value & IIC_XTCNTLSS_SRST) {
-             /* Is it actually a full reset? U-Boot sets some regs before */
-             ppc4xx_i2c_reset(DEVICE(i2c));
-             break;
-         }
--        i2c->xtcntlss = value;
-         break;
--    case 16:
-+    case IIC_DIRECTCNTL:
-         i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
-         i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
-         bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL,
-diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-index ea6c8e1..0891a9c 100644
---- a/include/hw/i2c/ppc4xx_i2c.h
-+++ b/include/hw/i2c/ppc4xx_i2c.h
-@@ -46,7 +46,8 @@ typedef struct PPC4xxI2CState {
-     qemu_irq irq;
-     MemoryRegion iomem;
-     bitbang_i2c_interface *bitbang;
--    uint8_t mdata;
-+    int mdidx;
-+    uint8_t mdata[4];
-     uint8_t lmadr;
-     uint8_t hmadr;
-     uint8_t cntl;
++        break;
++    case DMA0_SR:
++        dma->sr &= ~val;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d, %x)\n",
++                      __func__, dcrn, chnl, addr);
++    }
++}
++
++static void ppc4xx_dma_reset(void *opaque)
++{
++    PPC4xxDmaState *dma = opaque;
++    int dma_base = dma->base;
++
++    memset(dma, 0, sizeof(*dma));
++    dma->base = dma_base;
++}
++
++void ppc4xx_dma_init(CPUPPCState *env, int dcr_base)
++{
++    PPC4xxDmaState *dma;
++    int i;
++
++    dma = g_malloc0(sizeof(*dma));
++    dma->base = dcr_base;
++    qemu_register_reset(&ppc4xx_dma_reset, dma);
++    for (i = 0; i < 4; i++) {
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CR,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CT,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAH,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAL,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAH,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAL,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGH,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGL,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++    }
++    ppc_dcr_register(env, dcr_base + DMA0_SR,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++    ppc_dcr_register(env, dcr_base + DMA0_SGC,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++    ppc_dcr_register(env, dcr_base + DMA0_SLP,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++    ppc_dcr_register(env, dcr_base + DMA0_POL,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++}
++
++/*****************************************************************************/
+ /* PCI Express controller */
+ /* FIXME: This is not complete and does not work, only implemented partially
+  * to allow firmware and guests to find an empty bus. Cards should use PCI.
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index dc730cc..4f9248e 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -477,6 +477,9 @@ static void sam460ex_init(MachineState *machine)
+     /* MAL */
+     ppc4xx_mal_init(env, 4, 16, &uic[2][3]);
+ 
++    /* DMA */
++    ppc4xx_dma_init(env, 0x200);
++
+     /* 256K of L2 cache as memory */
+     ppc4xx_l2sram_init(env);
+     /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c? */
 -- 
 2.7.6
