@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAs-0007VG-91
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:51 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAx-0007b4-FF
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAr-0000pz-Bs
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:50 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43836)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdAw-0000wj-Az
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:55 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46017)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdAr-0000p7-5B
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:49 -0400
-Received: by mail-wr0-x244.google.com with SMTP id c5-v6so6681814wrs.10
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:49 -0700 (PDT)
-Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
-	127-v6sm6211110wmd.18.2018.06.28.13.05.46 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 28 Jun 2018 13:05:47 -0700 (PDT)
+	id 1fYdAw-0000vZ-2e
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:05:54 -0400
+Received: by mail-wr0-x242.google.com with SMTP id u7-v6so6680561wrn.12
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:05:53 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:04:45 +0200
-Message-Id: <1530216310-52873-36-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:04:50 +0200
+Message-Id: <1530216310-52873-41-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 35/60] pr-manager: put stubs in .c file
+Subject: [Qemu-devel] [PULL 40/60] WHPX workaround bug in OSVW handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +28,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Justin Terry (VM)" <juterry@microsoft.com>
 
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+
+Adds a workaround to an incorrect value setting
+CPUID Fn8000_0001_ECX[bit 9 OSVW] = 1. This can cause a guest linux kernel
+to panic when an issue to rdmsr C001_0140h returns 0. Disabling this feature
+correctly allows the guest to boot without accessing the osv workarounds.
+
+Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+Message-Id: <20180605221500.21674-1-juterry@microsoft.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/scsi/pr-manager.h |  9 ---------
- scsi/Makefile.objs        |  1 +
- scsi/pr-manager-stub.c    | 24 ++++++++++++++++++++++++
- 3 files changed, 25 insertions(+), 9 deletions(-)
- create mode 100644 scsi/pr-manager-stub.c
+ target/i386/whpx-all.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
-index 5d2f13a..71971ae 100644
---- a/include/scsi/pr-manager.h
-+++ b/include/scsi/pr-manager.h
-@@ -41,15 +41,6 @@ BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
-                                BlockCompletionFunc *complete,
-                                void *opaque);
- 
--#ifdef CONFIG_LINUX
- PRManager *pr_manager_lookup(const char *id, Error **errp);
--#else
--static inline PRManager *pr_manager_lookup(const char *id, Error **errp)
--{
--    /* The classes do not exist at all!  */
--    error_setg(errp, "No persistent reservation manager with id '%s'", id);
--    return NULL;
--}
--#endif
- 
- #endif
-diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
-index 4d25e47..bb8789c 100644
---- a/scsi/Makefile.objs
-+++ b/scsi/Makefile.objs
-@@ -1,3 +1,4 @@
- block-obj-y += utils.o
- 
- block-obj-$(CONFIG_LINUX) += pr-manager.o pr-manager-helper.o
-+block-obj-$(call lnot,$(CONFIG_LINUX)) += pr-manager-stub.o
-diff --git a/scsi/pr-manager-stub.c b/scsi/pr-manager-stub.c
-new file mode 100644
-index 0000000..632f17c
---- /dev/null
-+++ b/scsi/pr-manager-stub.c
-@@ -0,0 +1,24 @@
-+/*
-+ * Persistent reservation manager - stub for non-Linux platforms
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This code is licensed under the LGPL.
-+ *
-+ */
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 6b42096..99501ba 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -964,6 +964,16 @@ static int whpx_vcpu_run(CPUState *cpu)
+                 rdx = vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+                 rbx = vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+                 break;
++            case 0x80000001:
++                rax = vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
++                /* Remove any support of OSVW */
++                rcx =
++                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx &
++                    ~CPUID_EXT3_OSVW;
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "scsi/pr-manager.h"
-+#include "trace.h"
-+#include "qapi/qapi-types-block.h"
-+#include "qapi/qapi-commands-block.h"
++                rdx = vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
++                rbx = vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
++                break;
+             default:
+                 rax = vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+                 rcx = vcpu->exit_ctx.CpuidAccess.DefaultResultRcx;
+@@ -1382,12 +1392,13 @@ static int whpx_accel_init(MachineState *ms)
+         goto error;
+     }
+ 
+-    UINT32 cpuidExitList[] = {1};
++    UINT32 cpuidExitList[] = {1, 0x80000001};
+     hr = whp_dispatch.WHvSetPartitionProperty(
+         whpx->partition,
+         WHvPartitionPropertyCodeCpuidExitList,
+         cpuidExitList,
+         RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
 +
-+PRManager *pr_manager_lookup(const char *id, Error **errp)
-+{
-+    /* The classes do not exist at all!  */
-+    error_setg(errp, "No persistent reservation manager with id '%s'", id);
-+        return NULL;
-+}
+     if (FAILED(hr)) {
+         error_report("WHPX: Failed to set partition CpuidExitList hr=%08lx",
+                      hr);
 -- 
 1.8.3.1
