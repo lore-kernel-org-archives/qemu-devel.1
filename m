@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1fYVGk-0002gl-9F
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:39:24 -0400
+	(envelope-from <abologna@redhat.com>) id 1fYVIO-0003jb-AI
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhengui@huawei.com>) id 1fYVGh-0001k3-47
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:39:22 -0400
-Received: from [45.249.212.35] (port=37304 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lizhengui@huawei.com>)
-	id 1fYVGg-0001Ws-CR
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:39:19 -0400
-References: <86b43998-fc9e-75bf-564c-a64d72163793@huawei.com>
-From: l00284672 <lizhengui@huawei.com>
-Message-ID: <63986da7-f987-7a68-903b-0667ac3a0881@huawei.com>
-Date: Thu, 28 Jun 2018 19:37:41 +0800
-MIME-Version: 1.0
-In-Reply-To: <86b43998-fc9e-75bf-564c-a64d72163793@huawei.com>
-Content-Type: multipart/mixed; boundary="------------E240C1F02E301CFE7F9718C3"
-Content-Language: en-US
-Subject: Re: [Qemu-devel] question: disk missing in the guest contingently
- when hotplug several virtio scsi disks consecutively.
+	(envelope-from <abologna@redhat.com>) id 1fYVIL-0002ym-6X
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 07:41:04 -0400
+Message-ID: <597423567e18da819be8174ff593a2cb4b08517d.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Thu, 28 Jun 2018 13:40:55 +0200
+In-Reply-To: <f1175077-6eab-036f-7aa2-d06f2f4dfa1e@kaod.org>
+References: <20180626135928.23950-1-clg@kaod.org>
+	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
+	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
+	<8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
+	<20180628035909.GE23134@umbus.fritz.box>
+	<b84cc6b91f3af188c3eece0713f849031c5256c8.camel@redhat.com>
+	<f1175077-6eab-036f-7aa2-d06f2f4dfa1e@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com, stefanha@gmail.com, kwolf@redhat.com, pbonzini@redhat.compbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, lizhengui@huawei.comqemu-devel@nongnu.org
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
---------------E240C1F02E301CFE7F9718C3
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
+On Thu, 2018-06-28 at 12:04 +0200, C=C3=A9dric Le Goater wrote:
+> On 06/28/2018 10:00 AM, Andrea Bolognani wrote:
+> > On Thu, 2018-06-28 at 13:59 +1000, David Gibson wrote:
+> > > Well.. sure.. but it doesn't.  pSeries is a virtual platform, so we
+> > > have a reasonable amount of flexibility to define it as we want.
+> > > PowerNV is an emulation of existing hardware which has a specific
+> > > behaviour which we need to match.
+> >=20
+> > Sure, that's something to keep in mind.
+> >=20
+> > But the thing is, you still need to have *some* flexibility in
+> > the number of PHBs, since there is variation among real Power8
+> > and Power9 chips; in the current incarnation, that flexibility
+> > is provided by the num_phbs parameter, which is an entirely new
+> > interface that's exclusive to PowerNV.
+> >=20
+> > What I'm suggesting is that the same amount of flexibility is
+> > offered through a standard interface, namely -device, instead.
+>=20
+> Yes. I don't know to be honest. Adding support for -device is not=20
+> complex.
+>=20
+> v2 proposes to initialize a fixed set of PHBs 2, 3, 4 depending on=20
+> the CPU. I think this is the best modeling option to fit the HW.
 
-ping
+That approach would require even more hacks in libvirt if we ever
+wanted to support PowerNV - basing the PCI address allocation on
+the CPU model is not something that's really ever happened before.
 
+To make it somewhat reasonable, information about the number of
+PHBs created for each CPU model would have to be exposed through
+QMP. And I wonder what a multi-chip guest would look like...
 
-On 2018/6/27 18:33, l00284672 wrote:
->
-> Hi, I found a bug that disk missing (not all disks missing ) in the=20
-> guest contingently when hotplug several virtio scsi disks=20
-> consecutively.=C2=A0 After rebooting the guest,
->
-> the missing disks appear again.
->
-> The guest is centos7.3 running on a centos7.3 host and the scsi=20
-> controllers are configed with iothread. The scsi controller xml is belo=
-w:
->
-> =C2=A0=C2=A0=C2=A0 <controller type=3D'scsi' index=3D'0' model=3D'virti=
-o-scsi'>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <driver iothread=3D'26'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <alias name=3D'scsi0'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <address type=3D'pci' domain=3D'0x0000' =
-bus=3D'0x00' slot=3D'0x07'=20
-> function=3D'0x0'/>
-> =C2=A0=C2=A0=C2=A0 </controller>
-> =C2=A0=C2=A0=C2=A0 <controller type=3D'scsi' index=3D'1' model=3D'virti=
-o-scsi'>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <driver iothread=3D'27'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <alias name=3D'scsi1'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <address type=3D'pci' domain=3D'0x0000' =
-bus=3D'0x00' slot=3D'0x0a'=20
-> function=3D'0x0'/>
-> =C2=A0=C2=A0=C2=A0 </controller>
-> =C2=A0=C2=A0=C2=A0 <controller type=3D'scsi' index=3D'2' model=3D'virti=
-o-scsi'>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <driver iothread=3D'28'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <alias name=3D'scsi2'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <address type=3D'pci' domain=3D'0x0000' =
-bus=3D'0x00' slot=3D'0x0b'=20
-> function=3D'0x0'/>
-> =C2=A0=C2=A0=C2=A0 </controller>
-> =C2=A0=C2=A0=C2=A0 <controller type=3D'scsi' index=3D'3' model=3D'virti=
-o-scsi'>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <driver iothread=3D'29'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <alias name=3D'scsi3'/>
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <address type=3D'pci' domain=3D'0x0000' =
-bus=3D'0x00' slot=3D'0x0c'=20
-> function=3D'0x0'/>
-> =C2=A0=C2=A0=C2=A0 </controller>
->
->
-> If the scsi controllers are configed without iothread,=C2=A0 disks are =
-all=20
-> can be seen in the guest when hotplug several virtio scsi disks=20
-> consecutively.
->
-> I think the biggest difference between them is that scsi controllers=20
-> with iothread call virtio_notify_irqfd to notify guest and scsi=20
-> controllers without
->
-> iothread call virtio_notify instead.=C2=A0 What make it difference? Wil=
-l=C2=A0=20
-> interrupts are lost when call virtio_notify_irqfd due to=C2=A0 race=20
-> condition for some
->
-> unknow reasons? Maybe guys more familiar with scsi dataplane can help.=20
-> Thanks for your reply!
->
->
+Plus, as soon as you try something like
 
+  $ qemu-system-ppc64 \
+    -nodefaults -display none \
+    -machine powernv -cpu POWER8E \
+    -device pci-bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1 \
+    -device megasas,id=3Dscsi0,bus=3Dpci.1,addr=3D0x1
 
---------------E240C1F02E301CFE7F9718C3
-Content-Type: text/x-vcard; name="lizhengui.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="lizhengui.vcf"
+very interesting things will start happening :)
 
-bnVsbA==
---------------E240C1F02E301CFE7F9718C3--
+--=20
+Andrea Bolognani / Red Hat / Virtualization
