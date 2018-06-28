@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYZ6c-0000qG-3c
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:45:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fYZ7o-0001Vd-Dn
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYZ6Y-0006Bt-Vl
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:45:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56234 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYZ6Y-0006AN-Ox
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:45:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D0194010216
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 15:45:06 +0000 (UTC)
-Date: Thu, 28 Jun 2018 16:45:02 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180628154502.GO3513@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fYZ7l-0007se-9x
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:46:24 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fYZ7l-0007rI-0B
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:46:21 -0400
+Received: by mail-wm0-x243.google.com with SMTP id 69-v6so9530490wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 08:46:20 -0700 (PDT)
+References: <20180622004435.10291-1-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180622004435.10291-1-f4bug@amsat.org>
+Date: Thu, 28 Jun 2018 16:46:18 +0100
+Message-ID: <87muvevrqt.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Subject: [Qemu-devel] CPU model versioning separate from machine type
- versioning ?
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] Avocado: start multi-arch tests,
+ add a Travis job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
-
-This post is to raise question about helping use of named CPU models with
-KVM ie any case not using -cpu host.
-
-In the old days (ie before 2018), the world was innocent and we had a nice
-set of named CPU models that corresponded to different Intel/AMD physical
-CPU families/generations (lets temporarily ignore the -noTSX fiasco).
-
-An application could query libvirt to determine what the host CPU model
-was/is and use that model name in the guest XML and be fairly happy. If
-they wanted to, they could explicitly include the extra features listed
-by capabilities XML, or just rely on the host-model.
-
-Then Spectre happened, and QEMU took the decision to almost double the
-number of x86 models, adding in -IBRS / -IBPB variants for most CPU model,
-so that applications could get the spec_ctrl / ibpb flags set without
-having to manually list them.
-
-In retrospect this was somewhat pointless, at least at the QEMU level,
-because there is little difference in complexity between the two approaches:
-
-   -cpu Westmere,+spec-ctrl
-   -cpu Westmere-IBRS
-
-At a higher level the extra named CPU models were slightly useful in so much
-as many application developers had taken a lazy approach and not provided
-users any way to explicitly turn on extra flags. This affected oVirt,
-OpenStack and virt-manager, and probably more. Though OpenStack since added
-ability to turn on arbitrary flags in response to the Spectre flaw, others
-have not.
-
-Then a recently along came the Speculative Store Bypass hardware vulnerability
-requiring addition of yet another CPU flag to guest configs. This required use
-of 'ssbd' on Intel and 'virt-ssbd' on AMD. While QEMU could have now added yet
-more CPU models, eg Westmere-SSBD, this does not feel like a winning strategy
-long term. Looking at the models how would a user have any clue whether the
--IBRS or -SSBD or -NEXT-FLAW or -YET-ANOTHER-FLAW suffix is "better" ? So QEMU
-and libvirt took the joint decision to stop adding new named CPU models when
-CPU vulnerabilities are discovered from this point forwards. Applications /
-users would be expected to turn on CPU features explicitly as needed and are
-considered broken if they don't provide this functionality.
-
-As briefly mentioned above though, even before Spectre we had the pain of
-dealing with the -noTSX CPU models working around brokenness in the Intel TSX
-impl where they had to delete a CPU feature during microcode updates. This was
-rather painful to roll out at the time.
-
-An alternative to adding CPU models is to change meaning of existing CPU
-models. QEMU has a way todo this by tieing the change to machine types, and
-it has in fact been used to correct mistakes in the specification of CPU
-models in the past, when those mistakes have not had dependancies on microcode
-changes. This is not a particularly attractice way to deal with the errata.
-Short life distros tend to stick with upstream QEMU machine types and won't
-want to diverge by adding their own machine types. This gates them on having
-upstream define the extra machine types which is tricky under embargo. Long
-life distros do typically take on the burden of defining custom machine types,
-but usually only add them when doing major updates.
-
-The pain point with machine types is that the testing matrix grows at O(n^2)
-Using machine types for CPU security errata would significant increase the
-number of machine types and thus the testing matrix. eg if a security fix
-is needed in rhel-7.3, 7.4, 7.5 we can't just add a pc-rhel-7.5.1 machine
-with the fix, as it would not be possible to implement that in 7.3. So we
-would need would need pc-rhel-7.3.1,  pc-rhel-7.4.1,  pc-rhel-7.5.1, machine
-types, with 7.5 gaining all three. Finally CPU model changes have host
-hardware dependancies and machine types need to be independant of the host,
-since they are decided statically are build time. The only nice thing about
-machine type is that it is reasonably obvious what the "best" machine type
-is as they include a version number in the name, and users automatically get
-the best if they use an unversioned name.
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
 
-What if we can borrow the concept of versioning from machine types and apply
-it to CPU models directly. For example, considering the history of "Haswell"
-in QEMU, if we had versioned things, we would by now have:
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-     Haswell-1.3.0 - first version (37507094f350b75c62dc059f998e7185de3ab60a)
-     Haswell-2.2.0 - added 'rdrand' (78a611f1936b3eac8ed78a2be2146a742a85212c_
-     Haswell-2.3.0 - removed 'hle' & 'rtm' (a356850b80b3d13b2ef737dad2acb05e6da03753)
-     Haswell-2.5.0 - added 'abm' (becb66673ec30cb604926d247ab9449a60ad8b11
-     Haswell-2.12.0 - added 'spec-ctrl' (ac96c41354b7e4c70b756342d9b686e31ab87458)
-     Haswell-3.0.0  - added 'ssbd' (never done)
+> Hi,
+>
+> Another neanderthal approach to add multi-arch acceptance tests using
+> Avocado.
+>
+> Since Cleber Rosa work got merged [0], I can restart my previous attempt =
+[1]
+> at using Avocado in QEMU.
+> Cleber Rosa rewrote my previous v1 [1], in good python, now this v2 pushes
+> a bit further:
+> - we can now run other archs
+> - Avocado is integrated into Travis CI
+>
+> I'm not sure Travis is the best CI available for those tests, but it runs
+> quite fast:
+>
+>       ...
+>       LINK    x86_64-softmmu/qemu-system-x86_64
+>     JOB ID     : a3a56af3c02d193e862ce660aae1d9c72926dcb6
+>     JOB LOG    : /home/travis/avocado/job-results/job-2018-06-21T23.49-a3=
+a56af/job.log
+>      (1/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleX86_64.=
+test:  PASS (3.89 s)
+>      (2/7) tests/acceptance/boot_linux_console.py:BootLinuxConsoleMips.te=
+st:  PASS (1.83 s)
+>      (3/7) tests/acceptance/version.py:Version.test_qmp_human_info_versio=
+n:  PASS (0.05 s)
+>      (4/7) tests/acceptance/vnc.py:Vnc.test_no_vnc:  PASS (0.04 s)
+>      (5/7) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password:  PASS=
+ (0.04 s)
+>      (6/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_=
+a_password:  PASS (0.05 s)
+>      (7/7) tests/acceptance/vnc.py:Vnc.test_vnc_change_password:  PASS (0=
+.05 s)
+>     RESULTS    : PASS 7 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT =
+0 | CANCEL 0
+>     JOB TIME   : 6.21 s
 
-If we followed the machine type approach, then a bare "Haswell" would
-statically resolve at build time to the most recent Haswell-X.X.X version
-associated with the QEMU release. This is unhelpful as we have a direct
-dependancy on the host hardware features. Better would be for a bare
-"Haswell" to be dynamically resolved at runtime, picking the most recent
-version that is capable of launching given the current hardware, KVM/TCG impl
-and QEMU version.
+Hmm however if I do:
 
-  ie -cpu  Haswell
+   pip install --user avocado-framework
+   avocado run tests/acceptance
 
-should use Haswell-2.5.0  if on silicon with the TSX errata applied,
-but use Haswell-2.12.0 if the Spectre errata is applied in microcode,
-and use Haswell-3.0.0 once Intel finally releases SSBD microcode errata.
+I get:
 
-Versioning of CPU models as opposed to using arbitrary string suffixes
-(-noTSX, -IBRS) has a number of usability improvements that we would
-gain with versioned machine types, while avoiding exploding the machine
-type matrix. With versioned CPU models we can
+   Failed to load plugin from module "avocado_vt.plugins.vt_list": ImportEr=
+ror('No module named netaddr',)
+   Failed to load plugin from module "avocado_vt.plugins.vt": ImportError('=
+No module named netaddr',)
+   Failed to load plugin from module "avocado_vt.plugins.vt_bootstrap": OSE=
+rror(13, 'Permission denied')
+   Error running method "run" of plugin "virt": 'Namespace' object has no a=
+ttribute 'default_avocado_params'
+   Avocado crashed unexpectedly: [Errno 13] Permission denied: '/var/lib/li=
+bvirt/images/avocado_sg6NRi'
+   You can find details in /var/tmp/avocado-traceback-2018-06-28_16:44:25-D=
+Gb1CG.log
 
- - Automatically tailor the best model based on hardware support
+Which I seem to remember from last time I looked into this. I think
+avocado makes a bunch of assumptions about the filesystem and OS layout
+which is hard to gloss over for something you should be able to run
+straight out of the source tree.
 
- - Users always get the best model if they use the bare CPU name
 
- - It is obvious to users which is the "best" / "newest" CPU model
+>
+>     Done. Your build exited with 0.
+>
+>     Job ran for 5 min 34 sec
+>
+> I couldn't add the Alpha tests because all the vmlinux kernels I found
+> online are gzipped, so I'm waiting some upstream Avocado merges before.
+>
+> Cleber: I hope you can help me pythonizing this series :p
+>
+> Regards,
+>
+> Phil.
+>
+> [0]: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg04531.html
+> [1]: http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg03076.html
+>
+> Philippe Mathieu-Daud=C3=A9 (6):
+>   avocado: Add a Test.arch property
+>   tests/acceptance: Rename the x86-64 specific BootLinuxConsole test
+>   tests/acceptance: Improve the Avocado tags
+>   tests/acceptance: Add a BootLinuxConsoleMips test
+>   tests/acceptance: Add a kludge to not use the default console
+>   travis: Add Avocado tests
+>
+>  .travis.yml                               |  8 +++++
+>  scripts/qemu.py                           |  6 ++--
+>  tests/acceptance/avocado_qemu/__init__.py | 17 ++++++---
+>  tests/acceptance/boot_linux_console.py    | 44 +++++++++++++++++++++--
+>  4 files changed, 67 insertions(+), 8 deletions(-)
 
- - Avoid combinatorial expansion of machines since same CPU model
-   version can be added to all releases without adding machine types.
 
- - Users can still force a specific downgraded model by using the
-   fully versioned name.
-
-Such versioning of CPU models would largely "just work" with existing
-libvirt versions, but to libvirt would really want to expand the bare
-CPU name to a versioned CPU name when recording new guest XML, so the
-ABI is preserved long term.
-
-An application like virt-manager which wants a simple UI can forever be
-happy simply giving users a list of bare CPU model names, and allowing
-libvirt / QEMU to automatically expand to the best versioned model for
-their host.
-
-An application like oVirt/OpenStack which wants direct control can allow
-the admin to choice if a bare name, or explicitly picking a versioned name
-if they need to cope with possibility of outdated hosts.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Alex Benn=C3=A9e
