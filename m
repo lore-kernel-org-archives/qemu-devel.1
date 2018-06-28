@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYZ1U-0005Kf-8W
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:39:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYZ1V-0005Mc-Vh
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYZ1T-0006oT-ER
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:39:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYZ1U-0006q4-JC
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 11:39:54 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 28 Jun 2018 17:39:36 +0200
-Message-Id: <20180628153937.26097-3-kwolf@redhat.com>
+Date: Thu, 28 Jun 2018 17:39:37 +0200
+Message-Id: <20180628153937.26097-4-kwolf@redhat.com>
 In-Reply-To: <20180628153937.26097-1-kwolf@redhat.com>
 References: <20180628153937.26097-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] qcow2: Free allocated clusters on write
- error
+Subject: [Qemu-devel] [PATCH 3/3] qemu-iotests: Test qcow2 not leaking
+ clusters on write error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berto@igalia.com, qemu-devel@nongnu.org
 
-If we managed to allocate the clusters, but then failed to write the
-data, there's a good chance that we'll still be able to free the
-clusters again in order to avoid cluster leaks (the refcounts are
-cached, so even if we can't write them out right now, we may be able to
-do so when the VM is resumed after a werror=stop/enospc pause).
+This adds a test for a temporary write failure, which simulates the
+situation after werror=stop/enospc has stopped the VM. We shouldn't
+leave leaked clusters behind in such cases.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2.h         |  1 +
- block/qcow2-cluster.c | 11 +++++++++++
- block/qcow2.c         |  2 ++
- 3 files changed, 14 insertions(+)
+ tests/qemu-iotests/026             | 17 +++++++++++++++++
+ tests/qemu-iotests/026.out         |  8 ++++++++
+ tests/qemu-iotests/026.out.nocache |  8 ++++++++
+ 3 files changed, 33 insertions(+)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 01b5250415..1c9c0d3631 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -614,6 +614,7 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-                                          int compressed_size);
+diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
+index 7fadfbace5..582d254195 100755
+--- a/tests/qemu-iotests/026
++++ b/tests/qemu-iotests/026
+@@ -200,6 +200,23 @@ done
+ done
+ done
  
- int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
-+void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m);
- int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-                           uint64_t bytes, enum qcow2_discard_type type,
-                           bool full_discard);
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 0d74584c9b..d37fe08b3d 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -994,6 +994,17 @@ err:
-     return ret;
-  }
- 
-+/**
-+ * Frees the allocated clusters because the request failed and they won't
-+ * actually be linked.
-+ */
-+void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    qcow2_free_clusters(bs, m->alloc_offset, m->nb_clusters << s->cluster_bits,
-+                        QCOW2_DISCARD_NEVER);
-+}
++echo
++echo === Avoid cluster leaks after temporary failure ===
++echo
 +
- /*
-  * Returns the number of contiguous clusters that can be used for an allocating
-  * write, but require COW to be performed (this includes yet unallocated space,
-diff --git a/block/qcow2.c b/block/qcow2.c
-index da54b2c8f8..7a4db12afd 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1777,6 +1777,8 @@ static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-             if (ret) {
-                 goto out;
-             }
-+        } else {
-+            qcow2_alloc_cluster_abort(bs, l2meta);
-         }
++cat > "$TEST_DIR/blkdebug.conf" <<EOF
++[inject-error]
++event = "write_aio"
++errno = "5"
++once = "on"
++EOF
++
++# After the failed first write, do a second write so that the updated refcount
++# block is actually written back
++_make_test_img 64M
++$QEMU_IO -c "write 0 1M" -c "write 0 1M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++_check_test_img
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
+index 8e89416a86..dd10a82b51 100644
+--- a/tests/qemu-iotests/026.out
++++ b/tests/qemu-iotests/026.out
+@@ -675,4 +675,12 @@ write failed: No space left on device
  
-         /* Take the request off the list of running requests */
+ 96 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
++
++=== Avoid cluster leaks after temporary failure ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++write failed: Input/output error
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++No errors were found on the image.
+ *** done
+diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.out.nocache
+index 650ccd8b01..1ca6cda15c 100644
+--- a/tests/qemu-iotests/026.out.nocache
++++ b/tests/qemu-iotests/026.out.nocache
+@@ -683,4 +683,12 @@ write failed: No space left on device
+ 
+ 96 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
++
++=== Avoid cluster leaks after temporary failure ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++write failed: Input/output error
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++No errors were found on the image.
+ *** done
 -- 
 2.13.6
