@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fYUJY-00019T-0C
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fYUJb-0001Ee-Th
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fYUJT-0000QB-2o
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44824 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYUJS-0000Om-Ss
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:06 -0400
-References: <1526977831-31129-1-git-send-email-thuth@redhat.com>
-	<f5537d6c-b213-b982-0a63-1c9c397f807e@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <82420aa0-cae3-2244-3f4e-62e0e1136c14@redhat.com>
-Date: Thu, 28 Jun 2018 12:38:03 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fYUJb-0000gW-2w
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:15 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:36126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fYUJa-0000em-SE
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 06:38:14 -0400
+Received: by mail-oi0-x241.google.com with SMTP id r16-v6so4206142oie.3
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 03:38:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f5537d6c-b213-b982-0a63-1c9c397f807e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-serial: Do not delete the
- output file in case of errors
+In-Reply-To: <20180627043328.11531-14-richard.henderson@linaro.org>
+References: <20180627043328.11531-1-richard.henderson@linaro.org>
+	<20180627043328.11531-14-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 28 Jun 2018 11:37:53 +0100
+Message-ID: <CAFEAcA8Yfarg8juu_MJmDruYmsCsb6Y8fAxFS-wtw6dcDypteA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 13/35] target/arm: Implement SVE gather
+ loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 27/06/2018 12:16, Thomas Huth wrote:
-> On 22.05.2018 10:30, Thomas Huth wrote:
->> Peter reported that the boot-serial tester sometimes runs into timeouts
->> with SPARC guests. It's currently completely unclear whether this is due
->> to too much load on the host machine (so that the guest really just ran
->> too slow), or whether there is something wrong with the guest's firmware
->> boot. For further debugging, we need the serial output of the guest in
->> case of errors, so instead of unlinking the file immediately, this is
->> now only done in case of success. In case of error, print the name of the
->> file with the serial output via g_error() (which then also calls abort()
->> internally to mark the test as failed).
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/boot-serial-test.c | 17 +++++++++--------
->>  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
-> Ping!
-> 
-> Paolo, could you take this patch through your misc / character devices
-> tree, please?
-> 
->  Thanks,
->   Thomas
-> 
+On 27 June 2018 at 05:33, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> ---
+> v6:
+>   * Finish esz == msz && u==1 decode in sve.decode.
+>   * Remove duplicate decode in trans_ST1_zprz.
+>   * Add xs=2 comment.
+>   * Reformat tables to leave room for ff helpers.
+> ---
+>  target/arm/helper-sve.h    |  67 +++++++++++++++++++++++++
+>  target/arm/sve_helper.c    |  77 ++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 100 +++++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      |  57 +++++++++++++++++++++
+>  4 files changed, 301 insertions(+)
+>
 
-Done, thanks.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Paolo
+thanks
+-- PMM
