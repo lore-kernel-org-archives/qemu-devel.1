@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYa1u-0006Aq-QA
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:44:23 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYa4M-00074a-8i
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYa1p-0008AF-Ai
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:44:22 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:34737)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYa4J-0003bO-4O
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:46:54 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35521)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYa1p-00089i-58
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:44:17 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id i17-v6so6866486otl.1
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:44:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYa4J-0003al-00
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 12:46:51 -0400
+Received: by mail-qt0-x243.google.com with SMTP id z6-v6so5326395qti.2
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:46:50 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 28 Jun 2018 13:46:35 -0300
+Message-Id: <20180628164643.9668-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180627144838.26772-1-stefanha@redhat.com>
-References: <20180627144838.26772-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Jun 2018 17:43:55 +0100
-Message-ID: <CAFEAcA97ZTO=wb976mxdsk31=q1pP+7jcH9Jer335qqvNzzvZQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/8] Docker improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On 27 June 2018 at 15:48, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 00928a421d47f49691cace1207481b7aad31b1f1:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180626' into staging (2018-06-26 18:23:49 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to ed6e2161715c527330f936d44af4c547f25f687e:
->
->   linux-aio: properly bubble up errors from initialization (2018-06-27 13:06:34 +0100)
->
-> ----------------------------------------------------------------
-> Pull request
->
->  * Gracefully handle Linux AIO init failure
->
+Hi,
 
-Applied, thanks.
+This is a set of various unrelated Docker patches, from my daily
+docker-qemu usage.
 
--- PMM
+Last RFC patches restore building for ppc32 hosts, which sometimes
+triggers interesting 32-bit errors (atomic updates).
+
+The other 32-bit host is the MXE MinGW32 port.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (8):
+  docker: ubuntu: Update the package list before installing new ones
+  docker: ubuntu: Use SDL2
+  docker: Clean the MXE base image
+  docker: Add packages required to build a Linux kernel
+  docker: Restrict the 'travis' job to the Travis image
+  docker: Do not run tests in 'intermediate' images
+  docker: Cross build QEMU on ppc32 hosts
+  .shippable.yml: Restore the powerpc-cross image
+
+ .shippable.yml                                |  2 +
+ tests/docker/Makefile.include                 | 16 +++++--
+ tests/docker/dockerfiles/debian-apt-fake.sh   | 46 +++++++++++++++++++
+ .../dockerfiles/debian-powerpc-cross.docker   | 43 +++++++++++++++++
+ tests/docker/dockerfiles/debian-sid.docker    |  6 ++-
+ tests/docker/dockerfiles/debian8-mxe.docker   |  2 +-
+ tests/docker/dockerfiles/ubuntu.docker        |  8 ++--
+ 7 files changed, 114 insertions(+), 9 deletions(-)
+ create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+
+-- 
+2.18.0
