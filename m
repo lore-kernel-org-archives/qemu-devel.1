@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdB9-0007r2-Cw
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:08 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdBB-0007tf-5h
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdB8-0001Hd-Ar
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:07 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:43333)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYdBA-0001Oc-78
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:09 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38583)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYdB8-0001Di-3Z
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:06 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id c5-v6so6682437wrs.10
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:06:06 -0700 (PDT)
+	id 1fYdBA-0001Li-0j
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 16:06:08 -0400
+Received: by mail-wr0-x243.google.com with SMTP id e18-v6so6692293wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 13:06:07 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Jun 2018 22:05:02 +0200
-Message-Id: <1530216310-52873-53-git-send-email-pbonzini@redhat.com>
+Date: Thu, 28 Jun 2018 22:05:04 +0200
+Message-Id: <1530216310-52873-55-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
 References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 52/60] i386/cpu: make -cpu host support
- monitor/mwait
+Subject: [Qemu-devel] [PULL 54/60] dump: use system context in Windows dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+From: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-When guest CPU PM is enabled, and with -cpu host, expose the host CPU
-MWAIT leaf in the CPUID so guest can make good PM decisions.
+We use CPU #0 to access guest virtual memory, but it can execute user
+thread at that moment. So, switch CR3 to PageDirectoryBase from header
+and restore original value at the end.
 
-Note: the result is 100% CPU utilization reported by host as host
-no longer knows that the CPU is halted.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180622192148.178309-3-mst@redhat.com>
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Message-Id: <20180517162342.4330-3-viktor.prutyanov@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 19 ++++++++++++++-----
- target/i386/cpu.h |  9 +++++++++
- target/i386/kvm.c |  9 +++++++++
- 3 files changed, 32 insertions(+), 5 deletions(-)
+ win_dump.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e6c2f8a..b54f36a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3959,11 +3959,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         }
-         break;
-     case 5:
--        /* mwait info: needed for Core compatibility */
--        *eax = 0; /* Smallest monitor-line size in bytes */
--        *ebx = 0; /* Largest monitor-line size in bytes */
--        *ecx = CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
--        *edx = 0;
-+        /* MONITOR/MWAIT Leaf */
-+        *eax = cpu->mwait.eax; /* Smallest monitor-line size in bytes */
-+        *ebx = cpu->mwait.ebx; /* Largest monitor-line size in bytes */
-+        *ecx = cpu->mwait.ecx; /* flags */
-+        *edx = cpu->mwait.edx; /* mwait substates */
-         break;
-     case 6:
-         /* Thermal and Power Leaf */
-@@ -4811,6 +4811,15 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         goto out;
+diff --git a/win_dump.c b/win_dump.c
+index 58255c1..7d956ca 100644
+--- a/win_dump.c
++++ b/win_dump.c
+@@ -111,12 +111,6 @@ static void patch_header(WinDumpHeader64 *h)
+     h->PhysicalMemoryBlock.unused = 0;
+     h->unused1 = 0;
+ 
+-    /*
+-     * We assume h->DirectoryBase and current CR3 are the same when we access
+-     * memory by virtual address. In other words, we suppose current context
+-     * is system context. It is definetely true in case of BSOD.
+-     */
+-
+     patch_mm_pfn_database(h, &local_err);
+     if (local_err) {
+         warn_report_err(local_err);
+@@ -171,6 +165,8 @@ void create_win_dump(DumpState *s, Error **errp)
+ {
+     WinDumpHeader64 *h = (WinDumpHeader64 *)(s->guest_note +
+             VMCOREINFO_ELF_NOTE_HDR_SIZE);
++    X86CPU *first_x86_cpu = X86_CPU(first_cpu);
++    uint64_t saved_cr3 = first_x86_cpu->env.cr[3];
+     Error *local_err = NULL;
+ 
+     if (s->guest_note_size != sizeof(WinDumpHeader64) +
+@@ -185,10 +181,17 @@ void create_win_dump(DumpState *s, Error **errp)
+         return;
      }
  
-+    if (xcc->host_cpuid_required && enable_cpu_pm) {
-+        host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
-+                   &cpu->mwait.ecx, &cpu->mwait.edx);
-+        env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
-+    }
-+    /* mwait extended info: needed for Core compatibility */
-+    /* We always wake on interrupt even if host does not have the capability */
-+    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
++    /*
++     * Further access to kernel structures by virtual addresses
++     * should be made from system context.
++     */
 +
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-         error_setg(errp, "apic-id property was not initialized properly");
-         return;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 16c59b7..8eaefee 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1382,6 +1382,15 @@ struct X86CPU {
-     /* if true the CPUID code directly forward host cache leaves to the guest */
-     bool cache_info_passthrough;
++    first_x86_cpu->env.cr[3] = h->DirectoryTableBase;
++
+     check_kdbg(h, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        return;
++        goto out_cr3;
+     }
  
-+    /* if true the CPUID code directly forwards
-+     * host monitor/mwait leaves to the guest */
-+    struct {
-+        uint32_t eax;
-+        uint32_t ebx;
-+        uint32_t ecx;
-+        uint32_t edx;
-+    } mwait;
-+
-     /* Features that were filtered out because of missing host capabilities */
-     uint32_t filtered_features[FEATURE_WORDS];
+     patch_header(h);
+@@ -198,12 +201,17 @@ void create_win_dump(DumpState *s, Error **errp)
+     s->written_size = qemu_write_full(s->fd, h, sizeof(*h));
+     if (s->written_size != sizeof(*h)) {
+         error_setg(errp, QERR_IO_ERROR);
+-        return;
++        goto out_cr3;
+     }
  
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index dc991f6..c5f72d6 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -366,6 +366,15 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-         if (!kvm_irqchip_in_kernel()) {
-             ret &= ~CPUID_EXT_X2APIC;
-         }
+     write_runs(s, h, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        return;
++        goto out_cr3;
+     }
 +
-+        if (enable_cpu_pm) {
-+            int disable_exits = kvm_check_extension(s,
-+                                                    KVM_CAP_X86_DISABLE_EXITS);
++out_cr3:
++    first_x86_cpu->env.cr[3] = saved_cr3;
 +
-+            if (disable_exits & KVM_X86_DISABLE_EXITS_MWAIT) {
-+                ret |= CPUID_EXT_MONITOR;
-+            }
-+        }
-     } else if (function == 6 && reg == R_EAX) {
-         ret |= CPUID_6_EAX_ARAT; /* safe to allow because of emulated APIC */
-     } else if (function == 7 && index == 0 && reg == R_EBX) {
++    return;
+ }
 -- 
 1.8.3.1
