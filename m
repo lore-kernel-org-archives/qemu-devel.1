@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYTQ7-00077t-Ad
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:40:59 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fYTej-00017v-Oc
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYTQ2-0004gT-Jo
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:40:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57666)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYTQ2-0004eQ-CK
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:40:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYTQ0-000680-II
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:40:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 84AE92E819C
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 09:40:48 +0000 (UTC)
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fYTef-0002qz-SC
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:56:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48284
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1fYTef-0002o5-Jy
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:55:57 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5S9s4IJ018835
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 05:55:55 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jvw4091c9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 05:55:54 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Thu, 28 Jun 2018 10:55:53 +0100
+Date: Thu, 28 Jun 2018 15:25:47 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20180627125604.15275-1-quintela@redhat.com>
+	<20180627125604.15275-17-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180627125604.15275-17-quintela@redhat.com>
+Message-Id: <20180628095547.GA24412@localhost.localdomain>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Jun 2018 09:32:08 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1779017 <1779017@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153014968219.17704.367188786620032253.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153017832820.29724.9161733546630236086.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1779017] Re: qemu-system-arm: crashes raspian
- kernels with divide-by-zero
+Subject: Re: [Qemu-devel] [PULL 16/16] migration: fix crash in when incoming
+ client channel setup fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +44,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This isn't a kernel crash, it's just a warning (which I think is safely
-ignorable). The problem is that QEMU doesn't implement the 'cprman'
-clock control hardware, which means Linux thinks the UART is running at
-a zero baud rate. Unfortunately the cprman hardware is as far as I can
-determine undocumented, so it's not really possible to write an
-emulation of it.
+On Wed, Jun 27, 2018 at 02:56:04PM +0200, Juan Quintela wrote:
+> From: Daniel P. Berrang=E9 <berrange@redhat.com>
+>=20
+> The way we determine if we can start the incoming migration was
+> changed to use migration_has_all_channels() in:
+>=20
+>   commit 428d89084c709e568f9cd301c2f6416a54c53d6d
+>   Author: Juan Quintela <quintela@redhat.com>
+>   Date:   Mon Jul 24 13:06:25 2017 +0200
+>=20
+>     migration: Create migration_has_all_channels
+>=20
+> This method in turn calls multifd_recv_all_channels_created()
+> which is hardcoded to always return 'true' when multifd is
+> not in use. This is a latent bug...
+>=20
+> ...activated in a following commit where that return result
+> ends up acting as the flag to indicate whether it is possible
+> to start processing the migration:
+>=20
+>   commit 36c2f8be2c4eb0003ac77a14910842b7ddd7337e
+>   Author: Juan Quintela <quintela@redhat.com>
+>   Date:   Wed Mar 7 08:40:52 2018 +0100
+>=20
+>     migration: Delay start of migration main routines
+>=20
+> This means that if channel initialization fails with normal
+> migration, it'll never notice and attempt to start the
+> incoming migration regardless and crash on a NULL pointer.
+>=20
+> This can be seen, for example, if a client connects to a server
+> requiring TLS, but has an invalid x509 certificate:
+>=20
+> qemu-system-x86_64: The certificate hasn't got a known issuer
+> qemu-system-x86_64: migration/migration.c:386: process_incoming_migrati=
+on_co: Assertion `mis->from_src_file' failed.
+>=20
+>  #0  0x00007fffebd24f2b in raise () at /lib64/libc.so.6
+>  #1  0x00007fffebd0f561 in abort () at /lib64/libc.so.6
+>  #2  0x00007fffebd0f431 in _nl_load_domain.cold.0 () at /lib64/libc.so.=
+6
+>  #3  0x00007fffebd1d692 in  () at /lib64/libc.so.6
+>  #4  0x0000555555ad027e in process_incoming_migration_co (opaque=3D<opt=
+imized out>) at migration/migration.c:386
+>  #5  0x0000555555c45e8b in coroutine_trampoline (i0=3D<optimized out>, =
+i1=3D<optimized out>) at util/coroutine-ucontext.c:116
+>  #6  0x00007fffebd3a6a0 in __start_context () at /lib64/libc.so.6
+>  #7  0x0000000000000000 in  ()
+>=20
+> To handle the non-multifd case, we check whether mis->from_src_file
+> is non-NULL. With this in place, the migration server drops the
+> rejected client and stays around waiting for another, hopefully
+> valid, client to arrive.
 
-I'm not sure your bisection has landed on the right thing, as
-d9f8bbd8eb4e95 should be a no-behaviour-change commit.
+Hi Juan,
 
--- =
+I tried to perform multifd enabled migration and from qemu monitor
+enabled mutlifd capability on source and target,
+(qemu) migrate_set_capability x-multifd on
+(qemu) migrate -d tcp:127.0.0.1:4444
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1779017
+The migration succeeds and its cool to have the feature :)
+(qemu) info migrate
+globals:
+store-global-state: on
+only-migratable: off
+send-configuration: on
+send-section-footer: on
+decompress-error-check: on
+capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-block=
+s: off compress: off events: off postcopy-ram: off x-colo: off release-ra=
+m: off block: off return-path: off pause-before-switchover: off x-multifd=
+: on dirty-bitmaps: off postcopy-blocktime: off late-block-activate: off
+Migration status: completed
+total time: 1051 milliseconds
+downtime: 260 milliseconds
+setup: 17 milliseconds
+transferred ram: 8270 kbytes
+throughput: 143.91 mbps
+remaining ram: 0 kbytes
+total ram: 4194560 kbytes
+duplicate: 940989 pages
+skipped: 0 pages
+normal: 109635 pages
+normal bytes: 438540 kbytes
+dirty sync count: 3
+page size: 4 kbytes
 
-Title:
-  qemu-system-arm: crashes raspian kernels with divide-by-zero
 
-Status in QEMU:
-  New
+But when I just enable the multifd in souce but not in target
 
-Bug description:
-  While trying to boot a arm kernel for a raspi2 machine (kernel7-4.9.41-st=
-retch.img in my case, but applies to other versions, too) the kernel crash =
-with a division by zero. The output on the sreial console is:
-  [   10.022377] [<8011d344>] (__warn) from [<8011d42c>] (warn_slowpath_nul=
-l+0x30/0x38)
-  [   10.024726] [<8011d42c>] (warn_slowpath_null) from [<804da378>] (uart_=
-get_baud_rate+0xf8/0x160)
+source:
+x-multifd: on
 
-  ...
+target:
+x-multifd: off
 
-  [   10.094933] Hardware name: BCM2835
-  [   10.101507] [<8010fb3c>] (unwind_backtrace) from [<8010c058>] (show_st=
-ack+0x20/0x24)
-  [   10.105413] [<8010c058>] (show_stack) from [<80455f84>] (dump_stack+0x=
-d4/0x118)
-  [   10.140268] [<80455f84>] (dump_stack) from [<8010bed4>] (__div0+0x24/0=
-x28)
-  [   10.143065] [<8010bed4>] (__div0) from [<8045498c>] (Ldiv0+0x8/0x14)
-  [   10.145553] [<8045498c>] (Ldiv0) from [<804e5538>] (pl011_set_termios+=
-0x9c/0x37c)
-  [   10.148017] [<804e5538>] (pl011_set_termios) from [<804da954>] (uart_c=
-hange_speed+0x40/0xfc)
-  [   10.185887] [<804da954>] (uart_change_speed) from [<804ddedc>] (uart_s=
-tartup.part.3+0xa4/0x13c)
-  [   10.222187] [<804ddedc>] (uart_startup.part.3) from [<804ddfcc>] (uart=
-_port_activate+0x58/0x64)
-  [   10.226014] [<804ddfcc>] (uart_port_activate) from [<804c93b8>] (tty_p=
-ort_open+0xa0/0xe0)
-  [   10.228398] [<804c93b8>] (tty_port_open) from [<804dce64>] (uart_open+=
-0x40/0x48)
-  [   10.264254] [<804dce64>] (uart_open) from [<804c1d70>] (tty_open+0xc0/=
-0x678)
-  [   10.266697] [<804c1d70>] (tty_open) from [<802753f0>] (chrdev_open+0xe=
-0/0x1a0)
-  [   10.269049] [<802753f0>] (chrdev_open) from [<8026d964>] (do_dentry_op=
-en+0x1f4/0x314)
-  [   10.271620] [<8026d964>] (do_dentry_open) from [<8026ec00>] (vfs_open+=
-0x60/0x8c)
-  [   10.275245] [<8026ec00>] (vfs_open) from [<8027f39c>] (path_openat+0x2=
-bc/0x1040)
-  [   10.312827] [<8027f39c>] (path_openat) from [<80281040>] (do_filp_open=
-+0x70/0xd4)
-  [   10.317860] [<80281040>] (do_filp_open) from [<8026efd8>] (do_sys_open=
-+0x120/0x1d0)
-  [   10.320370] [<8026efd8>] (do_sys_open) from [<8026f0b4>] (SyS_open+0x2=
-c/0x30)
-  [   10.357033] [<8026f0b4>] (SyS_open) from [<801080c0>] (ret_fast_syscal=
-l+0x0/0x1c)
+when migration is triggered with,
+migrate -d tcp:127.0.0.1:4444 (port I used)
 
-  Tracking that down in the linux kernel source, it looks like somehow
-  uart_get_baud_rate() returns 0.
+The VM is lost in source with Segmentation fault.
 
-  The same kernel could be booted without problem with qemu version 2.11.
-  Trying to bisecting the issue revealed commit @d9f8bbd8eb4e95db97cf02bd03=
-af86a3d606f4f1 as the culprit.
+I think the correct way is to enable multifd on both source and target
+similar to postcopy, but in this negative scenario we should consider
+the right way of handling not to loose the VM instead error out
+appropriately.
 
-  Commandline to run was:
-  qemu-system-arm -M raspi2 \
-  	-kernel "$KERNEL" \
-  	-m 1024 \
-  	-d guest_errors,unimp \
-  	-dtb bcm2709-rpi-2-b.dtb \
-  	-drive file=3D"$IMG,if=3Dsd,format=3Draw"
+Please correct me if I miss something.
 
-  Distribution is SuSE tumbleweed (x86_64, kernel 4.17.2), but same
-  problem also happens with a freshly compiled qemu from git repository.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1779017/+subscriptions
+-- Bala
+>=20
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> Message-Id: <20180619163552.18206-1-berrange@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/migration.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index d075c27886..94d71f8b24 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -518,11 +518,12 @@ void migration_ioc_process_incoming(QIOChannel *i=
+oc)
+>   */
+>  bool migration_has_all_channels(void)
+>  {
+> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
+>      bool all_channels;
+> =20
+>      all_channels =3D multifd_recv_all_channels_created();
+> =20
+> -    return all_channels;
+> +    return all_channels && mis->from_src_file !=3D NULL;
+>  }
+> =20
+>  /*
+> --=20
+> 2.17.1
+>=20
+>=20
