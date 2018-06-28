@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYWaP-0007dY-N4
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:03:46 -0400
+	(envelope-from <clg@kaod.org>) id 1fYWbz-0008Qc-7R
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYWaL-0002Hu-JW
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:03:45 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:46405)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYWaL-0002HH-8t
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:03:41 -0400
-References: <20180626165658.31394-1-peter.maydell@linaro.org>
-	<20180626165658.31394-24-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <50e46f22-1e3d-10ce-5b5b-a10af49a95f1@vivier.eu>
-Date: Thu, 28 Jun 2018 15:03:38 +0200
+	(envelope-from <clg@kaod.org>) id 1fYWbs-000336-Sy
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:05:23 -0400
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:54807)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fYWbs-000329-Lf
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 09:05:16 -0400
+Received: from player771.ha.ovh.net (unknown [10.109.122.14])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id E22A51834FA
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 15:05:13 +0200 (CEST)
+References: <20180626135928.23950-1-clg@kaod.org>
+	<7d5dbadc1bb62c40da5de76c2a02807b0b96e7c0.camel@redhat.com>
+	<dfe396c1-05f2-c776-f2af-303e9325c332@kaod.org>
+	<8a5d8ae0f382003f8fc2ebf9083c995177c90695.camel@redhat.com>
+	<20180628035909.GE23134@umbus.fritz.box>
+	<b84cc6b91f3af188c3eece0713f849031c5256c8.camel@redhat.com>
+	<f1175077-6eab-036f-7aa2-d06f2f4dfa1e@kaod.org>
+	<597423567e18da819be8174ff593a2cb4b08517d.camel@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <76f6f78f-421c-1080-40ce-f29c7057208e@kaod.org>
+Date: Thu, 28 Jun 2018 15:05:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180626165658.31394-24-peter.maydell@linaro.org>
+In-Reply-To: <597423567e18da819be8174ff593a2cb4b08517d.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 23/32] tcg: Support MMU protection regions
- smaller than TARGET_PAGE_SIZE
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Add model for Power8 PHB3 PCIe
+ Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +38,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Andrea Bolognani <abologna@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Le 26/06/2018 à 18:56, Peter Maydell a écrit :
-> Add support for MMU protection regions that are smaller than
-> TARGET_PAGE_SIZE. We do this by marking the TLB entry for those
-> pages with a flag TLB_RECHECK. This flag causes us to always
-> take the slow-path for accesses. In the slow path we can then
-> special case them to always call tlb_fill() again, so we have
-> the correct information for the exact address being accessed.
-> 
-> This change allows us to handle reading and writing from small
-> regions; we cannot deal with execution from the small region.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Message-id: 20180620130619.11362-2-peter.maydell@linaro.org
-> ---
->  accel/tcg/softmmu_template.h |  24 ++++---
->  include/exec/cpu-all.h       |   5 +-
->  accel/tcg/cputlb.c           | 131 +++++++++++++++++++++++++++++------
->  3 files changed, 130 insertions(+), 30 deletions(-)
+On 06/28/2018 01:40 PM, Andrea Bolognani wrote:
+> On Thu, 2018-06-28 at 12:04 +0200, C=C3=A9dric Le Goater wrote:
+>> On 06/28/2018 10:00 AM, Andrea Bolognani wrote:
+>>> On Thu, 2018-06-28 at 13:59 +1000, David Gibson wrote:
+>>>> Well.. sure.. but it doesn't.  pSeries is a virtual platform, so we
+>>>> have a reasonable amount of flexibility to define it as we want.
+>>>> PowerNV is an emulation of existing hardware which has a specific
+>>>> behaviour which we need to match.
+>>>
+>>> Sure, that's something to keep in mind.
+>>>
+>>> But the thing is, you still need to have *some* flexibility in
+>>> the number of PHBs, since there is variation among real Power8
+>>> and Power9 chips; in the current incarnation, that flexibility
+>>> is provided by the num_phbs parameter, which is an entirely new
+>>> interface that's exclusive to PowerNV.
+>>>
+>>> What I'm suggesting is that the same amount of flexibility is
+>>> offered through a standard interface, namely -device, instead.
+>>
+>> Yes. I don't know to be honest. Adding support for -device is not=20
+>> complex.
+>>
+>> v2 proposes to initialize a fixed set of PHBs 2, 3, 4 depending on=20
+>> the CPU. I think this is the best modeling option to fit the HW.
+>=20
+> That approach would require even more hacks in libvirt if we ever
+> wanted to support PowerNV - basing the PCI address allocation on
+> the CPU model is not something that's really ever happened before.
 
-This patch breaks Quadra 800 emulation, any idea why?
+It's even more complex than that but let's keep it "simple" and
+consider that some CPU flavors can have more or less PHBs.
 
-ABCFGHIJK
-qemu: fatal: Unable to handle guest executing from RAM within a small
-MPU region at 0x0014cb5a
-D0 = 0000006a   A0 = 002d8a19   F0 = 7fff ffffffffffffffff  (         nan)
-D1 = 00000010   A1 = 002d8a19   F1 = 7fff ffffffffffffffff  (         nan)
-D2 = 000003e0   A2 = 00332310   F2 = 7fff ffffffffffffffff  (         nan)
-D3 = 00000000   A3 = 00331f98   F3 = 7fff ffffffffffffffff  (         nan)
-D4 = 0036da87   A4 = 0036daa3   F4 = 7fff ffffffffffffffff  (         nan)
-D5 = 000003e0   A5 = 0036de67   F5 = 7fff ffffffffffffffff  (         nan)
-D6 = 002d8a18   A6 = 002d8a1a   F6 = 7fff ffffffffffffffff  (         nan)
-D7 = 0014ac46   A7 = 00331ed8   F7 = 7fff ffffffffffffffff  (         nan)
-PC = 0014cb5a   SR = 2700 T:0 I:7 SI -----
-FPSR = 00000000 ---- -------- -----  FPCR = 0000 X RN --------
-  A7(MSP) = 00000000   A7(USP) = 00000000 ->A7(ISP) = 00331f38
-VBR = 0x00364528
-SFC = 0 DFC 0
-SSW 00000000 TCR 00008000 URP 00000000 SRP 00001000
-DTTR0/1: 00000000/f807a040 ITTR0/1: 00000000/f807a040
-MMUSR 00000000, fault at 00000000
-Aborted (core dumped)
+May be, we could agree on a common number of PHBs per chip which=20
+would be statically initialized. *two* PHBs should cover all CPU=20
+flavors. Extra PHBs created by the user with -device would be=20
+allowed but capped by a per CPU flavor limit. How's that ?=20
 
-Laurent
+C.  =20
+
+>=20
+> To make it somewhat reasonable, information about the number of
+> PHBs created for each CPU model would have to be exposed through
+> QMP. And I wonder what a multi-chip guest would look like...
+>=20
+> Plus, as soon as you try something like
+>=20
+>   $ qemu-system-ppc64 \
+>     -nodefaults -display none \
+>     -machine powernv -cpu POWER8E \
+>     -device pci-bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1=
+ \
+>     -device megasas,id=3Dscsi0,bus=3Dpci.1,addr=3D0x1
+>=20
+> very interesting things will start happening :)
+>=20
