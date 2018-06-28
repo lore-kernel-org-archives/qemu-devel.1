@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fYeWL-00036J-HY
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:32:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYeZl-0004UA-3q
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fYeWH-0006a2-KA
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:32:05 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33459)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fYeWH-0006X2-Dl
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:32:01 -0400
-Received: by mail-pg0-x244.google.com with SMTP id e11-v6so3026284pgq.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 14:32:01 -0700 (PDT)
-Date: Fri, 29 Jun 2018 06:31:58 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20180628213158.GO24595@lianli.shorne-pla.net>
-References: <20180628030330.15615-1-richard.henderson@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1fYeZk-0005Au-AT
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 17:35:37 -0400
+References: <20180628212544.21854-1-jsnow@redhat.com>
+	<20180628212544.21854-3-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <888bb4da-4cdc-12d7-4149-82c9e1ac130d@redhat.com>
+Date: Thu, 28 Jun 2018 16:35:29 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180628030330.15615-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v3 00/23] target/openrisc improvements
+In-Reply-To: <20180628212544.21854-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] iotests: add 222 to test basic
+ fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Jun 27, 2018 at 08:03:07PM -0700, Richard Henderson wrote:
-> Changes since v2:
->   * Fix missing mtspr break.
->   * Reorg print_insn_or1k and interrupt logging to the start.
->   * Adjust exit after mtspr; fixing smp kernel crash.
->   * Fix signals patch based on Larent's review.
+On 06/28/2018 04:25 PM, John Snow wrote:
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   tests/qemu-iotests/222     | 152 +++++++++++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/222.out |  66 ++++++++++++++++++++
+>   tests/qemu-iotests/group   |   1 +
+>   3 files changed, 219 insertions(+)
+>   create mode 100644 tests/qemu-iotests/222
+>   create mode 100644 tests/qemu-iotests/222.out
 
-Thanks, I confirmed this is working for me too.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-As mentioned before there are a few items I am working on.  I will take the
-series and send the pull request during the merge window.
-
-I didnt progress on those items yet as I was stuck on the issues mentioned
-above, but I will look into fixing issues with:
-
- - DSX handling differs from hardware
- - PICMR (interrupt masking) differs from hardware
-
--Stafford
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
