@@ -1,41 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fYTej-00017v-Oc
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:56:02 -0400
+	(envelope-from <clg@kaod.org>) id 1fYTgX-0001nr-FG
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fYTef-0002qz-SC
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:56:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48284
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
-	id 1fYTef-0002o5-Jy
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:55:57 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5S9s4IJ018835
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 05:55:55 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jvw4091c9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 05:55:54 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
-	Thu, 28 Jun 2018 10:55:53 +0100
-Date: Thu, 28 Jun 2018 15:25:47 +0530
-From: Balamuruhan S <bala24@linux.vnet.ibm.com>
-References: <20180627125604.15275-1-quintela@redhat.com>
-	<20180627125604.15275-17-quintela@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1fYTgT-0005N6-Fb
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:57:53 -0400
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:53171)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fYTgT-0005MI-1A
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 05:57:49 -0400
+Received: from player773.ha.ovh.net (unknown [10.109.108.125])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 4435FD5793
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 11:57:47 +0200 (CEST)
+References: <cover.1529839203.git.balaton@eik.bme.hu>
+	<61b9cf7d09f0f12a86f036b828665c3fc91c3ce9.1529839203.git.balaton@eik.bme.hu>
+	<51f8a2ca-0b35-dd1b-33a5-1fca51ef7a9c@kaod.org>
+	<alpine.BSF.2.21.1806242200550.67254@zero.eik.bme.hu>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5f5a8c59-9466-75ce-f291-ca2841ea5a99@kaod.org>
+Date: Thu, 28 Jun 2018 11:57:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180627125604.15275-17-quintela@redhat.com>
-Message-Id: <20180628095547.GA24412@localhost.localdomain>
+In-Reply-To: <alpine.BSF.2.21.1806242200550.67254@zero.eik.bme.hu>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 16/16] migration: fix crash in when incoming
- client channel setup fails
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 1/4] ppc4xx_i2c: Rewrite to
+ model hardware more closely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,150 +34,655 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Jun 27, 2018 at 02:56:04PM +0200, Juan Quintela wrote:
-> From: Daniel P. Berrang=E9 <berrange@redhat.com>
+On 06/24/2018 10:37 PM, BALATON Zoltan wrote:
+> Hello,
 >=20
-> The way we determine if we can start the incoming migration was
-> changed to use migration_has_all_channels() in:
+> On Sun, 24 Jun 2018, C=E9dric Le Goater wrote:
+>> On 06/24/2018 01:20 PM, BALATON Zoltan wrote:
+>>> Rewrite to make it closer to how real device works so that guest OS
+>>> drivers can access I2C devices. Previously this was only a hack to
+>>> allow U-Boot to get past accessing SPD EEPROMs but to support other
+>>> I2C devices and allow guests to access them we need to model real
+>>> device more properly.
+>>
+>> ppc4xx support was dropped from u-boot but there is some work being do=
+ne
+>> to re-add at least ppc-460x. These models should be of interest to emu=
+late
+>> BMC like boards and, in some near future, they could even run OpenBMC.
+>>
+>> I understand that you are adding extended status support, multi transf=
+er
+>> support, better interrupt support. Having some comments on the bit
+>> definitions and register names would help a lot.
+>>
+>> Is there a public datasheet for the I2C controller of the Sam460ex boa=
+rd ?
+>> and a simple boot image we could use to test ?
 >=20
->   commit 428d89084c709e568f9cd301c2f6416a54c53d6d
->   Author: Juan Quintela <quintela@redhat.com>
->   Date:   Mon Jul 24 13:06:25 2017 +0200
+> I don't have the manual of this SoC but some of the devices including t=
+his i2c controller is similar to the 440EP for which there's a manual onl=
+ine. That's the best reference I know of even if not always applicable fo=
+r 460ex.
 >=20
->     migration: Create migration_has_all_channels
+>> Some comments below,
+>>
+>>>
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> ---
+>>> =A0hw/i2c/ppc4xx_i2c.c=A0=A0=A0=A0=A0=A0=A0=A0 | 222 ++++++++++++++++=
++++++-----------------------
+>>> =A0include/hw/i2c/ppc4xx_i2c.h |=A0=A0 3 +-
+>>> =A02 files changed, 110 insertions(+), 115 deletions(-)
+>>>
+>>> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+>>> index fca80d6..3ebce17 100644
+>>> --- a/hw/i2c/ppc4xx_i2c.c
+>>> +++ b/hw/i2c/ppc4xx_i2c.c
+>>> @@ -38,13 +38,26 @@
+>>> =A0#define IIC_CNTL_READ=A0=A0=A0=A0=A0=A0 (1 << 1)
+>>> =A0#define IIC_CNTL_CHT=A0=A0=A0=A0=A0=A0=A0 (1 << 2)
+>>> =A0#define IIC_CNTL_RPST=A0=A0=A0=A0=A0=A0 (1 << 3)
+>>> +#define IIC_CNTL_AMD=A0=A0=A0=A0=A0=A0=A0 (1 << 6)
+>>> +#define IIC_CNTL_HMT=A0=A0=A0=A0=A0=A0=A0 (1 << 7)
+>>> +
+>>> +#define IIC_MDCNTL_EINT=A0=A0=A0=A0 (1 << 2)
+>>> +#define IIC_MDCNTL_ESM=A0=A0=A0=A0=A0 (1 << 3)
+>>> +#define IIC_MDCNTL_FMDB=A0=A0=A0=A0 (1 << 6)
+>>>
+>>> =A0#define IIC_STS_PT=A0=A0=A0=A0=A0=A0=A0=A0=A0 (1 << 0)
+>>> +#define IIC_STS_IRQA=A0=A0=A0=A0=A0=A0=A0 (1 << 1)
+>>> =A0#define IIC_STS_ERR=A0=A0=A0=A0=A0=A0=A0=A0 (1 << 2)
+>>> +#define IIC_STS_MDBF=A0=A0=A0=A0=A0=A0=A0 (1 << 4)
+>>> =A0#define IIC_STS_MDBS=A0=A0=A0=A0=A0=A0=A0 (1 << 5)
+>>>
+>>> =A0#define IIC_EXTSTS_XFRA=A0=A0=A0=A0 (1 << 0)
+>>>
+>>> +#define IIC_INTRMSK_EIMTC=A0=A0 (1 << 0)
+>>> +#define IIC_INTRMSK_EITA=A0=A0=A0 (1 << 1)
+>>> +#define IIC_INTRMSK_EIIC=A0=A0=A0 (1 << 2)
+>>> +#define IIC_INTRMSK_EIHE=A0=A0=A0 (1 << 3)
+>>> +
+>>> =A0#define IIC_XTCNTLSS_SRST=A0=A0 (1 << 0)
+>>>
+>>> =A0#define IIC_DIRECTCNTL_SDAC (1 << 3)
+>>> @@ -56,21 +69,13 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+>>> =A0{
+>>> =A0=A0=A0=A0 PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
+>>>
+>>> -=A0=A0=A0 /* FIXME: Should also reset bus?
+>>> -=A0=A0=A0=A0 *if (s->address !=3D ADDR_RESET) {
+>>> -=A0=A0=A0=A0 *=A0=A0=A0 i2c_end_transfer(s->bus);
+>>> -=A0=A0=A0=A0 *}
+>>> -=A0=A0=A0=A0 */> -
+>>> -=A0=A0=A0 i2c->mdata =3D 0;
+>>> -=A0=A0=A0 i2c->lmadr =3D 0;
+>>> -=A0=A0=A0 i2c->hmadr =3D 0;
+>>> +=A0=A0=A0 i2c->mdidx =3D -1;
+>>> +=A0=A0=A0 memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
+>>> +=A0=A0=A0 /* [hl][ms]addr are not affected by reset */
+>>> =A0=A0=A0=A0 i2c->cntl =3D 0;
+>>> =A0=A0=A0=A0 i2c->mdcntl =3D 0;
+>>> =A0=A0=A0=A0 i2c->sts =3D 0;
+>>> -=A0=A0=A0 i2c->extsts =3D 0x8f;
+>>> -=A0=A0=A0 i2c->lsadr =3D 0;
+>>> -=A0=A0=A0 i2c->hsadr =3D 0;
+>>> +=A0=A0=A0 i2c->extsts =3D (1 << 6);
+>>
+>> #define=A0=A0 EXTSTS_BCS_FREE=A0 0x40 ?
 >=20
-> This method in turn calls multifd_recv_all_channels_created()
-> which is hardcoded to always return 'true' when multifd is
-> not in use. This is a latent bug...
+> I guess this could be defined but I did not bother as this is not fully=
+ emulated. If you think it's worth to add it without the other states I c=
+an do in next version.
 >=20
-> ...activated in a following commit where that return result
-> ends up acting as the flag to indicate whether it is possible
-> to start processing the migration:
+>>> =A0=A0=A0=A0 i2c->clkdiv =3D 0;
+>>> =A0=A0=A0=A0 i2c->intrmsk =3D 0;
+>>> =A0=A0=A0=A0 i2c->xfrcnt =3D 0;
+>>> @@ -78,69 +83,29 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+>>> =A0=A0=A0=A0 i2c->directcntl =3D 0xf;
+>>> =A0}
+>>>
+>>> -static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
+>>> -{
+>>> -=A0=A0=A0 return true;
+>>> -}
+>>> -
+>>> =A0static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsign=
+ed int size)
+>>> =A0{
+>>> =A0=A0=A0=A0 PPC4xxI2CState *i2c =3D PPC4xx_I2C(opaque);
+>>> =A0=A0=A0=A0 uint64_t ret;
+>>> +=A0=A0=A0 int i;
+>>>
+>>> =A0=A0=A0=A0 switch (addr) {
+>>> =A0=A0=A0=A0 case 0:
+>>> -=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->mdata;
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (ppc4xx_i2c_is_master(i2c)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx < 0) {
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D 0xff;
+>>> -
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!(i2c->sts & IIC_STS_MDBS)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_GUES=
+T_ERROR, "[%s]%s: Trying to read "
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 "without starting transfer\n",
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 TYPE_PPC4xx_I2C, __func__);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int pending =3D (i2c->=
+cntl >> 4) & 3;
+>>> -
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* get the next byte *=
+/
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int byte =3D i2c_recv(=
+i2c->bus);
+>>> -
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (byte < 0) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_m=
+ask(LOG_GUEST_ERROR, "[%s]%s: read failed "
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "for device 0x%02x\n", TYPE_PPC4xx_I2C,
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __func__, i2c->lmadr);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D 0x=
+ff;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D by=
+te;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* Raise i=
+nterrupt if enabled */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*ppc4xx_i=
+2c_raise_interrupt(i2c)*/;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!pending) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
+=3D ~IIC_STS_MDBS;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*i2c_end_=
+transfer(i2c->bus);*/
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*} else if (i2c->cntl=
+ & (IIC_CNTL_RPST | IIC_CNTL_CHT)) {*/
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else if (pending) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* current=
+ smbus implementation doesn't like
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 m=
+ultibyte xfer repeated start */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_tr=
+ansfer(i2c->bus);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_st=
+art_transfer(i2c->bus, i2c->lmadr >> 1, 1)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ /* if non zero is returned, the adress is not valid */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts &=3D ~IIC_STS_PT;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts |=3D IIC_STS_ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->extsts |=3D IIC_EXTSTS_XFRA;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ /*i2c->sts |=3D IIC_STS_PT;*/
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts |=3D IIC_STS_MDBS;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts &=3D ~IIC_STS_ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->extsts =3D 0;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pending--;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->cntl =3D (i2c->cn=
+tl & 0xcf) | (pending << 4);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_UNIMP, "[%s]%s: =
+slave mode not implemented\n",
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 TYPE_PPC4xx_I2C, __func__);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->mdata[0];
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx =3D=3D 3) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS_MDBF;
+>>> +=A0=A0=A0=A0=A0=A0=A0 } else if (i2c->mdidx =3D=3D 0) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS_MDBS;
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 for (i =3D 0; i < i2c->mdidx; i++) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdata[i] =3D i2c->mdata[i + 1=
+];
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx >=3D 0) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdidx--;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 4:
+>>> @@ -160,6 +125,7 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hw=
+addr addr, unsigned int size)
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 9:
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->extsts;
+>>> +=A0=A0=A0=A0=A0=A0=A0 ret |=3D !!i2c_bus_busy(i2c->bus) << 4;
+>>
+>> Don't we have a bit definition for this ?
 >=20
->   commit 36c2f8be2c4eb0003ac77a14910842b7ddd7337e
->   Author: Juan Quintela <quintela@redhat.com>
->   Date:   Wed Mar 7 08:40:52 2018 +0100
+> No, like I said above not all states in extsts are emulated, just the b=
+its needed for the guests I've tested, because I don't know how real hard=
+ware works. So extsts is mostly a placeholder if it ever needs to be emul=
+ated more closely at which points appropriate defines could also be added=
+.
 >=20
->     migration: Delay start of migration main routines
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 10:
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 ret =3D i2c->lsadr;
+>>> @@ -203,70 +169,98 @@ static void ppc4xx_i2c_writeb(void *opaque, hwa=
+ddr addr, uint64_t value,
+>>>
+>>> =A0=A0=A0=A0 switch (addr) {
+>>> =A0=A0=A0=A0 case 0:
+>>> -=A0=A0=A0=A0=A0=A0=A0 i2c->mdata =3D value;
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (!i2c_bus_busy(i2c->bus)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* assume we start a write transfe=
+r */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_start_transfer(i2c->bus, i=
+2c->lmadr >> 1, 0)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* if non zero is retu=
+rned, the adress is not valid */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
+_PT;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
+ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts |=3D IIC_E=
+XTSTS_XFRA;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
+PT;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
+_ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts =3D 0;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx >=3D 3) {
+>>
+>> can mdidx go above 3 ?
 >=20
-> This means that if channel initialization fails with normal
-> migration, it'll never notice and attempt to start the
-> incoming migration regardless and crash on a NULL pointer.
+> No, it shouldn't, the > is just to make sure no buffer overrun is possi=
+ble.
 >=20
-> This can be seen, for example, if a client connects to a server
-> requiring TLS, but has an invalid x509 certificate:
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (i2c_bus_busy(i2c->bus)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_send(i2c->bus, i2c->mdata)=
+) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* if the target retur=
+n non zero then end the transfer */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
+_PT;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
+ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts |=3D IIC_E=
+XTSTS_XFRA;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_transfer(i2c->=
+bus);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 i2c->mdata[++i2c->mdidx] =3D value;
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdidx =3D=3D 3) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_MDBF;
+>>
+>> MDBF sounds like a 'M ... Data Buffer Full' status
 >=20
-> qemu-system-x86_64: The certificate hasn't got a known issuer
-> qemu-system-x86_64: migration/migration.c:386: process_incoming_migrati=
-on_co: Assertion `mis->from_src_file' failed.
+> Master Data Buffer Full
 >=20
->  #0  0x00007fffebd24f2b in raise () at /lib64/libc.so.6
->  #1  0x00007fffebd0f561 in abort () at /lib64/libc.so.6
->  #2  0x00007fffebd0f431 in _nl_load_domain.cold.0 () at /lib64/libc.so.=
-6
->  #3  0x00007fffebd1d692 in  () at /lib64/libc.so.6
->  #4  0x0000555555ad027e in process_incoming_migration_co (opaque=3D<opt=
-imized out>) at migration/migration.c:386
->  #5  0x0000555555c45e8b in coroutine_trampoline (i0=3D<optimized out>, =
-i1=3D<optimized out>) at util/coroutine-ucontext.c:116
->  #6  0x00007fffebd3a6a0 in __start_context () at /lib64/libc.so.6
->  #7  0x0000000000000000 in  ()
+>>> +=A0=A0=A0=A0=A0=A0=A0 } else if (i2c->mdidx =3D=3D 0) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_MDBS;
+>>
+>> what about MDBS ?
 >=20
-> To handle the non-multifd case, we check whether mis->from_src_file
-> is non-NULL. With this in place, the migration server drops the
-> rejected client and stays around waiting for another, hopefully
-> valid, client to arrive.
+> Master Data Buffer Status, shows if buffer has data or not.
+>=20
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 4:
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->lmadr =3D value;
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (i2c_bus_busy(i2c->bus)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_transfer(i2c->bus);
+>>> -=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 5:
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->hmadr =3D value;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 6:
+>>> -=A0=A0=A0=A0=A0=A0=A0 i2c->cntl =3D value;
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (i2c->cntl & IIC_CNTL_PT) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c->cntl & IIC_CNTL_READ) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_bus_busy(i2c->=
+bus)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* end pre=
+vious transfer */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
+=3D ~IIC_STS_PT;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_tr=
+ansfer(i2c->bus);
+>>> +=A0=A0=A0=A0=A0=A0=A0 i2c->cntl =3D value & 0xfe;
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_CNTL_AMD) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_UNIMP, "%s: only=
+ 7 bit addresses supported\n",
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 __func__);
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_CNTL_HMT && i2c_bus_busy(i2c->=
+bus)) {
+>>
+>> That's an abort ? correct ?
+>=20
+> HMT: Halt Master Transfer, issue stop to halt master transfer.
+>=20
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_transfer(i2c->bus);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c->mdcntl & IIC_MDCNTL_EINT =
+&&
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->intrmsk & IIC_INT=
+RMSK_EIHE) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=
+=3D IIC_STS_IRQA;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_irq_r=
+aise(i2c->irq);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 } else if (value & IIC_CNTL_PT) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int recv =3D (value & IIC_CNTL_REA=
+D) >> 1;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int tct =3D value >> 4 & 3;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int i;
+>>> +
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (recv && (i2c->lmadr >> 1) >=3D=
+ 0x50 && (i2c->lmadr >> 1) < 0x58) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* smbus emulation doe=
+s not like multi byte reads w/o restart */
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D IIC_CNTL_RP=
+ST;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 for (i =3D 0; i <=3D tct; i++) {
+>>
+>> ok. i is used for mdata, but the tct definition should not exceed 3
+>=20
+> TCT: Transfer Count, mdata FIFO is 4 bytes so max index is 3, TCT has 2=
+ bits so it should also not be higher than 3.
+>=20
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!i2c_bus_busy(i2c-=
+>bus)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extst=
+s =3D (1 << 6);
+>>
+>> please add a definition for this bit.
+>=20
+> See above, this basically resets extsts to initial value which may not =
+match what real hardware does but enough for tested guests.
+>=20
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_st=
+art_transfer(i2c->bus, i2c->lmadr >> 1, recv)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts |=3D IIC_STS_ERR;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->extsts |=3D IIC_EXTSTS_XFRA;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ break;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts &=3D ~IIC_STS_ERR;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>
+>> do we need to start the transfer in the loop ? The device address
+>> does not change if I am correct. We would not need to test sts against
+>> IIC_STS_ERR.
+>=20
+> I have no idea. This works with all guests I tested, that's U-Boot, ARO=
+S, AmigaOS, Linux. Don't know if it matches what real hardware does thoug=
+h. But there are some modes where repeated start is used so I think this =
+needs to be within the loop to allow that.
+>=20
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!(i2c->sts & IIC_S=
+TS_ERR) &&
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_send_r=
+ecv(i2c->bus, &i2c->mdata[i], !recv)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->sts |=3D IIC_STS_ERR;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ i2c->extsts |=3D IIC_EXTSTS_XFRA;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ break;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i2c_start_transfer=
+(i2c->bus, i2c->lmadr >> 1, 1)) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* if non =
+zero is returned, the adress is not valid */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
+=3D ~IIC_STS_PT;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=
+=3D IIC_STS_ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extst=
+s |=3D IIC_EXTSTS_XFRA;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*i2c->sts=
+ |=3D IIC_STS_PT;*/
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=
+=3D IIC_STS_MDBS;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=
+=3D ~IIC_STS_ERR;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->extst=
+s =3D 0;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_CNTL_R=
+PST || !(value & IIC_CNTL_CHT)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c_end_tr=
+ansfer(i2c->bus);
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* we actually already=
+ did the write transfer... */
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~IIC_STS=
+_PT;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>
+>> That's the end of the loop I suppose ?
+>>
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->xfrcnt =3D i;
+>>
+>> what is that xfrcnt field/reg for ?
+>=20
+> Transfer count, number of bytes transmitted.
+>=20
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdidx =3D i - 1;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (recv && i2c->mdidx >=3D 0) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
+MDBS;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (recv && i2c->mdidx =3D=3D 3) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
+MDBF;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (i && i2c->mdcntl & IIC_MDCNTL_=
+EINT &&
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->intrmsk & IIC_INT=
+RMSK_EIMTC) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts |=3D IIC_STS_=
+IRQA;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_irq_raise(i2c->ir=
+q);
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 7:
+>>
+>> So that seems to be 'control' register of the=A0 I2C controller.
+>=20
+> Yes.
+>=20
+>>> -=A0=A0=A0=A0=A0=A0=A0 i2c->mdcntl =3D value & 0xdf;
+>>> +=A0=A0=A0=A0=A0=A0=A0 i2c->mdcntl =3D value & 0x3d;
+>>
+>> Could we use a mask built from the bits instead of raw hex value ?
+>=20
+> Probably, I don't remember the details any more.
+>=20
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_MDCNTL_ESM) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log_mask(LOG_UNIMP, "%s: slav=
+e mode not implemented\n",
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 __func__);
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_MDCNTL_FMDB) {
+>>
+>> that's a flush ?
+>=20
+> FMDB: Flush Master Data Buffer
+>=20
+> All these names are in the documentation, you should consult that inste=
+ad of using this emulation as documentation which it's not just approxima=
+te emulation of hardware to satisfy guests.
+>=20
+> Do we need a new version with more constants added or is this acceptabl=
+e now?
 
-Hi Juan,
+I have tried an ISO from :
 
-I tried to perform multifd enabled migration and from qemu monitor
-enabled mutlifd capability on source and target,
-(qemu) migrate_set_capability x-multifd on
-(qemu) migrate -d tcp:127.0.0.1:4444
+	http://aros.sourceforge.net/nightly1.php
 
-The migration succeeds and its cool to have the feature :)
-(qemu) info migrate
-globals:
-store-global-state: on
-only-migratable: off
-send-configuration: on
-send-section-footer: on
-decompress-error-check: on
-capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-block=
-s: off compress: off events: off postcopy-ram: off x-colo: off release-ra=
-m: off block: off return-path: off pause-before-switchover: off x-multifd=
-: on dirty-bitmaps: off postcopy-blocktime: off late-block-activate: off
-Migration status: completed
-total time: 1051 milliseconds
-downtime: 260 milliseconds
-setup: 17 milliseconds
-transferred ram: 8270 kbytes
-throughput: 143.91 mbps
-remaining ram: 0 kbytes
-total ram: 4194560 kbytes
-duplicate: 940989 pages
-skipped: 0 pages
-normal: 109635 pages
-normal bytes: 438540 kbytes
-dirty sync count: 3
-page size: 4 kbytes
+which boots and writes :
 
+  U-Boot 2010.06.05 (Oct 22 2017 - 17:40:02)
+ =20
+  CPU:   AMCC PowerPC 460EX Rev. B at 1150 MHz (PLB=3D230 OPB=3D115 EBC=3D=
+115)
+         No Security/Kasumi support
+         Bootstrap Option A - Boot ROM Location EBC (8 bits)
+         Internal PCI arbiter disabled
+         32 kB I-Cache 32 kB D-Cache
+  Board: Sam460ex, PCIe 4x + SATA-2
+  I2C:   ready
+  DRAM:  512 MiB (ECC not enabled, 460 MHz, CL0)
+  *** Warning - bad CRC, using default environment
+ =20
+  PCI:   Bus Dev VenId DevId Class Int
+          00  06  126f  0501  0380  00
+  PCIE1: successfully set as root-complex
+  Net:   ppc_4xx_eth0
+  FPGA:  Revision 00 (20 0-00-00)
+  SM502: found
+  VGA:   NO CARDS
 
-But when I just enable the multifd in souce but not in target
+and on the graphic window :
 
-source:
-x-multifd: on
+  FLB: no SLB found in any of the designated boot sources, returning to u=
+-boot.
 
-target:
-x-multifd: off
-
-when migration is triggered with,
-migrate -d tcp:127.0.0.1:4444 (port I used)
-
-The VM is lost in source with Segmentation fault.
-
-I think the correct way is to enable multifd on both source and target
-similar to postcopy, but in this negative scenario we should consider
-the right way of handling not to loose the VM instead error out
-appropriately.
-
-Please correct me if I miss something.
+the graphical bool loader menu works but I couldn't exercise much more th=
+e=20
+system.
 
 
--- Bala
+I then used the 4.5 kernel from :
+
+  http://www.supertuxkart-amiga.de/amiga/sam.html#downloads
+
+with this command line :
+
+   qemu-system-ppc -M sam460ex  -serial mon:stdio -nodefaults -kernel ./S=
+am460ex-4.5.0/boot/uImage-sam460ex-4.5.0 -dtb Sam460ex-4.5.0/boot/canyonl=
+ands.dtb -append "console=3DttyS0,119200"
+
+output was :
+
+    =20
+  [    0.000000] Using Canyonlands machine description
+  [    0.000000] Linux version 4.5.0-sam460ex (root@julian-VirtualBox) (g=
+cc version 5.3.1 20160205 (Ubuntu 5.3.1-8ubuntu2) ) #1 PREEMPT Mon Mar 14=
+ 06:27:13 AST 2016
+  ...
+  [    2.194282] i2c /dev entries driver
+  [    2.201326] rtc-m41t80 0-0068: rtc core: registered m41t80 as rtc0
+  [    2.202357] ibm-iic 4ef600700.i2c: using standard (100 kHz) mode
+  [    2.203796] ibm-iic 4ef600800.i2c: using standard (100 kHz) mode
+  ...
+  [    2.269934] rtc-m41t80 0-0068: setting system clock to 2018-06-28 09=
+:49:28 UTC (1530179368)
+ =20
+
+So I would say from the review of the code and the tests that we are fine=
+.
+
+Could please document a little more the register and bit definitions and
+remove the raw hex values when possible ?=20
+
+With these addressed :
+
+Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.=20
+
+
+> Thanks you,
+> BALATON Zoltan
 >=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Message-Id: <20180619163552.18206-1-berrange@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index d075c27886..94d71f8b24 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -518,11 +518,12 @@ void migration_ioc_process_incoming(QIOChannel *i=
-oc)
->   */
->  bool migration_has_all_channels(void)
->  {
-> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
->      bool all_channels;
-> =20
->      all_channels =3D multifd_recv_all_channels_created();
-> =20
-> -    return all_channels;
-> +    return all_channels && mis->from_src_file !=3D NULL;
->  }
-> =20
->  /*
-> --=20
-> 2.17.1
->=20
->=20
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->mdidx =3D -1;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 memset(i2c->mdata, 0, ARRAY_SIZE(i=
+2c->mdata));
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~(IIC_STS_MDBF | IIC=
+_STS_MDBS);
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 8:
+>>> -=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~(value & 0xa);
+>>> +=A0=A0=A0=A0=A0=A0=A0 i2c->sts &=3D ~(value & 0x0a);
+>>
+>> ditto for the mask.
+>>
+>> Thanks,
+>>
+>> C.
+>>
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_STS_IRQA && i2c->mdcntl & IIC_=
+MDCNTL_EINT) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_irq_lower(i2c->irq);
+>>> +=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 9:
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->extsts &=3D ~(value & 0x8f);
+>>> @@ -287,12 +281,12 @@ static void ppc4xx_i2c_writeb(void *opaque, hwa=
+ddr addr, uint64_t value,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->xfrcnt =3D value & 0x77;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 15:
+>>> +=A0=A0=A0=A0=A0=A0=A0 i2c->xtcntlss &=3D ~(value & 0xf0);
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 if (value & IIC_XTCNTLSS_SRST) {
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* Is it actually a full reset? =
+U-Boot sets some regs before */
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ppc4xx_i2c_reset(DEVICE(i2c));
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0 i2c->xtcntlss =3D value;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0 case 16:
+>>> =A0=A0=A0=A0=A0=A0=A0=A0 i2c->directcntl =3D value & (IIC_DIRECTCNTL_=
+SDAC & IIC_DIRECTCNTL_SCLC);
+>>> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.=
+h
+>>> index ea6c8e1..0891a9c 100644
+>>> --- a/include/hw/i2c/ppc4xx_i2c.h
+>>> +++ b/include/hw/i2c/ppc4xx_i2c.h
+>>> @@ -46,7 +46,8 @@ typedef struct PPC4xxI2CState {
+>>> =A0=A0=A0=A0 qemu_irq irq;
+>>> =A0=A0=A0=A0 MemoryRegion iomem;
+>>> =A0=A0=A0=A0 bitbang_i2c_interface *bitbang;
+>>> -=A0=A0=A0 uint8_t mdata;
+>>> +=A0=A0=A0 int mdidx;
+>>> +=A0=A0=A0 uint8_t mdata[4];
+>>> =A0=A0=A0=A0 uint8_t lmadr;
+>>> =A0=A0=A0=A0 uint8_t hmadr;
+>>> =A0=A0=A0=A0 uint8_t cntl;
+>>>
+>>
+>>
+>>
