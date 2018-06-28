@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYbgl-0007gO-0Q
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:30:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fYbgw-0007lR-OZ
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYbgh-0000SF-PT
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:30:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53504)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYbgh-0000QY-Io
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:30:35 -0400
-Date: Thu, 28 Jun 2018 15:30:33 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180628183033.GF914@localhost.localdomain>
-References: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
-	<1529897961-134132-3-git-send-email-robert.hu@linux.intel.com>
-	<58ec011e-0f19-f882-abca-dd73bda95fe5@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fYbgv-00010o-Na
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 14:30:50 -0400
+References: <20180628180042.3881-1-jsnow@redhat.com>
+	<20180628180042.3881-3-jsnow@redhat.com>
+	<8a183b22-b934-13b9-f5ab-2d0c6bfbad77@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6c50a742-2b98-6b16-3d8b-ab483500ce54@redhat.com>
+Date: Thu, 28 Jun 2018 14:30:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58ec011e-0f19-f882-abca-dd73bda95fe5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] i386: Add CPUID bit and feature words
- for IA32_ARCH_CAPABILITIES MSR
+In-Reply-To: <8a183b22-b934-13b9-f5ab-2d0c6bfbad77@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: add 222 to test basic
+ fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org, rth@twiddle.net, robert.hu@intel.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Jun 25, 2018 at 02:06:15PM +0200, Paolo Bonzini wrote:
-> On 25/06/2018 05:39, Robert Hoo wrote:
-> > Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
-> > SPEC_CTRL.
-> > 
-> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > ---
-> >  target/i386/cpu.c | 2 +-
-> >  target/i386/cpu.h | 1 +
-> >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 1e69e68..3134af4 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -896,7 +896,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, "spec-ctrl", NULL,
-> > -            NULL, NULL, NULL, "ssbd",
-> > +            NULL, "arch-capabilities", NULL, "ssbd",
-> >          },
-> >          .cpuid_eax = 7,
-> >          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 734a73e..1ef2040 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -688,6 +688,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> >  #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
-> >  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
-> >  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
-> > +#define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities of RDCL_NO and IBRS_ALL*/
-> >  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
-> >  
-> >  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
-> > 
-> 
-> For migration to work, you need to add new "features" corresponding to
-> the bits in the MSR, and include them in the Icelake-Server and
-> Icelake-Client models.  Unfortunately there is no code for this in QEMU
-> yet, though the API is there in KVM.
 
-Will all Icelake VCPUs of a given model have the same value on
-MSR_IA32_ARCH_CAPABILITIES?
 
-If not, we can't choose a value that will work on all cases, and
-it will require management software to be smarter and explicitly
-configure some of the MSR bits on the command-line.
+On 06/28/2018 02:17 PM, Eric Blake wrote:
+> On 06/28/2018 01:00 PM, John Snow wrote:
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/222=C2=A0=C2=A0=C2=A0=C2=A0 | 149
+>> +++++++++++++++++++++++++++++++++++++++++++++
+>> =C2=A0 tests/qemu-iotests/222.out |=C2=A0 60 ++++++++++++++++++
+>> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>> =C2=A0 3 files changed, 210 insertions(+)
+>> =C2=A0 create mode 100644 tests/qemu-iotests/222
+>> =C2=A0 create mode 100644 tests/qemu-iotests/222.out
+>>
+>=20
+>> +iotests.verify_platform(['linux'])
+>> +
+>> +patterns =3D [("0x5d", "0",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 "64k"),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ("=
+0xd5", "1M",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "64k"),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ("=
+0xdc", "32M",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "64k"),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ("=
+0xcd", "0x3ff0000", "64k")]=C2=A0 # 64M - 64K
+>> +
+>> +overwrite =3D [("0xab", "0",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 "64k"), # Full overwrite
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ("0xad", "0x00f8000", "64k"), # Partial-left (1M-32K)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ("0x1d", "0x2008000", "64k"), # Partial-right (32M+32K)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ("0xea", "0x3fe0000", "64k")] # Adjacent-left (64M - 128K)
+>> +
+>> +remainder =3D [("0xd5", "0x108000",=C2=A0 "32K"), # Right-end of
+>> partial-left [1]
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ("0xdc", "32M",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "32k"), # Left-en=
+d of
+>> partial-right [2]
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ("0xcd", "0x3ff0000", "64k")] # patterns[3]
+>=20
+> What if you also add:
+>=20
+> zeroes =3D=C2=A0 [("0x00", "0x108000",=C2=A0 "32K"), # Right-end of par=
+tial-left [1]
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ("0x00", "=
+32M",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "32k"), # Left-end of partial-r=
+ight [2]
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ("0x00", "=
+0x3ff0000", "64k")] # patterns[3]
+>=20
+> then...
+>=20
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +=C2=A0=C2=A0=C2=A0 log('--- Sanity Check ---')
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for p in patterns:
+>=20
+> for p in (patterns + zeroes)
+>=20
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd =3D "read -P%s %s %s" =
+% p
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(cmd)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert qemu_io_silent('-r'=
+, '-f', 'raw', '-c', cmd, nbd_uri)
+>> =3D=3D 0
+>> +
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +=C2=A0=C2=A0=C2=A0 log('--- Testing COW ---')
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for p in overwrite:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd =3D "write -P%s %s %s"=
+ % p
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(cmd)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(vm.hmp_qemu_io(srcNode=
+, cmd))
+>> +
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +=C2=A0=C2=A0=C2=A0 log('--- Verifying Data ---')
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for p in patterns:
+>=20
+> for p in (patterns + zeroes)
+>=20
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd =3D "read -P%s %s %s" =
+% p
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(cmd)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert qemu_io_silent('-r'=
+, '-f', 'raw', '-c', cmd, nbd_uri)
+>> =3D=3D 0
+>> +
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +=C2=A0=C2=A0=C2=A0 log('--- Cleanup ---')
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +
+>> +=C2=A0=C2=A0=C2=A0 #log(vm.hmp_qemu_io(srcNode, 'flush'))
+>> +=C2=A0=C2=A0=C2=A0 log(vm.qmp('block-job-cancel', device=3DsrcNode))
+>> +=C2=A0=C2=A0=C2=A0 log(vm.qmp('nbd-server-stop'))
+>> +=C2=A0=C2=A0=C2=A0 log(vm.qmp('blockdev-del', node_name=3DtgtNode))
+>> +=C2=A0=C2=A0=C2=A0 vm.shutdown()
+>> +
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +=C2=A0=C2=A0=C2=A0 log('--- Confirming writes ---')
+>> +=C2=A0=C2=A0=C2=A0 log('')
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for p in (overwrite + remainder):
+>=20
+> so that reads of both the fleeced point in time and of the final image
+> cover the same set of byte ranges.
+>=20
 
--- 
-Eduardo
+Sure, why not.
+
+--js
