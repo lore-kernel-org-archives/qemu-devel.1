@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYYKy-0007JE-VP
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:55:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1fYYMb-0008LR-0Y
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:57:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYYKu-000812-2k
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:55:57 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:50847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fYYKt-0007yn-Rm
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:55:52 -0400
-Received: by mail-wm0-x243.google.com with SMTP id e16-v6so10024785wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 07:55:51 -0700 (PDT)
-References: <20180627043328.11531-1-richard.henderson@linaro.org>
-	<87y3ezuozw.fsf@linaro.org>
-	<CAFEAcA_EXZAHQEyj63Pko8XJqiEnsAHjLXAP6G1R29tqSf+W0A@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_EXZAHQEyj63Pko8XJqiEnsAHjLXAP6G1R29tqSf+W0A@mail.gmail.com>
-Date: Thu, 28 Jun 2018 15:55:49 +0100
-Message-ID: <87o9fvufii.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1fYYMW-0004sP-4b
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:57:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42560 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fYYMV-0004qQ-Vf
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 10:57:32 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
+	<20180627163551.31610-2-marcandre.lureau@redhat.com>
+Date: Thu, 28 Jun 2018 16:57:26 +0200
+In-Reply-To: <20180627163551.31610-2-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 27 Jun 2018 18:35:37 +0200")
+Message-ID: <871scrgdrd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 00/35] target/arm SVE patches
+Subject: Re: [Qemu-devel] [PATCH v6 01/15] qapi: add 'if' to top-level
+ expressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 28 June 2018 at 12:30, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->>
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>
->>> This is the remainder of the SVE enablement patches,
->>> with an extra bonus patch to enable ARMv8.2-DotProd.
->>>
->>> V6 updates based on review.
->>
->> One failure from the VQ3 test set:
->>
->> ../qemu.git/aarch64-linux-user/qemu-aarch64 \
->>   ./risu --test-sve=3D3 \
->>   sve-all-short-v8.3+sve@vq3/insn_sdiv_z_p_zz___INC.risu.bin \
->>   --trace=3Dsve-all-short-v8.3+sve@vq3/insn_sdiv_z_p_zz___INC.risu.bin.t=
-race
->>
->> Gives:
->>
->>   loading test image
->>   sve-all-short-v8.3+sve@vq3/insn_sdiv_z_p_zz___INC.risu.bin...
->>   starting apprentice image at 0x4000801000
->>   starting image
->>   fish: =E2=80=9C../qemu.git/aarch64-linux-user/=E2=80=A6=E2=80=9D termi=
-nated by signal SIGFPE
->>   (Floating point exception)
+> Accept 'if' key in top-level elements, accepted as string or list of
+> string type. The following patches will modify the test visitor to
+> check the value is correctly saved, and generate #if/#endif code (as a
+> single #if/endif line or a series for a list).
 >
-> Do you have the insn that it's barfing on? In particular,
-> I'm guessing from the test name that this is for something
-> covered by one of the SDIV_zpzz lines in sve.decode, which
-> is already in master rather than in this test series.
-> If that's true, then it shouldn't block applying this set...
+> Example of 'if' key:
+> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+>   'if': 'defined(TEST_IF_STRUCT)' }
+>
+> The generated code is for now *unconditional*. Later patches generate
+> the conditionals.
+>
+> A following patch for qapi-code-gen.txt will provide more complete
+> documentation for 'if' usage.
 
-#0  0x000055555569297f in helper_sve_sdiv_zpzz_s (vd=3D0x555557a522e0, vn=
-=3D0x555557a522e0, vm=3D0x555557a51fe0, vg=3D0x555557a52be0, desc=3D<optimi=
-sed out>) at /home/alex/lsrc/qemu/qemu.git/target/arm/sve_helper.c:480
-#1  0x0000555555b1283f in static_code_gen_buffer ()
-#2  0x00005555555ea0d8 in cpu_tb_exec (itb=3D<optimised out>, cpu=3D0x55555=
-7a50320) at /home/alex/lsrc/qemu/qemu.git/accel/tcg/cpu-exec.c:171
-#3  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic p=
-ointer>, tb=3D<optimised out>, cpu=3D0x555557a50320) at /home/alex/lsrc/qem=
-u/qemu.git/accel/tcg/cpu-exec.c:612
-#4  cpu_exec (cpu=3Dcpu@entry=3D0x555557a48070) at /home/alex/lsrc/qemu/qem=
-u.git/accel/tcg/cpu-exec.c:722
-#5  0x000055555560ad40 in cpu_loop (env=3D0x555557a50320) at /home/alex/lsr=
-c/qemu/qemu.git/linux-user/aarch64/cpu_loop.c:82
-#6  0x00005555555afb0c in main (argc=3D<optimised out>, argv=3D0x7fffffffde=
-a8, envp=3D<optimised out>) at /home/alex/lsrc/qemu/qemu.git/linux-user/mai=
-n.c:813
-#0  0x000055555569297f in helper_sve_sdiv_zpzz_s (vd=3D0x555557a522e0, vn=
-=3D0x555557a522e0, vm=3D0x555557a51fe0, vg=3D0x555557a52be0, desc=3D<optimi=
-sed out>) at /home/alex/lsrc/qemu/qemu.git/target/arm/sve_helper.c:480
-480	DO_ZPZZ(sve_sdiv_zpzz_s, int32_t, H1_4, DO_DIV)
-=3D> 0x55555569297f <helper_sve_sdiv_zpzz_s+63>:	idiv   %r10d
-   0x555555692982 <helper_sve_sdiv_zpzz_s+66>:	mov    %eax,%r11d
-   0x555555692985 <helper_sve_sdiv_zpzz_s+69>:	mov    %r11d,(%rdi,%r8,1)
-   0x555555692989 <helper_sve_sdiv_zpzz_s+73>:	add    $0x4,%r8
-   0x55555569298d <helper_sve_sdiv_zpzz_s+77>:	shr    $0x4,%r9w
-A syntax error in expression, near `./ $r10d'.
+This paragraph looks obsolete now, because...
 
-r10d $6 =3D 0xffffffff
-rax $7 =3D 0x80000000
-rdx $8 =3D 0xffffffff
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi/common.py                   | 35 ++++++++++++++++++++----
+>  tests/test-qmp-cmds.c                    |  6 ++++
+>  docs/devel/qapi-code-gen.txt             | 22 +++++++++++++++
 
-Yeah so from something already merged in.
+... you update documentation right in this patch (I like that).
 
---
-Alex Benn=C3=A9e
+[...]
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 88a70e4d45..7af60b48f3 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -739,6 +739,28 @@ Example: Red Hat, Inc. controls redhat.com, and may =
+therefore add a
+>  downstream command __com.redhat_drive-mirror.
+>=20=20
+>=20=20
+> +=3D=3D=3D Configuring the schema =3D=3D=3D
+> +
+> +Top-level QAPI expressions.
+
+This sentence no verb :)  I suspect an editing accident ate "can take an
+'if' key".
+
+>                               The value must be a string or a list of
+> +string.
+
+s/string/strings/
+
+>           The corresponding generated code will then guard the inclusion
+> +of that member in the larger struct or function with #if IFCOND
+> +(or several #if lines for a list), where IFCOND is the value of the
+> +'if' key.
+
+"that member" makes little sense; top-level expressions aren't members.
+
+> +
+> +'struct', 'enum', 'union', 'alternate', 'command' and 'event'
+> +top-level QAPI expressions can take an 'if' keyword like:
+> +
+> +{ 'struct': 'IfStruct', 'data': { 'foo': 'int' },
+> +  'if': 'defined(IFCOND)' }
+
+Repetitive.
+
+Moreover, I'd like to see the example spell out how conditions affect
+generated code.
+
+Here's my try:
+
+=3D=3D=3D Configuring the schema =3D=3D=3D
+
+The 'struct', 'enum', 'union', 'alternate', 'command' and 'event'
+top-level expressions can take an 'if' key.  Its value must be a string
+or a list of strings.  A string is shorthand for a list containing just
+that string.  The code generated for the top-level expression will then
+be guarded by #if COND for each COND in the list.
+
+Example: a conditional struct
+
+ { 'struct': 'IfStruct', 'data': { 'foo': 'int' },
+   'if': ['defined(CONFIG_FOO)', 'defined(HAVE_BAR)'] }
+
+gets its generated code guarded like this:
+
+ #if defined(CONFIG_FOO)
+ #if defined(HAVE_BAR)
+ ... generated code ...
+ #endif /* defined(HAVE_BAR) */
+ #endif /* defined(CONFIG_FOO) */
+
+> +
+> +Please note that you are responsible to ensure that the C code will
+> +compile with an arbitrary combination of conditions, since the
+> +generators are unable to check it at this point.
+> +
+> +The presence of 'if' keys in the schema is reflected through to the
+> +introspection output depending on the build configuration.
+> +
+> +
+>  =3D=3D Client JSON Protocol introspection =3D=3D
+>=20=20
+>  Clients of a Client JSON Protocol commonly need to figure out what
+[...]
+
+I'm happy to apply these proposals without a respin, if you like them.
