@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYViv-0006bk-Ac
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:08:34 -0400
+	(envelope-from <david@redhat.com>) id 1fYVoj-0001G6-P5
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYViq-0007nh-RM
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:08:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYViq-0007my-Mc
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:08:24 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 28 Jun 2018 13:08:19 +0100
-Message-Id: <20180628120821.10967-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 0/2] Qio next patches
+	(envelope-from <david@redhat.com>) id 1fYVoh-0002Xl-G5
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 08:14:29 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 28 Jun 2018 14:14:14 +0200
+Message-Id: <20180628121417.1980-2-david@redhat.com>
+In-Reply-To: <20180628121417.1980-1-david@redhat.com>
+References: <20180628121417.1980-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] pc-dimm: assign and verify the "slot"
+ property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +21,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, David Hildenbrand <david@redhat.com>
 
-The following changes since commit 00928a421d47f49691cace1207481b7aad31b1=
-f1:
+We can assign and verify the slot before realizing and trying to plug.
+reading/writing the slot property should never fail, so let's reduce
+error handling a bit by using &error_abort.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-80626' into staging (2018-06-26 18:23:49 +0100)
+To do this during pre_plug, add and use (x86, ppc) pc_dimm_pre_plug().
 
-are available in the Git repository at:
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c             |  2 ++
+ hw/mem/pc-dimm.c         | 35 ++++++++++++++++++-----------------
+ hw/ppc/spapr.c           |  9 ++++++++-
+ include/hw/mem/pc-dimm.h |  1 +
+ 4 files changed, 29 insertions(+), 18 deletions(-)
 
-  https://github.com/berrange/qemu tags/qio-next-pull-request
-
-for you to fetch changes up to 10aef3e986b4ae3fd909308bdd41c4e7ee1d1d04:
-
-  Delete AF_UNIX socket after close (2018-06-28 13:06:44 +0100)
-
-----------------------------------------------------------------
-Merge qio 2018-06-28 v2
-
-Misc bug fixes for sockets channels
-
-----------------------------------------------------------------
-
-Pavel Balaev (1):
-  Delete AF_UNIX socket after close
-
-linzhecheng (1):
-  socket: dont't free msgfds if error equals EAGAIN
-
- chardev/char-socket.c |  4 ++--
- io/channel-socket.c   | 18 +++++++++++++++++-
- 2 files changed, 19 insertions(+), 3 deletions(-)
-
---=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f310040351..bf986baf91 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1695,6 +1695,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+         return;
+     }
++
++    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+ }
+ 
+ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 65843bc52a..e56c4daef2 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -29,10 +29,27 @@
+ 
+ static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+ 
++void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
++{
++    Error *local_err = NULL;
++    int slot;
++
++    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
++                                   &error_abort);
++    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
++                                 machine->ram_slots, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
++    trace_mhp_pc_dimm_assigned_slot(slot);
++out:
++    error_propagate(errp, local_err);
++}
++
+ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+                   Error **errp)
+ {
+-    int slot;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+@@ -59,22 +76,6 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+     }
+     trace_mhp_pc_dimm_assigned_address(addr);
+ 
+-    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+-    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+-                                 machine->ram_slots, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-    trace_mhp_pc_dimm_assigned_slot(slot);
+-
+     memory_device_plug_region(machine, mr, addr);
+     vmstate_register_ram(vmstate_mr, dev);
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b32b971a14..bf012235b6 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3191,6 +3191,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
++    Error *local_err = NULL;
+     MemoryRegion *mr;
+     uint64_t size;
+     Object *memdev;
+@@ -3216,7 +3217,13 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
+                                       &error_abort);
+     pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
+-    spapr_check_pagesize(spapr, pagesize, errp);
++    spapr_check_pagesize(spapr, pagesize, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+ }
+ 
+ struct sPAPRDIMMState {
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 26ebb7d5e9..7b120416d1 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -79,6 +79,7 @@ typedef struct PCDIMMDeviceClass {
+                                                Error **errp);
+ } PCDIMMDeviceClass;
+ 
++void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
+ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+                   Error **errp);
+ void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+-- 
 2.17.1
