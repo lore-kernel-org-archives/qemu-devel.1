@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fYKUO-00057T-Ou
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fYKUQ-00059H-Bq
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fYKUN-00053x-Fb
-	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fYKUP-000574-AW
+	for qemu-devel@nongnu.org; Wed, 27 Jun 2018 20:08:46 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 28 Jun 2018 02:07:41 +0200
-Message-Id: <20180628000745.4477-28-mreitz@redhat.com>
+Date: Thu, 28 Jun 2018 02:07:42 +0200
+Message-Id: <20180628000745.4477-29-mreitz@redhat.com>
 In-Reply-To: <20180628000745.4477-1-mreitz@redhat.com>
 References: <20180628000745.4477-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 27/31] block/curl: Harmonize option defaults
+Subject: [Qemu-devel] [PATCH v9 28/31] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,68 +23,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Both of the defaults we currently have in the curl driver are named
-based on a slightly different schema, let's unify that and call both
-CURL_BLOCK_OPT_${NAME}_DEFAULT.
-
-While at it, we can add a macro for the third option for which a default
-exists, namely "sslverify".
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/curl.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ block/curl.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/block/curl.c b/block/curl.c
-index 8e4f17266b..f095fe4664 100644
+index f095fe4664..37a7da7815 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -73,8 +73,6 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+@@ -961,6 +961,23 @@ static int64_t curl_getlength(BlockDriverState *bs)
+     return s->len;
+ }
  
- #define CURL_NUM_STATES 8
- #define CURL_NUM_ACB    8
--#define READ_AHEAD_DEFAULT (256 * 1024)
--#define CURL_TIMEOUT_DEFAULT 5
- #define CURL_TIMEOUT_MAX 10000
- 
- #define CURL_BLOCK_OPT_URL       "url"
-@@ -88,6 +86,10 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
- #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
- #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
- 
-+#define CURL_BLOCK_OPT_READAHEAD_DEFAULT (256 * 1024)
-+#define CURL_BLOCK_OPT_SSLVERIFY_DEFAULT true
-+#define CURL_BLOCK_OPT_TIMEOUT_DEFAULT 5
++static void curl_refresh_filename(BlockDriverState *bs)
++{
++    BDRVCURLState *s = bs->opaque;
 +
- struct BDRVCURLState;
++    /* "readahead" and "timeout" do not change the guest-visible data,
++     * so ignore them */
++    if (s->sslverify != CURL_BLOCK_OPT_SSLVERIFY_DEFAULT ||
++        s->cookie || s->username || s->password || s->proxyusername ||
++        s->proxypassword)
++    {
++        return;
++    }
++
++    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), s->url);
++}
++
++
+ static const char *const curl_strong_runtime_opts[] = {
+     CURL_BLOCK_OPT_URL,
+     CURL_BLOCK_OPT_SSLVERIFY,
+@@ -989,6 +1006,7 @@ static BlockDriver bdrv_http = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
  
- static bool libcurl_initialized;
-@@ -706,7 +708,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     }
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .strong_runtime_opts        = curl_strong_runtime_opts,
+ };
  
-     s->readahead_size = qemu_opt_get_size(opts, CURL_BLOCK_OPT_READAHEAD,
--                                          READ_AHEAD_DEFAULT);
-+                                          CURL_BLOCK_OPT_READAHEAD_DEFAULT);
-     if ((s->readahead_size & 0x1ff) != 0) {
-         error_setg(errp, "HTTP_READAHEAD_SIZE %zd is not a multiple of 512",
-                    s->readahead_size);
-@@ -714,13 +716,14 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     }
+@@ -1007,6 +1025,7 @@ static BlockDriver bdrv_https = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
  
-     s->timeout = qemu_opt_get_number(opts, CURL_BLOCK_OPT_TIMEOUT,
--                                     CURL_TIMEOUT_DEFAULT);
-+                                     CURL_BLOCK_OPT_TIMEOUT_DEFAULT);
-     if (s->timeout > CURL_TIMEOUT_MAX) {
-         error_setg(errp, "timeout parameter is too large or negative");
-         goto out_noclean;
-     }
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .strong_runtime_opts        = curl_strong_runtime_opts,
+ };
  
--    s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
-+    s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY,
-+                                     CURL_BLOCK_OPT_SSLVERIFY_DEFAULT);
+@@ -1025,6 +1044,7 @@ static BlockDriver bdrv_ftp = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
  
-     cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
-     cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .strong_runtime_opts        = curl_strong_runtime_opts,
+ };
+ 
+@@ -1043,6 +1063,7 @@ static BlockDriver bdrv_ftps = {
+     .bdrv_detach_aio_context    = curl_detach_aio_context,
+     .bdrv_attach_aio_context    = curl_attach_aio_context,
+ 
++    .bdrv_refresh_filename      = curl_refresh_filename,
+     .strong_runtime_opts        = curl_strong_runtime_opts,
+ };
+ 
 -- 
 2.17.1
