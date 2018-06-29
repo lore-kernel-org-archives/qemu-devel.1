@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fYkZm-0000Vm-OG
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:00:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fYkoA-0003hv-6P
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fYkZj-0000xs-AY
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:00:02 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:33282)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fYkZj-0000vx-3r
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:59:59 -0400
-Received: by mail-pl0-x243.google.com with SMTP id 6-v6so3799381plb.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 20:59:58 -0700 (PDT)
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-10-xiaoguangrong@tencent.com>
-	<355310d0-a33d-dab1-1781-2de37dd648f7@redhat.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <73324779-b76f-3081-adbb-590bc2030833@gmail.com>
-Date: Fri, 29 Jun 2018 11:59:46 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1fYko9-0003o3-0J
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:14:54 -0400
+Date: Fri, 29 Jun 2018 13:33:04 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180629033304.GA3422@umbus.fritz.box>
+References: <20180626161921.27941-1-richard.henderson@linaro.org>
+	<20180626161921.27941-3-richard.henderson@linaro.org>
+	<20180628034955.GB23134@umbus.fritz.box>
+	<15d41b89-b239-c082-f3c7-9c28a0c54958@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <355310d0-a33d-dab1-1781-2de37dd648f7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 09/12] ring: introduce lockless ring buffer
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
+Content-Disposition: inline
+In-Reply-To: <15d41b89-b239-c082-f3c7-9c28a0c54958@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 02/13] target/ppc: Use atomic load for LQ
+ and LQARX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 06/28/2018 09:36 PM, Jason Wang wrote:
-> 
-> 
-> On 2018年06月04日 17:55, guangrong.xiao@gmail.com wrote:
->> From: Xiao Guangrong<xiaoguangrong@tencent.com>
->>
->> It's the simple lockless ring buffer implement which supports both
->> single producer vs. single consumer and multiple producers vs.
->> single consumer.
->>
+On Thu, Jun 28, 2018 at 08:22:38AM -0700, Richard Henderson wrote:
+> On 06/27/2018 08:49 PM, David Gibson wrote:
+> >> +    /* High part of 128-bit helper return.  */
+> >> +    uint64_t retxh;
+> >> +
+> >=20
+> > Adding a temporary here is kind of gross.  I guess the helper
+> > interface doesn't allow for 128-bit returns, but couldn't you pass a
+> > register number into the helper and have it update the right GPR
+> > without going through a temp?
+>=20
+> I could pass a pointer, but that would cause ...
+>=20
+> >> +#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
+> >> +DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
+> >> +DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
+>=20
+> ... the helper definitions to lose TCG_CALL_NO_WG, because they *would* w=
+rite
+> to a global register.  Which would cause TCG to discard all of the global=
+ guest
+> registers cached within host registers.
+>=20
+> I've used this secondary memory return before, in target/s390,
+> and to me it seems cleaner than pointers.
 
->> Finally, it fetches the valid data out, set the entry to the initialized
->> state and update ring->out to make the entry be usable to the producer:
->>
->>        data = *entry;
->>        *entry = NULL;
->>        ring->out++;
->>
->> Memory barrier is omitted here, please refer to the comment in the code.
->>
->> (1)https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/kfifo.h
->> (2)http://dpdk.org/doc/api/rte__ring_8h.html
->>
->> Signed-off-by: Xiao Guangrong<xiaoguangrong@tencent.com>
->> ---
-> 
-> May I ask why you need a MPSC ring here? Can we just use N SPSC ring for submitting pages and another N SPSC ring for passing back results?
+Ok, sounds reasonable, applied to ppc-for-3.0.
 
-Sure.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-We had this option in our mind, however, it is not scalable which will slow
-the main thread down, instead, we'd rather to speed up main thread and move
-reasonable workload to the threads.
+--lrZ03NoBR/3+SXJZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls1qG0ACgkQbDjKyiDZ
+s5Kd4Q/9Fx6CTCnDYI3fAB+CNc2XZXt7enbKrqDy7An88XffCj8ViUvzqObo7Rcu
+x1rN14uI/Z5oGzIaIM71X+pPsqaAvtmA8QKyG2rcMovWI1Q/pZb6DFifKnURwPBo
+yxhEDiU7nFxINYtWGc7aTwh/2lWl3nknxqqUZvWWew7OCNoI3CD1oa5g4Tz/Vg6R
+g9ZaIKdUxHhq1pgyJshT7Ox7419WVXlZXXerFXpgzwPJY6+8hp5PZIHc9AAnl4/0
+zhxBwzXmjG94ljUhHmWPO4GeWMUNewXrcmsqdBEm+MdaotN6hAAfm+lyv052eRUs
+g9l959KOl2U8EmOcUBX3+RyD/2fa1xy6nsN4i+nzUT6NeBoYYIyQp1RgANXthIKp
+FqtuWbiufr3Eu57+76gtYsejODLedyZ3j702/KC91v9WaLrUz68G78zHhfQIsucO
+dbax/5EgAelPiDnrt4ozWAb378Sw6WiJ5+UEcSYhnbYsicBodoFCy2vTWCVAGBuD
+Cotjbc+WAvEHumTfovXP+G+QwlIV8ZSe6lSUmIHP3cxO/aRDulkN7Gkmezcx5AHq
+Y3w2ZiODSEh4aFy3uHTt19pC1gamxh+ObQby7l3aw23fQr+ldb/pJiajrDeu/LoP
+UX6+ZfFMzYEJHz+SqtQFYSIO/5dXCSt0Tj/ZZ7SDh8pDGU3KvCg=
+=ZWN3
+-----END PGP SIGNATURE-----
+
+--lrZ03NoBR/3+SXJZ--
