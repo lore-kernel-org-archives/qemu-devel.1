@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Sj-0004Gi-U1
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:57:51 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Sj-0004Gn-VA
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Sg-0005Ji-FC
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:57:49 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50631)
+	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Sh-0005Kb-C4
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:57:50 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:52826)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZ0Sg-0005J3-8U
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:57:46 -0400
-Received: by mail-wm0-x242.google.com with SMTP id v25-v6so2447885wmc.0
+	id 1fZ0Sh-0005Jp-5q
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:57:47 -0400
+Received: by mail-wm0-x230.google.com with SMTP id w16-v6so2773243wmc.2
 	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:57:46 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 29 Jun 2018 21:52:31 +0100
-Message-Id: <20180629205232.27190-21-alex.bennee@linaro.org>
+Date: Fri, 29 Jun 2018 21:52:28 +0100
+Message-Id: <20180629205232.27190-18-alex.bennee@linaro.org>
 In-Reply-To: <20180629205232.27190-1-alex.bennee@linaro.org>
 References: <20180629205232.27190-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 20/21] docker: add linux-user powered cross
- builder for QEMU
+Subject: [Qemu-devel] [PATCH v2 17/21] docker: drop QEMU build-dep from
+ bootstrap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +33,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-We can't use cross compilers in the current Debian stable and Debian
-sid is sketchy as hell. So for powerpc fall back to dog-fooding our
-own linux-user to do the build.
-
-As we can only build the base image with a suitably configured
-source tree we fall back to checking for it's existence when we can't
-build it from scratch. However this does mean you don't have to keep
-a static powerpc-linux-user in your active configuration just to
-update the cross build image.
+This is best done with any child images that actually need it.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                 | 28 +++++++++++++++++++
- .../debian-powerpc-user-cross.docker          | 13 +++++++++
- 2 files changed, 41 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-powerpc-user-cross.docker
+ tests/docker/dockerfiles/debian-bootstrap.docker | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index d3bd2f57dd..556b260fad 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -118,6 +118,30 @@ docker-image-travis: NOUSER=1
- # Specialist build images, sometimes very limited tools
- docker-image-tricore-cross: docker-image-debian9
- 
-+# Rules for building linux-user powered images
-+#
-+# These are slower than using native cross compiler setups but can
-+# work around issues with poorly working multi-arch systems and broken
-+# packages.
-+
-+ifeq ($(filter ppc-linux-user,$(TARGET_LIST))$(CONFIG_STATIC),ppc-linux-usery)
-+# Jessie is the last supported release for powerpc, but multi-arch is
-+# broken so we need a qemu-linux-user for this target
-+docker-image-debian-powerpc-user: DEB_ARCH = powerpc
-+docker-image-debian-powerpc-user: DEB_TYPE = jessie
-+docker-image-debian-powerpc-user: EXECUTABLE = ${BUILD_DIR}/ppc-linux-user/qemu-ppc
-+DOCKER_USER_IMAGES += debian-powerpc-user
-+else
-+docker-image-debian-powerpc-user:
-+	$(call quiet-command, \
-+		$(DOCKER_SCRIPT) check --quiet qemu:debian-powerpc-user \
-+			$(DOCKER_FILES_DIR)/debian-bootstrap.docker, \
-+		"CHECK", "debian-powerpc-user exists")
-+endif
-+
-+docker-image-debian-powerpc-user-cross: docker-image-debian-powerpc-user
-+
-+
- # Expand all the pre-requistes for each docker image and test combination
- $(foreach i,$(filter-out $(DOCKER_INTERMEDIATE_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES)), \
- 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
-@@ -153,6 +177,10 @@ docker:
- 	@echo
- 	@echo 'Available container images:'
- 	@echo '    $(DOCKER_IMAGES)'
-+ifneq ($(DOCKER_USER_IMAGES),)
-+	@echo 'Available linux-user images:'
-+	@echo '    $(DOCKER_USER_IMAGES)'
-+endif
- 	@echo
- 	@echo 'Available tests:'
- 	@echo '    $(DOCKER_TESTS)'
-diff --git a/tests/docker/dockerfiles/debian-powerpc-user-cross.docker b/tests/docker/dockerfiles/debian-powerpc-user-cross.docker
-new file mode 100644
-index 0000000000..eadb142792
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-powerpc-user-cross.docker
-@@ -0,0 +1,13 @@
-+#
-+# Docker powerpc cross-compiler target for QEMU
-+#
-+# We can't use current Debian stable cross-compilers to build powerpc
-+# as it has been dropped as a release architecture. Using Debian Sid
-+# is just far too sketchy a build environment. This leaves us the
-+# final option of using linux-user. This image is based of the
-+# debootstrapped qemu:debian-powerpc-user but doesn't need any extra
-+# magic once it is setup.
-+#
-+FROM qemu:debian-powerpc-user
-+
-+RUN apt-get update && apt-get build-dep -yy qemu
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.docker b/tests/docker/dockerfiles/debian-bootstrap.docker
+index 3a9125e497..14212b9cf4 100644
+--- a/tests/docker/dockerfiles/debian-bootstrap.docker
++++ b/tests/docker/dockerfiles/debian-bootstrap.docker
+@@ -17,5 +17,3 @@ RUN /debootstrap/debootstrap --second-stage
+ # At this point we can install additional packages if we want
+ # Duplicate deb line as deb-src
+ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+-RUN apt-get update
+-RUN apt-get -y build-dep qemu
 -- 
 2.17.1
