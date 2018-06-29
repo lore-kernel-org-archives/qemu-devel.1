@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fYpcn-0000s3-RW
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:23:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fYpfO-0002R5-TL
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1fYpcm-0003Sr-Hf
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:23:29 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:46247)
+	(envelope-from <peter.maydell@linaro.org>) id 1fYpfO-00077a-1G
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:26:10 -0400
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:36846)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1fYpcm-0003S4-Bm
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:23:28 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id v24-v6so9223593otk.13
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:23:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fYpfN-00075g-Px
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:26:09 -0400
+Received: by mail-oi0-x22a.google.com with SMTP id r16-v6so7348861oie.3
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:26:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180629001538.11415-3-richard.henderson@linaro.org>
-References: <20180629001538.11415-1-richard.henderson@linaro.org>
-	<20180629001538.11415-3-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Fri, 29 Jun 2018 11:23:26 +0200
-Message-ID: <CABoDooPNXufYFJGtGuici2Gq-_PybFgk1yX7=8-pme2j0-7fOA@mail.gmail.com>
+In-Reply-To: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
+References: <1530216310-52873-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 10:25:48 +0100
+Message-ID: <CAFEAcA9i=tEQuOpuUksRDapLAuONJ6sSDiJY20pujOYo7GPeJA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/6] target/arm: Fix SVE system register
- access checks
+Subject: Re: [Qemu-devel] [PULL 00/60] Misc patches for soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hello,
-
-On Fri, Jun 29, 2018 at 2:15 AM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Leave ARM_CP_SVE, removing ARM_CP_FPU; the sve_access_check
-> produced by the flag already includes fp_access_check.  If
-> we also check ARM_CP_FPU the double fp_access_check asserts.
+On 28 June 2018 at 21:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 4a83bf2f339d4b63ecd5ef48b9816c3b7ee24553:
 >
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-
-Thanks for taking care of it,
-
-Laurent
-
-> ---
->  target/arm/helper.c        | 8 ++++----
->  target/arm/translate-a64.c | 5 ++---
->  2 files changed, 6 insertions(+), 7 deletions(-)
+>   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20180627' into staging (2018-06-28 15:31:42 +0100)
 >
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index b19c7ace78..a855da045b 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -4393,7 +4393,7 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->  static const ARMCPRegInfo zcr_el1_reginfo = {
->      .name = "ZCR_EL1", .state = ARM_CP_STATE_AA64,
->      .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 2, .opc2 = 0,
-> -    .access = PL1_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-> +    .access = PL1_RW, .type = ARM_CP_SVE,
->      .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[1]),
->      .writefn = zcr_write, .raw_writefn = raw_write
->  };
-> @@ -4401,7 +4401,7 @@ static const ARMCPRegInfo zcr_el1_reginfo = {
->  static const ARMCPRegInfo zcr_el2_reginfo = {
->      .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
->      .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
-> -    .access = PL2_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-> +    .access = PL2_RW, .type = ARM_CP_SVE,
->      .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[2]),
->      .writefn = zcr_write, .raw_writefn = raw_write
->  };
-> @@ -4409,14 +4409,14 @@ static const ARMCPRegInfo zcr_el2_reginfo = {
->  static const ARMCPRegInfo zcr_no_el2_reginfo = {
->      .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
->      .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
-> -    .access = PL2_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-> +    .access = PL2_RW, .type = ARM_CP_SVE,
->      .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore
->  };
->
->  static const ARMCPRegInfo zcr_el3_reginfo = {
->      .name = "ZCR_EL3", .state = ARM_CP_STATE_AA64,
->      .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 2, .opc2 = 0,
-> -    .access = PL3_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-> +    .access = PL3_RW, .type = ARM_CP_SVE,
->      .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[3]),
->      .writefn = zcr_write, .raw_writefn = raw_write
->  };
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index f986340832..45a6c2a3aa 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1633,11 +1633,10 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
->      default:
->          break;
->      }
-> -    if ((ri->type & ARM_CP_SVE) && !sve_access_check(s)) {
-> -        return;
-> -    }
->      if ((ri->type & ARM_CP_FPU) && !fp_access_check(s)) {
->          return;
-> +    } else if ((ri->type & ARM_CP_SVE) && !sve_access_check(s)) {
-> +        return;
->      }
->
->      if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_CP_IO)) {
-> --
-> 2.17.1
+> are available in the git repository at:
 >
 >
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 4cd00cd65e8f3d6301426c1f223f676935b3e9b8:
+>
+>   tests/boot-serial: Do not delete the output file in case of errors (2018-06-28 19:05:39 +0200)
+>
+> A separate pull request will come with Philippe's IEC unit series.
+> This one is already big enough!
+>
+> ----------------------------------------------------------------
+
+Hi; this fails to link the i386 linux-user binaries
+(x86-64 Linux host, debug build):
+
+  LINK    i386-linux-user/qemu-i386
+target/i386/cpu.o: In function `x86_cpu_realizefn':
+/home/petmay01/linaro/qemu-for-merges/target/i386/cpu.c:4814:
+undefined reference to `enable_cpu_pm'
+
+because enable_cpu_pm is defined in vl.c but used
+in code in target/i386 which isn't softmmu-specific.
+
+thanks
+-- PMM
