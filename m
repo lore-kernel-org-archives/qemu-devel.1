@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOc-0000GD-SD
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:04 -0400
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOi-0000KD-4G
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOb-0002m7-Ei
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:16:58 -0400
-Received: from foss.arm.com ([217.140.101.70]:39472)
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOh-0002tv-4I
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:04 -0400
+Received: from foss.arm.com ([217.140.101.70]:39506)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOb-0002lp-64
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:16:57 -0400
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOg-0002sj-UT
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:03 -0400
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Date: Fri, 29 Jun 2018 12:15:36 +0100
-Message-Id: <1530270944-11351-17-git-send-email-suzuki.poulose@arm.com>
+Date: Fri, 29 Jun 2018 12:15:38 +0100
+Message-Id: <1530270944-11351-19-git-send-email-suzuki.poulose@arm.com>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Subject: [Qemu-devel] [PATCH v3 16/20] kvm: arm64: Switch to per VM IPA limit
+Subject: [Qemu-devel] [PATCH v3 18/20] kvm: arm64: Add support for handling
+ 52bit IPA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +25,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
 
-Now that we can manage the stage2 page table per VM, switch the
-configuration details to per VM instance. We keep track of the
-IPA bits, number of page table levels and the VTCR bits (which
-depends on the IPA and the number of levels). While at it, remove
-unused pgd_lock field from kvm_arch for arm64.
+Add support for handling the 52bit IPA. 52bit IPA
+support needs changes to the following :
+
+ 1) Page-table entries - We use kernel page table helpers for setting
+ up the stage2. Hence we don't explicit changes here
+
+ 2) VTTBR:BADDR - This is already supported with :
+   commit 529c4b05a3cb2f324aa ("arm64: handle 52-bit addresses in TTBR")
+
+ 3) VGIC support for 52bit: Supported with a patch in this series.
+
+That leaves us with the handling for PAR and HPAR. This patch adds
+support for handling the 52bit addresses in PAR and HPFAR,
+which are used while handling the permission faults in stage1.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Kristina Martsenko <kristina.martsenko@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h       | 14 ++++++++++++--
- arch/arm64/include/asm/kvm_hyp.h        |  3 +--
- arch/arm64/include/asm/kvm_mmu.h        | 20 ++++++++++++++++++--
- arch/arm64/include/asm/stage2_pgtable.h |  1 -
- virt/kvm/arm/mmu.c                      |  4 ++++
- 5 files changed, 35 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 7 +++++++
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 328f472..9a15860 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -61,13 +61,23 @@ struct kvm_arch {
- 	u64    vmid_gen;
- 	u32    vmid;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 2e90942..cb6a2ee 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -301,6 +301,13 @@
  
--	/* 1-level 2nd stage table and lock */
--	spinlock_t pgd_lock;
-+	/* stage-2 page table */
- 	pgd_t *pgd;
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
++/*
++ * We have
++ *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
++ *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
++ */
++#define PAR_TO_HPFAR(par)		\
++	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
  
- 	/* VTTBR value associated with above pgd and vmid */
- 	u64    vttbr;
+ #define kvm_arm_exception_type	\
+ 	{0, "IRQ" }, 		\
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 355fb25..fb66320 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -260,7 +260,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 		return false; /* Translation failed, back to guest */
  
-+	/* Private bits of VTCR_EL2 for this VM */
-+	u64    vtcr_private;
-+	/* Size of the PA size for this guest */
-+	u8     phys_shift;
-+	/*
-+	 * Number of levels in page table. We could always calculate
-+	 * it from phys_shift above. We cache it for faster switches
-+	 * in stage2 page table helpers.
-+	 */
-+	u8     s2_levels;
-+
- 	/* The last vcpu id that ran on each physical CPU */
- 	int __percpu *last_vcpu_ran;
- 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 3e8052d1..699f678 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -166,8 +166,7 @@ static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
- 	u64 vtcr = read_sysreg(vtcr_el2);
- 
- 	vtcr &= ~VTCR_EL2_PRIVATE_MASK;
--	vtcr |= VTCR_EL2_SL0(kvm_stage2_levels(kvm)) |
--		VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
-+	vtcr |= kvm->arch.vtcr_private;
- 	write_sysreg(vtcr, vtcr_el2);
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- }
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index f3fb05a3..a291cdc 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -143,9 +143,10 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
-  */
- #define KVM_PHYS_SHIFT	(40)
- 
--#define kvm_phys_shift(kvm)		KVM_PHYS_SHIFT
-+#define kvm_phys_shift(kvm)		(kvm->arch.phys_shift)
- #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
- #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
-+#define kvm_stage2_levels(kvm)		(kvm->arch.s2_levels)
- 
- static inline bool kvm_page_empty(void *ptr)
- {
-@@ -528,6 +529,18 @@ static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
- 
- static inline void *stage2_alloc_pgd(struct kvm *kvm)
- {
-+	u32 ipa, lvls;
-+
-+	/*
-+	 * Stage2 page table can support concatenation of (upto 16) tables
-+	 * at the entry level, thereby reducing the number of levels.
-+	 */
-+	ipa = kvm_phys_shift(kvm);
-+	lvls = stage2_pt_levels(ipa);
-+
-+	kvm->arch.s2_levels = lvls;
-+	kvm->arch.vtcr_private = VTCR_EL2_SL0(lvls) | TCR_T0SZ(ipa);
-+
- 	return alloc_pages_exact(stage2_pgd_size(kvm),
- 				 GFP_KERNEL | __GFP_ZERO);
- }
-@@ -537,7 +550,10 @@ static inline u32 kvm_get_ipa_limit(void)
- 	return KVM_PHYS_SHIFT;
+ 	/* Convert PAR to HPFAR format */
+-	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
++	*hpfar = PAR_TO_HPFAR(tmp);
+ 	return true;
  }
  
--static inline void kvm_config_stage2(struct kvm *kvm, u32 ipa_shift) {}
-+static inline void kvm_config_stage2(struct kvm *kvm, u32 ipa_shift)
-+{
-+	kvm->arch.phys_shift = ipa_shift;
-+}
- 
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index ffc37cc..91d7936 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -65,7 +65,6 @@
- #define __s2_pgd_ptrs(pa, lvls)	(1 << ((pa) - pt_levels_pgdir_shift((lvls))))
- #define __s2_pgd_size(pa, lvls)	(__s2_pgd_ptrs((pa), (lvls)) * sizeof(pgd_t))
- 
--#define kvm_stage2_levels(kvm)		stage2_pt_levels(kvm_phys_shift(kvm))
- #define stage2_pgdir_shift(kvm)	\
- 		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
- #define stage2_pgdir_size(kvm)		(_AC(1, UL) << stage2_pgdir_shift((kvm)))
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index a339e00..d7822e1 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -867,6 +867,10 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
- 		return -EINVAL;
- 	}
- 
-+	/* Make sure we have the stage2 configured for this VM */
-+	if (WARN_ON(!kvm_phys_shift(kvm)))
-+		return -EINVAL;
-+
- 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
- 	pgd = stage2_alloc_pgd(kvm);
- 	if (!pgd)
 -- 
 2.7.4
