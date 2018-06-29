@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYwzb-0002o4-87
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:15:32 -0400
+	(envelope-from <prvs=711c09436=Alistair.Francis@wdc.com>)
+	id 1fYx6R-00044w-5Z
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYwzX-0000vY-8q
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:15:31 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:58938
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fYwzW-0000s0-T5
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:15:27 -0400
-References: <20180629135616.16570-1-mark.cave-ayland@ilande.co.uk>
-	<20180629135616.16570-3-mark.cave-ayland@ilande.co.uk>
-	<20180629200121-mutt-send-email-mst@kernel.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <d6d2b16b-e263-c29e-cdd2-4d68e851ef28@ilande.co.uk>
-Date: Fri, 29 Jun 2018 18:15:17 +0100
+	(envelope-from <prvs=711c09436=Alistair.Francis@wdc.com>)
+	id 1fYx6N-0003KC-7W
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:35 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:40970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=711c09436=Alistair.Francis@wdc.com>)
+	id 1fYx6M-0003Ft-GD
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:31 -0400
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Fri, 29 Jun 2018 10:22:08 -0700
+Message-Id: <20180629172215.29475-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20180629200121-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] pci: allow DeviceClass fw_name to
- override pci_dev_fw_name() if set
+Subject: [Qemu-devel] [PULL v2 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: marcel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mjc@sifive.com
+Cc: f4bug@amsat.org, alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
 
-On 29/06/18 18:04, Michael S. Tsirkin wrote:
+The following changes since commit 75507f1aba6feb73ae43329922d51571550b9128:
 
-> On Fri, Jun 29, 2018 at 02:56:16PM +0100, Mark Cave-Ayland wrote:
->> The current implementation of pci_dev_fw_name() scans through a fixed
->> set of PCI class descriptions to determine the firmware device name
->> but in some cases this isn't always appropriate, for example with
->> the macio device which uses a class code of 0xff (unassigned).
->>
->> Rather than add a new entry for the macio device and risk a potential
->> clash with another unassigned device later, add a check to
->> pcibus_get_fw_dev_path() that will use DeviceClass fw_name if set in
->> preference to pci_dev_fw_name().
->>
->> This enables PCI devices such as macio to set dc->fw_name as required
->> to match the name specified in the firmware.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   hw/pci/pci.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->> index 80bc45930d..126dd683dc 100644
->> --- a/hw/pci/pci.c
->> +++ b/hw/pci/pci.c
->> @@ -2411,12 +2411,14 @@ static char *pci_dev_fw_name(DeviceState *dev, char *buf, int len)
->>   
->>   static char *pcibus_get_fw_dev_path(DeviceState *dev)
->>   {
->> +    DeviceClass *dc = DEVICE_GET_CLASS(dev);
->>       PCIDevice *d = (PCIDevice *)dev;
->>       char path[50], name[33];
->>       int off;
->>   
->>       off = snprintf(path, sizeof(path), "%s@%x",
->> -                   pci_dev_fw_name(dev, name, sizeof name),
->> +                   dc->fw_name ? dc->fw_name :
->> +                       pci_dev_fw_name(dev, name, sizeof name),
->>                      PCI_SLOT(d->devfn));
-> 
-> So why not put the logic into pci_dev_fw_name then?
+  Merge remote-tracking branch 'remotes/berrange/tags/min-glib-pull-request' into staging (2018-06-29 15:04:20 +0100)
 
-To me it felt like pci_dev_fw_name() had already made the assumption 
-that it's going to start interrogating PCI config space to determine the 
-fw_name (the initialisers at the top of the function have already 
-started pulling information from out of there) so it seemed a little odd 
-to bury the logic in there.
+are available in the Git repository at:
 
-However if you feel it should still belong in pci_dev_fw_name() then I'm 
-happy to resubmit.
+  git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180629
 
+for you to fetch changes up to e4847c96685e210649e6ec90fecd732a744dad75:
 
-ATB,
+  hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device (2018-06-29 09:51:05 -0700)
 
-Mark.
+----------------------------------------------------------------
+RISC-V: SoCify SiFive boards and connect GEM
+
+This series has three tasks:
+ 1. To convert the SiFive U and E machines into SoCs and boards
+ 2. To connect the Cadence GEM device to the SiFive U board
+ 3. Fix some device tree problems with the SiFive U board
+
+After this series the SiFive E and U boards have their SoCs split into
+seperate QEMU objects, which can be used on future boards if desired.
+
+The RISC-V Virt and Spike boards have not been converted. They haven't
+been converted as they aren't physical boards, so it doesn't make a
+whole lot of sense to split them into an SoC and board. The only
+disadvantage with this is that they now differ to the SiFive boards.
+
+This series also connect the Cadence GEM device to the SiFive U board.
+There are some interrupt line changes requried before this is possible.
+
+----------------------------------------------------------------
+Alistair Francis (7):
+      hw/riscv/sifive_u: Create a SiFive U SoC object
+      hw/riscv/sifive_e: Create a SiFive E SoC object
+      hw/riscv/sifive_plic: Use gpios instead of irqs
+      hw/riscv/sifive_u: Set the soc device tree node as a simple-bus
+      hw/riscv/sifive_u: Set the interrupt controler number of interrupts
+      hw/riscv/sifive_u: Move the uart device tree node under /soc/
+      hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device
+
+ default-configs/riscv32-softmmu.mak |   3 +-
+ default-configs/riscv64-softmmu.mak |   3 +-
+ hw/riscv/sifive_e.c                 | 102 +++++++++++++++++-------
+ hw/riscv/sifive_plic.c              |   6 +-
+ hw/riscv/sifive_u.c                 | 151 +++++++++++++++++++++++++++++-------
+ hw/riscv/virt.c                     |   4 +-
+ include/hw/riscv/sifive_e.h         |  16 +++-
+ include/hw/riscv/sifive_plic.h      |   1 -
+ include/hw/riscv/sifive_u.h         |  25 +++++-
+ 9 files changed, 241 insertions(+), 70 deletions(-)
