@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYui3-0003Se-5e
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYuin-0003yb-Nr
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYuhz-00010L-7B
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46404 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYuhz-0000yW-3E
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:11 -0400
-Date: Fri, 29 Jun 2018 15:49:05 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180629144905.GU27016@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180627174435.31800-1-alistair.francis@wdc.com>
-	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
-	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
-	<CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
-	<CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
-	<CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fYuii-0003It-Np
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:50:01 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-2-f4bug@amsat.org>
+	<20180627132747.76773eb9@redhat.com>
+	<3dd9341a-f4e6-c107-2f1f-0745d039f03e@redhat.com>
+	<15aad1db-2f4c-ea49-9966-a969f0c769f5@amsat.org>
+	<c1939f7b-76e2-eca9-2819-d0b4d9a134b1@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0822da0f-1da2-bff3-e465-57654aad7c16@amsat.org>
+Date: Fri, 29 Jun 2018 11:49:51 -0300
 MIME-Version: 1.0
+In-Reply-To: <c1939f7b-76e2-eca9-2819-d0b4d9a134b1@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/46] include: Add IEC binary prefixes
+ in "qemu/units.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +33,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair23@gmail.com>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Fri, Jun 29, 2018 at 03:21:08PM +0100, Peter Maydell wrote:
-> On 29 June 2018 at 15:13, Alistair Francis <alistair23@gmail.com> wrote:
-> > Can you import it manually? The armour export is below:
+Hi Eric,
+
+On 06/29/2018 09:19 AM, Eric Blake wrote:
+> On 06/28/2018 05:53 PM, Philippe Mathieu-Daudé wrote:
 > 
-> Aha. I tried that, which didn't work either, which prompted
-> me to try --verbose, which says:
+>>>>> +#ifndef QEMU_UNITS_H
+>>>>> +#define QEMU_UNITS_H
+>>>>> +
+>>>>> +#define KiB     (INT64_C(1) << 10)
+>>>>> +#define MiB     (INT64_C(1) << 20)
+>>>>> +#define GiB     (INT64_C(1) << 30)
+>>>>> +#define TiB     (INT64_C(1) << 40)
+>>>>> +#define PiB     (INT64_C(1) << 50)
+>>>>> +#define EiB     (INT64_C(1) << 60)
+>>>> Shouldn't above use UINT64_C()
+>>>
+>>> Since the decision of signed vs. unsigned was intentional based on
+>>> review on earlier versions, it may be worth a comment in this file that
+>>> these constants are intentionally signed (in usage patterns, these tend
+>>> to be multiplied by another value; and while it is easy to go to
+>>> unsigned by doing '1U * KiB', you can't go in the opposite direction if
+>>> you want a signed number for '1 * KiB' unless KiB is signed).
+>>
+>> OK.
 > 
-> e104462:xenial:qemu-for-merges$ gpg --verbose --import /tmp/alistair.gpg
-> gpg: armour header: Version: GnuPG v2
-> gpg: can't handle public key algorithm 19
+> Actually, '1U * KiB' still ends up signed.  Why? Because as written, KiB
+> is a 64-bit quantity, but 1U is 32-bit; type promotion says that since a
+> 64-bit int can represent all 32-bit unsigned values, the result of the
+> expression is still signed 64-bit.
 
+Are you suggesting this?
 
-This is an ECC algorithm, and only supported by gpg2 tool not gpg AFAICT.
+#define KiB     (INT32_C(1) << 10)
+#define MiB     (INT32_C(1) << 20)
+#define GiB     (INT32_C(1) << 30)
 
+#define TiB     (INT64_C(1) << 40)
+#define PiB     (INT64_C(1) << 50)
+#define EiB     (INT64_C(1) << 60)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Now than I reread what Richard reviewed, I guess understand he suggested
+the same change:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg03284.html
+
+> To get unsigned KiB, you either have to use '1ULL * KiB', or KiB should
+> be changed to be (INT32_C(1) << 10) (a 32-bit constant, rather than a
+> 64-bit one).
+> 
+>>
+>> I'll also change this tests using your suggestion:
+>>
+>> diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+>> @@ -709,8 +709,7 @@ static void test_opts_parse_size(void)
+>>                              false, &error_abort);
+>> -    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0),
+>> -                     ==, 16777215 * T_BYTE);
+>> +    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), ==, 16777215U
+>> * TiB);
+>>
+>> to avoid this error on 32-bit archs:
+>>
+>> source/qemu/tests/test-qemu-opts.c: In function 'test_opts_parse_size':
+>> source/qemu/tests/test-qemu-opts.c:713:71: error: integer overflow in
+>> expression [-Werror=overflow]
+>>    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), ==, 16777215 *
+>> TiB);
+>>                                                                         ^
+> 
+> And this compile error is proof of the confusion when we have a signed
+> integer overflow (why it only happens on 32-bit arch and not also on
+> 64-bit arch is subtle - it's because TiB is 'long long' on 32-bit, but
+> merely 'long' on 64-bit, which results in a different type after type
+> promotion - although I still find it odd that the 64-bit compiler isn't
+> warning).
+> 
