@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYuvA-0006fm-6O
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:02:49 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fYv0t-0004Ey-Fj
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYuv4-0001cP-8o
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:02:48 -0400
-Date: Fri, 29 Jun 2018 16:02:36 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180629150236.GV27016@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-2-f4bug@amsat.org>
-	<20180627132747.76773eb9@redhat.com>
-	<3dd9341a-f4e6-c107-2f1f-0745d039f03e@redhat.com>
-	<15aad1db-2f4c-ea49-9966-a969f0c769f5@amsat.org>
-	<c1939f7b-76e2-eca9-2819-d0b4d9a134b1@redhat.com>
-	<0822da0f-1da2-bff3-e465-57654aad7c16@amsat.org>
+	(envelope-from <imammedo@redhat.com>) id 1fYv0p-00076T-B2
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:08:43 -0400
+Date: Fri, 29 Jun 2018 17:08:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180629170832.5389dcc6@redhat.com>
+In-Reply-To: <20180628121417.1980-5-david@redhat.com>
+References: <20180628121417.1980-1-david@redhat.com>
+	<20180628121417.1980-5-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0822da0f-1da2-bff3-e465-57654aad7c16@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 01/46] include: Add IEC binary prefixes
- in "qemu/units.h"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] pc-dimm: assign and verify the
+ "addr" property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +24,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
+	. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jun 29, 2018 at 11:49:51AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Hi Eric,
->=20
-> On 06/29/2018 09:19 AM, Eric Blake wrote:
-> > On 06/28/2018 05:53 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >=20
-> >>>>> +#ifndef QEMU_UNITS_H
-> >>>>> +#define QEMU_UNITS_H
-> >>>>> +
-> >>>>> +#define KiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 10)
-> >>>>> +#define MiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 20)
-> >>>>> +#define GiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 30)
-> >>>>> +#define TiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 40)
-> >>>>> +#define PiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 50)
-> >>>>> +#define EiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 60)
-> >>>> Shouldn't above use UINT64_C()
-> >>>
-> >>> Since the decision of signed vs. unsigned was intentional based on
-> >>> review on earlier versions, it may be worth a comment in this file =
-that
-> >>> these constants are intentionally signed (in usage patterns, these =
-tend
-> >>> to be multiplied by another value; and while it is easy to go to
-> >>> unsigned by doing '1U * KiB', you can't go in the opposite directio=
-n if
-> >>> you want a signed number for '1 * KiB' unless KiB is signed).
-> >>
-> >> OK.
-> >=20
-> > Actually, '1U * KiB' still ends up signed.=C2=A0 Why? Because as writ=
-ten, KiB
-> > is a 64-bit quantity, but 1U is 32-bit; type promotion says that sinc=
-e a
-> > 64-bit int can represent all 32-bit unsigned values, the result of th=
-e
-> > expression is still signed 64-bit.
->=20
-> Are you suggesting this?
->=20
-> #define KiB     (INT32_C(1) << 10)
-> #define MiB     (INT32_C(1) << 20)
-> #define GiB     (INT32_C(1) << 30)
->=20
-> #define TiB     (INT64_C(1) << 40)
-> #define PiB     (INT64_C(1) << 50)
-> #define EiB     (INT64_C(1) << 60)
+On Thu, 28 Jun 2018 14:14:17 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-This feels dangerous to me as now the calculation may or may not be 32-bi=
-t
-or 64-bit depending on which constant you happen to pick. I think this
-inconsistency is going to be surprising to both devs and reviewers leadin=
-g
-to bugs.
+> We can assign and verify the slot before realizing and trying to plug.
+> reading/writing the address property should never fail, so let's reduce
+> error handling a bit by using &error_abort. Getting access to the memory
+> region now might however fail. So forward errors from
+> get_memory_region() properly.
+> 
+> Keep tracing the assigned address for now in the plug code, as that's the
+> point we are sure plugging succeeded and the address willa ctually be
+                                                       ^^^^^^^^^^^^^   
+> used.
+I'd move tracing to pre_plug as well, so even if pre_plug fails we could
+see in trace what addr was during the failure
 
-Did you consider just adding unsigned versions  ?  eg UKiB, UMiB, UGiB. I=
-t
-is a bit ugly but is has the benefit of being obvious whether you're inte=
-nding
-the calculation  to be signed vs unsigned.
+> As all memory devices should use the alignment of the underlying memory
+> region for guest physical address asignment, do detection of the
+> alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
+> alignment for compatibility handling.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+patch look ok,
+see some nits below
+
+ 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/i386/pc.c             | 16 ++++--------
+>  hw/mem/pc-dimm.c         | 53 +++++++++++++++++++++++-----------------
+>  hw/ppc/spapr.c           |  7 +++---
+>  include/hw/mem/pc-dimm.h |  6 ++---
+>  4 files changed, 41 insertions(+), 41 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 934b7155b1..16e4b5baff 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1678,7 +1678,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                 Error **errp)
+>  {
+>      const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> +    const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> +    const uint64_t compat_align = TARGET_PAGE_SIZE;
+s/compat_align/legacy_align/
+
+>  
+>      /*
+>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
+> @@ -1696,7 +1698,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          return;
+>      }
+>  
+> -    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev),
+> +                     pcmc->enforce_aligned_dimm ? NULL : &compat_align, errp);
+>  }
+>  
+>  static void pc_memory_plug(HotplugHandler *hotplug_dev,
+> @@ -1705,18 +1708,9 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>      HotplugHandlerClass *hhc;
+>      Error *local_err = NULL;
+>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> -    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+> -    PCDIMMDevice *dimm = PC_DIMM(dev);
+> -    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> -    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+> -    uint64_t align = TARGET_PAGE_SIZE;
+>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>  
+> -    if (pcmc->enforce_aligned_dimm) {
+> -        align = memory_region_get_alignment(mr);
+> -    }
+> -
+> -    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
+> +    pc_dimm_plug(dev, MACHINE(pcms), &local_err);
+>      if (local_err) {
+>          goto out;
+>      }
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index e56c4daef2..8e2e8549dc 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -29,9 +29,14 @@
+>  
+>  static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+>  
+> -void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
+> +void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
+> +                      const uint64_t *compat_align, Error **errp)
+>  {
+> +    PCDIMMDevice *dimm = PC_DIMM(dev);
+> +    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      Error *local_err = NULL;
+> +    MemoryRegion *mr;
+> +    uint64_t addr, align;
+>      int slot;
+>  
+>      slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
+> @@ -43,44 +48,46 @@ void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
+>      }
+>      object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
+>      trace_mhp_pc_dimm_assigned_slot(slot);
+> +
+> +    mr = ddc->get_memory_region(dimm, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +
+> +    if (compat_align) {
+> +        align = *compat_align;
+> +    } else {
+> +        align = memory_region_get_alignment(mr);
+> +    }
+might be:
+
+       align =  compat_align ? *compat_align : memory_region_get_alignment(mr);
+
+> +
+> +    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
+> +                                    &error_abort);
+> +    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
+> +                                       memory_region_size(mr), &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP,
+> +                             &error_abort);
+if one considers memory device as separate black box, then set might fail
+(there is no guaranties that later on set could return a error)
+
+So I'd keep local_err & co for set actions through out all *_plug handlers
+
+
+>  out:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> -void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+> -                  Error **errp)
+> +void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp)
+>  {
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+>                                                                &error_abort);
+>      MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+> -    Error *local_err = NULL;
+>      uint64_t addr;
+>  
+> -    addr = object_property_get_uint(OBJECT(dimm),
+> -                                    PC_DIMM_ADDR_PROP, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -
+> -    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
+> -                                       memory_region_size(mr), &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -
+> -    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> +    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
+> +                                    &error_abort);
+>      trace_mhp_pc_dimm_assigned_address(addr);
+>  
+>      memory_device_plug_region(machine, mr, addr);
+>      vmstate_register_ram(vmstate_mr, dev);
+> -
+> -out:
+> -    error_propagate(errp, local_err);
+>  }
+>  
+>  void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index bf012235b6..33543c6373 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3150,13 +3150,12 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+> -    uint64_t align, size, addr;
+> +    uint64_t size, addr;
+>      uint32_t node;
+>  
+> -    align = memory_region_get_alignment(mr);
+>      size = memory_region_size(mr);
+>  
+> -    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
+> +    pc_dimm_plug(dev, MACHINE(ms), &local_err);
+>      if (local_err) {
+>          goto out;
+>      }
+> @@ -3223,7 +3222,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          return;
+>      }
+>  
+> -    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), NULL, errp);
+>  }
+>  
+>  struct sPAPRDIMMState {
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index 7b120416d1..6457b2a25f 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -79,8 +79,8 @@ typedef struct PCDIMMDeviceClass {
+>                                                 Error **errp);
+>  } PCDIMMDeviceClass;
+>  
+> -void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
+> -void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+> -                  Error **errp);
+> +void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
+> +                      const uint64_t *compat_align, Error **errp);
+> +void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp);
+>  void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+>  #endif
