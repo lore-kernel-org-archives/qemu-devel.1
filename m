@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fYvsc-0005yc-2j
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:04:15 -0400
+	(envelope-from <david@redhat.com>) id 1fYw3B-0003Qx-9r
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fYvsY-0007Cp-U5
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:04:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37126 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fYvsY-00079W-OR
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:04:10 -0400
-References: <20180629135616.16570-1-mark.cave-ayland@ilande.co.uk>
-	<20180629135616.16570-2-mark.cave-ayland@ilande.co.uk>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <dcf2364c-5422-e440-1713-b10e08023fbf@redhat.com>
-Date: Fri, 29 Jun 2018 18:04:02 +0200
+	(envelope-from <david@redhat.com>) id 1fYw38-0004M1-36
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:15:09 -0400
+References: <20180628121417.1980-1-david@redhat.com>
+	<20180628121417.1980-3-david@redhat.com>
+	<20180629164903.1630ea28@redhat.com>
+	<94085ac5-0242-1cb5-065a-7e50183792bd@redhat.com>
+	<20180629175641.13a2a747@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c310070c-dc0f-ee31-62c5-c10e6d84cc28@redhat.com>
+Date: Fri, 29 Jun 2018 18:14:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180629135616.16570-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180629175641.13a2a747@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] sysbus: always allow
- explicit_ofw_unit_address() to override address generation
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] util/oslib-win32: indicate
+ alignment for qemu_anon_ram_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com, mst@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
 
-On 06/29/18 15:56, Mark Cave-Ayland wrote:
-> Some SysBusDevices either use sysbus_init_mmio() without
-> sysbus_mmio_map() or the first MMIO memory region doesn't represent the
-> bus address, causing a firmware device path with an invalid address to
-> be generated.
+On 29.06.2018 17:56, Igor Mammedov wrote:
+> On Fri, 29 Jun 2018 17:39:10 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> SysBusDeviceClass does provide a virtual explicit_ofw_unit_address()
-> method that can be used to override this process, but it was originally intended
-> only as as a fallback option meaning that any existing MMIO memory regions still
-> take priority whilst determining the firmware device address.
+>> On 29.06.2018 16:49, Igor Mammedov wrote:
+>>> On Thu, 28 Jun 2018 14:14:15 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> Let's set the alignment just like for the posix variant. This will
+>>>> implicitly set the alignment of the underlying memory region and
+>>>> therefore make memory_region_get_alignment(mr) return something > 0 for
+>>>> all memory backends applicable to PCDIMM/NVDIMM.
+>>>>
+>>>> This will allow us to drop special handling in pc.c for
+>>>> memory_region_get_alignment(mr) == 0, as we can then assume that it is
+>>>> always set (and AFAICS >= getpagesize()).
+>>>>
+>>>> For pc in pc_memory_plug(), under Windows TARGET_PAGE_SIZE == getpagesize(),
+>>>> therefore alignment of DIMMs will not change, and therefore also not the
+>>>> guest physical memory layout.  
+>>> why not use QEMU_VMALLOC_ALIGN for consistency (on win => getpagesize())
+>>> instead of TARGET_PAGE_SIZE like linux allocator does?  
+>>
+>> Sure we can do that, I wanted to match here exactly what has been
+>> written in the comment.
+>>
+>>>
+>>> Also looking at FIXME comment it notes that VirtualAlloc might have 64K
+>>> alignment (though I haven't found it in VirtualAlloc manual).
+>>> If that's true then we might need set *align to it to avoid auto-picked
+>>> address overlap with previous allocation (not really sure about it).  
+>>
+>> "To determine the size of a page and the allocation granularity on the
+>> host computer, use the GetSystemInfo" [1]
+>>
+>> "The size of the region, in bytes. If the lpAddress parameter is NULL,
+>> this value is rounded up to the next page boundary. " [1]
+>>
+>> Historically, this seems to be 64k. But it will always be at least 4k
+>> (page size). So what we could do is query the actual allocation granularity:
+>>
+>> int get_allocation_granularity(void) {
+>> 	SYSTEM_INFO system_info;
+>>
+>> 	GetSystemInfo(&system_info);
+>> 	return system_info.dwAllocationGranularity
+>> }
+>>
+>>
+>> "dwAllocationGranularity: The granularity for the starting address at
+>> which virtual memory can be allocated. For more information, see
+>> VirtualAlloc." [2]
+>>
+>> What do you think?
+> maybe do following:
 > 
-> There is currently only one user of explicit_ofw_unit_address() and that
-> is the PCI expander bridge (PXB) device which has no MMIO/PIO resources
-> defined. This enables us to allow explicit_ofw_unit_address() to take
-> priority without affecting backwards compatibility, allowing the address
-> to be customised as required.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/core/sysbus.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index ecfb0cfc0e..1ee0c162f4 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -293,16 +293,8 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
->  {
->      SysBusDevice *s = SYS_BUS_DEVICE(dev);
->      SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(s);
-> -    /* for the explicit unit address fallback case: */
->      char *addr, *fw_dev_path;
->  
-> -    if (s->num_mmio) {
-> -        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
-> -                               s->mmio[0].addr);
-> -    }
-> -    if (s->num_pio) {
-> -        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
-> -    }
->      if (sbc->explicit_ofw_unit_address) {
->          addr = sbc->explicit_ofw_unit_address(s);
->          if (addr) {
-> @@ -311,6 +303,13 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
->              return fw_dev_path;
->          }
->      }
-> +    if (s->num_mmio) {
-> +        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
-> +                               s->mmio[0].addr);
-> +    }
-> +    if (s->num_pio) {
-> +        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
-> +    }
->      return g_strdup(qdev_fw_name(dev));
->  }
->  
-> 
+>     *align = MAX(get_allocation_granularity(), getpagesize())
 
+That sounds like the best alternative when having to guess what is
+actually going on behind the curtains.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+-- 
+
+Thanks,
+
+David / dhildenb
