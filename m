@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYzoW-0002vg-7G
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:16:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fYzpC-0003En-PO
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYzoV-0006wc-7w
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:16:16 -0400
-References: <CAFLvi203QwYCdfdhq6pb855xOZbt-bOiMsYU3cDSx6itHeu2=w@mail.gmail.com>
-	<ceff4595-026d-ae13-5628-042cf043d0ac@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <007fb94d-5a04-0ee1-5d1b-6fd41e67c9a4@redhat.com>
-Date: Fri, 29 Jun 2018 15:16:08 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1fYzp9-0007ho-L0
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:16:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYzp9-0007gP-Ec
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:16:55 -0400
+Date: Fri, 29 Jun 2018 17:16:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180629201652.GA7451@localhost.localdomain>
+References: <153026817452.402489.13386335348113684056.stgit@bahia.lan>
+	<8730183a-3e16-931e-c990-24a5e169b2d9@redhat.com>
+	<20180629103910.GE27016@redhat.com>
+	<65a3597e-5560-1fd3-4f04-8a60e9e99b44@redhat.com>
+	<20180629130701.6ab5d88a@bahia.lan>
+	<29caab50-f853-66bf-805e-984e76619a9a@redhat.com>
+	<20180629111405.GG27016@redhat.com>
+	<20180629171821.5e379a31@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ceff4595-026d-ae13-5628-042cf043d0ac@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [BUG] qed_aio_write_alloc: Assertion
- `s->allocating_acb == NULL' failed.
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180629171821.5e379a31@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] accel: forbid early use of
+ kvm_enabled() and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +35,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Quytelda Kahja <quytelda@tamalin.org>, qemu-devel@nongnu.org
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On 06/29/2018 03:07 PM, John Snow wrote:
-> CC Qemu Block; looks like QED is a bit busted.
-> 
-> On 06/27/2018 10:25 AM, Quytelda Kahja wrote:
->> Hello all,
->> I wanted to submit a bug report in the tracker, but it seem to require
->> an Ubuntu One account, which I'm having trouble with, so I'll just
->> give it here and hopefully somebody can make use of it.  The issue
->> seems to be in an experimental format, so it's likely not very
->> consequential anyway.
+On Fri, Jun 29, 2018 at 05:18:21PM +0200, Igor Mammedov wrote:
+> On Fri, 29 Jun 2018 12:14:05 +0100
+> Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+>=20
+> > On Fri, Jun 29, 2018 at 01:08:38PM +0200, Paolo Bonzini wrote:
+> > > On 29/06/2018 13:07, Greg Kurz wrote: =20
+> > > >>>> Also asserting current_machine !=3D NULL is not necessary, sin=
+ce you're
+> > > >>>> immediately dereferencing it.   =20
+> > > >>> Is there a practical way to simply initialize the accelerators =
+earlier
+> > > >>> in startup sequence, so we just remove or at least reduce, the =
+liklihood
+> > > >>> of accessing it too early ?   =20
+> > > >> We can try, though not for 3.0 of course.
+> > > >> =20
+> > > > FWIW, the motivation for this patch was kvm_enabled() being calle=
+d under
+> > > > the class_init function of the machine TypeInfo. This happens way=
+ earlier
+> > > > than accelerator init. Not sure this is doable, but I can have a =
+look.
+> > > >  =20
+> > >=20
+> > > Probably not, that's way too early indeed. =20
+> >=20
+> > Yeah, doing anything non-trivial in class_init is just asking for tro=
+uble,
+> > as conceivably nothing is initialized at that point.=20
+> isn't class_init called lazily? (so it might actually work as far as ty=
+pe
+> isn't touched before kvm is initialized)
 
-Analysis in another thread may be relevant:
+You have a good point: this means class_init bugs won't always
+trigger the assert because of lazy class_init.  It would be a
+good idea to add a functional test that calls qom-list-types
+using --preconfig to try to trigger them.
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08963.html
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--=20
+Eduardo
