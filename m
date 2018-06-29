@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYpu8-0006Bt-FM
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:41:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fYpv8-0006il-2r
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYpu7-000313-68
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:41:24 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:45988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYpu7-0002zb-0E
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:41:23 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id 188-v6so7873264oid.12
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:41:22 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fYpv4-000400-TC
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:42:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55034 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fYpv4-0003yy-Mm
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:42:22 -0400
+Date: Fri, 29 Jun 2018 10:42:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180629094213.GD2568@work-vm>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-7-xiaoguangrong@tencent.com>
+	<20180619073034.GA14814@xz-mi>
+	<e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
-References: <20180627174435.31800-1-alistair.francis@wdc.com>
-	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
-	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 10:41:01 +0100
-Message-ID: <CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
+Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +31,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair23@gmail.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 28 June 2018 at 22:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> On 06/28/2018 01:52 PM, Peter Maydell wrote:
->> On 27 June 2018 at 18:44, Alistair Francis <alistair.francis@wdc.com> wr=
+* Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
+>=20
+> Hi Peter,
+>=20
+> Sorry for the delay as i was busy on other things.
+>=20
+> On 06/19/2018 03:30 PM, Peter Xu wrote:
+> > On Mon, Jun 04, 2018 at 05:55:14PM +0800, guangrong.xiao@gmail.com wr=
 ote:
->>> The following changes since commit 00928a421d47f49691cace1207481b7aad31=
-b1f1:
->>>
->>>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-2=
-0180626' into staging (2018-06-26 18:23:49 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180627
->>>
->>> for you to fetch changes up to e5f5e16b67dc8a342f937bc00ebb2a6475e35050=
-:
->>>
->>>   hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device (2018-06-2=
-7 10:35:19 -0700)
->>>
->>
->> Something strange is up with the key used to sign this:
->>
->> $ gpg --recv-keys 7048B74B4C1B39E4
->> gpg: requesting key 0x7048B74B4C1B39E4 from hkp server keys.gnupg.net
->> gpg: key 0xE48E3BC2C123ED93: no valid user IDs
->> gpg: this may be caused by a missing self-signature
->> gpg: Total number processed: 1
->> gpg:           w/o user IDs: 1
->
-> It seems the SKS keyserver pool is having some problem:
-> https://sks-keyservers.net/status/
+> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > >=20
+> > > Detecting zero page is not a light work, we can disable it
+> > > for compression that can handle all zero data very well
+> >=20
+> > Is there any number shows how the compression algo performs better
+> > than the zero-detect algo?  Asked since AFAIU buffer_is_zero() might
+> > be fast, depending on how init_accel() is done in util/bufferiszero.c=
+.
+>=20
+> This is the comparison between zero-detection and compression (the targ=
+et
+> buffer is all zero bit):
+>=20
+> Zero 810 ns Compression: 26905 ns.
+> Zero 417 ns Compression: 8022 ns.
+> Zero 408 ns Compression: 7189 ns.
+> Zero 400 ns Compression: 7255 ns.
+> Zero 412 ns Compression: 7016 ns.
+> Zero 411 ns Compression: 7035 ns.
+> Zero 413 ns Compression: 6994 ns.
+> Zero 399 ns Compression: 7024 ns.
+> Zero 416 ns Compression: 7053 ns.
+> Zero 405 ns Compression: 7041 ns.
+>=20
+> Indeed, zero-detection is faster than compression.
+>=20
+> However during our profiling for the live_migration thread (after rever=
+ted this patch),
+> we noticed zero-detection cost lots of CPU:
+>=20
+>  12.01%  kqemu  qemu-system-x86_64            [.] buffer_zero_sse2     =
+                                                                         =
+                                                                         =
+                    =E2=97=86
 
-> The server is temporarily unable to service your request due to
-> maintenance downtime or capacity problems. Please try again later.
+Interesting; what host are you running on?
+Some hosts have support for the faster buffer_zero_ss4/avx2
 
-Hmm, there does seem to be something up with the pool. On
-the other hand:
+>   7.60%  kqemu  qemu-system-x86_64            [.] ram_bytes_total      =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   6.56%  kqemu  qemu-system-x86_64            [.] qemu_event_set       =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   5.61%  kqemu  qemu-system-x86_64            [.] qemu_put_qemu_file   =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   5.00%  kqemu  qemu-system-x86_64            [.] __ring_put           =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   4.89%  kqemu  [kernel.kallsyms]             [k] copy_user_enhanced_fa=
+st_string                                                                =
+                                                                         =
+                    =E2=96=92
+>   4.71%  kqemu  qemu-system-x86_64            [.] compress_thread_data_=
+done                                                                     =
+                                                                         =
+                    =E2=96=92
+>   3.63%  kqemu  qemu-system-x86_64            [.] ring_is_full         =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   2.89%  kqemu  qemu-system-x86_64            [.] __ring_is_full       =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   2.68%  kqemu  qemu-system-x86_64            [.] threads_submit_reques=
+t_prepare                                                                =
+                                                                         =
+                    =E2=96=92
+>   2.60%  kqemu  qemu-system-x86_64            [.] ring_mp_get          =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   2.25%  kqemu  qemu-system-x86_64            [.] ring_get             =
+                                                                         =
+                                                                         =
+                    =E2=96=92
+>   1.96%  kqemu  libc-2.12.so                  [.] memcpy
+>=20
+> After this patch, the workload is moved to the worker thread, is it
+> acceptable?
+>=20
+> >=20
+> >  From compression rate POV of course zero page algo wins since it
+> > contains no data (but only a flag).
+> >=20
+>=20
+> Yes it is. The compressed zero page is 45 bytes that is small enough i =
+think.
 
-> $ gpg --keyserver hkp://18.191.65.131 --recv-keys 7048B74B4C1B39E4
+So the compression is ~20x slow and 10x the size;  not a great
+improvement!
 
-This command with this specific server doesn't work for me
-(fails the same way with the "no valid user IDs" message),
-and using keyserver.ubuntu.com (which seems otherwise fine)
-also fails that way...
+However, the tricky thing is that in the case of a guest which is mostly
+non-zero, this patch would save that time used by zero detection, so it
+would be faster.
 
-thanks
--- PMM
+> Hmm, if you do not like, how about move detecting zero page to the work=
+ thread?
+
+That would be interesting to try.
+
+Dave
+
+> Thanks!
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
