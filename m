@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYtKl-0004Xh-8s
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:21:08 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hU-9N
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYtKh-0007lM-CF
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:21:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYtKh-0007hi-3o
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:21:03 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5TDIkSA027862
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 09:21:01 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jwms2jfud-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 09:21:01 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 29 Jun 2018 14:20:59 +0100
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 29 Jun 2018 15:20:45 +0200
-In-Reply-To: <20180629132045.429006-1-groug@kaod.org>
-References: <20180629132045.429006-1-groug@kaod.org>
-Message-Id: <20180629132045.429006-3-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 2/2] 9p: darwin: Explicitly cast comparisons of
- mode_t with -1
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUC-0007Hq-Ea
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:57 -0400
+From: Luc Michel <luc.michel@greensocs.com>
+Date: Fri, 29 Jun 2018 15:29:47 +0200
+Message-Id: <20180629132954.24269-14-luc.michel@greensocs.com>
+In-Reply-To: <20180629132954.24269-1-luc.michel@greensocs.com>
+References: <20180629132954.24269-1-luc.michel@greensocs.com>
+Subject: [Qemu-devel] [PATCH v3 13/20] intc/arm_gic: Implement
+ virtualization extensions in gic_cpu_(read|write)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,40 +21,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>, Keno Fischer <keno@juliacomputing.com>
+Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-From: Keno Fischer <keno@juliacomputing.com>
+Implement virtualization extensions in the gic_cpu_read() and
+gic_cpu_write() functions. Those are the last bits missing to fully
+support virtualization extensions in the CPU interface path.
 
-Comparisons of mode_t with -1 require an explicit cast, since mode_t
-is unsigned on Darwin.
-
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- hw/9pfs/9p-local.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/intc/arm_gic.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 828e8d6e5638..c30f4f26bd68 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -308,7 +308,7 @@ update_map_file:
-     if (credp->fc_gid != -1) {
-         gid = credp->fc_gid;
-     }
--    if (credp->fc_mode != -1) {
-+    if (credp->fc_mode != (mode_t)-1) {
-         mode = credp->fc_mode;
-     }
-     if (credp->fc_rdev != -1) {
-@@ -414,7 +414,7 @@ static int local_set_xattrat(int dirfd, const char *path, FsCred *credp)
-             return err;
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 434dc9c7b2..2b1fa280eb 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -1336,9 +1336,12 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+     case 0xd0: case 0xd4: case 0xd8: case 0xdc:
+     {
+         int regno = (offset - 0xd0) / 4;
++        int nr_aprs = gic_is_vcpu(cpu) ? GIC_VIRT_NR_APRS : GIC_NR_APRS;
+ 
+-        if (regno >= GIC_NR_APRS || s->revision != 2) {
++        if (regno >= nr_aprs || s->revision != 2) {
+             *data = 0;
++        } else if (gic_is_vcpu(cpu)) {
++            *data = s->h_apr[gic_get_vcpu_real_id(cpu)];
+         } else if (gic_cpu_ns_access(s, cpu, attrs)) {
+             /* NS view of GICC_APR<n> is the top half of GIC_NSAPR<n> */
+             *data = gic_apr_ns_view(s, regno, cpu);
+@@ -1352,7 +1355,7 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+         int regno = (offset - 0xe0) / 4;
+ 
+         if (regno >= GIC_NR_APRS || s->revision != 2 || !gic_has_groups(s) ||
+-            gic_cpu_ns_access(s, cpu, attrs)) {
++            gic_cpu_ns_access(s, cpu, attrs) || gic_is_vcpu(cpu)) {
+             *data = 0;
+         } else {
+             *data = s->nsapr[regno][cpu];
+@@ -1387,7 +1390,8 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+                 s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
+             }
+         } else {
+-            s->bpr[cpu] = MAX(value & 0x7, GIC_MIN_BPR);
++            int min_bpr = gic_is_vcpu(cpu) ? GIC_VIRT_MIN_BPR : GIC_MIN_BPR;
++            s->bpr[cpu] = MAX(value & 0x7, min_bpr);
          }
-     }
--    if (credp->fc_mode != -1) {
-+    if (credp->fc_mode != (mode_t)-1) {
-         uint32_t tmp_mode = cpu_to_le32(credp->fc_mode);
-         err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.mode", &tmp_mode,
-                                    sizeof(mode_t), 0);
+         break;
+     case 0x10: /* End Of Interrupt */
+@@ -1404,11 +1408,14 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+     case 0xd0: case 0xd4: case 0xd8: case 0xdc:
+     {
+         int regno = (offset - 0xd0) / 4;
++        int nr_aprs = gic_is_vcpu(cpu) ? GIC_VIRT_NR_APRS : GIC_NR_APRS;
+ 
+-        if (regno >= GIC_NR_APRS || s->revision != 2) {
++        if (regno >= nr_aprs || s->revision != 2) {
+             return MEMTX_OK;
+         }
+-        if (gic_cpu_ns_access(s, cpu, attrs)) {
++        if (gic_is_vcpu(cpu)) {
++            s->h_apr[gic_get_vcpu_real_id(cpu)] = value;
++        } else if (gic_cpu_ns_access(s, cpu, attrs)) {
+             /* NS view of GICC_APR<n> is the top half of GIC_NSAPR<n> */
+             gic_apr_write_ns_view(s, regno, cpu, value);
+         } else {
+@@ -1423,6 +1430,9 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         if (regno >= GIC_NR_APRS || s->revision != 2) {
+             return MEMTX_OK;
+         }
++        if (gic_is_vcpu(cpu)) {
++            return MEMTX_OK;
++        }
+         if (!gic_has_groups(s) || (gic_cpu_ns_access(s, cpu, attrs))) {
+             return MEMTX_OK;
+         }
 -- 
-2.14.4
+2.17.1
