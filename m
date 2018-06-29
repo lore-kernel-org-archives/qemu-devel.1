@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fYjv8-0000ZF-NJ
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:18:04 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fYkQQ-0005bP-Q5
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fYjv6-0004zz-Nl
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:18:02 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:37080)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fYkQN-0004y3-O2
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:50:22 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:41878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1fYjv6-0004yQ-95
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:18:00 -0400
-Received: by mail-io0-x242.google.com with SMTP id s26-v6so7181915ioj.4
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 20:18:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1fYkQN-0004wD-HC
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 23:50:19 -0400
+Received: by mail-pl0-x243.google.com with SMTP id w8-v6so3788133ply.8
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 20:50:19 -0700 (PDT)
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-7-xiaoguangrong@tencent.com>
+	<20180619073034.GA14814@xz-mi>
+	<e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
+	<20180628093650.GB3513@redhat.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <5c82a24f-6058-9b0d-a99e-dc298ba85674@gmail.com>
+Date: Fri, 29 Jun 2018 11:50:11 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180628113615.ml3t5xvxdftowsgj@kamzik.brq.redhat.com>
-References: <1530094388-607-1-git-send-email-hongbo.zhang@linaro.org>
-	<20180627165616.34d36aaf@redhat.com>
-	<CAHmQWvDAHmDvamC8tUF8JbLjbssAax+5Hza6S+w_go=YbM4wDA@mail.gmail.com>
-	<20180628090415.lysdgq66x5kkgq3x@kamzik.brq.redhat.com>
-	<CAHmQWvCmdOt-Bq3sM8SUgB4-tgwKKLhTBBP+d0-vBWfaT=2pLA@mail.gmail.com>
-	<20180628113615.ml3t5xvxdftowsgj@kamzik.brq.redhat.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Fri, 29 Jun 2018 11:17:58 +0800
-Message-ID: <CAHmQWvC_TsgJsaGuiZBjYM=qzpwGThvyp1BTsaVEWewFiP7DMg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm: Add SBSA machine type
+In-Reply-To: <20180628093650.GB3513@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,233 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, dgilbert@redhat.com, qemu-devel@nongnu.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, pbonzini@redhat.com
 
-On 28 June 2018 at 19:36, Andrew Jones <drjones@redhat.com> wrote:
-> On Thu, Jun 28, 2018 at 06:13:28PM +0800, Hongbo Zhang wrote:
->> On 28 June 2018 at 17:04, Andrew Jones <drjones@redhat.com> wrote:
->> > On Thu, Jun 28, 2018 at 04:11:56PM +0800, Hongbo Zhang wrote:
->> >> On 27 June 2018 at 22:56, Igor Mammedov <imammedo@redhat.com> wrote:
->> >> > On Wed, 27 Jun 2018 18:13:08 +0800
->> >> > Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> >> >
->> >> >> This patch introduces a new Arm machine type 'SBSA' with features:
->> >> >>  - Based on legacy 'virt' machine type.
->> >> >>  - Newly designed memory map.
->> >> >>  - EL2 and EL3 are enabled by default.
->> >> >>  - AHCI controller attached to system bus, and then CDROM and hard disc
->> >> >>    can be added to it.
->> >> >>  - EHCI controller attached to system bus, with USB mouse and key board
->> >> >>    installed by default.
->> >> >>  - E1000 ethernet card on PCIE bus.
->> >> >>  - VGA display adaptor on PCIE bus.
->> >> >>  - Default CPU type cortex-a57, 4 cores, and 1G bytes memory.
->> >> >>  - No virtio functions enabled, since this is to emulate real hardware.
->> >> > I'd drop all default (convenience) devices unless they are specified in SBSA,
->> >> > and make management explicitly provide needed devices on CLI.
->> >> >
->> >> Thanks for review.
->> >>
->> >> I mentioned these default values because they are different from the
->> >> 'virt' machine from which this sbsa machine derives. (sbsa has uart
->> >> too, it is same with 'virt' PL011).
->> >> Qemu implementation should has such default values, if the sbsa
->> >> machine does not offer them, they fallback to the parent machine's.
->> >
->> > QEMU's default devices is one of the problems with QEMU. Any serious
->> > use of QEMU must be done with '-nodefaults' and then explicit devices.
->> > To avoid requiring long command lines QEMU supports '-readconfig'. We
->> > already have two mach-virt configs that can be used as a basis for a
->> > new SBSA config. See docs/config/mach-virt-graphical.cfg and
->> > docs/config/mach-virt-serial.cfg.
->> >
->> When Linaro members discussed the target, some of them want this can
->> be used easily and simply "qemu -bios xxx -hda yyy", just like the
->> typical x86 machines, that is another reason I set default values.
+
+Hi Daniel,
+
+On 06/28/2018 05:36 PM, Daniel P. Berrangé wrote:
+> On Thu, Jun 28, 2018 at 05:12:39PM +0800, Xiao Guangrong wrote:
 >>
->> >> The parent 'virt' machine's default cpu type is cortext-a15, that is
->> >> not proper for a armv8 server, and its default memory is 128M, that is
->> >> not enough to load uefi, even 512M cannot either, so I set the sbsa
->> >> defualt minimal memory to 1G.
->> >
->> > config files support setting a memory size, but unfortunately not the
->> > CPU type. I'm not sure why it doesn't. Maybe readconfig can be taught
->> > to do so?
->> >
->> >>
->> >> The core numbers, is a new default. Server is smp in common sense,
->> >> single core isn't like a server, so some even want to set to max
->> >> capability as default, but this isn't good either I think, because
->> >> gicv3 memory space in Qemu can even support more than 200 cores, that
->> >> is too much.
->> >
->> > Core numbers can be managed with config
->> > [smp-opts]
->> >   cpus = "4"
->> >
->> >> (gicv2 currently support 8 cores, but there are issues to boot smp for
->> >> both gicv2 and gicv3 now, it should be another thread)
->> >>
->> >> >>
->> >> >> This is the prototype, more features can be added in futrue.
->> >> >>
->> >> >> Purpose of this is to have a standard QEMU platform for Arm firmware
->> >> >> developement etc. where the legacy machines cannot meets requirements.
->> >> >>
->> >> >> Arm Trusted Firmware and UEFI porting to this are done seperately.
->> >> >>
->> >> >> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
->> >> >> ---
->> >> > [...]
->> >> >
->> >> >> @@ -94,6 +98,8 @@
->> >> >>
->> >> >>  #define PLATFORM_BUS_NUM_IRQS 64
->> >> >>
->> >> >> +#define SATA_NUM_PORTS 6
->> >> >> +
->> >> >>  /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
->> >> >>   * RAM can go up to the 256GB mark, leaving 256GB of the physical
->> >> >>   * address space unallocated and free for future use between 256G and 512G.
->> >> >> @@ -168,6 +174,47 @@ static const int a15irqmap[] = {
->> >> >>      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
->> >> >>  };
->> >> >>
->> >> >> +static const MemMapEntry sbsa_memmap[] = {
->> >> >> +    /* Space up to 0x8000000 is reserved for a boot ROM */
->> >> >> +    [VIRT_FLASH] =              {          0, 0x08000000 },
->> >> >> +    [VIRT_CPUPERIPHS] =         { 0x08000000, 0x00020000 },
->> >> >> +    /* GIC distributor and CPU interfaces sit inside the CPU peripheral space */
->> >> >> +    [VIRT_GIC_DIST] =           { 0x08000000, 0x00010000 },
->> >> >> +    [VIRT_GIC_CPU] =            { 0x08010000, 0x00010000 },
->> >> >> +    [VIRT_GIC_V2M] =            { 0x08020000, 0x00001000 },
->> >> >> +    /* The space in between here is reserved for GICv3 CPU/vCPU/HYP */
->> >> >> +    [VIRT_GIC_ITS] =            { 0x08080000, 0x00020000 },
->> >> >> +    /* This redistributor space allows up to 2*64kB*123 CPUs */
->> >> >> +    [VIRT_GIC_REDIST] =         { 0x080A0000, 0x00F60000 },
->> >> >> +    [VIRT_UART] =               { 0x09000000, 0x00001000 },
->> >> >> +    [VIRT_RTC] =                { 0x09010000, 0x00001000 },
->> >> >> +    [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
->> >> >> +    [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->> >> >> +    [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->> >> >> +    [VIRT_AHCI] =               { 0x09050000, 0x00010000 },
->> >> >> +    [VIRT_EHCI] =               { 0x09060000, 0x00010000 },
->> >> >> +    [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
->> >> >> +    [VIRT_SECURE_MEM] =         { 0x0e000000, 0x01000000 },
->> >> >> +    [VIRT_PCIE_MMIO] =          { 0x10000000, 0x7fff0000 },
->> >> >> +    [VIRT_PCIE_PIO] =           { 0x8fff0000, 0x00010000 },
->> >> >> +    [VIRT_PCIE_ECAM] =          { 0x90000000, 0x10000000 },
->> >> >> +    /* Second PCIe window, 508GB wide at the 4GB boundary */
->> >> >> +    [VIRT_PCIE_MMIO_HIGH] =     { 0x100000000ULL, 0x7F00000000ULL },
->> >> >> +    [VIRT_MEM] =                { 0x8000000000ULL, RAMLIMIT_BYTES },
->> >> > does spec require support for 32-bit guest or is it only 64bit,
->> >> > if the later I'd put it somewhere high where we can increase region
->> >> > to terrabytes.
->> >> >
->> >> Spec only requires it to be compliant with armv8.
->> >> Designed purpose of this is to run 64bit guests, because in practice
->> >> an arm server is usually 64bit.
->> >
->> > I agree with Igor that if we're going to add a new machine type that is
->> > only for 64bit, then we shouldn't base our memory map on mach-virt's,
->> > but rather create a new one taking advantage of a much larger address
->> > space. Firmware would need to start taking the base of RAM from the
->> > DTB, and the address of the DTB from x0, but it probably should anyway.
->> >
->> >>
->> >> > another idea that was floating around (considering we don't care about legacy)
->> >> > is to use flexible base address and tell firmware[*] via register where it's.
->> >> > Then it would be able to support 32 guest with small amount of RAM
->> >> > and 64 bit guests with huge amount of RAM using a single memory range.
->> >> > (to keep memory management simple). It's also future friendly, as in case
->> >> > if we need to move it we could do easily by changing base address for new machine
->> >> > type only and firmware would automatically pick it up from register
->> >> > (without all compat nightmare we have with 2 regions in pc/q35 machines).
->> >> >
->> >> > [*] When I've talked with Laszlo about it he said it was not easy to do in uefi
->> >> > but still possible.
->> >> Sounds not easy.
->> >> I think the first step is to get this merged, and then we can add more
->> >> features if necessary.
->> >> I've already seen some points in trusted firmware and uefi need to be fixed.
->> >
->> > It sounds to me like the current mach-virt machine type, with an SBSA
->> > readconfig file would be sufficient for now, and that we should only
->> > merge a new machine type when firmware supports a dynamic RAM base,
->> > allowing the new machine type to have quite a different memory map.
->> >
->> Had a quick look at readconfig, it seems it cannot satisfy the SBSA design.
->>
->> The SBSA has EHCI and AHCI on the top level, eg so called system bus
->> in the Arm system, that is the case in real hardware.
->> If we use readconfig, they should appear at PCIE bus, that is not the
->> case we want.
->
-> SBSA doesn't even require EHCI or AHCI, afaict, so the decision to have
-> them on the system bus must have a different rationale. Can you please
-> share it? Also, when making that decision were other operating systems
-> (Windows) considered?
->
-Well, during the development stage, two names were used: Enterprise
-and SBSA. I was hesitating to decide which one is better.
-Now I know the Enterprise is better, because what we want is a
-standard armv8 platform as a base of firmware and software
-development. For armv7, there is vexpress acts as such role, but for
-armv8, there is no such platform, 'virt' is really a virtual one, no
-real hard ware is like that, we want a qemu platform similar as real
-armv8 hardware, we want fw/sw developed on this platform can be easily
-run on real hardware when it is ready, we want can be used as simple
-as typical x86 "qemu -bios -hda" if no specific requirements needed.
-But when term SBSA is used here, people may pay much attention to
-details of SBSA spec itself, that is not we want, we may want some
-part of it, but not fully compliant with it. SBSA spec described much
-requirements on CPU cores, and the armv8 emulation in Qemu is already
-there, my Enterprise/SBSA platform doesn't touch it at all.
-So I am considering giving up name SBSA, reuse name Enterprise.
 
-As to OS, Windows isn't considered yet. I've tested Debian official arm release.
+>> After this patch, the workload is moved to the worker thread, is it
+>> acceptable?
+> 
+> It depends on your point of view. If you have spare / idle CPUs on the host,
+> then moving workload to a thread is ok, despite the CPU cost of compression
+> in that thread being much higher what what was replaced, since you won't be
+> taking CPU resources away from other contending workloads.
+> 
+> I'd venture to suggest though that we should probably *not* be optimizing for
+> the case of idle CPUs on the host. More realistic is to expect that the host
+> CPUs are near fully committed to work, and thus the (default) goal should be
+> to minimize CPU overhead for the host as a whole. From this POV, zero-page
+> detection is better than compression due to > x10 better speed.
+> 
+> Given the CPU overheads of compression, I think it has fairly narrow use
+> in migration in general when considering hosts are often highly committed
+> on CPU.
 
-> Anyway, I believe with some work you should be able to modify the platform
-> bus code to allow them to be specified on the command line and still show
-> up on the system bus.
->
->> And when people start to use this, I think more features will be added in.
->>
->> "firmware supports a dynamic RAM base", -- this need to be done, but
->> other porting on this platform have been done, initial idea is to have
->> a SBSA prototype first, and firmware later, and then further usage,
->> such as CCIX development, can be done on this platform at last.
->
-> The firmware has no reason to change if the base of RAM matches mach-virt.
-> To me, it seems this machine model and the firmware change should be done
-> together.
->
-Oops, it was my misunderstand, I though "firmware supports a dynamic
-RAM base" is new feature and requirement, it is not, we've already use
-it.
+I understand your concern, however, it is not bad.
 
-Firmware need some changes, for new peripherals, new memory map, and
-some SBSA requirement for example GIVv3(after level2)
-Firmware is ready, will be upstreamed soon:
-https://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=sbsa_gicv3
-https://git.linaro.org/people/radoslaw.biernacki/atf.git/log/?h=sbsa12
-https://git.linaro.org/people/radoslaw.biernacki/edk2.git/
+First, we tolerate the case that the thread runs little slowly - we do
+not wait the thread becoming free, instead, we directly posted the page
+out as normal (zero detecting still works for the normal page), so it
+at least makes the performance not worse then the case compression is
+not used.
 
+Second we think the reasonable configuration is that the system should
+have enough CPU resource to run the number of threads the user
+configured. BTW, the work we will post out will make these parameters
+be runtimely configurable, then a control daemon (e.g, libvirt) will
+adjust them based on the current load of the system and the statistic
+from QEMU. This is the topic we submitted to KVM Forum this year,
+hope it can be accepted.
 
-> Thanks,
-> drew
->
->>
->> >>
->> >> >
->> >> > same applies to GIG regions/mmio/ecam where we are twisting our hands when trying to
->> >> > increase number of things.
->> >> >
->> >> > [...]
->> >> >
->> >>
->> >
->> > Thanks,
->> > drew
->>
+At last, we have a watermark to trigger live migration on a
+load-balanced production, the watermark makes sure there is some free
+CPU resource left for other works.
+
+Thanks!
