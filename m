@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumk-0007Qe-NU
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumm-0007SM-4d
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumh-0006RI-EF
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:06 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43094)
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumj-0006Zd-UA
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:08 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYumg-0006MP-Nx
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:03 -0400
+	id 1fYumj-0006Sf-Jn
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:05 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumf-0004aE-IX
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:54:01 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumi-0004bj-Bc
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:54:04 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:53:07 +0100
-Message-Id: <20180629145347.652-16-peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 15:53:10 +0100
+Message-Id: <20180629145347.652-19-peter.maydell@linaro.org>
 In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
 References: <20180629145347.652-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 15/55] target/arm: Implement SVE load and
- broadcast element
+Subject: [Qemu-devel] [PULL 18/55] target/arm: Implement SVE prefetches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,185 +33,75 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180627043328.11531-10-richard.henderson@linaro.org
+Message-id: 20180627043328.11531-13-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper-sve.h    |  5 +++
- target/arm/sve_helper.c    | 41 +++++++++++++++++++++++++
- target/arm/translate-sve.c | 62 ++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  5 +++
- 4 files changed, 113 insertions(+)
+ target/arm/translate-sve.c | 21 +++++++++++++++++++++
+ target/arm/sve.decode      | 23 +++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 68e55a8d031..a5d3bb121c7 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -274,6 +274,11 @@ DEF_HELPER_FLAGS_3(sve_clr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_clr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_clr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(sve_movz_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_movz_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_movz_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_movz_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_4(sve_asr_zpzi_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_asr_zpzi_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_asr_zpzi_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 2d08b7dcd3d..93f29425907 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -995,6 +995,47 @@ void HELPER(sve_clr_d)(void *vd, void *vg, uint32_t desc)
-     }
- }
- 
-+/* Copy Zn into Zd, and store zero into inactive elements.  */
-+void HELPER(sve_movz_b)(void *vd, void *vn, void *vg, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] & expand_pred_b(pg[H1(i)]);
-+    }
-+}
-+
-+void HELPER(sve_movz_h)(void *vd, void *vn, void *vg, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] & expand_pred_h(pg[H1(i)]);
-+    }
-+}
-+
-+void HELPER(sve_movz_s)(void *vd, void *vn, void *vg, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[i] & expand_pred_s(pg[H1(i)]);
-+    }
-+}
-+
-+void HELPER(sve_movz_d)(void *vd, void *vn, void *vg, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+    for (i = 0; i < opr_sz; i += 1) {
-+        d[i] = n[1] & -(uint64_t)(pg[H1(i)] & 1);
-+    }
-+}
-+
- /* Three-operand expander, immediate operand, controlled by a predicate.
-  */
- #define DO_ZPZI(NAME, TYPE, H, OP)                              \
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index ceb46895e0d..a0d5b0fd586 100644
+index 11541b1a502..c73c3fc2151 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -606,6 +606,20 @@ static bool do_clr_zp(DisasContext *s, int rd, int pg, int esz)
+@@ -4303,3 +4303,24 @@ static bool trans_ST1_zprz(DisasContext *s, arg_ST1_zprz *a, uint32_t insn)
+                cpu_reg_sp(s, a->rn), fn);
      return true;
  }
- 
-+/* Copy Zn into Zd, storing zeros into inactive elements.  */
-+static void do_movz_zpz(DisasContext *s, int rd, int rn, int pg, int esz)
++
++/*
++ * Prefetches
++ */
++
++static bool trans_PRF(DisasContext *s, arg_PRF *a, uint32_t insn)
 +{
-+    static gen_helper_gvec_3 * const fns[4] = {
-+        gen_helper_sve_movz_b, gen_helper_sve_movz_h,
-+        gen_helper_sve_movz_s, gen_helper_sve_movz_d,
-+    };
-+    unsigned vsz = vec_full_reg_size(s);
-+    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       pred_full_reg_offset(s, pg),
-+                       vsz, vsz, 0, fns[esz]);
-+}
-+
- static bool do_zpzi_ool(DisasContext *s, arg_rpri_esz *a,
-                         gen_helper_gvec_3 *fn)
- {
-@@ -3999,6 +4013,54 @@ static bool trans_LD1RQ_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
-     return true;
- }
- 
-+/* Load and broadcast element.  */
-+static bool trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
-+{
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    unsigned vsz = vec_full_reg_size(s);
-+    unsigned psz = pred_full_reg_size(s);
-+    unsigned esz = dtype_esz[a->dtype];
-+    TCGLabel *over = gen_new_label();
-+    TCGv_i64 temp;
-+
-+    /* If the guarding predicate has no bits set, no load occurs.  */
-+    if (psz <= 8) {
-+        /* Reduce the pred_esz_masks value simply to reduce the
-+         * size of the code generated here.
-+         */
-+        uint64_t psz_mask = MAKE_64BIT_MASK(0, psz * 8);
-+        temp = tcg_temp_new_i64();
-+        tcg_gen_ld_i64(temp, cpu_env, pred_full_reg_offset(s, a->pg));
-+        tcg_gen_andi_i64(temp, temp, pred_esz_masks[esz] & psz_mask);
-+        tcg_gen_brcondi_i64(TCG_COND_EQ, temp, 0, over);
-+        tcg_temp_free_i64(temp);
-+    } else {
-+        TCGv_i32 t32 = tcg_temp_new_i32();
-+        find_last_active(s, t32, esz, a->pg);
-+        tcg_gen_brcondi_i32(TCG_COND_LT, t32, 0, over);
-+        tcg_temp_free_i32(t32);
-+    }
-+
-+    /* Load the data.  */
-+    temp = tcg_temp_new_i64();
-+    tcg_gen_addi_i64(temp, cpu_reg_sp(s, a->rn), a->imm << esz);
-+    tcg_gen_qemu_ld_i64(temp, temp, get_mem_index(s),
-+                        s->be_data | dtype_mop[a->dtype]);
-+
-+    /* Broadcast to *all* elements.  */
-+    tcg_gen_gvec_dup_i64(esz, vec_full_reg_offset(s, a->rd),
-+                         vsz, vsz, temp);
-+    tcg_temp_free_i64(temp);
-+
-+    /* Zero the inactive elements.  */
-+    gen_set_label(over);
-+    do_movz_zpz(s, a->rd, a->rd, a->pg, esz);
++    /* Prefetch is a nop within QEMU.  */
++    sve_access_check(s);
 +    return true;
 +}
 +
- static void do_st_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
-                       int msz, int esz, int nreg)
- {
++static bool trans_PRF_rr(DisasContext *s, arg_PRF_rr *a, uint32_t insn)
++{
++    if (a->rm == 31) {
++        return false;
++    }
++    /* Prefetch is a nop within QEMU.  */
++    sve_access_check(s);
++    return true;
++}
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 675b81aaa03..765e7e479b1 100644
+index 7d24c2bdc4c..80b955ff840 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -28,6 +28,7 @@
- %imm8_16_10     16:5 10:3
- %imm9_16_10     16:s6 10:3
- %size_23        23:2
-+%dtype_23_13    23:2 13:2
+@@ -794,6 +794,29 @@ LD1RQ_zprr      1010010 .. 00 ..... 000 ... ..... ..... \
+ LD1RQ_zpri      1010010 .. 00 0.... 001 ... ..... ..... \
+                 @rpri_load_msz nreg=0
  
- # A combination of tsz:imm3 -- extract esize.
- %tszimm_esz     22:2 5:5 !function=tszimm_esz
-@@ -751,6 +752,10 @@ LDR_pri         10000101 10 ...... 000 ... ..... 0 ....         @pd_rn_i9
- # SVE load vector register
- LDR_zri         10000101 10 ...... 010 ... ..... .....          @rd_rn_i9
- 
-+# SVE load and broadcast element
-+LD1R_zpri       1000010 .. 1 imm:6 1.. pg:3 rn:5 rd:5 \
-+                &rpri_load dtype=%dtype_23_13 nreg=0
++# SVE 32-bit gather prefetch (scalar plus 32-bit scaled offsets)
++PRF             1000010 00 -1 ----- 0-- --- ----- 0 ----
 +
- ### SVE Memory Contiguous Load Group
++# SVE 32-bit gather prefetch (vector plus immediate)
++PRF             1000010 -- 00 ----- 111 --- ----- 0 ----
++
++# SVE contiguous prefetch (scalar plus immediate)
++PRF             1000010 11 1- ----- 0-- --- ----- 0 ----
++
++# SVE contiguous prefetch (scalar plus scalar)
++PRF_rr          1000010 -- 00 rm:5 110 --- ----- 0 ----
++
++### SVE Memory 64-bit Gather Group
++
++# SVE 64-bit gather prefetch (scalar plus 64-bit scaled offsets)
++PRF             1100010 00 11 ----- 1-- --- ----- 0 ----
++
++# SVE 64-bit gather prefetch (scalar plus unpacked 32-bit scaled offsets)
++PRF             1100010 00 -1 ----- 0-- --- ----- 0 ----
++
++# SVE 64-bit gather prefetch (vector plus immediate)
++PRF             1100010 -- 00 ----- 111 --- ----- 0 ----
++
+ ### SVE Memory Store Group
  
- # SVE contiguous load (scalar plus scalar)
+ # SVE store predicate register
 -- 
 2.17.1
