@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYq4Y-0003o4-P3
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:52:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fYq6n-0005H2-Nd
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:54:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fYq4T-0005DK-Uc
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:52:10 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:39947)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fYq4T-0005At-Jj
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:52:05 -0400
-Received: by mail-wr0-x242.google.com with SMTP id l2-v6so7661918wro.7
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:52:05 -0700 (PDT)
-Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
-	13-v6sm1907928wmi.2.2018.06.29.02.52.02 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 29 Jun 2018 02:52:02 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 29 Jun 2018 11:51:29 +0200
-Message-Id: <1530265890-17213-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fYq6m-0002Tr-B4
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:54:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35236 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fYq6m-0002Rq-4O
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:54:28 -0400
+Date: Fri, 29 Jun 2018 10:54:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180629095418.GE2568@work-vm>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-7-xiaoguangrong@tencent.com>
+	<20180619073034.GA14814@xz-mi>
+	<e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
+	<20180628093650.GB3513@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/60] Misc patches for soft freeze
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180628093650.GB3513@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,227 +32,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, pbonzini@redhat.com
 
-The following changes since commit 4a83bf2f339d4b63ecd5ef48b9816c3b7ee24553:
+* Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> On Thu, Jun 28, 2018 at 05:12:39PM +0800, Xiao Guangrong wrote:
+> >=20
+> > Hi Peter,
+> >=20
+> > Sorry for the delay as i was busy on other things.
+> >=20
+> > On 06/19/2018 03:30 PM, Peter Xu wrote:
+> > > On Mon, Jun 04, 2018 at 05:55:14PM +0800, guangrong.xiao@gmail.com =
+wrote:
+> > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > > >=20
+> > > > Detecting zero page is not a light work, we can disable it
+> > > > for compression that can handle all zero data very well
+> > >=20
+> > > Is there any number shows how the compression algo performs better
+> > > than the zero-detect algo?  Asked since AFAIU buffer_is_zero() migh=
+t
+> > > be fast, depending on how init_accel() is done in util/bufferiszero=
+.c.
+> >=20
+> > This is the comparison between zero-detection and compression (the ta=
+rget
+> > buffer is all zero bit):
+> >=20
+> > Zero 810 ns Compression: 26905 ns.
+> > Zero 417 ns Compression: 8022 ns.
+> > Zero 408 ns Compression: 7189 ns.
+> > Zero 400 ns Compression: 7255 ns.
+> > Zero 412 ns Compression: 7016 ns.
+> > Zero 411 ns Compression: 7035 ns.
+> > Zero 413 ns Compression: 6994 ns.
+> > Zero 399 ns Compression: 7024 ns.
+> > Zero 416 ns Compression: 7053 ns.
+> > Zero 405 ns Compression: 7041 ns.
+> >=20
+> > Indeed, zero-detection is faster than compression.
+> >=20
+> > However during our profiling for the live_migration thread (after rev=
+erted this patch),
+> > we noticed zero-detection cost lots of CPU:
+> >=20
+> >  12.01%  kqemu  qemu-system-x86_64            [.] buffer_zero_sse2   =
+                                                                         =
+                                                                         =
+                      =E2=97=86
+> >   7.60%  kqemu  qemu-system-x86_64            [.] ram_bytes_total    =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   6.56%  kqemu  qemu-system-x86_64            [.] qemu_event_set     =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   5.61%  kqemu  qemu-system-x86_64            [.] qemu_put_qemu_file =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   5.00%  kqemu  qemu-system-x86_64            [.] __ring_put         =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   4.89%  kqemu  [kernel.kallsyms]             [k] copy_user_enhanced_=
+fast_string                                                              =
+                                                                         =
+                      =E2=96=92
+> >   4.71%  kqemu  qemu-system-x86_64            [.] compress_thread_dat=
+a_done                                                                   =
+                                                                         =
+                      =E2=96=92
+> >   3.63%  kqemu  qemu-system-x86_64            [.] ring_is_full       =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   2.89%  kqemu  qemu-system-x86_64            [.] __ring_is_full     =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   2.68%  kqemu  qemu-system-x86_64            [.] threads_submit_requ=
+est_prepare                                                              =
+                                                                         =
+                      =E2=96=92
+> >   2.60%  kqemu  qemu-system-x86_64            [.] ring_mp_get        =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   2.25%  kqemu  qemu-system-x86_64            [.] ring_get           =
+                                                                         =
+                                                                         =
+                      =E2=96=92
+> >   1.96%  kqemu  libc-2.12.so                  [.] memcpy
+> >=20
+> > After this patch, the workload is moved to the worker thread, is it
+> > acceptable?
+>=20
+> It depends on your point of view. If you have spare / idle CPUs on the =
+host,
+> then moving workload to a thread is ok, despite the CPU cost of compres=
+sion
+> in that thread being much higher what what was replaced, since you won'=
+t be
+> taking CPU resources away from other contending workloads.
 
-  Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20180627' into staging (2018-06-28 15:31:42 +0100)
+It depends on teh VM as well; if the VM is mostly non-zero, the zero
+checks happen and are over head (although if the pages are non-zero then
+the zero check will mostly happen much faster unless you're unlucky and
+the non-zero byte is the last one on the page).
 
-are available in the git repository at:
+> I'd venture to suggest though that we should probably *not* be optimizi=
+ng for
+> the case of idle CPUs on the host. More realistic is to expect that the=
+ host
+> CPUs are near fully committed to work, and thus the (default) goal shou=
+ld be
+> to minimize CPU overhead for the host as a whole. From this POV, zero-p=
+age
+> detection is better than compression due to > x10 better speed.
 
+Note that this is only happening if compression is enabled.
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+> Given the CPU overheads of compression, I think it has fairly narrow us=
+e
+> in migration in general when considering hosts are often highly committ=
+ed
+> on CPU.
 
-for you to fetch changes up to f5a4d8d963a7f87c474a8b16d508321d4e75833c:
+Also, this compression series was originally written by Intel for the
+case where there's a compression accelerator hardware (that I've never
+found to try); in that case I guess it saves that CPU overhead.
 
-  tests/boot-serial: Do not delete the output file in case of errors (2018-06-29 11:47:57 +0200)
+Dave
 
-----------------------------------------------------------------
-* "info mtree" improvements (Alexey)
-* fake VPD block limits for SCSI passthrough (Daniel Barboza)
-* chardev and main loop fixes (Daniel Berrangé, Sergio, Stefan)
-* help fixes (Eduardo)
-* pc-dimm refactoring (David)
-* tests improvements and fixes (Emilio, Thomas)
-* SVM emulation fixes (Jan)
-* MemoryRegionCache fix (Eric)
-* WHPX improvements (Justin)
-* ESP cleanup (Mark)
-* -overcommit option (Michael)
-* qemu-pr-helper fixes (me)
-* "info pic" improvements for x86 (Peter)
-* x86 TCG emulation fixes (Richard)
-* KVM slot handling fix (Shannon)
-* Next round of deprecation (Thomas)
-* Windows dump format support (Viktor)
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      memory/hmp: Print owners/parents in "info mtree"
-
-Daniel Henrique Barboza (3):
-      hw/scsi: cleanups before VPD BL emulation
-      hw/scsi: centralize SG_IO calls into single function
-      hw/scsi: add VPD Block Limits emulation
-
-Daniel P. Berrangé (1):
-      chardev: don't splatter terminal settings on exit if not previously set
-
-David Hildenbrand (15):
-      memory-device: turn alignment assert into check
-      exec: check that alignment is a power of two
-      pc-dimm: remove leftover "struct pc_dimms_capacity"
-      pc: rename pc_dimm_(plug|unplug|...)* into pc_memory_(plug|unplug|...)*
-      pc-dimm: rename pc_dimm_memory_* to pc_dimm_*
-      pc-dimm: remove pc_dimm_get_free_slot() from header
-      pc: factor out pc specific dimm checks into pc_memory_pre_plug()
-      nvdimm: no need to overwrite get_vmstate_memory_region()
-      hostmem: drop error variable from host_memory_backend_get_memory()
-      pc-dimm: merge get_(vmstate_)memory_region()
-      nvdimm: convert "unarmed" into a static property
-      nvdimm: convert nvdimm_mr into a pointer
-      nvdimm: make get_memory_region() perform checks and initialization
-      pc-dimm: get_memory_region() will not fail after realize
-      numa: report all DIMM/NVDIMMs as plugged memory
-
-Eduardo Habkost (1):
-      qemu-options: Add missing newline to -accel help text
-
-Emilio G. Cota (1):
-      tests/atomic_add-bench: add -m option to use mutexes
-
-Eric Auger (1):
-      exec: Fix MAP_RAM for cached access
-
-Jan Kiszka (3):
-      target-i386: Add NMI interception to SVM
-      target-i386: Allow interrupt injection after STGI
-      target-i386: Mark cpu_vmexit noreturn
-
-Justin Terry (VM) (2):
-      WHPX workaround bug in OSVW handling
-      WHPX: register for unrecognized MSR exits
-
-Mark Cave-Ayland (2):
-      hw/mips/jazz: create ESP device directly via qdev
-      esp: remove legacy esp_init() function
-
-Michael S. Tsirkin (2):
-      kvm: support -overcommit cpu-pm=on|off
-      i386/cpu: make -cpu host support monitor/mwait
-
-Paolo Bonzini (10):
-      move public invalidate APIs out of translate-all.{c,h}, clean up
-      whpx: commit missing file
-      QemuMutex: support --enable-debug-mutex
-      osdep: work around Coverity parsing errors
-      pr-helper: fix --socket-path default in help
-      pr-helper: fix assertion failure on failed multipath PERSISTENT RESERVE IN
-      pr-manager-helper: avoid SIGSEGV when writing to the socket fail
-      pr-manager: put stubs in .c file
-      pr-manager: add query-pr-managers QMP command
-      pr-manager-helper: report event on connection/disconnection
-
-Peter Xu (7):
-      qemu-thread: introduce qemu-thread-common.h
-      configure: enable debug-mutex if debug enabled
-      doc: another fix to "info pic"
-      ioapic: support "info pic"
-      ioapic: some proper indents when dump info
-      ioapic: support "info irq"
-      hmp: obsolete "info ioapic"
-
-Richard Henderson (1):
-      target/i386: Fix BLSR and BLSI
-
-Sergio Lopez (1):
-      hw/char/serial: Only retry if qemu_chr_fe_write returns 0
-
-Shannon Zhao (1):
-      kvm: Delete the slot if and only if the KVM_MEM_READONLY flag is changed
-
-Stefan Hajnoczi (1):
-      main-loop: document IOCanReadHandler
-
-Thomas Huth (3):
-      Replace '-enable-kvm' with '-accel kvm' in docs and help texts
-      Deprecate the -enable-hax option
-      tests/boot-serial: Do not delete the output file in case of errors
-
-Viktor Prutyanov (4):
-      dump: add Windows dump format to dump-guest-memory
-      dump: use system context in Windows dump
-      dump: add fallback KDBG using in Windows dump
-      dump: add Windows live system dump
-
- Makefile.target                   |   1 +
- accel/kvm/kvm-all.c               |  17 +-
- accel/tcg/translate-all.c         |  28 +--
- accel/tcg/translate-all.h         |   1 -
- backends/hostmem.c                |   3 +-
- chardev/char-stdio.c              |   6 +-
- configure                         |  11 +
- docs/COLO-FT.txt                  |   8 +-
- docs/can.txt                      |   4 +-
- docs/multi-thread-compression.txt |   2 +-
- docs/multiseat.txt                |   2 +-
- docs/specs/tpm.txt                |   8 +-
- dump.c                            |  24 ++-
- exec.c                            |  39 +++-
- hmp-commands-info.hx              |   9 +-
- hmp-commands.hx                   |  13 +-
- hmp.c                             |   9 +-
- hw/block/dataplane/virtio-blk.c   |   4 +-
- hw/char/serial.c                  |   2 +-
- hw/i386/kvm/ioapic.c              |  11 +-
- hw/i386/pc.c                      |  73 +++----
- hw/intc/ioapic.c                  |  12 +-
- hw/intc/ioapic_common.c           |  47 ++++-
- hw/mem/memory-device.c            |   8 +-
- hw/mem/nvdimm.c                   |  93 +++++----
- hw/mem/pc-dimm.c                  |  35 ++--
- hw/mips/mips_jazz.c               |  19 +-
- hw/misc/ivshmem.c                 |   3 +-
- hw/ppc/spapr.c                    |  18 +-
- hw/scsi/esp.c                     |  30 ---
- hw/scsi/scsi-disk.c               | 427 +++++++++++++++++++-------------------
- hw/scsi/scsi-generic.c            | 246 ++++++++++++++++------
- hw/scsi/virtio-scsi-dataplane.c   |   4 +-
- include/exec/exec-all.h           |   8 +-
- include/exec/memory.h             |   2 +-
- include/exec/ram_addr.h           |   2 +
- include/hw/i386/ioapic_internal.h |   3 +
- include/hw/i386/pc.h              |   3 -
- include/hw/mem/nvdimm.h           |   2 +-
- include/hw/mem/pc-dimm.h          |  17 +-
- include/hw/scsi/esp.h             |   5 -
- include/hw/scsi/scsi.h            |   6 +-
- include/qemu/main-loop.h          |  14 ++
- include/qemu/osdep.h              |  15 ++
- include/qemu/thread-posix.h       |   4 +
- include/qemu/thread-win32.h       |   4 +
- include/scsi/pr-manager.h         |  11 +-
- include/sysemu/hostmem.h          |   3 +-
- include/sysemu/kvm_int.h          |   1 +
- include/sysemu/sysemu.h           |   1 +
- linux-user/mmap.c                 |   1 -
- memory.c                          |  72 ++++++-
- memory_ldst.inc.c                 |  47 ++---
- monitor.c                         |   4 +-
- numa.c                            |   9 +-
- qapi/block.json                   |  52 +++++
- qapi/misc.json                    |   5 +-
- qemu-doc.texi                     |   5 +
- qemu-options.hx                   |  28 ++-
- scsi/Makefile.objs                |   1 +
- scsi/pr-manager-helper.c          |  28 +++
- scsi/pr-manager-stub.c            |  30 +++
- scsi/pr-manager.c                 |  45 ++++
- scsi/qemu-pr-helper.c             |  21 +-
- target/i386/cpu.c                 |  32 ++-
- target/i386/cpu.h                 |  13 +-
- target/i386/kvm.c                 |  32 +++
- target/i386/monitor.c             |   8 +-
- target/i386/seg_helper.c          |   1 +
- target/i386/svm_helper.c          |   1 +
- target/i386/translate.c           |  29 +--
- target/i386/whp-dispatch.h        |  56 +++++
- target/i386/whpx-all.c            |  54 ++++-
- target/xtensa/op_helper.c         |   9 +-
- tests/atomic_add-bench.c          |  19 +-
- tests/boot-serial-test.c          |  17 +-
- trace/control-target.c            |   1 -
- util/qemu-thread-common.h         |  55 +++++
- util/qemu-thread-posix.c          |  19 +-
- util/qemu-thread-win32.c          |  17 +-
- vl.c                              |  33 ++-
- win_dump.c                        | 385 ++++++++++++++++++++++++++++++++++
- win_dump.h                        | 176 ++++++++++++++++
- 83 files changed, 1931 insertions(+), 692 deletions(-)
- create mode 100644 scsi/pr-manager-stub.c
- create mode 100644 target/i386/whp-dispatch.h
- create mode 100644 util/qemu-thread-common.h
- create mode 100644 win_dump.c
- create mode 100644 win_dump.h
--- 
-1.8.3.1
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
