@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fYmVZ-00016O-Mc
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:03:51 -0400
+	(envelope-from <famz@redhat.com>) id 1fYmVg-0001Dh-ME
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fYmVY-0007GI-TT
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:03:49 -0400
+	(envelope-from <famz@redhat.com>) id 1fYmVa-0007Hu-Qy
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:03:56 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 29 Jun 2018 14:03:28 +0800
-Message-Id: <20180629060328.4423-4-famz@redhat.com>
+Date: Fri, 29 Jun 2018 14:03:27 +0800
+Message-Id: <20180629060328.4423-3-famz@redhat.com>
 In-Reply-To: <20180629060328.4423-1-famz@redhat.com>
 References: <20180629060328.4423-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] file-posix: Fix EINTR handling
+Subject: [Qemu-devel] [PATCH 2/3] iscsi: Don't blindly use designator length
+ in response for memcpy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +23,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-EINTR should be checked against errno, not ret. While fixing the bug,
-collect the branches with a switch block.
+Per SCSI definition the designator_length we receive from INQUIRY is 8,
+12 or at most 16, but we should be careful because the remote iscsi
+target may misbehave, otherwise we could have a buffer overflow.
 
-Also, change the return value from -ENOSTUP to -ENOSPC when the actual
-issue is request range passes EOF, which should be distinguishable from
-the case of error == ENOSYS by the caller, so that it could still retry
-with other byte ranges, whereas it shouldn't retry anymore upon ENOSYS.
-
+Reported-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ block/iscsi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 07bb061fe4..6b736f603a 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1474,20 +1474,21 @@ static ssize_t handle_aiocb_copy_range(RawPosixAIOData *aiocb)
-         ssize_t ret = copy_file_range(aiocb->aio_fildes, &in_off,
-                                       aiocb->aio_fd2, &out_off,
-                                       bytes, 0);
--        if (ret == -EINTR) {
--            continue;
-+        if (ret == 0) {
-+            /* No progress (e.g. when beyond EOF), let the caller fall back to
-+             * buffer I/O. */
-+            return -ENOSPC;
-         }
-         if (ret < 0) {
--            if (errno == ENOSYS) {
-+            switch (errno) {
-+            case ENOSYS:
-                 return -ENOTSUP;
--            } else {
-+            case EINTR:
-+                continue;
-+            default:
-                 return -errno;
-             }
-         }
--        if (!ret) {
--            /* No progress (e.g. when beyond EOF), fall back to buffer I/O. */
--            return -ENOTSUP;
--        }
-         bytes -= ret;
-     }
-     return 0;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 9f00fb47a5..4b7f574510 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2226,7 +2226,7 @@ static void iscsi_populate_target_desc(unsigned char *desc, IscsiLun *lun)
+     desc[5] = (dd->designator_type & 0xF)
+         | ((dd->association & 3) << 4);
+     desc[7] = dd->designator_length;
+-    memcpy(desc + 8, dd->designator, dd->designator_length);
++    memcpy(desc + 8, dd->designator, MIN(dd->designator_length, 20));
+ 
+     desc[28] = 0;
+     desc[29] = (lun->block_size >> 16) & 0xFF;
 -- 
 2.17.1
