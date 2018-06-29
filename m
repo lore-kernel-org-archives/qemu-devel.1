@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNR-0007Ih-Cm
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNR-0007Ie-Ck
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNO-0006nW-8K
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNO-0006nM-8A
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:33 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58236)
+Received: from relay.sw.ru ([185.231.240.75]:58246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1fYoNN-0006ki-WE
+	id 1fYoNO-0006km-0A
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:30 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 29 Jun 2018 11:03:15 +0300
-Message-Id: <20180629080320.320144-3-dplotnikov@virtuozzo.com>
+Date: Fri, 29 Jun 2018 11:03:16 +0300
+Message-Id: <20180629080320.320144-4-dplotnikov@virtuozzo.com>
 In-Reply-To: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
 References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v0 2/7] bitops: add some atomic versions of
- bitmap operations
+Subject: [Qemu-devel] [PATCH v0 3/7] threads: add infrastructure to process
+ sigsegv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org
 
-1. test bit
-2. test and set bit
+Allows to define sigsegv handler temporary for all threads.
+This is useful to implement copy-on-write logic while
+linux usefaultfd doesn't support write-protected faults.
+In the future, switch to using WP userfaultfd when it's
+available.
+
+It's going to be used on background snapshotting.
 
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- include/qemu/bitops.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ include/qemu/thread.h    |  5 ++++
+ util/qemu-thread-posix.c | 50 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
-index 3f0926cf40..7b1c8c7baf 100644
---- a/include/qemu/bitops.h
-+++ b/include/qemu/bitops.h
-@@ -94,6 +94,21 @@ static inline int test_and_set_bit(long nr, unsigned long *addr)
-     return (old & mask) != 0;
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 9910f49b3a..886985d289 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -210,4 +210,9 @@ void qemu_lockcnt_inc_and_unlock(QemuLockCnt *lockcnt);
+  */
+ unsigned qemu_lockcnt_count(QemuLockCnt *lockcnt);
+ 
++
++typedef void (*sigsegv_handler)(int v0, siginfo_t *v1, void *v2);
++void sigsegv_user_handler_set(sigsegv_handler handler);
++void sigsegv_user_handler_reset(void);
++
+ #endif
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475899..e51abc9275 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -489,6 +489,45 @@ static void qemu_thread_set_name(QemuThread *thread, const char *name)
+ #endif
  }
  
-+/**
-+ * test_and_set_bit_atomic - Set a bit atomically and return its old value
-+ * @nr: Bit to set
-+ * @addr: Address to count from
-+ */
-+static inline int test_and_set_bit_atomic(long nr, unsigned long *addr)
-+{
-+    unsigned long mask = BIT_MASK(nr);
-+    unsigned long *p = addr + BIT_WORD(nr);
-+    unsigned long old;
++static sigsegv_handler sigsegv_user_handler;
 +
-+    old = atomic_fetch_or(p, mask);
-+    return (old & mask) != 0;
++void sigsegv_user_handler_set(sigsegv_handler handler)
++{
++    assert(handler);
++    atomic_set(&sigsegv_user_handler, handler);
 +}
 +
- /**
-  * test_and_clear_bit - Clear a bit and return its old value
-  * @nr: Bit to clear
-@@ -134,6 +149,15 @@ static inline int test_bit(long nr, const unsigned long *addr)
-     return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
- }
++static sigsegv_handler sigsegv_user_handler_get(void)
++{
++    return atomic_read(&sigsegv_user_handler);
++}
++
++void sigsegv_user_handler_reset(void)
++{
++    atomic_set(&sigsegv_user_handler, NULL);
++}
++
++static void sigsegv_default_handler(int v0, siginfo_t *v1, void *v2)
++{
++    sigsegv_handler handler = sigsegv_user_handler_get();
++
++    if (!handler) {
++        // remove the sigsegv handler if it's not set by user
++        // this will lead to re-raising the error without a handler
++        // and exiting from the program with "Sigmentation fault"
++        int err;
++        struct sigaction act;
++        memset(&act, 0, sizeof(act));
++        act.sa_flags = SA_RESETHAND;
++        err = sigaction(SIGSEGV, &act, NULL);
++        if (err) {
++            error_exit(err, __func__);
++        }
++    } else {
++        handler(v0, v1, v2);
++    }
++}
++
+ void qemu_thread_create(QemuThread *thread, const char *name,
+                        void *(*start_routine)(void*),
+                        void *arg, int mode)
+@@ -496,14 +535,25 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     sigset_t set, oldset;
+     int err;
+     pthread_attr_t attr;
++    struct sigaction act;
  
-+/**
-+ * test_bit_atomic - Determine whether a bit is set atomicallly
-+ * @nr: bit number to test
-+ * @addr: Address to start counting from
-+ */
-+static inline int test_bit_atomic(long nr, const unsigned long *addr)
-+{
-+    return 1UL & (atomic_read(&addr[BIT_WORD(nr)]) >> (nr & (BITS_PER_LONG-1)));
-+}
- /**
-  * find_last_bit - find the last set bit in a memory region
-  * @addr: The address to start the search at
+     err = pthread_attr_init(&attr);
+     if (err) {
+         error_exit(err, __func__);
+     }
+ 
++    memset(&act, 0, sizeof(act));
++    act.sa_flags = SA_SIGINFO;
++    act.sa_sigaction = sigsegv_default_handler;
++    err = sigaction(SIGSEGV, &act, NULL);
++    if (err) {
++        error_exit(err, __func__);
++    }
++
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
++    // ...all but SIGSEGV
++    sigdelset(&set, SIGSEGV);
+     pthread_sigmask(SIG_SETMASK, &set, &oldset);
+     err = pthread_create(&thread->thread, &attr, start_routine, arg);
+     if (err)
 -- 
 2.17.0
