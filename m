@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fYwpN-0006a6-M3
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:04:58 -0400
+	(envelope-from <david@redhat.com>) id 1fYwpu-000714-4J
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:05:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fYwpM-0006fV-Ec
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:04:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53330 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fYwpM-0006f3-8V
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:04:56 -0400
-Date: Fri, 29 Jun 2018 20:04:55 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180629200121-mutt-send-email-mst@kernel.org>
-References: <20180629135616.16570-1-mark.cave-ayland@ilande.co.uk>
-	<20180629135616.16570-3-mark.cave-ayland@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180629135616.16570-3-mark.cave-ayland@ilande.co.uk>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] pci: allow DeviceClass fw_name to
- override pci_dev_fw_name() if set
+	(envelope-from <david@redhat.com>) id 1fYwpp-0007OP-6s
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:05:30 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 29 Jun 2018 19:05:20 +0200
+Message-Id: <20180629170520.13671-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] s390x/tcg: fix locking problem with
+ tcg_s390_tod_updated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +18,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, marcel@redhat.com, armbru@redhat.com
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Fri, Jun 29, 2018 at 02:56:16PM +0100, Mark Cave-Ayland wrote:
-> The current implementation of pci_dev_fw_name() scans through a fixed
-> set of PCI class descriptions to determine the firmware device name
-> but in some cases this isn't always appropriate, for example with
-> the macio device which uses a class code of 0xff (unassigned).
->=20
-> Rather than add a new entry for the macio device and risk a potential
-> clash with another unassigned device later, add a check to
-> pcibus_get_fw_dev_path() that will use DeviceClass fw_name if set in
-> preference to pci_dev_fw_name().
->=20
-> This enables PCI devices such as macio to set dc->fw_name as required
-> to match the name specified in the firmware.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  hw/pci/pci.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 80bc45930d..126dd683dc 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2411,12 +2411,14 @@ static char *pci_dev_fw_name(DeviceState *dev, =
-char *buf, int len)
-> =20
->  static char *pcibus_get_fw_dev_path(DeviceState *dev)
->  {
-> +    DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
->      PCIDevice *d =3D (PCIDevice *)dev;
->      char path[50], name[33];
->      int off;
-> =20
->      off =3D snprintf(path, sizeof(path), "%s@%x",
-> -                   pci_dev_fw_name(dev, name, sizeof name),
-> +                   dc->fw_name ? dc->fw_name :
-> +                       pci_dev_fw_name(dev, name, sizeof name),
->                     PCI_SLOT(d->devfn));
+tcg_s390_tod_updated() is always called with the iothread being locked
+(e.g. from S390TODClass->set() e.g. via HELPER(sck) or on incomming
+migration). The helper we call takes the lock itself - bad.
 
-So why not put the logic into pci_dev_fw_name then?
+Let's change that by factoring out updating the ckc timer. This now looks
+much nicer than having to call a helper from another function.
 
+While touch it we also make sure that env->ckc is updated even if the new
+value is -1ULL, for now it would not have been modified in that case.
 
+Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
 
->      if (PCI_FUNC(d->devfn))
->          snprintf(path + off, sizeof(path) + off, ",%x", PCI_FUNC(d->de=
-vfn));
-> --=20
-> 2.11.0
+This survives my tests and the iotests Christian mentioned.
+
+ target/s390x/misc_helper.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 7656a9b90a..3f91579570 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -149,26 +149,23 @@ uint64_t HELPER(stck)(CPUS390XState *env)
+     return tod.low;
+ }
+ 
+-/* Set Clock Comparator */
+-void HELPER(sckc)(CPUS390XState *env, uint64_t time)
++static void update_ckc_timer(CPUS390XState *env)
+ {
+     S390TODState *td = s390_get_todstate();
++    uint64_t time;
+ 
+     /* stop the timer and remove pending CKC IRQs */
+     timer_del(env->tod_timer);
+-    qemu_mutex_lock_iothread();
++    g_assert(qemu_mutex_iothread_locked());
+     env->pending_int &= ~INTERRUPT_EXT_CLOCK_COMPARATOR;
+-    qemu_mutex_unlock_iothread();
+ 
+     /* the tod has to exceed the ckc, this can never happen if ckc is all 1's */
+-    if (time == -1ULL) {
++    if (env->ckc == -1ULL) {
+         return;
+     }
+ 
+-    env->ckc = time;
+-
+     /* difference between origins */
+-    time -= td->base.low;
++    time = env->ckc - td->base.low;
+ 
+     /* nanoseconds */
+     time = tod2time(time);
+@@ -176,12 +173,21 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+     timer_mod(env->tod_timer, time);
+ }
+ 
++/* Set Clock Comparator */
++void HELPER(sckc)(CPUS390XState *env, uint64_t ckc)
++{
++    env->ckc = ckc;
++
++    qemu_mutex_lock_iothread();
++    update_ckc_timer(env);
++    qemu_mutex_unlock_iothread();
++}
++
+ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
+ {
+     S390CPU *cpu = S390_CPU(cs);
+-    CPUS390XState *env = &cpu->env;
+ 
+-    helper_sckc(env, env->ckc);
++    update_ckc_timer(&cpu->env);
+ }
+ 
+ /* Set Clock */
+-- 
+2.17.1
