@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nw-0008Du-8M
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1fZ0Op-0000Yu-Gz
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nv-0006f1-Dw
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:52 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:32874)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZ0Nv-0006ci-3B
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:51 -0400
-Received: by mail-wm0-x229.google.com with SMTP id z6-v6so2894382wma.0
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:52:50 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 29 Jun 2018 21:52:27 +0100
-Message-Id: <20180629205232.27190-17-alex.bennee@linaro.org>
-In-Reply-To: <20180629205232.27190-1-alex.bennee@linaro.org>
-References: <20180629205232.27190-1-alex.bennee@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1fZ0Ok-0007ty-Ud
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:53:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59076 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fZ0Ok-0007tX-Pj
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:53:42 -0400
+References: <20180629195544.34263-1-eblake@redhat.com>
+	<20180629195544.34263-2-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8d5a8cdd-bf7a-2dd2-b97f-dfcaa37111c6@redhat.com>
+Date: Fri, 29 Jun 2018 15:53:41 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 16/21] docker: add env parser to docker.py
- build step
+In-Reply-To: <20180629195544.34263-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: Add comments to aid debugging
+ generated introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-We need to pass environment variables down to the debbootstrap.pre
-script to be able to specify build parameters.
+On 06/29/2018 02:55 PM, Eric Blake wrote:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> The generated qapi-introspect.c changes only with the addition
+> of comments, such as:
+> 
+> | @@ -14927,6 +15410,7 @@
+> |          {}
+> |      })),
+> |      QLIT_QDICT(((QLitDictEntry[]) {
+> | +        /* QCryptoBlockInfoLUKSSlot */
+> |          { "members", QLIT_QLIST(((QLitObject[]) {
+> |              QLIT_QDICT(((QLitDictEntry[]) {
+> |                  { "name", QLIT_QSTR("active") },
+
 ---
- tests/docker/docker.py | 8 ++++++++
- 1 file changed, 8 insertions(+)
+...
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index b279836154..388e86ada2 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -293,6 +293,8 @@ class BuildCommand(SubCommand):
-         parser.add_argument("--add-current-user", "-u", dest="user",
-                             action="store_true",
-                             help="Add the current user to image's passwd")
-+        parser.add_argument("--env", "-E", action='append', nargs=1,
-+                            help="Set FOO=BAR in envronment")
-         parser.add_argument("tag",
-                             help="Image Tag")
-         parser.add_argument("dockerfile",
-@@ -302,6 +304,12 @@ class BuildCommand(SubCommand):
-         dockerfile = open(args.dockerfile, "rb").read()
-         tag = args.tag
- 
-+        # Process env setting
-+        if args.env:
-+            for e in args.env:
-+                (env, val) = e[0].split("=")
-+                os.environ[env] = val
-+
-         dkr = Docker()
-         if "--no-cache" not in argv and \
-            dkr.image_matches_dockerfile(tag, dockerfile):
+> @@ -128,6 +131,8 @@ const QLitObject %(c_name)s = %(c_string)s;
+> 
+>       def _gen_qlit(self, name, mtype, obj):
+>           if mtype not in ('command', 'event', 'builtin', 'array'):
+> +            if not self._unmask:
+> +                obj['comment'] = name
+
+If desired, we could change this to:
+
+if not self._unmask:
+     obj['comment'] = '"%s" = %s' % (self._name(name), name)
+
+to produce comments like /* "0" = q_empty */
+
+for even easier debugging (if I see a line containing "ret-type", 
+QLIT_QSTR("0"), then I can grep for '"0" =' to directly look up the type 
+name, rather than having to grep for 'name.*"0"' then scrolling back to 
+find the associated comment).
+
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
