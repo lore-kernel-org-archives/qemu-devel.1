@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fYu52-0002VW-KX
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:09:01 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fYu5q-0003HN-Rm
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fYu4x-0000oH-HL
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:08:56 -0400
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:43477)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYu4x-0000lF-6d
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:08:51 -0400
-Received: by mail-wr0-f196.google.com with SMTP id c5-v6so8984492wrs.10
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:08:51 -0700 (PDT)
-References: <20180625124238.25339-1-f4bug@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e98fd1f6-e16a-4fb8-5697-c2758943e641@redhat.com>
-Date: Fri, 29 Jun 2018 16:08:44 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fYu5l-0002XT-O0
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:09:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51320 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fYu5l-0002UA-E5
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:09:41 -0400
+Date: Fri, 29 Jun 2018 16:09:37 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180629160937.6c09c130@redhat.com>
+In-Reply-To: <CAJ+F1CKKaw0GyD_94bvpC97NheYqstUF6NLDbeGaRj0BUw_H7g@mail.gmail.com>
+References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
+	<20180626122343.13473-5-marcandre.lureau@redhat.com>
+	<20180627151948.5779e60b@redhat.com>
+	<CAJ+F1CKKaw0GyD_94bvpC97NheYqstUF6NLDbeGaRj0BUw_H7g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180625124238.25339-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 00/46] Use the IEC binary
- prefix definitions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,343 +30,947 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Hildenbrand <david@redhat.com>, Jason Wang <jasowang@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Keith Busch <keith.busch@intel.com>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Marek Vasut <marex@denx.de>, Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-trivial@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Michael Walle <michael@walle.cc>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Antony Pavlov <antonynpavlov@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Andrzej Zaborowski <balrogg@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Alistair Francis <alistair@alistair23.me>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, Jiri Slaby <jslaby@suse.cz>, David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>, Alexander Graf <agraf@suse.de>, "Daniel P . Berrange" <berrange@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Paul Burton <paul.burton@mips.com>, qemu-ppc@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Queued with this squashed in:
+On Thu, 28 Jun 2018 17:24:47 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-index e75d433e56..0a6c657228 100644
---- a/hw/usb/ccid-card-passthru.c
-+++ b/hw/usb/ccid-card-passthru.c
-@@ -276,9 +276,9 @@ static void ccid_card_vscard_read(void *opaque, const uint8_t *buf, int size)
-     VSCMsgHeader *hdr;
- 
-     if (card->vscard_in_pos + size > VSCARD_IN_SIZE) {
--        error_report(
--            "no room for data: pos %u +  size %d > %ld. dropping connection.",
--            card->vscard_in_pos, size, VSCARD_IN_SIZE);
-+        error_report("no room for data: pos %u +  size %d > %" PRId64 "."
-+                     " dropping connection.",
-+                     card->vscard_in_pos, size, VSCARD_IN_SIZE);
-         ccid_card_vscard_drop_connection(card);
-         return;
-     }
-diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-index 7074a176d7..fd4d848f66 100644
---- a/tests/test-qemu-opts.c
-+++ b/tests/test-qemu-opts.c
-@@ -709,7 +709,7 @@ static void test_opts_parse_size(void)
-                            false, &error_abort);
-     g_assert_cmpuint(opts_count(opts), ==, 2);
-     g_assert_cmphex(qemu_opt_get_size(opts, "size1", 0), ==, GiB / 10);
--    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), ==, 16777215 * TiB);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), ==, 16777215U * TiB);
- 
-     /* Beyond limit with suffix */
-     opts = qemu_opts_parse(&opts_list_02, "size1=16777216T",
-diff --git a/vl.c b/vl.c
-index 2018052394..93795c1b9f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2810,7 +2810,7 @@ static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
-             uint64_t overflow_check = sz;
- 
-             sz *= MiB;
--            if ((sz >> 20) != overflow_check) {
-+            if (sz / MiB != overflow_check) {
-                 error_report("too large 'size' option value");
-                 exit(EXIT_FAILURE);
-             }
+> Hi
+>=20
+> On Wed, Jun 27, 2018 at 3:19 PM, Igor Mammedov <imammedo@redhat.com> wrot=
+e:
+> > On Tue, 26 Jun 2018 14:23:43 +0200
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > =20
+> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> >>
+> >> The TPM Physical Presence interface consists of an ACPI part, a shared
+> >> memory part, and code in the firmware. Users can send messages to the
+> >> firmware by writing a code into the shared memory through invoking the
+> >> ACPI code. When a reboot happens, the firmware looks for the code and
+> >> acts on it by sending sequences of commands to the TPM.
+> >>
+> >> This patch adds the ACPI code. It is similar to the one in EDK2 but do=
+esn't
+> >> assume that SMIs are necessary to use. It uses a similar datastructure=
+ for
+> >> the shared memory as EDK2 does so that EDK2 and SeaBIOS could both mak=
+e use
+> >> of it. I extended the shared memory data structure with an array of 256
+> >> bytes, one for each code that could be implemented. The array contains
+> >> flags describing the individual codes. This decouples the ACPI impleme=
+ntation
+> >> from the firmware implementation.
+> >>
+> >> The underlying TCG specification is accessible from the following page.
+> >>
+> >> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spec=
+ification/
+> >>
+> >> This patch implements version 1.30. =20
+> >
+> > I've made several suggestions below how to improve aml part of patch a =
+bit,
+> > will review v6 once it's done
+> > /hopefully it would be more readable, considering that ASM language is =
+horrible to begin with/
+> > =20
+> >>
+> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> >>
+> >> ---
+> >>
+> >> v6:
+> >>  - more code documentation (Marc-Andr=C3=A9)
+> >>  - use some explicit named variables to ease reading (Marc-Andr=C3=A9)
+> >>  - use fixed size fields/memory regions, remove PPI struct (Marc-Andr=
+=C3=A9)
+> >>  - only add PPI ACPI methods if PPI is enabled (Marc-Andr=C3=A9)
+> >>  - document the qemu/firmware ACPI memory region (Stefan)
+> >>
+> >> v5 (Marc-Andr=C3=A9):
+> >>  - /struct tpm_ppi/struct TPMPPIData
+> >>
+> >> v4 (Marc-Andr=C3=A9):
+> >>  - replace 'DerefOf (FUNC [N])' with a function, to fix Windows ACPI
+> >>     handling.
+> >>  - replace 'return Package (..) {} ' with scoped variables, to fix
+> >>    Windows ACPI handling.
+> >>
+> >> v3:
+> >>  - add support for PPI to CRB
+> >>  - split up OperationRegion TPPI into two parts, one containing
+> >>    the registers (TPP1) and the other one the flags (TPP2); switched
+> >>    the order of the flags versus registers in the code
+> >>  - adapted ACPI code to small changes to the array of flags where
+> >>    previous flag 0 was removed and now shifting right wasn't always
+> >>    necessary anymore
+> >>
+> >> v2:
+> >>  - get rid of FAIL variable; function 5 was using it and always
+> >>    returns 0; the value is related to the ACPI function call not
+> >>    a possible failure of the TPM function call.
+> >>  - extend shared memory data structure with per-opcode entries
+> >>    holding flags and use those flags to determine what to return
+> >>    to caller
+> >>  - implement interface version 1.3
+> >> ---
+> >>  include/hw/acpi/tpm.h |   8 +
+> >>  hw/i386/acpi-build.c  | 423 +++++++++++++++++++++++++++++++++++++++++-
+> >>  docs/specs/tpm.txt    |  79 ++++++++
+> >>  3 files changed, 509 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> >> index f79d68a77a..e0bd07862e 100644
+> >> --- a/include/hw/acpi/tpm.h
+> >> +++ b/include/hw/acpi/tpm.h
+> >> @@ -196,4 +196,12 @@ REG32(CRB_DATA_BUFFER, 0x80)
+> >>  #define TPM_PPI_VERSION_NONE        0
+> >>  #define TPM_PPI_VERSION_1_30        1
+> >>
+> >> +/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
+> >> +#define TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
+> >> +#define TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
+> >> +#define TPM_PPI_FUNC_BLOCKED             (2 << 0)
+> >> +#define TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
+> >> +#define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
+> >> +#define TPM_PPI_FUNC_MASK                (7 << 0)
+> >> +
+> >>  #endif /* HW_ACPI_TPM_H */
+> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> >> index d9320845ed..d815af4eef 100644
+> >> --- a/hw/i386/acpi-build.c
+> >> +++ b/hw/i386/acpi-build.c
+> >> @@ -43,6 +43,7 @@
+> >>  #include "hw/acpi/memory_hotplug.h"
+> >>  #include "sysemu/tpm.h"
+> >>  #include "hw/acpi/tpm.h"
+> >> +#include "hw/tpm/tpm_ppi.h"
+> >>  #include "hw/acpi/vmgenid.h"
+> >>  #include "sysemu/tpm_backend.h"
+> >>  #include "hw/timer/mc146818rtc_regs.h"
+> >> @@ -1789,6 +1790,421 @@ static Aml *build_q35_osc_method(void)
+> >>      return method;
+> >>  }
+> >>
+> >> +static void
+> >> +build_tpm_ppi(Aml *dev)
+> >> +{
+> >> +    Aml *method, *name, *field, *ifctx, *ifctx2, *ifctx3, *pak;
+> >> +    int i;
+> >> +
+> >> +    if (!object_property_get_bool(OBJECT(tpm_find()), "ppi", &error_a=
+bort)) { =20
+> > if tpm_find() =3D=3D NULL -> BAAM???
+> >
+> > I'd do it like this:
+> >    tmp =3D tpm_find()
+> >    if (TPM_IS_TIS(tpm) {
+> >       ...
+> >       if (object_property_get_bool(tpm), "ppi", &error_abort)) {
+> >           build_tpm_ppi(tpm, dev)
+> >       }
+> >       ...
+> >    }
+> >
+> >    if (TPM_IS_CRB(tpm))
+> >    {
+> >       ....
+> >    }
+> >
+> > a bit more verbose but then the reader won't have to jump inside of
+> > build_tpm_ppi() if he/she is not interested in it. =20
+>=20
+> ok, I pass the tpm to build_tpm_ppi() for the ppi property check, and
+> avoid extra lookup.
+>=20
+> > =20
+> >> +        return;
+> >> +    }
+> >> +    /*
+> >> +     * TPP1 is for the flags that indicate which PPI operations
+> >> +     * are supported by the firmware. The firmware is expected to
+> >> +     * write these flags.
+> >> +     */
+> >> +    aml_append(dev,
+> >> +               aml_operation_region("TPP1", AML_SYSTEM_MEMORY,
+> >> +                                    aml_int(TPM_PPI_ADDR_BASE), 0x100=
+));
+> >> +    field =3D aml_field("TPP1", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE=
+);
+> >> +    for (i =3D 0; i < 0x100; i++) {
+> >> +        char *tmp =3D g_strdup_printf("FN%02X", i);
+> >> +        aml_append(field, aml_named_field(tmp, 8));
+> >> +        g_free(tmp);
+> >> +    }
+> >> +    aml_append(dev, field);
+> >> +
+> >> +    /*
+> >> +     * TPP2 is for the registers that ACPI code used to pass
+> >> +     * the PPI code and parameter (PPRQ, PPRM) to the firmware.
+> >> +     */
+> >> +    aml_append(dev,
+> >> +               aml_operation_region("TPP2", AML_SYSTEM_MEMORY,
+> >> +                                    aml_int(TPM_PPI_ADDR_BASE + 0x100=
+),
+> >> +                                    0x5A));
+> >> +    field =3D aml_field("TPP2", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE=
+);
+> >> +    aml_append(field, aml_named_field("PPIN", 8));
+> >> +    aml_append(field, aml_named_field("PPIP", 32));
+> >> +    aml_append(field, aml_named_field("PPRP", 32));
+> >> +    aml_append(field, aml_named_field("PPRQ", 32));
+> >> +    aml_append(field, aml_named_field("PPRM", 32));
+> >> +    aml_append(field, aml_named_field("LPPR", 32));
+> >> +    aml_append(dev, field);
+> >> +
+> >> +    /*
+> >> +     * A function to return the value of DerefOf (FUNC [N]), by using
+> >> +     * accessing the fields individually instead. This is a workaround
+> >> +     * for what looks like a Windows ACPI bug in all versions so far
+> >> +     * (fwiw, DerefOf (FUNC [N]) works on Linux).
+> >> +     */
+> >> +    method =3D aml_method("TPFN", 1, AML_SERIALIZED);
+> >> +    {
+> >> +        for (i =3D 0; i < 0x100; i++) {
+> >> +            ifctx =3D aml_if(aml_equal(aml_int(i), aml_arg(0)));
+> >> +            {
+> >> +                aml_append(ifctx, aml_return(aml_name("FN%02X", i)));
+> >> +            }
+> >> +            aml_append(method, ifctx);
+> >> +        }
+> >> +        aml_append(method, aml_return(aml_int(0)));
+> >> +    }
+> >> +    aml_append(dev, method);
+> >> +
+> >> +    pak =3D aml_package(2);
+> >> +    aml_append(pak, aml_int(0));
+> >> +    aml_append(pak, aml_int(0));
+> >> +    name =3D aml_name_decl("TPM2", pak);
+> >> +    aml_append(dev, name);
+> >> +
+> >> +    pak =3D aml_package(3);
+> >> +    aml_append(pak, aml_int(0));
+> >> +    aml_append(pak, aml_int(0));
+> >> +    aml_append(pak, aml_int(0));
+> >> +    name =3D aml_name_decl("TPM3", pak); =20
+> > Aml one =3D aml_int(1)
+> > Aml tpm3 =3D local(x)
+> > aml_store(pak, tpm3)
+> >
+> > ... and then later ...
+> >
+> >             {
+> >              /* TPM2[1] =3D PPRQ */
+> >              aml_append(ifctx3, aml_store(aml_name("PPRQ"), aml_index(t=
+pm2, one)));
+> >              aml_append(ifctx3, aml_return(tpm2));
+> >
+> > which would make code a bit more readable
+> > =20
+>=20
+> But you would have to create aml_int(), aml_local() for every usage. I
+> don't think we gain in readability.
+Aml* variables can be reused as aml_append/aml_foo copies input arguments.
+Take look at build_cpus_aml() how it makes code more readable.
+=20
+> >> +    aml_append(dev, name); =20
+> > both packages could be local vars as return is done by value
+> > =20
+> >> +
+> >> +    method =3D aml_method("_DSM", 4, AML_SERIALIZED);
+> >> +    {
+> >> +        uint8_t zerobyte[1] =3D { 0 };
+> >> +        Aml *func_idx, *rev, *op, *op_arg, *op_flags;
+> >> +
+> >> +        ifctx =3D aml_if(
+> >> +            aml_equal(aml_arg(0),
+> >> +                      aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D165=
+3"))); =20
+> > aml_equal(uuid, aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D1653")) =20
+>=20
+> Ok
+>=20
+> > =20
+> >> +        {
+> >> +            func_idx =3D aml_local(0);
+> >> +            aml_append(ifctx,
+> >> +                       aml_store(aml_to_integer(aml_arg(2)), func_idx=
+)); =20
+> > why do you need aml_to_integer() cast here?
+> >
+> > Wouldn't following just work:
+> >
+> >    Aml function =3D aml_arg(2)
+> >
+> > I'd suggest to use "function" for consistency with nvdimm _DSM =20
+>=20
+> ok
+>=20
+> >
+> > you can use the same naming approach for other arguments i.e.
+> > arguments =3D aml_arg(3)
+> > =20
+>=20
+> ok
+>=20
+> >> +
+> >> +            /* standard DSM query function */
+> >> +            func_idx =3D aml_local(0); =20
+> > I don't think you need to init it twice.
+> > =20
+>=20
+> That looks right, and it's the way nvdimm ACPI code is written, but is
+> not following the usual convention to give up the ownership when given
+> as argument to other AML building function.
 
-Because Patchew is down, I couldn't gather all the Reviewed-by and Acked-by.
-Thanks to all the reviewers anyway!
+That's misunderstanding of how it works, there isn't such convention
+input argument is copied into output AML element.
 
-Paolo
 
-On 25/06/2018 14:41, Philippe Mathieu-Daudé wrote:
-> Hi,
-> 
-> This series:
-> 
-> - split the byte-based definitions from "qemu/cutils.h" to "qemu/units.h"
->   (this now triggers WARNING: 1 added file, does MAINTAINERS need updating?)
-> - clean hw/ includes;
-> - replace different constants used for byte size with their corresponding
->   IEC binary prefix definitions.
-> 
-> Since v4:
-> - fixed checkpatch (do not match the IEC binary prefix as camelcase typedefs)
-> - use signed format for size (Richard)
-> - fix 32-bit (Thomas)
-> - update '[<>][<>]= ?[1-5]0', adding 5 new patches (Eric)
-> 
-> Since v3:
-> - use IEC binary prefix definitions (Stefan Weil)
-> - rebased
-> - added R-b tags
-> 
-> Since v2:
-> - use "qemu/units.h" instead of "qemu/cunits.h" (Daniel P. Berrangé)
-> - avoid rebuilding the world including "qemu/units.h" in "hw/hw.h" (Thomas Huth)
-> - more constant replaced
-> 
-> Since v1:
-> - corrected Xen mult -> div (Alan Robinson)
-> - tagged 'include "qemu/cunits.h" in "hw/hw.h" as RFC
-> - fixed mips_r4k 'params_size' (Thomas Huth)
-> - added command used to generate patch in each commit (Alistair Francis)
-> - use G_BYTE for the raspi3 machine
-> - added Reviewed-by tags
-> 
-> Regards,
-> 
-> Phil.
-> 
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream patch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-> 
-> 001/46:[0012] [FC] 'include: Add IEC binary prefixes in "qemu/units.h"'
-> 002/46:[0005] [FC] 'vdi: Use definitions from "qemu/units.h"'
-> 003/46:[----] [--] 'x86/cpu: Use definitions from "qemu/units.h"'
-> 004/46:[0002] [FC] 'checkpatch: Recognize IEC binary prefix definitions'
-> 005/46:[----] [-C] 'hw: Use IEC binary prefix definitions from "qemu/units.h"'
-> 006/46:[----] [--] 'hw: Directly use "qemu/units.h" instead of "qemu/cutils.h"'
-> 007/46:[----] [--] 'hw/ivshmem: Use the IEC binary prefix definitions'
-> 008/46:[----] [--] 'hw/ipack: Use the IEC binary prefix definitions'
-> 009/46:[----] [--] 'hw/scsi: Use the IEC binary prefix definitions'
-> 010/46:[----] [--] 'hw/smbios: Use the IEC binary prefix definitions'
-> 011/46:[0002] [FC] 'hw/xen: Use the IEC binary prefix definitions'
-> 012/46:[----] [--] 'hw/tpm: Use the IEC binary prefix definitions'
-> 013/46:[----] [--] 'hw/block: Use the IEC binary prefix definitions'
-> 014/46:[0008] [FC] 'hw/display: Use the IEC binary prefix definitions'
-> 015/46:[----] [--] 'hw/misc: Use the IEC binary prefix definitions'
-> 016/46:[----] [--] 'hw/riscv: Use the IEC binary prefix definitions'
-> 017/46:[----] [--] 'hw/m68k: Use the IEC binary prefix definitions'
-> 018/46:[0006] [FC] 'hw/sparc: Use the IEC binary prefix definitions'
-> 019/46:[0003] [FC] 'hw/s390x: Use the IEC binary prefix definitions'
-> 020/46:[0004] [FC] 'hw/hppa: Use the IEC binary prefix definitions'
-> 021/46:[0009] [FC] 'hw/xtensa: Use the IEC binary prefix definitions'
-> 022/46:[----] [--] 'hw/alpha: Use the IEC binary prefix definitions'
-> 023/46:[----] [--] 'hw/tricore: Use the IEC binary prefix definitions'
-> 024/46:[----] [--] 'hw/microblaze: Use the IEC binary prefix definitions'
-> 025/46:[----] [--] 'hw/nios2: Use the IEC binary prefix definitions'
-> 026/46:[----] [--] 'hw/cris: Use the IEC binary prefix definitions'
-> 027/46:[----] [--] 'hw/lm32: Use the IEC binary prefix definitions'
-> 028/46:[----] [--] 'hw/sh4: Use the IEC binary prefix definitions'
-> 029/46:[----] [--] 'hw/mips/r4k: Constify params_size'
-> 030/46:[0012] [FC] 'hw/mips: Use the IEC binary prefix definitions'
-> 031/46:[----] [--] 'hw/arm: Use the IEC binary prefix definitions'
-> 032/46:[0022] [FC] 'hw/ppc: Use the IEC binary prefix definitions'
-> 033/46:[0006] [FC] 'hw/i386: Use the IEC binary prefix definitions'
-> 034/46:[----] [--] 'hw/net: Use the IEC binary prefix definitions'
-> 035/46:[0002] [FC] 'hw/usb: Use the IEC binary prefix definitions'
-> 036/46:[0002] [FC] 'hw/sd: Use the IEC binary prefix definitions'
-> 037/46:[----] [--] 'hw/vfio: Use the IEC binary prefix definitions'
-> 038/46:[----] [--] 'hw/virtio: Use the IEC binary prefix definitions'
-> 039/46:[----] [--] 'hw/rdma: Use the IEC binary prefix definitions'
-> 040/46:[----] [--] 'cutils: Do not include "qemu/units.h" directly'
-> 041/46:[0148] [FC] 'hw/ppc: Use the IEC binary prefix definitions'
-> 042/46:[down] 'monitor: Use the IEC binary prefix definitions'
-> 043/46:[down] 'vl: Use the IEC binary prefix definitions'
-> 044/46:[down] 'tests/crypto: Use the IEC binary prefix definitions'
-> 045/46:[down] 'linux-user: Use the IEC binary prefix definitions'
-> 046/46:[down] 'bsd-user: Use the IEC binary prefix definitions'
-> 
-> Philippe Mathieu-Daudé (46):
->   include: Add IEC binary prefixes in "qemu/units.h"
->   vdi: Use definitions from "qemu/units.h"
->   x86/cpu: Use definitions from "qemu/units.h"
->   checkpatch: Recognize IEC binary prefix definitions
->   hw: Use IEC binary prefix definitions from "qemu/units.h"
->   hw: Directly use "qemu/units.h" instead of "qemu/cutils.h"
->   hw/ivshmem: Use the IEC binary prefix definitions
->   hw/ipack: Use the IEC binary prefix definitions
->   hw/scsi: Use the IEC binary prefix definitions
->   hw/smbios: Use the IEC binary prefix definitions
->   hw/xen: Use the IEC binary prefix definitions
->   hw/tpm: Use the IEC binary prefix definitions
->   hw/block: Use the IEC binary prefix definitions
->   hw/display: Use the IEC binary prefix definitions
->   hw/misc: Use the IEC binary prefix definitions
->   hw/riscv: Use the IEC binary prefix definitions
->   hw/m68k: Use the IEC binary prefix definitions
->   hw/sparc: Use the IEC binary prefix definitions
->   hw/s390x: Use the IEC binary prefix definitions
->   hw/hppa: Use the IEC binary prefix definitions
->   hw/xtensa: Use the IEC binary prefix definitions
->   hw/alpha: Use the IEC binary prefix definitions
->   hw/tricore: Use the IEC binary prefix definitions
->   hw/microblaze: Use the IEC binary prefix definitions
->   hw/nios2: Use the IEC binary prefix definitions
->   hw/cris: Use the IEC binary prefix definitions
->   hw/lm32: Use the IEC binary prefix definitions
->   hw/sh4: Use the IEC binary prefix definitions
->   hw/mips/r4k: Constify params_size
->   hw/mips: Use the IEC binary prefix definitions
->   hw/arm: Use the IEC binary prefix definitions
->   hw/ppc: Use the IEC binary prefix definitions
->   hw/i386: Use the IEC binary prefix definitions
->   hw/net: Use the IEC binary prefix definitions
->   hw/usb: Use the IEC binary prefix definitions
->   hw/sd: Use the IEC binary prefix definitions
->   hw/vfio: Use the IEC binary prefix definitions
->   hw/virtio: Use the IEC binary prefix definitions
->   hw/rdma: Use the IEC binary prefix definitions
->   cutils: Do not include "qemu/units.h" directly
->   hw/ppc: Use the IEC binary prefix definitions
->   monitor: Use the IEC binary prefix definitions
->   vl: Use the IEC binary prefix definitions
->   tests/crypto: Use the IEC binary prefix definitions
->   linux-user: Use the IEC binary prefix definitions
->   bsd-user: Use the IEC binary prefix definitions
-> 
->  hw/net/ne2000.h                          |  5 ++--
->  hw/ppc/mac.h                             |  3 ++-
->  hw/rdma/vmw/pvrdma.h                     |  3 ++-
->  include/hw/acpi/tpm.h                    |  3 ++-
->  include/hw/arm/fsl-imx7.h                |  5 ++--
->  include/hw/arm/stm32f205_soc.h           |  5 ++--
->  include/hw/display/xlnx_dp.h             |  5 ++--
->  include/hw/i386/ich9.h                   |  3 ++-
->  include/hw/intc/mips_gic.h               |  3 ++-
->  include/hw/mips/bios.h                   |  3 ++-
->  include/hw/net/allwinner_emac.h          |  5 ++--
->  include/hw/ppc/spapr.h                   |  5 ++--
->  include/hw/virtio/virtio-net.h           |  3 ++-
->  include/qemu/cutils.h                    |  7 ------
->  include/qemu/units.h                     | 20 ++++++++++++++++
->  block/vdi.c                              |  7 +++---
->  bsd-user/main.c                          |  5 ++--
->  hw/alpha/typhoon.c                       | 17 +++++++-------
->  hw/arm/bcm2835_peripherals.c             |  3 ++-
->  hw/arm/boot.c                            |  7 +++---
->  hw/arm/collie.c                          |  5 ++--
->  hw/arm/digic_boards.c                    |  7 +++---
->  hw/arm/exynos4_boards.c                  |  3 ++-
->  hw/arm/gumstix.c                         |  3 ++-
->  hw/arm/integratorcp.c                    |  3 ++-
->  hw/arm/mainstone.c                       |  3 ++-
->  hw/arm/msf2-soc.c                        |  6 ++---
->  hw/arm/msf2-som.c                        |  8 +++----
->  hw/arm/musicpal.c                        |  9 +++----
->  hw/arm/omap_sx1.c                        | 11 +++++----
->  hw/arm/raspi.c                           |  5 ++--
->  hw/arm/smmu-common.c                     |  3 ++-
->  hw/arm/stellaris.c                       |  5 ++--
->  hw/arm/versatilepb.c                     |  5 ++--
->  hw/arm/vexpress.c                        |  7 +++---
->  hw/arm/virt.c                            |  5 ++--
->  hw/arm/xilinx_zynq.c                     |  7 +++---
->  hw/block/m25p80.c                        |  5 ++--
->  hw/block/nvme.c                          |  3 ++-
->  hw/block/tc58128.c                       |  3 ++-
->  hw/block/xen_disk.c                      |  3 ++-
->  hw/core/loader-fit.c                     |  3 ++-
->  hw/core/machine.c                        |  4 ++--
->  hw/cris/axis_dev88.c                     |  3 ++-
->  hw/display/bochs-display.c               |  9 +++----
->  hw/display/cirrus_vga.c                  | 10 ++++----
->  hw/display/g364fb.c                      |  4 ++--
->  hw/display/qxl.c                         | 30 +++++++++++-------------
->  hw/display/sm501.c                       | 16 ++++++-------
->  hw/display/vga-isa-mm.c                  |  5 ++--
->  hw/display/vga.c                         |  5 ++--
->  hw/display/virtio-gpu.c                  |  4 ++--
->  hw/display/vmware_vga.c                  |  3 ++-
->  hw/display/xenfb.c                       |  3 ++-
->  hw/hppa/dino.c                           |  5 ++--
->  hw/hppa/machine.c                        | 12 +++++-----
->  hw/i386/acpi-build.c                     |  5 ++--
->  hw/i386/pc.c                             | 19 ++++++++-------
->  hw/i386/pc_piix.c                        |  4 ++--
->  hw/i386/pc_q35.c                         |  3 ++-
->  hw/i386/pc_sysfw.c                       |  9 +++----
->  hw/i386/xen/xen-mapcache.c               |  3 ++-
->  hw/intc/apic_common.c                    |  3 ++-
->  hw/ipack/tpci200.c                       |  5 ++--
->  hw/lm32/lm32_boards.c                    | 13 +++++-----
->  hw/lm32/milkymist.c                      | 10 ++++----
->  hw/m68k/mcf5208.c                        |  3 ++-
->  hw/microblaze/petalogix_ml605_mmu.c      |  7 +++---
->  hw/microblaze/petalogix_s3adsp1800_mmu.c |  7 +++---
->  hw/mips/boston.c                         | 30 ++++++++++++------------
->  hw/mips/mips_fulong2e.c                  |  7 +++---
->  hw/mips/mips_malta.c                     | 25 +++++++++++---------
->  hw/mips/mips_r4k.c                       | 15 ++++++------
->  hw/misc/aspeed_sdmc.c                    |  9 +++----
->  hw/misc/auxbus.c                         |  3 ++-
->  hw/misc/edu.c                            |  3 ++-
->  hw/misc/imx7_gpr.c                       |  3 ++-
->  hw/misc/ivshmem.c                        |  3 ++-
->  hw/misc/mips_itu.c                       |  3 ++-
->  hw/misc/omap_gpmc.c                      |  5 ++--
->  hw/net/e1000e.c                          |  7 +++---
->  hw/net/e1000x_common.c                   |  3 ++-
->  hw/net/eepro100.c                        |  3 +--
->  hw/nios2/boot.c                          |  6 ++---
->  hw/nvram/spapr_nvram.c                   | 11 +++++----
->  hw/pci-host/designware.c                 |  3 ++-
->  hw/pci-host/gpex.c                       |  3 ++-
->  hw/pci-host/piix.c                       |  5 ++--
->  hw/pci-host/prep.c                       |  3 ++-
->  hw/pci-host/q35.c                        | 17 +++++++-------
->  hw/pci-host/xilinx-pcie.c                |  5 ++--
->  hw/ppc/e500.c                            | 13 +++++-----
->  hw/ppc/e500plat.c                        |  3 ++-
->  hw/ppc/mac_newworld.c                    |  1 -
->  hw/ppc/mac_oldworld.c                    |  9 ++++---
->  hw/ppc/pnv.c                             |  6 ++---
->  hw/ppc/ppc405_boards.c                   |  9 +++----
->  hw/ppc/ppc405_uc.c                       |  7 +++---
->  hw/ppc/ppc440_bamboo.c                   |  5 ++--
->  hw/ppc/ppc440_uc.c                       | 28 +++++++++++-----------
->  hw/ppc/ppc4xx_devs.c                     | 22 +++++++++--------
->  hw/ppc/ppce500_spin.c                    |  3 ++-
->  hw/ppc/prep.c                            |  6 ++---
->  hw/ppc/rs6000_mc.c                       | 13 +++++-----
->  hw/ppc/sam460ex.c                        | 18 +++++++-------
->  hw/ppc/spapr.c                           | 12 +++++-----
->  hw/ppc/spapr_rtas.c                      |  2 +-
->  hw/ppc/virtex_ml507.c                    |  7 +++---
->  hw/riscv/virt.c                          |  3 ++-
->  hw/s390x/s390-skeys.c                    |  3 ++-
->  hw/s390x/s390-stattrib.c                 |  3 ++-
->  hw/s390x/sclp.c                          |  3 ++-
->  hw/scsi/scsi-disk.c                      |  9 +++----
->  hw/sd/sd.c                               |  8 +++----
->  hw/sd/sdhci.c                            |  8 +++----
->  hw/sh4/r2d.c                             |  3 ++-
->  hw/smbios/smbios.c                       | 15 +++++-------
->  hw/sparc/leon3.c                         | 10 ++++----
->  hw/sparc/sun4m.c                         | 10 ++++----
->  hw/sparc64/niagara.c                     |  3 ++-
->  hw/sparc64/sun4u.c                       |  4 ++--
->  hw/ssi/aspeed_smc.c                      | 29 ++++++++++++-----------
->  hw/tricore/tricore_testboard.c           | 13 +++++-----
->  hw/usb/ccid-card-passthru.c              |  5 ++--
->  hw/usb/combined-packet.c                 |  3 ++-
->  hw/usb/dev-smartcard-reader.c            |  3 ++-
->  hw/usb/redirect.c                        |  3 ++-
->  hw/vfio/pci-quirks.c                     |  9 +++----
->  hw/vfio/pci.c                            |  3 ++-
->  hw/xenpv/xen_domainbuild.c               | 13 +++++-----
->  hw/xtensa/xtfpga.c                       |  9 +++----
->  linux-user/main.c                        |  5 ++--
->  monitor.c                                |  3 ++-
->  target/i386/cpu.c                        |  4 +---
->  target/ppc/mmu_helper.c                  |  8 +++----
->  target/xtensa/helper.c                   |  5 ++--
->  tests/benchmark-crypto-cipher.c          |  6 ++---
->  tests/benchmark-crypto-hash.c            |  5 ++--
->  tests/benchmark-crypto-hmac.c            |  6 ++---
->  tests/test-cutils.c                      | 18 +++++++-------
->  tests/test-keyval.c                      |  6 ++---
->  tests/test-qemu-opts.c                   |  7 +++---
->  vl.c                                     |  3 ++-
->  scripts/checkpatch.pl                    |  1 +
->  144 files changed, 565 insertions(+), 453 deletions(-)
->  create mode 100644 include/qemu/units.h
-> 
+> Sad we don't stick to a single usage pattern (giving up ownership).
+> Some day, someone will look at fixing the leaks, and that may make its
+> work easier if the code was consistent...
+Aml* pointers aren't leaked, see aml_alloc() which stores all allocations
+into a list which is freed later by free_aml_allocator() when table
+is build.
+
+
+> But I'll follow your advise for now.
+>=20
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(0)));
+> >> +            {
+> >> +                uint8_t byte_list[2] =3D { 0xff, 0x01 };
+> >> +                aml_append(ifctx2, aml_return(aml_buffer(2, byte_list=
+)));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.1 Get Physical Presence Interface Version =20
+> > like Michael noted use version/chapter pair to as reference
+> >
+> > ex: /* ACPI 1.0b: 16.2.5.2 Named Objects Encoding: DefOpRegion */ =20
+>=20
+> ok
+>=20
+> > =20
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 1
+> >> +             * Arg 3 (Package): Arguments =3D Empty Package
+> >> +             * Returns: Type: String
+> >> +             */
+> >> +            func_idx =3D aml_local(0); =20
+> > not needed
+> > =20
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(1)));
+> >> +            {
+> >> +                aml_append(ifctx2, aml_return(aml_string("1.3")));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.2 Submit TPM Operation Request to Pre-OS Environme=
+nt
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 2
+> >> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> >> +             *                              Operation Value of the Re=
+quest
+> >> +             * Returns: Type: Integer
+> >> +             *          0: Success
+> >> +             *          1: Operation Value of the Request Not Support=
+ed
+> >> +             *          2: General Failure
+> >> +             */
+> >> +            func_idx =3D aml_local(0); =20
+> > ditto and the same in other places
+> > =20
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(2)));
+> >> +            {
+> >> +                /* get opcode */
+> >> +                op =3D aml_derefof(aml_index(aml_arg(3), aml_int(0)));
+> >> +                aml_append(ifctx2, aml_store(op, aml_local(0))); =20
+> >                                                     ^^^ what this local=
+(0) is? suggest to use named var here (in C sense) =20
+> >> +
+> >> +                /* get opcode flags */
+> >> +                op =3D aml_local(0); =20
+> > use other local to make ASL less confusion (i.e. try not to reuse local=
+ vars for something else) =20
+>=20
+> I must say I get a bit confused by the code style change you request.
+> The original code from Stefan was more straightforward to me. Now it
+> seems C variables adds another layer of complexity. I think it's
+> easier if you come up with a follow-up patch for further cleanup
+> iterations, as I find it hard to match your wanted style.
+
+Whole point of review is to merge code that doesn't need to be
+rewritten later on and to show preferred style for ACPI code
+so I wouldn't be the only one who knows how it is supposed to work.
+
+Now about my original comment.
+What we have in this patch:
+  func_idx =3D aml_local(0);
+  ...
+  op =3D aml_local(0);
+so resulting AML decompiled in to ASL would (re)use Local0 with different m=
+eanings
+what I've suggested is:
+  Aml *func_idx =3D aml_local(0);
+  Aml *op =3D aml_local(1);
+  Aml *foo =3D aml_local(X);
+
+where ASL would retain LocalX meaning throughout method, making it a bit re=
+adable.
+
+
+> >> +                aml_append(ifctx2,
+> >> +                           aml_store(aml_call1("TPFN", op), aml_local=
+(1))); =20
+> >                                                                ^^^ what=
+ this local(1) is?
+> > =20
+> >> +
+> >> +                op_flags =3D aml_local(1); =20
+> > I'd init all named vars at the top of function where it's easy to see w=
+hat is what
+> > and use them later. ex: nvdimm_build_common_dsm() =20
+>=20
+> But the arguments depend on the function.
+some maybe, but
+function index is common, arguments also, so one could do following:
+
+Aml *func =3D aml_arg(2);
+Aml *args =3D aml_arg(3);
+
+without storing them in locals, and then use them within the method as nece=
+ssary
+
+> > =20
+> >> +                /* if func[opcode] & TPM_PPI_FUNC_NOT_IMPLEMENTED */
+> >> +                ifctx3 =3D aml_if(
+> >> +                    aml_equal(
+> >> +                        aml_and(op_flags, aml_int(TPM_PPI_FUNC_MASK),=
+ NULL),
+> >> +                        aml_int(TPM_PPI_FUNC_NOT_IMPLEMENTED)));
+> >> +                {
+> >> +                    /* 1: not implemented */ =20
+> > may be the same language as in above comment
+> >   /* 1: Operation Value of the Request Not Supported */
+> > same applies to other return values =20
+>=20
+> ok
+>=20
+> > =20
+> >> +                    aml_append(ifctx3, aml_return(aml_int(1)));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +
+> >> +                op =3D aml_local(0);
+> >> +                aml_append(ifctx2, aml_store(op, aml_name("PPRQ")));
+> >> +                aml_append(ifctx2, aml_store(aml_int(0), aml_name("PP=
+RM")));
+> >> +                /* 0: success */
+> >> +                aml_append(ifctx2, aml_return(aml_int(0)));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.3 Get Pending TPM Operation Requested By the OS
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 3
+> >> +             * Arg 3 (Package): Arguments =3D Empty Package
+> >> +             * Returns: Type: Package of Integers
+> >> +             *          Integer 1: Function Return code
+> >> +             *                     0: Success
+> >> +             *                     1: General Failure
+> >> +             *          Integer 2: Pending operation requested by the=
+ OS
+> >> +             *                     0: None
+> >> +             *                    >0: Operation Value of the Pending =
+Request
+> >> +             *          Integer 3: Optional argument to pending opera=
+tion
+> >> +             *                     requested by the OS
+> >> +             *                     0: None
+> >> +             *                    >0: Argument Value of the Pending R=
+equest
+> >> +             */
+> >> +            func_idx =3D aml_local(0);
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(3)));
+> >> +            {
+> >> +                /* revision to integer */
+> >> +                aml_append(ifctx2,
+> >> +                           aml_store(
+> >> +                               aml_to_integer(aml_arg(1)), =20
+> > same do you need cast here, by spec it's 'int' already?
+> > =20
+>=20
+> Yeah, looks like it's unnecessary. Stefan?
+>=20
+> >> +                               aml_local(1))); =20
+> > why store into local var, couldn't it be used directly ? =20
+>=20
+> removed
+>=20
+> > =20
+> >> +                /*
+> >> +                 * Revision ID of 1, no integer parameter beyond
+> >> +                 * parameter two are expected
+> >> +                 */
+> >> +                rev =3D aml_local(1);
+> >> +                ifctx3 =3D aml_if(aml_equal(rev, aml_int(1)));
+> >> +                {
+> >> +                    /* TPM2[1] =3D PPRQ */
+> >> +                    aml_append(ifctx3,
+> >> +                               aml_store(
+> >> +                                   aml_name("PPRQ"),
+> >> +                                   aml_index(aml_name("TPM2"), aml_in=
+t(1))));
+> >> +                    aml_append(ifctx3, aml_return(aml_name("TPM2")));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +
+> >> +                /*
+> >> +                 * A return value of {0, 23, 1} indicates that
+> >> +                 * operation 23 with argument 1 is pending.
+> >> +                 */
+> >> +                rev =3D aml_local(1);
+> >> +                ifctx3 =3D aml_if(aml_equal(rev, aml_int(2)));
+> >> +                {
+> >> +                    /* TPM3[1] =3D PPRQ */
+> >> +                    aml_append(ifctx3,
+> >> +                               aml_store(
+> >> +                                   aml_name("PPRQ"),
+> >> +                                   aml_index(aml_name("TPM3"), aml_in=
+t(1))));
+> >> +                    /* TPM3[2] =3D PPRM */
+> >> +                    aml_append(ifctx3,
+> >> +                               aml_store(
+> >> +                                   aml_name("PPRM"),
+> >> +                                   aml_index(aml_name("TPM3"), aml_in=
+t(2))));
+> >> +                    aml_append(ifctx3, aml_return(aml_name("TPM3")));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.4 Get Platform-Specific Action to Transition to
+> >> +             *       Pre-OS Environment
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 4
+> >> +             * Arg 3 (Package): Arguments =3D Empty Package
+> >> +             * Returns: Type: Integer
+> >> +             *          0: None
+> >> +             *          1: Shutdown
+> >> +             *          2: Reboot
+> >> +             *          3: OS Vendor-specific
+> >> +             */
+> >> +            func_idx =3D aml_local(0);
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(4)));
+> >> +            {
+> >> +                /* reboot */
+> >> +                aml_append(ifctx2, aml_return(aml_int(2)));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.5 Return TPM Operation Response to OS Environment
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 5
+> >> +             * Arg 3 (Package): Arguments =3D Empty Package
+> >> +             * Returns: Type: Package of Integer
+> >> +             *          Integer 1: Function Return code
+> >> +             *                     0: Success
+> >> +             *                     1: General Failure
+> >> +             *          Integer 2: Most recent operation request
+> >> +             *                     0: None
+> >> +             *                    >0: Operation Value of the most rec=
+ent request
+> >> +             *          Integer 3: Response to the most recent operat=
+ion request
+> >> +             *                     0: Success
+> >> +             *                     0x00000001..0x00000FFF: Correspond=
+ing TPM
+> >> +             *                                             error code
+> >> +             *                     0xFFFFFFF0: User Abort or timeout =
+of dialog
+> >> +             *                     0xFFFFFFF1: firmware Failure
+> >> +             */
+> >> +            func_idx =3D aml_local(0);
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(5)));
+> >> +            {
+> >> +                /* TPM3[1] =3D LPPR */
+> >> +                aml_append(ifctx2,
+> >> +                           aml_store(
+> >> +                               aml_name("LPPR"),
+> >> +                               aml_index(aml_name("TPM3"), aml_int(1)=
+)));
+> >> +                /* TPM3[2] =3D PPRP */
+> >> +                aml_append(ifctx2,
+> >> +                           aml_store(
+> >> +                               aml_name("PPRP"),
+> >> +                               aml_index(aml_name("TPM3"), aml_int(2)=
+)));
+> >> +                aml_append(ifctx2, aml_return(aml_name("TPM3")));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.6 Submit preferred user language
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 6
+> >> +             * Arg 3 (Package): Arguments =3D String Package
+> >> +             *                  Preferred language code
+> >> +             * Returns: Type: Integer
+> >> +             * Function Return Code
+> >> +             *          3: Not implemented
+> >> +             */
+> >> +            func_idx =3D aml_local(0);
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(6)));
+> >> +            {
+> >> +                /* 3 =3D not implemented */
+> >> +                aml_append(ifctx2, aml_return(aml_int(3)));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.7 Submit TPM Operation Request to Pre-OS Environme=
+nt 2
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 7
+> >> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> >> +             *                  Integer 1: Operation Value of the Req=
+uest
+> >> +             *                  Integer 2: Argument for Operation (op=
+tional)
+> >> +             * Returns: Type: Integer
+> >> +             *          0: Success
+> >> +             *          1: Not Implemented
+> >> +             *          2: General Failure
+> >> +             *          3: Operation blocked by current firmware sett=
+ings
+> >> +             */
+> >> +            func_idx =3D aml_local(0);
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(7)));
+> >> +            {
+> >> +                /* get opcode */
+> >> +                op =3D aml_derefof(aml_index(aml_arg(3), aml_int(0)));
+> >> +                aml_append(ifctx2, aml_store(op, aml_local(0)));
+> >> +
+> >> +                /* get opcode flags */
+> >> +                op =3D aml_local(0);
+> >> +                aml_append(ifctx2, aml_store(aml_call1("TPFN", op),
+> >> +                                             aml_local(1)));
+> >> +                /* if func[opcode] & TPM_PPI_FUNC_NOT_IMPLEMENTED */
+> >> +                op_flags =3D aml_local(1);
+> >> +                ifctx3 =3D aml_if(
+> >> +                    aml_equal(
+> >> +                        aml_and(op_flags, aml_int(TPM_PPI_FUNC_MASK),=
+ NULL),
+> >> +                        aml_int(TPM_PPI_FUNC_NOT_IMPLEMENTED)));
+> >> +                {
+> >> +                    /* 1: not implemented */
+> >> +                    aml_append(ifctx3, aml_return(aml_int(1)));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +
+> >> +                /* if func[opcode] & TPM_PPI_FUNC_BLOCKED */
+> >> +                op_flags =3D aml_local(1);
+> >> +                ifctx3 =3D aml_if(
+> >> +                    aml_equal(
+> >> +                        aml_and(op_flags, aml_int(TPM_PPI_FUNC_MASK),=
+ NULL),
+> >> +                        aml_int(TPM_PPI_FUNC_BLOCKED)));
+> >> +                {
+> >> +                    /* 3: blocked by firmware */
+> >> +                    aml_append(ifctx3, aml_return(aml_int(3)));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +
+> >> +                /* revision to integer */
+> >> +                aml_append(ifctx2,
+> >> +                           aml_store(
+> >> +                               aml_to_integer(aml_arg(1)),
+> >> +                               aml_local(1)));
+> >> +
+> >> +                rev =3D aml_local(1);
+> >> +                ifctx3 =3D aml_if(aml_equal(rev, aml_int(1)));
+> >> +                {
+> >> +                    /* revision 1 */
+> >> +                    /* PPRQ =3D op */
+> >> +                    op =3D aml_local(0);
+> >> +                    aml_append(ifctx3, aml_store(op, aml_name("PPRQ")=
+));
+> >> +                    /* no argument, PPRM =3D 0 */
+> >> +                    aml_append(ifctx3, aml_store(aml_int(0),
+> >> +                                                 aml_name("PPRM")));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +
+> >> +                rev =3D aml_local(1);
+> >> +                ifctx3 =3D aml_if(aml_equal(rev, aml_int(2)));
+> >> +                {
+> >> +                    /* revision 2 */
+> >> +                    /* PPRQ =3D op */
+> >> +                    op =3D aml_local(0);
+> >> +                    op_arg =3D aml_derefof(aml_index(aml_arg(3), aml_=
+int(1)));
+> >> +                    aml_append(ifctx3, aml_store(op, aml_name("PPRQ")=
+));
+> >> +                    /* PPRM =3D arg3[1] */
+> >> +                    aml_append(ifctx3, aml_store(op_arg, aml_name("PP=
+RM")));
+> >> +                }
+> >> +                aml_append(ifctx2, ifctx3);
+> >> +                /* 0: success */
+> >> +                aml_append(ifctx2, aml_return(aml_int(0)));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            /*
+> >> +             * 8.1.8 Get User Confirmation Status for Operation
+> >> +             *
+> >> +             * Arg 2 (Integer): Function Index =3D 8
+> >> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> >> +             *                  Operation Value that may need user co=
+nfirmation
+> >> +             * Returns: Type: Integer
+> >> +             *          0: Not implemented
+> >> +             *          1: Firmware only
+> >> +             *          2: Blocked for OS by firmware configuration
+> >> +             *          3: Allowed and physically present user requir=
+ed
+> >> +             *          4: Allowed and physically present user not re=
+quired
+> >> +             */
+> >> +            func_idx =3D aml_local(0);
+> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(8)));
+> >> +            {
+> >> +                /* get opcode */
+> >> +                op =3D aml_derefof(aml_index(aml_arg(3), aml_int(0)));
+> >> +                aml_append(ifctx2, aml_store(op, aml_local(0)));
+> >> +
+> >> +                /* get opcode flags */
+> >> +                op =3D aml_local(0);
+> >> +                aml_append(ifctx2, aml_store(aml_call1("TPFN", op),
+> >> +                                             aml_local(1)));
+> >> +                op_flags =3D aml_local(1);
+> >> +                /* return confirmation status code */
+> >> +                aml_append(ifctx2,
+> >> +                           aml_return(
+> >> +                               aml_and(op_flags,
+> >> +                                       aml_int(TPM_PPI_FUNC_MASK), NU=
+LL)));
+> >> +            }
+> >> +            aml_append(ifctx, ifctx2);
+> >> +
+> >> +            aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+> >> +        }
+> >> +        aml_append(method, ifctx);
+> >> +    }
+> >> +    aml_append(dev, method);
+> >> +}
+> >> +
+> >>  static void
+> >>  build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >>             AcpiPmInfo *pm, AcpiMiscInfo *misc,
+> >> @@ -2153,6 +2569,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
+r,
+> >>                   */
+> >>                  /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
+> >>                  aml_append(dev, aml_name_decl("_CRS", crs));
+> >> +
+> >> +                build_tpm_ppi(dev);
+> >> +
+> >>                  aml_append(scope, dev);
+> >>              }
+> >>
+> >> @@ -2172,6 +2591,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
+r,
+> >>          aml_append(method, aml_return(aml_int(0x0f)));
+> >>          aml_append(dev, method);
+> >>
+> >> +        build_tpm_ppi(dev);
+> >> +
+> >>          aml_append(sb_scope, dev);
+> >>      }
+> >>
+> >> @@ -2920,7 +3341,7 @@ void acpi_setup(void)
+> >>          tpm_config =3D (FWCfgTPMConfig) {
+> >>              .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+> >>              .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find())),
+> >> -            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
+> >> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_1_30) =20
+> > s/cpu_to_le32// =20
+>=20
+> ok
+>=20
+> > =20
+> >>          };
+> >>          fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+> >>                          &tpm_config, sizeof tpm_config);
+> >> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> >> index 2ddb768084..c27762c723 100644
+> >> --- a/docs/specs/tpm.txt
+> >> +++ b/docs/specs/tpm.txt
+> >> @@ -62,6 +62,85 @@ URL:
+> >>
+> >>  https://trustedcomputinggroup.org/tcg-acpi-specification/
+> >>
+> >> +=3D=3D ACPI PPI Interface =3D=3D
+> >> +
+> >> +QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and T=
+PM 2. This
+> >> +interface requires ACPI and firmware support. The specification can b=
+e found at
+> >> +the following URL:
+> >> +
+> >> +https://trustedcomputinggroup.org/resource/tcg-physical-presence-inte=
+rface-specification/
+> >> +
+> >> +PPI enables a system administrator (root) to request a modification t=
+o the
+> >> +TPM upon reboot. The PPI specification defines the operation requests=
+ and the
+> >> +actions the firmware has to take. The system administrator passes the=
+ operation
+> >> +request number to the firmware through an ACPI interface which writes=
+ this
+> >> +number to a memory location that the firmware knows. Upon reboot, the=
+ firmware
+> >> +finds the number and sends commands to the the TPM. The firmware writ=
+es the TPM
+> >> +result code and the operation request number to a memory location tha=
+t ACPI can
+> >> +read from and pass the result on to the administrator.
+> >> +
+> >> +The PPI specification defines a set of mandatory and optional operati=
+ons for
+> >> +the firmware to implement. The ACPI interface also allows an administ=
+rator to
+> >> +list the supported operations. In QEMU the ACPI code is generated by =
+QEMU, yet
+> >> +the firmware needs to implement support on a per-operations basis, and
+> >> +different firmwares may support a different subset. Therefore, QEMU i=
+ntroduces
+> >> +the virtual memory device for PPI where the firmware can indicate whi=
+ch
+> >> +operations it supports and ACPI can enable the ones that are supporte=
+d and
+> >> +disable all others. This interface lies in main memory and has the fo=
+llowing
+> >> +layout:
+> >> +
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + |  Field   | Length | Offset | Description                          =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | func     |  0x100 |  0x000 | Firmware sets values for each support=
+ed   |
+> >> + |          |        |        | operation. See defined values below. =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | ppin     |   0x1  |  0x100 | SMI interrupt to use. Set by firmware=
+.    |
+> >> + |          |        |        | Not supported.                       =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | ppip     |   0x4  |  0x101 | ACPI function index to pass to SMM co=
+de.  |
+> >> + |          |        |        | Set by ACPI. Not supported.          =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | pprp     |   0x4  |  0x105 | Result of last executed operation. Se=
+t by |
+> >> + |          |        |        | firmware. See function index 5 for va=
+lues.|
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | pprq     |   0x4  |  0x109 | Operation request number to execute. =
+See  |
+> >> + |          |        |        | 'Physical Presence Interface Operatio=
+n    |
+> >> + |          |        |        | Summary' tables in specs. Set by ACPI=
+.    |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | pprm     |   0x4  |  0x10d | Operation request optional parameter.=
+     |
+> >> + |          |        |        | Values depend on operation. Set by AC=
+PI.  |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | lppr     |   0x4  |  0x111 | Last executed operation request numbe=
+r.   |
+> >> + |          |        |        | Copied from pprq field by firmware.  =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | fret     |   0x4  |  0x115 | Result code from SMM function.       =
+     |
+> >> + |          |        |        | Not supported.                       =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | res1     |  0x40  |  0x119 | Reserved for future use              =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> + | next_step|   0x1  |  0x159 | Operation to execute after reboot by =
+     |
+> >> + |          |        |        | firmware. Used by firmware.          =
+     |
+> >> + +----------+--------+--------+--------------------------------------=
+-----+
+> >> +
+> >> +   The following values are supported for the 'func' field. They corr=
+espond
+> >> +   to the values used by ACPI function index 8.
+> >> +
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> + | value    | Description                                            =
+     |
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> + | 0        | Operation is not implemented.                          =
+     |
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> + | 1        | Operation is only accessible through firmware.         =
+     |
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> + | 2        | Operation is blocked for OS by firmware configuration. =
+     |
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> + | 3        | Operation is allowed and physically present user requir=
+ed.  |
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> + | 4        | Operation is allowed and physically present user is not=
+     |
+> >> + |          | required.                                              =
+     |
+> >> + +----------+--------------------------------------------------------=
+-----+
+> >> +
+> >>
+> >>  QEMU files related to TPM ACPI tables:
+> >>   - hw/i386/acpi-build.c =20
+> >
+> > =20
+>=20
+>=20
+>=20
