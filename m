@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYu6M-0003oY-Mi
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYu6N-0003pp-TD
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYu6J-0003iL-IT
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYu6J-0003i2-Hf
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 29 Jun 2018 16:09:35 +0200
-Message-Id: <20180629140959.6690-6-kwolf@redhat.com>
+Date: Fri, 29 Jun 2018 16:09:31 +0200
+Message-Id: <20180629140959.6690-2-kwolf@redhat.com>
 In-Reply-To: <20180629140959.6690-1-kwolf@redhat.com>
 References: <20180629140959.6690-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 05/29] hw/block/nvme: add optional parameter
- num_queues for nvme device
+Subject: [Qemu-devel] [PULL 01/29] block-qdict: Pacify Coverity after commit
+ f1b34a248e9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Weiping Zhang <zhangweiping@didichuxing.com>
+From: Markus Armbruster <armbru@redhat.com>
 
-Add an optional paramter num_queues for device, and set it
-to 64 by default.
+Commit f1b34a248e9 replaced less-than-obvious test in
+qdict_flatten_qdict() by the obvious one.  Sadly, it made something
+else non-obvious: the fact that @new_key passed to qdict_put_obj()
+can't be null, because that depends on the function's precondition
+(target == qdict) == !prefix.
 
-Signed-off-by: Weiping Zhang <zhangweiping@didichuxing.com>
-Acked-by: Keith Busch <keith.busch@intel.com>
+Tweak the function some more to help Coverity and human readers alike.
+
+Fixes: CID 1393620
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/block/nvme.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ qobject/block-qdict.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index d5bf95b79b..156ecf3c41 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -18,7 +18,8 @@
-  * Usage: add options:
-  *      -drive file=<file>,if=none,id=<drive_id>
-  *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
-- *              cmb_size_mb=<cmb_size_mb[optional]>
-+ *              cmb_size_mb=<cmb_size_mb[optional]>, \
-+ *              num_queues=<N[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-@@ -1232,7 +1233,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     pcie_endpoint_cap_init(&n->parent_obj, 0x80);
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index 36129e7379..80c653013f 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -97,7 +97,7 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+     const QDictEntry *entry, *next;
+     QDict *dict_val;
+     QList *list_val;
+-    char *new_key;
++    char *key, *new_key;
  
-     n->num_namespaces = 1;
--    n->num_queues = 64;
-     n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-     n->ns_size = bs_size / (uint64_t)n->num_namespaces;
+     entry = qdict_first(qdict);
  
-@@ -1341,6 +1341,7 @@ static Property nvme_props[] = {
-     DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
-     DEFINE_PROP_STRING("serial", NvmeCtrl, serial),
-     DEFINE_PROP_UINT32("cmb_size_mb", NvmeCtrl, cmb_size_mb, 0),
-+    DEFINE_PROP_UINT32("num_queues", NvmeCtrl, num_queues, 64),
-     DEFINE_PROP_END_OF_LIST(),
- };
+@@ -106,10 +106,12 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+         value = qdict_entry_value(entry);
+         dict_val = qobject_to(QDict, value);
+         list_val = qobject_to(QList, value);
+-        new_key = NULL;
  
+         if (prefix) {
+-            new_key = g_strdup_printf("%s.%s", prefix, entry->key);
++            key = new_key = g_strdup_printf("%s.%s", prefix, entry->key);
++        } else {
++            key = entry->key;
++            new_key = NULL;
+         }
+ 
+         /*
+@@ -125,19 +127,17 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+          * well advised not to modify them altogether.)
+          */
+         if (dict_val && qdict_size(dict_val)) {
+-            qdict_flatten_qdict(dict_val, target,
+-                                new_key ? new_key : entry->key);
++            qdict_flatten_qdict(dict_val, target, key);
+             if (target == qdict) {
+                 qdict_del(qdict, entry->key);
+             }
+         } else if (list_val && !qlist_empty(list_val)) {
+-            qdict_flatten_qlist(list_val, target,
+-                                new_key ? new_key : entry->key);
++            qdict_flatten_qlist(list_val, target, key);
+             if (target == qdict) {
+                 qdict_del(qdict, entry->key);
+             }
+         } else if (target != qdict) {
+-            qdict_put_obj(target, new_key, qobject_ref(value));
++            qdict_put_obj(target, key, qobject_ref(value));
+         }
+ 
+         g_free(new_key);
 -- 
 2.13.6
