@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYugk-0002gN-TZ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:47:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fYui4-0003Sg-6S
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYugf-00068V-UJ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:47:54 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:45076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYugf-00066Z-MP
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:47:49 -0400
-Received: by mail-pf0-x244.google.com with SMTP id y24-v6so76141pfe.12
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:47:49 -0700 (PDT)
-References: <20180629001538.11415-1-richard.henderson@linaro.org>
-	<20180629001538.11415-6-richard.henderson@linaro.org>
-	<CAFEAcA8zTOm6eesQVF_1_VY=JsVGpvoWstBwfL32ggARPPzOnQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2aadcec2-e73e-baba-1851-b7894c561999@linaro.org>
-Date: Fri, 29 Jun 2018 07:47:45 -0700
+	(envelope-from <imammedo@redhat.com>) id 1fYuhz-00012H-TK
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:16 -0400
+Date: Fri, 29 Jun 2018 16:49:03 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180629164903.1630ea28@redhat.com>
+In-Reply-To: <20180628121417.1980-3-david@redhat.com>
+References: <20180628121417.1980-1-david@redhat.com>
+	<20180628121417.1980-3-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8zTOm6eesQVF_1_VY=JsVGpvoWstBwfL32ggARPPzOnQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] target/arm: Add ID_ISAR6
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] util/oslib-win32: indicate
+ alignment for qemu_anon_ram_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
 
-On 06/29/2018 01:40 AM, Peter Maydell wrote:
->>      cpu->id_isar5 = 0x00000000;
->> +    cpu->id_isar6 = 0x00000000;
-...
->>      cpu->id_isar5 = 0x00000000;
->> +    cpu->id_isar6 = 0x00000000;
-...
->>      cpu->id_isar5 = 0x00000000;
->> +    cpu->id_isar6 = 0x00000000;
-...
->>      cpu->id_isar5 = 0x0;
->> +    cpu->id_isar6 = 0x0;
-...
-> The ARMCPU struct fields should all be initially cleared to
-> zero, so you don't really need to explicitly zero-initialize
-> isar6 all over the place like this. (Compare isar5, which is
-> I think only set in CPUs that are new enough that their TRMs
-> mentioned it.)
+On Thu, 28 Jun 2018 14:14:15 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Actually, the fact that isar5 is explicitly set to 0
-in many places is the reason that I initialize isar6.
+> Let's set the alignment just like for the posix variant. This will
+> implicitly set the alignment of the underlying memory region and
+> therefore make memory_region_get_alignment(mr) return something > 0 for
+> all memory backends applicable to PCDIMM/NVDIMM.
+> 
+> This will allow us to drop special handling in pc.c for
+> memory_region_get_alignment(mr) == 0, as we can then assume that it is
+> always set (and AFAICS >= getpagesize()).
+> 
+> For pc in pc_memory_plug(), under Windows TARGET_PAGE_SIZE == getpagesize(),
+> therefore alignment of DIMMs will not change, and therefore also not the
+> guest physical memory layout.
+why not use QEMU_VMALLOC_ALIGN for consistency (on win => getpagesize())
+instead of TARGET_PAGE_SIZE like linux allocator does?
+
+Also looking at FIXME comment it notes that VirtualAlloc might have 64K
+alignment (though I haven't found it in VirtualAlloc manual).
+If that's true then we might need set *align to it to avoid auto-picked
+address overlap with previous allocation (not really sure about it).
 
 
-r~
+> For spapr in spapr_memory_plug(), an alignment of 0 would have been used
+note that align == 0 would lead to crash where QEMU_ALIGN_UP() is used,
+so we don't care to keep it compatible (the same like in commit 92a37a04d)
+
+> until now. Now getpagesize() is used. But as the size of DIMMs has to be
+> multiple of 256MB on spapr, automatic address asignment will not change
+> the layout (no memory holes will be created as the alignment change will
+> not apply if DIMMs start/end on 256MB boundaries).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  util/oslib-win32.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index bb5ad28bd3..6e87721419 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -76,6 +76,10 @@ void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared)
+>         memory is page aligned. */
+>      ptr = VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
+>      trace_qemu_anon_ram_alloc(size, ptr);
+> +
+> +    if (ptr && align) {
+> +        *align = getpagesize();
+> +    }
+>      return ptr;
+>  }
+>  
