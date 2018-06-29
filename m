@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYsAV-0001sj-G3
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:06:28 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fYsEh-0003Eq-CH
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fYsAQ-00012W-M1
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:06:27 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fYsAQ-00010f-Ad
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:06:22 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id k7-v6so5121828wrq.0
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 05:06:22 -0700 (PDT)
-References: <20180605160541.10664-1-alex.bennee@linaro.org>
-	<20180605160541.10664-4-alex.bennee@linaro.org>
-	<e52bc79e-6d12-743f-f1ae-fc1a1ac8969a@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e52bc79e-6d12-743f-f1ae-fc1a1ac8969a@redhat.com>
-Date: Fri, 29 Jun 2018 13:06:19 +0100
-Message-ID: <878t6xvltw.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 3/6] Makefile: Rename TARGET_DIRS to
- TARGET_LIST
+	(envelope-from <balaton@eik.bme.hu>) id 1fYsEc-0005JP-8p
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:10:47 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Fri, 29 Jun 2018 14:04:33 +0200
+Message-Id: <20180629121040.246A27456B2@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH v7] ppc440_uc: Basic emulation of PPC440 DMA
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,158 +18,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>
 
+PPC440 SoCs such as the AMCC 460EX have a DMA controller which is used
+by AmigaOS on the sam460ex. Implement the parts used by AmigaOS so it
+can get further booting on the sam460ex machine.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+v7: fix warning about uninitialised variable
+v6:
+- CamelCase type names
+- Check return value of cpu_physical_memory_map
 
-> On 05/06/2018 18:05, Alex Benn=C3=A9e wrote:
->> From: Fam Zheng <famz@redhat.com>
->>
->> To be more accurate on its purpose and make code that looks for a certain
->> target out of this variable more readable.
->
-> This breaks the Docker mingw build, because the full list of targets
-> used on the host is passed to the container.  This includes linux-user
-> targets which do not exist on non-Linux.
+ hw/ppc/ppc440.h    |   1 +
+ hw/ppc/ppc440_uc.c | 222 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/sam460ex.c  |   3 +
+ 3 files changed, 226 insertions(+)
 
-OK I have a fix which I'll include in my gcov and build fixes later
-today.
-
->
-> Paolo
->
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> diff --git a/Makefile b/Makefile
->> index 6d588d1f71..023b3437ec 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can =
-fix this by running \
->>  endif
->>  endif
->>
->> -CONFIG_SOFTMMU :=3D $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
->> -CONFIG_USER_ONLY :=3D $(if $(filter %-user,$(TARGET_DIRS)),y)
->> +CONFIG_SOFTMMU :=3D $(if $(filter %-softmmu,$(TARGET_LIST)),y)
->> +CONFIG_USER_ONLY :=3D $(if $(filter %-user,$(TARGET_LIST)),y)
->>  CONFIG_XEN :=3D $(CONFIG_XEN_BACKEND)
->>  CONFIG_ALL=3Dy
->>  -include config-all-devices.mak
->> @@ -366,8 +366,8 @@ DOCS=3D
->>  endif
->>
->>  SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory --quiet) BUILD_DIR=
-=3D$(BUILD_DIR)
->> -SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
->> -SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGET=
-_DIRS))
->> +SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
->> +SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGET=
-_LIST))
->>
->>  ifeq ($(SUBDIR_DEVICES_MAK),)
->>  config-all-devices.mak:
->> @@ -470,7 +470,7 @@ config-host.h-timestamp: config-host.mak
->>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
->>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
-"$@")
->>
->> -SUBDIR_RULES=3D$(patsubst %,subdir-%, $(TARGET_DIRS))
->> +SUBDIR_RULES=3D$(patsubst %,subdir-%, $(TARGET_LIST))
->>  SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_RULES))
->>
->>  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
->> @@ -514,7 +514,7 @@ ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
->>  romsubdir-%:
->>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V=3D"$(=
-V)" TARGET_DIR=3D"$*/" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
->>
->> -ALL_SUBDIRS=3D$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
->> +ALL_SUBDIRS=3D$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
->>
->>  recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
->>
->> @@ -772,7 +772,7 @@ distclean: clean
->>  	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
->>  	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
->>  	rm -f docs/qemu-block-drivers.7
->> -	for d in $(TARGET_DIRS); do \
->> +	for d in $(TARGET_LIST); do \
->>  	rm -rf $$d || exit 1 ; \
->>          done
->>  	rm -Rf .sdk
->> @@ -873,7 +873,7 @@ endif
->>  		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_dat=
-adir)/keymaps"; \
->>  	done
->>  	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadi=
-r)/trace-events-all"
->> -	for d in $(TARGET_DIRS); do \
->> +	for d in $(TARGET_LIST); do \
->>  	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=3D$$d/ -C $$d $@ || exit 1 ; \
->>          done
->>
->> @@ -1071,9 +1071,9 @@ endif
->>  	@echo  '  ctags/TAGS      - Generate tags file for editors'
->>  	@echo  '  cscope          - Generate cscope index'
->>  	@echo  ''
->> -	@$(if $(TARGET_DIRS), \
->> +	@$(if $(TARGET_LIST), \
->>  		echo 'Architecture specific targets:'; \
->> -		$(foreach t, $(TARGET_DIRS), \
->> +		$(foreach t, $(TARGET_LIST), \
->>  		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);)=
- \
->>  		echo '')
->>  	@echo  'Cleaning targets:'
->> diff --git a/configure b/configure
->> index db8c9d8288..14b11130a7 100755
->> --- a/configure
->> +++ b/configure
->> @@ -6128,7 +6128,7 @@ qemu_version=3D$(head $source_path/VERSION)
->>  echo "VERSION=3D$qemu_version" >>$config_host_mak
->>  echo "PKGVERSION=3D$pkgversion" >>$config_host_mak
->>  echo "SRC_PATH=3D$source_path" >> $config_host_mak
->> -echo "TARGET_DIRS=3D$target_list" >> $config_host_mak
->> +echo "TARGET_LIST=3D$target_list" >> $config_host_mak
->>  if [ "$docs" =3D "yes" ] ; then
->>    echo "BUILD_DOCS=3Dyes" >> $config_host_mak
->>  fi
->> diff --git a/scripts/create_config b/scripts/create_config
->> index d727e5e36e..58948a67a4 100755
->> --- a/scripts/create_config
->> +++ b/scripts/create_config
->> @@ -107,7 +107,7 @@ case $line in
->>      target_name=3D${line#*=3D}
->>      echo "#define TARGET_NAME \"$target_name\""
->>      ;;
->> - TARGET_DIRS=3D*)
->> + TARGET_LIST=3D*)
->>      # do nothing
->>      ;;
->>   TARGET_*=3Dy) # configuration
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 86f90c0cb0..9854e7794b 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -858,7 +858,7 @@ endif
->>
->>  # QTest rules
->>
->> -TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
->> +TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
->>  ifeq ($(CONFIG_POSIX),y)
->>  QTEST_TARGETS =3D $(TARGETS)
->>  check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
->>
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/ppc/ppc440.h b/hw/ppc/ppc440.h
+index ad27db1..7cef936 100644
+--- a/hw/ppc/ppc440.h
++++ b/hw/ppc/ppc440.h
+@@ -21,6 +21,7 @@ void ppc440_sdram_init(CPUPPCState *env, int nbanks,
+                        hwaddr *ram_bases, hwaddr *ram_sizes,
+                        int do_init);
+ void ppc4xx_ahb_init(CPUPPCState *env);
++void ppc4xx_dma_init(CPUPPCState *env, int dcr_base);
+ void ppc460ex_pcie_init(CPUPPCState *env);
+ 
+ #endif /* PPC440_H */
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index 123f4ac..32802d7 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -13,6 +13,7 @@
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "exec/address-spaces.h"
+@@ -803,6 +804,227 @@ void ppc4xx_ahb_init(CPUPPCState *env)
+ }
+ 
+ /*****************************************************************************/
++/* DMA controller */
++
++#define DMA0_CR_CE  (1 << 31)
++#define DMA0_CR_PW  (1 << 26 | 1 << 25)
++#define DMA0_CR_DAI (1 << 24)
++#define DMA0_CR_SAI (1 << 23)
++#define DMA0_CR_DEC (1 << 2)
++
++enum {
++    DMA0_CR  = 0x00,
++    DMA0_CT,
++    DMA0_SAH,
++    DMA0_SAL,
++    DMA0_DAH,
++    DMA0_DAL,
++    DMA0_SGH,
++    DMA0_SGL,
++
++    DMA0_SR  = 0x20,
++    DMA0_SGC = 0x23,
++    DMA0_SLP = 0x25,
++    DMA0_POL = 0x26,
++};
++
++typedef struct {
++    uint32_t cr;
++    uint32_t ct;
++    uint64_t sa;
++    uint64_t da;
++    uint64_t sg;
++} PPC4xxDmaChnl;
++
++typedef struct {
++    int base;
++    PPC4xxDmaChnl ch[4];
++    uint32_t sr;
++} PPC4xxDmaState;
++
++static uint32_t dcr_read_dma(void *opaque, int dcrn)
++{
++    PPC4xxDmaState *dma = opaque;
++    uint32_t val = 0;
++    int addr = dcrn - dma->base;
++    int chnl = addr / 8;
++
++    switch (addr) {
++    case 0x00 ... 0x1f:
++        switch (addr % 8) {
++        case DMA0_CR:
++            val = dma->ch[chnl].cr;
++            break;
++        case DMA0_CT:
++            val = dma->ch[chnl].ct;
++            break;
++        case DMA0_SAH:
++            val = dma->ch[chnl].sa >> 32;
++            break;
++        case DMA0_SAL:
++            val = dma->ch[chnl].sa;
++            break;
++        case DMA0_DAH:
++            val = dma->ch[chnl].da >> 32;
++            break;
++        case DMA0_DAL:
++            val = dma->ch[chnl].da;
++            break;
++        case DMA0_SGH:
++            val = dma->ch[chnl].sg >> 32;
++            break;
++        case DMA0_SGL:
++            val = dma->ch[chnl].sg;
++            break;
++        }
++        break;
++    case DMA0_SR:
++        val = dma->sr;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d, %x)\n",
++                      __func__, dcrn, chnl, addr);
++    }
++
++    return val;
++}
++
++static void dcr_write_dma(void *opaque, int dcrn, uint32_t val)
++{
++    PPC4xxDmaState *dma = opaque;
++    int addr = dcrn - dma->base;
++    int chnl = addr / 8;
++
++    switch (addr) {
++    case 0x00 ... 0x1f:
++        switch (addr % 8) {
++        case DMA0_CR:
++            dma->ch[chnl].cr = val;
++            if (val & DMA0_CR_CE) {
++                int count = dma->ch[chnl].ct & 0xffff;
++
++                if (count) {
++                    int width, i, sidx, didx;
++                    uint8_t *rptr, *wptr;
++                    hwaddr rlen, wlen;
++
++                    sidx = didx = 0;
++                    width = 1 << ((val & DMA0_CR_PW) >> 25);
++                    rptr = cpu_physical_memory_map(dma->ch[chnl].sa, &rlen, 0);
++                    wptr = cpu_physical_memory_map(dma->ch[chnl].da, &wlen, 1);
++                    if (rptr && wptr) {
++                        if (!(val & DMA0_CR_DEC) &&
++                            val & DMA0_CR_SAI && val & DMA0_CR_DAI) {
++                            /* optimise common case */
++                            memmove(wptr, rptr, count * width);
++                            sidx = didx = count * width;
++                        } else {
++                            /* do it the slow way */
++                            for (sidx = didx = i = 0; i < count; i++) {
++                                uint64_t v = ldn_le_p(rptr + sidx, width);
++                                stn_le_p(wptr + didx, width, v);
++                                if (val & DMA0_CR_SAI) {
++                                    sidx += width;
++                                }
++                                if (val & DMA0_CR_DAI) {
++                                    didx += width;
++                                }
++                            }
++                        }
++                    }
++                    if (wptr) {
++                        cpu_physical_memory_unmap(wptr, wlen, 1, didx);
++                    }
++                    if (wptr) {
++                        cpu_physical_memory_unmap(rptr, rlen, 0, sidx);
++                    }
++                }
++            }
++            break;
++        case DMA0_CT:
++            dma->ch[chnl].ct = val;
++            break;
++        case DMA0_SAH:
++            dma->ch[chnl].sa &= 0xffffffffULL;
++            dma->ch[chnl].sa |= (uint64_t)val << 32;
++            break;
++        case DMA0_SAL:
++            dma->ch[chnl].sa &= 0xffffffff00000000ULL;
++            dma->ch[chnl].sa |= val;
++            break;
++        case DMA0_DAH:
++            dma->ch[chnl].da &= 0xffffffffULL;
++            dma->ch[chnl].da |= (uint64_t)val << 32;
++            break;
++        case DMA0_DAL:
++            dma->ch[chnl].da &= 0xffffffff00000000ULL;
++            dma->ch[chnl].da |= val;
++            break;
++        case DMA0_SGH:
++            dma->ch[chnl].sg &= 0xffffffffULL;
++            dma->ch[chnl].sg |= (uint64_t)val << 32;
++            break;
++        case DMA0_SGL:
++            dma->ch[chnl].sg &= 0xffffffff00000000ULL;
++            dma->ch[chnl].sg |= val;
++            break;
++        }
++        break;
++    case DMA0_SR:
++        dma->sr &= ~val;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d, %x)\n",
++                      __func__, dcrn, chnl, addr);
++    }
++}
++
++static void ppc4xx_dma_reset(void *opaque)
++{
++    PPC4xxDmaState *dma = opaque;
++    int dma_base = dma->base;
++
++    memset(dma, 0, sizeof(*dma));
++    dma->base = dma_base;
++}
++
++void ppc4xx_dma_init(CPUPPCState *env, int dcr_base)
++{
++    PPC4xxDmaState *dma;
++    int i;
++
++    dma = g_malloc0(sizeof(*dma));
++    dma->base = dcr_base;
++    qemu_register_reset(&ppc4xx_dma_reset, dma);
++    for (i = 0; i < 4; i++) {
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CR,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CT,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAH,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAL,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAH,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAL,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGH,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGL,
++                         dma, &dcr_read_dma, &dcr_write_dma);
++    }
++    ppc_dcr_register(env, dcr_base + DMA0_SR,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++    ppc_dcr_register(env, dcr_base + DMA0_SGC,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++    ppc_dcr_register(env, dcr_base + DMA0_SLP,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++    ppc_dcr_register(env, dcr_base + DMA0_POL,
++                     dma, &dcr_read_dma, &dcr_write_dma);
++}
++
++/*****************************************************************************/
+ /* PCI Express controller */
+ /* FIXME: This is not complete and does not work, only implemented partially
+  * to allow firmware and guests to find an empty bus. Cards should use PCI.
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index dc730cc..4f9248e 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -477,6 +477,9 @@ static void sam460ex_init(MachineState *machine)
+     /* MAL */
+     ppc4xx_mal_init(env, 4, 16, &uic[2][3]);
+ 
++    /* DMA */
++    ppc4xx_dma_init(env, 0x200);
++
+     /* 256K of L2 cache as memory */
+     ppc4xx_l2sram_init(env);
+     /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c? */
+-- 
+2.7.6
