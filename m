@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOh-0000KC-Tu
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:05 -0400
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOl-0000OQ-1J
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOe-0002px-9E
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:03 -0400
-Received: from foss.arm.com ([217.140.101.70]:39494)
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOj-0002zB-PB
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:07 -0400
+Received: from foss.arm.com ([217.140.101.70]:39524)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOd-0002p1-WB
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:00 -0400
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOj-0002xZ-Es
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:05 -0400
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Date: Fri, 29 Jun 2018 12:15:37 +0100
-Message-Id: <1530270944-11351-18-git-send-email-suzuki.poulose@arm.com>
+Date: Fri, 29 Jun 2018 12:15:39 +0100
+Message-Id: <1530270944-11351-20-git-send-email-suzuki.poulose@arm.com>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Subject: [Qemu-devel] [PATCH v3 17/20] vgic: Add support for 52bit guest
- physical address
+Subject: [Qemu-devel] [PATCH v3 19/20] kvm: arm64: Allow IPA size supported
+ by the system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,190 +25,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Kristina Martsenko <kristina.martsenko@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 
-From: Kristina Martsenko <kristina.martsenko@arm.com>
+So far we have restricted the IPA size of the VM to the default
+value (40bits). Now that we can manage the IPA size per VM and
+support dynamic stage2 page tables, allow VMs to have larger IPA.
+This is done by setting the IPA limit to the one supported by
+the hardware and kernel. This patch also moves the check for
+the default IPA size support to kvm_get_ipa_limit().
 
-Add support for handling 52bit guest physical address to the
-VGIC layer. So far we have limited the guest physical address
-to 48bits, by explicitly masking the upper bits. This patch
-removes the restriction. We do not have to check if the host
-supports 52bit as the gpa is always validated during an access.
-(e.g, kvm_{read/write}_guest, kvm_is_visible_gfn()).
-Also, the ITS table save-restore is also not affected with
-the enhancement. The DTE entries already store the bits[51:8]
-of the ITT_addr (with a 256byte alignment).
+Since the stage2 page table code is dependent on the stage1
+page table, we always ensure that :
 
+  Number of Levels at Stage1 >= Number of Levels at Stage2
+
+So we limit the IPA to make sure that the above condition
+is satisfied. This will affect the following combinations
+of VA_BITS and IPA for different page sizes.
+
+  39bit VA, 4K  - IPA > 43 (Upto 48)
+  36bit VA, 16K - IPA > 40 (Upto 48)
+  42bit VA, 64K - IPA > 46 (Upto 52)
+
+Supporting the above combinations need independent stage2
+page table manipulation code, which would need substantial
+changes. We could purse the solution independently and
+switch the page table code once we have it ready.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-[ Macro clean ups, fix PROPBASER and PENDBASER accesses ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  5 +++++
- virt/kvm/arm/vgic/vgic-its.c       | 36 ++++++++++--------------------------
- virt/kvm/arm/vgic/vgic-mmio-v3.c   |  2 --
- 3 files changed, 15 insertions(+), 28 deletions(-)
+Changes since V2:
+ - Restrict the IPA size to limit the number of page table
+   levels in stage2 to that of stage1 or less.
+---
+ arch/arm64/include/asm/kvm_host.h |  6 ------
+ arch/arm64/include/asm/kvm_mmu.h  | 37 ++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 36 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index cbb872c..bc4b95b 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -346,6 +346,8 @@
- #define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
- #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 9a15860..e858e49 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -452,13 +452,7 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
  
-+#define GITS_CBASER_ADDRESS(cbaser)	((cbaser) & GENMASK_ULL(52, 12))
-+
- #define GITS_BASER_NR_REGS		8
- 
- #define GITS_BASER_VALID			(1ULL << 63)
-@@ -377,6 +379,9 @@
- #define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
- #define GITS_BASER_PHYS_52_to_48(phys)					\
- 	(((phys) & GENMASK_ULL(47, 16)) | (((phys) >> 48) & 0xf) << 12)
-+#define GITS_BASER_ADDR_48_to_52(baser)					\
-+	(((baser) & GENMASK_ULL(47, 16)) | (((baser) >> 12) & 0xf) << 48)
-+
- #define GITS_BASER_SHAREABILITY_SHIFT	(10)
- #define GITS_BASER_InnerShareable					\
- 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4ed79c9..c6eb390 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -234,13 +234,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
- 	list_for_each_entry(dev, &(its)->device_list, dev_list) \
- 		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
- 
--/*
-- * We only implement 48 bits of PA at the moment, although the ITS
-- * supports more. Let's be restrictive here.
-- */
--#define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
--#define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
--
- #define GIC_LPI_OFFSET 8192
- 
- #define VITS_TYPER_IDBITS 16
-@@ -752,6 +745,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+ static inline void __cpu_init_stage2(void)
  {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-+	phys_addr_t base = GITS_BASER_ADDR_48_to_52(baser);
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
- 	int index;
- 	gfn_t gfn;
-@@ -776,7 +770,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 		if (id >= (l1_tbl_size / esz))
- 			return false;
- 
--		addr = BASER_ADDRESS(baser) + id * esz;
-+		addr = base + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
- 
- 		if (eaddr)
-@@ -791,7 +785,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 
- 	/* Each 1st level entry is represented by a 64-bit value. */
- 	if (kvm_read_guest_lock(its->dev->kvm,
--			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
-+			   base + index * sizeof(indirect_ptr),
- 			   &indirect_ptr, sizeof(indirect_ptr)))
- 		return false;
- 
-@@ -801,11 +795,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	if (!(indirect_ptr & BIT_ULL(63)))
- 		return false;
- 
--	/*
--	 * Mask the guest physical address and calculate the frame number.
--	 * Any address beyond our supported 48 bits of PA will be caught
--	 * by the actual check in the final step.
--	 */
-+	/* Mask the guest physical address and calculate the frame number. */
- 	indirect_ptr &= GENMASK_ULL(51, 16);
- 
- 	/* Find the address of the actual entry */
-@@ -1297,9 +1287,6 @@ static u64 vgic_sanitise_its_baser(u64 reg)
- 				  GITS_BASER_OUTER_CACHEABILITY_SHIFT,
- 				  vgic_sanitise_outer_cacheability);
- 
--	/* Bits 15:12 contain bits 51:48 of the PA, which we don't support. */
--	reg &= ~GENMASK_ULL(15, 12);
+-	u32 ps;
 -
- 	/* We support only one (ITS) page size: 64K */
- 	reg = (reg & ~GITS_BASER_PAGE_SIZE_MASK) | GITS_BASER_PAGE_SIZE_64K;
- 
-@@ -1318,11 +1305,8 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
- 				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
- 				  vgic_sanitise_outer_cacheability);
- 
--	/*
--	 * Sanitise the physical address to be 64k aligned.
--	 * Also limit the physical addresses to 48 bits.
--	 */
--	reg &= ~(GENMASK_ULL(51, 48) | GENMASK_ULL(15, 12));
-+	/* Sanitise the physical address to be 64k aligned. */
-+	reg &= ~GENMASK_ULL(15, 12);
- 
- 	return reg;
+ 	kvm_call_hyp(__init_stage2_translation);
+-	/* Sanity check for minimum IPA size support */
+-	ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1) & 0x7);
+-	WARN_ONCE(ps < 40,
+-		  "PARange is %d bits, unsupported configuration!", ps);
  }
-@@ -1368,7 +1352,7 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
- 	if (!its->enabled)
- 		return;
  
--	cbaser = CBASER_ADDRESS(its->cbaser);
-+	cbaser = GITS_CBASER_ADDRESS(its->cbaser);
+ /* Guest/host FPSIMD coordination helpers */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index a291cdc..d38f395 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -547,7 +547,42 @@ static inline void *stage2_alloc_pgd(struct kvm *kvm)
  
- 	while (its->cwriter != its->creadr) {
- 		int ret = kvm_read_guest_lock(kvm, cbaser + its->creadr,
-@@ -2226,7 +2210,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
- 	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	l1_gpa = BASER_ADDRESS(baser);
-+	l1_gpa = GITS_BASER_ADDR_48_to_52(baser);
- 
- 	if (baser & GITS_BASER_INDIRECT) {
- 		l1_esz = GITS_LVL1_ENTRY_SIZE;
-@@ -2298,7 +2282,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+ static inline u32 kvm_get_ipa_limit(void)
  {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
- 	u64 baser = its->baser_coll_table;
--	gpa_t gpa = BASER_ADDRESS(baser);
-+	gpa_t gpa = GITS_BASER_ADDR_48_to_52(baser);
- 	struct its_collection *collection;
- 	u64 val;
- 	size_t max_size, filled = 0;
-@@ -2347,7 +2331,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	gpa = BASER_ADDRESS(baser);
-+	gpa = GITS_BASER_ADDR_48_to_52(baser);
- 
- 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 2877840..64647be 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -338,7 +338,6 @@ static u64 vgic_sanitise_pendbaser(u64 reg)
- 				  vgic_sanitise_outer_cacheability);
- 
- 	reg &= ~PENDBASER_RES0_MASK;
--	reg &= ~GENMASK_ULL(51, 48);
- 
- 	return reg;
+-	return KVM_PHYS_SHIFT;
++	unsigned int ipa_max, va_max, parange;
++
++	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
++	ipa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
++
++	/* Raise the limit to the default size for backward compatibility */
++	if (ipa_max < KVM_PHYS_SHIFT) {
++		WARN_ONCE(1,
++			  "PARange is %d bits, unsupported configuration!",
++			  ipa_max);
++		ipa_max = KVM_PHYS_SHIFT;
++	}
++
++	/* Clamp it to the PA size supported by the kernel */
++	ipa_max = (ipa_max > PHYS_MASK_SHIFT) ? PHYS_MASK_SHIFT : ipa_max;
++	/*
++	 * Since our stage2 table is dependent on the stage1 page table code,
++	 * we must always honor the following condition:
++	 *
++	 *  Number of levels in Stage1 >= Number of levels in Stage2.
++	 *
++	 * So clamp the ipa limit further down to limit the number of levels.
++	 * Since we can concatenate upto 16 tables at entry level, we could
++	 * go upto 4bits above the maximum VA addressible with the current
++	 * number of levels.
++	 */
++	va_max = PGDIR_SHIFT + PAGE_SHIFT - 3;
++	va_max += 4;
++
++	if (va_max < ipa_max) {
++		kvm_info("Limiting IPA limit to %dbytes due to host VA bits limitation\n",
++			 va_max);
++		ipa_max = va_max;
++	}
++
++	return ipa_max;
  }
-@@ -356,7 +355,6 @@ static u64 vgic_sanitise_propbaser(u64 reg)
- 				  vgic_sanitise_outer_cacheability);
  
- 	reg &= ~PROPBASER_RES0_MASK;
--	reg &= ~GENMASK_ULL(51, 48);
- 	return reg;
- }
- 
+ static inline void kvm_config_stage2(struct kvm *kvm, u32 ipa_shift)
 -- 
 2.7.4
