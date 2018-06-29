@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42247)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=711c09436=Alistair.Francis@wdc.com>)
-	id 1fYx6V-00046Q-HV
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:42 -0400
+	id 1fYx6Y-00047K-GW
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=711c09436=Alistair.Francis@wdc.com>)
-	id 1fYx6R-0003RR-K5
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:39 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:54503)
+	id 1fYx6U-0003WM-Kh
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:42 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:49096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=711c09436=Alistair.Francis@wdc.com>)
-	id 1fYx6R-0003Hx-Ae
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:35 -0400
+	id 1fYx6U-0003Uq-78
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:22:38 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Fri, 29 Jun 2018 10:22:12 -0700
-Message-Id: <20180629172215.29475-5-alistair.francis@wdc.com>
+Date: Fri, 29 Jun 2018 10:22:14 -0700
+Message-Id: <20180629172215.29475-7-alistair.francis@wdc.com>
 In-Reply-To: <20180629172215.29475-1-alistair.francis@wdc.com>
 References: <20180629172215.29475-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL v2 4/7] hw/riscv/sifive_u: Set the soc device
- tree node as a simple-bus
+Subject: [Qemu-devel] [PULL v2 6/7] hw/riscv/sifive_u: Move the uart device
+ tree node under /soc/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,9 +32,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mjc@sifive.com
 Cc: f4bug@amsat.org, alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
 
-To allow Linux to ennumerate devices on the /soc/ node set it as a
-"simple-bus".
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Michael Clark <mjc@sifive.com>
 ---
@@ -42,17 +39,17 @@ Reviewed-by: Michael Clark <mjc@sifive.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 3883d7ff9c..f438a72c27 100644
+index f71527eaff..46459cd368 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -97,7 +97,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+@@ -194,7 +194,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     g_free(cells);
+     g_free(nodename);
  
-     qemu_fdt_add_subnode(fdt, "/soc");
-     qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
--    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
-+    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "simple-bus");
-     qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-     qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
- 
+-    nodename = g_strdup_printf("/uart@%lx",
++    nodename = g_strdup_printf("/soc/uart@%lx",
+         (long)memmap[SIFIVE_U_UART0].base);
+     qemu_fdt_add_subnode(fdt, nodename);
+     qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,uart0");
 -- 
 2.17.1
