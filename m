@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiD-0006wa-5s
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiD-0006xH-JY
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiC-0003eu-6R
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiC-0003fI-AI
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:41:17 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 29 Jun 2018 15:40:50 +0300
-Message-Id: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v0 0/2] Postponed actions
+Date: Fri, 29 Jun 2018 15:40:52 +0300
+Message-Id: <20180629124052.331406-3-dplotnikov@virtuozzo.com>
+In-Reply-To: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine executing
+ if the BDS's is drained
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +23,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kwolf@redhat.com, reitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-stable@nongnu.org
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-There are cases when a request to a block driver state shouldn't have
-appeared producing dangerous race conditions.
-This misbehaviour is usually happens with storage devices emulated
-without eventfd for guest to host notifications like IDE.
+Fixes the problem of ide request appearing when the BDS is in
+the "drained section".
 
-The issue arises when the context is in the "drained" section
-and doesn't expect the request to come, but request comes from the
-device not using iothread and which context is processed by the main loop.
+Without the patch the request can come and be processed by the main
+event loop, as the ide requests are processed by the main event loop
+and the main event loop doesn't stop when its context is in the
+"drained section".
+The request execution is postponed until the end of "drained section".
 
-The main loop apart of the iothread event loop isn't blocked by the
-"drained" section.
-The request coming and processing while in "drained" section can spoil the
-block driver state consistency.
+The patch doesn't modify ide specific code, as well as any other
+device code. Instead, it modifies the infrastructure of asynchronous
+Block Backend requests, in favor of postponing the requests arisen
+when in "drained section" to remove the possibility of request appearing
+for all the infrastructure clients.
 
-This behavior can be observed in the following KVM-based case:
+This approach doesn't make vCPU processing the request wait untill
+the end of request processing.
 
-1. Setup a VM with an IDE disk.
-2. Inside a VM start a disk writing load for the IDE device
-  e.g: dd if=<file> of=<file> bs=X count=Y oflag=direct
-3. On the host create a mirroring block job for the IDE device
-  e.g: drive_mirror <your_IDE> <your_path>
-4. On the host finish the block job
-  e.g: block_job_complete <your_IDE>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/block-backend.c | 58 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 46 insertions(+), 12 deletions(-)
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index d55c328736..68dcd704d2 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1318,6 +1318,7 @@ typedef struct BlkAioEmAIOCB {
+     BlkRwCo rwco;
+     int bytes;
+     bool has_returned;
++    CoroutineEntry *co_entry;
+ } BlkAioEmAIOCB;
  
-Having done the 4th action, you could get an assert:
-assert(QLIST_EMPTY(&bs->tracked_requests)) from mirror_run.
-On my setup, the assert is 1/3 reproducible.
-
-The patch series introduces the mechanism to postpone the requests
-until the BDS leaves "drained" section for the devices not using iothreads.
-Also, it modifies the asynchronous block backend infrastructure to use
-that mechanism to release the assert bug for IDE devices.
-
-Denis Plotnikov (2):
-  async: add infrastructure for postponed actions
-  block: postpone the coroutine executing if the BDS's is drained
-
- block/block-backend.c | 58 ++++++++++++++++++++++++++++++---------
- include/block/aio.h   | 63 +++++++++++++++++++++++++++++++++++++++++++
- util/async.c          | 33 +++++++++++++++++++++++
- 3 files changed, 142 insertions(+), 12 deletions(-)
-
+ static const AIOCBInfo blk_aio_em_aiocb_info = {
+@@ -1340,16 +1341,55 @@ static void blk_aio_complete_bh(void *opaque)
+     blk_aio_complete(acb);
+ }
+ 
++static void blk_aio_create_co(void *opaque)
++{
++    BlockDriverState *current_bs;
++    AioContext *ctx;
++    BlkAioEmAIOCB *acb = (BlkAioEmAIOCB *) opaque;
++    BlockBackend *blk = acb->rwco.blk;
++
++    /* The check makes sense if the action was postponed until the context
++     * is enabled for external requests: if a BlockDriverState of a BlockBackend
++     * was changed, for example on making a new snapshot, update BlockDriverState
++     * in ACB and try to run the coroutine in the changed BDS context
++     */
++    current_bs = blk_bs(blk);
++
++    if (current_bs != acb->common.bs) {
++        acb->common.bs = current_bs;
++    }
++
++    ctx = blk_get_aio_context(blk);
++    /* If a request comes from device (e.g. ide controller) when
++     * the context disabled, postpone the request until the context is
++     * enabled for external requests.
++     * Otherwise, create a couroutine and enter it right now
++     */
++    aio_context_acquire(ctx);
++    if (aio_external_disabled(ctx)) {
++        AioPostponedAction *action = aio_create_postponed_action(
++                                                blk_aio_create_co, acb);
++        aio_postpone_action(ctx, action);
++    } else {
++        Coroutine *co = qemu_coroutine_create(acb->co_entry, acb);
++        blk_inc_in_flight(blk);
++        bdrv_coroutine_enter(acb->common.bs, co);
++
++        acb->has_returned = true;
++        if (acb->rwco.ret != NOT_DONE) {
++            aio_bh_schedule_oneshot(ctx, blk_aio_complete_bh, acb);
++        }
++    }
++    aio_context_release(ctx);
++}
++
+ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
+                                 void *iobuf, CoroutineEntry co_entry,
+                                 BdrvRequestFlags flags,
+                                 BlockCompletionFunc *cb, void *opaque)
+ {
+-    BlkAioEmAIOCB *acb;
+-    Coroutine *co;
+ 
+-    blk_inc_in_flight(blk);
+-    acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
++    BlkAioEmAIOCB *acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
+     acb->rwco = (BlkRwCo) {
+         .blk    = blk,
+         .offset = offset,
+@@ -1359,15 +1399,9 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
+     };
+     acb->bytes = bytes;
+     acb->has_returned = false;
++    acb->co_entry = co_entry;
+ 
+-    co = qemu_coroutine_create(co_entry, acb);
+-    bdrv_coroutine_enter(blk_bs(blk), co);
+-
+-    acb->has_returned = true;
+-    if (acb->rwco.ret != NOT_DONE) {
+-        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
+-                                blk_aio_complete_bh, acb);
+-    }
++    blk_aio_create_co(acb);
+ 
+     return &acb->common;
+ }
 -- 
 2.17.0
