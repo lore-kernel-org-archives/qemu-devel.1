@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fYq6n-0005H2-Nd
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:54:33 -0400
+	(envelope-from <peterx@redhat.com>) id 1fYq9h-0006nn-4c
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:57:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fYq6m-0002Tr-B4
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:54:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35236 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fYq9c-0001FD-8T
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:57:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51346 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fYq6m-0002Rq-4O
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:54:28 -0400
-Date: Fri, 29 Jun 2018 10:54:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180629095418.GE2568@work-vm>
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-7-xiaoguangrong@tencent.com>
-	<20180619073034.GA14814@xz-mi>
-	<e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
-	<20180628093650.GB3513@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fYq9c-0001DO-1u
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:57:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 909AC72642
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 09:57:23 +0000 (UTC)
+Date: Fri, 29 Jun 2018 17:57:18 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180629095718.GJ2455@xz-mi>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org> <20180627115919.GC2516@xz-mi>
+	<87po0b48i9.fsf@dusky.pond.sub.org>
+	<20180628120044.GF3513@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180628093650.GB3513@redhat.com>
+In-Reply-To: <20180628120044.GF3513@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
- for compression
+Subject: Re: [Qemu-devel] your mail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,149 +36,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, pbonzini@redhat.com
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-* Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> On Thu, Jun 28, 2018 at 05:12:39PM +0800, Xiao Guangrong wrote:
+On Thu, Jun 28, 2018 at 01:00:44PM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Jun 28, 2018 at 10:31:42AM +0200, Markus Armbruster wrote:
+> > Peter Xu <peterx@redhat.com> writes:
 > >=20
-> > Hi Peter,
+> > > On Tue, Jun 26, 2018 at 07:21:49PM +0200, Markus Armbruster wrote:
+> > >> I fooled around a bit, and I think there are a few lose ends.
+> > [...]
+> > >> Talking to a QMP monitor that supports OOB:
+> > >>=20
+> > >>     $ socat UNIX:test-qmp READLINE,history=3D$HOME/.qmp_history,pr=
+ompt=3D'QMP> '
+> > >>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major=
+": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
+> > >>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": tr=
+ue } }
+> > >>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' i=
+s unexpected"}}
+> > >>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable":=
+ ["oob"] } }
+> > >>     {"return": {}}
+> > >>     QMP> { "execute": "query-qmp-schema" }
+> > >>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capab=
+ility requires that every command contains an 'id' field"}}
+> > >>=20
+> > >> Why does every command require 'id'?
 > >=20
-> > Sorry for the delay as i was busy on other things.
+> > Why am I asking?  Requiring 'id' is rather onerous when you play with
+> > QMP by hand.
 > >=20
-> > On 06/19/2018 03:30 PM, Peter Xu wrote:
-> > > On Mon, Jun 04, 2018 at 05:55:14PM +0800, guangrong.xiao@gmail.com =
-wrote:
-> > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > >=20
-> > > > Detecting zero page is not a light work, we can disable it
-> > > > for compression that can handle all zero data very well
-> > >=20
-> > > Is there any number shows how the compression algo performs better
-> > > than the zero-detect algo?  Asked since AFAIU buffer_is_zero() migh=
-t
-> > > be fast, depending on how init_accel() is done in util/bufferiszero=
-.c.
+> > > The COMMAND_DROPPED event is one reason, as you mentioned in the ot=
+her
+> > > thread. Meanwhile as long as we have OOB command it means that we c=
+an
+> > > have more than one commands running in parallel, then it's a must t=
+hat
+> > > we can mark that out in the response to mark out which command we a=
+re
+> > > replying to.
 > >=20
-> > This is the comparison between zero-detection and compression (the ta=
-rget
-> > buffer is all zero bit):
+> > Without OOB, the client can match response to command, because it'll
+> > receive responses in command issue order.
 > >=20
-> > Zero 810 ns Compression: 26905 ns.
-> > Zero 417 ns Compression: 8022 ns.
-> > Zero 408 ns Compression: 7189 ns.
-> > Zero 400 ns Compression: 7255 ns.
-> > Zero 412 ns Compression: 7016 ns.
-> > Zero 411 ns Compression: 7035 ns.
-> > Zero 413 ns Compression: 6994 ns.
-> > Zero 399 ns Compression: 7024 ns.
-> > Zero 416 ns Compression: 7053 ns.
-> > Zero 405 ns Compression: 7041 ns.
+> > Example 1: after sending
 > >=20
-> > Indeed, zero-detection is faster than compression.
+> >     { "execute": "cmd1", ... }
+> >     { "execute": "cmd2", ... }
+> >     { "execute": "cmd3", ... }
 > >=20
-> > However during our profiling for the live_migration thread (after rev=
-erted this patch),
-> > we noticed zero-detection cost lots of CPU:
+> > the client will receive three responses, first one is cmd1's, second =
+one
+> > is cmd2's, third one is cmd3's.
 > >=20
-> >  12.01%  kqemu  qemu-system-x86_64            [.] buffer_zero_sse2   =
-                                                                         =
-                                                                         =
-                      =E2=97=86
-> >   7.60%  kqemu  qemu-system-x86_64            [.] ram_bytes_total    =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   6.56%  kqemu  qemu-system-x86_64            [.] qemu_event_set     =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   5.61%  kqemu  qemu-system-x86_64            [.] qemu_put_qemu_file =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   5.00%  kqemu  qemu-system-x86_64            [.] __ring_put         =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   4.89%  kqemu  [kernel.kallsyms]             [k] copy_user_enhanced_=
-fast_string                                                              =
-                                                                         =
-                      =E2=96=92
-> >   4.71%  kqemu  qemu-system-x86_64            [.] compress_thread_dat=
-a_done                                                                   =
-                                                                         =
-                      =E2=96=92
-> >   3.63%  kqemu  qemu-system-x86_64            [.] ring_is_full       =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   2.89%  kqemu  qemu-system-x86_64            [.] __ring_is_full     =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   2.68%  kqemu  qemu-system-x86_64            [.] threads_submit_requ=
-est_prepare                                                              =
-                                                                         =
-                      =E2=96=92
-> >   2.60%  kqemu  qemu-system-x86_64            [.] ring_mp_get        =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   2.25%  kqemu  qemu-system-x86_64            [.] ring_get           =
-                                                                         =
-                                                                         =
-                      =E2=96=92
-> >   1.96%  kqemu  libc-2.12.so                  [.] memcpy
+> > With OOB, we have to independent command streams, in-band and
+> > out-of-band.  Each separate stream's responses arrive in-order, but t=
+he
+> > two streams may be interleaved.
 > >=20
-> > After this patch, the workload is moved to the worker thread, is it
-> > acceptable?
+> > Example 2: after sending
+> >=20
+> >     { "execute": "cmd1", ... }
+> >     { "execute": "cmd2", ... }
+> >     { "execute": "cmd3", ... }
+> >     { "execute": "oob1", "control": { "run-oob": true }, ... }
+> >     { "execute": "oob2", "control": { "run-oob": true }, ... }
+> >     { "execute": "oob3", "control": { "run-oob": true }, ... }
+> >=20
+> > the client will receive six responses: cmd1's before cmd2's before
+> > cmd3's, and oob1's before oob2's before oob3's.
 >=20
-> It depends on your point of view. If you have spare / idle CPUs on the =
-host,
-> then moving workload to a thread is ok, despite the CPU cost of compres=
-sion
-> in that thread being much higher what what was replaced, since you won'=
-t be
-> taking CPU resources away from other contending workloads.
+> I thought the intention was that oob1, oob2, and oob3 are defined
+> to return in any order. It just happens that we only hve a single
+> oob processing stream right now, but we may have more in future.
 
-It depends on teh VM as well; if the VM is mostly non-zero, the zero
-checks happen and are over head (although if the pages are non-zero then
-the zero check will mostly happen much faster unless you're unlucky and
-the non-zero byte is the last one on the page).
+Exactly.
 
-> I'd venture to suggest though that we should probably *not* be optimizi=
-ng for
-> the case of idle CPUs on the host. More realistic is to expect that the=
- host
-> CPUs are near fully committed to work, and thus the (default) goal shou=
-ld be
-> to minimize CPU overhead for the host as a whole. From this POV, zero-p=
-age
-> detection is better than compression due to > x10 better speed.
-
-Note that this is only happening if compression is enabled.
-
-> Given the CPU overheads of compression, I think it has fairly narrow us=
+>=20
+> > If the client sends "id" with each command, it can match responses to
+> > commands by id.
+> >=20
+> > But that's not the only way to match.  Imagine the client had a perfe=
+ct
+> > oracle to tell it whether a response is in-band or out-of-band.  Then
+> > matching can work pretty much as in example 1: the first in-band
+> > response is cmd1's, the second one is cmd2's, and the third one is
+> > cmd3's; the first out-of-band response is oob1's, the second one is
+> > oob2's and the third one is oob3's.
+>=20
+> Not if oob1/2/3 can retunr in any order in future, which I think we
+> should be allowing fore.
+>=20
+> IMHO 'id' should be mandatory for oob usage.
+>=20
+> > Possible solutions other than requiring "id":
+> >=20
+> > 1. Make out-of-band responses recognizable
+> >=20
+> >    Just like we copy "id" to the response, we could copy "run-oob", o=
+r
+> >    maybe "control".
+> >=20
+> >    Solves the "match response to command" problem, doesn't solve the
+> >    "match COMMAND_DROPPED event to command" problem.
+> >=20
+> >    Permit me a digression.  "control": { "run-oob": true } is awfully
+> >    verbose.  Back when we hashed out the OOB design, I proposed to us=
 e
-> in migration in general when considering hosts are often highly committ=
-ed
-> on CPU.
+> >    "exec-oob" instead of "execute" to run a command OOB.  I missed wh=
+en
+> >    that morphed into flag "run-oob" wrapped in object "control".  Was=
+ it
+> >    in response to reviewer feedback?  Can you give me a pointer?
 
-Also, this compression series was originally written by Intel for the
-case where there's a compression accelerator hardware (that I've never
-found to try); in that case I guess it saves that CPU overhead.
+It's me who proposed this, not from any reviewer's feedback.  It just
+happened that no one was against it.
 
-Dave
+> >=20
+> >    The counterpart to "exec-oob" would be "return-oob" and "error-oob=
+".
+> >    Hmm.
+>=20
+> I do prefer the less verbose proposal too.
 
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+But frankly speaking I still prefer current way.  QMP is majorly for
+clients (computer programs) rather than users to use it.  Comparing to
+verbosity, I would care more about coherency for how we define the
+interface.  Say, OOB execution is still one way to execute a command,
+so naturally it should still be using the same way that we execute a
+QMP command, we just need some extra fields to tell the server that
+"this message is more urgent than the other ones".
+
+If we are discussing HMP interfaces, I'll have the same preference
+with both of you to consider more about whether it's user-friendly or
+not.  But now we are talking about QMP, then I'll prefer "control".
+
+In the future, it's also possible to add some more sub-fields into the
+"control" field.  When that happens, do we want to introduce another
+standalone wording for that?  I would assume the answer is no.
+
+>=20
+> > 2. Do nothing; it's the client's problem
+> >=20
+> >    If the client needs to match responses and events to commands, it
+> >    should use the feature that was expressly designed for helping wit=
+h
+> >    that: "id".
+> >=20
+> >    Note that QMP's initial design assumed asynchronous commands,
+> >    i.e. respones that may arrive in any order.  Nevertheless, it did =
+not
+> >    require "id".  Same reasoning: if the client needs to match, it ca=
+n
+> >    use "id".
+>=20
+> IMHO we should just mandate 'id' when using "exec-oob", as it is
+> conceptually broken to use OOB without a way to match responses.
+> We don't want clients relying on all OOB replies coming in sequence
+> now, and then breaking when we allow multiple OOB processing threads.
+> That would require us to add a eec-oob-no-really-i-mean-it command
+> to allow overlapping OOB responses later.
+
+Agreed, again.
+
+Thanks,
+
+--=20
+Peter Xu
