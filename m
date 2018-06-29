@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fYq9h-0006nn-4c
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:57:30 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYqEM-0008LW-6A
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fYq9c-0001FD-8T
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:57:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51346 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fYq9c-0001DO-1u
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:57:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 909AC72642
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 09:57:23 +0000 (UTC)
-Date: Fri, 29 Jun 2018 17:57:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180629095718.GJ2455@xz-mi>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org> <20180627115919.GC2516@xz-mi>
-	<87po0b48i9.fsf@dusky.pond.sub.org>
-	<20180628120044.GF3513@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYqEI-0003TX-5O
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:02:18 -0400
+References: <20180621032539.134944-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <c4c1dc69-9d64-435b-1dab-c1edfa6ce2bd@virtuozzo.com>
+Date: Fri, 29 Jun 2018 13:01:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180628120044.GF3513@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] your mail
+In-Reply-To: <20180621032539.134944-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] nbd/client: add x-block-status hack for
+ testing server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,172 +24,432 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Jun 28, 2018 at 01:00:44PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Jun 28, 2018 at 10:31:42AM +0200, Markus Armbruster wrote:
-> > Peter Xu <peterx@redhat.com> writes:
-> >=20
-> > > On Tue, Jun 26, 2018 at 07:21:49PM +0200, Markus Armbruster wrote:
-> > >> I fooled around a bit, and I think there are a few lose ends.
-> > [...]
-> > >> Talking to a QMP monitor that supports OOB:
-> > >>=20
-> > >>     $ socat UNIX:test-qmp READLINE,history=3D$HOME/.qmp_history,pr=
-ompt=3D'QMP> '
-> > >>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major=
-": 2}, "package": "v2.12.0-1703-gb909799463"}, "capabilities": ["oob"]}}
-> > >>     QMP> { "execute": "qmp_capabilities", "arguments": { "oob": tr=
-ue } }
-> > >>     {"error": {"class": "GenericError", "desc": "Parameter 'oob' i=
-s unexpected"}}
-> > >>     QMP> { "execute": "qmp_capabilities", "arguments": { "enable":=
- ["oob"] } }
-> > >>     {"return": {}}
-> > >>     QMP> { "execute": "query-qmp-schema" }
-> > >>     {"error": {"class": "GenericError", "desc": "Out-Of-Band capab=
-ility requires that every command contains an 'id' field"}}
-> > >>=20
-> > >> Why does every command require 'id'?
-> >=20
-> > Why am I asking?  Requiring 'id' is rather onerous when you play with
-> > QMP by hand.
-> >=20
-> > > The COMMAND_DROPPED event is one reason, as you mentioned in the ot=
-her
-> > > thread. Meanwhile as long as we have OOB command it means that we c=
-an
-> > > have more than one commands running in parallel, then it's a must t=
-hat
-> > > we can mark that out in the response to mark out which command we a=
-re
-> > > replying to.
-> >=20
-> > Without OOB, the client can match response to command, because it'll
-> > receive responses in command issue order.
-> >=20
-> > Example 1: after sending
-> >=20
-> >     { "execute": "cmd1", ... }
-> >     { "execute": "cmd2", ... }
-> >     { "execute": "cmd3", ... }
-> >=20
-> > the client will receive three responses, first one is cmd1's, second =
-one
-> > is cmd2's, third one is cmd3's.
-> >=20
-> > With OOB, we have to independent command streams, in-band and
-> > out-of-band.  Each separate stream's responses arrive in-order, but t=
-he
-> > two streams may be interleaved.
-> >=20
-> > Example 2: after sending
-> >=20
-> >     { "execute": "cmd1", ... }
-> >     { "execute": "cmd2", ... }
-> >     { "execute": "cmd3", ... }
-> >     { "execute": "oob1", "control": { "run-oob": true }, ... }
-> >     { "execute": "oob2", "control": { "run-oob": true }, ... }
-> >     { "execute": "oob3", "control": { "run-oob": true }, ... }
-> >=20
-> > the client will receive six responses: cmd1's before cmd2's before
-> > cmd3's, and oob1's before oob2's before oob3's.
->=20
-> I thought the intention was that oob1, oob2, and oob3 are defined
-> to return in any order. It just happens that we only hve a single
-> oob processing stream right now, but we may have more in future.
+Sorry for being late, here are some thoughts. Anyway, idea is good, 
+we've planned to do something like this, but you were the first)
 
-Exactly.
+21.06.2018 06:25, Eric Blake wrote:
+> In order to test that the NBD server is properly advertising
+> dirty bitmaps, we need a bare minimum client that can request
+> and read the context.  This patch is a hack (hence the use of
+> the x- prefix) that serves two purposes: first, it lets the
+> client pass a request of more than one context at a time to
+> the server, to test the reaction of the server to various
+> contexts (via the list command).  Second, whatever the first
+> context in the user's list becomes the context wired up to the
+> results visible in bdrv_block_status(); this has the result
+> that if you pass in 'qemu:dirty-bitmap:b' instead of the usual
+> 'base:allocation', and the server is currently serving a named
+> bitmap 'b', then commands like 'qemu-img map' now output status
+> corresponding to the dirty bitmap (dirty sections look like
+> holes, while clean sections look like data, based on how the
+> status bits are mapped over the NBD protocol).
+>
+> Since the hack corrupts the meaning of bdrv_block_status(), I
+> would NOT try to run 'qemu-img convert' or any other program
+> that might misbehave based on thinking clusters have a different
+> status than what the normal 'base:allocation' would provide.
+>
+> The hack uses a semicolon-separated list embedded in a single
+> string, as that was easier to wire into the nbd block driver than
+> figuring out the right incantation of flattened QDict to represent
+> an array via the command line.  Oh well, just one more reason that
+> this hack deserves the 'x-' prefix.
+>
+> As a demo, I was able to prove things work with the following sequence:
+>
+> $ qemu-img info file
+> image: file
+> file format: qcow2
+> virtual size: 2.0M (2097152 bytes)
+> disk size: 2.0M
+> cluster_size: 65536
+> Format specific information:
+>      compat: 1.1
+>      lazy refcounts: false
+>      refcount bits: 16
+>      corrupt: false
+>
+> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1531-g3ab98aa673d"}, "capabilities": []}}
+> {'execute':'qmp_capabilities'}
+> {"return": {}}
+> {'execute':'blockdev-add','arguments':{'driver':'qcow2','node-name':'n','file':{'driver':'file','filename':'file'}}}
+> {"return": {}}
+> {'execute':'block-dirty-bitmap-add','arguments':{'node':'n','name':'b','persistent':true}}
+> {"return": {}}
+> {'execute':'quit'}
+> {"return": {}}
+> {"timestamp": {"seconds": 1529548814, "microseconds": 472828}, "event": "SHUTDOWN", "data": {"guest": false}}
+>
+> $ ./qemu-io -f qcow2 file
+> qemu-io> r -v 0 1
+> 00000000:  01  .
+> read 1/1 bytes at offset 0
+> 1 bytes, 1 ops; 0.0001 sec (4.957 KiB/sec and 5076.1421 ops/sec)
+> qemu-io> w -P 1 0 1
+> wrote 1/1 bytes at offset 0
+> 1 bytes, 1 ops; 0.0078 sec (127.502231 bytes/sec and 127.5022 ops/sec)
+> qemu-io> q
+>
+> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "package": "v2.12.0-1531-g3ab98aa673d"}, "capabilities": []}}
+> {'execute':'qmp_capabilities'}
+> {"return": {}}
+> {'execute':'nbd-server-start','arguments':{'addr':{'type':'inet','data':{'host':'localhost','port':'10809'}}}}
+> {"return": {}}
+> {'execute':'blockdev-add','arguments':{'driver':'qcow2','node-name':'n','file':{'driver':'file','filename':'file'}}}
+> {"return": {}}
+> {'execute':'nbd-server-add','arguments':{'device':'n'}}
+> {"return": {}}
+> {'execute':'x-nbd-server-add-bitmap','arguments':{'name':'n','bitmap':'b'}}
+> {"error": {"class": "GenericError", "desc": "Bitmap 'b' is enabled"}}
+> {'execute':'x-block-dirty-bitmap-disable','arguments':{'node':'n','name':'b'}}
+> {"return": {}}
+> {'execute':'x-nbd-server-add-bitmap','arguments':{'name':'n','bitmap':'b'}}
+> {"return": {}}
+> ... leave running
+>
+> $ ./qemu-img map --output=json --image-opts driver=nbd,export=n,server.type=inet,server.host=localhost,server.port=10809
+> [{ "start": 0, "length": 1114112, "depth": 0, "zero": false, "data": true},
+> { "start": 1114112, "length": 458752, "depth": 0, "zero": true, "data": false},
+> { "start": 1572864, "length": 524288, "depth": 0, "zero": false, "data": true}]
+>
+> $ ./qemu-img map --output=json --image-opts driver=nbd,export=n,server.type=inet,server.host=localhost,server.port=10809,x-block-status=qemu:dirty-bitmap:b
+> [{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false},
+> { "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": true}]
+>
+> The difference between the two runs shows that base:allocation status
+> is thus different from the contents of dirty bitmap 'b'; and that the
+> dirty bitmap 'b' indeed tracked the first 64k of the file as being
+> dirty due to the qemu-io write at offset 0 performed between the creation
+> of bitmap b in the first qemu, and the disabling it prior to exporting it
+> in the second qemu.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>
+> Based-on: <20180621031957.134718-1-eblake@redhat.com>
+> ([PULL 0/7] bitmap export over NBD)
+>
+>   qapi/block-core.json |  12 ++++-
+>   block/nbd-client.h   |   1 +
+>   include/block/nbd.h  |   1 +
+>   block/nbd-client.c   |   2 +
+>   block/nbd.c          |   9 +++-
+>   nbd/client.c         | 130 +++++++++++++++++++++++++++++++++++++++++++++++++--
+>   nbd/trace-events     |   2 +-
+>   7 files changed, 149 insertions(+), 8 deletions(-)
+>
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index cc3ede06309..be0456f72b7 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3484,12 +3484,22 @@
+>   #
+>   # @tls-creds:   TLS credentials ID
+>   #
+> +# @x-block-status: A string containing a semicolon-separated list of
+> +#                  block status context names to query and then
+> +#                  request
 
->=20
-> > If the client sends "id" with each command, it can match responses to
-> > commands by id.
-> >=20
-> > But that's not the only way to match.  Imagine the client had a perfe=
-ct
-> > oracle to tell it whether a response is in-band or out-of-band.  Then
-> > matching can work pretty much as in example 1: the first in-band
-> > response is cmd1's, the second one is cmd2's, and the third one is
-> > cmd3's; the first out-of-band response is oob1's, the second one is
-> > oob2's and the third one is oob3's.
->=20
-> Not if oob1/2/3 can retunr in any order in future, which I think we
-> should be allowing fore.
->=20
-> IMHO 'id' should be mandatory for oob usage.
->=20
-> > Possible solutions other than requiring "id":
-> >=20
-> > 1. Make out-of-band responses recognizable
-> >=20
-> >    Just like we copy "id" to the response, we could copy "run-oob", o=
-r
-> >    maybe "control".
-> >=20
-> >    Solves the "match response to command" problem, doesn't solve the
-> >    "match COMMAND_DROPPED event to command" problem.
-> >=20
-> >    Permit me a digression.  "control": { "run-oob": true } is awfully
-> >    verbose.  Back when we hashed out the OOB design, I proposed to us=
-e
-> >    "exec-oob" instead of "execute" to run a command OOB.  I missed wh=
-en
-> >    that morphed into flag "run-oob" wrapped in object "control".  Was=
- it
-> >    in response to reviewer feedback?  Can you give me a pointer?
+and then request only the first one
 
-It's me who proposed this, not from any reviewer's feedback.  It just
-happened that no one was against it.
+> (see NBD_OPT_LIST_META_CONTEXT in the NBD
+> +#                  protocol), only useful for debugging server
+> +#                  behavior. If omitted, no query is made, and the
+> +#                  request uses just "base:allocation". Since this
+> +#                  command is already a hack, it uses a flat string
+> +#                  instead of ['str']. (since 3.0)
+> +#
+>   # Since: 2.9
+>   ##
+>   { 'struct': 'BlockdevOptionsNbd',
+>     'data': { 'server': 'SocketAddress',
+>               '*export': 'str',
+> -            '*tls-creds': 'str' } }
+> +            '*tls-creds': 'str',
+> +            '*x-block-status': 'str' } }
+>
+>   ##
+>   # @BlockdevOptionsRaw:
+> diff --git a/block/nbd-client.h b/block/nbd-client.h
+> index 0ece76e5aff..18405e84a50 100644
+> --- a/block/nbd-client.h
+> +++ b/block/nbd-client.h
+> @@ -45,6 +45,7 @@ int nbd_client_init(BlockDriverState *bs,
+>                       const char *export_name,
+>                       QCryptoTLSCreds *tlscreds,
+>                       const char *hostname,
+> +                    const char *x_block_status,
+>                       Error **errp);
+>   void nbd_client_close(BlockDriverState *bs);
+>
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index 8bb9606c39b..79e237e15fa 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -258,6 +258,7 @@ static inline bool nbd_reply_type_is_error(int type)
+>   struct NBDExportInfo {
+>       /* Set by client before nbd_receive_negotiate() */
+>       bool request_sizes;
+> +    const char *x_block_status;
+>
+>       /* In-out fields, set by client before nbd_receive_negotiate() and
+>        * updated by server results during nbd_receive_negotiate() */
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 8d69eaaa32f..d27d65d6519 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -970,6 +970,7 @@ int nbd_client_init(BlockDriverState *bs,
+>                       const char *export,
+>                       QCryptoTLSCreds *tlscreds,
+>                       const char *hostname,
+> +                    const char *x_block_status,
+>                       Error **errp)
+>   {
+>       NBDClientSession *client = nbd_get_client_session(bs);
+> @@ -982,6 +983,7 @@ int nbd_client_init(BlockDriverState *bs,
+>       client->info.request_sizes = true;
+>       client->info.structured_reply = true;
+>       client->info.base_allocation = true;
+> +    client->info.x_block_status = x_block_status;
+>       ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), export,
+>                                   tlscreds, hostname,
+>                                   &client->ioc, &client->info, errp);
+> diff --git a/block/nbd.c b/block/nbd.c
+> index 13db4030e67..019d8e05450 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -378,6 +378,11 @@ static QemuOptsList nbd_runtime_opts = {
+>               .type = QEMU_OPT_STRING,
+>               .help = "ID of the TLS credentials to use",
+>           },
+> +        {
+> +            .name = "x-block-status",
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "debugging only: block status contexts to request",
+> +        },
+>           { /* end of list */ }
+>       },
+>   };
+> @@ -438,8 +443,8 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+>       }
+>
+>       /* NBD handshake */
+> -    ret = nbd_client_init(bs, sioc, s->export,
+> -                          tlscreds, hostname, errp);
+> +    ret = nbd_client_init(bs, sioc, s->export, tlscreds, hostname,
+> +                          qemu_opt_get(opts, "x-block-status"), errp);
 
-> >=20
-> >    The counterpart to "exec-oob" would be "return-oob" and "error-oob=
-".
-> >    Hmm.
->=20
-> I do prefer the less verbose proposal too.
+hm, so, after this nbd_open finish, info.x_block_status will become 
+invalid pointer..
+It's not used in other places, but looks like bad idea anyway. If we 
+don't want to allocate string,
+we can pass it as a separate const char* paramter to nbd_receive_negotiate.
 
-But frankly speaking I still prefer current way.  QMP is majorly for
-clients (computer programs) rather than users to use it.  Comparing to
-verbosity, I would care more about coherency for how we define the
-interface.  Say, OOB execution is still one way to execute a command,
-so naturally it should still be using the same way that we execute a
-QMP command, we just need some extra fields to tell the server that
-"this message is more urgent than the other ones".
+>    error:
+>       if (sioc) {
+>           object_unref(OBJECT(sioc));
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 232ff4f46da..f80d88f6c1e 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -601,6 +601,119 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+>       return QIO_CHANNEL(tioc);
+>   }
+>
+> +/* nbd_negotiate_list_meta_context:
+> + * Hack for testing meta context negotiation. Subdivide list on semicolons,
+> + * then pass that many queries for info and trace the results.
+> + * return 0 for successful negotiation
+> + *        -1 with errp set for any other error
+> + */
+> +static int nbd_negotiate_list_meta_context(QIOChannel *ioc,
+> +                                           const char *export,
+> +                                           const char *context,
+> +                                           Error **errp)
+> +{
 
-If we are discussing HMP interfaces, I'll have the same preference
-with both of you to consider more about whether it's user-friendly or
-not.  But now we are talking about QMP, then I'll prefer "control".
+hm, I'd prefer to refactor this, to not duplicate code.. this function 
+(may be a bit improved) may be called from
+nbd_negotiate_simple_meta_context(), and we will test normal code path 
+when debugging with the hack.
+However, I'm ok with this duplication for now, as a debugging hack.
 
-In the future, it's also possible to add some more sub-fields into the
-"control" field.  When that happens, do we want to introduce another
-standalone wording for that?  I would assume the answer is no.
+> +    int ret;
+> +    NBDOptionReply reply;
+> +    uint32_t received_id = 0;
+> +    char **list = g_strsplit(context, ";", -1);
+> +    char **iter;
+> +    uint32_t export_len = strlen(export);
+> +    uint32_t context_len;
+> +    uint32_t queries = g_strv_length(list);
+> +    uint32_t data_len = sizeof(export_len) + export_len +
+> +        sizeof(queries) + sizeof(context_len) * queries;
+> +    /* Slight overallocation of data is okay */
+> +    char *data = g_malloc(data_len + strlen(context));
+> +    char *p = data;
+> +
+> +    trace_nbd_opt_meta_request("list", context, export);
+> +    stl_be_p(p, export_len);
+> +    memcpy(p += sizeof(export_len), export, export_len);
+> +    stl_be_p(p += export_len, queries);
+> +    p += sizeof(queries);
+> +    for (iter = list; *iter; iter++) {
+> +        context_len = strlen(*iter);
+> +        stl_be_p(p, context_len);
+> +        memcpy(p += sizeof(context_len), *iter, context_len);
+> +        data_len += context_len;
+> +        p += context_len;
+> +    }
+> +
+> +    ret = nbd_send_option_request(ioc, NBD_OPT_LIST_META_CONTEXT, data_len,
+> +                                  data, errp);
+> +    g_free(data);
+> +    if (ret < 0) {
+> +        goto out;
+> +    }
+> +
+> +    if (nbd_receive_option_reply(ioc, NBD_OPT_LIST_META_CONTEXT, &reply,
+> +                                 errp) < 0)
+> +    {
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    ret = nbd_handle_reply_err(ioc, &reply, errp);
+> +    if (ret <= 0) {
+> +        goto out;
+> +    }
+> +
+> +    while (reply.type == NBD_REP_META_CONTEXT) {
+> +        char *name;
+> +
 
->=20
-> > 2. Do nothing; it's the client's problem
-> >=20
-> >    If the client needs to match responses and events to commands, it
-> >    should use the feature that was expressly designed for helping wit=
-h
-> >    that: "id".
-> >=20
-> >    Note that QMP's initial design assumed asynchronous commands,
-> >    i.e. respones that may arrive in any order.  Nevertheless, it did =
-not
-> >    require "id".  Same reasoning: if the client needs to match, it ca=
-n
-> >    use "id".
->=20
-> IMHO we should just mandate 'id' when using "exec-oob", as it is
-> conceptually broken to use OOB without a way to match responses.
-> We don't want clients relying on all OOB replies coming in sequence
-> now, and then breaking when we allow multiple OOB processing threads.
-> That would require us to add a eec-oob-no-really-i-mean-it command
-> to allow overlapping OOB responses later.
+don't you want to check reply.length before read?
 
-Agreed, again.
+> +        if (nbd_read(ioc, &received_id, sizeof(received_id), errp) < 0) {
+> +            ret = -1;
+> +            goto out;
+> +        }
+> +        be32_to_cpus(&received_id);
+> +
+> +        reply.length -= sizeof(received_id);
+> +        name = g_malloc(reply.length + 1);
+> +        if (nbd_read(ioc, name, reply.length, errp) < 0) {
+> +            g_free(name);
+> +            ret = -1;
+> +            goto out;
+> +        }
+> +        name[reply.length] = '\0';
+> +
+> +        trace_nbd_opt_meta_reply(name, received_id);
+> +        g_free(name);
+> +
+> +        /* read next part of reply */
+> +        if (nbd_receive_option_reply(ioc, NBD_OPT_LIST_META_CONTEXT, &reply,
+> +                                     errp) < 0)
+> +        {
+> +            ret = -1;
+> +            goto out;
+> +        }
+> +
+> +        ret = nbd_handle_reply_err(ioc, &reply, errp);
+> +        if (ret <= 0) {
+> +            goto out;
+> +        }
+> +    }
+> +
+> +    if (reply.type != NBD_REP_ACK) {
+> +        error_setg(errp, "Unexpected reply type %" PRIx32 " expected %x",
+> +                   reply.type, NBD_REP_ACK);
+> +        nbd_send_opt_abort(ioc);
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +    if (reply.length) {
+> +        error_setg(errp, "Unexpected length to ACK response");
+> +        nbd_send_opt_abort(ioc);
+> +        ret = -1;
+> +        goto out;
+> +    }
+> +
+> +    ret = 0;
+> +
+> + out:
+> +    g_strfreev(list);
+> +    return ret;
+> +}
+> +
+>   /* nbd_negotiate_simple_meta_context:
+>    * Set one meta context. Simple means that reply must contain zero (not
+>    * negotiated) or one (negotiated) contexts. More contexts would be considered
+> @@ -622,14 +735,14 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>       uint32_t received_id = 0;
+>       bool received = false;
+>       uint32_t export_len = strlen(export);
+> -    uint32_t context_len = strlen(context);
+> +    uint32_t context_len = strchrnul(context, ';') - context;
 
-Thanks,
+comment to above this function should be adjusted appropriately
 
---=20
-Peter Xu
+>       uint32_t data_len = sizeof(export_len) + export_len +
+>                           sizeof(uint32_t) + /* number of queries */
+>                           sizeof(context_len) + context_len;
+>       char *data = g_malloc(data_len);
+>       char *p = data;
+>
+> -    trace_nbd_opt_meta_request(context, export);
+> +    trace_nbd_opt_meta_request("set", context, export);
+>       stl_be_p(p, export_len);
+>       memcpy(p += sizeof(export_len), export, export_len);
+>       stl_be_p(p += export_len, 1);
+> @@ -677,7 +790,7 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>               return -1;
+>           }
+>           name[reply.length] = '\0';
+> -        if (strcmp(context, name)) {
+> +        if (strncmp(context, name, context_len)) {
+>               error_setg(errp, "Failed to negotiate meta context '%s', server "
+>                          "answered with different context '%s'", context,
+>                          name);
+> @@ -829,9 +942,18 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+>                   info->structured_reply = result == 1;
+>               }
+>
+> +            if (info->structured_reply && info->x_block_status &&
+> +                nbd_negotiate_list_meta_context(ioc, name,
+> +                                                info->x_block_status,
+> +                                                errp) < 0) {
+> +                goto fail;
+> +            }
+>               if (info->structured_reply && base_allocation) {
+> +                if (!info->x_block_status) {
+> +                    info->x_block_status = "base:allocation";
+> +                }
+>                   result = nbd_negotiate_simple_meta_context(
+> -                        ioc, name, "base:allocation",
+> +                        ioc, name, info->x_block_status,
+>                           &info->meta_base_allocation_id, errp);
+>                   if (result < 0) {
+>                       goto fail;
+> diff --git a/nbd/trace-events b/nbd/trace-events
+> index 5e1d4afe8e6..7b587a64856 100644
+> --- a/nbd/trace-events
+> +++ b/nbd/trace-events
+> @@ -10,7 +10,7 @@ nbd_receive_query_exports_start(const char *wantname) "Querying export list for
+>   nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+>   nbd_receive_starttls_new_client(void) "Setting up TLS"
+>   nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+> -nbd_opt_meta_request(const char *context, const char *export) "Requesting to set meta context %s for export %s"
+> +nbd_opt_meta_request(const char *act, const char *context, const char *export) "Requesting to %s meta context %s for export %s"
+>   nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping of context %s to id %" PRIu32
+>   nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
+>   nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
+
+-- 
+Best regards,
+Vladimir
