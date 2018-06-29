@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYxNl-00025s-BQ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:40:30 -0400
+	(envelope-from <rjones@redhat.com>) id 1fYxNz-0002G8-4D
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYxNk-0003Lj-Gh
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:40:29 -0400
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-	<20180629151524.138542-3-vsementsov@virtuozzo.com>
-	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <920ef7dd-67c3-fd93-b1b3-ea3bd31577f2@redhat.com>
-Date: Fri, 29 Jun 2018 12:40:21 -0500
+	(envelope-from <rjones@redhat.com>) id 1fYxNy-0003gG-42
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:40:43 -0400
+Date: Fri, 29 Jun 2018 18:40:29 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180629174029.GR1455@redhat.com>
+References: <20180628184624.5867-1-rjones@redhat.com>
+	<20180628184624.5867-2-rjones@redhat.com>
+	<20180629170343.GY27016@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
- driver for fleecing
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180629170343.GY27016@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5] crypto: Implement TLS Pre-Shared Keys
+ (PSK).
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, qemu-block@nongnu.org
 
-On 06/29/2018 12:30 PM, John Snow wrote:
-> 
-> 
-> On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
->> We need to synchronize backup job with reading from fleecing image
->> like it was done in block/replication.c.
->>
->> Otherwise, the following situation is theoretically possible:
->>
->> 1. client start reading
->> 2. client understand, that there is no corresponding cluster in
->>     fleecing image
-> 
-> I don't think the client refocuses the read, but QEMU does. (the client
-> has no idea if it is reading from the fleecing node or the backing file.)
-> 
-> ... but understood:
-> 
->> 3. client is going to read from backing file (i.e. active image)
->> 4. guest writes to active image
-> 
-> My question here is if QEMU will allow reads and writes to interleave in
-> general. If the client is reading from the backing file, the active
-> image, will QEMU allow a write to modify that data before we're done
-> getting that data?
-> 
->> 5. this write is stopped by backup(sync=none) and cluster is copied to
->>     fleecing image
->> 6. guest write continues...
->> 7. and client reads _new_ (or partly new) date from active image
->>
-> 
-> I can't answer this for myself one way or the other right now, but I
-> imagine you observed a failure in practice in your test setups, which
-> motivated this patch?
-> 
-> A test or some proof would help justification for this patch. It would
-> also help prove that it solves what it claims to!
+On Fri, Jun 29, 2018 at 06:03:43PM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, Jun 28, 2018 at 07:46:24PM +0100, Richard W.M. Jones wrote:
+> > diff --git a/crypto/tlssession.c b/crypto/tlssession.c
+> > index 96a02deb69..50df64e0a9 100644
+> > --- a/crypto/tlssession.c
+> > +++ b/crypto/tlssession.c
+> > @@ -21,6 +21,7 @@
+> >  #include "qemu/osdep.h"
+> >  #include "crypto/tlssession.h"
+> >  #include "crypto/tlscredsanon.h"
+> > +#include "crypto/tlscredspsk.h"
+> >  #include "crypto/tlscredsx509.h"
+> >  #include "qapi/error.h"
+> >  #include "qemu/acl.h"
+> > @@ -88,6 +89,8 @@ qcrypto_tls_session_pull(void *opaque, void *buf, s=
+ize_t len)
+> >      return session->readFunc(buf, len, session->opaque);
+> >  }
+> > =20
+> > +#define TLS_PRIORITY_ADDITIONAL_ANON "+ANON-DH"
+> > +#define TLS_PRIORITY_ADDITIONAL_PSK  "+ECDHE-PSK:+DHE-PSK:+PSK"
+>=20
+> Unfortunately in testing this I learn ECDHE-PSK is only supported when
+> using GNUTLS >=3D 3.0, so can you make this conditional based on=20
+> GNUTLS_VERSION_MAJOR  >=3D 3
 
-In fact, do we really need a new filter, or do we just need to make the 
-"sync":"none" blockdev-backup job take the appropriate synchronization 
-locks?
+GnuTLS 3.0 was released in 2011, and the last 2.x version seems to be
+from 2009.  Do we need to support such old versions?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I looked at the configure script.  It seems as if we will try to use
+any version of GnuTLS, even ancient ones (although other sub-features
+require later versions of GnuTLS).  But if I'm understanding it
+correctly, by forcing both GnuTLS >=3D 3.0.0 and Nettle we could
+eliminate all the conditionals there, except for one Nettle test.
+
+Rich.
+
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
