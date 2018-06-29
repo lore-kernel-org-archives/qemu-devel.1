@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYyEa-0001nk-7H
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:35:05 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYyHf-0002aK-Cb
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYyEX-0004xA-1y
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:35:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43094 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fYyEW-0004mq-Rr
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:35:00 -0400
-References: <1400565880-13409-1-git-send-email-famz@redhat.com>
-	<57e00977-d315-6be9-de9f-b599021958f2@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <7a7293c0-051e-1955-c990-bcd3db4d00ef@redhat.com>
-Date: Fri, 29 Jun 2018 14:34:53 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYyHc-0002VJ-7h
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:38:15 -0400
+References: <6aea7155-d453-95de-7ed6-dca7ef135b4d@ilande.co.uk>
+	<20180629181815.GA14726@flamenco>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <a0d80637-24e1-12fd-d667-0e06f2a80488@ilande.co.uk>
+Date: Fri, 29 Jun 2018 19:38:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <57e00977-d315-6be9-de9f-b599021958f2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v20 00/15] Drop in_use from
- BlockDriverState and enable point-in-time snapshot exporting over NBD
+In-Reply-To: <20180629181815.GA14726@flamenco>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] target/ppc: gdbstub single-step broken since
+ TranslatorOps conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,147 +25,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imain@redhat.com, stefanha@redhat.com, hbrock@redhat.com, jcody@redhat.com, armbru@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
+On 29/06/18 19:18, Emilio G. Cota wrote:
 
-
-On 06/29/2018 02:00 PM, Eric Blake wrote:
-> On 05/20/2014 01:04 AM, Fam Zheng wrote:
->> Thanks for Eric's and Markus' reviewing!
->=20
-> Thread necromancy - now that patch 15/15 has had a revival four years
-> later (two different threads proposing a test 222 for image fleecing) -
-> I want to double check if anything else in this series still needs
-> forward porting.
->=20
-
-This is pretty intensely old...
-
+> On Fri, Jun 29, 2018 at 13:17:11 +0100, Mark Cave-Ayland wrote:
+>> Whilst trying to debug an issue in OpenBIOS, I noticed that the gdbstub
+>> single-step functionality was broken which I bisected down to this commit:
+> (snip)
+>> commit b0c2d5213a14f8b9d44096ee879a5d7f10fbc505
+>> Author: Emilio G. Cota <cota@braap.org>
+>> Date:   Thu Feb 15 14:51:49 2018 -0500
 >>
->> v20: Rebase to master, with minor improvements as listed below:
+>>      target/ppc: convert to TranslatorOps
+> (snip)
+>> (gdb) c
+>> Continuing.
 >>
->> =C2=A0=C2=A0=C2=A0=C2=A0 [02/15] block: Introduce op_blockers to Block=
-DriverState
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Better error message in bdrv_op_is_blocked. (Markus)
+>> Breakpoint 1, ob_pci_init () at
+>> /home/build/src/openbios/openbios.git/openbios/drivers/pci.c:2020
+>> 2020        pci_config_t config = {}; /* host bridge */
+>> (gdb) n
+>> 2021        phandle_t phandle_host = 0, intc;
+>> (gdb) n
+>> 2025        activate_device("/");
+>> (gdb) n
 >>
->> =C2=A0=C2=A0=C2=A0=C2=A0 [03/15] block: Replace in_use with operation =
-blocker
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Accurate commit message: why use bdrv_op_blocker_is_empty in
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- block_job_create. (Markus)
+>> (hangs)
 >>
->> =C2=A0=C2=A0=C2=A0=C2=A0 [06/15] block: Add backing_blocker in BlockDr=
-iverState
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Drop error_is_set().
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Call error_free() unconditionally.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
->> =C2=A0=C2=A0=C2=A0=C2=A0 [08/15] block: Support dropping active in bdr=
-v_drop_intermediate
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Fix list index in function comment. (Eric)
 >>
->> =C2=A0=C2=A0=C2=A0=C2=A0 [13/15] block: Add blockdev-backup to transac=
-tion
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Drop error_is_set().
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 [14/15] qemu-iotests: Test blockdev-backup in=
- 055
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- Bump year in file header. (Eric)
->> =C2=A0=20
->=20
->> Fam Zheng (15):
->> =C2=A0=C2=A0 block: Add BlockOpType enum
->> =C2=A0=C2=A0 block: Introduce op_blockers to BlockDriverState
->> =C2=A0=C2=A0 block: Replace in_use with operation blocker
->> =C2=A0=C2=A0 block: Move op_blocker check from block_job_create to its=
- caller
->> =C2=A0=C2=A0 block: Add bdrv_set_backing_hd()
->> =C2=A0=C2=A0 block: Add backing_blocker in BlockDriverState
->=20
-> Before this point looks to be in master (in some form or another); afte=
-r
-> this point did not have any review.
->=20
->> =C2=A0=C2=A0 block: Parse "backing" option to reference existing BDS
+>> Hitting CTRL-C sometimes allows the single-step to continue but raises a
+>> SIGINT at address 0x400 which is in the CPU exception table.
+> 
+> Thanks for reporting this.
+> 
+> I'm afraid I can't reproduce this. I'm using gdb-multiarch as follows:
+> 
+> $ gdb-multiarch ../img/ppc/openbios-qemu.elf.nostrip
+> GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
+> Copyright (C) 2016 Free Software Foundation, Inc.
+> License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+> This is free software: you are free to change and redistribute it.
+> There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+> and "show warranty" for details.
+> This GDB was configured as "x86_64-linux-gnu".
+> Type "show configuration" for configuration details.
+> For bug reporting instructions, please see:
+> <http://www.gnu.org/software/gdb/bugs/>.
+> Find the GDB manual and other documentation resources online at:
+> <http://www.gnu.org/software/gdb/documentation/>.
+> For help, type "help".
+> Type "apropos word" to search for commands related to "word"...
+> Reading symbols from ../img/ppc/openbios-qemu.elf.nostrip...done.
+> warning: File "/data/src/qemu/.gdbinit" auto-loading has been declined by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
+> To enable execution of this file add
+>          add-auto-load-safe-path /data/src/qemu/.gdbinit
+> line to your configuration file "/home/cota/.gdbinit".
+> To completely disable this security protection add
+>          set auto-load safe-path /
+> line to your configuration file "/home/cota/.gdbinit".
+> For more information about this security protection see the
+> "Auto-loading safe path" section in the GDB manual.  E.g., run from the shell:
+>          info "(gdb)Auto-loading safe path"
+> (gdb) set arch powerpc:
+> 403       603       620       7400      EC603e    a35       common64  e500mc    e5500     rs64ii    titan
+> 601       604       630       750       MPC8XX    common    e500      e500mc64  e6500     rs64iii   vle
+> (gdb) set arch powerpc:403
+> The target architecture is assumed to be powerpc:403
+> (gdb) b ob_pci_init
+> Breakpoint 1 at 0xfff25c58: file /home/build/src/openbios/openbios.git/openbios/drivers/pci.c, line 2020.
+> (gdb) target remote :1234
+> Remote debugging using :1234
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> vector.0x100 () at /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/start.S:284
+> 284     /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/start.S: No such file or directory.
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+> 
+> (gdb) c
+> Continuing.
+> 
+> Breakpoint 1, ob_pci_init () at /home/build/src/openbios/openbios.git/openbios/drivers/pci.c:2020
+> 2020    /home/build/src/openbios/openbios.git/openbios/drivers/pci.c: No such file or directory.
+> (gdb) n
+> 2021    in /home/build/src/openbios/openbios.git/openbios/drivers/pci.c
+> (gdb)
+> 2025    in /home/build/src/openbios/openbios.git/openbios/drivers/pci.c
+> (gdb)
+> 2029    in /home/build/src/openbios/openbios.git/openbios/drivers/pci.c
+> 
+> Here I can keep executing for a while, with no hangs. Eventually I hit
+> (gdb)
+> arch_of_init () at /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/init.c:939
+> 939     in /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/init.c
+> Cannot access memory at address 0xfff0c054
+> 
+> I tried the last known good commit (as per your bisect) and get the same results
+> as above.
+> 
+> Is there any other way I could try reproducing this? Also, can you
+> reproduce with another gdb version?
 
-Well, this obviously currently works.
+Hmmm. Have you got a "git clone" of the OpenBIOS source in roms/ that 
+you can add to the gdb source path to make sure that "n" correlates with 
+the source file line numbers?
 
->> =C2=A0=C2=A0 block: Support dropping active in bdrv_drop_intermediate
->> =C2=A0=C2=A0 stream: Use bdrv_drop_intermediate and drop close_unused_=
-images
->> =C2=A0=C2=A0 commit: Use bdrv_drop_intermediate
+> If I don't manage to reproduce, I can send you off-list some patches to try,
+> basically breaking down the diff in the first bad commit into very small chunks,
+> to see where the problem was introduced.
 
-Not sure about these three.
+If the above doesn't work, please do, and I will test them and report back.
 
->> =C2=A0=C2=A0 qmp: Add command 'blockdev-backup'
 
-We do have this one.
+ATB,
 
->> =C2=A0=C2=A0 block: Allow backup on referenced named BlockDriverState
-
-With patch 1/2 or 1/3 from either Vlad or myself, we have this, too.
-
->> =C2=A0=C2=A0 block: Add blockdev-backup to transaction
-
-We already have this.
-
->> =C2=A0=C2=A0 qemu-iotests: Test blockdev-backup in 055
->> =C2=A0=C2=A0 qemu-iotests: Image fleecing test case 089
-
-These never got added, but we're working on that now.
-
->>
->> =C2=A0 block-migration.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 7 +-
->> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 310
->> +++++++++++++++++++++++++++-------------
->> =C2=A0 block/backup.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 26 ++++
->> =C2=A0 block/commit.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->> =C2=A0 block/mirror.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 9 +-
->> =C2=A0 block/stream.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 42 +-----
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-| 122 ++++++++++++++--
->> =C2=A0 blockjob.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0 14 +-
->> =C2=A0 hw/block/dataplane/virtio-blk.c |=C2=A0 18 ++-
->> =C2=A0 include/block/block.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 29 +++-
->> =C2=A0 include/block/block_int.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0 9 +-
->> =C2=A0 include/block/blockjob.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 3 +
->> =C2=A0 qapi-schema.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 52 +++++++
->> =C2=A0 qmp-commands.hx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 44 ++++++
->> =C2=A0 tests/qemu-iotests/055=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 277
->> +++++++++++++++++++++++++++++------
->> =C2=A0 tests/qemu-iotests/055.out=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
-=C2=A0 4 +-
->> =C2=A0 tests/qemu-iotests/089=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 99 +++++++++++++
->> =C2=A0 tests/qemu-iotests/089.out=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
-=C2=A0 5 +
->> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 1 +
->> =C2=A0 19 files changed, 856 insertions(+), 217 deletions(-)
->> =C2=A0 create mode 100755 tests/qemu-iotests/089
->> =C2=A0 create mode 100644 tests/qemu-iotests/089.out
->>
->=20
+Mark.
