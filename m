@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYuQv-0005An-O1
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:31:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fYuW4-0000tf-BY
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYuQs-0002js-FI
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:31:33 -0400
-Received: from mail-qk0-x229.google.com ([2607:f8b0:400d:c09::229]:40464)
+	(envelope-from <pbonzini@redhat.com>) id 1fYuW1-0003v6-6J
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:36:52 -0400
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:35218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYuQs-0002j7-99
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:31:30 -0400
-Received: by mail-qk0-x229.google.com with SMTP id b129-v6so5006008qke.7
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:31:30 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180627174435.31800-1-alistair.francis@wdc.com>
-	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
-	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
-	<CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
-	<CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
-	<CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3af3b510-61a5-abaa-8cd9-ee4e21ba7963@amsat.org>
-Date: Fri, 29 Jun 2018 11:31:23 -0300
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fYuW0-0003sd-Vb
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:36:49 -0400
+Received: by mail-wr0-f194.google.com with SMTP id c13-v6so9071771wrq.2
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:36:48 -0700 (PDT)
+References: <20180226130452.21309-1-dgilbert@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1229716d-6293-1cc6-8531-8a22e8c757dd@redhat.com>
+Date: Fri, 29 Jun 2018 16:36:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
+In-Reply-To: <20180226130452.21309-1-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
+Subject: Re: [Qemu-devel] [PATCH 1/1] serial: Open non-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,41 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>
-Cc: Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-On 06/29/2018 11:21 AM, Peter Maydell wrote:
-> On 29 June 2018 at 15:13, Alistair Francis <alistair23@gmail.com> wrote:
->> Can you import it manually? The armour export is below:
+On 26/02/2018 14:04, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Aha. I tried that, which didn't work either, which prompted
-> me to try --verbose, which says:
+> On a real serial device, the open can block if the handshake
+> lines are in a particular state.  If a QEMU is passing the serial
+> device to the guest, the QEMU startup is blocked opening the device
+> (with a symptom seen as a timeout from libvirt).
 > 
-> e104462:xenial:qemu-for-merges$ gpg --verbose --import /tmp/alistair.gpg
-> gpg: armour header: Version: GnuPG v2
-> gpg: can't handle public key algorithm 19
-> gpg: pub     0E/0xE48E3BC2C123ED93 2017-12-15  Alistair Francis
-> <alistair@alistair23.me>
-> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm on user
-> ID "Alistair Francis <alistair@alistair23.me>"
-> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm on user
-> ID "Alistair Francis <alistair23@gmail.com>"
-> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
-> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
-> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
-> gpg: key 0xE48E3BC2C123ED93: skipped user ID "Alistair Francis
-> <alistair@alistair23.me>"
-> gpg: key 0xE48E3BC2C123ED93: skipped user ID "Alistair Francis
-> <alistair23@gmail.com>"
-> gpg: key 0xE48E3BC2C123ED93: skipped subkey
-> gpg: key 0xE48E3BC2C123ED93: skipped subkey
-> gpg: key 0xE48E3BC2C123ED93: skipped subkey
-> gpg: key 0xE48E3BC2C123ED93: no valid user IDs
-> gpg: this may be caused by a missing self-signature
-> gpg: Total number processed: 1
-> gpg:           w/o user IDs: 1
+> Open the serial port with O_NONBLOCK.
 > 
-> So the problem is that your key is using some algorithm
-> that's too newfangled for my gpg to cope with...
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  chardev/char-serial.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+> index feb52e559d..97be5d4a63 100644
+> --- a/chardev/char-serial.c
+> +++ b/chardev/char-serial.c
+> @@ -265,7 +265,8 @@ static void qmp_chardev_open_serial(Chardev *chr,
+>      ChardevHostdev *serial = backend->u.serial.data;
+>      int fd;
+>  
+> -    fd = qmp_chardev_open_file_source(serial->device, O_RDWR, errp);
+> +    fd = qmp_chardev_open_file_source(serial->device, O_RDWR | O_NONBLOCK,
+> +                                      errp);
+>      if (fd < 0) {
+>          return;
+>      }
+> 
 
-Oh indeed, this is a ECDH NISTP-521 public key!
+Queued, thanks.
+
+Paolo
