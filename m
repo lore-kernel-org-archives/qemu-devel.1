@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOn-0000Qa-I7
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOv-0000TN-0C
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOm-00032A-94
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:09 -0400
-Received: from foss.arm.com ([217.140.101.70]:39544)
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOt-00038p-W4
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:16 -0400
+Received: from foss.arm.com ([217.140.101.70]:39596)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOl-00031d-Vc
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:08 -0400
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrOt-00037x-PD
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:17:15 -0400
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Date: Fri, 29 Jun 2018 12:15:40 +0100
-Message-Id: <1530270944-11351-21-git-send-email-suzuki.poulose@arm.com>
+Date: Fri, 29 Jun 2018 12:15:43 +0100
+Message-Id: <1530270944-11351-24-git-send-email-suzuki.poulose@arm.com>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Subject: [Qemu-devel] [PATCH v3 20/20] kvm: arm64: Fall back to normal
- stage2 entry level
+Subject: [Qemu-devel] [kvmtool test PATCH 23/24] kvmtool: arm64: Switch
+ memory layout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,146 +27,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 
-We use concatenated entry level page tables (upto 16tables) for
-stage2. If we don't have sufficient contiguous pages (e.g, 16 * 64K),
-fallback to the normal page table format, by going one level
-deeper if permitted.
+If the guest wants to use a larger physical address space place
+the RAM at upper half of the address space. Otherwise, it uses the
+default layout.
 
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-New in v3
----
- arch/arm64/include/asm/kvm_arm.h |  7 +++++++
- arch/arm64/include/asm/kvm_mmu.h | 18 +----------------
- arch/arm64/kvm/guest.c           | 42 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+), 17 deletions(-)
+ arm/aarch32/include/kvm/kvm-arch.h |  6 ++++--
+ arm/aarch64/include/kvm/kvm-arch.h | 15 ++++++++++++---
+ arm/include/arm-common/kvm-arch.h  | 11 ++++++-----
+ arm/kvm.c                          |  2 +-
+ 4 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index cb6a2ee..42eb528 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -137,6 +137,8 @@
-  *
-  * VTCR_EL2.SL0 and T0SZ are configured per VM at runtime before switching to
-  * the VM.
-+ *
-+ * With 16k/64k, the maximum number of levels supported at Stage2 is 3.
-  */
+diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+index cd31e72..bcd382b 100644
+--- a/arm/aarch32/include/kvm/kvm-arch.h
++++ b/arm/aarch32/include/kvm/kvm-arch.h
+@@ -3,8 +3,10 @@
  
- #define VTCR_EL2_COMMON_BITS	(VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
-@@ -150,6 +152,7 @@
-  */
- #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_64K
- #define VTCR_EL2_TGRAN_SL0_BASE		3UL
-+#define ARM64_TGRAN_STAGE2_MAX_LEVELS	3
+ #define ARM_KERN_OFFSET(...)	0x8000
  
- #elif defined(CONFIG_ARM64_16K_PAGES)
- /*
-@@ -158,6 +161,8 @@
-  */
- #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_16K
- #define VTCR_EL2_TGRAN_SL0_BASE		3UL
-+#define ARM64_TGRAN_STAGE2_MAX_LEVELS	3
-+
- #else	/* 4K */
- /*
-  * Stage2 translation configuration:
-@@ -165,6 +170,8 @@
-  */
- #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_4K
- #define VTCR_EL2_TGRAN_SL0_BASE		2UL
-+#define ARM64_TGRAN_STAGE2_MAX_LEVELS	4
-+
- #endif
- 
- #define VTCR_EL2_FLAGS		(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index d38f395..50f632e 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -527,23 +527,7 @@ static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
- 	return vttbr_baddr_mask(kvm_phys_shift(kvm), kvm_stage2_levels(kvm));
- }
- 
--static inline void *stage2_alloc_pgd(struct kvm *kvm)
--{
--	u32 ipa, lvls;
+-#define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
 -
--	/*
--	 * Stage2 page table can support concatenation of (upto 16) tables
--	 * at the entry level, thereby reducing the number of levels.
--	 */
--	ipa = kvm_phys_shift(kvm);
--	lvls = stage2_pt_levels(ipa);
+ #include "arm-common/kvm-arch.h"
+ 
++#define ARM_MAX_MEMORY(...)	ARM32_MAX_MEMORY
++#define ARM_MEMORY_AREA(...)	ARM32_MEMORY_AREA
++
++
+ #endif /* KVM__KVM_ARCH_H */
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+index 9de623a..bad35b9 100644
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ b/arm/aarch64/include/kvm/kvm-arch.h
+@@ -1,14 +1,23 @@
+ #ifndef KVM__KVM_ARCH_H
+ #define KVM__KVM_ARCH_H
+ 
++#include "arm-common/kvm-arch.h"
++
++#define ARM64_MEMORY_AREA(phys_shift)	(1UL << (phys_shift - 1))
++#define ARM64_MAX_MEMORY(phys_shift)	\
++	((1ULL << (phys_shift)) - ARM64_MEMORY_AREA(phys_shift))
++
++#define ARM_MEMORY_AREA(kvm)	((kvm)->cfg.arch.aarch32_guest ?	\
++				 ARM32_MEMORY_AREA		:	\
++				 ARM64_MEMORY_AREA(kvm->cfg.arch.phys_shift))
++
+ #define ARM_KERN_OFFSET(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+ 				0x8000				:	\
+ 				0x80000)
+ 
+ #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+-				ARM_LOMAP_MAX_MEMORY		:	\
+-				ARM_HIMAP_MAX_MEMORY)
++				ARM32_MAX_MEMORY		:	\
++				ARM64_MAX_MEMORY(kvm->cfg.arch.phys_shift))
+ 
+-#include "arm-common/kvm-arch.h"
+ 
+ #endif /* KVM__KVM_ARCH_H */
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index b9d486d..b29b4b1 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -6,14 +6,15 @@
+ #include <linux/types.h>
+ 
+ #include "arm-common/gic.h"
 -
--	kvm->arch.s2_levels = lvls;
--	kvm->arch.vtcr_private = VTCR_EL2_SL0(lvls) | TCR_T0SZ(ipa);
--
--	return alloc_pages_exact(stage2_pgd_size(kvm),
--				 GFP_KERNEL | __GFP_ZERO);
--}
-+extern void *stage2_alloc_pgd(struct kvm *kvm);
+ #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
+ #define ARM_MMIO_AREA		_AC(0x0000000000010000, UL)
+ #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
+-#define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
  
- static inline u32 kvm_get_ipa_limit(void)
- {
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 56a0260..5a3a687 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -31,6 +31,8 @@
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_mmu.h>
-+#include <asm/pgtable-hwdef.h>
+-#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+-#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
++#define ARM32_MEMORY_AREA	_AC(0x0000000080000000, UL)
++#define ARM32_MAX_MEMORY	((1ULL << 32) - ARM32_MEMORY_AREA)
++
++#define ARM_IOMEM_AREA_END	ARM32_MEMORY_AREA
++
  
- #include "trace.h"
+ #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
+ #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
+@@ -24,7 +25,7 @@
+ #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
+ #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
+ #define ARM_PCI_CFG_SIZE	(1ULL << 24)
+-#define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
++#define ARM_PCI_MMIO_SIZE	(ARM_IOMEM_AREA_END - \
+ 				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
  
-@@ -458,3 +460,43 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ #define KVM_IOPORT_AREA		ARM_IOPORT_AREA
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 2ab436e..5701d41 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -30,7 +30,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 	u64 phys_start, phys_size;
+ 	void *host_mem;
  
- 	return ret;
- }
-+
-+void *stage2_alloc_pgd(struct kvm *kvm)
-+{
-+	u32 ipa, s2_lvls, lvls;
-+	u64 pgd_size;
-+	void *pgd;
-+
-+	/*
-+	 * Stage2 page table can support concatenation of (upto 16) tables
-+	 * at the entry level, thereby reducing the number of levels. We try
-+	 * to use concatenation wherever possible. If we fail, fallback to
-+	 * normal levels if possible.
-+	 */
-+	ipa = kvm_phys_shift(kvm);
-+	lvls = s2_lvls = stage2_pt_levels(ipa);
-+
-+retry:
-+	pgd_size = __s2_pgd_size(ipa, lvls);
-+	pgd = alloc_pages_exact(pgd_size, GFP_KERNEL | __GFP_ZERO);
-+
-+	/* Check if the PGD meets the alignment requirements */
-+	if (pgd && (virt_to_phys(pgd) & ~vttbr_baddr_mask(ipa, lvls))) {
-+		free_pages_exact(pgd, pgd_size);
-+		pgd = NULL;
-+	}
-+
-+	if (pgd) {
-+		kvm->arch.s2_levels = lvls;
-+		kvm->arch.vtcr_private = VTCR_EL2_SL0(lvls) | TCR_T0SZ(ipa);
-+	} else {
-+		/* Check if we can use an entry level without concatenation */
-+		lvls = ARM64_HW_PGTABLE_LEVELS(ipa);
-+		if ((lvls > s2_lvls) &&
-+		    (lvls <= CONFIG_PGTABLE_LEVELS) &&
-+		    (lvls <= ARM64_TGRAN_STAGE2_MAX_LEVELS))
-+			goto retry;
-+	}
-+
-+	return pgd;
-+}
+-	phys_start	= ARM_MEMORY_AREA;
++	phys_start	= ARM_MEMORY_AREA(kvm);
+ 	phys_size	= kvm->ram_size;
+ 	host_mem	= kvm->ram_start;
+ 
 -- 
 2.7.4
