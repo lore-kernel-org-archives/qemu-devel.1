@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYzXK-0002GS-FV
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:58:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fYzc6-0003QM-6T
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:03:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYzXH-0000DF-Ck
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:58:30 -0400
-Date: Fri, 29 Jun 2018 16:58:23 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fYzc2-0001Jr-16
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:03:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYzc1-0001Hb-R7
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:03:21 -0400
+Date: Fri, 29 Jun 2018 17:03:18 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180629195823.GX7451@localhost.localdomain>
-References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
-	<153018093372.336571.7266716996862582164.stgit@bahia>
+Message-ID: <20180629200318.GY7451@localhost.localdomain>
+References: <153026817452.402489.13386335348113684056.stgit@bahia.lan>
+	<8730183a-3e16-931e-c990-24a5e169b2d9@redhat.com>
+	<20180629103910.GE27016@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <153018093372.336571.7266716996862582164.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH 3/3] accel: forbid early use of
+In-Reply-To: <20180629103910.GE27016@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] accel: forbid early use of
  kvm_enabled() and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,171 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jun 28, 2018 at 12:15:33PM +0200, Greg Kurz wrote:
-> It is unsafe to rely on *_enabled() helpers before the accelerator has
-> been initialized, ie, accel_init_machine() has succeeded, because they
-> always return false. But it is still possible to end up calling them
-> indirectly by inadvertance, and cause QEMU to misbehave.
-> 
-> This patch causes QEMU to abort if we try to check for an accelerator
-> before it has been set up. This will help to catch bugs earlier.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  accel/accel.c          |    7 +++++++
->  include/qemu-common.h  |    3 ++-
->  include/sysemu/accel.h |    1 +
->  include/sysemu/kvm.h   |    3 ++-
->  qom/cpu.c              |    1 +
->  stubs/Makefile.objs    |    1 +
->  stubs/accel.c          |   14 ++++++++++++++
->  target/i386/hax-all.c  |    2 +-
->  target/i386/whpx-all.c |    2 +-
->  9 files changed, 30 insertions(+), 4 deletions(-)
->  create mode 100644 stubs/accel.c
-> 
-> diff --git a/accel/accel.c b/accel/accel.c
-> index 966b2d8f536c..27900aac9cc5 100644
-> --- a/accel/accel.c
-> +++ b/accel/accel.c
-> @@ -51,6 +51,13 @@ static AccelClass *accel_find(const char *opt_name)
->      return ac;
->  }
->  
-> +bool assert_accelerator_initialized(bool allowed)
-> +{
-> +    assert(current_machine != NULL);
-> +    assert(current_machine->accelerator != NULL);
-> +    return allowed;
-> +}
-> +
->  static int accel_init_machine(AccelClass *acc, MachineState *ms)
->  {
->      ObjectClass *oc = OBJECT_CLASS(acc);
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index 85f4749aefb7..01d5e4d97dbf 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -82,7 +82,8 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
->  extern bool tcg_allowed;
->  void tcg_exec_init(unsigned long tb_size);
->  #ifdef CONFIG_TCG
-> -#define tcg_enabled() (tcg_allowed)
-> +#include "sysemu/accel.h"
-> +#define tcg_enabled() (assert_accelerator_initialized(tcg_allowed))
->  #else
->  #define tcg_enabled() 0
+On Fri, Jun 29, 2018 at 11:39:10AM +0100, Daniel P. Berrang=E9 wrote:
+> On Fri, Jun 29, 2018 at 12:35:09PM +0200, Paolo Bonzini wrote:
+> > On 29/06/2018 12:29, Greg Kurz wrote:
+> > > It is unsafe to rely on *_enabled() helpers before the accelerator =
+has
+> > > been initialized, ie, accel_init_machine() has succeeded, because t=
+hey
+> > > always return false. But it is still possible to end up calling the=
+m
+> > > indirectly by inadvertance, and cause QEMU to misbehave.
+> > >=20
+> > > This patch causes QEMU to abort if we try to check for an accelerat=
+or
+> > > before it has been set up. This will help to catch bugs earlier.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> > >=20
+> > > This patch was motivated by an regression we're currently fixing in
+> > > spapr because of an early use of kvm_enabled(). David suggested to
+> > > post this patch separately:
+> > >=20
+> > > https://lists.nongnu.org/archive/html/qemu-ppc/2018-06/msg01136.htm=
+l
+> > >=20
+> > > v2: - dropped change in qom/cpu.c (useless header inclusion)
+> > >     - only #include "sysemu/kvm.h" if we actually need it
+> > >     - added David's R-b from v1 because changes in v2 are minor
+> >=20
+> > This adds a function call on possibly hot paths.  Can you make it inl=
+ine?
+> >=20
+> > Also asserting current_machine !=3D NULL is not necessary, since you'=
+re
+> > immediately dereferencing it.
+>=20
+> Is there a practical way to simply initialize the accelerators earlier
+> in startup sequence, so we just remove or at least reduce, the liklihoo=
+d
+> of accessing it too early ?
 
-It would be nice to catch mistakes even if
-the CONFIG_{TCG,KVM,HAX,XEN} is disabled.  That would require making
-assert_accelerator_initialized() a macro or inline function,
-though.
+We can reduce it, but not eliminate it: it would still be
+possible to use the *_enabled() macros too early, before we parse
+all command-line options (on QOM class_init, for example).
 
-
->  #endif
-> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> index 637358f43014..76965cb69cc9 100644
-> --- a/include/sysemu/accel.h
-> +++ b/include/sysemu/accel.h
-> @@ -71,5 +71,6 @@ void configure_accelerator(MachineState *ms);
->  void accel_register_compat_props(AccelState *accel);
->  /* Called just before os_setup_post (ie just before drop OS privs) */
->  void accel_setup_post(MachineState *ms);
-> +bool assert_accelerator_initialized(bool allowed);
->  
->  #endif
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 0b64b8e06786..ac4dbb2d6d6d 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -18,6 +18,7 @@
->  #include "qom/cpu.h"
->  #include "exec/memattrs.h"
->  #include "hw/irq.h"
-> +#include "sysemu/accel.h"
->  
->  #ifdef NEED_CPU_H
->  # ifdef CONFIG_KVM
-> @@ -46,7 +47,7 @@ extern bool kvm_direct_msi_allowed;
->  extern bool kvm_ioeventfd_any_length_allowed;
->  extern bool kvm_msi_use_devid;
->  
-> -#define kvm_enabled()           (kvm_allowed)
-> +#define kvm_enabled()           (assert_accelerator_initialized(kvm_allowed))
->  /**
->   * kvm_irqchip_in_kernel:
->   *
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index 92599f35413b..65a8f03a66a4 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -23,6 +23,7 @@
->  #include "qemu-common.h"
->  #include "qom/cpu.h"
->  #include "sysemu/hw_accel.h"
-> +#include "sysemu/accel.h"
->  #include "qemu/notify.h"
->  #include "qemu/log.h"
->  #include "exec/log.h"
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 53d3f32cb258..2d5142287525 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -43,3 +43,4 @@ stub-obj-y += xen-common.o
->  stub-obj-y += xen-hvm.o
->  stub-obj-y += pci-host-piix.o
->  stub-obj-y += ram-block.o
-> +stub-obj-y += accel.o
-> diff --git a/stubs/accel.c b/stubs/accel.c
-> new file mode 100644
-> index 000000000000..4f480f2d3f29
-> --- /dev/null
-> +++ b/stubs/accel.c
-> @@ -0,0 +1,14 @@
-> +/*
-> + * accel stubs
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "sysemu/accel.h"
-> +
-> +bool assert_accelerator_initialized(bool allowed)
-> +{
-> +    return allowed;
-> +}
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index d2e512856bb8..7c78bd7d094d 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -57,7 +57,7 @@ static int hax_arch_get_registers(CPUArchState *env);
->  
->  int hax_enabled(void)
->  {
-> -    return hax_allowed;
-> +    return assert_accelerator_initialized(hax_allowed);
->  }
->  
->  int valid_hax_tunnel_size(uint16_t size)
-> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-> index 6b42096698ee..e7f6bc5958e7 100644
-> --- a/target/i386/whpx-all.c
-> +++ b/target/i386/whpx-all.c
-> @@ -1422,7 +1422,7 @@ static int whpx_accel_init(MachineState *ms)
->  
->  int whpx_enabled(void)
->  {
-> -    return whpx_allowed;
-> +    return assert_accelerator_initialized(whpx_allowed);
->  }
->  
->  static void whpx_accel_class_init(ObjectClass *oc, void *data)
-> 
-
--- 
+--=20
 Eduardo
