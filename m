@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fYyZa-0006X1-BE
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:56:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fYykv-0000ZM-F3
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:08:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fYyZX-0000Xy-8u
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:56:46 -0400
-Date: Fri, 29 Jun 2018 14:56:41 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180629185641.GC14726@flamenco>
-References: <6aea7155-d453-95de-7ed6-dca7ef135b4d@ilande.co.uk>
-	<20180629181815.GA14726@flamenco>
-	<a0d80637-24e1-12fd-d667-0e06f2a80488@ilande.co.uk>
+	(envelope-from <ehabkost@redhat.com>) id 1fYyks-000215-87
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:08:29 -0400
+Date: Fri, 29 Jun 2018 16:08:22 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180629190822.GW7451@localhost.localdomain>
+References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
+	<153018091454.336571.7311461748726927045.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a0d80637-24e1-12fd-d667-0e06f2a80488@ilande.co.uk>
-Subject: Re: [Qemu-devel] target/ppc: gdbstub single-step broken since
- TranslatorOps conversion
+In-Reply-To: <153018091454.336571.7311461748726927045.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH 2/3] spapr: compute default value of
+ "hpt-max-page-size" later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-On Fri, Jun 29, 2018 at 19:38:02 +0100, Mark Cave-Ayland wrote:
-> On 29/06/18 19:18, Emilio G. Cota wrote:
-> >I tried the last known good commit (as per your bisect) and get the same results
-> >as above.
-> >
-> >Is there any other way I could try reproducing this? Also, can you
-> >reproduce with another gdb version?
+On Thu, Jun 28, 2018 at 12:15:14PM +0200, Greg Kurz wrote:
+[...]
+> @@ -2527,6 +2527,18 @@ static void spapr_machine_init(MachineState *machine)
+>      QLIST_INIT(&spapr->phbs);
+>      QTAILQ_INIT(&spapr->pending_dimm_unplugs);
+>  
+> +    /* This is for pseries-2.12 and older machine types */
+> +    if (!smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
+> +        uint8_t mps;
+> +
+> +        if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> +            mps = ctz64(qemu_getrampagesize());
+> +        } else {
+> +            mps = 34; /* allow everything up to 16GiB, i.e. everything */
+> +        }
+> +        smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
+
+Initializing class fields on instance init functions is a sign
+that the information doesn't belong to the class struct.  Can't
+this be handled at default_caps_with_cpu()?
+
+> +    }
+> +
+>      /* Determine capabilities to run with */
+>      spapr_caps_init(spapr);
+>  
+> @@ -4103,17 +4115,16 @@ static void spapr_machine_2_12_instance_options(MachineState *machine)
+>  static void spapr_machine_2_12_class_options(MachineClass *mc)
+>  {
+>      sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> -    uint8_t mps;
+>  
+>      spapr_machine_3_0_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
+>  
+> -    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> -        mps = ctz64(qemu_getrampagesize());
+> -    } else {
+> -        mps = 34; /* allow everything up to 16GiB, i.e. everything */
+> -    }
+> -    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
+> +    /* We depend on kvm_enabled() to choose a default value for the
+> +     * hpt-max-page-size capability. Of course we can't do it here
+> +     * because this is too early and the HW accelerator isn't initialzed
+> +     * yet. Postpone this to spapr_machine_init().
+> +     */
+> +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 0;
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
 > 
-> Hmmm. Have you got a "git clone" of the OpenBIOS source in roms/ that you
-> can add to the gdb source path to make sure that "n" correlates with the
-> source file line numbers?
 
-I just cloned it and pointed to it using substitute-path in gdb. I
-get the same (good) outcome, except that I see the corresponding source.
-
-> >If I don't manage to reproduce, I can send you off-list some patches to try,
-> >basically breaking down the diff in the first bad commit into very small chunks,
-> >to see where the problem was introduced.
-> 
-> If the above doesn't work, please do, and I will test them and report back.
-
-Will do.
-
-Cheers,
-
-		Emilio
+-- 
+Eduardo
