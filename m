@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYsN1-0007Ob-89
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:19:24 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fYsOP-000061-SS
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fYsMx-0006cM-4z
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:19:23 -0400
-References: <20180625124238.25339-1-f4bug@amsat.org>
-	<20180625124238.25339-2-f4bug@amsat.org>
-	<20180627132747.76773eb9@redhat.com>
-	<3dd9341a-f4e6-c107-2f1f-0745d039f03e@redhat.com>
-	<15aad1db-2f4c-ea49-9966-a969f0c769f5@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c1939f7b-76e2-eca9-2819-d0b4d9a134b1@redhat.com>
-Date: Fri, 29 Jun 2018 07:19:16 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fYsOL-0000E3-QK
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:20:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49784
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fYsOL-0000DU-Jk
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:20:45 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5TCIwPl130859
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 08:20:45 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jwhyfeuna-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 08:20:44 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 29 Jun 2018 06:20:44 -0600
+References: <20180628172657.11646-1-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 29 Jun 2018 08:20:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <15aad1db-2f4c-ea49-9966-a969f0c769f5@amsat.org>
+In-Reply-To: <20180628172657.11646-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-MW
+Message-Id: <89c2a128-3679-8b44-f00a-7f94bd3bdf0d@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 01/46] include: Add IEC binary prefixes
- in "qemu/units.h"
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +43,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 06/28/2018 05:53 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+On 06/28/2018 01:26 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi,
+>
+> The following patches implement the TPM Physical Presence Interface
+> that allows a user to set a command via ACPI (sysfs entry in Linux)
+> that, upon the next reboot, the firmware looks for and acts upon by
+> sending sequences of commands to the TPM.
+>
+> A dedicated memory region is added to the TPM CRB & TIS devices, at
+> address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+> holds the location for that PPI region and some version details, to
+> allow for future flexibility.
+>
+> With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+> now runs successfully.
+>
+> It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+> Implement Physical Presence interface for TPM 1.2 and 2")
+>
+> The edk2 support is merged upstream.
 
->>>> +#ifndef QEMU_UNITS_H
->>>> +#define QEMU_UNITS_H
->>>> +
->>>> +#define KiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 10)
->>>> +#define MiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 20)
->>>> +#define GiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 30)
->>>> +#define TiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 40)
->>>> +#define PiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 50)
->>>> +#define EiB=C2=A0=C2=A0=C2=A0=C2=A0 (INT64_C(1) << 60)
->>> Shouldn't above use UINT64_C()
->>
->> Since the decision of signed vs. unsigned was intentional based on
->> review on earlier versions, it may be worth a comment in this file tha=
-t
->> these constants are intentionally signed (in usage patterns, these ten=
-d
->> to be multiplied by another value; and while it is easy to go to
->> unsigned by doing '1U * KiB', you can't go in the opposite direction i=
-f
->> you want a signed number for '1 * KiB' unless KiB is signed).
->=20
-> OK.
+The least I could do now is test this... So, I tested this now with the=20
+SeaBIOS support I have for this series. It's here:
 
-Actually, '1U * KiB' still ends up signed.  Why? Because as written, KiB=20
-is a 64-bit quantity, but 1U is 32-bit; type promotion says that since a=20
-64-bit int can represent all 32-bit unsigned values, the result of the=20
-expression is still signed 64-bit.
+https://github.com/stefanberger/seabios-tpm/tree/qemu-ppi.v6
 
-To get unsigned KiB, you either have to use '1ULL * KiB', or KiB should=20
-be changed to be (INT32_C(1) << 10) (a 32-bit constant, rather than a=20
-64-bit one).
+It works fine with at least an attached TPM 1.2. I haven't tried TPM 2=20
+yet but would not expect complications from QEMU level. A operation=20
+request value put into Linux's PPI interface can be read back also after=20
+a VM suspend / resume operation. The list of supported operations is=20
+shown correctly (needs Linux extensions for TPM 2 operation values=20
+beyond a certain number iirc). The request operation is executed=20
+correctly and the response shows the last operation and its result. So=20
+it seems to work fine.
 
->=20
-> I'll also change this tests using your suggestion:
->=20
-> diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-> @@ -709,8 +709,7 @@ static void test_opts_parse_size(void)
->                              false, &error_abort);
-> -    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0),
-> -                     =3D=3D, 16777215 * T_BYTE);
-> +    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), =3D=3D, 16777=
-215U
-> * TiB);
->=20
-> to avoid this error on 32-bit archs:
->=20
-> source/qemu/tests/test-qemu-opts.c: In function 'test_opts_parse_size':
-> source/qemu/tests/test-qemu-opts.c:713:71: error: integer overflow in
-> expression [-Werror=3Doverflow]
->    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), =3D=3D, 1677721=
-5 * TiB);
->                                                                        =
- ^
 
-And this compile error is proof of the confusion when we have a signed=20
-integer overflow (why it only happens on 32-bit arch and not also on=20
-64-bit arch is subtle - it's because TiB is 'long long' on 32-bit, but=20
-merely 'long' on 64-bit, which results in a different type after type=20
-promotion - although I still find it odd that the 64-bit compiler isn't=20
-warning).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ =C2=A0=C2=A0 Stefan
