@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYy19-0006wk-7P
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:21:13 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYy9B-0008Mb-KD
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYy17-0004PN-ST
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:21:11 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fYy9A-0003DT-4A
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:29:29 -0400
 References: <20180627232951.14725-1-laurent@vivier.eu>
+	<20180627232951.14725-3-laurent@vivier.eu>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <20c78c30-1bd4-7869-48e3-9f951bd53768@ilande.co.uk>
-Date: Fri, 29 Jun 2018 19:20:32 +0100
+Message-ID: <9bc31a5c-aeb8-04c5-dbc8-cb8d2ceaa0dc@ilande.co.uk>
+Date: Fri, 29 Jun 2018 19:28:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180627232951.14725-1-laurent@vivier.eu>
+In-Reply-To: <20180627232951.14725-3-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 00/10] hw/m68k: add Apple Machintosh
- Quadra 800 machine
+Subject: Re: [Qemu-devel] [RFC v3 02/10] ADB: VIA probes ADB bus when it is
+ idle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +30,336 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongn
 
 On 28/06/18 00:29, Laurent Vivier wrote:
 
-> I'm rebasing some of these patches for seven years now,
-> too many years...
+> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   hw/input/adb-kbd.c        |   4 ++
+>   hw/input/adb-mouse.c      |   4 ++
+>   hw/input/adb.c            | 115 ++++++++++++++++++++++++++++++++++++++++++++++
+>   hw/misc/mac_via.c         |  56 ++++++++++++++++++++++
+>   include/hw/input/adb.h    |  10 ++++
+>   include/hw/misc/mac_via.h |   1 +
+>   6 files changed, 190 insertions(+)
 > 
-> if you want to test the machine, I'm sorry, it doesn't boot
-> a MacROM, but you can boot a linux kernel from the command line.
-> 
-> You can install your own disk using debian-installer, with:
-> 
->      ...
->      -M q800 \
->      -serial none -serial mon:stdio \
->      -m 1000M -drive file=m68k.qcow2,format=qcow2 \
->      -net nic,model=dp83932,addr=09:00:07:12:34:57 \
->      -append "console=ttyS0 vga=off" \
->      -kernel vmlinux-4.15.0-2-m68k \
->      -initrd initrd.gz \
->      -drive file=debian-9.0-m68k-NETINST-1.iso \
->      -drive file=m68k.qcow2,format=qcow2 \
->      -nographic
-> 
-> If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
-> size of the display (I use "-g 1600x800x24").
-> 
-> You can get the ISO from:
-> 
-> https://cdimage.debian.org/mirror/cdimage/ports/9.0/m68k/iso-cd/debian-9.0-m68k-NETINST-1.iso
-> 
-> and extract the kernel and initrd.gz:
-> 
-> guestfish --add debian-9.0-m68k-NETINST-1.iso --ro \
->            --mount /dev/sda:/ <<_EOF_
-> copy-out /install/cdrom/initrd.gz .
-> copy-out /install/kernels/vmlinux-4.15.0-2-m68k .
-> _EOF_
-> 
-> The mirror to use is: http://ftp.ports.debian.org/debian-ports/
-> when it fails, continue without boot loader.
-> 
-> In the same way, you can extract the kernel and the initramfs from the qcow2
-> image to use it with "-kernel" and "-initrd":
-> 
-> guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
-> copy-out /boot/vmlinux-4.15.0-2-m68k .
-> copy-out /boot/initrd.img-4.15.0-2-m68k .
-> _EOF_
-> 
-> and boot with:
-> 
->     ...
->     -append "root=/dev/sda2 rw console=ttyS0 console=tty \
->     -kernel vmlinux-4.15.0-2-m68k \
->     -initrd initrd.img-4.15.0-2-m68k
-> 
-> v3: fix subject prefix "C" -> "RFC"
-> 
-> v2: remove the dp8393x fixes, because one of the patch breaks something
->      Update "dp8393x: manage big endian bus" with idea from Thomas
->      Mark has reworked most of the patches:
->      - use mos6522
->      - some code move, renamings and cleanup
-> 
-> Laurent Vivier (10):
->    hw/m68k: add via support
->    ADB: VIA probes ADB bus when it is idle
->    escc: introduce a selector for the register bit
->    hw/m68k: add video card
->    hw/m68k: Apple Sound Chip (ASC) emulation
->    ESP: add pseudo-DMA as used by Macintosh
->    hw/m68k: add Nubus support
->    hw/m68k: add a dummy SWIM floppy controller
->    dp8393x: manage big endian bus
->    hw/m68k: define Macintosh Quadra 800
-> 
->   MAINTAINERS                         |  19 +
->   arch_init.c                         |   4 +
->   default-configs/m68k-softmmu.mak    |  14 +
->   hw/Makefile.objs                    |   1 +
->   hw/audio/Makefile.objs              |   1 +
->   hw/audio/asc.c                      | 463 +++++++++++++++++++++++
->   hw/block/Makefile.objs              |   1 +
->   hw/block/swim.c                     | 284 ++++++++++++++
->   hw/char/escc.c                      |  30 +-
->   hw/display/Makefile.objs            |   1 +
->   hw/display/macfb-template.h         | 158 ++++++++
->   hw/display/macfb.c                  | 308 +++++++++++++++
->   hw/input/adb-kbd.c                  |   4 +
->   hw/input/adb-mouse.c                |   4 +
->   hw/input/adb.c                      | 115 ++++++
->   hw/intc/Makefile.objs               |   1 +
->   hw/intc/q800_irq.c                  |  73 ++++
->   hw/m68k/Makefile.objs               |   6 +-
->   hw/m68k/bootinfo.h                  | 100 +++++
->   hw/m68k/q800.c                      | 385 +++++++++++++++++++
->   hw/mips/mips_jazz.c                 |   2 +-
->   hw/misc/Makefile.objs               |   1 +
->   hw/misc/mac_via.c                   | 731 ++++++++++++++++++++++++++++++++++++
->   hw/net/dp8393x.c                    |  88 +++--
->   hw/nubus/Makefile.objs              |   4 +
->   hw/nubus/mac-nubus-bridge.c         |  45 +++
->   hw/nubus/nubus-bridge.c             |  34 ++
->   hw/nubus/nubus-bus.c                | 111 ++++++
->   hw/nubus/nubus-device.c             | 210 +++++++++++
->   hw/scsi/esp.c                       | 297 +++++++++++++--
->   include/hw/audio/asc.h              |  48 +++
->   include/hw/block/swim.h             |  53 +++
->   include/hw/char/escc.h              |   1 +
->   include/hw/display/macfb.h          |  63 ++++
->   include/hw/input/adb.h              |  10 +
->   include/hw/intc/q800_irq.h          |  39 ++
->   include/hw/misc/mac_via.h           | 107 ++++++
->   include/hw/nubus/mac-nubus-bridge.h |  24 ++
->   include/hw/nubus/nubus.h            |  69 ++++
->   include/hw/scsi/esp.h               |  11 +-
->   qemu-options.hx                     |   2 +-
->   tests/qom-test.c                    |   5 +
->   tests/test-hmp.c                    |   3 +-
->   vl.c                                |   3 +-
->   44 files changed, 3857 insertions(+), 76 deletions(-)
->   create mode 100644 hw/audio/asc.c
->   create mode 100644 hw/block/swim.c
->   create mode 100644 hw/display/macfb-template.h
->   create mode 100644 hw/display/macfb.c
->   create mode 100644 hw/intc/q800_irq.c
->   create mode 100644 hw/m68k/bootinfo.h
->   create mode 100644 hw/m68k/q800.c
->   create mode 100644 hw/misc/mac_via.c
->   create mode 100644 hw/nubus/Makefile.objs
->   create mode 100644 hw/nubus/mac-nubus-bridge.c
->   create mode 100644 hw/nubus/nubus-bridge.c
->   create mode 100644 hw/nubus/nubus-bus.c
->   create mode 100644 hw/nubus/nubus-device.c
->   create mode 100644 include/hw/audio/asc.h
->   create mode 100644 include/hw/block/swim.h
->   create mode 100644 include/hw/display/macfb.h
->   create mode 100644 include/hw/intc/q800_irq.h
->   create mode 100644 include/hw/misc/mac_via.h
->   create mode 100644 include/hw/nubus/mac-nubus-bridge.h
->   create mode 100644 include/hw/nubus/nubus.h
+> diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+> index b026e9d49f..f439e106bb 100644
+> --- a/hw/input/adb-kbd.c
+> +++ b/hw/input/adb-kbd.c
+> @@ -195,6 +195,10 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
+>       int keycode;
+>       int olen;
+>   
+> +    if (obuf == NULL) {
+> +        return s->count;
+> +    }
+> +
+>       olen = 0;
+>       if (s->count == 0) {
+>           return 0;
+> diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+> index 83833b0035..7615c252d5 100644
+> --- a/hw/input/adb-mouse.c
+> +++ b/hw/input/adb-mouse.c
+> @@ -73,6 +73,10 @@ static int adb_mouse_poll(ADBDevice *d, uint8_t *obuf)
+>           return 0;
+>       }
+>   
+> +    if (obuf == NULL) {
+> +        return 2;
+> +    }
+> +
+>       dx = s->dx;
+>       if (dx < -63) {
+>           dx = -63;
 
-I'm fairly happy with the majority of these patches apart from 2 of them 
-which I will reply to separately.
+I think that these two hunks should be placed in a separate patch as 
+they can potentially alter existing behaviour with the PPC Mac machines.
 
-A couple of minor points around files/naming:
+> diff --git a/hw/input/adb.c b/hw/input/adb.c
+> index bbb40aeef1..99852879d8 100644
+> --- a/hw/input/adb.c
+> +++ b/hw/input/adb.c
+> @@ -25,6 +25,17 @@
+>   #include "hw/input/adb.h"
+>   #include "adb-internal.h"
+>   
+> +#define ADB_POLL_FREQ 50
+> +
+> +/* Apple Macintosh Family Hardware Refenece
+> + * Table 19-10 ADB transaction states
+> + */
+> +
+> +#define STATE_NEW       0
+> +#define STATE_EVEN      1
+> +#define STATE_ODD       2
+> +#define STATE_IDLE      3
+> +
+>   /* error codes */
+>   #define ADB_RET_NOTPRESENT (-2)
+>   
+> @@ -84,6 +95,110 @@ int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
+>       return olen;
+>   }
+>   
+> +int adb_via_poll(ADBBusState *adb, int state, uint8_t *data)
+> +{
+> +    if (state != STATE_IDLE) {
+> +        return 0;
+> +    }
+> +    if (adb->data_in_size < adb->data_in_index) {
+> +        return 0;
+> +    }
+> +    if (adb->data_out_index != 0) {
+> +        return 0;
+> +    }
+> +    adb->data_in_index = 0;
+> +    adb->data_out_index = 0;
+> +    adb->data_in_size = adb_poll(adb, adb->data_in, 0xffff);
+> +    if (adb->data_in_size) {
+> +        *data = adb->data_in[adb->data_in_index++];
+> +        qemu_irq_raise(adb->data_ready);
+> +    }
+> +    return adb->data_in_size;
+> +}
+> +
+> +int adb_send(ADBBusState *adb, int state, uint8_t data)
+> +{
+> +    switch (state) {
+> +    case STATE_NEW:
+> +        adb->data_out_index = 0;
+> +        break;
+> +    case STATE_EVEN:
+> +        if ((adb->data_out_index & 1) == 0) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_ODD:
+> +        if (adb->data_out_index & 1) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_IDLE:
+> +        return 0;
+> +    }
+> +    adb->data_out[adb->data_out_index++] = data;
+> +    qemu_irq_raise(adb->data_ready);
+> +    return 1;
+> +}
+> +
+> +int adb_receive(ADBBusState *adb, int state, uint8_t *data)
+> +{
+> +    switch (state) {
+> +    case STATE_NEW:
+> +        return 0;
+> +    case STATE_EVEN:
+> +        if (adb->data_in_size <= 0) {
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 0;
+> +        }
+> +        if (adb->data_in_index >= adb->data_in_size) {
+> +            *data = 0;
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 1;
+> +        }
+> +        if ((adb->data_in_index & 1) == 0) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_ODD:
+> +        if (adb->data_in_size <= 0) {
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 0;
+> +        }
+> +        if (adb->data_in_index >= adb->data_in_size) {
+> +            *data = 0;
+> +            qemu_irq_raise(adb->data_ready);
+> +            return 1;
+> +        }
+> +        if (adb->data_in_index & 1) {
+> +            return 0;
+> +        }
+> +        break;
+> +    case STATE_IDLE:
+> +        if (adb->data_out_index == 0) {
+> +            return 0;
+> +        }
+> +        adb->data_in_size = adb_request(adb, adb->data_in,
+> +                                        adb->data_out, adb->data_out_index);
+> +        adb->data_out_index = 0;
+> +        adb->data_in_index = 0;
+> +        if (adb->data_in_size < 0) {
+> +            *data = 0xff;
+> +            qemu_irq_raise(adb->data_ready);
+> +            return -1;
+> +        }
+> +        if (adb->data_in_size == 0) {
+> +            return 0;
+> +        }
+> +        break;
+> +    }
+> +    *data = adb->data_in[adb->data_in_index++];
+> +    qemu_irq_raise(adb->data_ready);
+> +    if (*data == 0xff || *data == 0) {
+> +        return 0;
+> +    }
+> +    return 1;
+> +}
+> +
+>   static const TypeInfo adb_bus_type_info = {
+>       .name = TYPE_ADB_BUS,
+>       .parent = TYPE_BUS,
 
-- mac_via.c seems a bit vague, for example we already have 2 mac VIAs 
-for PPC Macs (CUDA and PMU). Should it be q800_via.c or have some other 
-designation to show that it is for 68K macs?
+I'm not convinced that these changes should live in adb.c and would 
+prefer them to live in mac_via.c.
 
-- Same as above for mac-nubus-bridge.c and macfb.c, could we name them 
-differently to indicate they are related to the 68K macs and not PPC macs?
+For example with the CUDA/PMU PPC VIAs, the data is bit-banged over the 
+port B pins and it is the responsibility of the CUDA/PMU device to 
+maintain the state of transmission/reception itself and then just call 
+adb_request().
 
-- As part of the work I did, I turned the interrupt "controller" into a 
-separate controller and also moved it to a separate file (q800_irq.c), 
-but looking at it again it is really just a priority-based CPU interrupt.
+I can see there is an argument here that the mac_via states are related 
+to ADB physical wire states but my feeling is that this adds too much 
+complexity within ADB itself.
 
-If there is no other complexity other than prioritising the CPU 
-interrupts, then perhaps the QOM Q800_INTC device should be moved into 
-q800.c rather than living in a separate file?
+Following on from this, I'd say that the comment in adb.c "/* XXX: move 
+that to cuda ? */" is probably correct, because each different VIA will 
+poll ADB in a slightly different way.
+
+> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+> index 586477ca9e..200121f798 100644
+> --- a/hw/misc/mac_via.c
+> +++ b/hw/misc/mac_via.c
+> @@ -424,6 +424,53 @@ static void via1_rtc_update(MacVIAState *m)
+>       }
+>   }
+>   
+> +static void via1_adb_update(MacVIAState *m)
+> +{
+> +    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
+> +    MOS6522State *s = MOS6522(v1s);
+> +    int state;
+> +    int ret;
+> +
+> +    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
+> +
+> +    if (s->acr & VIA1ACR_vShiftOut) {
+> +        /* output mode */
+> +        ret = adb_send(&m->adb_bus, state, s->sr);
+> +        if (ret > 0) {
+> +            s->b &= ~VIA1B_vADBInt;
+> +        } else {
+> +            s->b |= VIA1B_vADBInt;
+> +        }
+> +    } else {
+> +        /* input mode */
+> +        ret = adb_receive(&m->adb_bus, state, &s->sr);
+> +        if (ret > 0 && s->sr != 0xff) {
+> +            s->b &= ~VIA1B_vADBInt;
+> +        } else {
+> +            s->b |= VIA1B_vADBInt;
+> +        }
+> +    }
+> +}
+> +
+> +static void via_adb_poll(void *opaque)
+> +{
+> +    MacVIAState *m = opaque;
+> +    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
+> +    MOS6522State *s = MOS6522(v1s);
+> +    int state;
+> +
+> +    if (s->b & VIA1B_vADBInt) {
+> +        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
+> +        if (adb_via_poll(&m->adb_bus, state, &s->sr)) {
+> +            s->b &= ~VIA1B_vADBInt;
+> +        }
+> +    }
+> +
+> +    timer_mod(m->adb_poll_timer,
+> +              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> +              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
+> +}
+> +
+>   static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
+>   {
+>       MOS6522Q800VIA1State *s = opaque;
+> @@ -486,6 +533,10 @@ static void mac_via_reset(DeviceState *dev)
+>   {
+>       MacVIAState *m = MAC_VIA(dev);
+>   
+> +    timer_mod(m->adb_poll_timer,
+> +              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> +              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
+> +
+>       timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
+>                 / 16630 * 16630);
+>   
+> @@ -504,6 +555,7 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+>   
+>       qemu_get_timedate(&tm, 0);
+>       m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+> +    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
+>   }
+>   
+>   static void mac_via_init(Object *obj)
+> @@ -553,6 +605,9 @@ static void mac_via_init(Object *obj)
+>       /* ADB */
+>       qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+>                           TYPE_ADB_BUS, DEVICE(obj), "adb.0");
+> +
+> +    m->adb_bus.data_ready = qdev_get_gpio_in_named(DEVICE(obj), "via1-irq",
+> +                                                   VIA1_IRQ_ADB_READY_BIT);
+>   }
+>   
+>   static void mac_via_class_init(ObjectClass *oc, void *data)
+> @@ -579,6 +634,7 @@ static void mos6522_q800_via1_portB_write(MOS6522State *s)
+>       MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
+>   
+>       via1_rtc_update(m);
+> +    via1_adb_update(m);
+>   
+>       v1s->last_b = s->b;
+>   }
+> diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+> index f99d478252..1888c5aab7 100644
+> --- a/include/hw/input/adb.h
+> +++ b/include/hw/input/adb.h
+> @@ -76,6 +76,12 @@ struct ADBBusState {
+>       ADBDevice *devices[MAX_ADB_DEVICES];
+>       int nb_devices;
+>       int poll_index;
+> +    qemu_irq data_ready;
+> +    int data_in_size;
+> +    int data_in_index;
+> +    int data_out_index;
+> +    uint8_t data_in[128];
+> +    uint8_t data_out[16];
+>   };
+>   
+>   int adb_request(ADBBusState *s, uint8_t *buf_out,
+> @@ -85,4 +91,8 @@ int adb_poll(ADBBusState *s, uint8_t *buf_out, uint16_t poll_mask);
+>   #define TYPE_ADB_KEYBOARD "adb-keyboard"
+>   #define TYPE_ADB_MOUSE "adb-mouse"
+>   
+> +int adb_via_poll(ADBBusState *s, int state, uint8_t *data);
+> +int adb_send(ADBBusState *adb, int state, uint8_t data);
+> +int adb_receive(ADBBusState *adb, int state, uint8_t *data);
+> +
+>   #endif /* ADB_H */
+> diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
+> index a3a972ccc5..85d8715b12 100644
+> --- a/include/hw/misc/mac_via.h
+> +++ b/include/hw/misc/mac_via.h
+> @@ -96,6 +96,7 @@ typedef struct MacVIAState {
+>   
+>       /* ADB */
+>       ADBBusState adb_bus;
+> +    QEMUTimer *adb_poll_timer;
+>   
+>       /* external timers */
+>       QEMUTimer *one_second_timer;
+> 
 
 
 ATB,
