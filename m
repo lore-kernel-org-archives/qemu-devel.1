@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYvcI-0001Xp-Lp
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:47:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYvhV-0005K1-3D
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYvcH-0003Ms-Bv
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:47:22 -0400
-Date: Fri, 29 Jun 2018 17:47:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180629154711.GI15588@localhost.localdomain>
-References: <20180628190723.276458-1-eblake@redhat.com>
-	<20180628190723.276458-7-eblake@redhat.com>
-	<20180629090317.GD15588@localhost.localdomain>
-	<b041ee2a-6d59-1d8a-cf41-1164d9c3e129@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1fYvhS-0005st-0L
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:52:45 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:53864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYvhR-0005rl-M0
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:52:41 -0400
+References: <20180626165658.31394-1-peter.maydell@linaro.org>
+	<20180626165658.31394-24-peter.maydell@linaro.org>
+	<50e46f22-1e3d-10ce-5b5b-a10af49a95f1@vivier.eu>
+	<CAFEAcA8141WC556H1fZLM4AEaz62o4qb7JOOVB-+75N9vugi+g@mail.gmail.com>
+	<a46a8b06-c780-0c22-b9f7-8eaae73dd26d@vivier.eu>
+	<CAFEAcA8gKWG9O7rjhC1+n_Bqce+CGQvUEiM+mc7wu-1C7no2ug@mail.gmail.com>
+	<489d8470-c12f-a441-4e87-b2b3013a3ab8@vivier.eu>
+	<CAFEAcA-Md2yKBcxqapmmROE5mX8eg9z_X=80Uk=bOjzhPft8Tw@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <1de8bd28-869b-49af-e877-6b8802d582b5@vivier.eu>
+Date: Fri, 29 Jun 2018 17:52:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b041ee2a-6d59-1d8a-cf41-1164d9c3e129@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 6/6] qcow2: Avoid memory over-allocation
- on compressed images
+In-Reply-To: <CAFEAcA-Md2yKBcxqapmmROE5mX8eg9z_X=80Uk=bOjzhPft8Tw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 23/32] tcg: Support MMU protection regions
+ smaller than TARGET_PAGE_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org, berto@igalia.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 29.06.2018 um 17:16 hat Eric Blake geschrieben:
-> On 06/29/2018 04:03 AM, Kevin Wolf wrote:
-> > Am 28.06.2018 um 21:07 hat Eric Blake geschrieben:
-> > > When reading a compressed image, we were allocating s->cluster_data
-> > > to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
-> > > with 2M clusters).  Let's check out the history:
-> > > 
+Le 29/06/2018 à 17:28, Peter Maydell a écrit :
+> On 28 June 2018 at 23:26, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Le 28/06/2018 à 22:05, Peter Maydell a écrit :
+>>> Do you have a repro case (images, command line) that I can
+>>> use to investigate ?
+>> - checkout the branch q800-dev-part1 from
+>>   git://github.com/vivier/qemu-m68k.git
+>>
+>> - configure and build
+>>
+>>  './configure' '--target-list=m68k-softmmu' '--enable-debug' \
+>>                '--enable-debug-tcg' '--enable-debug-info'
+>>
+>>   my gcc is from Fedora 27, version 7.3.1 20180303 (Red Hat 7.3.1-5)
+>>
+>> - get the kernel from the debian installer:
+>>
+>> wget
+>> https://cdimage.debian.org/mirror/cdimage/ports/9.0/m68k/iso-cd/debian-9.0-m68k-NETINST-1.iso
+>>
+>> guestfish --add debian-9.0-m68k-NETINST-1.iso --ro \
+>>           --mount /dev/sda:/ <<_EOF_
+>> copy-out /install/kernels/vmlinux-4.15.0-2-m68k .
+>> _EOF_
+>>
+>> - and run
+>>
+>> ./m68k-softmmu/qemu-system-m68k -M q800 \
+>>     -serial none -serial mon:stdio \
+>>     -kernel vmlinux-4.15.0-2-m68k \
+>>     -nographic
 > 
-> > > However, the qcow2 spec permits an all-ones sector count, plus
-> > > a full sector containing the initial offset, for a maximum read
-> > > of 2 full clusters.  Thanks to the way decompression works, even
-> > > though such a value is too large for the actual compressed data
-> > > (for all but 512-byte clusters), it really doesn't matter if we
-> > > read too much (gzip ignores slop, once it has decoded a full
-> > > cluster).  So it's easier to just allocate cluster_data to be as
-> > > large as we can ever possibly see; even if it still wastes up to
-> > > 2M on any image created by qcow2, that's still an improvment of
-> 
-> s/improvment/improvement/
-> 
-> > > 60M less waste than pre-patch.
-> > > 
-> > > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > > Reviewed-by: Alberto Garcia <berto@igalia.com>
-> > > 
-> > > ---
-> 
-> > > +++ b/block/qcow2-cluster.c
-> > > @@ -1599,20 +1599,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
-> > >           sector_offset = coffset & 511;
-> > >           csize = nb_csectors * 512 - sector_offset;
-> > > 
-> > > -        /* Allocate buffers on first decompress operation, most images are
-> > > -         * uncompressed and the memory overhead can be avoided.  The buffers
-> > > -         * are freed in .bdrv_close().
-> > > +        /* Allocate buffers on the first decompress operation; most
-> > > +         * images are uncompressed and the memory overhead can be
-> > > +         * avoided.  The buffers are freed in .bdrv_close().  qemu
-> > > +         * never writes an inflated cluster, and gzip itself never
-> > > +         * inflates a problematic cluster by more than 0.015%, but the
-> > > +         * qcow2 format allows up to 1 byte short of 2 full clusters
-> > > +         * when including the sector containing offset.  gzip ignores
-> > > +         * trailing slop, so just allocate that much up front rather
-> > > +         * than reject third-party images with overlarge csize.
-> > >            */
-> > > +        assert(!!s->cluster_data == !!s->cluster_cache);
-> > > +        assert(csize <= 2 * s->cluster_size);
-> > >           if (!s->cluster_data) {
-> > > -            /* one more sector for decompressed data alignment */
-> > > -            s->cluster_data = qemu_try_blockalign(bs->file->bs,
-> > > -                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
-> > > +            s->cluster_data = g_try_malloc(2 * s->cluster_size);
-> > >               if (!s->cluster_data) {
-> > >                   return -ENOMEM;
-> > >               }
-> > > -        }
-> > > -        if (!s->cluster_cache) {
-> > > -            s->cluster_cache = g_malloc(s->cluster_size);
-> > > +            s->cluster_cache = g_try_malloc(s->cluster_size);
-> > > +            if (!s->cluster_cache) {
-> > > +                g_free(s->cluster_data);
-> > > +                s->cluster_data = NULL;
-> > > +                return -ENOMEM;
-> > > +            }
-> > >           }
-> > 
-> > I wonder how much of a difference s->cluster_cache really makes. I
-> > wouldn't expect guests to access the same cluster twice in a row.
-> 
-> I don't know if it makes a difference.  But my patch is not even touching
-> that - ALL I'm doing is changing a 64M allocation into a 4M allocation, with
-> otherwise no change to the frequency of allocation (which is once per
-> image).
-> 
-> > 
-> > Maybe the easiest solution would be switching to temporary buffers that
-> > would have the exact size we need and would be freed at the end of the
-> > request?
-> 
-> The exact size for a qemu-produced image would be at most 2M instead of 4M -
-> but doing the change you propose WILL cause more frequent allocations (once
-> per cluster, rather than once per image).  We'd have to benchmark if it
-> makes sense.
+> What is this testcase supposed to print when it works?
+> I tried reverting 55df6fcf5476b44bc1b9, but that just prints
+> "ABCFGHIJK" and then nothing else.
 
-I wouldn't expect that another allocation makes a big difference when
-you already have to decompress the whole cluster. In fact, it could
-speed things up because we could then parallelise this.
+At this point, you can either remove the -nographic or add -append
+"console=ttyS0 vga=off" to have the kernel boot logs.
 
-Hmm... Wasn't there a series for using a worker thread for decompression
-recently? It might actually already make that change, I don't remember.
+If you want to have started an userspace command, add the initrd from
+the CD:
 
-> But that would be a separate patch from this one.
+guestfish --add debian-9.0-m68k-NETINST-1.iso --ro \
+          --mount /dev/sda:/ <<_EOF_
+copy-out /install/cdrom/initrd.gz .
+_EOF_
 
-Yes, just a thought I had while reviewing your patch.
-
-Kevin
+Thanks,
+Laurent
