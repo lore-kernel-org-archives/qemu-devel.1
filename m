@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYx8f-0005ng-LK
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:24:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fYxCz-00016x-7q
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYx8b-0000OX-Fe
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:24:53 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:40354)
+	(envelope-from <peter.maydell@linaro.org>) id 1fYxCy-0006zg-7q
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:29:21 -0400
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:39497)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYx8b-0000Li-9v
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:24:49 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id z24-v6so4516692pfe.7
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 10:24:49 -0700 (PDT)
-References: <20180629170520.13671-1-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <144b8041-46a0-4fbd-ee39-30ead9a723b1@linaro.org>
-Date: Fri, 29 Jun 2018 10:24:45 -0700
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fYxCx-0006wY-Pc
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:29:20 -0400
+Received: by mail-ot0-x234.google.com with SMTP id l15-v6so10731596oth.6
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 10:29:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180629170520.13671-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: fix locking problem with
- tcg_s390_tod_updated
+In-Reply-To: <20180629132045.429006-1-groug@kaod.org>
+References: <20180629132045.429006-1-groug@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 18:28:58 +0100
+Message-ID: <CAFEAcA9Yw=_MvudjTkgqdD-54b1dwWhAo2JAndv4zwmVbvH=rQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] 9p patches 2018-06-29
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/29/2018 10:05 AM, David Hildenbrand wrote:
-> tcg_s390_tod_updated() is always called with the iothread being locked
-> (e.g. from S390TODClass->set() e.g. via HELPER(sck) or on incomming
-> migration). The helper we call takes the lock itself - bad.
-> 
-> Let's change that by factoring out updating the ckc timer. This now looks
-> much nicer than having to call a helper from another function.
-> 
-> While touch it we also make sure that env->ckc is updated even if the new
-> value is -1ULL, for now it would not have been modified in that case.
-> 
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-> 
-> This survives my tests and the iotests Christian mentioned.
-> 
->  target/s390x/misc_helper.c | 26 ++++++++++++++++----------
->  1 file changed, 16 insertions(+), 10 deletions(-)
+On 29 June 2018 at 14:20, Greg Kurz <groug@kaod.org> wrote:
+> The following changes since commit 609ef9f451759151d0bfe7c3843410ab94d68f18:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/qio-next-pull-request' into staging (2018-06-28 17:53:31 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/gkurz/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 230f1b31c5d58a852e1ac46e1ef05cfa7d5d9280:
+>
+>   9p: darwin: Explicitly cast comparisons of mode_t with -1 (2018-06-29 12:32:10 +0200)
+>
+> ----------------------------------------------------------------
+> The Darwin host support still needs some more work. It won't make it for
+> soft-freeze, but I'd like these preparatory patches to be merged anyway.
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Applied, thanks.
 
-
-r~
+-- PMM
