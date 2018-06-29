@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYrLy-0007Dn-Kv
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:14:18 -0400
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrO0-0008Fl-9R
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYrLu-0000A3-L0
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:14:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37808 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYrLu-00009f-Dr
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:14:10 -0400
-Date: Fri, 29 Jun 2018 12:14:05 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180629111405.GG27016@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <153026817452.402489.13386335348113684056.stgit@bahia.lan>
-	<8730183a-3e16-931e-c990-24a5e169b2d9@redhat.com>
-	<20180629103910.GE27016@redhat.com>
-	<65a3597e-5560-1fd3-4f04-8a60e9e99b44@redhat.com>
-	<20180629130701.6ab5d88a@bahia.lan>
-	<29caab50-f853-66bf-805e-984e76619a9a@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <29caab50-f853-66bf-805e-984e76619a9a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] accel: forbid early use of
- kvm_enabled() and friends
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrNw-00029C-O1
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:16:20 -0400
+Received: from foss.arm.com ([217.140.101.70]:39228)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suzuki.poulose@arm.com>) id 1fYrNw-00028U-GZ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:16:16 -0400
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Date: Fri, 29 Jun 2018 12:15:21 +0100
+Message-Id: <1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+Subject: [Qemu-devel] [PATCH v3 01/20] virtio: mmio-v1: Validate queue PFN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-On Fri, Jun 29, 2018 at 01:08:38PM +0200, Paolo Bonzini wrote:
-> On 29/06/2018 13:07, Greg Kurz wrote:
-> >>>> Also asserting current_machine != NULL is not necessary, since you're
-> >>>> immediately dereferencing it.  
-> >>> Is there a practical way to simply initialize the accelerators earlier
-> >>> in startup sequence, so we just remove or at least reduce, the liklihood
-> >>> of accessing it too early ?  
-> >> We can try, though not for 3.0 of course.
-> >>
-> > FWIW, the motivation for this patch was kvm_enabled() being called under
-> > the class_init function of the machine TypeInfo. This happens way earlier
-> > than accelerator init. Not sure this is doable, but I can have a look.
-> > 
-> 
-> Probably not, that's way too early indeed.
+virtio-mmio with virtio-v1 uses a 32bit PFN for the queue.
+If the queue pfn is too large to fit in 32bits, which
+we could hit on arm64 systems with 52bit physical addresses
+(even with 64K page size), we simply miss out a proper link
+to the other side of the queue.
 
-Yeah, doing anything non-trivial in class_init is just asking for trouble,
-as conceivably nothing is initialized at that point. 
+Add a check to validate the PFN, rather than silently breaking
+the devices.
 
-Regards,
-Daniel
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>
+Cc: Peter Maydel <peter.maydell@linaro.org>
+Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+Changes since v2:
+ - Change errno to -E2BIG
+---
+ drivers/virtio/virtio_mmio.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index 67763d3..82cedc8 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -397,9 +397,21 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ 	/* Activate the queue */
+ 	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+ 	if (vm_dev->version == 1) {
++		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
++
++		/*
++		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
++		 * that doesn't fit in 32bit, fail the setup rather than
++		 * pretending to be successful.
++		 */
++		if (q_pfn >> 32) {
++			dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
++			err = -E2BIG;
++			goto error_bad_pfn;
++		}
++
+ 		writel(PAGE_SIZE, vm_dev->base + VIRTIO_MMIO_QUEUE_ALIGN);
+-		writel(virtqueue_get_desc_addr(vq) >> PAGE_SHIFT,
+-				vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
++		writel(q_pfn, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+ 	} else {
+ 		u64 addr;
+ 
+@@ -430,6 +442,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ 
+ 	return vq;
+ 
++error_bad_pfn:
++	vring_del_virtqueue(vq);
+ error_new_virtqueue:
+ 	if (vm_dev->version == 1) {
+ 		writel(0, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.7.4
