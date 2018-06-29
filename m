@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYxnK-0001fI-GL
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:06:55 -0400
+	(envelope-from <cota@braap.org>) id 1fYxyR-0005Qg-S0
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYxnJ-0003qH-OL
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:06:54 -0400
-Date: Fri, 29 Jun 2018 20:06:45 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180629180645.GL15588@localhost.localdomain>
-References: <20180620144837.19341-1-vsementsov@virtuozzo.com>
+	(envelope-from <cota@braap.org>) id 1fYxyO-0001Un-HI
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 14:18:23 -0400
+Date: Fri, 29 Jun 2018 14:18:15 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180629181815.GA14726@flamenco>
+References: <6aea7155-d453-95de-7ed6-dca7ef135b4d@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180620144837.19341-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] qcow2 compress threads
+In-Reply-To: <6aea7155-d453-95de-7ed6-dca7ef135b4d@ilande.co.uk>
+Subject: Re: [Qemu-devel] target/ppc: gdbstub single-step broken since
+ TranslatorOps conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,15 +23,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@gmail.com, pl@kamp.de, den@openvz.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-Am 20.06.2018 um 16:48 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Hi all!
+On Fri, Jun 29, 2018 at 13:17:11 +0100, Mark Cave-Ayland wrote:
+> Whilst trying to debug an issue in OpenBIOS, I noticed that the gdbstub
+> single-step functionality was broken which I bisected down to this commit:
+(snip)
+> commit b0c2d5213a14f8b9d44096ee879a5d7f10fbc505
+> Author: Emilio G. Cota <cota@braap.org>
+> Date:   Thu Feb 15 14:51:49 2018 -0500
 > 
-> Here are compress threads for qcow2, to increase performance of
-> compressed writes.
+>     target/ppc: convert to TranslatorOps
+(snip)
+> (gdb) c
+> Continuing.
+> 
+> Breakpoint 1, ob_pci_init () at
+> /home/build/src/openbios/openbios.git/openbios/drivers/pci.c:2020
+> 2020        pci_config_t config = {}; /* host bridge */
+> (gdb) n
+> 2021        phandle_t phandle_host = 0, intc;
+> (gdb) n
+> 2025        activate_device("/");
+> (gdb) n
+> 
+> (hangs)
+> 
+> 
+> Hitting CTRL-C sometimes allows the single-step to continue but raises a
+> SIGINT at address 0x400 which is in the CPU exception table.
 
-Thanks, applied to the block branch.
+Thanks for reporting this.
 
-Kevin
+I'm afraid I can't reproduce this. I'm using gdb-multiarch as follows:
+
+$ gdb-multiarch ../img/ppc/openbios-qemu.elf.nostrip
+GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
+Copyright (C) 2016 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ../img/ppc/openbios-qemu.elf.nostrip...done.
+warning: File "/data/src/qemu/.gdbinit" auto-loading has been declined by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
+To enable execution of this file add
+        add-auto-load-safe-path /data/src/qemu/.gdbinit
+line to your configuration file "/home/cota/.gdbinit".
+To completely disable this security protection add
+        set auto-load safe-path /
+line to your configuration file "/home/cota/.gdbinit".
+For more information about this security protection see the
+"Auto-loading safe path" section in the GDB manual.  E.g., run from the shell:
+        info "(gdb)Auto-loading safe path"
+(gdb) set arch powerpc:
+403       603       620       7400      EC603e    a35       common64  e500mc    e5500     rs64ii    titan
+601       604       630       750       MPC8XX    common    e500      e500mc64  e6500     rs64iii   vle
+(gdb) set arch powerpc:403
+The target architecture is assumed to be powerpc:403
+(gdb) b ob_pci_init
+Breakpoint 1 at 0xfff25c58: file /home/build/src/openbios/openbios.git/openbios/drivers/pci.c, line 2020.
+(gdb) target remote :1234
+Remote debugging using :1234
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+vector.0x100 () at /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/start.S:284
+284     /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/start.S: No such file or directory.
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+warning: (Internal error: pc 0xfff00100 in read in psymtab, but not in symtab.)
+
+(gdb) c
+Continuing.
+
+Breakpoint 1, ob_pci_init () at /home/build/src/openbios/openbios.git/openbios/drivers/pci.c:2020
+2020    /home/build/src/openbios/openbios.git/openbios/drivers/pci.c: No such file or directory.
+(gdb) n
+2021    in /home/build/src/openbios/openbios.git/openbios/drivers/pci.c
+(gdb)
+2025    in /home/build/src/openbios/openbios.git/openbios/drivers/pci.c
+(gdb)
+2029    in /home/build/src/openbios/openbios.git/openbios/drivers/pci.c
+
+Here I can keep executing for a while, with no hangs. Eventually I hit
+(gdb) 
+arch_of_init () at /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/init.c:939
+939     in /home/build/src/openbios/openbios.git/openbios/arch/ppc/qemu/init.c
+Cannot access memory at address 0xfff0c054
+
+I tried the last known good commit (as per your bisect) and get the same results
+as above.
+
+Is there any other way I could try reproducing this? Also, can you
+reproduce with another gdb version?
+
+If I don't manage to reproduce, I can send you off-list some patches to try,
+basically breaking down the diff in the first bad commit into very small chunks,
+to see where the problem was introduced.
+
+Thanks,
+
+		Emilio
