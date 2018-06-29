@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiD-0006xH-JY
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:41:18 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiF-0006yn-0x
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiC-0003fI-AI
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:41:17 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYsiD-0003jE-8P
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:41:19 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 29 Jun 2018 15:40:52 +0300
-Message-Id: <20180629124052.331406-3-dplotnikov@virtuozzo.com>
+Date: Fri, 29 Jun 2018 15:40:51 +0300
+Message-Id: <20180629124052.331406-2-dplotnikov@virtuozzo.com>
 In-Reply-To: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
 References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine executing
- if the BDS's is drained
+Subject: [Qemu-devel] [PATCH v0 1/2] async: add infrastructure for postponed
+ actions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +23,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kwolf@redhat.com, reitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-stable@nongnu.org
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Fixes the problem of ide request appearing when the BDS is in
-the "drained section".
+There is the concept of iothreads servicing Block Driver States
+via processing events on the corresponding aio context. Also,
+there is a mechanism called "drained section" which is kind of
+critical section, preventing an instance of Block Driver State
+from processing external requests.
 
-Without the patch the request can come and be processed by the main
-event loop, as the ide requests are processed by the main event loop
-and the main event loop doesn't stop when its context is in the
-"drained section".
-The request execution is postponed until the end of "drained section".
+The "drained section" is respected by iothreads. While processing the
+the event loop, the iothread stops its event loop from running until
+the current context has no Block Driver States in drained section.
 
-The patch doesn't modify ide specific code, as well as any other
-device code. Instead, it modifies the infrastructure of asynchronous
-Block Backend requests, in favor of postponing the requests arisen
-when in "drained section" to remove the possibility of request appearing
-for all the infrastructure clients.
+This scheme works for devices are able to work with iothread only.
+There are other devices, e.g. ide, which don't work with iothreads.
+The requests to those devices are processed by the main event loop
+which doesn't stop processing the events on its context when there are
+in "drained section" BlockDriverState-s.
 
-This approach doesn't make vCPU processing the request wait untill
-the end of request processing.
+Thereby, there is a case when the request can be processed when
+the BDS don't expect that, for example, ide controller makes a request
+when the VM finalizes the drive mirroring. This could lead to spoiling
+the data consistency on those BDS'es.
+
+To prevent this situation, the patch introduces the infrastructure
+for postponing actions. The infrastructure allows postponing the
+actions for the BDS to the moment when BDS's context becomes enabled
+for external requests. When the context becomes enabled for external
+requests all the postponed action are executed.
+
+The not-iothread-friendly devices can use the infrastructure to
+postpone the execution of the requests appeared when the context was
+in "drained section".
 
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- block/block-backend.c | 58 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 46 insertions(+), 12 deletions(-)
+ include/block/aio.h | 63 +++++++++++++++++++++++++++++++++++++++++++++
+ util/async.c        | 33 ++++++++++++++++++++++++
+ 2 files changed, 96 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index d55c328736..68dcd704d2 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1318,6 +1318,7 @@ typedef struct BlkAioEmAIOCB {
-     BlkRwCo rwco;
-     int bytes;
-     bool has_returned;
-+    CoroutineEntry *co_entry;
- } BlkAioEmAIOCB;
+diff --git a/include/block/aio.h b/include/block/aio.h
+index ae6f354e6c..ca61009e57 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -46,11 +46,24 @@ typedef struct AioHandler AioHandler;
+ typedef void QEMUBHFunc(void *opaque);
+ typedef bool AioPollFn(void *opaque);
+ typedef void IOHandler(void *opaque);
++typedef void AioPostponedFunc(void *opaque);
  
- static const AIOCBInfo blk_aio_em_aiocb_info = {
-@@ -1340,16 +1341,55 @@ static void blk_aio_complete_bh(void *opaque)
-     blk_aio_complete(acb);
+ struct Coroutine;
+ struct ThreadPool;
+ struct LinuxAioState;
+ 
++/**
++ * Struct for postponing the actions
++ */
++typedef struct AioPostponedAction {
++    /* A function to run on context enabling */
++    AioPostponedFunc *func;
++    /* Param to be passed to the function */
++    void *func_param;
++    /**/
++    QSLIST_ENTRY(AioPostponedAction) next_action;
++} AioPostponedAction;
++
+ struct AioContext {
+     GSource source;
+ 
+@@ -110,6 +123,16 @@ struct AioContext {
+     EventNotifier notifier;
+ 
+     QSLIST_HEAD(, Coroutine) scheduled_coroutines;
++
++    /* list of postponed actions
++     * The actions (might be thought as requests) which have been postponed
++     * because of the drained section was entered at the moment of their
++     * appearing.
++     * All these actions have to be run wheen the context is enabled for
++     * external requests.
++     */
++    QSLIST_HEAD(, AioPostponedAction) postponed_actions;
++
+     QEMUBH *co_schedule_bh;
+ 
+     /* Thread pool for performing work and receiving completion callbacks.
+@@ -435,6 +458,41 @@ static inline void aio_timer_init(AioContext *ctx,
+  */
+ int64_t aio_compute_timeout(AioContext *ctx);
+ 
++/**
++ * aio_create_postponed_action:
++ * @ctx: the aio context
++ * @func: the function to postpone
++ * @param: the parameter to passed to the function
++ *
++ * Create a postponed action.
++ */
++AioPostponedAction *aio_create_postponed_action(
++                        AioPostponedFunc func, void *func_param);
++
++/**
++ * aio_postpone_action:
++ * @ctx: the aio context
++ * @action: the function and the parameter to passed to the function
++ *
++ * Queue an ation to the queue. The queue are processed and the actions
++ * are executed when the context becomes available to the external
++ * requests.
++ *
++ * Should be invoked under aio_context_acquire/release.
++ */
++void aio_postpone_action(AioContext *ctx, AioPostponedAction *action);
++
++/**
++ * aio_run_postponed_actions:
++ * @ctx: the aio context
++ *
++ * The function invokes all the actions queued to postponed action
++ * context queue.
++ *
++ * Should be invoked under aio_context_acquire/release.
++ */
++void aio_run_postponed_actions(AioContext *ctx);
++
+ /**
+  * aio_disable_external:
+  * @ctx: the aio context
+@@ -443,7 +501,9 @@ int64_t aio_compute_timeout(AioContext *ctx);
+  */
+ static inline void aio_disable_external(AioContext *ctx)
+ {
++    aio_context_acquire(ctx);
+     atomic_inc(&ctx->external_disable_cnt);
++    aio_context_release(ctx);
  }
  
-+static void blk_aio_create_co(void *opaque)
-+{
-+    BlockDriverState *current_bs;
-+    AioContext *ctx;
-+    BlkAioEmAIOCB *acb = (BlkAioEmAIOCB *) opaque;
-+    BlockBackend *blk = acb->rwco.blk;
-+
-+    /* The check makes sense if the action was postponed until the context
-+     * is enabled for external requests: if a BlockDriverState of a BlockBackend
-+     * was changed, for example on making a new snapshot, update BlockDriverState
-+     * in ACB and try to run the coroutine in the changed BDS context
-+     */
-+    current_bs = blk_bs(blk);
-+
-+    if (current_bs != acb->common.bs) {
-+        acb->common.bs = current_bs;
-+    }
-+
-+    ctx = blk_get_aio_context(blk);
-+    /* If a request comes from device (e.g. ide controller) when
-+     * the context disabled, postpone the request until the context is
-+     * enabled for external requests.
-+     * Otherwise, create a couroutine and enter it right now
-+     */
+ /**
+@@ -456,12 +516,15 @@ static inline void aio_enable_external(AioContext *ctx)
+ {
+     int old;
+ 
 +    aio_context_acquire(ctx);
-+    if (aio_external_disabled(ctx)) {
-+        AioPostponedAction *action = aio_create_postponed_action(
-+                                                blk_aio_create_co, acb);
-+        aio_postpone_action(ctx, action);
-+    } else {
-+        Coroutine *co = qemu_coroutine_create(acb->co_entry, acb);
-+        blk_inc_in_flight(blk);
-+        bdrv_coroutine_enter(acb->common.bs, co);
-+
-+        acb->has_returned = true;
-+        if (acb->rwco.ret != NOT_DONE) {
-+            aio_bh_schedule_oneshot(ctx, blk_aio_complete_bh, acb);
-+        }
-+    }
+     old = atomic_fetch_dec(&ctx->external_disable_cnt);
+     assert(old > 0);
+     if (old == 1) {
++        aio_run_postponed_actions(ctx);
+         /* Kick event loop so it re-arms file descriptors */
+         aio_notify(ctx);
+     }
 +    aio_context_release(ctx);
+ }
+ 
+ /**
+diff --git a/util/async.c b/util/async.c
+index 03f62787f2..e5fa35972e 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -278,6 +278,7 @@ aio_ctx_finalize(GSource     *source)
+ #endif
+ 
+     assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
++    assert(QSLIST_EMPTY(&ctx->postponed_actions));
+     qemu_bh_delete(ctx->co_schedule_bh);
+ 
+     qemu_lockcnt_lock(&ctx->list_lock);
+@@ -415,6 +416,7 @@ AioContext *aio_context_new(Error **errp)
+ 
+     ctx->co_schedule_bh = aio_bh_new(ctx, co_schedule_bh_cb, ctx);
+     QSLIST_INIT(&ctx->scheduled_coroutines);
++    QSLIST_INIT(&ctx->postponed_actions);
+ 
+     aio_set_event_notifier(ctx, &ctx->notifier,
+                            false,
+@@ -507,3 +509,34 @@ void aio_context_release(AioContext *ctx)
+ {
+     qemu_rec_mutex_unlock(&ctx->lock);
+ }
++
++AioPostponedAction *aio_create_postponed_action(
++                        AioPostponedFunc func, void *func_param)
++{
++    AioPostponedAction *action = g_malloc(sizeof(AioPostponedAction));
++    action->func = func;
++    action->func_param = func_param;
++    return action;
 +}
 +
- static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
-                                 void *iobuf, CoroutineEntry co_entry,
-                                 BdrvRequestFlags flags,
-                                 BlockCompletionFunc *cb, void *opaque)
- {
--    BlkAioEmAIOCB *acb;
--    Coroutine *co;
- 
--    blk_inc_in_flight(blk);
--    acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
-+    BlkAioEmAIOCB *acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
-     acb->rwco = (BlkRwCo) {
-         .blk    = blk,
-         .offset = offset,
-@@ -1359,15 +1399,9 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
-     };
-     acb->bytes = bytes;
-     acb->has_returned = false;
-+    acb->co_entry = co_entry;
- 
--    co = qemu_coroutine_create(co_entry, acb);
--    bdrv_coroutine_enter(blk_bs(blk), co);
--
--    acb->has_returned = true;
--    if (acb->rwco.ret != NOT_DONE) {
--        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
--                                blk_aio_complete_bh, acb);
--    }
-+    blk_aio_create_co(acb);
- 
-     return &acb->common;
- }
++static void aio_destroy_postponed_action(AioPostponedAction *action)
++{
++    g_free(action);
++}
++
++/* should be run under aio_context_aquire/release */
++void aio_postpone_action(AioContext *ctx, AioPostponedAction *action)
++{
++    QSLIST_INSERT_HEAD(&ctx->postponed_actions, action, next_action);
++}
++
++/* should be run under aio_context_aquire/release */
++void aio_run_postponed_actions(AioContext *ctx)
++{
++    while(!QSLIST_EMPTY(&ctx->postponed_actions)) {
++        AioPostponedAction *action = QSLIST_FIRST(&ctx->postponed_actions);
++        QSLIST_REMOVE_HEAD(&ctx->postponed_actions, next_action);
++        action->func(action->func_param);
++        aio_destroy_postponed_action(action);
++    }
++}
 -- 
 2.17.0
