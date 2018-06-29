@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYw9G-0008Ms-3v
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:21:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fYwBP-0001Gu-Hw
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:23:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYw9F-0002Dk-9Y
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:21:26 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYw9F-0002Aa-1V
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:21:25 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 17:21:20 +0100
-Message-Id: <20180629162122.19376-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] tcg: fix TLB miss check in
- get_page_addr_code()
+	(envelope-from <laurent@vivier.eu>) id 1fYwBO-0005EQ-Hq
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:23:39 -0400
+References: <20180629161731.16239-1-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6f17a133-37dd-e165-3a2a-2486ae49bfae@vivier.eu>
+Date: Fri, 29 Jun 2018 18:23:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180629161731.16239-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0] accel/tcg: Don't treat invalid TLB
+ entries as needing recheck
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-In commit 71b9a45330fe220d1 we changed the condition we use to
-determine whether we need to refill the TLB in get_page_addr_code() to
-        if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
-                     (addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK)))) {
+Le 29/06/2018 à 18:17, Peter Maydell a écrit :
+> In get_page_addr_code() when we check whether the TLB entry
+> is marked as TLB_RECHECK, we should not go down that code
+> path if the TLB entry is not valid at all (ie the TLB_INVALID
+> bit is set).
+> 
+> Reported-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This fixes the abort that Laurent was seeing with his m68k test case.
+> 
+>  accel/tcg/cputlb.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index eebe97dabb7..a55296583b9 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -967,7 +967,8 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+>          }
+>      }
+>  
+> -    if (unlikely(env->tlb_table[mmu_idx][index].addr_code & TLB_RECHECK)) {
+> +    if (unlikely((env->tlb_table[mmu_idx][index].addr_code &
+> +                  (TLB_RECHECK | TLB_INVALID_MASK)) == TLB_RECHECK)) {
+>          /*
+>           * This is a TLB_RECHECK access, where the MMU protection
+>           * covers a smaller range than a target page, and we must
+> 
 
-This isn't the right check (it will falsely fail if the
-input addr happens to have the low bit corresponding to
-TLB_INVALID_MASK set, for instance).
+Thank you!
 
-This patchset first factors out the "check for a hit" logic
-into some new functions tlb_hit() and tlb_hit_page() (the
-latter is for when the address is known to be page-aligned),
-uses those functions in the various places that do TLB hit tests,
-and then uses tlb_hit() to replace the erroneous code in
-get_page_addr_code().
-
-I noticed this while trying to debug Laurent's m68k test case:
-it meant that we would come into get_page_addr_code() for a
-TLB hit, falsely decide it was a miss, and then fish an
-older entry out of the TLB victim cache...
-
-
-Peter Maydell (2):
-  tcg: Define and use new tlb_hit() and tlb_hit_page() functions
-  accel/tcg: Correct "is this a TLB miss" check in get_page_addr_code()
-
- accel/tcg/softmmu_template.h | 16 ++++++----------
- include/exec/cpu-all.h       | 23 +++++++++++++++++++++++
- include/exec/cpu_ldst.h      |  3 +--
- accel/tcg/cputlb.c           | 18 ++++++------------
- 4 files changed, 36 insertions(+), 24 deletions(-)
-
--- 
-2.17.1
+Tested-by: Laurent Vivier <laurent@vivier.eu>
