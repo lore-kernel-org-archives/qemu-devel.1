@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYv1I-0004Zy-0x
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:09:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYv3T-0006Nt-Ic
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYv1H-0008B5-0V
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:09:07 -0400
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:38581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYv1G-00089G-FW
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:09:06 -0400
-Received: by mail-ot0-x236.google.com with SMTP id w22-v6so10282844otk.5
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 08:09:06 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fYv3P-0004P6-Hb
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:11:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37414 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYv3P-0004OP-CH
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:11:19 -0400
+References: <20180625131253.11218-1-kraxel@redhat.com>
+	<20180625131253.11218-2-kraxel@redhat.com>
+	<CAFEAcA_hfvKR2aRkLO+TL2vAGJecUfNxfXtvtuO94VGMybt1xg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ec389afc-3d16-2cf9-7dd3-2f8f3572d264@redhat.com>
+Date: Fri, 29 Jun 2018 10:11:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <eb78a151-b5e4-87c6-89d6-a527904c0961@linaro.org>
-References: <20180629001538.11415-1-richard.henderson@linaro.org>
-	<20180629001538.11415-7-richard.henderson@linaro.org>
-	<CAFEAcA9JkC_9niGrEoVf8FKzT+k6yn0WS0Mjbwz8WpLpzJhszQ@mail.gmail.com>
-	<eb78a151-b5e4-87c6-89d6-a527904c0961@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 16:08:45 +0100
-Message-ID: <CAFEAcA8t3n2p3v75q3EoAUD=jvi=zDB=F_=VBHK3knTMSPHx2g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 6/6] target/arm: Set ISAR bits for -cpu max
+In-Reply-To: <CAFEAcA_hfvKR2aRkLO+TL2vAGJecUfNxfXtvtuO94VGMybt1xg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 1/6] audio/hda: create millisecond timers
+ that handle IO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Martin Schrodt <martin@schrodt.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 29 June 2018 at 15:54, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 06/29/2018 01:42 AM, Peter Maydell wrote:
->> On 29 June 2018 at 01:15, Richard Henderson
->> <richard.henderson@linaro.org> wrote:
->>> For the supported extensions, fill in the appropriate bits in
->>> ID_ISAR5, ID_ISAR6, ID_AA64ISAR0, ID_AA64ISAR1.
+On 06/29/2018 03:19 AM, Peter Maydell wrote:
+> On 25 June 2018 at 14:12, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>> Currently, the HDA device tries to sync itself with the QEMU audio
+>> backend by waiting for the guest driver to handle buffer completion
+>> interrupts. This causes the backend to often read too much data from the
+>> device, as well as running out of data whenever the guest takes too long
+>> to handle the interrupt.
+>>
+>> According to the HDA specification, the guest is also not required to
+>> use interrupts, but can also sync itself by polling the LPIB registers.
+>>
+>> This patch will introduce high frequency (1000Hz) timers that interface
+>> with the device and allow for much smoother emulation of the LPIB
+>> registers. Since the timing is now provided by these timers, the need
+>> to wait for buffer completion interrupts also ceases.
+> 
+>> +static inline int64_t hda_bytes_per_second(HDAAudioStream *st)
+>> +{
+>> +    return 2 * st->as.nchannels * st->as.freq;
+>> +}
+> 
+> Hi; Coverity warns about this expression because the
+> multiplication is done as a 32-bit multiply and the
+> result is returned as a 64-bit (CID 1393631). As usual,
+> a suitable cast would fix it.
 
->> This makes sense, but I'd rather have a bit of time to think
->> about how exactly we want to handle feature bits vs ID
->> register values (the current codebase is not entirely
->> coherent on the topic), so I'd rather not put this in
->> for softfreeze unless there's a strong reason we should...
->
-> Fair.
->
-> I was wondering if we'd post-process the feature bits to initialize the id
-> registers, so that we don't have different places with the same knowledge.
->
-> The clearing of EL3 bits from id_pfr1 is an example of that already.
+Said suitable cast might look best written without parentheses, as in:
 
-Yes, exactly. We have a few bits that are odd like that,
-where we've kind of ad-hoc tweaked stuff to make things work.
-I'd rather we decided on a coherent design and then moved
-the code to do that. (Another example is Aaron's PMUv3
-patchset, which wants to tweak the PMU related ID registers
-to match what the emulation code implements.)
+return 2LL * st->as.nchannels * st->as.freq;
 
-The original QEMU design I think was more or less "we report
-fixed ID regs which don't necessarily match our actual
-capabilities" (which is also how a KVM vCPU will behave).
-"Feature bits are the primary source of truth" is also a
-coherent design, just not the one we started with...
-
-thanks
--- PMM
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
