@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYun8-0007rB-DZ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fYun9-0007tF-JZ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYun7-0007ju-Nq
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fYun8-0007mT-Ly
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:31 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYun7-0007hP-Gl
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:29 -0400
+	id 1fYun8-0007hP-E2
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:30 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYun6-0004pD-Fr
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:54:28 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fYun7-0004pS-65
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:54:29 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:53:40 +0100
-Message-Id: <20180629145347.652-49-peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 15:53:41 +0100
+Message-Id: <20180629145347.652-50-peter.maydell@linaro.org>
 In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
 References: <20180629145347.652-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 48/55] target/arm: Mark PMINTENSET accesses as
- possibly doing IO
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 49/55] sd: Don't trace SDRequest crc field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +32,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Aaron Lindsay <alindsay@codeaurora.org>
+We don't actually implement SD command CRC checking, because
+for almost all of our SD controllers the CRC generation is
+done in hardware, and so modelling CRC generation and checking
+would be a bit pointless. (The exception is that milkymist-memcard
+makes the guest software compute the CRC.)
 
-This makes it match its AArch64 equivalent, PMINTENSET_EL1
+As a result almost all of our SD controller models don't bother
+to set the SDRequest crc field, and the SD card model doesn't
+check it. So the tracing of it in sdbus_do_command() provokes
+Coverity warnings about use of uninitialized data.
 
-Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-Message-id: 1529699547-17044-13-git-send-email-alindsay@codeaurora.org
+Drop the CRC field from the trace; we can always add it back
+if and when we do anything useful with the CRC.
+
+Fixes Coverity issues 1386072, 1386074, 1386076, 1390571.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180626180324.5537-1-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/sd/core.c       | 2 +-
+ hw/sd/trace-events | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index d0786e0c210..60589b7eaf9 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1404,7 +1404,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .writefn = pmuserenr_write, .raw_writefn = raw_write },
-     { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
-       .access = PL1_RW, .accessfn = access_tpm,
--      .type = ARM_CP_ALIAS,
-+      .type = ARM_CP_ALIAS | ARM_CP_IO,
-       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pminten),
-       .resetvalue = 0,
-       .writefn = pmintenset_write, .raw_writefn = raw_write },
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index 820345f704b..107e6d71ddb 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -91,7 +91,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint8_t *response)
+ {
+     SDState *card = get_card(sdbus);
+ 
+-    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc);
++    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg);
+     if (card) {
+         SDCardClass *sc = SD_CARD_GET_CLASS(card);
+ 
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index bfd1d62efcb..43cffab8b17 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -7,7 +7,7 @@ bcm2835_sdhost_edm_change(const char *why, uint32_t edm) "(%s) EDM now 0x%x"
+ bcm2835_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%x\n"
+ 
+ # hw/sd/core.c
+-sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t crc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
++sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg) "@%s CMD%02d arg 0x%08x"
+ sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+ sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+ sdbus_set_voltage(const char *bus_name, uint16_t millivolts) "@%s %u (mV)"
 -- 
 2.17.1
