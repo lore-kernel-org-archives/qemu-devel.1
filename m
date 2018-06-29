@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fYrjC-0001ro-47
+	(envelope-from <berto@igalia.com>) id 1fYrjC-0001rp-67
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:38:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fYriz-0005H5-G8
+	(envelope-from <berto@igalia.com>) id 1fYriz-0005HR-HF
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 07:38:14 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 29 Jun 2018 14:36:58 +0300
-Message-Id: <cover.1530270904.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 0/5] Some bs->options fixes
+Date: Fri, 29 Jun 2018 14:36:59 +0300
+Message-Id: <6d4bbe2a722855e10655f9f5ee1dbf4e94f62e59.1530270904.git.berto@igalia.com>
+In-Reply-To: <cover.1530270904.git.berto@igalia.com>
+References: <cover.1530270904.git.berto@igalia.com>
+In-Reply-To: <cover.1530270904.git.berto@igalia.com>
+References: <cover.1530270904.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 1/5] qdict: Make qdict_extract_subqdict()
+ accept dst = NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +25,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Hi everyone,
+This function extracts all options from a QDict starting with a
+certain prefix and puts them in a new QDict.
 
-this is part of the blockdev-reopen work that I'm doing, but since
-I'll be away during most of July I thought that I could send already a
-couple of patches that I think are ready and don't need anything else
-from the rest of the series.
+We'll have a couple of cases where we simply want to discard those
+options instead of copying them, and that's what this patch does.
 
-There's two main fixes here:
-
-  1) bs->options are not kept up to date after an image is reopened
-     and no longer reflect its state.
-
-  2) bs->options and bs->explicit_options also contain the options of
-     a BDS's children, so there's data that is duplicated and will be
-     inconsistent as soon as you change the children's options
-     directly.
-
-The fix for (2) involves removing all children options from both
-QDicts. In the cases of node name references ("backing": "node-name")
-those remain in the QDict (they're technically parent options). I
-think we don't really need them and it should be possible to get rid
-of them, but it's a little more complicated (we need them during
-bdrv_reopen() to ensure that the user didn't try to change any of
-them).
-
-Regards,
-
-Berto
-
-Alberto Garcia (5):
-  qdict: Make qdict_extract_subqdict() accept dst = NULL
-  block: Remove children options from bs->{options,explicit_options}
-  block: Simplify bdrv_reopen_abort()
-  block: Update bs->options if bdrv_reopen() succeeds
-  block: Simplify append_open_options()
-
- block.c               | 42 +++++++++++++++++++++++++++++++-----------
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
  qobject/block-qdict.c | 11 ++++++++---
- 2 files changed, 39 insertions(+), 14 deletions(-)
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index 36129e7379..ef443cb8d5 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -158,20 +158,25 @@ void qdict_flatten(QDict *qdict)
+     qdict_flatten_qdict(qdict, qdict, NULL);
+ }
+ 
+-/* extract all the src QDict entries starting by start into dst */
++/* extract all the src QDict entries starting by start into dst.
++ * If dst is NULL then the entries are simply removed from src. */
+ void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start)
+ 
+ {
+     const QDictEntry *entry, *next;
+     const char *p;
+ 
+-    *dst = qdict_new();
++    if (dst) {
++        *dst = qdict_new();
++    }
+     entry = qdict_first(src);
+ 
+     while (entry != NULL) {
+         next = qdict_next(src, entry);
+         if (strstart(entry->key, start, &p)) {
+-            qdict_put_obj(*dst, p, qobject_ref(entry->value));
++            if (dst) {
++                qdict_put_obj(*dst, p, qobject_ref(entry->value));
++            }
+             qdict_del(src, entry->key);
+         }
+         entry = next;
 -- 
 2.11.0
