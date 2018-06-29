@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fZ0yD-0006Dt-Bz
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 17:30:23 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fZ14E-0007UM-5m
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 17:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fZ0yA-0004GV-2q
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 17:30:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fZ0y9-0004FJ-GD
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 17:30:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fZ0y8-0006Vt-25
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 21:30:16 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00B552E8197
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 21:30:16 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1fZ14D-0007ye-9n
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 17:36:34 -0400
+References: <20180622201122.9358-1-jsnow@redhat.com>
+	<20180629170709.GD16547@stefanha-x1.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4a80026d-b7bf-a656-4216-bab491ca69c1@redhat.com>
+Date: Fri, 29 Jun 2018 17:36:25 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 29 Jun 2018 21:19:55 -0000
-From: Andreas Hasenack <andreas@canonical.com>
-Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
-Message-Id: <153030719578.6721.10021837873123322482.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
- block fsfreeze
+In-Reply-To: <20180629170709.GD16547@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration: Appease coverity,
+ skip empty block trees
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,344 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-** Description changed:
-
-  [Impact]
-  =
-
--  * An explanation of the effects of the bug on users and
-+ =C2=A0* An explanation of the effects of the bug on users and
-  =
-
--  * justification for backporting the fix to the stable release.
-+ =C2=A0* justification for backporting the fix to the stable release.
-  =
-
--  * In addition, it is helpful, but not required, to include an
--    explanation of how the upload fixes this bug.
-+ =C2=A0* In addition, it is helpful, but not required, to include an
-+ =C2=A0=C2=A0=C2=A0explanation of how the upload fixes this bug.
-  =
-
-  [Test Case]
-  =
-
--  * Prepare a guest
--    $ uvt-simplestreams-libvirt --verbose sync --source http://cloud-image=
-s.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddaily
-+ =C2=A0* Prepare a guest
-+ =C2=A0=C2=A0=C2=A0$ uvt-simplestreams-libvirt --verbose sync --source htt=
-p://cloud-images.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddai=
-ly
-  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
-abel=3Ddaily
-  =
-
--  * Shut it down and use virsh edit to add a channel for the agent
-+ =C2=A0* Shut it down and use virsh edit to add a channel for the agent. A=
-dd this somewhere under <devices>:
-  <channel type=3D'unix'>
--    <source mode=3D'bind'/>
--    <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'/>
-+ =C2=A0=C2=A0=C2=A0<source mode=3D'bind'/>
-+ =C2=A0=C2=A0=C2=A0<target type=3D'virtio' name=3D'org.qemu.guest_agent.0'=
-/>
-  </channel>
-  =
-
--   * Start the guest again, in it install qemu-guest-agent
-+ =C2=A0=C2=A0* Start the guest again, in it install qemu-guest-agent
-  =
-
--   *
-+ =C2=A0=C2=A0*
-  =
-
--   * On the Host then freeze and thaw the guest
--     $ virsh domfsfreeze x-freeze
--     $ virsh domfsthaw x-freeze
-+ =C2=A0=C2=A0* On the Host then freeze and thaw the guest
-+ =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsfreeze x-freeze
-+ =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsthaw x-freeze
-  =
-
--   # The above works, then trigger the issue, in the guest do
--     $ sudo mkdir /mnt/test
--     $ sudo mount -o bind / /mnt/test/
-+ =C2=A0=C2=A0# The above works, then trigger the issue, in the guest do
-+ =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mkdir /mnt/test
-+ =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mount -o bind / /mnt/test/
-  =
-
--   * Now the freeze/thaw will fail unless the fix is applied.
-+ =C2=A0=C2=A0* Now the freeze/thaw will fail unless the fix is applied.
-  =
-
-  [Regression Potential]
-  =
-
--  * From looking at the code alone I could think of a different cause that =
-
--    makes it return EBUSY.
--    The biggest risk I could see due to that is the agent reporting a =
-
--    successful freeze due to accepting EBUSY which is not actually true.
--    But we have that in Ubuntu since Artful and =
-
--    upstream since January 2017 and there are no such reports.
-+ =C2=A0* From looking at the code alone I could think of a different cause=
- that
-+ =C2=A0=C2=A0=C2=A0makes it return EBUSY.
-+ =C2=A0=C2=A0=C2=A0The biggest risk I could see due to that is the agent r=
-eporting a
-+ =C2=A0=C2=A0=C2=A0successful freeze due to accepting EBUSY which is not a=
-ctually true.
-+ =C2=A0=C2=A0=C2=A0But we have that in Ubuntu since Artful and
-+ =C2=A0=C2=A0=C2=A0upstream since January 2017 and there are no such repor=
-ts.
-  =
-
-  [Other Info]
--  =
-
--  * n/a
-  =
-
-+ =C2=A0* n/a
-  =
-
-  ---
-  =
-
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-  =
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-  =
-
-  Below more information about how we encountered this issue...
-  =
-
-  Message send to qemu-discuss@nongnu.org:
-  =
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-  =
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-  =
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-  =
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-  =
-
-  This is the only entry of the qemu guest agent in syslog.
-  =
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-  =
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-  =
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-  =
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-  =C2=A0may have bind-mounts that let a device appear multiple times in the=
- mount list. Unfortunately the guest agent is not smart enough to consider =
-a device that has been frozen as succesfull and keep going. This causes thi=
-s specific error.
-  =
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-  =
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1587065
-
-Title:
-  btrfs qemu-ga - multiple mounts block fsfreeze
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  In Progress
-
-Bug description:
-  [Impact]
-
-  =C2=A0* An explanation of the effects of the bug on users and
-
-  =C2=A0* justification for backporting the fix to the stable release.
-
-  =C2=A0* In addition, it is helpful, but not required, to include an
-  =C2=A0=C2=A0=C2=A0explanation of how the upload fixes this bug.
-
-  [Test Case]
-
-  =C2=A0* Prepare a guest
-  =C2=A0=C2=A0=C2=A0$ uvt-simplestreams-libvirt --verbose sync --source htt=
-p://cloud-images.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddai=
-ly
-  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
-abel=3Ddaily
-
-  =C2=A0* Shut it down and use virsh edit to add a channel for the agent. A=
-dd this somewhere under <devices>:
-  <channel type=3D'unix'>
-  =C2=A0=C2=A0=C2=A0<source mode=3D'bind'/>
-  =C2=A0=C2=A0=C2=A0<target type=3D'virtio' name=3D'org.qemu.guest_agent.0'=
-/>
-  </channel>
-
-  =C2=A0=C2=A0* Start the guest again, in it install qemu-guest-agent
-
-  =C2=A0=C2=A0*
-
-  =C2=A0=C2=A0* On the Host then freeze and thaw the guest
-  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsfreeze x-freeze
-  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsthaw x-freeze
-
-  =C2=A0=C2=A0# The above works, then trigger the issue, in the guest do
-  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mkdir /mnt/test
-  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mount -o bind / /mnt/test/
-
-  =C2=A0=C2=A0* Now the freeze/thaw will fail unless the fix is applied.
-
-  [Regression Potential]
-
-  =C2=A0* From looking at the code alone I could think of a different cause=
- that
-  =C2=A0=C2=A0=C2=A0makes it return EBUSY.
-  =C2=A0=C2=A0=C2=A0The biggest risk I could see due to that is the agent r=
-eporting a
-  =C2=A0=C2=A0=C2=A0successful freeze due to accepting EBUSY which is not a=
-ctually true.
-  =C2=A0=C2=A0=C2=A0But we have that in Ubuntu since Artful and
-  =C2=A0=C2=A0=C2=A0upstream since January 2017 and there are no such repor=
-ts.
-
-  [Other Info]
-
-  =C2=A0* n/a
-
-  ---
-
-  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
-sible.
-  root@CmsrvMTA:/# mount -l | grep /dev/vda2
-  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
-=3D/@)
-  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
-vol=3D/@home)
-
-  Having two mounts is rather common with btrfs, so the feature fsfreeze
-  is unusable on these systems.
-
-  Below more information about how we encountered this issue...
-
-  Message send to qemu-discuss@nongnu.org:
-
-  Message 1:
-  ----------
-  I use external snapshots to backup my guests. I use the 'quiesce' option =
-to flush and frees the guest file system with the qemu guest agent.
-
-  With the exeption of one guest, this procedure works fine. On the 'unwill=
-ing' guest, I get this error message:
-  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
-nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
-ze /: Device or resource busy"
-
-  I don't think this is not some sort of time-out error, because
-  activation of the fsfreeze and the error message happen immediately
-  after each other:
-
-  $ grep qemu-ga syslog.1
-  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
-
-  This is the only entry of the qemu guest agent in syslog.
-
-  $ sudo virsh version
-  Compiled against library: libvirt 1.3.1
-  Using library: libvirt 1.3.1
-  Gebruikte API: QEMU 1.3.1
-  Draaiende hypervisor: QEMU 2.5.0
-
-  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
-  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
-"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
-ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
--response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
-ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
-response":true}, ... }
-
-  For making an external snapshot, I use this command:
-  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
-uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
-
-  Piece of reply 1:
-  -----------------
-  I have encountered this before. Some operating systems
-  =C2=A0may have bind-mounts that let a device appear multiple times in the=
- mount list. Unfortunately the guest agent is not smart enough to consider =
-a device that has been frozen as succesfull and keep going. This causes thi=
-s specific error.
-
-  Piece of reply 2:
-  -----------------
-  Ok, that seems to be it.
-
-  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
-he same device formatted as btrfs on
-  two separate sub volumes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, peter.maydell@linaro.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>
+
+
+
+On 06/29/2018 01:07 PM, Stefan Hajnoczi wrote:
+> On Fri, Jun 22, 2018 at 04:11:22PM -0400, John Snow wrote:
+>> If a tree consists exclusively of implicit filter nodes, we might crash
+>> QEMU. This configuration should not exist in practice, but if it did,
+>> skipping it would be fine.
+>>
+>> For the purposes of debug builds, throw an assert to remind us that
+>> this configuration is truly unexpected, but if it's compiled out we
+>> will cope just fine.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  migration/block-dirty-bitmap.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+>> index 3bafbbdc4c..02725293dd 100644
+>> --- a/migration/block-dirty-bitmap.c
+>> +++ b/migration/block-dirty-bitmap.c
+>> @@ -287,6 +287,10 @@ static int init_dirty_bitmap_migration(void)
+>>          while (bs && bs->drv && bs->implicit) {
+>>              bs = backing_bs(bs);
+>>          }
+>> +        if (!bs) {
+>> +            g_assert_not_reached();
+>> +            continue;
+>> +        }
+> 
+> If bs can never be NULL, why test that it is non-NULL in the while loop
+> condition?
+> 
+> Try:
+> 
+>   /* Precondition: bs != NULL thanks to the for loop */
+>   while (bs->drv && bs->implicit) {
+>       bs = backing_bs(bs);
+>   }
+>   /* Postcondition: bs != NULL due to implicit node layout assumption */
+> 
+> Does this silence Coverity?  ISTR it looks for cues like the bs check in
+> the while loop condition to decide whether it's likely that a variable
+> could be NULL.
+> 
+
+I'll give this a go, but mechanically it looks suspect without an
+assert(bs) in the loop body, but that would definitely silence Coverity.
+
+--js
