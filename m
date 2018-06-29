@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fYvRe-0001Kz-OR
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:36:24 -0400
+	(envelope-from <david@redhat.com>) id 1fYvUT-0003a8-VT
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:39:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fYvRd-0003UK-67
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:36:22 -0400
-References: <1529415820-7750-1-git-send-email-ari@tuxera.com>
-	<1529415820-7750-3-git-send-email-ari@tuxera.com>
-	<20180629100752.GE15588@localhost.localdomain>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <7d9b8648-a919-307e-b4e9-cd47148d4de0@tuxera.com>
-Date: Fri, 29 Jun 2018 18:36:07 +0300
+	(envelope-from <david@redhat.com>) id 1fYvUQ-0002fw-Sk
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:39:18 -0400
+References: <20180628121417.1980-1-david@redhat.com>
+	<20180628121417.1980-3-david@redhat.com>
+	<20180629164903.1630ea28@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <94085ac5-0242-1cb5-065a-7e50183792bd@redhat.com>
+Date: Fri, 29 Jun 2018 17:39:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180629100752.GE15588@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20180629164903.1630ea28@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/8] block: Add a mechanism for passing
- a block driver a block configuration
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] util/oslib-win32: indicate
+ alignment for qemu_anon_ram_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,142 +26,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
 
-On 06/29/2018 01:07 PM, Kevin Wolf wrote:
-> Am 19.06.2018 um 15:43 hat Ari Sundholm geschrieben:
->> A block driver may need to know about the block configuration, most
->> critically the sector sizes, of a block backend for alignment purposes
->> or for some other reason.
-> 
-> It makes sense to me that you need to know alignment constraints of the
-> thing you are calling (i.e. your child nodes), but I don't really see
-> why you would need to know anything about the parent nodes. I'm doubtful
-> that this is a good thing to add.
-> 
-
-I guess I should explain the exact use case here to show where we are 
-coming from.
-
-The use case is the new blklogwrites driver (introduced in this patch 
-set), which we use to test file system implementations. It needs to log 
-the writes to whatever guest block device is used (for instance, a 
--device scsi-hd). These block devices may have different kinds of 
-logical sector sizes, as determined by their configuration (such as 
-physical_block_size=4096,logical_block_size=512). In order to properly 
-log the writes that hit such a block device, we need to do this at a 
-granularity of its logical sector size for the log to be most useful. 
-For this, we need to get this information from the direction of the parent.
-
-This patch set proposes a mechanism for exposing that information to 
-blklogwrites (and all other block drivers that may use this 
-information), along with other information in the block configuration, 
-to allow it to automatically adjust to it.
-
-> I hope that the rest of the series will tell me why you are wanting this
-> information, but if we keep it, it needs a better explanation in the
-> commit message.
-> 
->> It doesn't seem like qemu has an existing
->> mechanism for a block backend to convey the required information to
->> the relevant block driver when it is being realized.
+On 29.06.2018 16:49, Igor Mammedov wrote:
+> On Thu, 28 Jun 2018 14:14:15 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> Let's set the alignment just like for the posix variant. This will
+>> implicitly set the alignment of the underlying memory region and
+>> therefore make memory_region_get_alignment(mr) return something > 0 fo=
+r
+>> all memory backends applicable to PCDIMM/NVDIMM.
 >>
->> The need for this mechanism rises from the fact that a drive may not
->> have a backend at the time it is created, as devices are created after
->> drives during qemu startup. Therefore, a driver requiring information
->> about the block configuration can get this information when a backend
->> is created for it at the earliest. The most natural place for this to
->> take place seems to be in the realization functions of the various
->> block device drivers, such as scsi-hd. The interface proposed here
->> allows the block driver to receive information about the block
->> configuration and the associated backend through a new callback.
+>> This will allow us to drop special handling in pc.c for
+>> memory_region_get_alignment(mr) =3D=3D 0, as we can then assume that i=
+t is
+>> always set (and AFAICS >=3D getpagesize()).
 >>
->> Signed-off-by: Ari Sundholm <ari@tuxera.com>
-> 
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 327e478..74c470e 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -465,6 +465,15 @@ struct BlockDriver {
->>       void (*bdrv_abort_perm_update)(BlockDriverState *bs);
->>   
->>       /**
->> +     * Called to inform the driver of the block configuration of the virtual
->> +     * block device.
->> +     *
->> +     * This function is called by a block device realization function if the
->> +     * device wants to inform the block driver of its block configuration.
->> +     */
->> +    void (*bdrv_apply_blkconf)(BlockDriverState *bs, BlockConf *conf);
-> 
-> This interface can't really work. Block nodes (BlockDriverStates) can
-> have an arbitrary number of parents, which can be attached and detached
-> dynamically. This interface basically assumes that there is one device
-> attached to the node, it will always stay attached and its configuration
-> stays the same.
-> 
-> Is this function supposed to be called only once? (That assumption
-> wouldn't hold true.) If not, does a second call mean that a second
-> parent was attached, or does it update the information of the existing
-> parent?
-> 
-> How is this information useful when one parent calls the function and
-> provides BlockConf, but the other doesn't and the block driver doesn't
-> know about this?
-> 
+>> For pc in pc_memory_plug(), under Windows TARGET_PAGE_SIZE =3D=3D getp=
+agesize(),
+>> therefore alignment of DIMMs will not change, and therefore also not t=
+he
+>> guest physical memory layout.
+> why not use QEMU_VMALLOC_ALIGN for consistency (on win =3D> getpagesize=
+())
+> instead of TARGET_PAGE_SIZE like linux allocator does?
 
-Yes, the interface needs work when you consider the general case. It 
-should be considered a first approximation towards a proper one. As it 
-is, it doesn't handle the removal of a block backend properly. Also, it 
-can be cumbersome to manage the block configurations provided by the 
-various parents and use them as constraints for the operation of the 
-block driver. It is very general as it is, though, as block drivers can 
-freely choose what to do with the block configuration.
+Sure we can do that, I wanted to match here exactly what has been
+written in the comment.
 
-I see you proposed dropping this interface entirely in your review of 
-patch 8. I think having an interface like this can be valuable, but it 
-seems that it requires more work, so I think I will move the definition 
-of a proper interface to a separate patch set and opt for manual 
-configuration of the log settings in blklogwrites, as you suggested.
+>=20
+> Also looking at FIXME comment it notes that VirtualAlloc might have 64K
+> alignment (though I haven't found it in VirtualAlloc manual).
+> If that's true then we might need set *align to it to avoid auto-picked
+> address overlap with previous allocation (not really sure about it).
 
->> diff --git a/block/io.c b/block/io.c
->> index b7beaee..3a06843 100644
->> --- a/block/io.c
->> +++ b/block/io.c
->> @@ -2932,3 +2932,25 @@ int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
->>       bdrv_dec_in_flight(dst_bs);
->>       return ret;
->>   }
->> +
->> +void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
->> +{
->> +    BlockDriver *drv = bs->drv;
->> +
->> +    if (!drv) {
->> +        return;
->> +    }
->> +
->> +    if (drv->bdrv_apply_blkconf) {
->> +        drv->bdrv_apply_blkconf(bs, conf);
->> +        return;
->> +    }
->> +
->> +    if (bs->file && bs->file->bs) {
->> +        bdrv_apply_blkconf(bs->file->bs, conf);
->> +    }
->> +
->> +    if (bs->drv->supports_backing && backing_bs(bs)) {
->> +        bdrv_apply_blkconf(backing_bs(bs), conf);
->> +    }
->> +}
-> 
-> You probably want to propagate to all children instead of singling out
-> bs->file and bs->backing.
-> 
+"To determine the size of a page and the allocation granularity on the
+host computer, use the GetSystemInfo" [1]
 
-Oops, this was on my TODO list, but I apparently never did that change.
+"The size of the region, in bytes. If the lpAddress parameter is NULL,
+this value is rounded up to the next page boundary. " [1]
 
-Thank you,
-Ari Sundholm
-ari@tuxera.com
+Historically, this seems to be 64k. But it will always be at least 4k
+(page size). So what we could do is query the actual allocation granulari=
+ty:
+
+int get_allocation_granularity(void) {
+	SYSTEM_INFO system_info;
+
+	GetSystemInfo(&system_info);
+	return system_info.dwAllocationGranularity
+}
+
+
+"dwAllocationGranularity: The granularity for the starting address at
+which virtual memory can be allocated. For more information, see
+VirtualAlloc." [2]
+
+What do you think?
+
+>=20
+>=20
+>> For spapr in spapr_memory_plug(), an alignment of 0 would have been us=
+ed
+> note that align =3D=3D 0 would lead to crash where QEMU_ALIGN_UP() is u=
+sed,
+> so we don't care to keep it compatible (the same like in commit 92a37a0=
+4d)
+
+Good point!
+
+[1]
+https://msdn.microsoft.com/en-us/library/windows/desktop/aa366887(v=3Dvs.=
+85).aspx
+[2]
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=3Dvs.=
+85).aspx
+
+--=20
+
+Thanks,
+
+David / dhildenb
