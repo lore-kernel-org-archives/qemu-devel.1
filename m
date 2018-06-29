@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fYxKD-0006WJ-Ls
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:50 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fYxMU-0000Uv-5V
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fYxKC-0005av-R4
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:49 -0400
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-	<cafebdd0-01bb-c025-5519-0984e0b40d55@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <3e512e87-c9ba-e2b3-8f2f-8c4991fec522@virtuozzo.com>
-Date: Fri, 29 Jun 2018 20:36:34 +0300
+	(envelope-from <rth7680@gmail.com>) id 1fYxMR-0000uW-1x
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:39:10 -0400
+Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:40773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fYxMQ-0000rM-SS
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:39:06 -0400
+Received: by mail-pl0-x230.google.com with SMTP id t6-v6so4787300plo.7
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 10:39:05 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180629162122.19376-1-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <72ef12b4-02b0-2a78-fc1f-18a8c8fd4b40@twiddle.net>
+Date: Fri, 29 Jun 2018 10:39:01 -0700
 MIME-Version: 1.0
-In-Reply-To: <cafebdd0-01bb-c025-5519-0984e0b40d55@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180629162122.19376-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] image fleecing
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] tcg: fix TLB miss check in
+ get_page_addr_code()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>
 
-29.06.2018 19:38, John Snow wrote:
->
-> On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Image fleecing, or external (or pull) backup scheme is near to complete.
->> Here is forgotten test, written by Fam in far 2014, with two my necessary
->> patches, previously sent separately, so the series are called "v2"
->>
->> v2:
->>   01: add transaction support
->>   02: rebase on master, drop "'fleecing-filter': 'BlockdevCreateNotSupported'"
->>       add empty .bdrv_close
->>       add default .bdrv_child_perm
->>   03: comparing to [PATCH v20 15/15] qemu-iotests: Image fleecing test case 08:
->>       add -f iotests.imgfmt to qemu_io
->>       fix target_img to be always qcow2
->>       add -r to qemu_io for nbd
->>       add fleecing-filter layer
->>       wrap long lines
->>
->> Fam Zheng (1):
->>    qemu-iotests: Image fleecing test case 222
->>
->> Vladimir Sementsov-Ogievskiy (2):
->>    blockdev-backup: enable non-root nodes for backup source
->>    block/fleecing-filter: new filter driver for fleecing
->>
->>   qapi/block-core.json       |   6 ++-
->>   block/fleecing-filter.c    |  80 ++++++++++++++++++++++++++++++++
->>   blockdev.c                 |   4 +-
->>   block/Makefile.objs        |   1 +
->>   tests/qemu-iotests/222     | 112 +++++++++++++++++++++++++++++++++++++++++++++
->>   tests/qemu-iotests/222.out |   5 ++
->>   tests/qemu-iotests/group   |   1 +
->>   7 files changed, 205 insertions(+), 4 deletions(-)
->>   create mode 100644 block/fleecing-filter.c
->>   create mode 100755 tests/qemu-iotests/222
->>   create mode 100644 tests/qemu-iotests/222.out
->>
-> Have you been able to reproduce a race that proves the filter is
-> necessary, or can you explain how it might happen?
+On 06/29/2018 09:21 AM, Peter Maydell wrote:
+> In commit 71b9a45330fe220d1 we changed the condition we use to
+> determine whether we need to refill the TLB in get_page_addr_code() to
+>         if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
+>                      (addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK)))) {
+> 
+> This isn't the right check (it will falsely fail if the
+> input addr happens to have the low bit corresponding to
+> TLB_INVALID_MASK set, for instance).
+> 
+> This patchset first factors out the "check for a hit" logic
+> into some new functions tlb_hit() and tlb_hit_page() (the
+> latter is for when the address is known to be page-aligned),
+> uses those functions in the various places that do TLB hit tests,
+> and then uses tlb_hit() to replace the erroneous code in
+> get_page_addr_code().
+> 
+> I noticed this while trying to debug Laurent's m68k test case:
+> it meant that we would come into get_page_addr_code() for a
+> TLB hit, falsely decide it was a miss, and then fish an
+> older entry out of the TLB victim cache...
+> 
+> 
+> Peter Maydell (2):
+>   tcg: Define and use new tlb_hit() and tlb_hit_page() functions
+>   accel/tcg: Correct "is this a TLB miss" check in get_page_addr_code()
 
-No. But same logic is in block/replication, and I remember, that I 
-discussed it on list, and the case I've described in 02 is not my idea.
-
->
-> I think I mentioned it once as a possibility but I hadn't convinced myself.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Also, queued to tcg-next.
 
 
--- 
-Best regards,
-Vladimir
+r~
