@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYuIV-0006Xs-G8
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:22:52 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fYuNw-0002hp-M6
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fYuIR-0006xB-GQ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:22:51 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:58328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fYuIR-0006tM-52
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:22:47 -0400
-References: <20180625111935.26108-1-alex.bennee@linaro.org>
-	<20180625111935.26108-10-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a4292b7c-cc74-f593-246e-64d1a482ab3c@vivier.eu>
-Date: Fri, 29 Jun 2018 16:22:11 +0200
+	(envelope-from <alistair23@gmail.com>) id 1fYuNv-0005da-Os
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:28:28 -0400
+Received: from mail-lj1-x22b.google.com ([2a00:1450:4864:20::22b]:40389)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fYuNv-0005b2-FQ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:28:27 -0400
+Received: by mail-lj1-x22b.google.com with SMTP id a6-v6so7478750ljj.7
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:28:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180625111935.26108-10-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 09/10] linux-user: introduce
- preexit_cleanup
+In-Reply-To: <CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
+References: <20180627174435.31800-1-alistair.francis@wdc.com>
+	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
+	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
+	<CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
+	<CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
+	<CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 29 Jun 2018 07:27:55 -0700
+Message-ID: <CAKmqyKP8Qu3+k=3Wn8X20+qM4JR_HPDhtRLjY-tufGcsopG_fQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
 
-Le 25/06/2018 à 13:19, Alex Bennée a écrit :
-> To avoid repeating ourselves move our preexit clean-up code into a
-> helper function. I figured the continuing effort to split of the
-> syscalls made it worthwhile creating a new file for it now.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  linux-user/Makefile.objs |  2 +-
->  linux-user/exit.c        | 28 ++++++++++++++++++++++++++++
->  linux-user/qemu.h        |  8 ++++++++
->  linux-user/syscall.c     | 10 ++--------
->  4 files changed, 39 insertions(+), 9 deletions(-)
->  create mode 100644 linux-user/exit.c
+On Fri, Jun 29, 2018 at 7:21 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 29 June 2018 at 15:13, Alistair Francis <alistair23@gmail.com> wrote:
+>> Can you import it manually? The armour export is below:
+>
+> Aha. I tried that, which didn't work either, which prompted
+> me to try --verbose, which says:
+>
+> e104462:xenial:qemu-for-merges$ gpg --verbose --import /tmp/alistair.gpg
+> gpg: armour header: Version: GnuPG v2
+> gpg: can't handle public key algorithm 19
+> gpg: pub     0E/0xE48E3BC2C123ED93 2017-12-15  Alistair Francis
+> <alistair@alistair23.me>
+> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm on user
+> ID "Alistair Francis <alistair@alistair23.me>"
+> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm on user
+> ID "Alistair Francis <alistair23@gmail.com>"
+> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
+> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
+> gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
+> gpg: key 0xE48E3BC2C123ED93: skipped user ID "Alistair Francis
+> <alistair@alistair23.me>"
+> gpg: key 0xE48E3BC2C123ED93: skipped user ID "Alistair Francis
+> <alistair23@gmail.com>"
+> gpg: key 0xE48E3BC2C123ED93: skipped subkey
+> gpg: key 0xE48E3BC2C123ED93: skipped subkey
+> gpg: key 0xE48E3BC2C123ED93: skipped subkey
+> gpg: key 0xE48E3BC2C123ED93: no valid user IDs
+> gpg: this may be caused by a missing self-signature
+> gpg: Total number processed: 1
+> gpg:           w/o user IDs: 1
+>
+> So the problem is that your key is using some algorithm
+> that's too newfangled for my gpg to cope with...
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Hmm... I do use gpg2, but it's just an RSA2048 key.
+
+Is it possible to update your GPG?
+
+Otherwise I can try generating a new key just for QEMU PRs.
+
+Alistair
+
+>
+> thanks
+> -- PMM
