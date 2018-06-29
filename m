@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fYkx2-0006ep-HX
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:24:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fYl3e-0008HV-VA
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:30:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fYkwz-0003Dq-Av
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:24:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40888 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fYkwz-0002vC-3R
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:24:01 -0400
-Date: Fri, 29 Jun 2018 07:23:50 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180629072313-mutt-send-email-mst@kernel.org>
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-10-xiaoguangrong@tencent.com>
-	<355310d0-a33d-dab1-1781-2de37dd648f7@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fYl3d-0003Xp-MZ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:30:54 -0400
+Date: Fri, 29 Jun 2018 14:16:32 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180629041632.GF3422@umbus.fritz.box>
+References: <20180624231248.6827-1-programmingkidx@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ExXT7PjY8AI4Hyfa"
 Content-Disposition: inline
-In-Reply-To: <355310d0-a33d-dab1-1781-2de37dd648f7@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/12] ring: introduce lockless ring buffer
+In-Reply-To: <20180624231248.6827-1-programmingkidx@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] fpu_helper.c: fix setting FPSCR[FI] bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +23,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: John Arbuckle <programmingkidx@gmail.com>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Jun 28, 2018 at 09:36:00PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B406=E6=9C=8804=E6=97=A5 17:55, guangrong.xiao@gmail.com =
-wrote:
-> > From: Xiao Guangrong<xiaoguangrong@tencent.com>
-> >=20
-> > It's the simple lockless ring buffer implement which supports both
-> > single producer vs. single consumer and multiple producers vs.
-> > single consumer.
-> >=20
-> > Many lessons were learned from Linux Kernel's kfifo (1) and DPDK's
-> > rte_ring (2) before i wrote this implement. It corrects some bugs of
-> > memory barriers in kfifo and it is the simpler lockless version of
-> > rte_ring as currently multiple access is only allowed for producer.
-> >=20
-> > If has single producer vs. single consumer, it is the traditional fif=
-o,
-> > If has multiple producers, it uses the algorithm as followings:
-> >=20
-> > For the producer, it uses two steps to update the ring:
-> >     - first step, occupy the entry in the ring:
-> >=20
-> > retry:
-> >        in =3D ring->in
-> >        if (cmpxhg(&ring->in, in, in +1) !=3D in)
-> >              goto retry;
-> >=20
-> >       after that the entry pointed by ring->data[in] has been owned b=
-y
-> >       the producer.
-> >=20
-> >       assert(ring->data[in] =3D=3D NULL);
-> >=20
-> >       Note, no other producer can touch this entry so that this entry
-> >       should always be the initialized state.
-> >=20
-> >     - second step, write the data to the entry:
-> >=20
-> >       ring->data[in] =3D data;
-> >=20
-> > For the consumer, it first checks if there is available entry in the
-> > ring and fetches the entry from the ring:
-> >=20
-> >       if (!ring_is_empty(ring))
-> >            entry =3D &ring[ring->out];
-> >=20
-> >       Note: the ring->out has not been updated so that the entry poin=
-ted
-> >       by ring->out is completely owned by the consumer.
-> >=20
-> > Then it checks if the data is ready:
-> >=20
-> > retry:
-> >       if (*entry =3D=3D NULL)
-> >              goto retry;
-> > That means, the producer has updated the index but haven't written an=
-y
-> > data to it.
-> >=20
-> > Finally, it fetches the valid data out, set the entry to the initiali=
-zed
-> > state and update ring->out to make the entry be usable to the produce=
-r:
-> >=20
-> >        data =3D *entry;
-> >        *entry =3D NULL;
-> >        ring->out++;
-> >=20
-> > Memory barrier is omitted here, please refer to the comment in the co=
-de.
-> >=20
-> > (1)https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
-/tree/include/linux/kfifo.h
-> > (2)http://dpdk.org/doc/api/rte__ring_8h.html
-> >=20
-> > Signed-off-by: Xiao Guangrong<xiaoguangrong@tencent.com>
-> > ---
->=20
-> May I ask why you need a MPSC ring here? Can we just use N SPSC ring fo=
-r
-> submitting pages and another N SPSC ring for passing back results?
->=20
-> Thanks
 
-Or just an SPSC ring + a lock.
-How big of a gain is lockless access to a trivial structure
-like the ring?
+--ExXT7PjY8AI4Hyfa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Jun 24, 2018 at 07:12:48PM -0400, John Arbuckle wrote:
+> The FPSCR[FI] bit indicates if the last floating point instruction had a =
+result that was rounded. Each consecutive floating point instruction is sup=
+pose to set this bit to the correct value. What currently happens is this b=
+it is not set as often as it should be. I have verified that this is the be=
+havior of a real PowerPC 950. This patch fixes that problem by deciding to =
+set this bit after each floating point instruction.
+>=20
+> https://www.pdfdrive.net/powerpc-microprocessor-family-the-programming-en=
+vironments-for-32-e3087633.html
+> Page 63 in table 2-4 is where the description of this bit can be found.
+>=20
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+
+I'm not sure it's the nicest way to fix it, but the existing code is
+pretty horrible, so, whatever.
+
+It looks correct, so, applied to ppc-for-3.0.
+
+> ---
+>  target/ppc/fpu_helper.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+> index d31a933cbb..9c841864c8 100644
+> --- a/target/ppc/fpu_helper.c
+> +++ b/target/ppc/fpu_helper.c
+> @@ -274,6 +274,7 @@ static inline void float_inexact_excp(CPUPPCState *en=
+v)
+>  {
+>      CPUState *cs =3D CPU(ppc_env_get_cpu(env));
+> =20
+> +    env->fpscr |=3D 1 << FPSCR_FI;
+>      env->fpscr |=3D 1 << FPSCR_XX;
+>      /* Update the floating-point exception summary */
+>      env->fpscr |=3D FP_FX;
+> @@ -505,6 +506,7 @@ static void do_float_check_status(CPUPPCState *env, u=
+intptr_t raddr)
+>  {
+>      CPUState *cs =3D CPU(ppc_env_get_cpu(env));
+>      int status =3D get_float_exception_flags(&env->fp_status);
+> +    bool inexact_happened =3D false;
+> =20
+>      if (status & float_flag_divbyzero) {
+>          float_zero_divide_excp(env, raddr);
+> @@ -514,6 +516,12 @@ static void do_float_check_status(CPUPPCState *env, =
+uintptr_t raddr)
+>          float_underflow_excp(env);
+>      } else if (status & float_flag_inexact) {
+>          float_inexact_excp(env);
+> +        inexact_happened =3D true;
+> +    }
+> +
+> +    /* if the inexact flag was not set */
+> +    if (inexact_happened =3D=3D false) {
+> +        env->fpscr &=3D ~(1 << FPSCR_FI); /* clear the FPSCR[FI] bit */
+>      }
+> =20
+>      if (cs->exception_index =3D=3D POWERPC_EXCP_PROGRAM &&
 
 --=20
-MST
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ExXT7PjY8AI4Hyfa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls1sqAACgkQbDjKyiDZ
+s5Iiig//TDeLnVINVJrta0pDQeDiPBoEV7aoRty7BAMsA1Jyr7d9XIDjYiD1ebAk
+tbLeZhvSIqzY/gLU9LWYPC8gPFKdD9+54AEZcNQid3zCQQ/vdcX8dJhz8ssoIf32
+twrpBLHQ18n4bHRi2MqQG01NTIVUODFbPzM8kZ2TOzcbaXMnDytDzwA8dKOA7uyi
+xi9Q8Ifm/GBM9FGNP2L9q9NycNPAxPcylAwZMgX9KyZBFO2Dcx26owl+Wwb4JJe/
+yEPvNFBDO6u0x7cbA8pWpLk5Cg/sCgDKYiJwWvbgm/MNJ8/IWoF2P5ZennqJ3yxJ
+I/bYDRWyfnY4C1AxJGEdF49ameeuDibm0fu3xfi0ggh9PJxLu1hS5oTrR2sNgrY3
+zLaCyW938e05ajH+B/dElsyLSGOCZzqTbDA/AGNqZ8CFG/ffk4ZMwhv+8lyW7I6m
+FRY7XWLJk1uLrXAwK10EAlZosVVuel3TnleG3B+hRl357o0LiKsuCc2hgaauoB4+
+DhyUYk/DXQLap5TWGiCoiKPYoFmfvlKb58lKDEFix968ohjH9rCRZoC4EvhglGGu
+kJEGPbA9CeKwybV9k5OA+4i6VEB5ntbXAWf0ucSypLHgqQpXsCkpz3zJnqaJwqrF
+CilxmceR2CK/4wUzrVa4y38vI50nOWSlPgPqqOy3b55ByC/L91I=
+=5R2I
+-----END PGP SIGNATURE-----
+
+--ExXT7PjY8AI4Hyfa--
