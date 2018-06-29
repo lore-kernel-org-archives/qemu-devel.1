@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hX-B2
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007ha-Aj
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUC-0007IF-K6
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUE-0007MV-5M
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:57 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 29 Jun 2018 15:29:45 +0200
-Message-Id: <20180629132954.24269-12-luc.michel@greensocs.com>
+Date: Fri, 29 Jun 2018 15:29:52 +0200
+Message-Id: <20180629132954.24269-19-luc.michel@greensocs.com>
 In-Reply-To: <20180629132954.24269-1-luc.michel@greensocs.com>
 References: <20180629132954.24269-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 11/20] intc/arm_gic: Implement
- virtualization extensions in gic_acknowledge_irq
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 18/20] intc/arm_gic: Improve traces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +25,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Implement virtualization extensions in the gic_acknowledge_irq()
-function. This function changes the state of the highest priority IRQ
-from pending to active.
+Add some traces to the ARM GIC to catch register accesses (distributor,
+(v)cpu interface and virtual interface), and to take into account
+virtualization extensions (print `vcpu` instead of `cpu` when needed).
 
-When the current CPU is a vCPU, modifying the state of an IRQ modifies
-the corresponding LR entry. However if we clear the pending flag before
-setting the active one, we lose track of the LR entry as it becomes
-invalid. The next call to gic_get_lr_entry() will fail.
-
-To overcome this issue, we call gic_activate_irq() before
-gic_clear_pending(). This does not change the general behaviour of
-gic_acknowledge_irq.
-
-We also move the SGI case in gic_clear_pending_sgi() to enhance
-code readability as the virtualization extensions support adds a if-else
-level.
+Also add some virtualization extensions specific traces: LR updating
+and maintenance IRQ generation.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c | 52 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 33 insertions(+), 19 deletions(-)
+ hw/intc/arm_gic.c    | 31 +++++++++++++++++++++++++------
+ hw/intc/trace-events | 12 ++++++++++--
+ 2 files changed, 35 insertions(+), 8 deletions(-)
 
 diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index d61c2dd557..a7577ac073 100644
+index 10300e9b4c..7d24348d96 100644
 --- a/hw/intc/arm_gic.c
 +++ b/hw/intc/arm_gic.c
-@@ -366,17 +366,44 @@ static void gic_drop_prio(GICState *s, int cpu, int group)
-     s->running_priority[cpu] = gic_get_prio_from_apr_bits(s, cpu);
+@@ -172,8 +172,10 @@ static inline void gic_update_internal(GICState *s, =
+bool virt)
+         }
+=20
+         if (best_irq !=3D 1023) {
+-            trace_gic_update_bestirq(cpu, best_irq, best_prio,
+-                s->priority_mask[cpu_iface], s->running_priority[cpu_ifa=
+ce]);
++            trace_gic_update_bestirq(virt ? "vcpu" : "cpu", cpu,
++                                     best_irq, best_prio,
++                                     s->priority_mask[cpu_iface],
++                                     s->running_priority[cpu_iface]);
+         }
+=20
+         irq_level =3D fiq_level =3D 0;
+@@ -290,6 +292,7 @@ static void gic_update_maintenance(GICState *s)
+         gic_compute_misr(s, cpu);
+         maint_level =3D (s->h_hcr[cpu] & R_GICH_HCR_EN_MASK) && s->h_mis=
+r[cpu];
+=20
++        trace_gic_update_maintenance_irq(cpu, maint_level);
+         qemu_set_irq(s->maintenance_irq[cpu], maint_level);
+     }
  }
- 
-+static inline uint32_t gic_clear_pending_sgi(GICState *s, int irq, int cpu)
-+{
-+    int src;
-+    uint32_t ret;
-+
-+    if (!gic_is_vcpu(cpu)) {
-+        /* Lookup the source CPU for the SGI and clear this in the
-+         * sgi_pending map.  Return the src and clear the overall pending
-+         * state on this CPU if the SGI is not pending from any CPUs.
-+         */
-+        assert(s->sgi_pending[irq][cpu] != 0);
-+        src = ctz32(s->sgi_pending[irq][cpu]);
-+        s->sgi_pending[irq][cpu] &= ~(1 << src);
-+        if (s->sgi_pending[irq][cpu] == 0) {
-+            gic_clear_pending(s, irq, cpu);
-+        }
-+        ret = irq | ((src & 0x7) << 10);
-+    } else {
-+        uint32_t *lr_entry = gic_get_lr_entry(s, irq, cpu);
-+        src = GICH_LR_CPUID(*lr_entry);
-+
-+        gic_clear_pending(s, irq, cpu);
-+        ret = irq | (src << 10);
-+    }
-+
-+    return ret;
-+}
-+
- uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
- {
--    int ret, irq, src;
--    int cm = 1 << cpu;
-+    int ret, irq;
- 
-     /* gic_get_current_pending_irq() will return 1022 or 1023 appropriately
-      * for the case where this GIC supports grouping and the pending interrupt
+@@ -561,7 +564,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, Me=
+mTxAttrs attrs)
       * is in the wrong group.
       */
-     irq = gic_get_current_pending_irq(s, cpu, attrs);
--    trace_gic_acknowledge_irq(cpu, irq);
-+    trace_gic_acknowledge_irq(gic_get_vcpu_real_id(cpu), irq);
- 
-     if (irq >= GIC_MAXIRQ) {
+     irq =3D gic_get_current_pending_irq(s, cpu, attrs);
+-    trace_gic_acknowledge_irq(gic_get_vcpu_real_id(cpu), irq);
++    trace_gic_acknowledge_irq(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
++                              gic_get_vcpu_real_id(cpu), irq);
+=20
+     if (irq >=3D GIC_MAXIRQ) {
          DPRINTF("ACK, no pending interrupt or it is hidden: %d\n", irq);
-@@ -388,6 +415,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
-         return 1023;
+@@ -1040,20 +1044,23 @@ static MemTxResult gic_dist_read(void *opaque, hw=
+addr offset, uint64_t *data,
+     switch (size) {
+     case 1:
+         *data =3D gic_dist_readb(opaque, offset, attrs);
+-        return MEMTX_OK;
++        break;
+     case 2:
+         *data =3D gic_dist_readb(opaque, offset, attrs);
+         *data |=3D gic_dist_readb(opaque, offset + 1, attrs) << 8;
+-        return MEMTX_OK;
++        break;
+     case 4:
+         *data =3D gic_dist_readb(opaque, offset, attrs);
+         *data |=3D gic_dist_readb(opaque, offset + 1, attrs) << 8;
+         *data |=3D gic_dist_readb(opaque, offset + 2, attrs) << 16;
+         *data |=3D gic_dist_readb(opaque, offset + 3, attrs) << 24;
+-        return MEMTX_OK;
++        break;
+     default:
+         return MEMTX_ERROR;
      }
- 
-+    gic_activate_irq(s, cpu, irq);
 +
-     if (s->revision == REV_11MPCORE) {
-         /* Clear pending flags for both level and edge triggered interrupts.
-          * Level triggered IRQs will be reasserted once they become inactive.
-@@ -396,28 +425,13 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
-         ret = irq;
-     } else {
-         if (irq < GIC_NR_SGIS) {
--            /* Lookup the source CPU for the SGI and clear this in the
--             * sgi_pending map.  Return the src and clear the overall pending
--             * state on this CPU if the SGI is not pending from any CPUs.
--             */
--            assert(s->sgi_pending[irq][cpu] != 0);
--            src = ctz32(s->sgi_pending[irq][cpu]);
--            s->sgi_pending[irq][cpu] &= ~(1 << src);
--            if (s->sgi_pending[irq][cpu] == 0) {
--                gic_clear_pending(s, irq, cpu);
--            }
--            ret = irq | ((src & 0x7) << 10);
-+            ret = gic_clear_pending_sgi(s, irq, cpu);
-         } else {
--            /* Clear pending state for both level and edge triggered
--             * interrupts. (level triggered interrupts with an active line
--             * remain pending, see gic_test_pending)
--             */
-             gic_clear_pending(s, irq, cpu);
-             ret = irq;
-         }
++    trace_gic_dist_read(offset, size, *data);
++    return MEMTX_OK;
+ }
+=20
+ static void gic_dist_writeb(void *opaque, hwaddr offset,
+@@ -1384,6 +1391,8 @@ static void gic_dist_writel(void *opaque, hwaddr of=
+fset,
+ static MemTxResult gic_dist_write(void *opaque, hwaddr offset, uint64_t =
+data,
+                                   unsigned size, MemTxAttrs attrs)
+ {
++    trace_gic_dist_write(offset, size, data);
++
+     switch (size) {
+     case 1:
+         gic_dist_writeb(opaque, offset, data, attrs);
+@@ -1540,12 +1549,18 @@ static MemTxResult gic_cpu_read(GICState *s, int =
+cpu, int offset,
+         *data =3D 0;
+         break;
      }
- 
--    gic_activate_irq(s, cpu, irq);
-     gic_update(s);
-     DPRINTF("ACK %d\n", irq);
-     return ret;
--- 
++
++    trace_gic_cpu_read(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
++                       gic_get_vcpu_real_id(cpu), offset, *data);
+     return MEMTX_OK;
+ }
+=20
+ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+                                  uint32_t value, MemTxAttrs attrs)
+ {
++    trace_gic_cpu_write(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
++                        gic_get_vcpu_real_id(cpu), offset, value);
++
+     switch (offset) {
+     case 0x00: /* Control */
+         gic_set_cpu_control(s, cpu, value, attrs);
+@@ -1820,6 +1835,7 @@ static MemTxResult gic_hyp_read(void *opaque, hwadd=
+r addr, uint64_t *data,
+         return MEMTX_OK;
+     }
+=20
++    trace_gic_hyp_read(addr, *data);
+     return MEMTX_OK;
+ }
+=20
+@@ -1830,6 +1846,8 @@ static MemTxResult gic_hyp_write(void *opaque, hwad=
+dr addr, uint64_t value,
+     int cpu =3D gic_get_current_cpu(s);
+     int vcpu =3D gic_get_current_vcpu(s);
+=20
++    trace_gic_hyp_write(addr, value);
++
+     switch (addr) {
+     case A_GICH_HCR: /* Hypervisor Control */
+         s->h_hcr[cpu] =3D value & GICH_HCR_MASK;
+@@ -1853,6 +1871,7 @@ static MemTxResult gic_hyp_write(void *opaque, hwad=
+dr addr, uint64_t value,
+         }
+=20
+         s->h_lr[lr_idx][cpu] =3D value & GICH_LR_MASK;
++        trace_gic_lr_entry(cpu, lr_idx, s->h_lr[lr_idx][cpu]);
+         break;
+     }
+=20
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index 55e8c2570c..47fa4ad5c1 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -92,9 +92,17 @@ aspeed_vic_write(uint64_t offset, unsigned size, uint3=
+2_t data) "To 0x%" PRIx64
+ gic_enable_irq(int irq) "irq %d enabled"
+ gic_disable_irq(int irq) "irq %d disabled"
+ gic_set_irq(int irq, int level, int cpumask, int target) "irq %d level %=
+d cpumask 0x%x target 0x%x"
+-gic_update_bestirq(int cpu, int irq, int prio, int priority_mask, int ru=
+nning_priority) "cpu %d irq %d priority %d cpu priority mask %d cpu runni=
+ng priority %d"
++gic_update_bestirq(const char *s, int cpu, int irq, int prio, int priori=
+ty_mask, int running_priority) "%s %d irq %d priority %d cpu priority mas=
+k %d cpu running priority %d"
+ gic_update_set_irq(int cpu, const char *name, int level) "cpu[%d]: %s =3D=
+ %d"
+-gic_acknowledge_irq(int cpu, int irq) "cpu %d acknowledged irq %d"
++gic_acknowledge_irq(const char *s, int cpu, int irq) "%s %d acknowledged=
+ irq %d"
++gic_cpu_write(const char *s, int cpu, int addr, uint32_t val) "%s %d ifa=
+ce write at 0x%08x 0x%08" PRIx32
++gic_cpu_read(const char *s, int cpu, int addr, uint32_t val) "%s %d ifac=
+e read at 0x%08x: 0x%08" PRIx32
++gic_hyp_read(int addr, uint32_t val) "hyp read at 0x%08x: 0x%08" PRIx32
++gic_hyp_write(int addr, uint32_t val) "hyp write at 0x%08x: 0x%08" PRIx3=
+2
++gic_dist_read(int addr, unsigned int size, uint32_t val) "dist read at 0=
+x%08x size %u: 0x%08" PRIx32
++gic_dist_write(int addr, unsigned int size, uint32_t val) "dist write at=
+ 0x%08x size %u: 0x%08" PRIx32
++gic_lr_entry(int cpu, int entry, uint32_t val) "cpu %d: new lr entry %d:=
+ 0x%08" PRIx32
++gic_update_maintenance_irq(int cpu, int val) "cpu %d: maintenance =3D %d=
+"
+=20
+ # hw/intc/arm_gicv3_cpuif.c
+ gicv3_icc_pmr_read(uint32_t cpu, uint64_t val) "GICv3 ICC_PMR read cpu 0=
+x%x value 0x%" PRIx64
+--=20
 2.17.1
