@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYvYF-0006ce-NH
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:43:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYvYI-0006fX-92
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fYvYE-0004Mk-MZ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:43:11 -0400
-Date: Fri, 29 Jun 2018 16:43:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180629154300.GX27016@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1fYvYH-0004Rz-5R
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:43:14 -0400
+Date: Fri, 29 Jun 2018 17:43:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180629154308.GH15588@localhost.localdomain>
 References: <20180628190723.276458-1-eblake@redhat.com>
 	<20180628190723.276458-4-eblake@redhat.com>
 	<20180629084444.GC15588@localhost.localdomain>
 	<41be61a0-9048-c08f-1a9a-1c213f5103ef@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <41be61a0-9048-c08f-1a9a-1c213f5103ef@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v7 3/6] qcow2: Reduce REFT_OFFSET_MASK
@@ -27,9 +26,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, berto@igalia.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org, berto@igalia.com
 
-On Fri, Jun 29, 2018 at 10:22:22AM -0500, Eric Blake wrote:
+Am 29.06.2018 um 17:22 hat Eric Blake geschrieben:
 > On 06/29/2018 03:44 AM, Kevin Wolf wrote:
 > > Am 28.06.2018 um 21:07 hat Eric Blake geschrieben:
 > > > Match our code to the spec change in the previous patch - there's
@@ -47,14 +46,42 @@ On Fri, Jun 29, 2018 at 10:22:22AM -0500, Eric Blake wrote:
 > The fact that ext4 cannot hold an image this large is already an indication
 > that setting this limit on the refcount table is NOT going to bite real
 > users.
+> 
+> Yes, you can argue that with lots of metadata, including internal snapshots,
+> and on a capable file system (such as tmpfs) that can even hold files this
+> large to begin with, then yes, allowing the refcount to exceed this limit
+> will allow slightly more metadata to be crammed into a single image.  But
+> will it actually help anyone?
+> 
+> Do I need to respin the series to split patch 2 into the obvious changes
+> (stuff unrelated to capping refcount size) vs. the controversial stuff
+> (refcount cap and this code change)?
+> 
+> > 
+> > Kevin
+> > 
+> > > In practice, no image has more than 64PB of
+> > > allocated clusters anyways, as anything beyond that can't be
+> > > expressed via L2 mappings to host offsets.
+> 
+> If you're opposed to an exact 56-bit limit on the grounds that 56-bit guest
+> data plus minimal metadata should still be expressable, would it be better
+> to cap refcount at 57-bits?
 
-NB, RHEL-7 defaults to xfs and this supports file sizes way larger
-than ext4 does, so not sure we should consider ext4 as representative
-of real world limits anymore.
+You're arguing that the patch doesn't hurt in practice, but what I'm
+really looking for is what do we gain from it?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+We generally don't apply patches just because they don't hurt, but
+because they are helpful for something. In the simple, fully compatible
+cases "helpful" could just mean "we like the code better".
+
+This is a slightly different category: "it's technically incompatible,
+but we don't think anyone uses this". We have done such changes before
+when they allowed us to improve something substantially, but I think the
+requirements for this are at least a little higher than just "because we
+like it better". And I'm not even sure yet if I like it better because
+it seems like an arbitrary restriction.
+
+So apart from not hurting in practice, what does the restriction buy us?
+
+Kevin
