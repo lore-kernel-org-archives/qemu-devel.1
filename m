@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYxJi-0006Fd-Qj
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:19 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYxKD-0006WJ-Ls
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYxJf-0004yy-Jx
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYxJf-0004xa-9J
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D66C883BC
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 17:36:14 +0000 (UTC)
-Date: Fri, 29 Jun 2018 14:36:08 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180629173608.GP7451@localhost.localdomain>
-References: <20180628154502.GO3513@redhat.com>
-	<20180628195227.GH7451@localhost.localdomain>
-	<20180629085353.GA5301@work-vm> <20180629101917.GC27016@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYxKC-0005av-R4
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:36:49 -0400
+References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+	<cafebdd0-01bb-c025-5519-0984e0b40d55@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3e512e87-c9ba-e2b3-8f2f-8c4991fec522@virtuozzo.com>
+Date: Fri, 29 Jun 2018 20:36:34 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180629101917.GC27016@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] CPU model versioning separate from machine type
- versioning ?
+In-Reply-To: <cafebdd0-01bb-c025-5519-0984e0b40d55@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] image fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
 
-On Fri, Jun 29, 2018 at 11:19:17AM +0100, Daniel P. Berrang=E9 wrote:
-> On Fri, Jun 29, 2018 at 09:53:53AM +0100, Dr. David Alan Gilbert wrote:
-[...]
-> > We're going to have to say something like:
-> >   'For the new XYZ vulnerability make sure you're using
-> >   Haswell-3.2 or later, SkyLake-2.6 or later, Westmere-4.8 or later
-> >   .....'
-> >=20
-> > which all gets a bit confusing.
->=20
-> The kernel has a /sys/devices/system/cpu/vulnerabilities dir
-> that lists status of various flaws.
->=20
-> I have been thinking about whether libvirt should create a
-> 'virt-guest-validate' command that looks at guest XML and
-> reports whether any of the config settings are vulnerable
-> or otherwise diverging from best practice in some way.
->=20
-> QEMU itself would perhaps have a 'query-vulnerabilities'
-> monitor command to report whether the current config is
-> satisfactory or not.
+29.06.2018 19:38, John Snow wrote:
+>
+> On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Image fleecing, or external (or pull) backup scheme is near to complete.
+>> Here is forgotten test, written by Fam in far 2014, with two my necessary
+>> patches, previously sent separately, so the series are called "v2"
+>>
+>> v2:
+>>   01: add transaction support
+>>   02: rebase on master, drop "'fleecing-filter': 'BlockdevCreateNotSupported'"
+>>       add empty .bdrv_close
+>>       add default .bdrv_child_perm
+>>   03: comparing to [PATCH v20 15/15] qemu-iotests: Image fleecing test case 08:
+>>       add -f iotests.imgfmt to qemu_io
+>>       fix target_img to be always qcow2
+>>       add -r to qemu_io for nbd
+>>       add fleecing-filter layer
+>>       wrap long lines
+>>
+>> Fam Zheng (1):
+>>    qemu-iotests: Image fleecing test case 222
+>>
+>> Vladimir Sementsov-Ogievskiy (2):
+>>    blockdev-backup: enable non-root nodes for backup source
+>>    block/fleecing-filter: new filter driver for fleecing
+>>
+>>   qapi/block-core.json       |   6 ++-
+>>   block/fleecing-filter.c    |  80 ++++++++++++++++++++++++++++++++
+>>   blockdev.c                 |   4 +-
+>>   block/Makefile.objs        |   1 +
+>>   tests/qemu-iotests/222     | 112 +++++++++++++++++++++++++++++++++++++++++++++
+>>   tests/qemu-iotests/222.out |   5 ++
+>>   tests/qemu-iotests/group   |   1 +
+>>   7 files changed, 205 insertions(+), 4 deletions(-)
+>>   create mode 100644 block/fleecing-filter.c
+>>   create mode 100755 tests/qemu-iotests/222
+>>   create mode 100644 tests/qemu-iotests/222.out
+>>
+> Have you been able to reproduce a race that proves the filter is
+> necessary, or can you explain how it might happen?
 
-Makes sense to me.  I wanted to make QEMU emit warnings on
-obviously insecure configurations.  Adding a
-query-vulnerabilities command would be the QMP counterpart of
-that.
+No. But same logic is in block/replication, and I remember, that I 
+discussed it on list, and the case I've described in 02 is not my idea.
 
---=20
-Eduardo
+>
+> I think I mentioned it once as a possibility but I hadn't convinced myself.
+
+
+-- 
+Best regards,
+Vladimir
