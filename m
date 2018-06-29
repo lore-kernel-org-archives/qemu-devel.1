@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYqJv-0000uG-0n
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:08:04 -0400
+	(envelope-from <kchamart@redhat.com>) id 1fYqK9-00011m-TJ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYqJt-0003az-Pw
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:08:02 -0400
-Date: Fri, 29 Jun 2018 12:07:52 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180629100752.GE15588@localhost.localdomain>
-References: <1529415820-7750-1-git-send-email-ari@tuxera.com>
-	<1529415820-7750-3-git-send-email-ari@tuxera.com>
+	(envelope-from <kchamart@redhat.com>) id 1fYqK5-0004Bx-Sb
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:08:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44852 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1fYqK5-00049p-MX
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 06:08:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A73A401CE88
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 10:08:12 +0000 (UTC)
+Date: Fri, 29 Jun 2018 12:08:08 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180629100808.GC24405@paraplu>
+References: <20180625101216.GE18277@paraplu>
+	<87y3ez150t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1529415820-7750-3-git-send-email-ari@tuxera.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/8] block: Add a mechanism for passing
- a block driver a block configuration
+In-Reply-To: <87y3ez150t.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] RNG: Any reason QEMU doesn't default to
+ `/dev/urandom`?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +34,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ari Sundholm <ari@tuxera.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, dgilbert@redhat.com, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 
-Am 19.06.2018 um 15:43 hat Ari Sundholm geschrieben:
-> A block driver may need to know about the block configuration, most
-> critically the sector sizes, of a block backend for alignment purposes
-> or for some other reason.
+On Thu, Jun 28, 2018 at 02:15:14PM +0200, Markus Armbruster wrote:
+> Kashyap Chamarthy <kchamart@redhat.com> writes:
 
-It makes sense to me that you need to know alignment constraints of the
-thing you are calling (i.e. your child nodes), but I don't really see
-why you would need to know anything about the parent nodes. I'm doubtful
-that this is a good thing to add.
+[...]
 
-I hope that the rest of the series will tell me why you are wanting this
-information, but if we keep it, it needs a better explanation in the
-commit message.
-
-> It doesn't seem like qemu has an existing
-> mechanism for a block backend to convey the required information to
-> the relevant block driver when it is being realized.
+> There's also getrandom(2).
 > 
-> The need for this mechanism rises from the fact that a drive may not
-> have a backend at the time it is created, as devices are created after
-> drives during qemu startup. Therefore, a driver requiring information
-> about the block configuration can get this information when a backend
-> is created for it at the earliest. The most natural place for this to
-> take place seems to be in the realization functions of the various
-> block device drivers, such as scsi-hd. The interface proposed here
-> allows the block driver to receive information about the block
-> configuration and the associated backend through a new callback.
+> See random(7) for a comparison between getrandom(), /dev/urandom,
+> /dev/random.
 > 
-> Signed-off-by: Ari Sundholm <ari@tuxera.com>
+> As you wrote, Linux's /dev/random blocks when the kernel entropy pool
+> has been depleted, while /dev/urandom doesn't.  There are systems where
+> both devices behave exactly the same, or only /dev/random exists.
+> Trying /dev/urandom first, and /dev/random as fallback is simple and
+> works okay across a wide range of hosts.  That said, getrandom(2) or
+> getentropy(3) are even nicer when available.
+> 
+> I can see two uses of /dev/random in QEMU outside tests:
+> 
+> * crypto/random-platform.c
+> 
+>     int qcrypto_random_init(Error **errp)
+>     {
+>     #ifndef _WIN32
+>         /* TBD perhaps also add support for BSD getentropy / Linux
+>          * getrandom syscalls directly */
+>         fd = open("/dev/urandom", O_RDONLY);
+>         if (fd == -1 && errno == ENOENT) {
+>             fd = open("/dev/random", O_RDONLY);
+>         }
+> 
+>         if (fd < 0) {
+>             error_setg(errp, "No /dev/urandom or /dev/random found");
+>             return -1;
+>         }
+>     #else
+>     [...]
+>     #endif
+> 
+>         return 0;
+>     }
+> 
+>   Looks good to me.  Resolving the TBD would be nice.
+> 
+> * backends/rng-random.c
+> 
+>     static void rng_random_init(Object *obj)
+>     {
+>         RngRandom *s = RNG_RANDOM(obj);
+> 
+>         object_property_add_str(obj, "filename",
+>                                 rng_random_get_filename,
+>                                 rng_random_set_filename,
+>                                 NULL);
+> 
+>         s->filename = g_strdup("/dev/random");
+>         s->fd = -1;
+>     }
+> 
+>    This is TYPE_RNG_RANDOM's instance_init() method.  Doesn't look so
+>    good, but it's "only" a default.
+> 
+>    What TYPE_RNG_RANDOM's intended use?  The manual suggests "backend
+>    for virtio-rng":
+> 
+>     @item -object rng-random,id=@var{id},filename=@var{/dev/random}
+> 
+>     Creates a random number generator backend which obtains entropy from
+>     a device on the host. The @option{id} parameter is a unique ID that
+>     will be used to reference this entropy backend from the @option{virtio-rng}
+>     device. The @option{filename} parameter specifies which file to obtain
+>     entropy from and if omitted defaults to @option{/dev/random}.
+> 
+> Regardless of other considerations, duplicating something as hairy as
+> getting high-quality random numbers from the host in a portable manner
+> is a Bad Idea.
 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 327e478..74c470e 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -465,6 +465,15 @@ struct BlockDriver {
->      void (*bdrv_abort_perm_update)(BlockDriverState *bs);
->  
->      /**
-> +     * Called to inform the driver of the block configuration of the virtual
-> +     * block device.
-> +     *
-> +     * This function is called by a block device realization function if the
-> +     * device wants to inform the block driver of its block configuration.
-> +     */
-> +    void (*bdrv_apply_blkconf)(BlockDriverState *bs, BlockConf *conf);
+I see, thanks for the detailed responses, both.  This is not really a
+high-priority item for management layers for now.  For now, (OpenStack)
+Nova overrides the QEMU default.
 
-This interface can't really work. Block nodes (BlockDriverStates) can
-have an arbitrary number of parents, which can be attached and detached
-dynamically. This interface basically assumes that there is one device
-attached to the node, it will always stay attached and its configuration
-stays the same.
-
-Is this function supposed to be called only once? (That assumption
-wouldn't hold true.) If not, does a second call mean that a second
-parent was attached, or does it update the information of the existing
-parent?
-
-How is this information useful when one parent calls the function and
-provides BlockConf, but the other doesn't and the block driver doesn't
-know about this?
-
-> diff --git a/block/io.c b/block/io.c
-> index b7beaee..3a06843 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2932,3 +2932,25 @@ int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
->      bdrv_dec_in_flight(dst_bs);
->      return ret;
->  }
-> +
-> +void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
-> +{
-> +    BlockDriver *drv = bs->drv;
-> +
-> +    if (!drv) {
-> +        return;
-> +    }
-> +
-> +    if (drv->bdrv_apply_blkconf) {
-> +        drv->bdrv_apply_blkconf(bs, conf);
-> +        return;
-> +    }
-> +
-> +    if (bs->file && bs->file->bs) {
-> +        bdrv_apply_blkconf(bs->file->bs, conf);
-> +    }
-> +
-> +    if (bs->drv->supports_backing && backing_bs(bs)) {
-> +        bdrv_apply_blkconf(backing_bs(bs), conf);
-> +    }
-> +}
-
-You probably want to propagate to all children instead of singling out
-bs->file and bs->backing.
-
-Kevin
+-- 
+/kashyap
