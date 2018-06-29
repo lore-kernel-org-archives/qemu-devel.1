@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fYuA7-000782-AP
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:14:13 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fYuFD-0003R0-TU
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fYuA5-0002ac-Ey
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:14:11 -0400
-Received: from mail-lf0-x232.google.com ([2a00:1450:4010:c07::232]:36445)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fYuFB-0001Nj-Hn
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:19:27 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fYuA4-0002Vs-Kg
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:14:09 -0400
-Received: by mail-lf0-x232.google.com with SMTP id n24-v6so6913863lfh.3
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:14:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fYuFB-0001Ln-5i
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:19:25 -0400
+Received: by mail-wm0-x244.google.com with SMTP id w137-v6so2395987wmw.1
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:19:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
-References: <20180627174435.31800-1-alistair.francis@wdc.com>
-	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
-	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
-	<CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 29 Jun 2018 07:13:36 -0700
-Message-ID: <CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
+In-Reply-To: <20180629160937.6c09c130@redhat.com>
+References: <20180626122343.13473-1-marcandre.lureau@redhat.com>
+	<20180626122343.13473-5-marcandre.lureau@redhat.com>
+	<20180627151948.5779e60b@redhat.com>
+	<CAJ+F1CKKaw0GyD_94bvpC97NheYqstUF6NLDbeGaRj0BUw_H7g@mail.gmail.com>
+	<20180629160937.6c09c130@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 29 Jun 2018 16:19:22 +0200
+Message-ID: <CAJ+F1CLDK7jS9wy-1eWeAPfwwHa5QgkO1jvNoVmm3eAMXrGNEQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,135 +34,452 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jun 29, 2018 at 2:41 AM, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> On 28 June 2018 at 22:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
-rote:
->> On 06/28/2018 01:52 PM, Peter Maydell wrote:
->>> On 27 June 2018 at 18:44, Alistair Francis <alistair.francis@wdc.com> w=
-rote:
->>>> The following changes since commit 00928a421d47f49691cace1207481b7aad3=
-1b1f1:
->>>>
->>>>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-=
-20180626' into staging (2018-06-26 18:23:49 +0100)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>   git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180627
->>>>
->>>> for you to fetch changes up to e5f5e16b67dc8a342f937bc00ebb2a6475e3505=
-0:
->>>>
->>>>   hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device (2018-06-=
-27 10:35:19 -0700)
->>>>
->>>
->>> Something strange is up with the key used to sign this:
->>>
->>> $ gpg --recv-keys 7048B74B4C1B39E4
->>> gpg: requesting key 0x7048B74B4C1B39E4 from hkp server keys.gnupg.net
->>> gpg: key 0xE48E3BC2C123ED93: no valid user IDs
->>> gpg: this may be caused by a missing self-signature
->>> gpg: Total number processed: 1
->>> gpg:           w/o user IDs: 1
+Hi
+
+On Fri, Jun 29, 2018 at 4:09 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 28 Jun 2018 17:24:47 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>
+>> Hi
 >>
->> It seems the SKS keyserver pool is having some problem:
->> https://sks-keyservers.net/status/
+>> On Wed, Jun 27, 2018 at 3:19 PM, Igor Mammedov <imammedo@redhat.com> wro=
+te:
+>> > On Tue, 26 Jun 2018 14:23:43 +0200
+>> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>> >
+>> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> >>
+>> >> The TPM Physical Presence interface consists of an ACPI part, a share=
+d
+>> >> memory part, and code in the firmware. Users can send messages to the
+>> >> firmware by writing a code into the shared memory through invoking th=
+e
+>> >> ACPI code. When a reboot happens, the firmware looks for the code and
+>> >> acts on it by sending sequences of commands to the TPM.
+>> >>
+>> >> This patch adds the ACPI code. It is similar to the one in EDK2 but d=
+oesn't
+>> >> assume that SMIs are necessary to use. It uses a similar datastructur=
+e for
+>> >> the shared memory as EDK2 does so that EDK2 and SeaBIOS could both ma=
+ke use
+>> >> of it. I extended the shared memory data structure with an array of 2=
+56
+>> >> bytes, one for each code that could be implemented. The array contain=
+s
+>> >> flags describing the individual codes. This decouples the ACPI implem=
+entation
+>> >> from the firmware implementation.
+>> >>
+>> >> The underlying TCG specification is accessible from the following pag=
+e.
+>> >>
+>> >> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spe=
+cification/
+>> >>
+>> >> This patch implements version 1.30.
+>> >
+>> > I've made several suggestions below how to improve aml part of patch a=
+ bit,
+>> > will review v6 once it's done
+>> > /hopefully it would be more readable, considering that ASM language is=
+ horrible to begin with/
+>> >
+>> >>
+>> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> >>
+>> >> ---
+>> >>
+>> >> v6:
+>> >>  - more code documentation (Marc-Andr=C3=A9)
+>> >>  - use some explicit named variables to ease reading (Marc-Andr=C3=A9=
+)
+>> >>  - use fixed size fields/memory regions, remove PPI struct (Marc-Andr=
+=C3=A9)
+>> >>  - only add PPI ACPI methods if PPI is enabled (Marc-Andr=C3=A9)
+>> >>  - document the qemu/firmware ACPI memory region (Stefan)
+>> >>
+>> >> v5 (Marc-Andr=C3=A9):
+>> >>  - /struct tpm_ppi/struct TPMPPIData
+>> >>
+>> >> v4 (Marc-Andr=C3=A9):
+>> >>  - replace 'DerefOf (FUNC [N])' with a function, to fix Windows ACPI
+>> >>     handling.
+>> >>  - replace 'return Package (..) {} ' with scoped variables, to fix
+>> >>    Windows ACPI handling.
+>> >>
+>> >> v3:
+>> >>  - add support for PPI to CRB
+>> >>  - split up OperationRegion TPPI into two parts, one containing
+>> >>    the registers (TPP1) and the other one the flags (TPP2); switched
+>> >>    the order of the flags versus registers in the code
+>> >>  - adapted ACPI code to small changes to the array of flags where
+>> >>    previous flag 0 was removed and now shifting right wasn't always
+>> >>    necessary anymore
+>> >>
+>> >> v2:
+>> >>  - get rid of FAIL variable; function 5 was using it and always
+>> >>    returns 0; the value is related to the ACPI function call not
+>> >>    a possible failure of the TPM function call.
+>> >>  - extend shared memory data structure with per-opcode entries
+>> >>    holding flags and use those flags to determine what to return
+>> >>    to caller
+>> >>  - implement interface version 1.3
+>> >> ---
+>> >>  include/hw/acpi/tpm.h |   8 +
+>> >>  hw/i386/acpi-build.c  | 423 ++++++++++++++++++++++++++++++++++++++++=
++-
+>> >>  docs/specs/tpm.txt    |  79 ++++++++
+>> >>  3 files changed, 509 insertions(+), 1 deletion(-)
+>> >>
+>> >> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>> >> index f79d68a77a..e0bd07862e 100644
+>> >> --- a/include/hw/acpi/tpm.h
+>> >> +++ b/include/hw/acpi/tpm.h
+>> >> @@ -196,4 +196,12 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>> >>  #define TPM_PPI_VERSION_NONE        0
+>> >>  #define TPM_PPI_VERSION_1_30        1
+>> >>
+>> >> +/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
+>> >> +#define TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
+>> >> +#define TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
+>> >> +#define TPM_PPI_FUNC_BLOCKED             (2 << 0)
+>> >> +#define TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
+>> >> +#define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
+>> >> +#define TPM_PPI_FUNC_MASK                (7 << 0)
+>> >> +
+>> >>  #endif /* HW_ACPI_TPM_H */
+>> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> >> index d9320845ed..d815af4eef 100644
+>> >> --- a/hw/i386/acpi-build.c
+>> >> +++ b/hw/i386/acpi-build.c
+>> >> @@ -43,6 +43,7 @@
+>> >>  #include "hw/acpi/memory_hotplug.h"
+>> >>  #include "sysemu/tpm.h"
+>> >>  #include "hw/acpi/tpm.h"
+>> >> +#include "hw/tpm/tpm_ppi.h"
+>> >>  #include "hw/acpi/vmgenid.h"
+>> >>  #include "sysemu/tpm_backend.h"
+>> >>  #include "hw/timer/mc146818rtc_regs.h"
+>> >> @@ -1789,6 +1790,421 @@ static Aml *build_q35_osc_method(void)
+>> >>      return method;
+>> >>  }
+>> >>
+>> >> +static void
+>> >> +build_tpm_ppi(Aml *dev)
+>> >> +{
+>> >> +    Aml *method, *name, *field, *ifctx, *ifctx2, *ifctx3, *pak;
+>> >> +    int i;
+>> >> +
+>> >> +    if (!object_property_get_bool(OBJECT(tpm_find()), "ppi", &error_=
+abort)) {
+>> > if tpm_find() =3D=3D NULL -> BAAM???
+>> >
+>> > I'd do it like this:
+>> >    tmp =3D tpm_find()
+>> >    if (TPM_IS_TIS(tpm) {
+>> >       ...
+>> >       if (object_property_get_bool(tpm), "ppi", &error_abort)) {
+>> >           build_tpm_ppi(tpm, dev)
+>> >       }
+>> >       ...
+>> >    }
+>> >
+>> >    if (TPM_IS_CRB(tpm))
+>> >    {
+>> >       ....
+>> >    }
+>> >
+>> > a bit more verbose but then the reader won't have to jump inside of
+>> > build_tpm_ppi() if he/she is not interested in it.
+>>
+>> ok, I pass the tpm to build_tpm_ppi() for the ppi property check, and
+>> avoid extra lookup.
+>>
+>> >
+>> >> +        return;
+>> >> +    }
+>> >> +    /*
+>> >> +     * TPP1 is for the flags that indicate which PPI operations
+>> >> +     * are supported by the firmware. The firmware is expected to
+>> >> +     * write these flags.
+>> >> +     */
+>> >> +    aml_append(dev,
+>> >> +               aml_operation_region("TPP1", AML_SYSTEM_MEMORY,
+>> >> +                                    aml_int(TPM_PPI_ADDR_BASE), 0x10=
+0));
+>> >> +    field =3D aml_field("TPP1", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
+E);
+>> >> +    for (i =3D 0; i < 0x100; i++) {
+>> >> +        char *tmp =3D g_strdup_printf("FN%02X", i);
+>> >> +        aml_append(field, aml_named_field(tmp, 8));
+>> >> +        g_free(tmp);
+>> >> +    }
+>> >> +    aml_append(dev, field);
+>> >> +
+>> >> +    /*
+>> >> +     * TPP2 is for the registers that ACPI code used to pass
+>> >> +     * the PPI code and parameter (PPRQ, PPRM) to the firmware.
+>> >> +     */
+>> >> +    aml_append(dev,
+>> >> +               aml_operation_region("TPP2", AML_SYSTEM_MEMORY,
+>> >> +                                    aml_int(TPM_PPI_ADDR_BASE + 0x10=
+0),
+>> >> +                                    0x5A));
+>> >> +    field =3D aml_field("TPP2", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
+E);
+>> >> +    aml_append(field, aml_named_field("PPIN", 8));
+>> >> +    aml_append(field, aml_named_field("PPIP", 32));
+>> >> +    aml_append(field, aml_named_field("PPRP", 32));
+>> >> +    aml_append(field, aml_named_field("PPRQ", 32));
+>> >> +    aml_append(field, aml_named_field("PPRM", 32));
+>> >> +    aml_append(field, aml_named_field("LPPR", 32));
+>> >> +    aml_append(dev, field);
+>> >> +
+>> >> +    /*
+>> >> +     * A function to return the value of DerefOf (FUNC [N]), by usin=
+g
+>> >> +     * accessing the fields individually instead. This is a workarou=
+nd
+>> >> +     * for what looks like a Windows ACPI bug in all versions so far
+>> >> +     * (fwiw, DerefOf (FUNC [N]) works on Linux).
+>> >> +     */
+>> >> +    method =3D aml_method("TPFN", 1, AML_SERIALIZED);
+>> >> +    {
+>> >> +        for (i =3D 0; i < 0x100; i++) {
+>> >> +            ifctx =3D aml_if(aml_equal(aml_int(i), aml_arg(0)));
+>> >> +            {
+>> >> +                aml_append(ifctx, aml_return(aml_name("FN%02X", i)))=
+;
+>> >> +            }
+>> >> +            aml_append(method, ifctx);
+>> >> +        }
+>> >> +        aml_append(method, aml_return(aml_int(0)));
+>> >> +    }
+>> >> +    aml_append(dev, method);
+>> >> +
+>> >> +    pak =3D aml_package(2);
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    name =3D aml_name_decl("TPM2", pak);
+>> >> +    aml_append(dev, name);
+>> >> +
+>> >> +    pak =3D aml_package(3);
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    name =3D aml_name_decl("TPM3", pak);
+>> > Aml one =3D aml_int(1)
+>> > Aml tpm3 =3D local(x)
+>> > aml_store(pak, tpm3)
+>> >
+>> > ... and then later ...
+>> >
+>> >             {
+>> >              /* TPM2[1] =3D PPRQ */
+>> >              aml_append(ifctx3, aml_store(aml_name("PPRQ"), aml_index(=
+tpm2, one)));
+>> >              aml_append(ifctx3, aml_return(tpm2));
+>> >
+>> > which would make code a bit more readable
+>> >
+>>
+>> But you would have to create aml_int(), aml_local() for every usage. I
+>> don't think we gain in readability.
+> Aml* variables can be reused as aml_append/aml_foo copies input arguments=
+.
+> Take look at build_cpus_aml() how it makes code more readable.
 >
->> The server is temporarily unable to service your request due to
->> maintenance downtime or capacity problems. Please try again later.
+>> >> +    aml_append(dev, name);
+>> > both packages could be local vars as return is done by value
+>> >
+>> >> +
+>> >> +    method =3D aml_method("_DSM", 4, AML_SERIALIZED);
+>> >> +    {
+>> >> +        uint8_t zerobyte[1] =3D { 0 };
+>> >> +        Aml *func_idx, *rev, *op, *op_arg, *op_flags;
+>> >> +
+>> >> +        ifctx =3D aml_if(
+>> >> +            aml_equal(aml_arg(0),
+>> >> +                      aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D16=
+53")));
+>> > aml_equal(uuid, aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D1653"))
+>>
+>> Ok
+>>
+>> >
+>> >> +        {
+>> >> +            func_idx =3D aml_local(0);
+>> >> +            aml_append(ifctx,
+>> >> +                       aml_store(aml_to_integer(aml_arg(2)), func_id=
+x));
+>> > why do you need aml_to_integer() cast here?
+>> >
+>> > Wouldn't following just work:
+>> >
+>> >    Aml function =3D aml_arg(2)
+>> >
+>> > I'd suggest to use "function" for consistency with nvdimm _DSM
+>>
+>> ok
+>>
+>> >
+>> > you can use the same naming approach for other arguments i.e.
+>> > arguments =3D aml_arg(3)
+>> >
+>>
+>> ok
+>>
+>> >> +
+>> >> +            /* standard DSM query function */
+>> >> +            func_idx =3D aml_local(0);
+>> > I don't think you need to init it twice.
+>> >
+>>
+>> That looks right, and it's the way nvdimm ACPI code is written, but is
+>> not following the usual convention to give up the ownership when given
+>> as argument to other AML building function.
 >
-> Hmm, there does seem to be something up with the pool. On
-> the other hand:
+> That's misunderstanding of how it works, there isn't such convention
+> input argument is copied into output AML element.
 >
->> $ gpg --keyserver hkp://18.191.65.131 --recv-keys 7048B74B4C1B39E4
 >
-> This command with this specific server doesn't work for me
-> (fails the same way with the "no valid user IDs" message),
-> and using keyserver.ubuntu.com (which seems otherwise fine)
-> also fails that way...
+>> Sad we don't stick to a single usage pattern (giving up ownership).
+>> Some day, someone will look at fixing the leaks, and that may make its
+>> work easier if the code was consistent...
+> Aml* pointers aren't leaked, see aml_alloc() which stores all allocations
+> into a list which is freed later by free_aml_allocator() when table
+> is build.
+>
 
-I'm not sure what else to do. I have submitted it to all of those key
-servers through GPG and through the web interface. I never see an
-error, but it doesn't show up under the web search.
-
-Can you import it manually? The armour export is below:
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v2
-
-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
-zafpeVkcoSpABQrI2UQ=3D
-=3DxMq1
------END PGP PUBLIC KEY BLOCK-----
-
-Alistair
+oh ok, GC magic :)
 
 >
-> thanks
-> -- PMM
+>> But I'll follow your advise for now.
+>>
+>> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(0)));
+>> >> +            {
+>> >> +                uint8_t byte_list[2] =3D { 0xff, 0x01 };
+>> >> +                aml_append(ifctx2, aml_return(aml_buffer(2, byte_lis=
+t)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /*
+>> >> +             * 8.1.1 Get Physical Presence Interface Version
+>> > like Michael noted use version/chapter pair to as reference
+>> >
+>> > ex: /* ACPI 1.0b: 16.2.5.2 Named Objects Encoding: DefOpRegion */
+>>
+>> ok
+>>
+>> >
+>> >> +             *
+>> >> +             * Arg 2 (Integer): Function Index =3D 1
+>> >> +             * Arg 3 (Package): Arguments =3D Empty Package
+>> >> +             * Returns: Type: String
+>> >> +             */
+>> >> +            func_idx =3D aml_local(0);
+>> > not needed
+>> >
+>> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(1)));
+>> >> +            {
+>> >> +                aml_append(ifctx2, aml_return(aml_string("1.3")));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /*
+>> >> +             * 8.1.2 Submit TPM Operation Request to Pre-OS Environm=
+ent
+>> >> +             *
+>> >> +             * Arg 2 (Integer): Function Index =3D 2
+>> >> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+>> >> +             *                              Operation Value of the R=
+equest
+>> >> +             * Returns: Type: Integer
+>> >> +             *          0: Success
+>> >> +             *          1: Operation Value of the Request Not Suppor=
+ted
+>> >> +             *          2: General Failure
+>> >> +             */
+>> >> +            func_idx =3D aml_local(0);
+>> > ditto and the same in other places
+>> >
+>> >> +            ifctx2 =3D aml_if(aml_equal(func_idx, aml_int(2)));
+>> >> +            {
+>> >> +                /* get opcode */
+>> >> +                op =3D aml_derefof(aml_index(aml_arg(3), aml_int(0))=
+);
+>> >> +                aml_append(ifctx2, aml_store(op, aml_local(0)));
+>> >                                                     ^^^ what this loca=
+l(0) is? suggest to use named var here (in C sense)
+>> >> +
+>> >> +                /* get opcode flags */
+>> >> +                op =3D aml_local(0);
+>> > use other local to make ASL less confusion (i.e. try not to reuse loca=
+l vars for something else)
+>>
+>> I must say I get a bit confused by the code style change you request.
+>> The original code from Stefan was more straightforward to me. Now it
+>> seems C variables adds another layer of complexity. I think it's
+>> easier if you come up with a follow-up patch for further cleanup
+>> iterations, as I find it hard to match your wanted style.
+>
+> Whole point of review is to merge code that doesn't need to be
+> rewritten later on and to show preferred style for ACPI code
+> so I wouldn't be the only one who knows how it is supposed to work.
+>
+> Now about my original comment.
+> What we have in this patch:
+>   func_idx =3D aml_local(0);
+>   ...
+>   op =3D aml_local(0);
+> so resulting AML decompiled in to ASL would (re)use Local0 with different=
+ meanings
+> what I've suggested is:
+>   Aml *func_idx =3D aml_local(0);
+>   Aml *op =3D aml_local(1);
+>   Aml *foo =3D aml_local(X);
+>
+> where ASL would retain LocalX meaning throughout method, making it a bit =
+readable.
+>
+
+Ok, hopefully last iteration is closer to that goal.
+
+>
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_call1("TPFN", op), aml_loca=
+l(1)));
+>> >                                                                ^^^ wha=
+t this local(1) is?
+>> >
+>> >> +
+>> >> +                op_flags =3D aml_local(1);
+>> > I'd init all named vars at the top of function where it's easy to see =
+what is what
+>> > and use them later. ex: nvdimm_build_common_dsm()
+>>
+>> But the arguments depend on the function.
+> some maybe, but
+> function index is common, arguments also, so one could do following:
+>
+> Aml *func =3D aml_arg(2);
+> Aml *args =3D aml_arg(3);
+>
+> without storing them in locals, and then use them within the method as ne=
+cessary
+
+I did that for aml_arg(0..2). just now reading ACPI DSM spec, I
+realize aml_arg(3) is always supposed to be optional arguments
+package. So I agree, and my last iteration can be further improved in
+that direction.
+
+thanks
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
