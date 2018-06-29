@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYq1Q-0001Oi-Li
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:49:01 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYq4Y-0003oD-VH
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:52:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYq1L-0005yy-UY
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:56 -0400
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:43569)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYq1L-0005wK-Mc
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:51 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.120.50])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 146751BD7C9
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 11:48:49 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 29 Jun 2018 11:48:40 +0200
-Message-ID: <153026572065.394407.16369067299697377597.stgit@bahia.lan>
-In-Reply-To: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
-References: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 3/3] spapr: compute default value of
- "hpt-max-page-size" later
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fYq4V-0005G4-0f
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:52:11 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fYq4U-0005DW-P5
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:52:06 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id u18-v6so1419189wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:52:06 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 29 Jun 2018 11:51:30 +0200
+Message-Id: <1530265890-17213-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1530265890-17213-1-git-send-email-pbonzini@redhat.com>
+References: <1530265890-17213-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 52/60] i386/cpu: make -cpu host support
+ monitor/mwait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +29,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-It is currently not possible to run a pseries-2.12 or older machine
-with HV KVM. QEMU prints the following and exits right away.
+From: "Michael S. Tsirkin" <mst@redhat.com>
 
-qemu-system-ppc64: KVM doesn't support for base page shift 34
+When guest CPU PM is enabled, and with -cpu host, expose the host CPU
+MWAIT leaf in the CPUID so guest can make good PM decisions.
 
-The "hpt-max-page-size" capability was recently added to spapr to hide
-host configuration details from HPT mode guests. Its default value for
-newer machine types is 64k.
+Note: the result is 100% CPU utilization reported by host as host
+no longer knows that the CPU is halted.
 
-For backwards compatibility, pseries-2.12 and older machine types need
-a different value. This is handled as usual in a class init function.
-The default value is 16G, ie, all page sizes supported by POWER7 and
-newer CPUs, but HV KVM requires guest pages to be hpa contiguous as
-well as gpa contiguous. The default value is the page size used to
-back the guest RAM in this case.
-
-Unfortunately kvmppc_hpt_needs_host_contiguous_pages()->kvm_enabled() is
-called way before KVM init and returns false, even if the user requested
-KVM. We thus end up selecting 16G, which isn't supported by HV KVM. The
-default value must be set during machine init, because we can safely
-assume that KVM is initialized at this point.
-
-We fix this by moving the logic to a fixup helper to be called by
-spapr_caps_init(). Since the user cannot pass cap-hpt-max-page-size=0,
-we set the default to 0 in the pseries-2.12 class init function and use
-that as a flag to do the real work.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20180622192148.178309-3-mst@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-v2: - moved logic under spapr_caps_init()
----
- hw/ppc/spapr.c      |   13 ++++++-------
- hw/ppc/spapr_caps.c |   20 ++++++++++++++++++++
- 2 files changed, 26 insertions(+), 7 deletions(-)
+ target/i386/cpu.c | 32 ++++++++++++++++++++++----------
+ target/i386/cpu.h |  9 +++++++++
+ target/i386/kvm.c |  9 +++++++++
+ 3 files changed, 40 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8cc996d0b822..f6c60f2a1248 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4103,17 +4103,16 @@ static void spapr_machine_2_12_instance_options(MachineState *machine)
- static void spapr_machine_2_12_class_options(MachineClass *mc)
- {
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
--    uint8_t mps;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e6c2f8a..1e6a7d0 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3959,11 +3959,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         }
+         break;
+     case 5:
+-        /* mwait info: needed for Core compatibility */
+-        *eax = 0; /* Smallest monitor-line size in bytes */
+-        *ebx = 0; /* Largest monitor-line size in bytes */
+-        *ecx = CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
+-        *edx = 0;
++        /* MONITOR/MWAIT Leaf */
++        *eax = cpu->mwait.eax; /* Smallest monitor-line size in bytes */
++        *ebx = cpu->mwait.ebx; /* Largest monitor-line size in bytes */
++        *ecx = cpu->mwait.ecx; /* flags */
++        *edx = cpu->mwait.edx; /* mwait substates */
+         break;
+     case 6:
+         /* Thermal and Power Leaf */
+@@ -4804,13 +4804,25 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+     Error *local_err = NULL;
+     static bool ht_warned;
  
-     spapr_machine_3_0_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
- 
--    if (kvmppc_hpt_needs_host_contiguous_pages()) {
--        mps = ctz64(qemu_getrampagesize());
--    } else {
--        mps = 34; /* allow everything up to 16GiB, i.e. everything */
--    }
--    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
-+    /* We depend on kvm_enabled() to choose a default value for the
-+     * hpt-max-page-size capability. Of course we can't do it here
-+     * because this is too early and the HW accelerator isn't initialzed
-+     * yet. Postpone this to spapr_caps_init().
-+     */
-+    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 0;
- }
- 
- DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 62663ebdf51a..e307161f6425 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -552,11 +552,31 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
- SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
- SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
- 
-+static void fixup_default_cap_hpt_maxpagesize_pre_3_0(sPAPRMachineState *spapr)
-+{
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-+    uint8_t mps;
+-    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+-        char *name = x86_cpu_class_get_model_name(xcc);
+-        error_setg(&local_err, "CPU model '%s' requires KVM", name);
+-        g_free(name);
+-        goto out;
++    if (xcc->host_cpuid_required) {
++        if (!accel_uses_host_cpuid()) {
++            char *name = x86_cpu_class_get_model_name(xcc);
++            error_setg(&local_err, "CPU model '%s' requires KVM", name);
++            g_free(name);
++            goto out;
++        }
 +
-+    /* If it is already set, then this is a 3.0 or newer machine */
-+    if (smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
-+        return;
-+    }
-+
-+    if (kvmppc_hpt_needs_host_contiguous_pages()) {
-+        mps = ctz64(qemu_getrampagesize());
-+    } else {
-+        mps = 34; /* allow everything up to 16GiB, i.e. everything */
-+    }
-+    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
-+}
-+
- void spapr_caps_init(sPAPRMachineState *spapr)
- {
-     sPAPRCapabilities default_caps;
-     int i;
++        if (enable_cpu_pm) {
++            host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
++                       &cpu->mwait.ecx, &cpu->mwait.edx);
++            env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
++        }
+     }
  
-+    fixup_default_cap_hpt_maxpagesize_pre_3_0(spapr);
++    /* mwait extended info: needed for Core compatibility */
++    /* We always wake on interrupt even if host does not have the capability */
++    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
 +
-     /* Compute the actual set of caps we should run with */
-     default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
+     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+         error_setg(errp, "apic-id property was not initialized properly");
+         return;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 16c59b7..8eaefee 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1382,6 +1382,15 @@ struct X86CPU {
+     /* if true the CPUID code directly forward host cache leaves to the guest */
+     bool cache_info_passthrough;
  
++    /* if true the CPUID code directly forwards
++     * host monitor/mwait leaves to the guest */
++    struct {
++        uint32_t eax;
++        uint32_t ebx;
++        uint32_t ecx;
++        uint32_t edx;
++    } mwait;
++
+     /* Features that were filtered out because of missing host capabilities */
+     uint32_t filtered_features[FEATURE_WORDS];
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index dc991f6..c5f72d6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -366,6 +366,15 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         if (!kvm_irqchip_in_kernel()) {
+             ret &= ~CPUID_EXT_X2APIC;
+         }
++
++        if (enable_cpu_pm) {
++            int disable_exits = kvm_check_extension(s,
++                                                    KVM_CAP_X86_DISABLE_EXITS);
++
++            if (disable_exits & KVM_X86_DISABLE_EXITS_MWAIT) {
++                ret |= CPUID_EXT_MONITOR;
++            }
++        }
+     } else if (function == 6 && reg == R_EAX) {
+         ret |= CPUID_6_EAX_ARAT; /* safe to allow because of emulated APIC */
+     } else if (function == 7 && index == 0 && reg == R_EBX) {
+-- 
+1.8.3.1
