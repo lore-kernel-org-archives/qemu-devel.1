@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYoBK-00056G-4l
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:51:02 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNR-0007Ig-D3
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYoBJ-0005xU-Ee
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:51:02 -0400
-Date: Fri, 29 Jun 2018 09:50:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180629075051.GA15588@localhost.localdomain>
-References: <20180629060328.4423-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180629060328.4423-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] block: A few more copy offloading fixes
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNO-0006nk-8P
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:33 -0400
+Received: from relay.sw.ru ([185.231.240.75]:58256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1fYoNO-0006ko-0V
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:30 -0400
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Fri, 29 Jun 2018 11:03:14 +0300
+Message-Id: <20180629080320.320144-2-dplotnikov@virtuozzo.com>
+In-Reply-To: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v0 1/7] migration: add background snapshot
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,13 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org
 
-Am 29.06.2018 um 08:03 hat Fam Zheng geschrieben:
-> These are unfortunately more serious than the previous two fixes but the
-> patches are not complicated.
+The capability is used for the background vmstate saving
+using the migration infrastructure.
+Background vmstate saving means that the majority of vmstate
+(RAM) is saved in the background when VM's vCPUS are running.
+This helps to reduce the VM downtime on VM snapshotting.
 
-Thanks, applied to the block branch.
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ migration/migration.c | 35 +++++++++++++++++++++++++++++++++++
+ migration/migration.h |  1 +
+ qapi/migration.json   |  6 +++++-
+ 3 files changed, 41 insertions(+), 1 deletion(-)
 
-Kevin
+diff --git a/migration/migration.c b/migration/migration.c
+index d780601f0c..87096d23ef 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -697,6 +697,12 @@ static bool migrate_caps_check(bool *cap_list,
+             return false;
+         }
+ 
++        if (cap_list[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT]) {
++            error_setg(errp, "Postcopy is not compatible "
++                        "with background snapshot");
++            return false;
++        }
++
+         /* This check is reasonably expensive, so only when it's being
+          * set the first time, also it's only the destination that needs
+          * special support.
+@@ -711,6 +717,26 @@ static bool migrate_caps_check(bool *cap_list,
+         }
+     }
+ 
++    if (cap_list[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT]) {
++        if (cap_list[MIGRATION_CAPABILITY_RELEASE_RAM]) {
++            error_setg(errp, "Background snapshot is not compatible "
++                        "with release ram capability");
++            return false;
++        }
++
++        if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
++            error_setg(errp, "Background snapshot is not "
++                        "currently compatible with compression");
++            return false;
++        }
++
++        if (cap_list[MIGRATION_CAPABILITY_XBZRLE]) {
++            error_setg(errp, "Background snapshot is not "
++                        "currently compatible with XBZLRE");
++            return false;
++        }
++    }
++
+     return true;
+ }
+ 
+@@ -1635,6 +1661,15 @@ bool migrate_use_block_incremental(void)
+     return s->parameters.block_incremental;
+ }
+ 
++bool migrate_background_snapshot(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT];
++}
++
+ /* migration thread support */
+ /*
+  * Something bad happened to the RP stream, mark an error
+diff --git a/migration/migration.h b/migration/migration.h
+index 663415fe48..21babbc008 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -201,6 +201,7 @@ int migrate_compress_level(void);
+ int migrate_compress_threads(void);
+ int migrate_decompress_threads(void);
+ bool migrate_use_events(void);
++bool migrate_background_snapshot(void);
+ 
+ /* Sending on the return path - generic and then for each message type */
+ void migrate_send_rp_shut(MigrationIncomingState *mis,
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 03f57c9616..eb5f52b7ff 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -352,12 +352,16 @@
+ #
+ # @x-multifd: Use more than one fd for migration (since 2.11)
+ #
++# @background-snapshot: Using migration infrastructure makes VM snapshot
++#         saving its RAM in background. This reduces  VM downtime. (since 2.12)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+-           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
++           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
++           'background-snapshot' ] }
+ 
+ ##
+ # @MigrationCapabilityStatus:
+-- 
+2.17.0
