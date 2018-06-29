@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYunB-0007w7-Ul
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fYun8-0007qq-62
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYunA-0007ur-Of
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:34 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43132)
+	(envelope-from <pm215@archaic.org.uk>) id 1fYun7-0007ip-Av
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:30 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYunA-0007rD-HL
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:32 -0400
+	id 1fYun7-0007dX-0Q
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:29 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYun9-0004qz-EK
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:54:31 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fYun5-0004ol-P7
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:54:27 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:53:44 +0100
-Message-Id: <20180629145347.652-53-peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 15:53:39 +0100
+Message-Id: <20180629145347.652-48-peter.maydell@linaro.org>
 In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
 References: <20180629145347.652-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 52/55] target/arm: Fix SVE system register
- access checks
+Subject: [Qemu-devel] [PULL 47/55] target/arm: Remove redundant DIV
+ detection for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +30,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Aaron Lindsay <alindsay@codeaurora.org>
 
-Leave ARM_CP_SVE, removing ARM_CP_FPU; the sve_access_check
-produced by the flag already includes fp_access_check.  If
-we also check ARM_CP_FPU the double fp_access_check asserts.
+KVM implies V7VE, which implies ARM_DIV and THUMB_DIV. The conditional
+detection here is therefore unnecessary. Because V7VE is already
+unconditionally specified for all KVM hosts, ARM_DIV and THUMB_DIV are
+already indirectly specified and do not need to be included here at all.
 
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180629001538.11415-3-richard.henderson@linaro.org
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+Message-id: 1529699547-17044-6-git-send-email-alindsay@codeaurora.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c        | 8 ++++----
- target/arm/translate-a64.c | 5 ++---
- 2 files changed, 6 insertions(+), 7 deletions(-)
+ target/arm/kvm32.c | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 60589b7eaf9..ae70b874c71 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4414,7 +4414,7 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static const ARMCPRegInfo zcr_el1_reginfo = {
-     .name = "ZCR_EL1", .state = ARM_CP_STATE_AA64,
-     .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 2, .opc2 = 0,
--    .access = PL1_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-+    .access = PL1_RW, .type = ARM_CP_SVE,
-     .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[1]),
-     .writefn = zcr_write, .raw_writefn = raw_write
- };
-@@ -4422,7 +4422,7 @@ static const ARMCPRegInfo zcr_el1_reginfo = {
- static const ARMCPRegInfo zcr_el2_reginfo = {
-     .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
-     .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
--    .access = PL2_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-+    .access = PL2_RW, .type = ARM_CP_SVE,
-     .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[2]),
-     .writefn = zcr_write, .raw_writefn = raw_write
- };
-@@ -4430,14 +4430,14 @@ static const ARMCPRegInfo zcr_el2_reginfo = {
- static const ARMCPRegInfo zcr_no_el2_reginfo = {
-     .name = "ZCR_EL2", .state = ARM_CP_STATE_AA64,
-     .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 2, .opc2 = 0,
--    .access = PL2_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-+    .access = PL2_RW, .type = ARM_CP_SVE,
-     .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore
- };
+diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+index fb9ea37a318..4e91c11796b 100644
+--- a/target/arm/kvm32.c
++++ b/target/arm/kvm32.c
+@@ -36,7 +36,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      * and then query that CPU for the relevant ID registers.
+      */
+     int i, ret, fdarray[3];
+-    uint32_t midr, id_pfr0, id_isar0, mvfr1;
++    uint32_t midr, id_pfr0, mvfr1;
+     uint64_t features = 0;
+     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+      * we know these will only support creating one kind of guest CPU,
+@@ -58,11 +58,6 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+             | ENCODE_CP_REG(15, 0, 0, 0, 1, 0, 0),
+             .addr = (uintptr_t)&id_pfr0,
+         },
+-        {
+-            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+-            | ENCODE_CP_REG(15, 0, 0, 0, 2, 0, 0),
+-            .addr = (uintptr_t)&id_isar0,
+-        },
+         {
+             .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+             | KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1,
+@@ -106,18 +101,6 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     set_feature(&features, ARM_FEATURE_VFP3);
+     set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
  
- static const ARMCPRegInfo zcr_el3_reginfo = {
-     .name = "ZCR_EL3", .state = ARM_CP_STATE_AA64,
-     .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 2, .opc2 = 0,
--    .access = PL3_RW, .type = ARM_CP_SVE | ARM_CP_FPU,
-+    .access = PL3_RW, .type = ARM_CP_SVE,
-     .fieldoffset = offsetof(CPUARMState, vfp.zcr_el[3]),
-     .writefn = zcr_write, .raw_writefn = raw_write
- };
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index f9863408324..45a6c2a3aa1 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1633,11 +1633,10 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
-     default:
-         break;
-     }
--    if ((ri->type & ARM_CP_SVE) && !sve_access_check(s)) {
--        return;
+-    switch (extract32(id_isar0, 24, 4)) {
+-    case 1:
+-        set_feature(&features, ARM_FEATURE_THUMB_DIV);
+-        break;
+-    case 2:
+-        set_feature(&features, ARM_FEATURE_ARM_DIV);
+-        set_feature(&features, ARM_FEATURE_THUMB_DIV);
+-        break;
+-    default:
+-        break;
 -    }
-     if ((ri->type & ARM_CP_FPU) && !fp_access_check(s)) {
-         return;
-+    } else if ((ri->type & ARM_CP_SVE) && !sve_access_check(s)) {
-+        return;
+-
+     if (extract32(id_pfr0, 12, 4) == 1) {
+         set_feature(&features, ARM_FEATURE_THUMB2EE);
      }
- 
-     if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_CP_IO)) {
 -- 
 2.17.1
