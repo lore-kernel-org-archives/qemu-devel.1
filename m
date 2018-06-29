@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nv-0008Cu-6m
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nw-0008Du-8M
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nr-0006Yy-8U
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:51 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37482)
+	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nv-0006f1-Dw
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:52 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:32874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZ0Nr-0006Xv-1h
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:47 -0400
-Received: by mail-wr0-x242.google.com with SMTP id k6-v6so9981879wrp.4
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:52:46 -0700 (PDT)
+	id 1fZ0Nv-0006ci-3B
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:51 -0400
+Received: by mail-wm0-x229.google.com with SMTP id z6-v6so2894382wma.0
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:52:50 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 29 Jun 2018 21:52:20 +0100
-Message-Id: <20180629205232.27190-10-alex.bennee@linaro.org>
+Date: Fri, 29 Jun 2018 21:52:27 +0100
+Message-Id: <20180629205232.27190-17-alex.bennee@linaro.org>
 In-Reply-To: <20180629205232.27190-1-alex.bennee@linaro.org>
 References: <20180629205232.27190-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 09/21] linux-user: introduce preexit_cleanup
+Subject: [Qemu-devel] [PATCH v2 16/21] docker: add env parser to docker.py
+ build step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +31,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-To avoid repeating ourselves move our preexit clean-up code into a
-helper function. I figured the continuing effort to split of the
-syscalls made it worthwhile creating a new file for it now.
+We need to pass environment variables down to the debbootstrap.pre
+script to be able to specify build parameters.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/Makefile.objs |  2 +-
- linux-user/exit.c        | 28 ++++++++++++++++++++++++++++
- linux-user/qemu.h        |  8 ++++++++
- linux-user/syscall.c     | 10 ++--------
- 4 files changed, 39 insertions(+), 9 deletions(-)
- create mode 100644 linux-user/exit.c
+ tests/docker/docker.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 59a5c17354..b5dfb71f25 100644
---- a/linux-user/Makefile.objs
-+++ b/linux-user/Makefile.objs
-@@ -1,7 +1,7 @@
- obj-y = main.o syscall.o strace.o mmap.o signal.o \
- 	elfload.o linuxload.o uaccess.o uname.o \
- 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
--        $(TARGET_ABI_DIR)/cpu_loop.o
-+        $(TARGET_ABI_DIR)/cpu_loop.o exit.o
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index b279836154..388e86ada2 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -293,6 +293,8 @@ class BuildCommand(SubCommand):
+         parser.add_argument("--add-current-user", "-u", dest="user",
+                             action="store_true",
+                             help="Add the current user to image's passwd")
++        parser.add_argument("--env", "-E", action='append', nargs=1,
++                            help="Set FOO=BAR in envronment")
+         parser.add_argument("tag",
+                             help="Image Tag")
+         parser.add_argument("dockerfile",
+@@ -302,6 +304,12 @@ class BuildCommand(SubCommand):
+         dockerfile = open(args.dockerfile, "rb").read()
+         tag = args.tag
  
- obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-new file mode 100644
-index 0000000000..aed8713fae
---- /dev/null
-+++ b/linux-user/exit.c
-@@ -0,0 +1,28 @@
-+/*
-+ *  exit support for qemu
-+ *
-+ *  Copyright (c) 2018 Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu.h"
++        # Process env setting
++        if args.env:
++            for e in args.env:
++                (env, val) = e[0].split("=")
++                os.environ[env] = val
 +
-+void preexit_cleanup(CPUArchState *env, int code)
-+{
-+#ifdef TARGET_GPROF
-+        _mcleanup();
-+#endif
-+        gdb_exit(env, code);
-+}
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 793cd4df04..bb85c81aa4 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -623,6 +623,14 @@ static inline int is_error(abi_long ret)
-     return (abi_ulong)ret >= (abi_ulong)(-4096);
- }
- 
-+/**
-+ * preexit_cleanup: housekeeping before the guest exits
-+ *
-+ * env: the CPU state
-+ * code: the exit code
-+ */
-+void preexit_cleanup(CPUArchState *env, int code);
-+
- /* Include target-specific struct and function definitions;
-  * they may need access to the target-independent structures
-  * above, so include them last.
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 2117fb13b4..7c66442357 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8018,10 +8018,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-         }
- 
-         cpu_list_unlock();
--#ifdef TARGET_GPROF
--        _mcleanup();
--#endif
--        gdb_exit(cpu_env, arg1);
-+        preexit_cleanup(cpu_env, arg1);
-         _exit(arg1);
-         ret = 0; /* avoid warning */
-         break;
-@@ -10127,10 +10124,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- #ifdef __NR_exit_group
-         /* new thread calls */
-     case TARGET_NR_exit_group:
--#ifdef TARGET_GPROF
--        _mcleanup();
--#endif
--        gdb_exit(cpu_env, arg1);
-+        preexit_cleanup(cpu_env, arg1);
-         ret = get_errno(exit_group(arg1));
-         break;
- #endif
+         dkr = Docker()
+         if "--no-cache" not in argv and \
+            dkr.image_matches_dockerfile(tag, dockerfile):
 -- 
 2.17.1
