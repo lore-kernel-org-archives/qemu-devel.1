@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fYv7U-0001G6-RD
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYv7U-0001G5-QD
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:15:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fYv7R-0006AR-E9
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fYv7R-0006AX-Ef
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 11:15:32 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 29 Jun 2018 18:15:24 +0300
-Message-Id: <20180629151524.138542-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qemu-iotests: Image fleecing test case
- 222
+Date: Fri, 29 Jun 2018 18:15:21 +0300
+Message-Id: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] image fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,164 +20,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-From: Fam Zheng <famz@redhat.com>
+Image fleecing, or external (or pull) backup scheme is near to complete.
+Here is forgotten test, written by Fam in far 2014, with two my necessary
+patches, previously sent separately, so the series are called "v2"
 
-This tests the workflow of creating a lightweight point-in-time snapshot
-with blockdev-backup command, and exporting it with built-in NBD server.
+v2:
+ 01: add transaction support
+ 02: rebase on master, drop "'fleecing-filter': 'BlockdevCreateNotSupported'"
+     add empty .bdrv_close
+     add default .bdrv_child_perm
+ 03: comparing to [PATCH v20 15/15] qemu-iotests: Image fleecing test case 08:
+     add -f iotests.imgfmt to qemu_io
+     fix target_img to be always qcow2
+     add -r to qemu_io for nbd
+     add fleecing-filter layer
+     wrap long lines
 
-It's tested that any post-snapshot writing to the original device
-doesn't change data seen in NBD target.
+Fam Zheng (1):
+  qemu-iotests: Image fleecing test case 222
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-[vsementsov: add -f iotests.imgfmt to qemu_io, fix target_img to be
-always qcow2, add -r to qemu_io for nbd, add fleecing-filter layer,
-wrap long lines]
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+Vladimir Sementsov-Ogievskiy (2):
+  blockdev-backup: enable non-root nodes for backup source
+  block/fleecing-filter: new filter driver for fleecing
+
+ qapi/block-core.json       |   6 ++-
+ block/fleecing-filter.c    |  80 ++++++++++++++++++++++++++++++++
+ blockdev.c                 |   4 +-
+ block/Makefile.objs        |   1 +
  tests/qemu-iotests/222     | 112 +++++++++++++++++++++++++++++++++++++++++++++
  tests/qemu-iotests/222.out |   5 ++
  tests/qemu-iotests/group   |   1 +
- 3 files changed, 118 insertions(+)
+ 7 files changed, 205 insertions(+), 4 deletions(-)
+ create mode 100644 block/fleecing-filter.c
  create mode 100755 tests/qemu-iotests/222
  create mode 100644 tests/qemu-iotests/222.out
 
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-new file mode 100755
-index 0000000000..3bcf9505fd
---- /dev/null
-+++ b/tests/qemu-iotests/222
-@@ -0,0 +1,112 @@
-+#!/usr/bin/env python
-+#
-+# Tests for image fleecing (point in time snapshot export to NBD)
-+#
-+# Copyright (C) 2014 Red Hat, Inc.
-+#
-+# Based on 055.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import time
-+import os
-+import iotests
-+from iotests import qemu_img, qemu_io
-+
-+test_img = os.path.join(iotests.test_dir, 'test.img')
-+target_img = os.path.join(iotests.test_dir, 'target.img')
-+nbd_sock = os.path.join(iotests.test_dir, 'nbd.sock')
-+
-+class TestImageFleecing(iotests.QMPTestCase):
-+    image_len = 64 * 1024 * 1024 # MB
-+
-+    def setUp(self):
-+        # Write data to the image so we can compare later
-+        qemu_img('create', '-f', iotests.imgfmt, test_img,
-+                 str(TestImageFleecing.image_len))
-+        self.patterns = [
-+                ("0x5d", "0", "64k"),
-+                ("0xd5", "1M", "64k"),
-+                ("0xdc", "32M", "64k"),
-+                ("0xdc", "67043328", "64k")]
-+
-+        for p in self.patterns:
-+            qemu_io('-f', iotests.imgfmt, '-c', 'write -P%s %s %s' % p,
-+                    test_img)
-+
-+        qemu_img('create', '-f', 'qcow2', target_img,
-+                 str(TestImageFleecing.image_len))
-+
-+        self.vm = iotests.VM().add_drive(test_img)
-+        self.vm.launch()
-+
-+        self.overwrite_patterns = [
-+                ("0xa0", "0", "64k"),
-+                ("0x0a", "1M", "64k"),
-+                ("0x55", "32M", "64k"),
-+                ("0x56", "67043328", "64k")]
-+
-+        self.nbd_uri = "nbd+unix:///drive1?socket=%s" % nbd_sock
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(test_img)
-+        os.remove(target_img)
-+
-+    def verify_patterns(self):
-+        for p in self.patterns:
-+            self.assertEqual(
-+                    -1,
-+                    qemu_io(self.nbd_uri, '-r', '-c', 'read -P%s %s %s' % p)
-+                        .find("verification failed"),
-+                    "Failed to verify pattern: %s %s %s" % p)
-+
-+    def test_image_fleecing(self):
-+        result = self.vm.qmp("blockdev-add", **{
-+            "driver": "fleecing-filter",
-+            "node-name": "drive1",
-+            "file": {
-+                "driver": "qcow2",
-+                "file": {
-+                    "driver": "file",
-+                    "filename": target_img,
-+                    },
-+                "backing": "drive0",
-+            }
-+            })
-+        self.assert_qmp(result, 'return', {})
-+
-+        result = self.vm.qmp(
-+                "nbd-server-start",
-+                **{"addr": { "type": "unix", "data": { "path": nbd_sock } } })
-+        self.assert_qmp(result, 'return', {})
-+        result = self.vm.qmp("blockdev-backup", device="drive0",
-+                             target="drive1", sync="none")
-+        self.assert_qmp(result, 'return', {})
-+        result = self.vm.qmp("nbd-server-add", device="drive1")
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.verify_patterns()
-+
-+        for p in self.overwrite_patterns:
-+            self.vm.hmp_qemu_io("drive0", "write -P%s %s %s" % p)
-+
-+        self.verify_patterns()
-+
-+        self.cancel_and_wait(resume=True)
-+        self.assert_no_active_block_jobs()
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['raw', 'qcow2'])
-diff --git a/tests/qemu-iotests/222.out b/tests/qemu-iotests/222.out
-new file mode 100644
-index 0000000000..ae1213e6f8
---- /dev/null
-+++ b/tests/qemu-iotests/222.out
-@@ -0,0 +1,5 @@
-+.
-+----------------------------------------------------------------------
-+Ran 1 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index eea75819d2..8019a9f721 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -220,3 +220,4 @@
- 218 rw auto quick
- 219 rw auto
- 221 rw auto quick
-+222 rw auto quick
 -- 
 2.11.1
