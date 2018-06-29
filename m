@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYj1h-0006yU-TX
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:20:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1fYj6X-0007ze-Gn
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYj1c-00081B-VE
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41724)
+	(envelope-from <bounces@canonical.com>) id 1fYj6S-0000Ou-JS
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:25:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42336)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYj1c-0007yh-OO
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:20:40 -0400
+	id 1fYj6S-0000Mi-Cc
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:25:40 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYj1b-0006kG-GO
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:20:39 +0000
+	id 1fYj6R-00073j-7Z
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:25:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 79FB72E8197
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:20:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 37EAA2E8198
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:25:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 29 Jun 2018 02:06:23 -0000
+Date: Fri, 29 Jun 2018 02:13:20 -0000
 From: Bruce Campbell <yakman2020@gmail.com>
 Reply-To: Bug 1778966 <1778966@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153012207304.7182.2374266143525192096.malonedeb@soybean.canonical.com>
-Message-Id: <153023798346.12922.4457900418664558521.malone@gac.canonical.com>
+Message-Id: <153023840072.29565.6050880126729698090.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1778966] Re: Windows 1803 and later crashes on KVM
 List-Id: <qemu-devel.nongnu.org>
@@ -38,11 +38,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Regrettably opteron_g5 is not a workaround. I get a complaint that my
-cpu doesn't provide xop, fma4, tbm.
-
-I've tried a number of other cpus including nehalem, phenom and athlon
-with similar results.
+Opteron didn't work do to some missing features. I was able to get
+nehalem to come up but that looks like the closest.
 
 -- =
 
