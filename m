@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYui4-0003Sg-6S
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:17 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fYuhz-00012H-TK
+	(envelope-from <berrange@redhat.com>) id 1fYui3-0003Se-5e
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:16 -0400
-Date: Fri, 29 Jun 2018 16:49:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180629164903.1630ea28@redhat.com>
-In-Reply-To: <20180628121417.1980-3-david@redhat.com>
-References: <20180628121417.1980-1-david@redhat.com>
-	<20180628121417.1980-3-david@redhat.com>
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1fYuhz-00010L-7B
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46404 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fYuhz-0000yW-3E
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:49:11 -0400
+Date: Fri, 29 Jun 2018 15:49:05 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180629144905.GU27016@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180627174435.31800-1-alistair.francis@wdc.com>
+	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
+	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
+	<CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
+	<CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
+	<CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] util/oslib-win32: indicate
- alignment for qemu_anon_ram_alloc()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair23@gmail.com>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 28 Jun 2018 14:14:15 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> Let's set the alignment just like for the posix variant. This will
-> implicitly set the alignment of the underlying memory region and
-> therefore make memory_region_get_alignment(mr) return something > 0 for
-> all memory backends applicable to PCDIMM/NVDIMM.
+On Fri, Jun 29, 2018 at 03:21:08PM +0100, Peter Maydell wrote:
+> On 29 June 2018 at 15:13, Alistair Francis <alistair23@gmail.com> wrote:
+> > Can you import it manually? The armour export is below:
 > 
-> This will allow us to drop special handling in pc.c for
-> memory_region_get_alignment(mr) == 0, as we can then assume that it is
-> always set (and AFAICS >= getpagesize()).
+> Aha. I tried that, which didn't work either, which prompted
+> me to try --verbose, which says:
 > 
-> For pc in pc_memory_plug(), under Windows TARGET_PAGE_SIZE == getpagesize(),
-> therefore alignment of DIMMs will not change, and therefore also not the
-> guest physical memory layout.
-why not use QEMU_VMALLOC_ALIGN for consistency (on win => getpagesize())
-instead of TARGET_PAGE_SIZE like linux allocator does?
-
-Also looking at FIXME comment it notes that VirtualAlloc might have 64K
-alignment (though I haven't found it in VirtualAlloc manual).
-If that's true then we might need set *align to it to avoid auto-picked
-address overlap with previous allocation (not really sure about it).
+> e104462:xenial:qemu-for-merges$ gpg --verbose --import /tmp/alistair.gpg
+> gpg: armour header: Version: GnuPG v2
+> gpg: can't handle public key algorithm 19
 
 
-> For spapr in spapr_memory_plug(), an alignment of 0 would have been used
-note that align == 0 would lead to crash where QEMU_ALIGN_UP() is used,
-so we don't care to keep it compatible (the same like in commit 92a37a04d)
+This is an ECC algorithm, and only supported by gpg2 tool not gpg AFAICT.
 
-> until now. Now getpagesize() is used. But as the size of DIMMs has to be
-> multiple of 256MB on spapr, automatic address asignment will not change
-> the layout (no memory holes will be created as the alignment change will
-> not apply if DIMMs start/end on 256MB boundaries).
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  util/oslib-win32.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index bb5ad28bd3..6e87721419 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -76,6 +76,10 @@ void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared)
->         memory is page aligned. */
->      ptr = VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
->      trace_qemu_anon_ram_alloc(size, ptr);
-> +
-> +    if (ptr && align) {
-> +        *align = getpagesize();
-> +    }
->      return ptr;
->  }
->  
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
