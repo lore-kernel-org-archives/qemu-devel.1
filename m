@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fYmv0-0001Eg-Lj
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:30:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1fYnMg-0007iU-My
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:58:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fYmuz-0000Xh-L1
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:30:06 -0400
-Date: Fri, 29 Jun 2018 16:29:49 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180629062949.GO3422@umbus.fritz.box>
-References: <20180629062024.20477-1-sjitindarsingh@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1fYnMb-0006xO-R2
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:58:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39760 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fYnMb-0006ro-Ma
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 02:58:37 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D8CD640122D6
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 06:58:30 +0000 (UTC)
+Date: Fri, 29 Jun 2018 14:58:25 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180629065825.GD2455@xz-mi>
+References: <20180627105112.31401-1-peterx@redhat.com>
+	<20180627105112.31401-4-peterx@redhat.com>
+	<20180627122544.GG2423@work-vm> <20180627130319.GF2516@xz-mi>
+	<20180627141303.GH2423@work-vm>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2/+Vq7w28QOSGzSM"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180629062024.20477-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH] ppc/tcg: Ignore bit 6 in the
- eieio instruction
+In-Reply-To: <20180627141303.GH2423@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: do explicit incoming
+ setup for rdma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
+On Wed, Jun 27, 2018 at 03:13:04PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Wed, Jun 27, 2018 at 01:25:45PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > RDMA does not support postcopy recovery, so no need to go into such
+> > > > logic.  Instead of calling migration_fd_process_incoming(), let's call
+> > > > the two functions that setup the incoming migration.  There should have
+> > > > no functional change at all.
+> > > 
+> > > Can you explain why we need to though?  The reason I ask is that there
+> > > is Lidong Chen's work that gets postcopy partially working with RDMA, so
+> > > then the next question is bound to be recovery.
+> > 
+> > Ah if so this patch needs to change.  Could you paste me the message
+> > id of the work?  Or link?
+> > 
+> > After all I'll need to keep this bit, but I am just curious about what
+> > is "partially" mean here. :)
+> 
+> https://patchwork.ozlabs.org/cover/925525/
+> 
+> It enables postcopy with RDMA, but once it switches into postcopy mode
+> it doesn't use the fast features of RDMA, it still shuffles the data
+> as a stream (using some more basic RDMA features).
 
---2/+Vq7w28QOSGzSM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah so it's not really partial but relatively complete, though it seems
+that there can be further performance work on top.  That's an
+interesting work, thanks for the pointer.
 
-On Fri, Jun 29, 2018 at 04:20:24PM +1000, Suraj Jitindar Singh wrote:
-> The kernel patch
-> "powerpc/64s: Add support for a store forwarding barrier at kernel entry/=
-exit"
-> adds an eieio barrier instruction to kernel entry and exit points on
-> the POWER9 platform. The eieio instruction form used has bit 6 set.
-> This bit is ignored by hardware however under tcg it causes an illegal
-> instruction.
->=20
-> To allow these kernels to run under tcg, modify the eieio instruction
-> to ignore bit 6.
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-
-Already done by commit c8fd8373 "target/ppc: extend eieio for POWER9".
-
-> ---
->  target/ppc/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 3457d29f8e..b1ad1e2a22 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6496,7 +6496,7 @@ GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, PPC=
-_STRING),
->  GEN_HANDLER(lswx, 0x1F, 0x15, 0x10, 0x00000001, PPC_STRING),
->  GEN_HANDLER(stswi, 0x1F, 0x15, 0x16, 0x00000001, PPC_STRING),
->  GEN_HANDLER(stswx, 0x1F, 0x15, 0x14, 0x00000001, PPC_STRING),
-> -GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x03FFF801, PPC_MEM_EIEIO),
-> +GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x01FFF801, PPC_MEM_EIEIO),
->  GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, PPC_MEM),
->  GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---2/+Vq7w28QOSGzSM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls10doACgkQbDjKyiDZ
-s5Li5Q//f+RLVHFQjb6rixspO/oIJ+M2vGkGv2Fb+3C7CeK7q3RX1o1jxm73CrT+
-ooG8uNsyPHeXFderTtaLbxh1o4nVsEbFzAaL+iSYxDIXRNJEJYN91Y/mFmx1XeyT
-znh+3LZnJtr3wT46ItnsCmg1LdZSuDJ5BzVjIJvcIKM6v2o6f93pzl335WrZ0WB+
-bLL78nUrD+mP7K5PmzAGRKUYZ9GjrIk+DVw/JnAEte+yROLrdPS5A8WaYgXvbphF
-QxOlKqQvHtgIEjCYsKV2LkA4Q+uddThrrx6OFs137X587Sq/a0nJwwofH6oZ9m4S
-dehx37ZC6kzUn/S5zvonZEFv0VWPpsfTEg5Lf+lrJStBVmpR6m71R7emh9gm/D8E
-R9HQlQ22sL742iWkEV5zeSEZ/ly0WSz0mXjnJ/cJbSj2FzAGSEI+H3cBMz+T0TLU
-rabwTtoKetQfEcTudueMmCCOj+x2yuPXuEDhRyIYJsdVJJ0jy6HwX3/oJn0teZvl
-AVSps45EnAnMoq9DXPCsSio0JCJnvcK6Bvi64iI19RGBIeBK1n4V18m+IWM+0QNR
-RtcA/SFOJAYj2AR2R9EshtZM/SR0DPWDjw/Uspw+SHkdQ0maQwzcaJDuXT/rIeZY
-V6+Dz/LsxHRwndwUyD7g7kd1XKuBwsNBOXtnQ9Ohp7otmK6fUok=
-=2b3i
------END PGP SIGNATURE-----
-
---2/+Vq7w28QOSGzSM--
+-- 
+Peter Xu
