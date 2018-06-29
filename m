@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYh4m-000426-HT
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 20:15:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fYh4o-00043l-85
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 20:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fYh4l-0006gl-LO
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 20:15:48 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:39642)
+	(envelope-from <richard.henderson@linaro.org>) id 1fYh4n-0006hb-42
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 20:15:50 -0400
+Received: from mail-pl0-x22c.google.com ([2607:f8b0:400e:c01::22c]:41159)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fYh4l-0006gO-El
-	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 20:15:47 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id s21-v6so3344370pfm.6
-	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 17:15:47 -0700 (PDT)
+	id 1fYh4m-0006h4-Mr
+	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 20:15:49 -0400
+Received: by mail-pl0-x22c.google.com with SMTP id w8-v6so3553480ply.8
+	for <qemu-devel@nongnu.org>; Thu, 28 Jun 2018 17:15:48 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 28 Jun 2018 17:15:36 -0700
-Message-Id: <20180629001538.11415-5-richard.henderson@linaro.org>
+Date: Thu, 28 Jun 2018 17:15:37 -0700
+Message-Id: <20180629001538.11415-6-richard.henderson@linaro.org>
 In-Reply-To: <20180629001538.11415-1-richard.henderson@linaro.org>
 References: <20180629001538.11415-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/6] target/arm: Prune a15 features from max
+Subject: [Qemu-devel] [PATCH 5/6] target/arm: Add ID_ISAR6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +29,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-There is no need to re-set these 3 features already
-implied by the call to aarch64_a15_initfn.
+This register was added to aa32 state by ARMv8.2.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 3 ---
- 1 file changed, 3 deletions(-)
+ target/arm/cpu.h    | 1 +
+ target/arm/cpu.c    | 4 ++++
+ target/arm/cpu64.c  | 2 ++
+ target/arm/helper.c | 5 ++---
+ 4 files changed, 9 insertions(+), 3 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 6a8441c2dd..1505ac936e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -813,6 +813,7 @@ struct ARMCPU {
+     uint32_t id_isar3;
+     uint32_t id_isar4;
+     uint32_t id_isar5;
++    uint32_t id_isar6;
+     uint64_t id_aa64pfr0;
+     uint64_t id_aa64pfr1;
+     uint64_t id_aa64dfr0;
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index aa62315cea..878cc6c7e8 100644
+index 878cc6c7e8..de1a07a9f1 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -1796,9 +1796,6 @@ static void arm_max_initfn(Object *obj)
-          * since we don't correctly set the ID registers to advertise them,
-          */
-         set_feature(&cpu->env, ARM_FEATURE_V8);
--        set_feature(&cpu->env, ARM_FEATURE_VFP4);
--        set_feature(&cpu->env, ARM_FEATURE_NEON);
--        set_feature(&cpu->env, ARM_FEATURE_THUMB2EE);
-         set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-         set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-         set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
+@@ -1262,6 +1262,7 @@ static void cortex_m3_initfn(Object *obj)
+     cpu->id_isar3 = 0x01111110;
+     cpu->id_isar4 = 0x01310102;
+     cpu->id_isar5 = 0x00000000;
++    cpu->id_isar6 = 0x00000000;
+ }
+ 
+ static void cortex_m4_initfn(Object *obj)
+@@ -1288,6 +1289,7 @@ static void cortex_m4_initfn(Object *obj)
+     cpu->id_isar3 = 0x01111110;
+     cpu->id_isar4 = 0x01310102;
+     cpu->id_isar5 = 0x00000000;
++    cpu->id_isar6 = 0x00000000;
+ }
+ 
+ static void cortex_m33_initfn(Object *obj)
+@@ -1316,6 +1318,7 @@ static void cortex_m33_initfn(Object *obj)
+     cpu->id_isar3 = 0x01111131;
+     cpu->id_isar4 = 0x01310132;
+     cpu->id_isar5 = 0x00000000;
++    cpu->id_isar6 = 0x00000000;
+     cpu->clidr = 0x00000000;
+     cpu->ctr = 0x8000c000;
+ }
+@@ -1366,6 +1369,7 @@ static void cortex_r5_initfn(Object *obj)
+     cpu->id_isar3 = 0x01112131;
+     cpu->id_isar4 = 0x0010142;
+     cpu->id_isar5 = 0x0;
++    cpu->id_isar6 = 0x0;
+     cpu->mp_is_up = true;
+     cpu->pmsav7_dregion = 16;
+     define_arm_cp_regs(cpu, cortexr5_cp_reginfo);
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 8040493d5c..d0581d59d8 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -139,6 +139,7 @@ static void aarch64_a57_initfn(Object *obj)
+     cpu->id_isar3 = 0x01112131;
+     cpu->id_isar4 = 0x00011142;
+     cpu->id_isar5 = 0x00011121;
++    cpu->id_isar6 = 0;
+     cpu->id_aa64pfr0 = 0x00002222;
+     cpu->id_aa64dfr0 = 0x10305106;
+     cpu->pmceid0 = 0x00000000;
+@@ -199,6 +200,7 @@ static void aarch64_a53_initfn(Object *obj)
+     cpu->id_isar3 = 0x01112131;
+     cpu->id_isar4 = 0x00011142;
+     cpu->id_isar5 = 0x00011121;
++    cpu->id_isar6 = 0;
+     cpu->id_aa64pfr0 = 0x00002222;
+     cpu->id_aa64dfr0 = 0x10305106;
+     cpu->id_aa64isar0 = 0x00011120;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index a855da045b..e62f02d4e5 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4851,11 +4851,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 2, .opc2 = 6,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .resetvalue = cpu->id_mmfr4 },
+-            /* 7 is as yet unallocated and must RAZ */
+-            { .name = "ID_ISAR7_RESERVED", .state = ARM_CP_STATE_BOTH,
++            { .name = "ID_ISAR6", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 2, .opc2 = 7,
+               .access = PL1_R, .type = ARM_CP_CONST,
+-              .resetvalue = 0 },
++              .resetvalue = cpu->id_isar6 },
+             REGINFO_SENTINEL
+         };
+         define_arm_cp_regs(cpu, v6_idregs);
 -- 
 2.17.1
