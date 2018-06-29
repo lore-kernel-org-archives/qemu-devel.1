@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYnXp-00021L-PA
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:10:14 -0400
+	(envelope-from <david@redhat.com>) id 1fYncV-0002xJ-88
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:15:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYnXo-00065u-VN
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:10:13 -0400
-Date: Fri, 29 Jun 2018 09:10:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180629071003.GA4555@localhost.localdomain>
-References: <20180626174119.25778-1-armbru@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fYncR-0005FY-8D
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:15:03 -0400
+References: <20180628121417.1980-1-david@redhat.com>
+	<20180628121417.1980-5-david@redhat.com>
+	<20180629011933.GJ23134@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <293c189c-3034-f002-ca90-698e6ecf0c09@redhat.com>
+Date: Fri, 29 Jun 2018 09:14:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180626174119.25778-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] block/crypto: Simplify
- block_crypto_{open, create}_opts_init()
+In-Reply-To: <20180629011933.GJ23134@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] pc-dimm: assign and verify the
+ "addr" property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,20 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
 
-Am 26.06.2018 um 19:41 hat Markus Armbruster geschrieben:
-> block_crypto_open_opts_init() and block_crypto_create_opts_init()
-> contain a virtual visit of QCryptoBlockOptions and
-> QCryptoBlockCreateOptions less member "format", respectively.
+On 29.06.2018 03:19, David Gibson wrote:
+> On Thu, Jun 28, 2018 at 02:14:17PM +0200, David Hildenbrand wrote:
+>> We can assign and verify the slot before realizing and trying to plug.
+>> reading/writing the address property should never fail, so let's reduce
+>> error handling a bit by using &error_abort. Getting access to the memory
+>> region now might however fail. So forward errors from
+>> get_memory_region() properly.
+>>
+>> Keep tracing the assigned address for now in the plug code, as that's the
+>> point we are sure plugging succeeded and the address willa ctually be
+>> used.
+>>
+>> As all memory devices should use the alignment of the underlying memory
+>> region for guest physical address asignment, do detection of the
+>> alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
+>> alignment for compatibility handling.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/i386/pc.c             | 16 ++++--------
+>>  hw/mem/pc-dimm.c         | 53 +++++++++++++++++++++++-----------------
+>>  hw/ppc/spapr.c           |  7 +++---
+>>  include/hw/mem/pc-dimm.h |  6 ++---
+>>  4 files changed, 41 insertions(+), 41 deletions(-)
+>>
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index 934b7155b1..16e4b5baff 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -1678,7 +1678,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>                                 Error **errp)
+>>  {
+>>      const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>> +    const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>> +    const uint64_t compat_align = TARGET_PAGE_SIZE;
+>>  
+>>      /*
+>>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
+>> @@ -1696,7 +1698,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>          return;
+>>      }
+>>  
+>> -    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev),
+>> +                     pcmc->enforce_aligned_dimm ? NULL : &compat_align, errp);
 > 
-> Change their callers to put member "format" in the QDict, so they can
-> use the generated visitors for these types instead.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Why would you pass a const pointer, rather than just a value?
 
-Thanks, applied to the block branch.
+We could do that if we make "0" -> "no compat alignment, detect
+alignment yourself". That should work here.
 
-Kevin
+Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
