@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYncV-0002xJ-88
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:15:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1fYnhl-000409-C8
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:20:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fYncR-0005FY-8D
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:15:03 -0400
-References: <20180628121417.1980-1-david@redhat.com>
-	<20180628121417.1980-5-david@redhat.com>
-	<20180629011933.GJ23134@umbus.fritz.box>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <293c189c-3034-f002-ca90-698e6ecf0c09@redhat.com>
-Date: Fri, 29 Jun 2018 09:14:52 +0200
+	(envelope-from <peterx@redhat.com>) id 1fYnhh-00063b-DQ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:20:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37132 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fYnhh-00062F-8R
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 03:20:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA092818F6F8
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:20:24 +0000 (UTC)
+Date: Fri, 29 Jun 2018 15:20:20 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180629072020.GF2455@xz-mi>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<871sctea4y.fsf@dusky.pond.sub.org>
+	<87tvpoadcc.fsf_-_@dusky.pond.sub.org>
+	<87wouk8vul.fsf@dusky.pond.sub.org>
+	<20180627102043.GD30628@redhat.com>
+	<8760248odg.fsf@dusky.pond.sub.org> <20180627120733.GD2516@xz-mi>
+	<9e9dc7aa-1d4e-ca9d-c551-eb0fb36e88b8@redhat.com>
+	<8736x75r4c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180629011933.GJ23134@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] pc-dimm: assign and verify the
- "addr" property during pre_plug
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8736x75r4c.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +39,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On 29.06.2018 03:19, David Gibson wrote:
-> On Thu, Jun 28, 2018 at 02:14:17PM +0200, David Hildenbrand wrote:
->> We can assign and verify the slot before realizing and trying to plug.
->> reading/writing the address property should never fail, so let's reduce
->> error handling a bit by using &error_abort. Getting access to the memory
->> region now might however fail. So forward errors from
->> get_memory_region() properly.
->>
->> Keep tracing the assigned address for now in the plug code, as that's the
->> point we are sure plugging succeeded and the address willa ctually be
->> used.
->>
->> As all memory devices should use the alignment of the underlying memory
->> region for guest physical address asignment, do detection of the
->> alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
->> alignment for compatibility handling.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/i386/pc.c             | 16 ++++--------
->>  hw/mem/pc-dimm.c         | 53 +++++++++++++++++++++++-----------------
->>  hw/ppc/spapr.c           |  7 +++---
->>  include/hw/mem/pc-dimm.h |  6 ++---
->>  4 files changed, 41 insertions(+), 41 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 934b7155b1..16e4b5baff 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1678,7 +1678,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>                                 Error **errp)
->>  {
->>      const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->> +    const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->> +    const uint64_t compat_align = TARGET_PAGE_SIZE;
->>  
->>      /*
->>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
->> @@ -1696,7 +1698,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>          return;
->>      }
->>  
->> -    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
->> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev),
->> +                     pcmc->enforce_aligned_dimm ? NULL : &compat_align, errp);
+On Thu, Jun 28, 2018 at 09:04:19AM +0200, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 > 
-> Why would you pass a const pointer, rather than just a value?
+> > On 06/27/2018 07:07 AM, Peter Xu wrote:
+> >
+> >>>> Worse than that - broadcasting to all monitors is categorically broken.
+> >>>> Different monitors make use the same "id" formatting scheme, so if you
+> >>>> broadcast COMMAND_DROPPED to a different monitor you might have clashing
+> >>>> "id" and thus incorrectly tell a client its command was dropped when in
+> >>>> fact it was processed. You'd have to be fairly unlucky in timing, but
+> >>>> it could happen.
+> >>>
+> >>> Right.  Must fix bug.
+> >>
+> >
+> >>
+> >> My current plan is that I can touch up scripts/qapi/events.py and
+> >> related stuff to allow QMPEventFuncEmit to take a monitor parameter,
+> >> then we pass in NULL when we want to send the event to all monitors.
+> >>
+> >> Would that work?
+> >
+> > Makes sense to me. Also, right now, ALL callers of qapi_event_send_*
+> > pass &error_abort as their final parameter. If you're refactoring
+> > everything anyways, you could get rid of that parameter on the
+> > presumption that it doesn't buy us anything.
+> 
+> Let me try to turn presumption into fact :)
+> 
+> The generated qapi_event_send_FOO() can detect the following error
+> conditions:
+> 
+> * Visitor fails.  But the QObject output visitor can't actually fail.
+> 
+>   Since the errp parameter is part of the abstract visitor interface, we
+>   can't eliminate it.  We can pass &error_abort.
+> 
+> * emit() function fails.  Can't happen, either.
+> 
+>   Let's eliminate the unused errp parameter of QMPEventFuncEmit.
 
-We could do that if we make "0" -> "no compat alignment, detect
-alignment yourself". That should work here.
+Hmm, I think I got your point.
 
-Thanks!
+> 
+>   If we can eliminate the somewhat silly indirection through
+>   qmp_event_get_func_emit(), even better.
+
+It confused me before on why we had that after all. Let me give it a
+shot.
+
+Regards,
 
 -- 
-
-Thanks,
-
-David / dhildenb
+Peter Xu
