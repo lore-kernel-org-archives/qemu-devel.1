@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYume-0007J1-LI
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumg-0007KL-1N
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumc-0006AU-Mp
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:00 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43086)
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumd-0006FE-Ta
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:02 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYumc-0005dk-B4
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:53:58 -0400
+	id 1fYumd-00063g-Ko
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:53:59 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumb-0004YG-7T
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:53:57 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumX-0004WD-5F
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:53:53 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:53:03 +0100
-Message-Id: <20180629145347.652-12-peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 15:52:58 +0100
+Message-Id: <20180629145347.652-7-peter.maydell@linaro.org>
 In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
 References: <20180629145347.652-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 11/55] target/arm: Implement SVE integer convert
- to floating-point
+Subject: [Qemu-devel] [PULL 06/55] hw/arm/virt: Silence dtc /memory warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,250 +29,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Eric Auger <eric.auger@redhat.com>
 
+When running dtc on the guest /proc/device-tree we get the
+following warning: Warning (unit_address_vs_reg): Node /memory
+has a reg or ranges property, but no unit name".
+
+Let's fix that by adding the unit address to the node name. We also
+don't create the /memory node anymore in create_fdt(). We directly
+create it in load_dtb. /chosen still needs to be created in create_fdt
+as the uart needs it. In case the user provided his own dtb, we nop
+all memory nodes found in root and create new one(s).
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 1530044492-24921-4-git-send-email-eric.auger@redhat.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMM: fixed typo]
-Message-id: 20180627043328.11531-6-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper-sve.h    | 30 +++++++++++++
- target/arm/sve_helper.c    | 38 ++++++++++++++++
- target/arm/translate-sve.c | 90 ++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 22 ++++++++++
- 4 files changed, 180 insertions(+)
+ hw/arm/boot.c | 41 +++++++++++++++++++++++------------------
+ hw/arm/virt.c |  7 +------
+ 2 files changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index b7681289519..185112e1d24 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -720,6 +720,36 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 1e481662adb..e09201cc97c 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -490,11 +490,13 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+                  hwaddr addr_limit, AddressSpace *as)
+ {
+     void *fdt = NULL;
+-    int size, rc;
++    int size, rc, n = 0;
+     uint32_t acells, scells;
+     char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
++    char **node_path;
++    Error *err = NULL;
  
-+DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_dh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_ss, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_sd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_ds, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_scvt_dd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_ucvt_hh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_sh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_dh, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_ss, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_sd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_ds, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ucvt_dd, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index bd874e6fa28..031bec22df1 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2811,6 +2811,44 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
-     return predtest_ones(d, oprsz, esz_mask);
- }
+     if (binfo->dtb_filename) {
+         char *filename;
+@@ -546,12 +548,21 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+         goto fail;
+     }
  
-+/* Fully general two-operand expander, controlled by a predicate,
-+ * With the extra float_status parameter.
-+ */
-+#define DO_ZPZ_FP(NAME, TYPE, H, OP)                                  \
-+void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t desc) \
-+{                                                                     \
-+    intptr_t i = simd_oprsz(desc);                                    \
-+    uint64_t *g = vg;                                                 \
-+    do {                                                              \
-+        uint64_t pg = g[(i - 1) >> 6];                                \
-+        do {                                                          \
-+            i -= sizeof(TYPE);                                        \
-+            if (likely((pg >> (i & 63)) & 1)) {                       \
-+                TYPE nn = *(TYPE *)(vn + H(i));                       \
-+                *(TYPE *)(vd + H(i)) = OP(nn, status);                \
-+            }                                                         \
-+        } while (i & 63);                                             \
-+    } while (i != 0);                                                 \
-+}
-+
-+DO_ZPZ_FP(sve_scvt_hh, uint16_t, H1_2, int16_to_float16)
-+DO_ZPZ_FP(sve_scvt_sh, uint32_t, H1_4, int32_to_float16)
-+DO_ZPZ_FP(sve_scvt_ss, uint32_t, H1_4, int32_to_float32)
-+DO_ZPZ_FP(sve_scvt_sd, uint64_t,     , int32_to_float64)
-+DO_ZPZ_FP(sve_scvt_dh, uint64_t,     , int64_to_float16)
-+DO_ZPZ_FP(sve_scvt_ds, uint64_t,     , int64_to_float32)
-+DO_ZPZ_FP(sve_scvt_dd, uint64_t,     , int64_to_float64)
-+
-+DO_ZPZ_FP(sve_ucvt_hh, uint16_t, H1_2, uint16_to_float16)
-+DO_ZPZ_FP(sve_ucvt_sh, uint32_t, H1_4, uint32_to_float16)
-+DO_ZPZ_FP(sve_ucvt_ss, uint32_t, H1_4, uint32_to_float32)
-+DO_ZPZ_FP(sve_ucvt_sd, uint64_t,     , uint32_to_float64)
-+DO_ZPZ_FP(sve_ucvt_dh, uint64_t,     , uint64_to_float16)
-+DO_ZPZ_FP(sve_ucvt_ds, uint64_t,     , uint64_to_float32)
-+DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_float64)
-+
-+#undef DO_ZPZ_FP
-+
- /*
-  * Load contiguous data, protected by a governing predicate.
-  */
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 83de87ee0ea..5cb13393bac 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3425,6 +3425,96 @@ DO_FP3(FRSQRTS, rsqrts)
- 
- #undef DO_FP3
- 
-+
-+/*
-+ *** SVE Floating Point Unary Operations Predicated Group
-+ */
-+
-+static bool do_zpz_ptr(DisasContext *s, int rd, int rn, int pg,
-+                       bool is_fp16, gen_helper_gvec_3_ptr *fn)
-+{
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(is_fp16);
-+        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-+                           vec_full_reg_offset(s, rn),
-+                           pred_full_reg_offset(s, pg),
-+                           status, vsz, vsz, 0, fn);
-+        tcg_temp_free_ptr(status);
++    /* nop all root nodes matching /memory or /memory@unit-address */
++    node_path = qemu_fdt_node_unit_path(fdt, "memory", &err);
++    if (err) {
++        error_report_err(err);
++        goto fail;
 +    }
-+    return true;
-+}
++    while (node_path[n]) {
++        if (g_str_has_prefix(node_path[n], "/memory")) {
++            qemu_fdt_nop_node(fdt, node_path[n]);
++        }
++        n++;
++    }
++    g_strfreev(node_path);
 +
-+static bool trans_SCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_hh);
-+}
-+
-+static bool trans_SCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_sh);
-+}
-+
-+static bool trans_SCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_scvt_dh);
-+}
-+
-+static bool trans_SCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_ss);
-+}
-+
-+static bool trans_SCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_ds);
-+}
-+
-+static bool trans_SCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_sd);
-+}
-+
-+static bool trans_SCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_scvt_dd);
-+}
-+
-+static bool trans_UCVTF_hh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_hh);
-+}
-+
-+static bool trans_UCVTF_sh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_sh);
-+}
-+
-+static bool trans_UCVTF_dh(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, true, gen_helper_sve_ucvt_dh);
-+}
-+
-+static bool trans_UCVTF_ss(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_ss);
-+}
-+
-+static bool trans_UCVTF_ds(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_ds);
-+}
-+
-+static bool trans_UCVTF_sd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_sd);
-+}
-+
-+static bool trans_UCVTF_dd(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve_ucvt_dd);
-+}
-+
- /*
-  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
-  */
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 606c4f623cc..3abdb87cf56 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -133,6 +133,9 @@
- @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
- @rd_pg4_pn      ........ esz:2 ... ... .. pg:4 . rn:4 rd:5      &rpr_esz
+     if (nb_numa_nodes > 0) {
+-        /*
+-         * Turn the /memory node created before into a NOP node, then create
+-         * /memory@addr nodes for all numa nodes respectively.
+-         */
+-        qemu_fdt_nop_node(fdt, "/memory");
+         mem_base = binfo->loader_start;
+         for (i = 0; i < nb_numa_nodes; i++) {
+             mem_len = numa_info[i].node_mem;
+@@ -572,24 +583,18 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+             g_free(nodename);
+         }
+     } else {
+-        Error *err = NULL;
++        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
++        qemu_fdt_add_subnode(fdt, nodename);
++        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
  
-+# One register operand, with governing predicate, no vector element size
-+@rd_pg_rn_e0    ........ .. ... ... ... pg:3 rn:5 rd:5          &rpr_esz esz=0
-+
- # Two register operands with a 6-bit signed immediate.
- @rd_rn_i6       ........ ... rn:5 ..... imm:s6 rd:5             &rri
+-        rc = fdt_path_offset(fdt, "/memory");
+-        if (rc < 0) {
+-            qemu_fdt_add_subnode(fdt, "/memory");
+-        }
+-
+-        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &err)) {
+-            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+-        }
+-
+-        rc = qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
++        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+                                           acells, binfo->loader_start,
+                                           scells, binfo->ram_size);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set /memory/reg\n");
++            fprintf(stderr, "couldn't set %s reg\n", nodename);
+             goto fail;
+         }
++        g_free(nodename);
+     }
  
-@@ -681,6 +684,25 @@ FTSMUL          01100101 .. 0 ..... 000 011 ..... .....         @rd_rn_rm
- FRECPS          01100101 .. 0 ..... 000 110 ..... .....         @rd_rn_rm
- FRSQRTS         01100101 .. 0 ..... 000 111 ..... .....         @rd_rn_rm
+     rc = fdt_path_offset(fdt, "/chosen");
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 6cce2828f7c..281ddcdf6e2 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -204,13 +204,8 @@ static void create_fdt(VirtMachineState *vms)
+     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
  
-+### SVE FP Unary Operations Predicated Group
-+
-+# SVE integer convert to floating-point
-+SCVTF_hh        01100101 01 010 01 0 101 ... ..... .....        @rd_pg_rn_e0
-+SCVTF_sh        01100101 01 010 10 0 101 ... ..... .....        @rd_pg_rn_e0
-+SCVTF_dh        01100101 01 010 11 0 101 ... ..... .....        @rd_pg_rn_e0
-+SCVTF_ss        01100101 10 010 10 0 101 ... ..... .....        @rd_pg_rn_e0
-+SCVTF_sd        01100101 11 010 00 0 101 ... ..... .....        @rd_pg_rn_e0
-+SCVTF_ds        01100101 11 010 10 0 101 ... ..... .....        @rd_pg_rn_e0
-+SCVTF_dd        01100101 11 010 11 0 101 ... ..... .....        @rd_pg_rn_e0
-+
-+UCVTF_hh        01100101 01 010 01 1 101 ... ..... .....        @rd_pg_rn_e0
-+UCVTF_sh        01100101 01 010 10 1 101 ... ..... .....        @rd_pg_rn_e0
-+UCVTF_dh        01100101 01 010 11 1 101 ... ..... .....        @rd_pg_rn_e0
-+UCVTF_ss        01100101 10 010 10 1 101 ... ..... .....        @rd_pg_rn_e0
-+UCVTF_sd        01100101 11 010 00 1 101 ... ..... .....        @rd_pg_rn_e0
-+UCVTF_ds        01100101 11 010 10 1 101 ... ..... .....        @rd_pg_rn_e0
-+UCVTF_dd        01100101 11 010 11 1 101 ... ..... .....        @rd_pg_rn_e0
-+
- ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
+-    /*
+-     * /chosen and /memory nodes must exist for load_dtb
+-     * to fill in necessary properties later
+-     */
++    /* /chosen must exist for load_dtb to fill in necessary properties later */
+     qemu_fdt_add_subnode(fdt, "/chosen");
+-    qemu_fdt_add_subnode(fdt, "/memory");
+-    qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
  
- # SVE load predicate register
+     /* Clock node, for the benefit of the UART. The kernel device tree
+      * binding documentation claims the PL011 node clock properties are
 -- 
 2.17.1
