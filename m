@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumk-0007Pq-33
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumj-0007PU-LP
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumg-0006Ml-43
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:06 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43088)
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumf-0006KM-Fl
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:05 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYumf-00063g-LS
+	id 1fYumf-0006GJ-2H
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:01 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumU-0004UR-9I
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:53:50 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumd-0004ZY-PK
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:53:59 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:52:54 +0100
-Message-Id: <20180629145347.652-3-peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 15:53:06 +0100
+Message-Id: <20180629145347.652-15-peter.maydell@linaro.org>
 In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
 References: <20180629145347.652-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/55] hw/arm/sysbus-fdt: Replace
- error_setg(&error_fatal) by error_report() + exit()
+Subject: [Qemu-devel] [PULL 14/55] target/arm: Implement SVE Floating Point
+ Accumulating Reduction Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,145 +30,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Use error_report() + exit() instead of error_setg(&error_fatal),
-as suggested by the "qapi/error.h" documentation:
-
-   Please don't error_setg(&error_fatal, ...), use error_report() and
-   exit(), because that's more obvious.
-
-This fixes CID 1352173:
-    "Passing null pointer dt_name to qemu_fdt_node_path, which dereferences it."
-
-And this also fixes:
-
-    hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node_path') results in a null pointer dereference
-        if (node_path[1]) {
-            ^~~~~~~~~~~~
-
-Fixes: Coverity CID 1352173 (Dereference after null check)
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Message-id: 20180625165749.3910-3-f4bug@amsat.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180627043328.11531-9-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/sysbus-fdt.c | 53 +++++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
+ target/arm/helper-sve.h    |  7 +++++
+ target/arm/sve_helper.c    | 56 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 45 ++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  5 ++++
+ 4 files changed, 113 insertions(+)
 
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index 277ed872e7c..0d4c75702c3 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -92,16 +92,20 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
-         r = qemu_fdt_getprop(host_fdt, node_path,
-                              props[i].name,
-                              &prop_len,
--                             props[i].optional ? &err : &error_fatal);
-+                             &err);
-         if (r) {
-             qemu_fdt_setprop(guest_fdt, nodename,
-                              props[i].name, r, prop_len);
-         } else {
--            if (prop_len != -FDT_ERR_NOTFOUND) {
--                /* optional property not returned although property exists */
--                error_report_err(err);
--            } else {
-+            if (props[i].optional && prop_len == -FDT_ERR_NOTFOUND) {
-+                /* optional property does not exist */
-                 error_free(err);
-+            } else {
-+                error_report_err(err);
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index eb0645dd432..68e55a8d031 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -720,6 +720,13 @@ DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_5(sve_fadda_h, TCG_CALL_NO_RWG,
++                   i64, i64, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fadda_s, TCG_CALL_NO_RWG,
++                   i64, i64, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fadda_d, TCG_CALL_NO_RWG,
++                   i64, i64, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_6(sve_fadd_h, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_6(sve_fadd_s, TCG_CALL_NO_RWG,
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 2f416e5e286..2d08b7dcd3d 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -2811,6 +2811,62 @@ uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
+     return predtest_ones(d, oprsz, esz_mask);
+ }
+ 
++uint64_t HELPER(sve_fadda_h)(uint64_t nn, void *vm, void *vg,
++                             void *status, uint32_t desc)
++{
++    intptr_t i = 0, opr_sz = simd_oprsz(desc);
++    float16 result = nn;
++
++    do {
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
++        do {
++            if (pg & 1) {
++                float16 mm = *(float16 *)(vm + H1_2(i));
++                result = float16_add(result, mm, status);
 +            }
-+            if (!props[i].optional) {
-+                /* mandatory property not found: bail out */
-+                exit(1);
-             }
-         }
-     }
-@@ -138,9 +142,9 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
++            i += sizeof(float16), pg >>= sizeof(float16);
++        } while (i & 15);
++    } while (i < opr_sz);
++
++    return result;
++}
++
++uint64_t HELPER(sve_fadda_s)(uint64_t nn, void *vm, void *vg,
++                             void *status, uint32_t desc)
++{
++    intptr_t i = 0, opr_sz = simd_oprsz(desc);
++    float32 result = nn;
++
++    do {
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
++        do {
++            if (pg & 1) {
++                float32 mm = *(float32 *)(vm + H1_2(i));
++                result = float32_add(result, mm, status);
++            }
++            i += sizeof(float32), pg >>= sizeof(float32);
++        } while (i & 15);
++    } while (i < opr_sz);
++
++    return result;
++}
++
++uint64_t HELPER(sve_fadda_d)(uint64_t nn, void *vm, void *vg,
++                             void *status, uint32_t desc)
++{
++    intptr_t i = 0, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *m = vm;
++    uint8_t *pg = vg;
++
++    for (i = 0; i < opr_sz; i++) {
++        if (pg[H1(i)] & 1) {
++            nn = float64_add(nn, m[i], status);
++        }
++    }
++
++    return nn;
++}
++
+ /* Fully general three-operand expander, controlled by a predicate,
+  * With the extra float_status parameter.
+  */
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 369ce98dc60..ceb46895e0d 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -3383,6 +3383,51 @@ DO_ZZI(UMIN, umin)
  
-     node_offset = fdt_node_offset_by_phandle(host_fdt, host_phandle);
-     if (node_offset <= 0) {
--        error_setg(&error_fatal,
--                   "not able to locate clock handle %d in host device tree",
--                   host_phandle);
-+        error_report("not able to locate clock handle %d in host device tree",
-+                     host_phandle);
-+        exit(1);
-     }
-     node_path = g_malloc(path_len);
-     while ((ret = fdt_get_path(host_fdt, node_offset, node_path, path_len))
-@@ -149,16 +153,16 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
-         node_path = g_realloc(node_path, path_len);
-     }
-     if (ret < 0) {
--        error_setg(&error_fatal,
--                   "not able to retrieve node path for clock handle %d",
--                   host_phandle);
-+        error_report("not able to retrieve node path for clock handle %d",
-+                     host_phandle);
-+        exit(1);
-     }
+ #undef DO_ZZI
  
-     r = qemu_fdt_getprop(host_fdt, node_path, "compatible", &prop_len,
-                          &error_fatal);
-     if (strcmp(r, "fixed-clock")) {
--        error_setg(&error_fatal,
--                   "clock handle %d is not a fixed clock", host_phandle);
-+        error_report("clock handle %d is not a fixed clock", host_phandle);
-+        exit(1);
-     }
++/*
++ *** SVE Floating Point Accumulating Reduction Group
++ */
++
++static bool trans_FADDA(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
++{
++    typedef void fadda_fn(TCGv_i64, TCGv_i64, TCGv_ptr,
++                          TCGv_ptr, TCGv_ptr, TCGv_i32);
++    static fadda_fn * const fns[3] = {
++        gen_helper_sve_fadda_h,
++        gen_helper_sve_fadda_s,
++        gen_helper_sve_fadda_d,
++    };
++    unsigned vsz = vec_full_reg_size(s);
++    TCGv_ptr t_rm, t_pg, t_fpst;
++    TCGv_i64 t_val;
++    TCGv_i32 t_desc;
++
++    if (a->esz == 0) {
++        return false;
++    }
++    if (!sve_access_check(s)) {
++        return true;
++    }
++
++    t_val = load_esz(cpu_env, vec_reg_offset(s, a->rn, 0, a->esz), a->esz);
++    t_rm = tcg_temp_new_ptr();
++    t_pg = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(t_rm, cpu_env, vec_full_reg_offset(s, a->rm));
++    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, a->pg));
++    t_fpst = get_fpstatus_ptr(a->esz == MO_16);
++    t_desc = tcg_const_i32(simd_desc(vsz, vsz, 0));
++
++    fns[a->esz - 1](t_val, t_val, t_rm, t_pg, t_fpst, t_desc);
++
++    tcg_temp_free_i32(t_desc);
++    tcg_temp_free_ptr(t_fpst);
++    tcg_temp_free_ptr(t_pg);
++    tcg_temp_free_ptr(t_rm);
++
++    write_fp_dreg(s, a->rd, t_val);
++    tcg_temp_free_i64(t_val);
++    return true;
++}
++
+ /*
+  *** SVE Floating Point Arithmetic - Unpredicated Group
+  */
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index e8531e28cd7..675b81aaa03 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -676,6 +676,11 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
+ # SVE integer multiply immediate (unpredicated)
+ MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
  
-     nodename = strrchr(node_path, '/');
-@@ -301,34 +305,37 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
++### SVE FP Accumulating Reduction Group
++
++# SVE floating-point serial reduction (predicated)
++FADDA           01100101 .. 011 000 001 ... ..... .....         @rdn_pg_rm
++
+ ### SVE Floating Point Arithmetic - Unpredicated Group
  
-     dt_name = sysfs_to_dt_name(vbasedev->name);
-     if (!dt_name) {
--        error_setg(&error_fatal, "%s incorrect sysfs device name %s",
--                    __func__, vbasedev->name);
-+        error_report("%s incorrect sysfs device name %s",
-+                     __func__, vbasedev->name);
-+        exit(1);
-     }
-     node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
-                                    &error_fatal);
-     if (!node_path || !node_path[0]) {
--        error_setg(&error_fatal, "%s unable to retrieve node path for %s/%s",
--                   __func__, dt_name, vdev->compat);
-+        error_report("%s unable to retrieve node path for %s/%s",
-+                     __func__, dt_name, vdev->compat);
-+        exit(1);
-     }
- 
-     if (node_path[1]) {
--        error_setg(&error_fatal, "%s more than one node matching %s/%s!",
--                   __func__, dt_name, vdev->compat);
-+        error_report("%s more than one node matching %s/%s!",
-+                     __func__, dt_name, vdev->compat);
-+        exit(1);
-     }
- 
-     g_free(dt_name);
- 
-     if (vbasedev->num_regions != 5) {
--        error_setg(&error_fatal, "%s Does the host dt node combine XGBE/PHY?",
--                   __func__);
-+        error_report("%s Does the host dt node combine XGBE/PHY?", __func__);
-+        exit(1);
-     }
- 
-     /* generate nodes for DMA_CLK and PTP_CLK */
-     r = qemu_fdt_getprop(host_fdt, node_path[0], "clocks",
-                          &prop_len, &error_fatal);
-     if (prop_len != 8) {
--        error_setg(&error_fatal, "%s clocks property should contain 2 handles",
--                   __func__);
-+        error_report("%s clocks property should contain 2 handles", __func__);
-+        exit(1);
-     }
-     host_clock_phandles = (uint32_t *)r;
-     guest_clock_phandles[0] = qemu_fdt_alloc_phandle(guest_fdt);
+ # SVE floating-point arithmetic (unpredicated)
 -- 
 2.17.1
