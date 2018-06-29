@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hT-3e
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:31:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fYtqN-0000Qc-3x
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:53:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtU9-0007A9-Np
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:57 -0400
-From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 29 Jun 2018 15:29:38 +0200
-Message-Id: <20180629132954.24269-5-luc.michel@greensocs.com>
-In-Reply-To: <20180629132954.24269-1-luc.michel@greensocs.com>
-References: <20180629132954.24269-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 04/20] vmstate.h: Provide
- VMSTATE_UINT16_SUB_ARRAY
+	(envelope-from <ehabkost@redhat.com>) id 1fYtqK-0006p8-0a
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:53:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYtqJ-0006mN-QU
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:53:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CA5A9804FC
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:53:42 +0000 (UTC)
+Date: Fri, 29 Jun 2018 10:53:37 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180629135337.GK7451@localhost.localdomain>
+References: <20180628154502.GO3513@redhat.com> <20180628185938.GC2538@work-vm>
+	<20180628192353.GG7451@localhost.localdomain>
+	<20180629060604.GA5072@orkuz.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180629060604.GA5072@orkuz.home>
+Subject: Re: [Qemu-devel] [libvirt] CPU model versioning separate from
+ machine type versioning ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,31 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
+To: Jiri Denemark <jdenemar@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-Provide a VMSTATE_UINT16_SUB_ARRAY macro to save a uint16_t sub-array in
-a VMState.
+On Fri, Jun 29, 2018 at 08:06:04AM +0200, Jiri Denemark wrote:
+> On Thu, Jun 28, 2018 at 16:23:53 -0300, Eduardo Habkost wrote:
+> > On Thu, Jun 28, 2018 at 07:59:38PM +0100, Dr. David Alan Gilbert wrote:
+[...]
+> > > Would you restrict the combinations to cut down the test matrix - e.g.
+> > > not allow Haswell-3.0.0 on anything prior to a 2.12 machine type?
+> > 
+> > Not sure if it would be worth the extra complexity: we would need
+> > an interface to tell libvirt which CPU models are usable on which
+> > machine-types.
+> 
+> In case we do this, libvirt should already by ready for it on the API
+> level for both reporting capabilities and CPU comparison/baseline. All
+> these APIs already accept machine type as an optional parameter so that
+> different results can be provided depending on machine type.
 
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/migration/vmstate.h | 3 +++
- 1 file changed, 3 insertions(+)
+Does it have an abstraction that can already represent "CPU model
+$C can/can't be used with machine-type $M"?
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 42b946ce90..2b501d0466 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -923,6 +923,9 @@ extern const VMStateInfo vmstate_info_qtailq;
- #define VMSTATE_UINT16_ARRAY(_f, _s, _n)                               \
-     VMSTATE_UINT16_ARRAY_V(_f, _s, _n, 0)
- 
-+#define VMSTATE_UINT16_SUB_ARRAY(_f, _s, _start, _num)                \
-+    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint16, uint16_t)
-+
- #define VMSTATE_UINT16_2DARRAY(_f, _s, _n1, _n2)                      \
-     VMSTATE_UINT16_2DARRAY_V(_f, _s, _n1, _n2, 0)
- 
 -- 
-2.17.1
+Eduardo
