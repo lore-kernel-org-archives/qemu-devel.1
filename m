@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumh-0007NW-Bp
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumg-0007KK-1L
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYume-0006IZ-Vq
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumc-0006B2-Qn
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:01 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fYume-00063g-Kd
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:54:00 -0400
+	id 1fYumc-00063g-Dq
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:53:58 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fYumV-0004VM-MW
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:53:51 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fYumY-0004X5-MA
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:53:54 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:52:56 +0100
-Message-Id: <20180629145347.652-5-peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 15:53:00 +0100
+Message-Id: <20180629145347.652-9-peter.maydell@linaro.org>
 In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
 References: <20180629145347.652-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 04/55] device_tree: Add qemu_fdt_node_unit_path
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 08/55] target/arm: Implement SVE Contiguous Load,
+ first-fault and no-fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +33,329 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This helper allows to retrieve the paths of nodes whose name
-match node-name or node-name@unit-address patterns.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Message-id: 1530044492-24921-2-git-send-email-eric.auger@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20180627043328.11531-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/sysemu/device_tree.h | 16 +++++++++++
- device_tree.c                | 55 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+)
+ target/arm/helper-sve.h    |  40 ++++++++++
+ target/arm/sve_helper.c    | 157 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c |  69 ++++++++++++++++
+ target/arm/sve.decode      |   6 ++
+ 4 files changed, 272 insertions(+)
 
-diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
-index e22e5bec9c3..c16fd69bc0b 100644
---- a/include/sysemu/device_tree.h
-+++ b/include/sysemu/device_tree.h
-@@ -43,6 +43,22 @@ void *load_device_tree_from_sysfs(void);
- char **qemu_fdt_node_path(void *fdt, const char *name, char *compat,
-                           Error **errp);
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index fcc9ba5f503..7338abbbcfe 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -754,3 +754,43 @@ DEF_HELPER_FLAGS_4(sve_ld1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
  
-+/**
-+ * qemu_fdt_node_unit_path: return the paths of nodes matching a given
-+ * node-name, ie. node-name and node-name@unit-address
-+ * @fdt: pointer to the dt blob
-+ * @name: node name
-+ * @errp: handle to an error object
-+ *
-+ * returns a newly allocated NULL-terminated array of node paths.
-+ * Use g_strfreev() to free it. If one or more nodes were found, the
-+ * array contains the path of each node and the last element equals to
-+ * NULL. If there is no error but no matching node was found, the
-+ * returned array contains a single element equal to NULL. If an error
-+ * was encountered when parsing the blob, the function returns NULL
+ DEF_HELPER_FLAGS_4(sve_ld1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldff1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1bsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1bdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1bhs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1bss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1bds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldff1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldff1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldff1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldnf1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1bsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1bdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1bhs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1bss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1bds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldnf1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldnf1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldnf1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 4e6ad282f98..0d22a57a22e 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -2963,3 +2963,160 @@ DO_LD4(sve_ld4dd_r, cpu_ldq_data_ra, uint64_t, uint64_t, )
+ #undef DO_LD2
+ #undef DO_LD3
+ #undef DO_LD4
++
++/*
++ * Load contiguous data, first-fault and no-fault.
 + */
-+char **qemu_fdt_node_unit_path(void *fdt, const char *name, Error **errp);
 +
- int qemu_fdt_setprop(void *fdt, const char *node_path,
-                      const char *property, const void *val, int size);
- int qemu_fdt_setprop_cell(void *fdt, const char *node_path,
-diff --git a/device_tree.c b/device_tree.c
-index 3553819257b..6d9c9726f66 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -232,6 +232,61 @@ static int findnode_nofail(void *fdt, const char *node_path)
-     return offset;
- }
- 
-+char **qemu_fdt_node_unit_path(void *fdt, const char *name, Error **errp)
++#ifdef CONFIG_USER_ONLY
++
++/* Fault on byte I.  All bits in FFR from I are cleared.  The vector
++ * result from I is CONSTRAINED UNPREDICTABLE; we choose the MERGE
++ * option, which leaves subsequent data unchanged.
++ */
++static void record_fault(CPUARMState *env, uintptr_t i, uintptr_t oprsz)
 +{
-+    char *prefix =  g_strdup_printf("%s@", name);
-+    unsigned int path_len = 16, n = 0;
-+    GSList *path_list = NULL, *iter;
-+    const char *iter_name;
-+    int offset, len, ret;
-+    char **path_array;
++    uint64_t *ffr = env->vfp.pregs[FFR_PRED_NUM].p;
 +
-+    offset = fdt_next_node(fdt, -1, NULL);
-+
-+    while (offset >= 0) {
-+        iter_name = fdt_get_name(fdt, offset, &len);
-+        if (!iter_name) {
-+            offset = len;
-+            break;
-+        }
-+        if (!strcmp(iter_name, name) || g_str_has_prefix(iter_name, prefix)) {
-+            char *path;
-+
-+            path = g_malloc(path_len);
-+            while ((ret = fdt_get_path(fdt, offset, path, path_len))
-+                  == -FDT_ERR_NOSPACE) {
-+                path_len += 16;
-+                path = g_realloc(path, path_len);
-+            }
-+            path_list = g_slist_prepend(path_list, path);
-+            n++;
-+        }
-+        offset = fdt_next_node(fdt, offset, NULL);
++    if (i & 63) {
++        ffr[i / 64] &= MAKE_64BIT_MASK(0, i & 63);
++        i = ROUND_UP(i, 64);
 +    }
-+    g_free(prefix);
-+
-+    if (offset < 0 && offset != -FDT_ERR_NOTFOUND) {
-+        error_setg(errp, "%s: abort parsing dt for %s node units: %s",
-+                   __func__, name, fdt_strerror(offset));
-+        for (iter = path_list; iter; iter = iter->next) {
-+            g_free(iter->data);
-+        }
-+        g_slist_free(path_list);
-+        return NULL;
++    for (; i < oprsz; i += 64) {
++        ffr[i / 64] = 0;
 +    }
-+
-+    path_array = g_new(char *, n + 1);
-+    path_array[n--] = NULL;
-+
-+    for (iter = path_list; iter; iter = iter->next) {
-+        path_array[n--] = iter->data;
-+    }
-+
-+    g_slist_free(path_list);
-+
-+    return path_array;
 +}
 +
- char **qemu_fdt_node_path(void *fdt, const char *name, char *compat,
-                           Error **errp)
- {
++/* Hold the mmap lock during the operation so that there is no race
++ * between page_check_range and the load operation.  We expect the
++ * usual case to have no faults at all, so we check the whole range
++ * first and if successful defer to the normal load operation.
++ *
++ * TODO: Change mmap_lock to a rwlock so that multiple readers
++ * can run simultaneously.  This will probably help other uses
++ * within QEMU as well.
++ */
++#define DO_LDFF1(PART, FN, TYPEE, TYPEM, H)                             \
++static void do_sve_ldff1##PART(CPUARMState *env, void *vd, void *vg,    \
++                               target_ulong addr, intptr_t oprsz,       \
++                               bool first, uintptr_t ra)                \
++{                                                                       \
++    intptr_t i = 0;                                                     \
++    do {                                                                \
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                 \
++        do {                                                            \
++            TYPEM m = 0;                                                \
++            if (pg & 1) {                                               \
++                if (!first &&                                           \
++                    unlikely(page_check_range(addr, sizeof(TYPEM),      \
++                                              PAGE_READ))) {            \
++                    record_fault(env, i, oprsz);                        \
++                    return;                                             \
++                }                                                       \
++                m = FN(env, addr, ra);                                  \
++                first = false;                                          \
++            }                                                           \
++            *(TYPEE *)(vd + H(i)) = m;                                  \
++            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);                   \
++            addr += sizeof(TYPEM);                                      \
++        } while (i & 15);                                               \
++    } while (i < oprsz);                                                \
++}                                                                       \
++void HELPER(sve_ldff1##PART)(CPUARMState *env, void *vg,                \
++                             target_ulong addr, uint32_t desc)          \
++{                                                                       \
++    intptr_t oprsz = simd_oprsz(desc);                                  \
++    unsigned rd = simd_data(desc);                                      \
++    void *vd = &env->vfp.zregs[rd];                                     \
++    mmap_lock();                                                        \
++    if (likely(page_check_range(addr, oprsz, PAGE_READ) == 0)) {        \
++        do_sve_ld1##PART(env, vd, vg, addr, oprsz, GETPC());            \
++    } else {                                                            \
++        do_sve_ldff1##PART(env, vd, vg, addr, oprsz, true, GETPC());    \
++    }                                                                   \
++    mmap_unlock();                                                      \
++}
++
++/* No-fault loads are like first-fault loads without the
++ * first faulting special case.
++ */
++#define DO_LDNF1(PART)                                                  \
++void HELPER(sve_ldnf1##PART)(CPUARMState *env, void *vg,                \
++                             target_ulong addr, uint32_t desc)          \
++{                                                                       \
++    intptr_t oprsz = simd_oprsz(desc);                                  \
++    unsigned rd = simd_data(desc);                                      \
++    void *vd = &env->vfp.zregs[rd];                                     \
++    mmap_lock();                                                        \
++    if (likely(page_check_range(addr, oprsz, PAGE_READ) == 0)) {        \
++        do_sve_ld1##PART(env, vd, vg, addr, oprsz, GETPC());            \
++    } else {                                                            \
++        do_sve_ldff1##PART(env, vd, vg, addr, oprsz, false, GETPC());   \
++    }                                                                   \
++    mmap_unlock();                                                      \
++}
++
++#else
++
++/* TODO: System mode is not yet supported.
++ * This would probably use tlb_vaddr_to_host.
++ */
++#define DO_LDFF1(PART, FN, TYPEE, TYPEM, H)                     \
++void HELPER(sve_ldff1##PART)(CPUARMState *env, void *vg,        \
++                  target_ulong addr, uint32_t desc)             \
++{                                                               \
++    g_assert_not_reached();                                     \
++}
++
++#define DO_LDNF1(PART)                                          \
++void HELPER(sve_ldnf1##PART)(CPUARMState *env, void *vg,        \
++                  target_ulong addr, uint32_t desc)             \
++{                                                               \
++    g_assert_not_reached();                                     \
++}
++
++#endif
++
++DO_LDFF1(bb_r,  cpu_ldub_data_ra, uint8_t, uint8_t, H1)
++DO_LDFF1(bhu_r, cpu_ldub_data_ra, uint16_t, uint8_t, H1_2)
++DO_LDFF1(bhs_r, cpu_ldsb_data_ra, uint16_t, int8_t, H1_2)
++DO_LDFF1(bsu_r, cpu_ldub_data_ra, uint32_t, uint8_t, H1_4)
++DO_LDFF1(bss_r, cpu_ldsb_data_ra, uint32_t, int8_t, H1_4)
++DO_LDFF1(bdu_r, cpu_ldub_data_ra, uint64_t, uint8_t, )
++DO_LDFF1(bds_r, cpu_ldsb_data_ra, uint64_t, int8_t, )
++
++DO_LDFF1(hh_r,  cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
++DO_LDFF1(hsu_r, cpu_lduw_data_ra, uint32_t, uint16_t, H1_4)
++DO_LDFF1(hss_r, cpu_ldsw_data_ra, uint32_t, int8_t, H1_4)
++DO_LDFF1(hdu_r, cpu_lduw_data_ra, uint64_t, uint16_t, )
++DO_LDFF1(hds_r, cpu_ldsw_data_ra, uint64_t, int16_t, )
++
++DO_LDFF1(ss_r,  cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
++DO_LDFF1(sdu_r, cpu_ldl_data_ra, uint64_t, uint32_t, )
++DO_LDFF1(sds_r, cpu_ldl_data_ra, uint64_t, int32_t, )
++
++DO_LDFF1(dd_r,  cpu_ldq_data_ra, uint64_t, uint64_t, )
++
++#undef DO_LDFF1
++
++DO_LDNF1(bb_r)
++DO_LDNF1(bhu_r)
++DO_LDNF1(bhs_r)
++DO_LDNF1(bsu_r)
++DO_LDNF1(bss_r)
++DO_LDNF1(bdu_r)
++DO_LDNF1(bds_r)
++
++DO_LDNF1(hh_r)
++DO_LDNF1(hsu_r)
++DO_LDNF1(hss_r)
++DO_LDNF1(hdu_r)
++DO_LDNF1(hds_r)
++
++DO_LDNF1(ss_r)
++DO_LDNF1(sdu_r)
++DO_LDNF1(sds_r)
++
++DO_LDNF1(dd_r)
++
++#undef DO_LDNF1
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 3543daff48f..09f77b54054 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -3647,3 +3647,72 @@ static bool trans_LD_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+     }
+     return true;
+ }
++
++static bool trans_LDFF1_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
++{
++    static gen_helper_gvec_mem * const fns[16] = {
++        gen_helper_sve_ldff1bb_r,
++        gen_helper_sve_ldff1bhu_r,
++        gen_helper_sve_ldff1bsu_r,
++        gen_helper_sve_ldff1bdu_r,
++
++        gen_helper_sve_ldff1sds_r,
++        gen_helper_sve_ldff1hh_r,
++        gen_helper_sve_ldff1hsu_r,
++        gen_helper_sve_ldff1hdu_r,
++
++        gen_helper_sve_ldff1hds_r,
++        gen_helper_sve_ldff1hss_r,
++        gen_helper_sve_ldff1ss_r,
++        gen_helper_sve_ldff1sdu_r,
++
++        gen_helper_sve_ldff1bds_r,
++        gen_helper_sve_ldff1bss_r,
++        gen_helper_sve_ldff1bhs_r,
++        gen_helper_sve_ldff1dd_r,
++    };
++
++    if (sve_access_check(s)) {
++        TCGv_i64 addr = new_tmp_a64(s);
++        tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), dtype_msz(a->dtype));
++        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
++        do_mem_zpa(s, a->rd, a->pg, addr, fns[a->dtype]);
++    }
++    return true;
++}
++
++static bool trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
++{
++    static gen_helper_gvec_mem * const fns[16] = {
++        gen_helper_sve_ldnf1bb_r,
++        gen_helper_sve_ldnf1bhu_r,
++        gen_helper_sve_ldnf1bsu_r,
++        gen_helper_sve_ldnf1bdu_r,
++
++        gen_helper_sve_ldnf1sds_r,
++        gen_helper_sve_ldnf1hh_r,
++        gen_helper_sve_ldnf1hsu_r,
++        gen_helper_sve_ldnf1hdu_r,
++
++        gen_helper_sve_ldnf1hds_r,
++        gen_helper_sve_ldnf1hss_r,
++        gen_helper_sve_ldnf1ss_r,
++        gen_helper_sve_ldnf1sdu_r,
++
++        gen_helper_sve_ldnf1bds_r,
++        gen_helper_sve_ldnf1bss_r,
++        gen_helper_sve_ldnf1bhs_r,
++        gen_helper_sve_ldnf1dd_r,
++    };
++
++    if (sve_access_check(s)) {
++        int vsz = vec_full_reg_size(s);
++        int elements = vsz >> dtype_esz[a->dtype];
++        int off = (a->imm * elements) << dtype_msz(a->dtype);
++        TCGv_i64 addr = new_tmp_a64(s);
++
++        tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn), off);
++        do_mem_zpa(s, a->rd, a->pg, addr, fns[a->dtype]);
++    }
++    return true;
++}
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index cfb12da639a..afbed57de1d 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -685,9 +685,15 @@ LDR_zri         10000101 10 ...... 010 ... ..... .....          @rd_rn_i9
+ # SVE contiguous load (scalar plus scalar)
+ LD_zprr         1010010 .... ..... 010 ... ..... .....    @rprr_load_dt nreg=0
+ 
++# SVE contiguous first-fault load (scalar plus scalar)
++LDFF1_zprr      1010010 .... ..... 011 ... ..... .....    @rprr_load_dt nreg=0
++
+ # SVE contiguous load (scalar plus immediate)
+ LD_zpri         1010010 .... 0.... 101 ... ..... .....    @rpri_load_dt nreg=0
+ 
++# SVE contiguous non-fault load (scalar plus immediate)
++LDNF1_zpri      1010010 .... 1.... 101 ... ..... .....    @rpri_load_dt nreg=0
++
+ # SVE contiguous non-temporal load (scalar plus scalar)
+ # LDNT1B, LDNT1H, LDNT1W, LDNT1D
+ # SVE load multiple structures (scalar plus scalar)
 -- 
 2.17.1
