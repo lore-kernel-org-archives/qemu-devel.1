@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fYkoC-0003i1-B7
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:14:57 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fYkoT-0003xy-J1
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fYko9-0003oF-1L
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:14:56 -0400
-Date: Fri, 29 Jun 2018 13:33:53 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fYkoR-0004IF-Va
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 00:15:13 -0400
+Date: Fri, 29 Jun 2018 14:15:03 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180629033353.GB3422@umbus.fritz.box>
+Message-ID: <20180629041503.GE3422@umbus.fritz.box>
 References: <20180626161921.27941-1-richard.henderson@linaro.org>
-	<20180626161921.27941-4-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6sX45UoQRIJXqkqR"
+	protocol="application/pgp-signature"; boundary="BZaMRJmqxGScZ8Mx"
 Content-Disposition: inline
-In-Reply-To: <20180626161921.27941-4-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 03/13] target/ppc: Use atomic store for STQ
+In-Reply-To: <20180626161921.27941-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 00/13] target/ppc improve atomic operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +27,68 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---6sX45UoQRIJXqkqR
+--BZaMRJmqxGScZ8Mx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 26, 2018 at 09:19:11AM -0700, Richard Henderson wrote:
-> Section 1.4 of the Power ISA v3.0B states that this insn is
-> single-copy atomic.  As we cannot (yet) issue 128-bit loads
-> within TCG, use the generic helpers provided.
+On Tue, Jun 26, 2018 at 09:19:08AM -0700, Richard Henderson wrote:
+> In another patch set this week, I had noticed the old linux-user
+> do_store_exclusive code was still present.  I had thought that was
+> dead code that simply hadn't been removed, but it turned out that
+> we had not completed the transition to tcg atomics for linux-user.
 >=20
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Applied to ppc-for-3.0, thanks.
-
-> ---
->  target/ppc/helper.h     |  4 ++++
->  target/ppc/mem_helper.c | 14 ++++++++++++++
->  target/ppc/translate.c  | 35 +++++++++++++++++++++++++++--------
->  3 files changed, 45 insertions(+), 8 deletions(-)
+> In the process, I discovered that we weren't using atomic operations
+> for the 128-bit lq, lqarx, and stqcx insns.  These would have simply
+> produced incorrect results for -smp in system mode.
 >=20
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 3f451a5d7e..cbc1228570 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -803,4 +803,8 @@ DEF_HELPER_FLAGS_1(fixup_thrm, TCG_CALL_NO_RWG, void,=
- env)
->  #if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
->  DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
->  DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
-> +DEF_HELPER_FLAGS_5(stq_le_parallel, TCG_CALL_NO_WG,
-> +                   void, env, tl, i64, i64, i32)
-> +DEF_HELPER_FLAGS_5(stq_be_parallel, TCG_CALL_NO_WG,
-> +                   void, env, tl, i64, i64, i32)
->  #endif
-> diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-> index 44a8f3445a..57e301edc3 100644
-> --- a/target/ppc/mem_helper.c
-> +++ b/target/ppc/mem_helper.c
-> @@ -231,6 +231,20 @@ uint64_t helper_lq_be_parallel(CPUPPCState *env, tar=
-get_ulong addr,
->      env->retxh =3D int128_gethi(ret);
->      return int128_getlo(ret);
->  }
-> +
-> +void helper_stq_le_parallel(CPUPPCState *env, target_ulong addr,
-> +                            uint64_t lo, uint64_t hi, uint32_t opidx)
-> +{
-> +    Int128 val =3D int128_make128(lo, hi);
-> +    helper_atomic_sto_le_mmu(env, addr, val, opidx, GETPC());
-> +}
-> +
-> +void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
-> +                            uint64_t lo, uint64_t hi, uint32_t opidx)
-> +{
-> +    Int128 val =3D int128_make128(lo, hi);
-> +    helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
-> +}
->  #endif
-> =20
->  /***********************************************************************=
-******/
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 0923cc24e3..3d63a62269 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -2760,6 +2760,7 @@ static void gen_std(DisasContext *ctx)
->      if ((ctx->opcode & 0x3) =3D=3D 0x2) { /* stq */
->          bool legal_in_user_mode =3D (ctx->insns_flags2 & PPC2_LSQ_ISA207=
-) !=3D 0;
->          bool le_is_supported =3D (ctx->insns_flags2 & PPC2_LSQ_ISA207) !=
-=3D 0;
-> +        TCGv hi, lo;
-> =20
->          if (!(ctx->insns_flags & PPC_64BX)) {
->              gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
-> @@ -2783,20 +2784,38 @@ static void gen_std(DisasContext *ctx)
->          EA =3D tcg_temp_new();
->          gen_addr_imm_index(ctx, EA, 0x03);
-> =20
-> -        /* We only need to swap high and low halves. gen_qemu_st64_i64 d=
-oes
-> -           necessary 64-bit byteswap already. */
-> -        if (unlikely(ctx->le_mode)) {
-> -            gen_qemu_st64_i64(ctx, cpu_gpr[rs + 1], EA);
-> +        /* Note that the low part is always in RS+1, even in LE mode.  */
-> +        lo =3D cpu_gpr[rs + 1];
-> +        hi =3D cpu_gpr[rs];
-> +
-> +        if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
-> +#ifdef CONFIG_ATOMIC128
-> +            TCGv_i32 oi =3D tcg_temp_new_i32();
-> +            if (ctx->le_mode) {
-> +                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx=
-));
-> +                gen_helper_stq_le_parallel(cpu_env, EA, lo, hi, oi);
-> +            } else {
-> +                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx=
-));
-> +                gen_helper_stq_be_parallel(cpu_env, EA, lo, hi, oi);
-> +            }
-> +            tcg_temp_free_i32(oi);
-> +#else
-> +            /* Restart with exclusive lock.  */
-> +            gen_helper_exit_atomic(cpu_env);
-> +            ctx->base.is_jmp =3D DISAS_NORETURN;
-> +#endif
-> +        } else if (ctx->le_mode) {
-> +            tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_LEQ);
->              gen_addr_add(ctx, EA, EA, 8);
-> -            gen_qemu_st64_i64(ctx, cpu_gpr[rs], EA);
-> +            tcg_gen_qemu_st_i64(hi, EA, ctx->mem_idx, MO_LEQ);
->          } else {
-> -            gen_qemu_st64_i64(ctx, cpu_gpr[rs], EA);
-> +            tcg_gen_qemu_st_i64(hi, EA, ctx->mem_idx, MO_BEQ);
->              gen_addr_add(ctx, EA, EA, 8);
-> -            gen_qemu_st64_i64(ctx, cpu_gpr[rs + 1], EA);
-> +            tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_BEQ);
->          }
->          tcg_temp_free(EA);
->      } else {
-> -        /* std / stdu*/
-> +        /* std / stdu */
->          if (Rc(ctx->opcode)) {
->              if (unlikely(rA(ctx->opcode) =3D=3D 0)) {
->                  gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+> I tidy the code a bit by making use of MO_ALIGN, which means that
+> we don't need a separate explicit alignment check.
+>=20
+> I use the new min/max atomic operations I added recently for
+> ARMv8.2-Atomics and RISC-V.
+>=20
+> Finally, Power9 has some *really* odd atomic operations in its
+> l[wd]at and st[wd]at instructions.  We were generating illegal
+> instruction for these.  I implement them for serial context and
+> force parallel context to grab the exclusive lock and try again.
+>=20
+> Except for the trivial linux-user ll/sc case, I do not have any
+> code that exercises these instructions.  Perhaps the IBM folk
+> have something that can test the others?
+
+I've now applied the whole series to ppc-for-3.0.
+
+>=20
+>=20
+> r~
+>=20
+>=20
+> Richard Henderson (13):
+>   target/ppc: Add do_unaligned_access hook
+>   target/ppc: Use atomic load for LQ and LQARX
+>   target/ppc: Use atomic store for STQ
+>   target/ppc: Use atomic cmpxchg for STQCX
+>   target/ppc: Remove POWERPC_EXCP_STCX
+>   target/ppc: Tidy gen_conditional_store
+>   target/ppc: Split out gen_load_locked
+>   target/ppc: Split out gen_ld_atomic
+>   target/ppc: Split out gen_st_atomic
+>   target/ppc: Use MO_ALIGN for EXIWX and ECOWX
+>   target/ppc: Use atomic min/max helpers
+>   target/ppc: Implement the rest of gen_ld_atomic
+>   target/ppc: Implement the rest of gen_st_atomic
+>=20
+>  target/ppc/cpu.h                |   8 +-
+>  target/ppc/helper.h             |  11 +
+>  target/ppc/internal.h           |   5 +
+>  linux-user/ppc/cpu_loop.c       | 123 ++----
+>  target/ppc/excp_helper.c        |  18 +-
+>  target/ppc/mem_helper.c         |  72 +++-
+>  target/ppc/translate.c          | 648 ++++++++++++++++++++------------
+>  target/ppc/translate_init.inc.c |   1 +
+>  8 files changed, 539 insertions(+), 347 deletions(-)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -160,24 +96,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---6sX45UoQRIJXqkqR
+--BZaMRJmqxGScZ8Mx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls1qKEACgkQbDjKyiDZ
-s5Kq5g/+Kz0sixeINq9a/VGsh5WQ+zEAkTakGCtNIzSXrKpDui0gsF4iGGsxExxE
-cGOotYLHp6OUrEziYJUDLvZZ+II0vDARbl7zmzEPZ4S7oU6SCNYLgGlWndG5sbwk
-6qki5zpGNBaoQYxZOQSkUAjnU6HywjJe64EHkdxmbhO/5QjflsQX9l8L5PBRmEPl
-z9n9lD6AtpXrhE8zlBBEW4sw6F3ofaK53m+1D8aLvKD/HLzIPTI51pb8mXmiGMkq
-DFGqCyMMCwlGuduyq68Vs/VfDMDAO+Qu41c0L0G+PsLAPrVjX7Gf9I9H4fsqN6UD
-gu3czO1zIB/Pif7fbR1Q4ajzSWqdw5GFis/kwt4eyqspgLRaHmeG5cewiGbs6cAT
-eje+mezPU99i2T0ZcacsHLXC8N+xvH8NXwyTvGTFnBKs4eI5GUPGRezdOiwL+XZr
-h6yRsyeA/TbZ9kvUhBOjjdiWsHPwfO+fC4jPp/FP5HY1issykAZpTxlvs68DH789
-AJEyY9m5Pnn/+opUhg9IPZgtSsF/N0lmrgf5MuJ30DZgwArv6Ba22U1mZ3gS5ja/
-TAP0UzyYRkLV+jp7nboOO8dI4Azyx8IV/SueRM6Q+IURVMEOlTkd4jegcThBRPQy
-UMmh7vYgg8OANamFQuB6dUr+YK3cXFAXzEGF1ouknwrLan9nTb4=
-=QqrB
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls1skcACgkQbDjKyiDZ
+s5Lduw/+ImSbmrwN4fs4WLK1yzEi1J8MCscdHzXJaQew5nHM25zDxNPVzicXplZH
+Z1Ee/rhocXVWvpdoORnRqXxbRlGTp07yT0qYQjQWnkqvIFHsuXzEyQYJZFbwbGOR
+wpRUK9D46Fxbl2/A+E6oejH/5PLotOfvZZuetdikLURf3NewUjE7aMRUI30YBKuK
+GwXzWczeChAjZj7AxGvNG8SvS5VnZpIbX0AQpzJSh5LYQrIVzPf3KQrbYbx3MML0
++ogAohRoGutyaWIV4Qh/wqmpMZxAzrrZANVSd5d3Cd1mVAQCmtD/nNYn14FOtkXW
+VphzrijBUcfu9XuC1HHAgyzhOoRvGYDZNj8NJgSyKJO6LZOm2zNbwLROTwhRTrAf
+0LfD6DVVZONxgvn7FgMKAheTWFLlaUZE34YmXUXooM/HblJc57p4Y0gyXe+7Xae3
+wLCJzjPeRIZKBTKYEacqj/rdfITz4YceBv9R8NTYahfqJdfcsiVGJOGKjEnmBqUC
+33N+xWxpZVZaIlVE5mvNtU/W/GNSpOHJvXxrRzXALqwgtKl9vmZDdmfxpXpnCn3Z
+cIyuHY0JMumaqINN6Zl6yA+JnWY0dQVlVutX4W2lKfJVFpTyFiyiPP+97SSKdiXn
+L3XHTfIIavxt0pFLPxja5pCoTaxD6UnEPWeQzA87IgNvETBlAe8=
+=Hldo
 -----END PGP SIGNATURE-----
 
---6sX45UoQRIJXqkqR--
+--BZaMRJmqxGScZ8Mx--
