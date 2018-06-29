@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYzg3-0005Ok-EO
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYzhh-0006dj-Hs
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYzg2-00038F-Aq
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:31 -0400
-References: <CAFLvi203QwYCdfdhq6pb855xOZbt-bOiMsYU3cDSx6itHeu2=w@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ceff4595-026d-ae13-5628-042cf043d0ac@redhat.com>
-Date: Fri, 29 Jun 2018 16:07:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYzhd-0005Uo-5n
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:09:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57772 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYzhc-0005TI-UX
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:09:09 -0400
+References: <20180629195544.34263-1-eblake@redhat.com>
+	<20180629195544.34263-2-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ed5d831b-2035-74b5-b12a-01f443c8a896@redhat.com>
+Date: Fri, 29 Jun 2018 15:09:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFLvi203QwYCdfdhq6pb855xOZbt-bOiMsYU3cDSx6itHeu2=w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180629195544.34263-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [BUG] qed_aio_write_alloc: Assertion
- `s->allocating_acb == NULL' failed.
+Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: Add comments to aid debugging
+ generated introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Quytelda Kahja <quytelda@tamalin.org>, qemu-devel@nongnu.org
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-CC Qemu Block; looks like QED is a bit busted.
+On 06/29/2018 02:55 PM, Eric Blake wrote:
+> We consciously chose in commit 1a9a507b to hide QAPI type names
+> from the generated introspection output, but added a command line
+> option -u to unmask the type name when doing a debug build.  At
+> that time, we generated a monolithic C string, so there was no
+> better way to do things (we could not really inject comments).
+> 
+> Later, in commit 7d0f982b, we switched the generation to output
+> a QLit object, in part to make it easier for future addition of
+> conditional compilation.  But this switch has also made it easier
+> to interject strategic comments.  That commit also forgot to
+> delete some now-stale comments about long generated line lengths.
+> 
+> For now, type name debug aid comments are only output once per
+> meta-type, rather than at all uses of the number used to encode
+> the type to the introspection data.  But this is still a lot
+> more convenient than having to regenerate the file with the
+> unmask operation temporarily turned on.
+...
 
-On 06/27/2018 10:25 AM, Quytelda Kahja wrote:
-> Hello all,
-> I wanted to submit a bug report in the tracker, but it seem to require
-> an Ubuntu One account, which I'm having trouble with, so I'll just
-> give it here and hopefully somebody can make use of it.  The issue
-> seems to be in an experimental format, so it's likely not very
-> consequential anyway.
-> 
-> For the sake of anyone else simply googling for a workaround, I'll
-> just paste in the (cleaned up) brief IRC conversation about my issue
-> from the official channel:
-> <quy> I'm using QEMU version 2.12.0 on an x86_64 host (Arch Linux,
-> Kernel v4.17.2), and I'm trying to create an x86_64 virtual machine
-> (FreeBSD-11.1).  The VM always aborts at the same point in the
-> installation (downloading 'ports.tgz') with the following error
-> message:
-> "qemu-system-x86_64: /build/qemu/src/qemu-2.12.0/block/qed.c:1197:
-> qed_aio_write_alloc: Assertion `s->allocating_acb == NULL' failed.
-> zsh: abort (core dumped)  qemu-system-x86_64 -smp 2 -m 4096
-> -enable-kvm -hda freebsd/freebsd.qed -devic"
-> The commands I ran to create the machine are as follows:
-> "qemu-img create -f qed freebsd/freebsd.qed 16G"
-> "qemu-system-x86_64 -smp 2 -m 4096 -enable-kvm -hda
-> freebsd/freebsd.qed -device e1000,netdev=net0 -netdev user,id=net0
-> -cdrom FreeBSD-11.1-RELEASE-amd64-bootonly.iso -boot order=d"
-> I tried adding logging options with the -d flag, but I didn't get
-> anything that seemed relevant, since I'm not sure what to look for.
-> <stsquad> ohh what's a qed device?
-> <stsquad> quy: it might be a workaround to use a qcow2 image for now
-> <stsquad> ahh the wiki has a statement "It is not recommended to use
-> QED for any new images. "
-> <danpb> 'qed' was an experimental disk image format created by IBM
-> before qcow2 v3 came along
-> <danpb> honestly nothing should ever use  QED these days
-> <danpb> the good ideas from QED became  qcow2v3
-> <stsquad> danpb: sounds like we should put a warning on the option to
-> remind users of that fact
-> <danpb> quy: sounds like qed driver is simply broken - please do file
-> a bug against qemu bug tracker
-> <danpb> quy: but you should also really switch to qcow2
-> <quy> I see; some people need to update their wikis then.  I don't
-> remember where which guide I read when I first learned what little
-> QEMU I know, but I remember it specifically remember it saying QED was
-> the newest and most optimal format.
-> <stsquad> quy: we can only be responsible for our own wiki I'm afraid...
-> <danpb> if you remember where you saw that please let us know so we
-> can try to get it fixed
-> <quy> Thank you very much for the info; I will switch to QCOW.
-> Unfortunately, I'm not sure if I will be able to file any bug reports
-> in the tracker as I can't seem to log Launchpad, which it seems to
-> require.
-> <danpb> quy:  an email to the mailing list would suffice too if you
-> can't deal with launchpad
-> <danpb> kwolf: ^^^ in case you're interested in possible QED
-> assertions from 2.12
-> 
-> If any more info is needed, feel free to email me; I'm not actually
-> subscribed to this list though.
-> Thank you,
-> Quytelda Kahja
-> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>   scripts/qapi/introspect.py | 11 ++++++++---
+>   1 file changed, 8 insertions(+), 3 deletions(-)
+
+Misses a change to docs/devel/qapi-code.gen.tx:
+
+diff --git i/docs/devel/qapi-code-gen.txt w/docs/devel/qapi-code-gen.txt
+index 88a70e4d451..0c98c7d7b6c 100644
+--- i/docs/devel/qapi-code-gen.txt
++++ w/docs/devel/qapi-code-gen.txt
+@@ -1392,6 +1392,7 @@ Example:
+              { }
+          })),
+          QLIT_QDICT(((QLitDictEntry[]) {
++            /* q_empty */
+              { "members", QLIT_QLIST(((QLitObject[]) {
+                  { }
+              })) },
+
+> @@ -118,8 +121,8 @@ const QLitObject %(c_name)s = %(c_string)s;
+>           if typ not in self._used_types:
+>               self._used_types.append(typ)
+>           # Clients should examine commands and events, not types.  Hide
+> -        # type names to reduce the temptation.  Also saves a few
+> -        # characters.
+> +        # type names as integers to reduce the temptation, but provide
+> +        # comments for debugging aid.
+
+When I wrote the patch, I assumed the final sentence of the comment was 
+talking about fewer characters in the generated .c file (I nuked it, 
+since adding comments makes for a longer, not shorter, generated .c 
+file); but now that I'm writing this email, I see it could also refer to 
+fewer characters sent over the wire in the QMP command (which length is 
+unchanged by this patch, but was a 13KiB savings compared to the 
+unmasked version, per commit 1a9a507b).  So feel free to bikeshed this 
+comment.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
