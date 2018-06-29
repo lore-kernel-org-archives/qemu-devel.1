@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nv-0008Cv-6y
+	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nv-0008Cu-6m
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Ns-0006Zz-9k
+	(envelope-from <alex.bennee@linaro.org>) id 1fZ0Nr-0006Yy-8U
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:51 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36077)
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZ0Ns-0006ZD-2i
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:48 -0400
-Received: by mail-wm0-x232.google.com with SMTP id u18-v6so3306745wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:52:47 -0700 (PDT)
+	id 1fZ0Nr-0006Xv-1h
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:52:47 -0400
+Received: by mail-wr0-x242.google.com with SMTP id k6-v6so9981879wrp.4
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:52:46 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 29 Jun 2018 21:52:23 +0100
-Message-Id: <20180629205232.27190-13-alex.bennee@linaro.org>
+Date: Fri, 29 Jun 2018 21:52:20 +0100
+Message-Id: <20180629205232.27190-10-alex.bennee@linaro.org>
 In-Reply-To: <20180629205232.27190-1-alex.bennee@linaro.org>
 References: <20180629205232.27190-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 12/21] docker: ubuntu: Update the package
- list before installing new ones
+Subject: [Qemu-devel] [PATCH v2 09/21] linux-user: introduce preexit_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +30,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+To avoid repeating ourselves move our preexit clean-up code into a
+helper function. I figured the continuing effort to split of the
+syscalls made it worthwhile creating a new file for it now.
 
-Since docker caches the different layers, updating the package
-list does not invalidate the previous "apt-get update" layer,
-and it is likely "apt-get install" hits an outdated repository.
-
-See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#apt-get
-
-This fixes:
-
-  $ make docker-image-ubuntu V=1
-  ./tests/docker/docker.py build qemu:ubuntu tests/docker/dockerfiles/ubuntu.docker   --add-current-user
-  Sending build context to Docker daemon  3.072kB
-  [...]
-  E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/main/m/mesa/libgles2-mesa_17.0.7-0ubuntu0.16.04.2_amd64.deb  404  Not Found
-  E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/main/m/mesa/libgles2-mesa-dev_17.0.7-0ubuntu0.16.04.2_amd64.deb  404  Not Found
-  E: Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?
-  The command '/bin/sh -c apt-get -y install $PACKAGES' returned a non-zero code: 100
-  tests/docker/Makefile.include:40: recipe for target 'docker-image-ubuntu' failed
-  make: *** [docker-image-ubuntu] Error 1
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/docker/dockerfiles/ubuntu.docker | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ linux-user/Makefile.objs |  2 +-
+ linux-user/exit.c        | 28 ++++++++++++++++++++++++++++
+ linux-user/qemu.h        |  8 ++++++++
+ linux-user/syscall.c     | 10 ++--------
+ 4 files changed, 39 insertions(+), 9 deletions(-)
+ create mode 100644 linux-user/exit.c
 
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index dabbf2a8a4..c03520ce3f 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -1,7 +1,6 @@
- FROM ubuntu:16.04
- RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
-     /etc/apt/sources.list
--RUN apt-get update
- ENV PACKAGES flex bison \
-     libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
-     libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
-@@ -13,6 +12,7 @@ ENV PACKAGES flex bison \
-     libjemalloc-dev libcacard-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
-     texinfo \
-     gettext git make ccache python-yaml gcc clang sparse
--RUN apt-get -y install $PACKAGES
-+RUN apt-get update && \
-+    apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
- ENV FEATURES clang pyyaml
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 59a5c17354..b5dfb71f25 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,7 +1,7 @@
+ obj-y = main.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+ 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
+-        $(TARGET_ABI_DIR)/cpu_loop.o
++        $(TARGET_ABI_DIR)/cpu_loop.o exit.o
+ 
+ obj-$(TARGET_HAS_BFLT) += flatload.o
+ obj-$(TARGET_I386) += vm86.o
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+new file mode 100644
+index 0000000000..aed8713fae
+--- /dev/null
++++ b/linux-user/exit.c
+@@ -0,0 +1,28 @@
++/*
++ *  exit support for qemu
++ *
++ *  Copyright (c) 2018 Alex Bennée <alex.bennee@linaro.org>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu.h"
++
++void preexit_cleanup(CPUArchState *env, int code)
++{
++#ifdef TARGET_GPROF
++        _mcleanup();
++#endif
++        gdb_exit(env, code);
++}
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 793cd4df04..bb85c81aa4 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -623,6 +623,14 @@ static inline int is_error(abi_long ret)
+     return (abi_ulong)ret >= (abi_ulong)(-4096);
+ }
+ 
++/**
++ * preexit_cleanup: housekeeping before the guest exits
++ *
++ * env: the CPU state
++ * code: the exit code
++ */
++void preexit_cleanup(CPUArchState *env, int code);
++
+ /* Include target-specific struct and function definitions;
+  * they may need access to the target-independent structures
+  * above, so include them last.
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 2117fb13b4..7c66442357 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8018,10 +8018,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         }
+ 
+         cpu_list_unlock();
+-#ifdef TARGET_GPROF
+-        _mcleanup();
+-#endif
+-        gdb_exit(cpu_env, arg1);
++        preexit_cleanup(cpu_env, arg1);
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+         break;
+@@ -10127,10 +10124,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ #ifdef __NR_exit_group
+         /* new thread calls */
+     case TARGET_NR_exit_group:
+-#ifdef TARGET_GPROF
+-        _mcleanup();
+-#endif
+-        gdb_exit(cpu_env, arg1);
++        preexit_cleanup(cpu_env, arg1);
+         ret = get_errno(exit_group(arg1));
+         break;
+ #endif
 -- 
 2.17.1
