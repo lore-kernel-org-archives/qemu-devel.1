@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYuob-0000st-IR
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:56:02 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fYusQ-0004Gj-1M
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:59:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYuoW-0003JX-Je
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:56:01 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:42079)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYuoW-0003HY-DW
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:55:56 -0400
-Received: by mail-qt0-x243.google.com with SMTP id y31-v6so8051140qty.9
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:55:56 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180628164643.9668-1-f4bug@amsat.org>
-	<20180628164643.9668-5-f4bug@amsat.org> <876021vg3t.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c0cedd84-3598-7a6b-8ffb-b4f737ab4728@amsat.org>
-Date: Fri, 29 Jun 2018 11:55:51 -0300
+	(envelope-from <imammedo@redhat.com>) id 1fYusM-0004HL-1f
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:59:58 -0400
+Date: Fri, 29 Jun 2018 16:59:46 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180629165946.4ca31187@redhat.com>
+In-Reply-To: <293c189c-3034-f002-ca90-698e6ecf0c09@redhat.com>
+References: <20180628121417.1980-1-david@redhat.com>
+	<20180628121417.1980-5-david@redhat.com>
+	<20180629011933.GJ23134@umbus.fritz.box>
+	<293c189c-3034-f002-ca90-698e6ecf0c09@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <876021vg3t.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/8] docker: Add packages required to
- build a Linux kernel
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] pc-dimm: assign and verify the
+ "addr" property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S .
+	Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
 
-On 06/29/2018 11:09 AM, Alex Bennée wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> Being able to also cross build Linux kernels with our docker cross
->> images allow us to add more complex qemu-system acceptance tests.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> This is not required to build QEMU, so I might resend it in the
->> acceptance-test series which actually requires this patch.
->>
->>  tests/docker/dockerfiles/debian-sid.docker | 6 +++++-
->>  1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
->> index 9a3d168705..846021b032 100644
->> --- a/tests/docker/dockerfiles/debian-sid.docker
->> +++ b/tests/docker/dockerfiles/debian-sid.docker
->> @@ -22,11 +22,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
->>  RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->>      apt install -y --no-install-recommends \
->>          bison \
->> +        binutils-multiarch \
->>          build-essential \
->>          ca-certificates \
->> +        curl \
->>          flex \
->> +        gettext \
->>          git \
->> +        gnupg \
->>          pkg-config \
->>          psmisc \
->> -        python \
->> +        python-minimal \
-> 
-> Hmm don't we need full python for QEMU though?
+On Fri, 29 Jun 2018 09:14:52 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I'm not sure, but the goal of this image is to be useful, not tiny, so
-I'm happy with the normal package (I cherry-picked this from an older
-series and did not notice this particular change).
+> On 29.06.2018 03:19, David Gibson wrote:
+> > On Thu, Jun 28, 2018 at 02:14:17PM +0200, David Hildenbrand wrote:  
+> >> We can assign and verify the slot before realizing and trying to plug.
+> >> reading/writing the address property should never fail, so let's reduce
+> >> error handling a bit by using &error_abort. Getting access to the memory
+> >> region now might however fail. So forward errors from
+> >> get_memory_region() properly.
+> >>
+> >> Keep tracing the assigned address for now in the plug code, as that's the
+> >> point we are sure plugging succeeded and the address willa ctually be
+> >> used.
+> >>
+> >> As all memory devices should use the alignment of the underlying memory
+> >> region for guest physical address asignment, do detection of the
+> >> alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
+> >> alignment for compatibility handling.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/i386/pc.c             | 16 ++++--------
+> >>  hw/mem/pc-dimm.c         | 53 +++++++++++++++++++++++-----------------
+> >>  hw/ppc/spapr.c           |  7 +++---
+> >>  include/hw/mem/pc-dimm.h |  6 ++---
+> >>  4 files changed, 41 insertions(+), 41 deletions(-)
+> >>
+> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >> index 934b7155b1..16e4b5baff 100644
+> >> --- a/hw/i386/pc.c
+> >> +++ b/hw/i386/pc.c
+> >> @@ -1678,7 +1678,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >>                                 Error **errp)
+> >>  {
+> >>      const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> >> +    const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+> >>      const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> >> +    const uint64_t compat_align = TARGET_PAGE_SIZE;
+> >>  
+> >>      /*
+> >>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
+> >> @@ -1696,7 +1698,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >>          return;
+> >>      }
+> >>  
+> >> -    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+> >> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev),
+> >> +                     pcmc->enforce_aligned_dimm ? NULL : &compat_align, errp);  
+> > 
+> > Why would you pass a const pointer, rather than just a value?  
+> 
+> We could do that if we make "0" -> "no compat alignment, detect
+> alignment yourself". That should work here.
+I'd prefer pointer as it doesn't give any special meaning to 0 value
+and more visible showing that something non trivial happens here 
 
 > 
->>          texinfo || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
-> 
-> 
-> --
-> Alex Bennée
+> Thanks!
 > 
