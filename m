@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYxab-0000GU-IA
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:53:50 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fYxag-0000JA-Eq
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fYxaa-0008TG-Ew
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:53:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40230 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fYxac-0008Vo-TL
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:53:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40258 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fYxaa-0008Sj-9U
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:53:44 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fYxac-0008VP-Nk
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:53:46 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 29 Jun 2018 18:53:24 +0100
-Message-Id: <20180629175330.19391-6-stefanha@redhat.com>
+Date: Fri, 29 Jun 2018 18:53:26 +0100
+Message-Id: <20180629175330.19391-8-stefanha@redhat.com>
 In-Reply-To: <20180629175330.19391-1-stefanha@redhat.com>
 References: <20180629175330.19391-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/11] hw/char/parallel: Convert from pdebug()
- macro to trace events
+Subject: [Qemu-devel] [PULL 07/11] hw/net/ne2000: Add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,135 +34,79 @@ From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/char/parallel.c   | 16 +++++++++++++---
- hw/char/trace-events |  4 ++++
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ hw/net/ne2000.c     | 17 ++++++++++++-----
+ hw/net/trace-events |  4 ++++
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-index 35748e6c1b..a80da47ecf 100644
---- a/hw/char/parallel.c
-+++ b/hw/char/parallel.c
-@@ -30,6 +30,7 @@
- #include "hw/isa/isa.h"
- #include "hw/char/parallel.h"
+diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
+index 3a9fc89e48..26b234b7eb 100644
+--- a/hw/net/ne2000.c
++++ b/hw/net/ne2000.c
+@@ -26,6 +26,7 @@
+ #include "net/eth.h"
+ #include "ne2000.h"
  #include "sysemu/sysemu.h"
 +#include "trace.h"
 =20
- //#define DEBUG_PARALLEL
-=20
-@@ -110,9 +111,8 @@ parallel_ioport_write_sw(void *opaque, uint32_t addr,=
- uint32_t val)
+ /* debug NE2000 card */
+ //#define DEBUG_NE2000
+@@ -662,19 +663,24 @@ static uint64_t ne2000_read(void *opaque, hwaddr ad=
+dr,
+                             unsigned size)
  {
-     ParallelState *s =3D opaque;
+     NE2000State *s =3D opaque;
++    uint64_t val;
 =20
--    pdebug("write addr=3D0x%02x val=3D0x%02x\n", addr, val);
--
-     addr &=3D 7;
-+    trace_parallel_ioport_write("SW", addr, val);
-     switch(addr) {
-     case PARA_REG_DATA:
-         s->dataw =3D val;
-@@ -157,6 +157,7 @@ static void parallel_ioport_write_hw(void *opaque, ui=
-nt32_t addr, uint32_t val)
-     s->last_read_offset =3D ~0U;
-=20
-     addr &=3D 7;
-+    trace_parallel_ioport_write("HW", addr, val);
-     switch(addr) {
-     case PARA_REG_DATA:
-         if (s->dataw =3D=3D val)
-@@ -230,6 +231,8 @@ parallel_ioport_eppdata_write_hw2(void *opaque, uint3=
-2_t addr, uint32_t val)
-     struct ParallelIOArg ioarg =3D {
-         .buffer =3D &eppdata, .count =3D sizeof(eppdata)
-     };
-+
-+    trace_parallel_ioport_write("EPP", addr, val);
-     if ((s->control & (PARA_CTR_DIR|PARA_CTR_SIGNAL)) !=3D PARA_CTR_INIT=
-) {
-         /* Controls not correct for EPP data cycle, so do nothing */
-         pdebug("we%04x s\n", val);
-@@ -253,6 +256,8 @@ parallel_ioport_eppdata_write_hw4(void *opaque, uint3=
-2_t addr, uint32_t val)
-     struct ParallelIOArg ioarg =3D {
-         .buffer =3D &eppdata, .count =3D sizeof(eppdata)
-     };
-+
-+    trace_parallel_ioport_write("EPP", addr, val);
-     if ((s->control & (PARA_CTR_DIR|PARA_CTR_SIGNAL)) !=3D PARA_CTR_INIT=
-) {
-         /* Controls not correct for EPP data cycle, so do nothing */
-         pdebug("we%08x s\n", val);
-@@ -299,7 +304,7 @@ static uint32_t parallel_ioport_read_sw(void *opaque,=
- uint32_t addr)
-         ret =3D s->control;
-         break;
-     }
--    pdebug("read addr=3D0x%02x val=3D0x%02x\n", addr, ret);
-+    trace_parallel_ioport_read("SW", addr, ret);
-     return ret;
- }
-=20
-@@ -371,6 +376,7 @@ static uint32_t parallel_ioport_read_hw(void *opaque,=
- uint32_t addr)
+     if (addr < 0x10 && size =3D=3D 1) {
+-        return ne2000_ioport_read(s, addr);
++        val =3D ne2000_ioport_read(s, addr);
+     } else if (addr =3D=3D 0x10) {
+         if (size <=3D 2) {
+-            return ne2000_asic_ioport_read(s, addr);
++            val =3D ne2000_asic_ioport_read(s, addr);
+         } else {
+-            return ne2000_asic_ioport_readl(s, addr);
++            val =3D ne2000_asic_ioport_readl(s, addr);
          }
-         break;
+     } else if (addr =3D=3D 0x1f && size =3D=3D 1) {
+-        return ne2000_reset_ioport_read(s, addr);
++        val =3D ne2000_reset_ioport_read(s, addr);
++    } else {
++        val =3D ((uint64_t)1 << (size * 8)) - 1;
      }
-+    trace_parallel_ioport_read("HW", addr, ret);
-     s->last_read_offset =3D addr;
-     return ret;
- }
-@@ -399,6 +405,7 @@ parallel_ioport_eppdata_read_hw2(void *opaque, uint32=
-_t addr)
-     }
-     else
-         pdebug("re%04x\n", ret);
-+    trace_parallel_ioport_read("EPP", addr, ret);
-     return ret;
- }
-=20
-@@ -426,11 +433,13 @@ parallel_ioport_eppdata_read_hw4(void *opaque, uint=
-32_t addr)
-     }
-     else
-         pdebug("re%08x\n", ret);
-+    trace_parallel_ioport_read("EPP", addr, ret);
-     return ret;
- }
-=20
- static void parallel_ioport_ecp_write(void *opaque, uint32_t addr, uint3=
-2_t val)
- {
-+    trace_parallel_ioport_write("ECP", addr & 7, val);
-     pdebug("wecp%d=3D%02x\n", addr & 7, val);
- }
-=20
-@@ -438,6 +447,7 @@ static uint32_t parallel_ioport_ecp_read(void *opaque=
-, uint32_t addr)
- {
-     uint8_t ret =3D 0xff;
-=20
-+    trace_parallel_ioport_read("ECP", addr & 7, ret);
-     pdebug("recp%d:%02x\n", addr & 7, ret);
-     return ret;
- }
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index 158957627e..b64213d4dd 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -1,5 +1,9 @@
- # See docs/devel/tracing.txt for syntax documentation.
-=20
-+# hw/char/parallel.c
-+parallel_ioport_read(const char *desc, uint16_t addr, uint8_t value) "re=
-ad [%s] addr 0x%02x val 0x%02x"
-+parallel_ioport_write(const char *desc, uint16_t addr, uint8_t value) "w=
-rite [%s] addr 0x%02x val 0x%02x"
+-    return ((uint64_t)1 << (size * 8)) - 1;
++    trace_ne2000_read(addr, val);
 +
- # hw/char/serial.c
- serial_ioport_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0=
-x%02x"
- serial_ioport_write(uint16_t addr, uint8_t value) "write addr 0x%02x val=
- 0x%02x"
++    return val;
+ }
+=20
+ static void ne2000_write(void *opaque, hwaddr addr,
+@@ -682,6 +688,7 @@ static void ne2000_write(void *opaque, hwaddr addr,
+ {
+     NE2000State *s =3D opaque;
+=20
++    trace_ne2000_write(addr, data);
+     if (addr < 0x10 && size =3D=3D 1) {
+         ne2000_ioport_write(s, addr, data);
+     } else if (addr =3D=3D 0x10) {
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index 45c4e9fba0..95a1de01e9 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -23,6 +23,10 @@ mipsnet_read(uint64_t addr, uint32_t val) "read addr=3D=
+0x%" PRIx64 " val=3D0x%x"
+ mipsnet_write(uint64_t addr, uint64_t val) "write addr=3D0x%" PRIx64 " v=
+al=3D0x%" PRIx64
+ mipsnet_irq(uint32_t isr, uint32_t intctl) "set irq to %d (0x%02x)"
+=20
++# hw/net/ne2000.c
++ne2000_read(uint64_t addr, uint64_t val) "read addr=3D0x%" PRIx64 " val=3D=
+0x%" PRIx64
++ne2000_write(uint64_t addr, uint64_t val) "write addr=3D0x%" PRIx64 " va=
+l=3D0x%" PRIx64
++
+ # hw/net/opencores_eth.c
+ open_eth_mii_write(unsigned idx, uint16_t v) "MII[0x%02x] <- 0x%04x"
+ open_eth_mii_read(unsigned idx, uint16_t v) "MII[0x%02x] -> 0x%04x"
 --=20
 2.17.1
