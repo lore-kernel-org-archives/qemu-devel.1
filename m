@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYuHD-0005bQ-9H
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:21:32 -0400
+	(envelope-from <famz@redhat.com>) id 1fYuIK-0006PN-Gg
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:22:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fYuHC-0004YU-8Z
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:21:31 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:37268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fYuHC-0004Y4-1f
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:21:30 -0400
-Received: by mail-oi0-x235.google.com with SMTP id k81-v6so8595267oib.4
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 07:21:29 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1fYuIG-0006Zo-IR
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:22:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51676 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fYuIG-0006Xo-By
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:22:36 -0400
+Date: Fri, 29 Jun 2018 22:22:32 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180629142232.GG3862@lemon.usersys.redhat.com>
+References: <20180628164643.9668-1-f4bug@amsat.org>
+	<20180628164643.9668-6-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
-References: <20180627174435.31800-1-alistair.francis@wdc.com>
-	<CAFEAcA8rRRTYhS-JNBTeJfZDydYEdNpab_TPieyrKcV5cad0SA@mail.gmail.com>
-	<23cb43c1-15aa-187b-3711-da7847396a01@amsat.org>
-	<CAFEAcA83eO5DZawurRmLtuV4jBL8s23EHaUCFLS7_c9mGHEdxA@mail.gmail.com>
-	<CAKmqyKMB-KeukYvsSfvj+Sv6_eQoTP+1_iztuMuy-yJqVzP1Gw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Jun 2018 15:21:08 +0100
-Message-ID: <CAFEAcA98fthhG_q0skQcWzhLMFYVPQpc=jAJOL+8CrrEpGLvQw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] riscv-pull queue
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180628164643.9668-6-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 5/8] docker: Restrict the 'travis' job
+ to the Travis image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On 29 June 2018 at 15:13, Alistair Francis <alistair23@gmail.com> wrote:
-> Can you import it manually? The armour export is below:
+On Thu, 06/28 13:46, Philippe Mathieu-Daud=E9 wrote:
+> We can still run any test in Travis.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/docker/Makefile.include | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index 91d9665517..7d9d568eee 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -99,11 +99,17 @@ docker-image-tricore-cross: docker-image-debian9
+> =20
+>  # Expand all the pre-requistes for each docker image and test combinat=
+ion
+>  $(foreach i,$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES), \
+> -	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+> +	$(foreach t,$(DOCKER_TESTS), \
+>  		$(eval .PHONY: docker-$t@$i) \
+>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+> +		$(eval docker-test: docker-$t@$i) \
+>  	) \
+> -	$(foreach t,$(DOCKER_TESTS), \
+> +)
+> +# we only run Travis tests on the Travis image
+> +$(foreach i,travis, \
+> +	$(foreach t,$(DOCKER_TOOLS), \
+> +		$(eval .PHONY: docker-$t@$i) \
+> +		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+>  		$(eval docker-test: docker-$t@$i) \
+>  	) \
+>  )
+> --=20
+> 2.18.0
+>=20
 
-Aha. I tried that, which didn't work either, which prompted
-me to try --verbose, which says:
+Apart from Alex's concern (which I don't have), I suppose a 'requires tra=
+vis'
+and 'ENV features travis' pair is the correct way to do it. See test-ming=
+w for
+example.
 
-e104462:xenial:qemu-for-merges$ gpg --verbose --import /tmp/alistair.gpg
-gpg: armour header: Version: GnuPG v2
-gpg: can't handle public key algorithm 19
-gpg: pub     0E/0xE48E3BC2C123ED93 2017-12-15  Alistair Francis
-<alistair@alistair23.me>
-gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm on user
-ID "Alistair Francis <alistair@alistair23.me>"
-gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm on user
-ID "Alistair Francis <alistair23@gmail.com>"
-gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
-gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
-gpg: key 0xE48E3BC2C123ED93: unsupported public key algorithm
-gpg: key 0xE48E3BC2C123ED93: skipped user ID "Alistair Francis
-<alistair@alistair23.me>"
-gpg: key 0xE48E3BC2C123ED93: skipped user ID "Alistair Francis
-<alistair23@gmail.com>"
-gpg: key 0xE48E3BC2C123ED93: skipped subkey
-gpg: key 0xE48E3BC2C123ED93: skipped subkey
-gpg: key 0xE48E3BC2C123ED93: skipped subkey
-gpg: key 0xE48E3BC2C123ED93: no valid user IDs
-gpg: this may be caused by a missing self-signature
-gpg: Total number processed: 1
-gpg:           w/o user IDs: 1
-
-So the problem is that your key is using some algorithm
-that's too newfangled for my gpg to cope with...
-
-thanks
--- PMM
+Fam
