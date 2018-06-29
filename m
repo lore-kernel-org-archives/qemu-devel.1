@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYyuS-00049c-S9
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:18:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYzUj-0000K6-3O
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYyuR-0005yC-Bl
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:18:20 -0400
-References: <20180621154850.23354-1-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <462b0c49-6dc6-abff-fd62-907e81ccdae6@redhat.com>
-Date: Fri, 29 Jun 2018 15:18:11 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180621154850.23354-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/fleecing-filter: new filter driver
- for fleecing
+	(envelope-from <eblake@redhat.com>) id 1fYzUg-0004eN-0V
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:55:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43508 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fYzUf-0004e7-Ry
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 15:55:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 178057DAC6
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 19:55:45 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 29 Jun 2018 14:55:42 -0500
+Message-Id: <20180629195544.34263-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] qapi: easier debugging of introspection
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,191 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.com, armbru@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
+When inspecting the generated qapi-introspect.c (for debugging,
+or to see what QAPI changes are user visible vs. internal only),
+the fact that we've intentionally masked names from the QMP client
+makes it harder to tie back generated code back to the original
+QAPI .json files.  We have a -u switch to qapi-gen for temporarily
+bypassing the name masking, but that's a rather heavy-handed
+tactic just for some temporary debugging.  Better is to just make
+the generated file include strategic comments.
 
+Eric Blake (2):
+  qapi: Add comments to aid debugging generated introspection
+  qapi: Drop qapi-gen --unmask option
 
-On 06/21/2018 11:48 AM, Vladimir Sementsov-Ogievskiy wrote:
-> We need to synchronize backup job with reading from fleecing image
-> like it was done in block/replication.c.
-> 
-> Otherwise, the following situation is theoretically possible:
-> 
-> 1. client start reading
-> 2. client understand, that there is no corresponding cluster in
->    fleecing image
-> 3. client is going to read from backing file (i.e. active image)
-> 4. guest writes to active image
-> 5. this write is stopped by backup(sync=none) and cluster is copied to
->    fleecing image
-> 6. guest write continues...
-> 7. and client reads _new_ (or partly new) date from active image
-> 
-> So, this fleecing-filter should be above fleecing image, the whole
-> picture of fleecing looks like this:
-> 
->     +-------+           +------------+
->     |       |           |            |
->     | guest |           | NBD client +<------+
->     |       |           |            |       |
->     ++-----++           +------------+       |only read
->      |     ^                                 |
->      | IO  |                                 |
->      v     |                           +-----+------+
->     ++-----+---------+                 |            |
->     |                |                 |  internal  |
->     |  active image  +----+            | NBD server |
->     |                |    |            |            |
->     +-+--------------+    |backup      +-+----------+
->       ^                   |sync=none     ^
->       |backing            |              |only read
->       |                   |              |
->     +-+--------------+    |       +------+----------+
->     |                |    |       |                 |
->     | fleecing image +<---+       | fleecing filter |
->     |                |            |                 |
->     +--------+-------+            +-----+-----------+
->              ^                          |
->              |                          |
->              +--------------------------+
->                        file
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block-core.json    |  9 ++++---
->  block/fleecing-filter.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
->  block/Makefile.objs     |  1 +
->  3 files changed, 79 insertions(+), 3 deletions(-)
->  create mode 100644 block/fleecing-filter.c
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index dfaa050651..b21bc3b693 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2543,7 +2543,8 @@
->              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
->              'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
->              'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
-> -            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
-> +            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs',
-> +            'fleecing-filter' ] }
->  
->  ##
->  # @BlockdevOptionsFile:
-> @@ -3607,7 +3608,8 @@
->        'vmdk':       'BlockdevOptionsGenericCOWFormat',
->        'vpc':        'BlockdevOptionsGenericFormat',
->        'vvfat':      'BlockdevOptionsVVFAT',
-> -      'vxhs':       'BlockdevOptionsVxHS'
-> +      'vxhs':       'BlockdevOptionsVxHS',
-> +      'fleecing-filter': 'BlockdevOptionsGenericFormat'
->    } }
->  
->  ##
-> @@ -4135,7 +4137,8 @@
->        'vmdk':           'BlockdevCreateNotSupported',
->        'vpc':            'BlockdevCreateOptionsVpc',
->        'vvfat':          'BlockdevCreateNotSupported',
-> -      'vxhs':           'BlockdevCreateNotSupported'
-> +      'vxhs':           'BlockdevCreateNotSupported',
-> +      'fleecing-filter': 'BlockdevCreateNotSupported'
->    } }
->  
->  ##
-> diff --git a/block/fleecing-filter.c b/block/fleecing-filter.c
-> new file mode 100644
-> index 0000000000..60bac9c0b4
-> --- /dev/null
-> +++ b/block/fleecing-filter.c
-> @@ -0,0 +1,72 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "block/blockjob.h"
-> +#include "block/block_int.h"
-> +#include "block/block_backup.h"
-> +
-> +static int64_t fleecing_getlength(BlockDriverState *bs)
-> +{
-> +    return bdrv_getlength(bs->file->bs);
-> +}
-> +
-> +static coroutine_fn int fleecing_co_preadv(BlockDriverState *bs,
-> +                                           uint64_t offset, uint64_t bytes,
-> +                                           QEMUIOVector *qiov, int flags)
-> +{
-> +    int ret;
-> +    BlockJob *job = bs->file->bs->backing->bs->job;
-> +    CowRequest req;
-> +
-> +    backup_wait_for_overlapping_requests(job, offset, bytes);
-> +    backup_cow_request_begin(&req, job, offset, bytes);
-> +
-> +    ret = bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-> +
-> +    backup_cow_request_end(&req);
-> +
-> +    return ret;
-> +}
-> +
-> +static coroutine_fn int fleecing_co_pwritev(BlockDriverState *bs,
-> +                                            uint64_t offset, uint64_t bytes,
-> +                                            QEMUIOVector *qiov, int flags)
-> +{
-> +    return -EINVAL;
-> +}
-> +
-> +static bool fleecing_recurse_is_first_non_filter(BlockDriverState *bs,
-> +                                                 BlockDriverState *candidate)
-> +{
-> +    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
-> +}
-> +
-> +static int fleecing_open(BlockDriverState *bs, QDict *options,
-> +                         int flags, Error **errp)
-> +{
-> +    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
-> +                               errp);
-> +
-> +    return bs->file ? 0 : -EINVAL;
-> +}
-> +
-> +BlockDriver bdrv_fleecing_filter = {
-> +    .format_name = "fleecing-filter",
-> +    .protocol_name = "fleecing-filter",
-> +    .instance_size = 0,
-> +
-> +    .bdrv_open = fleecing_open,
-> +
-> +    .bdrv_getlength = fleecing_getlength,
-> +    .bdrv_co_preadv = fleecing_co_preadv,
-> +    .bdrv_co_pwritev = fleecing_co_pwritev,
-> +
-> +    .is_filter = true,
-> +    .bdrv_recurse_is_first_non_filter = fleecing_recurse_is_first_non_filter,
-> +};
-> +
-> +static void bdrv_fleecing_init(void)
-> +{
-> +    bdrv_register(&bdrv_fleecing_filter);
-> +}
-> +
-> +block_init(bdrv_fleecing_init);
-> diff --git a/block/Makefile.objs b/block/Makefile.objs
-> index 899bfb5e2c..aa0a6dd971 100644
-> --- a/block/Makefile.objs
-> +++ b/block/Makefile.objs
-> @@ -27,6 +27,7 @@ block-obj-y += write-threshold.o
->  block-obj-y += backup.o
->  block-obj-$(CONFIG_REPLICATION) += replication.o
->  block-obj-y += throttle.o copy-on-read.o
-> +block-obj-y += fleecing-filter.o
->  
->  block-obj-y += crypto.o
->  
-> 
+ scripts/qapi-gen.py        |  5 +----
+ scripts/qapi/introspect.py | 19 ++++++++++---------
+ 2 files changed, 11 insertions(+), 13 deletions(-)
 
-Dropping this one from review queue in favor of the fleecing discussion
-on "[Qemu-devel] [PATCH v2 0/3] image fleecing"
-
---js
+-- 
+2.14.4
