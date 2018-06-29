@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNR-0007Id-CS
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNR-0007Ih-Cm
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNO-0006nU-86
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fYoNO-0006nW-8K
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:33 -0400
-Received: from relay.sw.ru ([185.231.240.75]:58254)
+Received: from relay.sw.ru ([185.231.240.75]:58236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1fYoNO-0006kn-0D
+	id 1fYoNN-0006ki-WE
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 04:03:30 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 29 Jun 2018 11:03:18 +0300
-Message-Id: <20180629080320.320144-6-dplotnikov@virtuozzo.com>
+Date: Fri, 29 Jun 2018 11:03:15 +0300
+Message-Id: <20180629080320.320144-3-dplotnikov@virtuozzo.com>
 In-Reply-To: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
 References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v0 5/7] kvm: add failed memeory access exit
- reason
+Subject: [Qemu-devel] [PATCH v0 2/7] bitops: add some atomic versions of
+ bitmap operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org
 
-The patch allows qemu to be aware of how to read kvm failed memeory
-access.
-
-This is a temporary patch. It sould be removed on importing
-the kvm failed memeory access exit from the linux branch.
+1. test bit
+2. test and set bit
 
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- linux-headers/linux/kvm.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/qemu/bitops.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index d92c9b2f0e..ea63b681d8 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_S390_STSI        25
- #define KVM_EXIT_IOAPIC_EOI       26
- #define KVM_EXIT_HYPERV           27
-+#define KVM_EXIT_FAIL_MEM_ACCESS  28
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 3f0926cf40..7b1c8c7baf 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -94,6 +94,21 @@ static inline int test_and_set_bit(long nr, unsigned long *addr)
+     return (old & mask) != 0;
+ }
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -392,6 +393,10 @@ struct kvm_run {
- 		} eoi;
- 		/* KVM_EXIT_HYPERV */
- 		struct kvm_hyperv_exit hyperv;
-+		/* KVM_EXIT_FAIL_MEM_ACCESS */
-+		struct {
-+			__u64 hva;
-+		} fail_mem_access;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
++/**
++ * test_and_set_bit_atomic - Set a bit atomically and return its old value
++ * @nr: Bit to set
++ * @addr: Address to count from
++ */
++static inline int test_and_set_bit_atomic(long nr, unsigned long *addr)
++{
++    unsigned long mask = BIT_MASK(nr);
++    unsigned long *p = addr + BIT_WORD(nr);
++    unsigned long old;
++
++    old = atomic_fetch_or(p, mask);
++    return (old & mask) != 0;
++}
++
+ /**
+  * test_and_clear_bit - Clear a bit and return its old value
+  * @nr: Bit to clear
+@@ -134,6 +149,15 @@ static inline int test_bit(long nr, const unsigned long *addr)
+     return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
+ }
+ 
++/**
++ * test_bit_atomic - Determine whether a bit is set atomicallly
++ * @nr: bit number to test
++ * @addr: Address to start counting from
++ */
++static inline int test_bit_atomic(long nr, const unsigned long *addr)
++{
++    return 1UL & (atomic_read(&addr[BIT_WORD(nr)]) >> (nr & (BITS_PER_LONG-1)));
++}
+ /**
+  * find_last_bit - find the last set bit in a memory region
+  * @addr: The address to start the search at
 -- 
 2.17.0
