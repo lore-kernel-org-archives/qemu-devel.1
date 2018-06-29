@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYwQ1-0001jM-JF
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:38:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYwa2-0003tD-Vc
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:49:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fYwQ0-0002B3-Fm
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:38:45 -0400
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <cafebdd0-01bb-c025-5519-0984e0b40d55@redhat.com>
-Date: Fri, 29 Jun 2018 12:38:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYwa1-0001TU-Sl
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 12:49:07 -0400
+Date: Fri, 29 Jun 2018 18:48:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180629164856.GK15588@localhost.localdomain>
+References: <20180628190723.276458-1-eblake@redhat.com>
+	<20180628190723.276458-7-eblake@redhat.com>
+	<20180629090317.GD15588@localhost.localdomain>
+	<b041ee2a-6d59-1d8a-cf41-1164d9c3e129@redhat.com>
+	<20180629154711.GI15588@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] image fleecing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180629154711.GI15588@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v7 6/6] qcow2: Avoid memory
+ over-allocation on compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
+Am 29.06.2018 um 17:47 hat Kevin Wolf geschrieben:
+> Am 29.06.2018 um 17:16 hat Eric Blake geschrieben:
+> > On 06/29/2018 04:03 AM, Kevin Wolf wrote:
+> > > Am 28.06.2018 um 21:07 hat Eric Blake geschrieben:
+> > > > When reading a compressed image, we were allocating s->cluster_data
+> > > > to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
+> > > > with 2M clusters).  Let's check out the history:
+> > > > 
+> > 
+> > > > However, the qcow2 spec permits an all-ones sector count, plus
+> > > > a full sector containing the initial offset, for a maximum read
+> > > > of 2 full clusters.  Thanks to the way decompression works, even
+> > > > though such a value is too large for the actual compressed data
+> > > > (for all but 512-byte clusters), it really doesn't matter if we
+> > > > read too much (gzip ignores slop, once it has decoded a full
+> > > > cluster).  So it's easier to just allocate cluster_data to be as
+> > > > large as we can ever possibly see; even if it still wastes up to
+> > > > 2M on any image created by qcow2, that's still an improvment of
+> > 
+> > s/improvment/improvement/
+> > 
+> > > > 60M less waste than pre-patch.
+> > > > 
+> > > > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > > > Reviewed-by: Alberto Garcia <berto@igalia.com>
+> > > > 
+> > > > ---
+> > 
+> > > > +++ b/block/qcow2-cluster.c
+> > > > @@ -1599,20 +1599,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+> > > >           sector_offset = coffset & 511;
+> > > >           csize = nb_csectors * 512 - sector_offset;
+> > > > 
+> > > > -        /* Allocate buffers on first decompress operation, most images are
+> > > > -         * uncompressed and the memory overhead can be avoided.  The buffers
+> > > > -         * are freed in .bdrv_close().
+> > > > +        /* Allocate buffers on the first decompress operation; most
+> > > > +         * images are uncompressed and the memory overhead can be
+> > > > +         * avoided.  The buffers are freed in .bdrv_close().  qemu
+> > > > +         * never writes an inflated cluster, and gzip itself never
+> > > > +         * inflates a problematic cluster by more than 0.015%, but the
+> > > > +         * qcow2 format allows up to 1 byte short of 2 full clusters
+> > > > +         * when including the sector containing offset.  gzip ignores
+> > > > +         * trailing slop, so just allocate that much up front rather
+> > > > +         * than reject third-party images with overlarge csize.
+> > > >            */
+> > > > +        assert(!!s->cluster_data == !!s->cluster_cache);
+> > > > +        assert(csize <= 2 * s->cluster_size);
+> > > >           if (!s->cluster_data) {
+> > > > -            /* one more sector for decompressed data alignment */
+> > > > -            s->cluster_data = qemu_try_blockalign(bs->file->bs,
+> > > > -                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
+> > > > +            s->cluster_data = g_try_malloc(2 * s->cluster_size);
+> > > >               if (!s->cluster_data) {
+> > > >                   return -ENOMEM;
+> > > >               }
+> > > > -        }
+> > > > -        if (!s->cluster_cache) {
+> > > > -            s->cluster_cache = g_malloc(s->cluster_size);
+> > > > +            s->cluster_cache = g_try_malloc(s->cluster_size);
+> > > > +            if (!s->cluster_cache) {
+> > > > +                g_free(s->cluster_data);
+> > > > +                s->cluster_data = NULL;
+> > > > +                return -ENOMEM;
+> > > > +            }
+> > > >           }
+> > > 
+> > > I wonder how much of a difference s->cluster_cache really makes. I
+> > > wouldn't expect guests to access the same cluster twice in a row.
+> > 
+> > I don't know if it makes a difference.  But my patch is not even touching
+> > that - ALL I'm doing is changing a 64M allocation into a 4M allocation, with
+> > otherwise no change to the frequency of allocation (which is once per
+> > image).
+> > 
+> > > 
+> > > Maybe the easiest solution would be switching to temporary buffers that
+> > > would have the exact size we need and would be freed at the end of the
+> > > request?
+> > 
+> > The exact size for a qemu-produced image would be at most 2M instead of 4M -
+> > but doing the change you propose WILL cause more frequent allocations (once
+> > per cluster, rather than once per image).  We'd have to benchmark if it
+> > makes sense.
+> 
+> I wouldn't expect that another allocation makes a big difference when
+> you already have to decompress the whole cluster. In fact, it could
+> speed things up because we could then parallelise this.
+> 
+> Hmm... Wasn't there a series for using a worker thread for decompression
+> recently? It might actually already make that change, I don't remember.
 
+Actually no, it was compression, not decompression.
 
-On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Image fleecing, or external (or pull) backup scheme is near to complete.
-> Here is forgotten test, written by Fam in far 2014, with two my necessary
-> patches, previously sent separately, so the series are called "v2"
-> 
-> v2:
->  01: add transaction support
->  02: rebase on master, drop "'fleecing-filter': 'BlockdevCreateNotSupported'"
->      add empty .bdrv_close
->      add default .bdrv_child_perm
->  03: comparing to [PATCH v20 15/15] qemu-iotests: Image fleecing test case 08:
->      add -f iotests.imgfmt to qemu_io
->      fix target_img to be always qcow2
->      add -r to qemu_io for nbd
->      add fleecing-filter layer
->      wrap long lines
-> 
-> Fam Zheng (1):
->   qemu-iotests: Image fleecing test case 222
-> 
-> Vladimir Sementsov-Ogievskiy (2):
->   blockdev-backup: enable non-root nodes for backup source
->   block/fleecing-filter: new filter driver for fleecing
-> 
->  qapi/block-core.json       |   6 ++-
->  block/fleecing-filter.c    |  80 ++++++++++++++++++++++++++++++++
->  blockdev.c                 |   4 +-
->  block/Makefile.objs        |   1 +
->  tests/qemu-iotests/222     | 112 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/222.out |   5 ++
->  tests/qemu-iotests/group   |   1 +
->  7 files changed, 205 insertions(+), 4 deletions(-)
->  create mode 100644 block/fleecing-filter.c
->  create mode 100755 tests/qemu-iotests/222
->  create mode 100644 tests/qemu-iotests/222.out
-> 
-
-Have you been able to reproduce a race that proves the filter is
-necessary, or can you explain how it might happen?
-
-I think I mentioned it once as a possibility but I hadn't convinced myself.
+Kevin
