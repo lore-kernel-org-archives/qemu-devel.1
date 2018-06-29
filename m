@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYzfx-0005Nq-6h
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:29 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fYzg3-0005Ok-EO
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYzfs-0002x8-77
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:25 -0400
-Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:44176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fYzfr-0002wT-VO
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:20 -0400
-Received: by mail-qk0-x231.google.com with SMTP id i188-v6so5620358qkc.11
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 13:07:19 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 29 Jun 2018 17:07:10 -0300
-Message-Id: <20180629200710.27626-1-f4bug@amsat.org>
+	(envelope-from <jsnow@redhat.com>) id 1fYzg2-00038F-Aq
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 16:07:31 -0400
+References: <CAFLvi203QwYCdfdhq6pb855xOZbt-bOiMsYU3cDSx6itHeu2=w@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ceff4595-026d-ae13-5628-042cf043d0ac@redhat.com>
+Date: Fri, 29 Jun 2018 16:07:22 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tcg: Fix --disable-tcg build breakage
+In-Reply-To: <CAFLvi203QwYCdfdhq6pb855xOZbt-bOiMsYU3cDSx6itHeu2=w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [BUG] qed_aio_write_alloc: Assertion
+ `s->allocating_acb == NULL' failed.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Quytelda Kahja <quytelda@tamalin.org>, qemu-devel@nongnu.org
+Cc: Qemu-block <qemu-block@nongnu.org>
 
-Fix the --disable-tcg breakage introduced by 8bca9a03ec60d:
+CC Qemu Block; looks like QED is a bit busted.
 
-    $ configure --disable-tcg
-    [...]
-    $ make -C i386-softmmu exec.o
-    make: Entering directory 'i386-softmmu'
-      CC      exec.o
-    In file included from source/qemu/exec.c:62:0:
-    source/qemu/include/exec/ram_addr.h:96:6: error: conflicting types for ‘tb_invalidate_phys_range’
-     void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end);
-          ^~~~~~~~~~~~~~~~~~~~~~~~
-    In file included from source/qemu/exec.c:24:0:
-    source/qemu/include/exec/exec-all.h:309:6: note: previous declaration of ‘tb_invalidate_phys_range’ was here
-     void tb_invalidate_phys_range(target_ulong start, target_ulong end);
-          ^~~~~~~~~~~~~~~~~~~~~~~~
-    source/qemu/exec.c:1043:6: error: conflicting types for ‘tb_invalidate_phys_addr’
-     void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
-          ^~~~~~~~~~~~~~~~~~~~~~~
-    In file included from source/qemu/exec.c:24:0:
-    source/qemu/include/exec/exec-all.h:308:6: note: previous declaration of ‘tb_invalidate_phys_addr’ was here
-     void tb_invalidate_phys_addr(target_ulong addr);
-          ^~~~~~~~~~~~~~~~~~~~~~~
-    make: *** [source/qemu/rules.mak:69: exec.o] Error 1
-    make: Leaving directory 'i386-softmmu'
-
-Tested to build x86_64-softmmu and i386-softmmu targets.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/exec/exec-all.h | 13 +++++++++----
- accel/stubs/tcg-stub.c  |  6 ++++++
- exec.c                  |  2 +-
- 3 files changed, 16 insertions(+), 5 deletions(-)
-
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 6a7e7a866e..cb497dee0b 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -255,7 +255,6 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
- void tlb_set_page(CPUState *cpu, target_ulong vaddr,
-                   hwaddr paddr, int prot,
-                   int mmu_idx, target_ulong size);
--void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs);
- void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-                  uintptr_t retaddr);
- #else
-@@ -304,9 +303,6 @@ static inline void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
-                                                        uint16_t idxmap)
- {
- }
--
--void tb_invalidate_phys_addr(target_ulong addr);
--void tb_invalidate_phys_range(target_ulong start, target_ulong end);
- #endif
- 
- #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
-@@ -415,6 +411,15 @@ static inline uint32_t curr_cflags(void)
-          | (use_icount ? CF_USE_ICOUNT : 0);
- }
- 
-+/* TranslationBlock invalidate API */
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-+void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs);
-+#else
-+void tb_invalidate_phys_addr(target_ulong addr);
-+#endif
-+#if defined(CONFIG_USER_ONLY)
-+void tb_invalidate_phys_range(target_ulong start, target_ulong end);
-+#endif
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
- TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-index 76ae461749..8ee85ed665 100644
---- a/accel/stubs/tcg-stub.c
-+++ b/accel/stubs/tcg-stub.c
-@@ -16,6 +16,7 @@
- #include "tcg/tcg.h"
- #include "exec/cpu-common.h"
- #include "exec/exec-all.h"
-+#include "translate-all.h"
- 
- void tb_flush(CPUState *cpu)
- {
-@@ -24,3 +25,8 @@ void tb_flush(CPUState *cpu)
- void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
- {
- }
-+
-+void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-+                                   int is_cpu_write_access)
-+{
-+}
-diff --git a/exec.c b/exec.c
-index cdcf769daa..ee726888a5 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1027,7 +1027,7 @@ const char *parse_cpu_model(const char *cpu_model)
-     return cpu_type;
- }
- 
--#if defined(CONFIG_USER_ONLY)
-+#if defined(CONFIG_USER_ONLY) || !defined(CONFIG_TCG)
- void tb_invalidate_phys_addr(target_ulong addr)
- {
-     mmap_lock();
--- 
-2.18.0
+On 06/27/2018 10:25 AM, Quytelda Kahja wrote:
+> Hello all,
+> I wanted to submit a bug report in the tracker, but it seem to require
+> an Ubuntu One account, which I'm having trouble with, so I'll just
+> give it here and hopefully somebody can make use of it.  The issue
+> seems to be in an experimental format, so it's likely not very
+> consequential anyway.
+> 
+> For the sake of anyone else simply googling for a workaround, I'll
+> just paste in the (cleaned up) brief IRC conversation about my issue
+> from the official channel:
+> <quy> I'm using QEMU version 2.12.0 on an x86_64 host (Arch Linux,
+> Kernel v4.17.2), and I'm trying to create an x86_64 virtual machine
+> (FreeBSD-11.1).  The VM always aborts at the same point in the
+> installation (downloading 'ports.tgz') with the following error
+> message:
+> "qemu-system-x86_64: /build/qemu/src/qemu-2.12.0/block/qed.c:1197:
+> qed_aio_write_alloc: Assertion `s->allocating_acb == NULL' failed.
+> zsh: abort (core dumped)  qemu-system-x86_64 -smp 2 -m 4096
+> -enable-kvm -hda freebsd/freebsd.qed -devic"
+> The commands I ran to create the machine are as follows:
+> "qemu-img create -f qed freebsd/freebsd.qed 16G"
+> "qemu-system-x86_64 -smp 2 -m 4096 -enable-kvm -hda
+> freebsd/freebsd.qed -device e1000,netdev=net0 -netdev user,id=net0
+> -cdrom FreeBSD-11.1-RELEASE-amd64-bootonly.iso -boot order=d"
+> I tried adding logging options with the -d flag, but I didn't get
+> anything that seemed relevant, since I'm not sure what to look for.
+> <stsquad> ohh what's a qed device?
+> <stsquad> quy: it might be a workaround to use a qcow2 image for now
+> <stsquad> ahh the wiki has a statement "It is not recommended to use
+> QED for any new images. "
+> <danpb> 'qed' was an experimental disk image format created by IBM
+> before qcow2 v3 came along
+> <danpb> honestly nothing should ever use  QED these days
+> <danpb> the good ideas from QED became  qcow2v3
+> <stsquad> danpb: sounds like we should put a warning on the option to
+> remind users of that fact
+> <danpb> quy: sounds like qed driver is simply broken - please do file
+> a bug against qemu bug tracker
+> <danpb> quy: but you should also really switch to qcow2
+> <quy> I see; some people need to update their wikis then.  I don't
+> remember where which guide I read when I first learned what little
+> QEMU I know, but I remember it specifically remember it saying QED was
+> the newest and most optimal format.
+> <stsquad> quy: we can only be responsible for our own wiki I'm afraid...
+> <danpb> if you remember where you saw that please let us know so we
+> can try to get it fixed
+> <quy> Thank you very much for the info; I will switch to QCOW.
+> Unfortunately, I'm not sure if I will be able to file any bug reports
+> in the tracker as I can't seem to log Launchpad, which it seems to
+> require.
+> <danpb> quy:  an email to the mailing list would suffice too if you
+> can't deal with launchpad
+> <danpb> kwolf: ^^^ in case you're interested in possible QED
+> assertions from 2.12
+> 
+> If any more info is needed, feel free to email me; I'm not actually
+> subscribed to this list though.
+> Thank you,
+> Quytelda Kahja
+> 
