@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYq1C-0001Fk-8o
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:47 -0400
+	(envelope-from <groug@kaod.org>) id 1fYq1Q-0001Oi-Li
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYq17-0005GA-JQ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:42 -0400
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:39482)
+	(envelope-from <groug@kaod.org>) id 1fYq1L-0005yy-UY
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:56 -0400
+Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:43569)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYq17-0005Bb-AS
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:37 -0400
-Received: from player755.ha.ovh.net (unknown [10.109.108.51])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id CED331D753
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 11:48:35 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYq1L-0005wK-Mc
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:51 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.120.50])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 146751BD7C9
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 11:48:49 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 29 Jun 2018 11:48:32 +0200
-Message-ID: <153026571205.394407.1842744312813398945.stgit@bahia.lan>
+Date: Fri, 29 Jun 2018 11:48:40 +0200
+Message-ID: <153026572065.394407.16369067299697377597.stgit@bahia.lan>
 In-Reply-To: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
 References: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 2/3] target/ppc/kvm: don't pass cpu to
- kvm_get_smmu_info()
+Subject: [Qemu-devel] [PATCH v2 3/3] spapr: compute default value of
+ "hpt-max-page-size" later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +33,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-In a future patch the machine code will need to retrieve the MMU
-information from KVM during machine initialization before the CPUs
-are created.
+It is currently not possible to run a pseries-2.12 or older machine
+with HV KVM. QEMU prints the following and exits right away.
 
-Actually, KVM_PPC_GET_SMMU_INFO is a VM class ioctl, and thus, we
-don't need to have a CPU object around. We just need for KVM to
-be initialized and use the kvm_state global. This patch just does
-that.
+qemu-system-ppc64: KVM doesn't support for base page shift 34
+
+The "hpt-max-page-size" capability was recently added to spapr to hide
+host configuration details from HPT mode guests. Its default value for
+newer machine types is 64k.
+
+For backwards compatibility, pseries-2.12 and older machine types need
+a different value. This is handled as usual in a class init function.
+The default value is 16G, ie, all page sizes supported by POWER7 and
+newer CPUs, but HV KVM requires guest pages to be hpa contiguous as
+well as gpa contiguous. The default value is the page size used to
+back the guest RAM in this case.
+
+Unfortunately kvmppc_hpt_needs_host_contiguous_pages()->kvm_enabled() is
+called way before KVM init and returns false, even if the user requested
+KVM. We thus end up selecting 16G, which isn't supported by HV KVM. The
+default value must be set during machine init, because we can safely
+assume that KVM is initialized at this point.
+
+We fix this by moving the logic to a fixup helper to be called by
+spapr_caps_init(). Since the user cannot pass cap-hpt-max-page-size=0,
+we set the default to 0 in the pseries-2.12 class init function and use
+that as a flag to do the real work.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
-v2: - fallback code was dropped by a previous patch
+v2: - moved logic under spapr_caps_init()
 ---
- target/ppc/kvm.c |   17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ hw/ppc/spapr.c      |   13 ++++++-------
+ hw/ppc/spapr_caps.c |   20 ++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 7 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index b6000f12b98f..9211ee2ee1a0 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -248,19 +248,19 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
- 
- 
- #if defined(TARGET_PPC64)
--static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info,
--                              Error **errp)
-+static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **errp)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 8cc996d0b822..f6c60f2a1248 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4103,17 +4103,16 @@ static void spapr_machine_2_12_instance_options(MachineState *machine)
+ static void spapr_machine_2_12_class_options(MachineClass *mc)
  {
--    CPUState *cs = CPU(cpu);
-     int ret;
+     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+-    uint8_t mps;
  
--    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
-+    assert(kvm_state != NULL);
-+
-+    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
-         error_setg(errp, "KVM doesn't expose the MMU features it supports");
-         error_append_hint(errp, "Consider switching to a newer KVM\n");
-         return;
-     }
+     spapr_machine_3_0_class_options(mc);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
  
--    ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, info);
-+    ret = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_SMMU_INFO, info);
-     if (ret == 0) {
-         return;
-     }
-@@ -326,14 +326,13 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
- 
- bool kvmppc_hpt_needs_host_contiguous_pages(void)
- {
--    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-     static struct kvm_ppc_smmu_info smmu_info;
- 
-     if (!kvm_enabled()) {
-         return false;
-     }
- 
--    kvm_get_smmu_info(cpu, &smmu_info, &error_fatal);
-+    kvm_get_smmu_info(&smmu_info, &error_fatal);
-     return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
+-    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+-        mps = ctz64(qemu_getrampagesize());
+-    } else {
+-        mps = 34; /* allow everything up to 16GiB, i.e. everything */
+-    }
+-    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
++    /* We depend on kvm_enabled() to choose a default value for the
++     * hpt-max-page-size capability. Of course we can't do it here
++     * because this is too early and the HW accelerator isn't initialzed
++     * yet. Postpone this to spapr_caps_init().
++     */
++    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = 0;
  }
  
-@@ -348,7 +347,7 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
-         return;
-     }
+ DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 62663ebdf51a..e307161f6425 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -552,11 +552,31 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+ SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+ SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
  
--    kvm_get_smmu_info(cpu, &smmu_info, &local_err);
-+    kvm_get_smmu_info(&smmu_info, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -2091,7 +2090,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
++static void fixup_default_cap_hpt_maxpagesize_pre_3_0(sPAPRMachineState *spapr)
++{
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
++    uint8_t mps;
++
++    /* If it is already set, then this is a 3.0 or newer machine */
++    if (smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
++        return;
++    }
++
++    if (kvmppc_hpt_needs_host_contiguous_pages()) {
++        mps = ctz64(qemu_getrampagesize());
++    } else {
++        mps = 34; /* allow everything up to 16GiB, i.e. everything */
++    }
++    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
++}
++
+ void spapr_caps_init(sPAPRMachineState *spapr)
+ {
+     sPAPRCapabilities default_caps;
+     int i;
  
-     /* Find the largest hardware supported page size that's less than
-      * or equal to the (logical) backing page size of guest RAM */
--    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info, &error_fatal);
-+    kvm_get_smmu_info(&info, &error_fatal);
-     rampagesize = qemu_getrampagesize();
-     best_page_shift = 0;
++    fixup_default_cap_hpt_maxpagesize_pre_3_0(spapr);
++
+     /* Compute the actual set of caps we should run with */
+     default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
  
