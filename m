@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYxPy-0000Fm-No
+	(envelope-from <mst@redhat.com>) id 1fYxPy-0000FC-I3
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYxPw-0008Nj-N1
+	(envelope-from <mst@redhat.com>) id 1fYxPw-0008Nd-Lr
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:42:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56712)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54120 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYxPw-0008LH-GQ
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fYxPw-0008MJ-GU
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:42:44 -0400
-Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
-	[10.5.11.27])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9BFF6811A9
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 17:42:43 +0000 (UTC)
-Date: Fri, 29 Jun 2018 14:42:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180629174239.GQ7451@localhost.localdomain>
-References: <20180628154502.GO3513@redhat.com>
-	<20180628195227.GH7451@localhost.localdomain>
-	<20180629101417.GB27016@redhat.com>
+Date: Fri, 29 Jun 2018 20:42:40 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180629204213-mutt-send-email-mst@kernel.org>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-3-git-send-email-suzuki.poulose@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180629101417.GB27016@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] CPU model versioning separate from machine type
- versioning ?
+In-Reply-To: <1530270944-11351-3-git-send-email-suzuki.poulose@arm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 02/20] virtio: pci-legacy: Validate
+ queue pfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-On Fri, Jun 29, 2018 at 11:14:17AM +0100, Daniel P. Berrang=E9 wrote:
-> On Thu, Jun 28, 2018 at 04:52:27PM -0300, Eduardo Habkost wrote:
-[...]
-> > I'm not sure what would be the best way to encode two types of
-> > information, though:
-> >=20
-> > * Fallback/alternatives info, e.g.: "It makes sense to use
-> >   Haswell-{3.0,2.12,2.5,...} if Haswell-3.1 is not runnable and the
-> >   user asked for Haswell".
-> >=20
-> > * Ordering/preference info, e.g.: "Haswell-3.1 is better than
-> >   Haswell-3.0, prefer the latter"
->=20
-> The version number of course gives an ordering, but we generally
-> tell people not to assume version is numeric.  We could report
-> an explicit "priority" in some manner against each.
+On Fri, Jun 29, 2018 at 12:15:22PM +0100, Suzuki K Poulose wrote:
+> Legacy PCI over virtio uses a 32bit PFN for the queue. If the
+> queue pfn is too large to fit in 32bits, which we could hit on
+> arm64 systems with 52bit physical addresses (even with 64K page
+> size), we simply miss out a proper link to the other side of
+> the queue.
+> 
+> Add a check to validate the PFN, rather than silently breaking
+> the devices.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Cc: Peter Maydel <peter.maydell@linaro.org>
+> Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v2:
+>  - Change errno to -E2BIG
+> ---
+>  drivers/virtio/virtio_pci_legacy.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index 2780886..c0d6987a 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -122,6 +122,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>  	struct virtqueue *vq;
+>  	u16 num;
+>  	int err;
+> +	u64 q_pfn;
+>  
+>  	/* Select the queue we're interested in */
+>  	iowrite16(index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+> @@ -141,9 +142,15 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>  	if (!vq)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> +	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
+> +	if (q_pfn >> 32) {
+> +		dev_err(&vp_dev->pci_dev->dev, "virtio-pci queue PFN too large\n");
+> +		err = -E2BIG;
 
-Makes sense.  "priority" could be included on
-query-cpu-definitions to help software choose the best
-alternative, and "version" could be just an opaque string that
-libvirt needs to save after expanding a CPU model.
+Same comment here. Let's make it clear it's host not guest problem.
 
---=20
-Eduardo
+> +		goto out_del_vq;
+> +	}
+> +
+>  	/* activate the queue */
+> -	iowrite32(virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT,
+> -		  vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+> +	iowrite32(q_pfn, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+>  
+>  	vq->priv = (void __force *)vp_dev->ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
+>  
+> @@ -160,6 +167,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>  
+>  out_deactivate:
+>  	iowrite32(0, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+> +out_del_vq:
+>  	vring_del_virtqueue(vq);
+>  	return ERR_PTR(err);
+>  }
+> -- 
+> 2.7.4
