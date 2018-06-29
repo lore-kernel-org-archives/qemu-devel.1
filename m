@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fYsIh-0004bU-Dc
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:14:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fYsIz-0004sX-My
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:15:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fYsId-0001K7-7p
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:14:55 -0400
-Date: Fri, 29 Jun 2018 14:14:49 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180629045931.GJ3422@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806291410520.18342@zero.eik.bme.hu>
-References: <cover.1530225513.git.balaton@eik.bme.hu>
-	<beba73ec147c790500c6a57e405d5c5f83899af1.1530225513.git.balaton@eik.bme.hu>
-	<20180629044840.GH3422@umbus.fritz.box>
-	<20180629045931.GJ3422@umbus.fritz.box>
+	(envelope-from <peter.maydell@linaro.org>) id 1fYsIy-0001uF-Hm
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:15:13 -0400
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:41815)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fYsIy-0001ss-3g
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 08:15:12 -0400
+Received: by mail-ot0-x22a.google.com with SMTP id d19-v6so9680377oti.8
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 05:15:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v6 4/5] ppc440_uc: Basic
- emulation of PPC440 DMA controller
+In-Reply-To: <489d8470-c12f-a441-4e87-b2b3013a3ab8@vivier.eu>
+References: <20180626165658.31394-1-peter.maydell@linaro.org>
+	<20180626165658.31394-24-peter.maydell@linaro.org>
+	<50e46f22-1e3d-10ce-5b5b-a10af49a95f1@vivier.eu>
+	<CAFEAcA8141WC556H1fZLM4AEaz62o4qb7JOOVB-+75N9vugi+g@mail.gmail.com>
+	<a46a8b06-c780-0c22-b9f7-8eaae73dd26d@vivier.eu>
+	<CAFEAcA8gKWG9O7rjhC1+n_Bqce+CGQvUEiM+mc7wu-1C7no2ug@mail.gmail.com>
+	<489d8470-c12f-a441-4e87-b2b3013a3ab8@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 Jun 2018 13:14:50 +0100
+Message-ID: <CAFEAcA8jVXUapKN7nP5eJ0SAP5QWa_PHeZXThZEN3Gn249qRug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 23/32] tcg: Support MMU protection regions
+ smaller than TARGET_PAGE_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,351 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Cedric Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Fri, 29 Jun 2018, David Gibson wrote:
-> On Fri, Jun 29, 2018 at 02:48:40PM +1000, David Gibson wrote:
->> On Fri, Jun 29, 2018 at 12:38:33AM +0200, BALATON Zoltan wrote:
->>> PPC440 SoCs such as the AMCC 460EX have a DMA controller which is use=
-d
->>> by AmigaOS on the sam460ex. Implement the parts used by AmigaOS so it
->>> can get further booting on the sam460ex machine.
->>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> ---
->>> v6:
->>> - CamelCase type names
->>> - Check return value of cpu_physical_memory_map
->>
->> I don't really have the knowledge to review this, but since it's a new
->> device that no-one else is using, I've applied it.
->
-> I take that back.  This breaks compile for me with:
->
->  CC      ppc-softmmu/hw/ppc/ppc440_uc.o
-> /home/dwg/src/qemu/hw/ppc/ppc440_uc.c: In function =E2=80=98dcr_write_d=
-ma=E2=80=99:
-> /home/dwg/src/qemu/hw/ppc/ppc440_uc.c:907:35: error: =E2=80=98sidx=E2=80=
-=99 may be used uninitialized in this function [-Werror=3Dmaybe-uninitial=
-ized]
->                     int width, i, sidx, didx;
->                                   ^~~~
-> /home/dwg/src/qemu/hw/ppc/ppc440_uc.c:935:25: error: =E2=80=98didx=E2=80=
-=99 may be used uninitialized in this function [-Werror=3Dmaybe-uninitial=
-ized]
->                         cpu_physical_memory_unmap(wptr, wlen, 1, didx);
->                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> gcc 8.1.1 on Fedora 28.
+On 28 June 2018 at 23:26, Laurent Vivier <laurent@vivier.eu> wrote:
+> ./m68k-softmmu/qemu-system-m68k -M q800 \
+>     -serial none -serial mon:stdio \
+>     -kernel vmlinux-4.15.0-2-m68k \
+>     -nographic
 
-Sorry, this was introduced in v6 when trying to handle return values from=
-=20
-cpu_physical_memory_map. I've sent a v7 of just this patch that should fi=
-x=20
-this.
+Thanks for the test case. I'm still investigating, but there
+are a couple of things happening here.
 
-There was also a 5/5 in this series which is useful even by itself withou=
-t=20
-the OpenBIOS patch as it allows MorphOS to get further on sam460ex even i=
-f=20
-it's not booting yet. Just let you know, that it's not tied to the=20
-OpenBIOS change in case this wasn't clear from the commit message.
+First, there's a bug in get_page_addr_code()'s "is this a
+TLB miss?" condition which was introduced in commit 71b9a45330fe22:
 
-Thank you,
-BALATON Zoltan
+    if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
+                 (addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK)))) {
 
->
->>
->>>
->>>  hw/ppc/ppc440.h    |   1 +
->>>  hw/ppc/ppc440_uc.c | 221 +++++++++++++++++++++++++++++++++++++++++++=
-++++++++++
->>>  hw/ppc/sam460ex.c  |   3 +
->>>  3 files changed, 225 insertions(+)
->>>
->>> diff --git a/hw/ppc/ppc440.h b/hw/ppc/ppc440.h
->>> index ad27db1..7cef936 100644
->>> --- a/hw/ppc/ppc440.h
->>> +++ b/hw/ppc/ppc440.h
->>> @@ -21,6 +21,7 @@ void ppc440_sdram_init(CPUPPCState *env, int nbanks=
-,
->>>                         hwaddr *ram_bases, hwaddr *ram_sizes,
->>>                         int do_init);
->>>  void ppc4xx_ahb_init(CPUPPCState *env);
->>> +void ppc4xx_dma_init(CPUPPCState *env, int dcr_base);
->>>  void ppc460ex_pcie_init(CPUPPCState *env);
->>>
->>>  #endif /* PPC440_H */
->>> diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
->>> index 123f4ac..97808ce 100644
->>> --- a/hw/ppc/ppc440_uc.c
->>> +++ b/hw/ppc/ppc440_uc.c
->>> @@ -13,6 +13,7 @@
->>>  #include "qemu/cutils.h"
->>>  #include "qemu/error-report.h"
->>>  #include "qapi/error.h"
->>> +#include "qemu/log.h"
->>>  #include "cpu.h"
->>>  #include "hw/hw.h"
->>>  #include "exec/address-spaces.h"
->>> @@ -803,6 +804,226 @@ void ppc4xx_ahb_init(CPUPPCState *env)
->>>  }
->>>
->>>  /*******************************************************************=
-**********/
->>> +/* DMA controller */
->>> +
->>> +#define DMA0_CR_CE  (1 << 31)
->>> +#define DMA0_CR_PW  (1 << 26 | 1 << 25)
->>> +#define DMA0_CR_DAI (1 << 24)
->>> +#define DMA0_CR_SAI (1 << 23)
->>> +#define DMA0_CR_DEC (1 << 2)
->>> +
->>> +enum {
->>> +    DMA0_CR  =3D 0x00,
->>> +    DMA0_CT,
->>> +    DMA0_SAH,
->>> +    DMA0_SAL,
->>> +    DMA0_DAH,
->>> +    DMA0_DAL,
->>> +    DMA0_SGH,
->>> +    DMA0_SGL,
->>> +
->>> +    DMA0_SR  =3D 0x20,
->>> +    DMA0_SGC =3D 0x23,
->>> +    DMA0_SLP =3D 0x25,
->>> +    DMA0_POL =3D 0x26,
->>> +};
->>> +
->>> +typedef struct {
->>> +    uint32_t cr;
->>> +    uint32_t ct;
->>> +    uint64_t sa;
->>> +    uint64_t da;
->>> +    uint64_t sg;
->>> +} PPC4xxDmaChnl;
->>> +
->>> +typedef struct {
->>> +    int base;
->>> +    PPC4xxDmaChnl ch[4];
->>> +    uint32_t sr;
->>> +} PPC4xxDmaState;
->>> +
->>> +static uint32_t dcr_read_dma(void *opaque, int dcrn)
->>> +{
->>> +    PPC4xxDmaState *dma =3D opaque;
->>> +    uint32_t val =3D 0;
->>> +    int addr =3D dcrn - dma->base;
->>> +    int chnl =3D addr / 8;
->>> +
->>> +    switch (addr) {
->>> +    case 0x00 ... 0x1f:
->>> +        switch (addr % 8) {
->>> +        case DMA0_CR:
->>> +            val =3D dma->ch[chnl].cr;
->>> +            break;
->>> +        case DMA0_CT:
->>> +            val =3D dma->ch[chnl].ct;
->>> +            break;
->>> +        case DMA0_SAH:
->>> +            val =3D dma->ch[chnl].sa >> 32;
->>> +            break;
->>> +        case DMA0_SAL:
->>> +            val =3D dma->ch[chnl].sa;
->>> +            break;
->>> +        case DMA0_DAH:
->>> +            val =3D dma->ch[chnl].da >> 32;
->>> +            break;
->>> +        case DMA0_DAL:
->>> +            val =3D dma->ch[chnl].da;
->>> +            break;
->>> +        case DMA0_SGH:
->>> +            val =3D dma->ch[chnl].sg >> 32;
->>> +            break;
->>> +        case DMA0_SGL:
->>> +            val =3D dma->ch[chnl].sg;
->>> +            break;
->>> +        }
->>> +        break;
->>> +    case DMA0_SR:
->>> +        val =3D dma->sr;
->>> +        break;
->>> +    default:
->>> +        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d,=
- %x)\n",
->>> +                      __func__, dcrn, chnl, addr);
->>> +    }
->>> +
->>> +    return val;
->>> +}
->>> +
->>> +static void dcr_write_dma(void *opaque, int dcrn, uint32_t val)
->>> +{
->>> +    PPC4xxDmaState *dma =3D opaque;
->>> +    int addr =3D dcrn - dma->base;
->>> +    int chnl =3D addr / 8;
->>> +
->>> +    switch (addr) {
->>> +    case 0x00 ... 0x1f:
->>> +        switch (addr % 8) {
->>> +        case DMA0_CR:
->>> +            dma->ch[chnl].cr =3D val;
->>> +            if (val & DMA0_CR_CE) {
->>> +                int count =3D dma->ch[chnl].ct & 0xffff;
->>> +
->>> +                if (count) {
->>> +                    int width, i, sidx, didx;
->>> +                    uint8_t *rptr, *wptr;
->>> +                    hwaddr rlen, wlen;
->>> +
->>> +                    width =3D 1 << ((val & DMA0_CR_PW) >> 25);
->>> +                    rptr =3D cpu_physical_memory_map(dma->ch[chnl].s=
-a, &rlen, 0);
->>> +                    wptr =3D cpu_physical_memory_map(dma->ch[chnl].d=
-a, &wlen, 1);
->>> +                    if (rptr && wptr) {
->>> +                        if (!(val & DMA0_CR_DEC) &&
->>> +                            val & DMA0_CR_SAI && val & DMA0_CR_DAI) =
-{
->>> +                            /* optimise common case */
->>> +                            memmove(wptr, rptr, count * width);
->>> +                            sidx =3D didx =3D count * width;
->>> +                        } else {
->>> +                            /* do it the slow way */
->>> +                            for (sidx =3D didx =3D i =3D 0; i < coun=
-t; i++) {
->>> +                                uint64_t v =3D ldn_le_p(rptr + sidx,=
- width);
->>> +                                stn_le_p(wptr + didx, width, v);
->>> +                                if (val & DMA0_CR_SAI) {
->>> +                                    sidx +=3D width;
->>> +                                }
->>> +                                if (val & DMA0_CR_DAI) {
->>> +                                    didx +=3D width;
->>> +                                }
->>> +                            }
->>> +                        }
->>> +                    }
->>> +                    if (wptr) {
->>> +                        cpu_physical_memory_unmap(wptr, wlen, 1, did=
-x);
->>> +                    }
->>> +                    if (wptr) {
->>> +                        cpu_physical_memory_unmap(rptr, rlen, 0, sid=
-x);
->>> +                    }
->>> +                }
->>> +            }
->>> +            break;
->>> +        case DMA0_CT:
->>> +            dma->ch[chnl].ct =3D val;
->>> +            break;
->>> +        case DMA0_SAH:
->>> +            dma->ch[chnl].sa &=3D 0xffffffffULL;
->>> +            dma->ch[chnl].sa |=3D (uint64_t)val << 32;
->>> +            break;
->>> +        case DMA0_SAL:
->>> +            dma->ch[chnl].sa &=3D 0xffffffff00000000ULL;
->>> +            dma->ch[chnl].sa |=3D val;
->>> +            break;
->>> +        case DMA0_DAH:
->>> +            dma->ch[chnl].da &=3D 0xffffffffULL;
->>> +            dma->ch[chnl].da |=3D (uint64_t)val << 32;
->>> +            break;
->>> +        case DMA0_DAL:
->>> +            dma->ch[chnl].da &=3D 0xffffffff00000000ULL;
->>> +            dma->ch[chnl].da |=3D val;
->>> +            break;
->>> +        case DMA0_SGH:
->>> +            dma->ch[chnl].sg &=3D 0xffffffffULL;
->>> +            dma->ch[chnl].sg |=3D (uint64_t)val << 32;
->>> +            break;
->>> +        case DMA0_SGL:
->>> +            dma->ch[chnl].sg &=3D 0xffffffff00000000ULL;
->>> +            dma->ch[chnl].sg |=3D val;
->>> +            break;
->>> +        }
->>> +        break;
->>> +    case DMA0_SR:
->>> +        dma->sr &=3D ~val;
->>> +        break;
->>> +    default:
->>> +        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d,=
- %x)\n",
->>> +                      __func__, dcrn, chnl, addr);
->>> +    }
->>> +}
->>> +
->>> +static void ppc4xx_dma_reset(void *opaque)
->>> +{
->>> +    PPC4xxDmaState *dma =3D opaque;
->>> +    int dma_base =3D dma->base;
->>> +
->>> +    memset(dma, 0, sizeof(*dma));
->>> +    dma->base =3D dma_base;
->>> +}
->>> +
->>> +void ppc4xx_dma_init(CPUPPCState *env, int dcr_base)
->>> +{
->>> +    PPC4xxDmaState *dma;
->>> +    int i;
->>> +
->>> +    dma =3D g_malloc0(sizeof(*dma));
->>> +    dma->base =3D dcr_base;
->>> +    qemu_register_reset(&ppc4xx_dma_reset, dma);
->>> +    for (i =3D 0; i < 4; i++) {
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CR,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CT,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAH,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAL,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAH,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAL,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGH,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGL,
->>> +                         dma, &dcr_read_dma, &dcr_write_dma);
->>> +    }
->>> +    ppc_dcr_register(env, dcr_base + DMA0_SR,
->>> +                     dma, &dcr_read_dma, &dcr_write_dma);
->>> +    ppc_dcr_register(env, dcr_base + DMA0_SGC,
->>> +                     dma, &dcr_read_dma, &dcr_write_dma);
->>> +    ppc_dcr_register(env, dcr_base + DMA0_SLP,
->>> +                     dma, &dcr_read_dma, &dcr_write_dma);
->>> +    ppc_dcr_register(env, dcr_base + DMA0_POL,
->>> +                     dma, &dcr_read_dma, &dcr_write_dma);
->>> +}
->>> +
->>> +/*******************************************************************=
-**********/
->>>  /* PCI Express controller */
->>>  /* FIXME: This is not complete and does not work, only implemented p=
-artially
->>>   * to allow firmware and guests to find an empty bus. Cards should u=
-se PCI.
->>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
->>> index dc730cc..4f9248e 100644
->>> --- a/hw/ppc/sam460ex.c
->>> +++ b/hw/ppc/sam460ex.c
->>> @@ -477,6 +477,9 @@ static void sam460ex_init(MachineState *machine)
->>>      /* MAL */
->>>      ppc4xx_mal_init(env, 4, 16, &uic[2][3]);
->>>
->>> +    /* DMA */
->>> +    ppc4xx_dma_init(env, 0x200);
->>> +
->>>      /* 256K of L2 cache as memory */
->>>      ppc4xx_l2sram_init(env);
->>>      /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c=
-? */
->>
->
->
->
->
+takes a (not necessarily page aligned) address, and masks out
+everything but the page-aligned top half (good) and the
+TLB_INVALID bit (not good, because that could be either 0 or 1
+depending on the address). This means sometimes we'll incorrectly
+decide we got a miss in the TLB and do an unnecessary refill.
+
+The second thing that's going on here is that the m68k target
+code writes TLB entries for the same address with different
+prot bits without doing a flush in between:
+
+tlb_set_page_with_attrs: vaddr=0029b000 paddr=0x000000000029b000 prot=3 idx=0
+tlb_set_page_with_attrs: vaddr=0029b000 paddr=0x000000000029b000 prot=7 idx=0
+
+The tlb_set_page_with_attrs() code isn't expecting this, so
+we end up with two TLB entries for the same address, one in
+the main TLB and one in the victim cache TLB. The bug above
+means that we get this sequence of events:
+ * fill main TLB entry with prot=3 entry
+ * later, fill main TLB with prot=7 entry, and evict prot=3
+   entry to victim cache
+ * hit on the prot=7 entry in the main TLB
+ * refill condition incorrectly fails, but we hit in the victim cache
+ * so we pull the prot=3 entry from victim to main TLB
+ * prot=3 means "addr_code == -1", so the check of the TLB_RECHECK
+   bit succeeds
+ * in the TLB_RECHECK code we do a tlb_fill()
+ * that fills in the main TLB with a prot=7 entry again, bouncing
+   the prot=3 entry back out to the victim cache
+ * prot=7 means the addr_code is correct, so we find ourselves in
+   the "TLB_RECHECK but this is RAM" abort code path
+
+I'm not sure whether it's supposed to be the responsibility
+of the target code or the common accel/tcg code to ensure
+that we don't have multiple TLB entries for the same address.
+
+thanks
+-- PMM
