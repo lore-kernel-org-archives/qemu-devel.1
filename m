@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYj6X-0007ze-Gn
+	(envelope-from <bounces@canonical.com>) id 1fYj6X-0007zf-Gv
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fYj6S-0000Ou-JS
+	(envelope-from <bounces@canonical.com>) id 1fYj6T-0000PL-1H
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:25:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42336)
+Received: from indium.canonical.com ([91.189.90.7]:42352)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fYj6S-0000Mi-Cc
+	id 1fYj6S-0000Nz-Ll
 	for qemu-devel@nongnu.org; Thu, 28 Jun 2018 22:25:40 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fYj6R-00073j-7Z
+	id 1fYj6R-00073z-PX
 	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:25:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 37EAA2E8198
+	by loganberry.canonical.com (Postfix) with ESMTP id BED012E8197
 	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 02:25:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 29 Jun 2018 02:13:20 -0000
+Date: Fri, 29 Jun 2018 02:15:43 -0000
 From: Bruce Campbell <yakman2020@gmail.com>
 Reply-To: Bug 1778966 <1778966@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153012207304.7182.2374266143525192096.malonedeb@soybean.canonical.com>
-Message-Id: <153023840072.29565.6050880126729698090.malone@wampee.canonical.com>
+Message-Id: <153023854361.18330.4923638668881963383.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1778966] Re: Windows 1803 and later crashes on KVM
 List-Id: <qemu-devel.nongnu.org>
@@ -38,8 +38,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Opteron didn't work do to some missing features. I was able to get
-nehalem to come up but that looks like the closest.
+Is there any way to define a new CPU model that isn't EPYC (maybe
+ryzen?) but is feature compatible with the threadripper?
 
 -- =
 
