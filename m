@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYu6F-0003ef-Lv
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYu6G-0003gy-RS
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fYu6E-0003XD-BZ
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fYu6F-0003b2-Jy
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 10:10:12 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 29 Jun 2018 16:09:33 +0200
-Message-Id: <20180629140959.6690-4-kwolf@redhat.com>
+Date: Fri, 29 Jun 2018 16:09:34 +0200
+Message-Id: <20180629140959.6690-5-kwolf@redhat.com>
 In-Reply-To: <20180629140959.6690-1-kwolf@redhat.com>
 References: <20180629140959.6690-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 03/29] qapi/job: The next release will be 3.0
+Subject: [Qemu-devel] [PULL 04/29] usb-storage: Add rerror/werror properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,100 +22,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Commit 51f63ec7d tried to change all references to 2.13 into 3.0, but
-it failed to achieve this because it was not properly rebased on top of
-the series introducing qapi/job.json. Change the references now.
+The error handling policy was traditionally set with -drive, but with
+-blockdev it is no longer possible to set frontend options. scsi-disk
+(and other block devices) have long supported qdev properties to
+configure the error handling policy, so let's add these options to
+usb-storage as well and just forward them to the internal scsi-disk
+instance.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/job.json | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ include/hw/scsi/scsi.h |  2 ++
+ hw/scsi/scsi-bus.c     | 11 ++++++++++-
+ hw/usb/dev-storage.c   |  2 ++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/job.json b/qapi/job.json
-index 9d074eb8d2..a121b615fb 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -104,7 +104,7 @@
- # @id: The job identifier
- # @status: The new job status
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'event': 'JOB_STATUS_CHANGE',
-   'data': { 'id': 'str',
-@@ -126,7 +126,7 @@
- #
- # @id: The job identifier.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'job-pause', 'data': { 'id': 'str' } }
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index e35137ea78..1a7290d563 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -154,6 +154,8 @@ static inline SCSIBus *scsi_bus_from_device(SCSIDevice *d)
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
+                                       bool share_rw,
++                                      BlockdevOnError rerror,
++                                      BlockdevOnError werror,
+                                       const char *serial, Error **errp);
+ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
+ void scsi_legacy_handle_cmdline(void);
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 9646743a7d..5905f6bf29 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -226,6 +226,8 @@ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
+                                       bool share_rw,
++                                      BlockdevOnError rerror,
++                                      BlockdevOnError werror,
+                                       const char *serial, Error **errp)
+ {
+     const char *driver;
+@@ -262,6 +264,10 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
++
++    qdev_prop_set_enum(dev, "rerror", rerror);
++    qdev_prop_set_enum(dev, "werror", werror);
++
+     object_property_set_bool(OBJECT(dev), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -285,7 +291,10 @@ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus)
+         }
+         qemu_opts_loc_restore(dinfo->opts);
+         scsi_bus_legacy_add_drive(bus, blk_by_legacy_dinfo(dinfo),
+-                                  unit, false, -1, false, NULL, &error_fatal);
++                                  unit, false, -1, false,
++                                  BLOCKDEV_ON_ERROR_AUTO,
++                                  BLOCKDEV_ON_ERROR_AUTO,
++                                  NULL, &error_fatal);
+     }
+     loc_pop(&loc);
+ }
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index c99398b7f6..cd5551d94f 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -625,6 +625,7 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+                  &usb_msd_scsi_info_storage, NULL);
+     scsi_dev = scsi_bus_legacy_add_drive(&s->bus, blk, 0, !!s->removable,
+                                          s->conf.bootindex, s->conf.share_rw,
++                                         s->conf.rerror, s->conf.werror,
+                                          dev->serial,
+                                          errp);
+     blk_unref(blk);
+@@ -671,6 +672,7 @@ static const VMStateDescription vmstate_usb_msd = {
  
-@@ -140,7 +140,7 @@
- #
- # @id : The job identifier.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'job-resume', 'data': { 'id': 'str' } }
- 
-@@ -159,7 +159,7 @@
- #
- # @id: The job identifier.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'job-cancel', 'data': { 'id': 'str' } }
- 
-@@ -171,7 +171,7 @@
- #
- # @id: The job identifier.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'job-complete', 'data': { 'id': 'str' } }
- 
-@@ -187,7 +187,7 @@
- #
- # @id: The job identifier.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'job-dismiss', 'data': { 'id': 'str' } }
- 
-@@ -205,7 +205,7 @@
- # @id: The identifier of any job in the transaction, or of a job that is not
- #      part of any transaction.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'job-finalize', 'data': { 'id': 'str' } }
- 
-@@ -237,7 +237,7 @@
- #                       the reason for the job failure. It should not be parsed
- #                       by applications.
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'struct': 'JobInfo',
-   'data': { 'id': 'str', 'type': 'JobType', 'status': 'JobStatus',
-@@ -251,6 +251,6 @@
- #
- # Returns: a list with a @JobInfo for each active job
- #
--# Since: 2.13
-+# Since: 3.0
- ##
- { 'command': 'query-jobs', 'returns': ['JobInfo'] }
+ static Property msd_properties[] = {
+     DEFINE_BLOCK_PROPERTIES(MSDState, conf),
++    DEFINE_BLOCK_ERROR_PROPERTIES(MSDState, conf),
+     DEFINE_PROP_BIT("removable", MSDState, removable, 0, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 -- 
 2.13.6
