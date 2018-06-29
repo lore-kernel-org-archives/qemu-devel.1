@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYxeu-00042l-98
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:58:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1fYxf1-00049X-KQ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:58:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fYxep-0005FK-Cy
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:58:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fYxep-0005En-62
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:58:07 -0400
-Date: Fri, 29 Jun 2018 14:58:04 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180629175804.GT7451@localhost.localdomain>
-References: <20180627160103.13634-1-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fYxf0-0005Ov-A0
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 13:58:19 -0400
+References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+	<20180629151524.138542-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fadc548f-0cde-769a-8523-80fa0a28ac81@redhat.com>
+Date: Fri, 29 Jun 2018 12:58:12 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180627160103.13634-1-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] docs: add guidance on configuring CPU
- models for x86
+In-Reply-To: <20180629151524.138542-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-iotests: Image fleecing test
+ case 222
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +25,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org
 
-On Wed, Jun 27, 2018 at 05:01:03PM +0100, Daniel P. Berrang=E9 wrote:
-> With the recent set of CPU hardware vulnerabilities on x86, it is
-> increasingly difficult to understand which CPU configurations are
-> good to use and what flaws they might be vulnerable to.
->=20
-> This doc attempts to help management applications and administrators in
-> picking sensible CPU configuration on x86 hosts. It outlines which of
-> the named CPU models are good choices, and describes which extra CPU
-> flags should be enabled to allow the guest to mitigate hardware flaws.
->=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+On 06/29/2018 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> From: Fam Zheng <famz@redhat.com>
+> 
+> This tests the workflow of creating a lightweight point-in-time snapshot
+> with blockdev-backup command, and exporting it with built-in NBD server.
+> 
+> It's tested that any post-snapshot writing to the original device
+> doesn't change data seen in NBD target.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> [vsementsov: add -f iotests.imgfmt to qemu_io, fix target_img to be
+> always qcow2, add -r to qemu_io for nbd, add fleecing-filter layer,
+> wrap long lines]
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Queued, thanks!
+For my own records: Fam's most recent post was:
+https://lists.gnu.org/archive/html/qemu-devel/2014-05/msg03895.html
+[Qemu-devel] [PATCH v20 15/15] qemu-iotests: Image fleecing test case 089
 
---=20
-Eduardo
+Wow - has it really been FOUR YEARS since we first proposed this?
+
+I'm trying to figure out why that original post was abandoned; it looks 
+like:
+https://lists.gnu.org/archive/html/qemu-devel/2014-05/msg04333.html
+
+split that v20 series into stuff that was ready (which made it in back 
+then), and stuff that was still undergoing comments (which then stalled 
+and got lost in the shuffle until now).
+
+My next question: how does this compare to John's recent patch?  And how 
+much of Fam's original work did John borrow (that self.patterns array 
+looks pretty common, now that I'm looking at multiple mails - although 
+John's version lacks any commit message body):
+https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08594.html
+
+And given the iterative improvements that have gone into John's version 
+(such as checking that the fleece image reads overwritten zeroes just as 
+correctly as overwritten data), we definitely need to merge the two 
+approaches into one patch.
+
+> +++ b/tests/qemu-iotests/222
+> @@ -0,0 +1,112 @@
+> +#!/usr/bin/env python
+> +#
+> +# Tests for image fleecing (point in time snapshot export to NBD)
+> +#
+> +# Copyright (C) 2014 Red Hat, Inc.
+> +#
+
+Interesting copyright line; it matches Fam's original post (and the fact 
+that you kept him as author); whereas John's version had the humorous:
+
++# Copyright (C) 2018 Red Hat, Inc.
++# John helped, too.
+
+> +# Based on 055.
+
+Is this information still useful? John dropped it.
+
+> +
+> +test_img = os.path.join(iotests.test_dir, 'test.img')
+> +target_img = os.path.join(iotests.test_dir, 'target.img')
+> +nbd_sock = os.path.join(iotests.test_dir, 'nbd.sock')
+> +
+> +class TestImageFleecing(iotests.QMPTestCase):
+> +    image_len = 64 * 1024 * 1024 # MB
+> +
+> +    def setUp(self):
+> +        # Write data to the image so we can compare later
+> +        qemu_img('create', '-f', iotests.imgfmt, test_img,
+> +                 str(TestImageFleecing.image_len))
+
+Difference in style between nested methods of a class, vs. directly 
+using 'with iotests.FilePath(..., iotests.VM() as vm:'
+
+> +        self.patterns = [
+> +                ("0x5d", "0", "64k"),
+> +                ("0xd5", "1M", "64k"),
+> +                ("0xdc", "32M", "64k"),
+> +                ("0xdc", "67043328", "64k")]
+
+John spelled it:
+  ("0xcd", "0x3ff0000", "64k"]  # 64M - 64K
+
+The 0xdc vs. 0xcd doesn't matter all that much, but having distinct 
+patterns in distinct ranges is kind of nice if we have to later inspect 
+a file.
+
+> +
+> +        for p in self.patterns:
+> +            qemu_io('-f', iotests.imgfmt, '-c', 'write -P%s %s %s' % p,
+> +                    test_img)
+> +
+> +        qemu_img('create', '-f', 'qcow2', target_img,
+> +                 str(TestImageFleecing.image_len))
+> +
+> +        self.vm = iotests.VM().add_drive(test_img)
+> +        self.vm.launch()
+> +
+> +        self.overwrite_patterns = [
+> +                ("0xa0", "0", "64k"),
+> +                ("0x0a", "1M", "64k"),
+> +                ("0x55", "32M", "64k"),
+> +                ("0x56", "67043328", "64k")]
+> +
+> +        self.nbd_uri = "nbd+unix:///drive1?socket=%s" % nbd_sock
+> +
+> +    def tearDown(self):
+> +        self.vm.shutdown()
+> +        os.remove(test_img)
+> +        os.remove(target_img)
+
+I'm not seeing anything that stops the NBD server; John's version added 
+that at my insistence.
+
+> +
+> +    def verify_patterns(self):
+> +        for p in self.patterns:
+> +            self.assertEqual(
+> +                    -1,
+> +                    qemu_io(self.nbd_uri, '-r', '-c', 'read -P%s %s %s' % p)
+> +                        .find("verification failed"),
+> +                    "Failed to verify pattern: %s %s %s" % p)
+> +
+> +    def test_image_fleecing(self):
+> +        result = self.vm.qmp("blockdev-add", **{
+> +            "driver": "fleecing-filter",
+> +            "node-name": "drive1",
+> +            "file": {
+> +                "driver": "qcow2",
+> +                "file": {
+> +                    "driver": "file",
+> +                    "filename": target_img,
+> +                    },
+> +                "backing": "drive0",
+> +            }
+> +            })
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        result = self.vm.qmp(
+> +                "nbd-server-start",
+> +                **{"addr": { "type": "unix", "data": { "path": nbd_sock } } })
+> +        self.assert_qmp(result, 'return', {})
+> +        result = self.vm.qmp("blockdev-backup", device="drive0",
+> +                             target="drive1", sync="none")
+> +        self.assert_qmp(result, 'return', {})
+> +        result = self.vm.qmp("nbd-server-add", device="drive1")
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        self.verify_patterns()
+> +
+> +        for p in self.overwrite_patterns:
+> +            self.vm.hmp_qemu_io("drive0", "write -P%s %s %s" % p)
+> +
+> +        self.verify_patterns()
+> +
+> +        self.cancel_and_wait(resume=True)
+> +        self.assert_no_active_block_jobs()
+> +
+> +if __name__ == '__main__':
+> +    iotests.main(supported_fmts=['raw', 'qcow2'])
+> diff --git a/tests/qemu-iotests/222.out b/tests/qemu-iotests/222.out
+> new file mode 100644
+> index 0000000000..ae1213e6f8
+> --- /dev/null
+> +++ b/tests/qemu-iotests/222.out
+> @@ -0,0 +1,5 @@
+> +.
+> +----------------------------------------------------------------------
+> +Ran 1 tests
+> +
+
+I also much prefer the output style that resulted in John's version.
+
+> +OK
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index eea75819d2..8019a9f721 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -220,3 +220,4 @@
+>   218 rw auto quick
+>   219 rw auto
+>   221 rw auto quick
+> +222 rw auto quick
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
