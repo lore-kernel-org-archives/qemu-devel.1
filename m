@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fZ1k7-0001u5-9G
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 18:19:55 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fZ2Bg-00019n-GE
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 18:48:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1fZ1k3-00089f-7D
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 18:19:51 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:50264)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fZ2Bd-00006o-C7
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 18:48:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60556
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1fZ1k2-00088n-UW
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 18:19:47 -0400
-From: Venu Busireddy <venu.busireddy@oracle.com>
-Date: Fri, 29 Jun 2018 17:19:07 -0500
-Message-Id: <20180629221907.3662-5-venu.busireddy@oracle.com>
-In-Reply-To: <20180629221907.3662-1-venu.busireddy@oracle.com>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 virtio 1/1] Add "Group Identifier" to virtio
- PCI capabilities.
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1fZ2Bd-00005P-6X
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 18:48:17 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5TMiWWo094709
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 18:48:15 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jws2fhxw7-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 18:48:15 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Fri, 29 Jun 2018 18:48:15 -0400
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Fri, 29 Jun 2018 18:47:59 -0400
+In-Reply-To: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+References: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Message-Id: <1530312483-23864-2-git-send-email-akrowiak@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 1/5] linux-headers: linux header updates for
+ AP support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +39,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: venu.busireddy@oracle.com, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, akrowiak@linux.vnet.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>
 
-Add VIRTIO_PCI_CAP_GROUP_ID_CFG (Group Identifier) capability to the
-virtio PCI capabilities to allow for the grouping of devices.
+Updates the linux header files in preparation for introduction
+of the VFIO AP device:
 
-Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+* Added a feature ID to indicate AP facilities are installed
+
+* Added a device attribute to the KVM_S390_VM_CRYPTO group to
+  indicate whether AP instructions are to be interpreted
+
+* Added VFIO device information for AP devices
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 ---
- content.tex | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ linux-headers/asm-s390/kvm.h |    2 ++
+ linux-headers/linux/vfio.h   |    2 ++
+ 2 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/content.tex b/content.tex
-index be18234..34627e5 100644
---- a/content.tex
-+++ b/content.tex
-@@ -599,6 +599,8 @@ The fields are interpreted as follows:
- #define VIRTIO_PCI_CAP_DEVICE_CFG        4
- /* PCI configuration access */
- #define VIRTIO_PCI_CAP_PCI_CFG           5
-+/* Group Identifier */
-+#define VIRTIO_PCI_CAP_GROUP_ID_CFG      6
- \end{lstlisting}
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 11def14..391b250 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -130,6 +130,7 @@ struct kvm_s390_vm_cpu_machine {
+ #define KVM_S390_VM_CPU_FEAT_PFMFI	11
+ #define KVM_S390_VM_CPU_FEAT_SIGPIF	12
+ #define KVM_S390_VM_CPU_FEAT_KSS	13
++#define KVM_S390_VM_CPU_FEAT_AP		14
+ struct kvm_s390_vm_cpu_feat {
+ 	__u64 feat[16];
+ };
+@@ -160,6 +161,7 @@ struct kvm_s390_vm_cpu_subfunc {
+ #define KVM_S390_VM_CRYPTO_ENABLE_DEA_KW	1
+ #define KVM_S390_VM_CRYPTO_DISABLE_AES_KW	2
+ #define KVM_S390_VM_CRYPTO_DISABLE_DEA_KW	3
++#define KVM_S390_VM_CRYPTO_INTERPRET_AP		4
  
-         Any other value is reserved for future use.
-@@ -997,6 +999,34 @@ address \field{cap.length} bytes within a BAR range
- specified by some other Virtio Structure PCI Capability
- of type other than \field{VIRTIO_PCI_CAP_PCI_CFG}.
+ /* kvm attributes for migration mode */
+ #define KVM_S390_VM_MIGRATION_STOP	0
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 3615a26..838919a 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -200,6 +200,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+ #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+ #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
++#define VFIO_DEVICE_FLAGS_AP (1 << 5)		/* vfio-ap device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
+ };
+@@ -215,6 +216,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_API_PLATFORM_STRING		"vfio-platform"
+ #define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
+ #define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
++#define VFIO_DEVICE_API_AP_STRING		"vfio-ap"
  
-+\subsubsection{Group Identifier capability}\label{sec:Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
-+
-+The VIRTIO_PCI_CAP_GROUP_ID_CFG capability provides means for grouping
-+devices together.
-+
-+The capability is immediately followed by an identifier of type u64
-+as below:
-+
-+\begin{lstlisting}
-+struct virtio_pci_group_id_cap {
-+        struct virtio_pci_cap cap;
-+        u64 group_id; /* Group Identifier */
-+};
-+\end{lstlisting}
-+
-+\devicenormative{\paragraph}{Group Identifier capability}{Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
-+
-+The device MAY present the VIRTIO_PCI_CAP_GROUP_ID_CFG capability.
-+
-+When this capability is present, the device must set the fields
-+\field{cap.bar}, \field{cap.offset} and \field{cap.length} to 0, and
-+set the group_id to a unique identifier.
-+
-+\drivernormative{\paragraph}{Group Identifier capability}{Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
-+
-+The fields \field{cap.bar}, \field{cap.offset}, \field{cap.length}
-+and \field{group_id} are read-only for the driver.
-+
- \subsubsection{Legacy Interfaces: A Note on PCI Device Layout}\label{sec:Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Legacy Interfaces: A Note on PCI Device Layout}
- 
- Transitional devices MUST present part of configuration
+ /**
+  * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+-- 
+1.7.1
