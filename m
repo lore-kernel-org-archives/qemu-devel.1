@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hW-Aw
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:31:02 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hY-B5
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUB-0007El-Bh
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUB-0007GD-S5
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:57 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 29 Jun 2018 15:29:37 +0200
-Message-Id: <20180629132954.24269-4-luc.michel@greensocs.com>
+Date: Fri, 29 Jun 2018 15:29:40 +0200
+Message-Id: <20180629132954.24269-7-luc.michel@greensocs.com>
 In-Reply-To: <20180629132954.24269-1-luc.michel@greensocs.com>
 References: <20180629132954.24269-1-luc.michel@greensocs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 03/20] intc/arm_gic: Remove some dead code
- and put some functions static
+Subject: [Qemu-devel] [PATCH v3 06/20] intc/arm_gic: Add virtual interface
+ register definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +23,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Some functions are now only used in arm_gic.c, put them static. Some of
-them where only used by the NVIC implementation and are not used
-anymore, so remove them.
+Add the register definitions for the virtual interface of the GICv2.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c      | 23 ++---------------------
- hw/intc/gic_internal.h |  4 ----
- 2 files changed, 2 insertions(+), 25 deletions(-)
+ hw/intc/gic_internal.h | 65 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 3b299e37cc..6bed3d3e0b 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -71,7 +71,7 @@ static inline bool gic_has_groups(GICState *s)
-=20
- /* TODO: Many places that call this routine could be optimized.  */
- /* Update interrupt status after enabled or pending bits have been chang=
-ed.  */
--void gic_update(GICState *s)
-+static void gic_update(GICState *s)
- {
-     int best_irq;
-     int best_prio;
-@@ -137,19 +137,6 @@ void gic_update(GICState *s)
-     }
- }
-=20
--void gic_set_pending_private(GICState *s, int cpu, int irq)
--{
--    int cm =3D 1 << cpu;
--
--    if (gic_test_pending(s, irq, cm)) {
--        return;
--    }
--
--    DPRINTF("Set %d pending cpu %d\n", irq, cpu);
--    GIC_DIST_SET_PENDING(irq, cm);
--    gic_update(s);
--}
--
- static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
-                                  int cm, int target)
- {
-@@ -565,7 +552,7 @@ static void gic_deactivate_irq(GICState *s, int cpu, =
-int irq, MemTxAttrs attrs)
-     GIC_DIST_CLEAR_ACTIVE(irq, cm);
- }
-=20
--void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
-+static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs a=
-ttrs)
- {
-     int cm =3D 1 << cpu;
-     int group;
-@@ -1456,12 +1443,6 @@ static const MemoryRegionOps gic_cpu_ops =3D {
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
- };
-=20
--/* This function is used by nvic model */
--void gic_init_irqs_and_distributor(GICState *s)
--{
--    gic_init_irqs_and_mmio(s, gic_set_irq, gic_ops);
--}
--
- static void arm_gic_realize(DeviceState *dev, Error **errp)
- {
-     /* Device instance realize function for the GIC sysbus device */
 diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-index 6f8d242904..a2075a94db 100644
+index c85427c8e3..1aa888a576 100644
 --- a/hw/intc/gic_internal.h
 +++ b/hw/intc/gic_internal.h
-@@ -75,11 +75,7 @@
- /* The special cases for the revision property: */
- #define REV_11MPCORE 0
-=20
--void gic_set_pending_private(GICState *s, int cpu, int irq);
- uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
--void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs);
--void gic_update(GICState *s);
--void gic_init_irqs_and_distributor(GICState *s);
- void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-                            MemTxAttrs attrs);
-=20
---=20
+@@ -21,6 +21,7 @@
+ #ifndef QEMU_ARM_GIC_INTERNAL_H
+ #define QEMU_ARM_GIC_INTERNAL_H
+ 
++#include "hw/registerfields.h"
+ #include "hw/intc/arm_gic.h"
+ 
+ #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+@@ -64,6 +65,70 @@
+ #define GICC_CTLR_EOIMODE    (1U << 9)
+ #define GICC_CTLR_EOIMODE_NS (1U << 10)
+ 
++REG32(GICH_HCR, 0x0)
++    FIELD(GICH_HCR, EN, 0, 1)
++    FIELD(GICH_HCR, UIE, 1, 1)
++    FIELD(GICH_HCR, LRENPIE, 2, 1)
++    FIELD(GICH_HCR, NPIE, 3, 1)
++    FIELD(GICH_HCR, VGRP0EIE, 4, 1)
++    FIELD(GICH_HCR, VGRP0DIE, 5, 1)
++    FIELD(GICH_HCR, VGRP1EIE, 6, 1)
++    FIELD(GICH_HCR, VGRP1DIE, 7, 1)
++    FIELD(GICH_HCR, EOICount, 27, 5)
++
++#define GICH_HCR_MASK \
++    (R_GICH_HCR_EN_MASK | R_GICH_HCR_UIE_MASK | \
++     R_GICH_HCR_LRENPIE_MASK | R_GICH_HCR_NPIE_MASK | \
++     R_GICH_HCR_VGRP0EIE_MASK | R_GICH_HCR_VGRP0DIE_MASK | \
++     R_GICH_HCR_VGRP1EIE_MASK | R_GICH_HCR_VGRP1DIE_MASK | \
++     R_GICH_HCR_EOICount_MASK)
++
++REG32(GICH_VTR, 0x4)
++    FIELD(GICH_VTR, ListRegs, 0, 6)
++    FIELD(GICH_VTR, PREbits, 26, 3)
++    FIELD(GICH_VTR, PRIbits, 29, 3)
++
++REG32(GICH_VMCR, 0x8)
++    FIELD(GICH_VMCR, VMCCtlr, 0, 10)
++    FIELD(GICH_VMCR, VMABP, 18, 3)
++    FIELD(GICH_VMCR, VMBP, 21, 3)
++    FIELD(GICH_VMCR, VMPriMask, 27, 5)
++
++REG32(GICH_MISR, 0x10)
++    FIELD(GICH_MISR, EOI, 0, 1)
++    FIELD(GICH_MISR, U, 1, 1)
++    FIELD(GICH_MISR, LRENP, 2, 1)
++    FIELD(GICH_MISR, NP, 3, 1)
++    FIELD(GICH_MISR, VGrp0E, 4, 1)
++    FIELD(GICH_MISR, VGrp0D, 5, 1)
++    FIELD(GICH_MISR, VGrp1E, 6, 1)
++    FIELD(GICH_MISR, VGrp1D, 7, 1)
++
++REG32(GICH_EISR0, 0x20)
++REG32(GICH_EISR1, 0x24)
++REG32(GICH_ELRSR0, 0x30)
++REG32(GICH_ELRSR1, 0x34)
++REG32(GICH_APR, 0xf0)
++
++REG32(GICH_LR0, 0x100)
++    FIELD(GICH_LR0, VirtualID, 0, 10)
++    FIELD(GICH_LR0, PhysicalID, 10, 10)
++    FIELD(GICH_LR0, CPUID, 10, 3)
++    FIELD(GICH_LR0, EOI, 19, 1)
++    FIELD(GICH_LR0, Priority, 23, 5)
++    FIELD(GICH_LR0, State, 28, 2)
++    FIELD(GICH_LR0, Grp1, 30, 1)
++    FIELD(GICH_LR0, HW, 31, 1)
++
++/* Last LR register */
++REG32(GICH_LR63, 0x1fc)
++
++#define GICH_LR_MASK \
++    (R_GICH_LR0_VirtualID_MASK | R_GICH_LR0_PhysicalID_MASK | \
++     R_GICH_LR0_CPUID_MASK | R_GICH_LR0_EOI_MASK | \
++     R_GICH_LR0_Priority_MASK | R_GICH_LR0_State_MASK | \
++     R_GICH_LR0_Grp1_MASK | R_GICH_LR0_HW_MASK)
++
+ /* Valid bits for GICC_CTLR for GICv1, v1 with security extensions,
+  * GICv2 and GICv2 with security extensions:
+  */
+-- 
 2.17.1
