@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hd-CL
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUH-0007hX-B2
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fYtUD-0007LC-Ih
+	(envelope-from <luc.michel@greensocs.com>) id 1fYtUC-0007IF-K6
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 09:30:57 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 29 Jun 2018 15:29:51 +0200
-Message-Id: <20180629132954.24269-18-luc.michel@greensocs.com>
+Date: Fri, 29 Jun 2018 15:29:45 +0200
+Message-Id: <20180629132954.24269-12-luc.michel@greensocs.com>
 In-Reply-To: <20180629132954.24269-1-luc.michel@greensocs.com>
 References: <20180629132954.24269-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 17/20] intc/arm_gic: Implement maintenance
- interrupt generation
+Subject: [Qemu-devel] [PATCH v3 11/20] intc/arm_gic: Implement
+ virtualization extensions in gic_acknowledge_irq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +23,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Implement the maintenance interrupt generation that is part of the GICv2
-virtualization extensions.
+Implement virtualization extensions in the gic_acknowledge_irq()
+function. This function changes the state of the highest priority IRQ
+from pending to active.
+
+When the current CPU is a vCPU, modifying the state of an IRQ modifies
+the corresponding LR entry. However if we clear the pending flag before
+setting the active one, we lose track of the LR entry as it becomes
+invalid. The next call to gic_get_lr_entry() will fail.
+
+To overcome this issue, we call gic_activate_irq() before
+gic_clear_pending(). This does not change the general behaviour of
+gic_acknowledge_irq.
+
+We also move the SGI case in gic_clear_pending_sgi() to enhance
+code readability as the virtualization extensions support adds a if-else
+level.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- hw/intc/arm_gic.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ hw/intc/arm_gic.c | 52 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 33 insertions(+), 19 deletions(-)
 
 diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index a3ff4b89d1..10300e9b4c 100644
+index d61c2dd557..a7577ac073 100644
 --- a/hw/intc/arm_gic.c
 +++ b/hw/intc/arm_gic.c
-@@ -206,6 +206,94 @@ static inline void gic_update_internal(GICState *s, bool virt)
+@@ -366,17 +366,44 @@ static void gic_drop_prio(GICState *s, int cpu, int group)
+     s->running_priority[cpu] = gic_get_prio_from_apr_bits(s, cpu);
+ }
+ 
++static inline uint32_t gic_clear_pending_sgi(GICState *s, int irq, int cpu)
++{
++    int src;
++    uint32_t ret;
++
++    if (!gic_is_vcpu(cpu)) {
++        /* Lookup the source CPU for the SGI and clear this in the
++         * sgi_pending map.  Return the src and clear the overall pending
++         * state on this CPU if the SGI is not pending from any CPUs.
++         */
++        assert(s->sgi_pending[irq][cpu] != 0);
++        src = ctz32(s->sgi_pending[irq][cpu]);
++        s->sgi_pending[irq][cpu] &= ~(1 << src);
++        if (s->sgi_pending[irq][cpu] == 0) {
++            gic_clear_pending(s, irq, cpu);
++        }
++        ret = irq | ((src & 0x7) << 10);
++    } else {
++        uint32_t *lr_entry = gic_get_lr_entry(s, irq, cpu);
++        src = GICH_LR_CPUID(*lr_entry);
++
++        gic_clear_pending(s, irq, cpu);
++        ret = irq | (src << 10);
++    }
++
++    return ret;
++}
++
+ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+ {
+-    int ret, irq, src;
+-    int cm = 1 << cpu;
++    int ret, irq;
+ 
+     /* gic_get_current_pending_irq() will return 1022 or 1023 appropriately
+      * for the case where this GIC supports grouping and the pending interrupt
+      * is in the wrong group.
+      */
+     irq = gic_get_current_pending_irq(s, cpu, attrs);
+-    trace_gic_acknowledge_irq(cpu, irq);
++    trace_gic_acknowledge_irq(gic_get_vcpu_real_id(cpu), irq);
+ 
+     if (irq >= GIC_MAXIRQ) {
+         DPRINTF("ACK, no pending interrupt or it is hidden: %d\n", irq);
+@@ -388,6 +415,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+         return 1023;
      }
- }
  
-+static inline void gic_extract_lr_info(GICState *s, int cpu,
-+                                int *num_eoi, int *num_valid, int *num_pending)
-+{
-+    int lr_idx;
++    gic_activate_irq(s, cpu, irq);
 +
-+    *num_eoi = 0;
-+    *num_valid = 0;
-+    *num_pending = 0;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if (gic_lr_entry_is_eoi(*entry)) {
-+            (*num_eoi)++;
-+        }
-+
-+        if (GICH_LR_STATE(*entry) != GICH_LR_STATE_INVALID) {
-+            (*num_valid)++;
-+        }
-+
-+        if (GICH_LR_STATE(*entry) == GICH_LR_STATE_PENDING) {
-+            (*num_pending)++;
-+        }
-+    }
-+}
-+
-+static void gic_compute_misr(GICState *s, int cpu)
-+{
-+    int val;
-+    int vcpu = cpu + GIC_NCPU;
-+
-+    int num_eoi, num_valid, num_pending;
-+
-+    gic_extract_lr_info(s, cpu, &num_eoi, &num_valid, &num_pending);
-+
-+    /* EOI */
-+    val = (num_eoi != 0);
-+    s->h_misr[cpu] = FIELD_DP32(0, GICH_MISR, EOI, val);
-+
-+    /* U: true if only 0 or 1 LR entry is valid */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_UIE_MASK &&
-+        (num_valid < 2);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, U, val);
-+
-+    /* LRENP: EOICount is not 0 */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_LRENPIE_MASK &&
-+        ((s->h_hcr[cpu] & R_GICH_HCR_EOICount_MASK) != 0);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, LRENP, val);
-+
-+    /* NP: no pending interrupts */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_NPIE_MASK &&
-+        (num_pending == 0);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, NP, val);
-+
-+    /* VGrp0E: group0 virq signaling enabled */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_VGRP0EIE_MASK &&
-+        (s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP0);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, VGrp0E, val);
-+
-+    /* VGrp0D: group0 virq signaling disabled */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_VGRP0DIE_MASK &&
-+        !(s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP0);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, VGrp0D, val);
-+
-+    /* VGrp1E: group1 virq signaling enabled */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_VGRP1EIE_MASK &&
-+        (s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP1);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, VGrp1E, val);
-+
-+    /* VGrp1D: group1 virq signaling disabled */
-+    val = s->h_hcr[cpu] & R_GICH_HCR_VGRP1DIE_MASK &&
-+        !(s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP1);
-+    s->h_misr[cpu] = FIELD_DP32(s->h_misr[cpu], GICH_MISR, VGrp1D, val);
-+}
-+
-+static void gic_update_maintenance(GICState *s)
-+{
-+    int cpu = 0;
-+    int maint_level;
-+
-+    for (cpu = 0; cpu < s->num_cpu; cpu++) {
-+        gic_compute_misr(s, cpu);
-+        maint_level = (s->h_hcr[cpu] & R_GICH_HCR_EN_MASK) && s->h_misr[cpu];
-+
-+        qemu_set_irq(s->maintenance_irq[cpu], maint_level);
-+    }
-+}
-+
- static void gic_update(GICState *s)
- {
-     gic_update_internal(s, false);
-@@ -214,6 +302,7 @@ static void gic_update(GICState *s)
- static void gic_update_virt(GICState *s)
- {
-     gic_update_internal(s, true);
-+    gic_update_maintenance(s);
- }
+     if (s->revision == REV_11MPCORE) {
+         /* Clear pending flags for both level and edge triggered interrupts.
+          * Level triggered IRQs will be reasserted once they become inactive.
+@@ -396,28 +425,13 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+         ret = irq;
+     } else {
+         if (irq < GIC_NR_SGIS) {
+-            /* Lookup the source CPU for the SGI and clear this in the
+-             * sgi_pending map.  Return the src and clear the overall pending
+-             * state on this CPU if the SGI is not pending from any CPUs.
+-             */
+-            assert(s->sgi_pending[irq][cpu] != 0);
+-            src = ctz32(s->sgi_pending[irq][cpu]);
+-            s->sgi_pending[irq][cpu] &= ~(1 << src);
+-            if (s->sgi_pending[irq][cpu] == 0) {
+-                gic_clear_pending(s, irq, cpu);
+-            }
+-            ret = irq | ((src & 0x7) << 10);
++            ret = gic_clear_pending_sgi(s, irq, cpu);
+         } else {
+-            /* Clear pending state for both level and edge triggered
+-             * interrupts. (level triggered interrupts with an active line
+-             * remain pending, see gic_test_pending)
+-             */
+             gic_clear_pending(s, irq, cpu);
+             ret = irq;
+         }
+     }
  
- static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
+-    gic_activate_irq(s, cpu, irq);
+     gic_update(s);
+     DPRINTF("ACK %d\n", irq);
+     return ret;
 -- 
 2.17.1
