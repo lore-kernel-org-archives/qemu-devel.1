@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYq0q-00016R-0P
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:20 -0400
+	(envelope-from <groug@kaod.org>) id 1fYq14-0001Bg-Hv
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fYq0l-00042E-42
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:20 -0400
-Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:60982)
+	(envelope-from <groug@kaod.org>) id 1fYq0z-0004oF-GU
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:34 -0400
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:52590)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYq0k-0003xD-S7
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:15 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.120.107])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 020CF1C6BC8
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 11:48:12 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fYq0z-0004jC-6O
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 05:48:29 -0400
+Received: from player718.ha.ovh.net (unknown [10.109.105.45])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4ED471D74C
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 11:48:27 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 29 Jun 2018 11:48:01 +0200
-Message-ID: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
+Date: Fri, 29 Jun 2018 11:48:16 +0200
+Message-ID: <153026569690.394407.15353910318501418469.stgit@bahia.lan>
+In-Reply-To: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
+References: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 0/3] spapr: fix regression with older
- machine types
+Subject: [Qemu-devel] [PATCH v2 1/3] target/ppc/kvm: get rid of
+ kvm_get_fallback_smmu_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +33,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-Since the recent cleanups to hide host configuration details from guests,
-it isn't possible to start an older machine type with HV KVM [*]:
+Now that we're checking our MMU configuration is supported by KVM,
+rather than adjusting it to KVM, it doesn't really make sense to
+have a fallback for kvm_get_smmu_info(). If KVM is too old or buggy
+to provide the details, we should rather treat this as an error.
 
-qemu-system-ppc64: KVM doesn't support for base page shift 34
+This patch thus adds error reporting to kvm_get_smmu_info() and get
+rid of the fallback code. QEMU will now terminate if KVM fails to
+provide MMU details. This may break some very old setups, but the
+simplification is worth the sacrifice.
 
-This basically boils down to the fact that it isn't safe to call
-the kvmppc_hpt_needs_host_contiguous_pages() helper from a class
-init function because:
-- KVM isn't initialized yet, and kvm_enabled() always return false
-  in this case. This causes kvmppc_hpt_needs_host_contiguous_pages()
-  to do nothing and we end up choosing a 16G default page size
-  which is not supported by KVM.
-- even if we drop kvm_enabled() we then have the issue that
-  kvmppc_hpt_needs_host_contiguous_pages() assumes CPUs are
-  created, which isn't the case either.
-
-The choice was made to initialize capabilities during machine
-init before creating the CPUs, and I don't think we should
-revert to the previous behavior. Let's go forward instead and
-ensure we can retrieve the MMU information from KVM before
-CPUs are created.
-
-To fix this, we first change kvm_get_smmu_info() so that it
-doesn't need a CPU object. This allows to stop using first_cpu
-in kvmppc_hpt_needs_host_contiguous_pages(). Then we delay
-the setting of the default value to machine init time, so
-that we're sure that KVM is fully initialized.
-
-Please comment.
-
-[*] it also breaks PR KVM actually, but the error is different and
-    I need to dig some more.
-
-Changes in v2:
-- added patch "target/ppc/kvm: get rid of kvm_get_fallback_smmu_info()"
-- dropped patch "accel: forbid early use of kvm_enabled() and friends" to
-  be sent separately
-
---
-Greg
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+ target/ppc/kvm.c |  117 +++++++++---------------------------------------------
+ 1 file changed, 20 insertions(+), 97 deletions(-)
 
-Greg Kurz (3):
-      target/ppc/kvm: get rid of kvm_get_fallback_smmu_info()
-      target/ppc/kvm: don't pass cpu to kvm_get_smmu_info()
-      spapr: compute default value of "hpt-max-page-size" later
-
-
- hw/ppc/spapr.c      |   13 +++---
- hw/ppc/spapr_caps.c |   20 +++++++++
- target/ppc/kvm.c    |  118 +++++++++------------------------------------------
- 3 files changed, 46 insertions(+), 105 deletions(-)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 4df4ff6cbff2..b6000f12b98f 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -248,107 +248,25 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
+ 
+ 
+ #if defined(TARGET_PPC64)
+-static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
+-                                       struct kvm_ppc_smmu_info *info)
++static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info,
++                              Error **errp)
+ {
+-    CPUPPCState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
++    int ret;
+ 
+-    memset(info, 0, sizeof(*info));
+-
+-    /* We don't have the new KVM_PPC_GET_SMMU_INFO ioctl, so
+-     * need to "guess" what the supported page sizes are.
+-     *
+-     * For that to work we make a few assumptions:
+-     *
+-     * - Check whether we are running "PR" KVM which only supports 4K
+-     *   and 16M pages, but supports them regardless of the backing
+-     *   store characteritics. We also don't support 1T segments.
+-     *
+-     *   This is safe as if HV KVM ever supports that capability or PR
+-     *   KVM grows supports for more page/segment sizes, those versions
+-     *   will have implemented KVM_CAP_PPC_GET_SMMU_INFO and thus we
+-     *   will not hit this fallback
+-     *
+-     * - Else we are running HV KVM. This means we only support page
+-     *   sizes that fit in the backing store. Additionally we only
+-     *   advertize 64K pages if the processor is ARCH 2.06 and we assume
+-     *   P7 encodings for the SLB and hash table. Here too, we assume
+-     *   support for any newer processor will mean a kernel that
+-     *   implements KVM_CAP_PPC_GET_SMMU_INFO and thus doesn't hit
+-     *   this fallback.
+-     */
+-    if (kvmppc_is_pr(cs->kvm_state)) {
+-        /* No flags */
+-        info->flags = 0;
+-        info->slb_size = 64;
+-
+-        /* Standard 4k base page size segment */
+-        info->sps[0].page_shift = 12;
+-        info->sps[0].slb_enc = 0;
+-        info->sps[0].enc[0].page_shift = 12;
+-        info->sps[0].enc[0].pte_enc = 0;
+-
+-        /* Standard 16M large page size segment */
+-        info->sps[1].page_shift = 24;
+-        info->sps[1].slb_enc = SLB_VSID_L;
+-        info->sps[1].enc[0].page_shift = 24;
+-        info->sps[1].enc[0].pte_enc = 0;
+-    } else {
+-        int i = 0;
+-
+-        /* HV KVM has backing store size restrictions */
+-        info->flags = KVM_PPC_PAGE_SIZES_REAL;
+-
+-        if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+-            info->flags |= KVM_PPC_1T_SEGMENTS;
+-        }
+-
+-        if (env->mmu_model == POWERPC_MMU_2_06 ||
+-            env->mmu_model == POWERPC_MMU_2_07) {
+-            info->slb_size = 32;
+-        } else {
+-            info->slb_size = 64;
+-        }
+-
+-        /* Standard 4k base page size segment */
+-        info->sps[i].page_shift = 12;
+-        info->sps[i].slb_enc = 0;
+-        info->sps[i].enc[0].page_shift = 12;
+-        info->sps[i].enc[0].pte_enc = 0;
+-        i++;
+-
+-        /* 64K on MMU 2.06 and later */
+-        if (env->mmu_model == POWERPC_MMU_2_06 ||
+-            env->mmu_model == POWERPC_MMU_2_07) {
+-            info->sps[i].page_shift = 16;
+-            info->sps[i].slb_enc = 0x110;
+-            info->sps[i].enc[0].page_shift = 16;
+-            info->sps[i].enc[0].pte_enc = 1;
+-            i++;
+-        }
+-
+-        /* Standard 16M large page size segment */
+-        info->sps[i].page_shift = 24;
+-        info->sps[i].slb_enc = SLB_VSID_L;
+-        info->sps[i].enc[0].page_shift = 24;
+-        info->sps[i].enc[0].pte_enc = 0;
++    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
++        error_setg(errp, "KVM doesn't expose the MMU features it supports");
++        error_append_hint(errp, "Consider switching to a newer KVM\n");
++        return;
+     }
+-}
+-
+-static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+-{
+-    CPUState *cs = CPU(cpu);
+-    int ret;
+ 
+-    if (kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
+-        ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, info);
+-        if (ret == 0) {
+-            return;
+-        }
++    ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, info);
++    if (ret == 0) {
++        return;
+     }
+ 
+-    kvm_get_fallback_smmu_info(cpu, info);
++    error_setg_errno(errp, -ret,
++                     "KVM failed to provide the MMU features it supports");
+ }
+ 
+ struct ppc_radix_page_info *kvm_get_radix_page_info(void)
+@@ -415,7 +333,7 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void)
+         return false;
+     }
+ 
+-    kvm_get_smmu_info(cpu, &smmu_info);
++    kvm_get_smmu_info(cpu, &smmu_info, &error_fatal);
+     return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
+ }
+ 
+@@ -423,13 +341,18 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
+ {
+     struct kvm_ppc_smmu_info smmu_info;
+     int iq, ik, jq, jk;
++    Error *local_err = NULL;
+ 
+     /* For now, we only have anything to check on hash64 MMUs */
+     if (!cpu->hash64_opts || !kvm_enabled()) {
+         return;
+     }
+ 
+-    kvm_get_smmu_info(cpu, &smmu_info);
++    kvm_get_smmu_info(cpu, &smmu_info, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)
+         && !(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+@@ -2168,7 +2091,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+ 
+     /* Find the largest hardware supported page size that's less than
+      * or equal to the (logical) backing page size of guest RAM */
+-    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
++    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info, &error_fatal);
+     rampagesize = qemu_getrampagesize();
+     best_page_shift = 0;
+ 
