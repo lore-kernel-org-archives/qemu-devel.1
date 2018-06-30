@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fZBKe-0003YQ-U3
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:16 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fZBKd-0003Xn-Qp
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fZBKb-0001N0-KT
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:12 -0400
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:47093)
+	(envelope-from <th.huth@gmail.com>) id 1fZBKa-0001LE-K9
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:11 -0400
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:36894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fZBKb-0001LI-Au
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:09 -0400
-Received: by mail-wr0-f195.google.com with SMTP id s11-v6so1614655wra.13
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 01:34:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fZBKa-0001Jk-Ae
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:08 -0400
+Received: by mail-wr0-f180.google.com with SMTP id k6-v6so10853569wrp.4
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 01:34:08 -0700 (PDT)
 From: Thomas Huth <huth@tuxfamily.org>
-Date: Sat, 30 Jun 2018 10:33:55 +0200
-Message-Id: <20180630083357.23489-3-huth@tuxfamily.org>
+Date: Sat, 30 Jun 2018 10:33:54 +0200
+Message-Id: <20180630083357.23489-2-huth@tuxfamily.org>
 In-Reply-To: <20180630083357.23489-1-huth@tuxfamily.org>
 References: <20180630083357.23489-1-huth@tuxfamily.org>
-Subject: [Qemu-devel] [PATCH v1 2/4] m68k: Add NeXTcube keyboard device
+Subject: [Qemu-devel] [PATCH v1 1/4] m68k: Add NeXTcube framebuffer device
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +29,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Bryce Lanham <blanham@gmail.com>, Natalia Portillo <claunia@claunia.com>
 
-It is likely still quite incomplete (e.g. mouse and interrupts are not
-implemented yet), but it is good enough for keyboard input at the firmware
-monitor.
+The NeXTcube uses a linear framebuffer with 4 greyscale colors and
+a fixed resolution of 1120 * 832.
 This code has been taken from Bryce Lanham's GSoC 2011 NeXT branch at
 
- https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-kbd.c
+ https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-fb.c
 
-and altered to fit the latest interface of the current QEMU (e.g. to use
-memory_region_init_io() instead of cpu_register_physical_memory()).
+and altered to fit the latest interface of the current QEMU (e.g.
+the device has been "qdev"-ified etc.).
 
 Signed-off-by: Thomas Huth <huth@tuxfamily.org>
 ---
- hw/m68k/Makefile.objs       |   5 +-
- hw/m68k/next-kbd.c          | 289 ++++++++++++++++++++++++++++++++++++
- include/hw/m68k/next-cube.h |   3 +
- 3 files changed, 295 insertions(+), 2 deletions(-)
- create mode 100644 hw/m68k/next-kbd.c
+ default-configs/m68k-softmmu.mak |   2 +
+ hw/display/Makefile.objs         |   1 +
+ hw/display/next-fb.c             | 152 +++++++++++++++++++++++++++++++
+ include/hw/m68k/next-cube.h      |   8 ++
+ 4 files changed, 163 insertions(+)
+ create mode 100644 hw/display/next-fb.c
+ create mode 100644 include/hw/m68k/next-cube.h
 
-diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-index d1f089c08a..5852fd2500 100644
---- a/hw/m68k/Makefile.objs
-+++ b/hw/m68k/Makefile.objs
-@@ -1,2 +1,3 @@
--obj-y += an5206.o mcf5208.o
--obj-y += mcf5206.o mcf_intc.o
-+obj-$(CONFIG_COLDFIRE) += an5206.o mcf5208.o
-+obj-$(CONFIG_COLDFIRE) += mcf5206.o mcf_intc.o
-+obj-$(CONFIG_NEXTCUBE) += next-kbd.o
-diff --git a/hw/m68k/next-kbd.c b/hw/m68k/next-kbd.c
+diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
+index 60f7cdfbf2..d3248a6506 100644
+--- a/default-configs/m68k-softmmu.mak
++++ b/default-configs/m68k-softmmu.mak
+@@ -2,3 +2,5 @@
+ 
+ CONFIG_COLDFIRE=y
+ CONFIG_PTIMER=y
++CONFIG_NEXTCUBE=y
++CONFIG_FRAMEBUFFER=y
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index fb8408c6d0..c91a660ad2 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -34,6 +34,7 @@ obj-$(CONFIG_RASPI) += bcm2835_fb.o
+ obj-$(CONFIG_SM501) += sm501.o
+ obj-$(CONFIG_TCX) += tcx.o
+ obj-$(CONFIG_CG3) += cg3.o
++obj-$(CONFIG_NEXTCUBE) += next-fb.o
+ 
+ obj-$(CONFIG_VGA) += vga.o
+ 
+diff --git a/hw/display/next-fb.c b/hw/display/next-fb.c
 new file mode 100644
-index 0000000000..0c4655f586
+index 0000000000..f4248405df
 --- /dev/null
-+++ b/hw/m68k/next-kbd.c
-@@ -0,0 +1,289 @@
++++ b/hw/display/next-fb.c
+@@ -0,0 +1,152 @@
 +/*
-+ * QEMU NeXT Keyboard/Mouse emulation
++ * NeXT Cube/Station Framebuffer Emulation
 + *
 + * Copyright (c) 2011 Bryce Lanham
 + *
@@ -85,283 +99,148 @@ index 0000000000..0c4655f586
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
-+
-+/*
-+ * This is admittedly hackish, but works well enough for basic input. Mouse
-+ * support will be added once we can boot something that needs the mouse.
-+ */
-+
 +#include "qemu/osdep.h"
-+#include "exec/address-spaces.h"
 +#include "hw/hw.h"
-+#include "hw/m68k/next-cube.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "hw/display/framebuffer.h"
 +#include "ui/console.h"
-+#include "sysemu/sysemu.h"
++#define BITS 8
++#include "ui/pixel_ops.h"
++#include "hw/m68k/next-cube.h"
 +
-+/* debug NeXT keyboard */
-+//#define DEBUG_KBD
++#define TYPE_NEXTFB "next-fb"
++#define NEXTFB(obj) OBJECT_CHECK(NeXTFbState, (obj), TYPE_NEXTFB)
 +
-+#ifdef DEBUG_KBD
-+#define DPRINTF(fmt, ...) do { printf("KBD: " fmt , ## __VA_ARGS__); } while (0)
-+#else
-+#define DPRINTF(fmt, ...) do { } while (0)
-+#endif
++struct NeXTFbState {
++    SysBusDevice parent_obj;
 +
-+/* following defintions from next68k netbsd */
-+#define CSR_INT 0x00800000
-+#define CSR_DATA 0x00400000
++    MemoryRegion fb_mr;
++    MemoryRegionSection fbsection;
++    QemuConsole *con;
 +
-+#define KD_KEYMASK    0x007f
-+#define KD_DIRECTION  0x0080 /* pressed or released */
-+#define KD_CNTL       0x0100
-+#define KD_LSHIFT     0x0200
-+#define KD_RSHIFT     0x0400
-+#define KD_LCOMM      0x0800
-+#define KD_RCOMM      0x1000
-+#define KD_LALT       0x2000
-+#define KD_RALT       0x4000
-+#define KD_VALID      0x8000 /* only set for scancode keys ? */
-+#define KD_MODS       0x4f00
++    uint32_t pitch;
++    uint32_t cols;
++    uint32_t rows;
++    int invalidate;
++};
++typedef struct NeXTFbState NeXTFbState;
 +
-+#define KBD_QUEUE_SIZE 256
-+
-+typedef struct {
-+    uint8_t data[KBD_QUEUE_SIZE];
-+    int rptr, wptr, count;
-+} KBDQueue;
-+
-+
-+typedef struct KBDState {
-+    KBDQueue queue;
-+    uint8_t blank;
-+    uint16_t shift;
-+} KBDState;
-+KBDState *kbd_env;
-+
-+static void queue_code(void *opaque, int code);
-+
-+/* lots of magic numbers here */
-+static uint32_t kbd_read_byte(void *opaque, hwaddr addr)
++static void nextfb_draw_line(void *opaque, uint8_t *d, const uint8_t *s,
++                             int width, int pitch)
 +{
-+    switch (addr & 0x3) {
-+    case 0x0:   /* 0xe000 */
-+        return 0x80 | 0x20;
++    NeXTFbState *nfbstate = NEXTFB(opaque);
++    uint32_t pal[4] = { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
++    uint32_t *buf = (uint32_t *)d;
++    int i = 0;
 +
-+    case 0x1:   /* 0xe001 */
-+        return 0x80 | 0x40 | 0x20 | 0x10;
-+
-+    case 0x2:   /* 0xe002 */
-+        // return 0x40|0x10|0x2|0x1;
-+        /* returning 0x40 caused mach to hang */
-+        return 0x10 | 0x2 | 0x1;
-+
-+    default:
-+        DPRINTF("RB ADDR %x\n", addr);
-+    }
-+
-+    return 0;
-+}
-+
-+static uint32_t kbd_read_word(void *opaque, hwaddr addr)
-+{
-+    DPRINTF("RW ADDR %x\n", addr);
-+    return 0;
-+}
-+
-+/* even more magic numbers */
-+static uint32_t kbd_read_long(void *opaque, hwaddr addr)
-+{
-+    int key = 0;
-+    KBDState *s = (KBDState *)opaque;
-+    KBDQueue *q = &s->queue;
-+
-+    switch (addr & 0xf) {
-+    case 0x0:   /* 0xe000 */
-+        // DPRINTF("KB L Read: @ %X\n", pc);
-+        return 0xA0F09300;
-+
-+    case 0x8:   /* 0xe008 */
-+        /* get keycode from buffer */
-+        if (q->count > 0) {
-+            key = q->data[q->rptr];
-+            if (++q->rptr == KBD_QUEUE_SIZE) {
-+                q->rptr = 0;
-+            }
-+
-+            q->count--;
-+
-+            if (s->shift) {
-+                key |= s->shift;
-+            }
-+
-+            if (key & 0x80) {
-+                return 0;
-+            } else {
-+                return 0x10000000 | KD_VALID | key;
-+            }
-+        } else {
-+            return 0;
-+        }
-+
-+    default:
-+        DPRINTF("RL ADDR %x\n", addr);
-+        return 0;
++    for (i = 0; i < nfbstate->cols / 4; i++) {
++        int j = i * 4;
++        uint8_t src = s[i];
++        buf[j + 3] = pal[src & 0x3];
++        src >>= 2;
++        buf[j + 2] = pal[src & 0x3];
++        src >>= 2;
++        buf[j + 1] = pal[src & 0x3];
++        src >>= 2;
++        buf[j + 0] = pal[src & 0x3];
 +    }
 +}
 +
-+static void kbd_write_byte(void *opaque, hwaddr addr, uint32_t val)
++static void nextfb_update(void *opaque)
 +{
-+    DPRINTF("WB ADDR %x\n", addr);
-+}
-+static void kbd_write_word(void *opaque, hwaddr addr, uint32_t val)
-+{
-+    DPRINTF("WW ADDR %x\n", addr);
-+}
-+static void kbd_write_long(void *opaque, hwaddr addr, uint32_t val)
-+{
-+    DPRINTF("WL ADDR %x\n", addr);
-+}
++    NeXTFbState *s = NEXTFB(opaque);
++    int dest_width = 4;
++    int src_width;
++    int first = 0;
++    int last  = 0;
++    DisplaySurface *surface = qemu_console_surface(s->con);
 +
-+static uint64_t kbd_readfn(void *opaque, hwaddr addr, unsigned size)
-+{
-+    switch (size) {
-+    case 1:
-+        return kbd_read_byte(opaque, addr);
-+    case 2:
-+        return kbd_read_word(opaque, addr);
-+    case 4:
-+        return kbd_read_long(opaque, addr);
-+    default:
-+        g_assert_not_reached();
++    src_width = s->cols / 4 + 8;
++    dest_width = s->cols * 4;
++
++    if (s->invalidate) {
++        framebuffer_update_memory_section(&s->fbsection, &s->fb_mr, 0,
++                                          s->cols, src_width);
++        s->invalidate = 0;
 +    }
++
++    framebuffer_update_display(surface, &s->fbsection, 1120, 832,
++                               src_width, dest_width, 0, 1, nextfb_draw_line,
++                               s, &first, &last);
++
++    dpy_gfx_update(s->con, 0, 0, 1120, 832);
 +}
 +
-+static void kbd_writefn(void *opaque, hwaddr addr, uint64_t value,
-+                        unsigned size)
++static void nextfb_invalidate(void *opaque)
 +{
-+    switch (size) {
-+    case 1:
-+        kbd_write_byte(opaque, addr, value);
-+        break;
-+    case 2:
-+        kbd_write_word(opaque, addr, value);
-+        break;
-+    case 4:
-+        kbd_write_long(opaque, addr, value);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++    NeXTFbState *s = NEXTFB(opaque);
++    s->invalidate = 1;
 +}
 +
-+static const MemoryRegionOps kbd_ops = {
-+    .read = kbd_readfn,
-+    .write = kbd_writefn,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++static const GraphicHwOps nextfb_ops = {
++    .invalidate  = nextfb_invalidate,
++    .gfx_update  = nextfb_update,
 +};
 +
-+static void nextkbd_event(void *opaque, int ch)
++static void nextfb_realize(DeviceState *dev, Error **errp)
 +{
-+    /* Will want to set vars for caps/num lock */
-+    /* if (ch & 0x80) -> key release */
-+    /* there's also e0 escaped scancodes that might need to be handled */
-+    DPRINTF("EVENT %X\n", ch);
++    NeXTFbState *s = NEXTFB(dev);
 +
-+    queue_code(opaque, ch);
++    memory_region_allocate_system_memory(&s->fb_mr, NULL, "next.video",
++                                         0x1CB100);
++    memory_region_add_subregion(get_system_memory(), 0xB000000, &s->fb_mr);
++
++    s->invalidate = 1;
++    s->cols = 1120;
++    s->rows = 832;
++
++    s->con = graphic_console_init(dev, 0, &nextfb_ops, s);
++    qemu_console_resize(s->con, s->cols, s->rows);
 +}
 +
-+static const unsigned char next_keycodes[128] = {
-+    0x00, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x50, 0x4F,
-+    0x4E, 0x1E, 0x1F, 0x20, 0x1D, 0x1C, 0x1B, 0x00,
-+    0x42, 0x43, 0x44, 0x45, 0x48, 0x47, 0x46, 0x06,
-+    0x07, 0x08, 0x00, 0x00, 0x2A, 0x00, 0x39, 0x3A,
-+    0x3B, 0x3C, 0x3D, 0x40, 0x3F, 0x3E, 0x2D, 0x2C,
-+    0x2B, 0x26, 0x00, 0x00, 0x31, 0x32, 0x33, 0x34,
-+    0x35, 0x37, 0x36, 0x2e, 0x2f, 0x30, 0x00, 0x00,
-+    0x00, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
++static void nextfb_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    dc->realize = nextfb_realize;
++}
++
++static const TypeInfo nextfb_info = {
++    .name          = TYPE_NEXTFB,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(NeXTFbState),
++    .class_init    = nextfb_class_init,
 +};
 +
-+static void queue_code(void *opaque, int code)
++static void nextfb_register_types(void)
 +{
-+    KBDState *s = (KBDState *)opaque;
-+    KBDQueue *q = &s->queue;
-+    int key = code & 0x7F;
-+    int release = code & 0x80;
-+    static int ext;
-+
-+    if (code == 0xE0) {
-+        ext = 1;
-+    }
-+
-+    if (code == 0x2A || code == 0x1D || code == 0x36) {
-+        if (code == 0x2A) {
-+            s->shift = KD_LSHIFT;
-+        } else if (code == 0x36) {
-+            s->shift = KD_RSHIFT;
-+            ext = 0;
-+        } else if (code == 0x1D && !ext) {
-+            s->shift = KD_LCOMM;
-+        } else if (code == 0x1D && ext) {
-+            ext = 0;
-+            s->shift = KD_RCOMM;
-+        }
-+        return;
-+    } else if (code == (0x2A | 0x80) || code == (0x1D | 0x80) ||
-+               code == (0x36 | 0x80)) {
-+        s->shift = 0;
-+        return;
-+    }
-+
-+    if (q->count >= KBD_QUEUE_SIZE) {
-+        return;
-+    }
-+
-+    q->data[q->wptr] = next_keycodes[key] | release;
-+
-+    if (++q->wptr == KBD_QUEUE_SIZE) {
-+        q->wptr = 0;
-+    }
-+
-+    q->count++;
-+
-+    /*
-+     * might need to actually trigger the NeXT irq, but as the keyboard works
-+     * at the moment, I'll worry about it later
-+     */
-+    // s->update_irq(s->update_arg, 1);
-+
-+    s->blank += 1;
++    type_register_static(&nextfb_info);
 +}
 +
-+void nextkbd_init(void)
++type_init(nextfb_register_types)
++
++void nextfb_init(void)
 +{
-+    KBDState *s = g_new0(KBDState, 1);
-+    MemoryRegion *kbdmem = g_new(MemoryRegion, 1);
++    DeviceState *dev;
 +
-+    s->shift = 0;
-+
-+    memory_region_init_io(kbdmem, NULL, &kbd_ops, s, "next.kbd", 0x1000);
-+    memory_region_add_subregion(get_system_memory(), 0x200e000, kbdmem);
-+
-+    qemu_add_kbd_event_handler(nextkbd_event, s);
++    dev = qdev_create(NULL, TYPE_NEXTFB);
++    qdev_init_nofail(dev);
 +}
 diff --git a/include/hw/m68k/next-cube.h b/include/hw/m68k/next-cube.h
-index cf07243bda..88e94f6595 100644
---- a/include/hw/m68k/next-cube.h
+new file mode 100644
+index 0000000000..cf07243bda
+--- /dev/null
 +++ b/include/hw/m68k/next-cube.h
-@@ -5,4 +5,7 @@
- /* next-fb.c */
- void nextfb_init(void);
- 
-+/* next-kbd.c  */
-+void nextkbd_init(void);
+@@ -0,0 +1,8 @@
 +
- #endif /* NEXT_CUBE_H */
++#ifndef NEXT_CUBE_H
++#define NEXT_CUBE_H
++
++/* next-fb.c */
++void nextfb_init(void);
++
++#endif /* NEXT_CUBE_H */
 -- 
 2.17.1
