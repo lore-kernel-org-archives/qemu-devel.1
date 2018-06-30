@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZGUy-0000lw-Uh
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 10:05:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fZHyV-0002dZ-8J
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 11:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZGUy-0003Fr-9W
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 10:05:12 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:44419)
+	(envelope-from <peter.maydell@linaro.org>) id 1fZHyU-0006yJ-Ba
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 11:39:47 -0400
+Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:35258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fZGUy-0003EZ-4I
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 10:05:12 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id w13-v6so12887206ote.11
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 07:05:11 -0700 (PDT)
+	id 1fZHyU-0006wd-5Q
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 11:39:46 -0400
+Received: by mail-oi0-x229.google.com with SMTP id i12-v6so6671239oik.2
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 08:39:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180629175330.19391-1-stefanha@redhat.com>
-References: <20180629175330.19391-1-stefanha@redhat.com>
+In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
+References: <20180630061040.6018-1-pbonzini@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 30 Jun 2018 15:04:50 +0100
-Message-ID: <CAFEAcA96fEdTQrRvFoa6TZns4dZyOLXiHaNAo4SCQ2ZHvTqR+A@mail.gmail.com>
+Date: Sat, 30 Jun 2018 16:39:24 +0100
+Message-ID: <CAFEAcA8Fj+Ym5KdCr4iCUKy+znrhFRxNNCQDH15dHLPcg4hbOg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] Tracing patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/47] More misc patches for 3.0 soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 29 June 2018 at 18:53, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 609ef9f451759151d0bfe7c3843410ab94d68f18:
+On 30 June 2018 at 07:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 109b25045b3651f9c5d02c3766c0b3ff63e6d1=
+93:
 >
->   Merge remote-tracking branch 'remotes/berrange/tags/qio-next-pull-request' into staging (2018-06-28 17:53:31 +0100)
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-06-29 12:30:29 +0100)
 >
-> are available in the Git repository at:
+> are available in the git repository at:
 >
->   git://github.com/stefanha/qemu.git tags/tracing-pull-request
 >
-> for you to fetch changes up to 13019f1fd6c683b243120b7eb999f1b50a224940:
+>   git://github.com/bonzini/qemu.git tags/for-upstream
 >
->   hw/block/pflash_cfi: Convert from DPRINTF() macro to trace events (2018-06-29 15:04:18 +0100)
+> for you to fetch changes up to 633e23f138f04ce776feaef78042901af883eafe:
+>
+>   serial: Open non-block (2018-06-29 17:31:08 +0200)
 >
 > ----------------------------------------------------------------
-> Pull request
+> * IEC units series (Philippe)
+> * Hyper-V PV TLB flush (Vitaly)
+> * git archive detection (Daniel)
+> * host serial passthrough fix (David)
 >
->  * Python 3 support in simpletrace.py
->  * Convert DPRINTF() to trace events
 
-Applied, thanks.
+Compile failures I'm afraid:
 
+/root/qemu/tests/test-qemu-opts.c:707:66: error: use of undeclared
+identifier 'MiB'
+    g_assert_cmphex(qemu_opt_get_size(opts, "size3", 0), =3D=3D, 2 * MiB);
+                                                                 ^
+/root/qemu/tests/test-qemu-opts.c:711:62: error: use of undeclared
+identifier 'GiB'
+    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 0), =3D=3D, GiB / 10);
+                                                             ^
+/root/qemu/tests/test-qemu-opts.c:712:74: error: use of undeclared
+identifier 'TiB'
+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), =3D=3D, 16777215U =
+* TiB);
+                                                                         ^
+/home/petmay01/linaro/qemu-for-merges/tests/test-keyval.c: In function
+=E2=80=98test_keyval_visit_size=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/tests/test-keyval.c:460:43:
+error: =E2=80=98MiB=E2=80=99 undeclared (first use in this function)
+/home/petmay01/linaro/qemu-for-merges/tests/test-keyval.c:460:43:
+note: each undeclared identifier is reported only once for each
+function it appears in
+/home/petmay01/linaro/qemu-for-merges/tests/test-keyval.c:462:39:
+error: =E2=80=98GiB=E2=80=99 undeclared (first use in this function)
+/home/petmay01/linaro/qemu-for-merges/tests/test-keyval.c:464:50:
+error: =E2=80=98TiB=E2=80=99 undeclared (first use in this function)
+
+thanks
 -- PMM
