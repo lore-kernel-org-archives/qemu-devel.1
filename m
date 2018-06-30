@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ964-00045q-RO
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:01 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96E-0004JA-Vg
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ963-0001z4-Rq
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:00 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54800)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96A-00029T-R4
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:10 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:54090)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fZ963-0001xa-Ju
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:59 -0400
-Received: by mail-wm0-x243.google.com with SMTP id i139-v6so4085516wmf.4
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:10:59 -0700 (PDT)
+	id 1fZ96A-00028g-KO
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:06 -0400
+Received: by mail-wm0-x229.google.com with SMTP id b188-v6so4122420wme.3
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:06 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 30 Jun 2018 08:10:08 +0200
-Message-Id: <20180630061040.6018-16-pbonzini@redhat.com>
+Date: Sat, 30 Jun 2018 08:10:15 +0200
+Message-Id: <20180630061040.6018-23-pbonzini@redhat.com>
 In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
 References: <20180630061040.6018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/47] hw/block: Use the IEC binary prefix
+Subject: [Qemu-devel] [PULL 22/47] hw/hppa: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,80 +45,70 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180625124238.25339-14-f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20180625124238.25339-20-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/block/m25p80.c  | 5 +++--
- hw/block/nvme.c    | 3 ++-
- hw/block/tc58128.c | 3 ++-
- 3 files changed, 7 insertions(+), 4 deletions(-)
+ hw/hppa/dino.c    |  3 ++-
+ hw/hppa/machine.c | 10 +++++-----
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index b0ed8fa..e8dfa14 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -22,6 +22,7 @@
+diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+index 26f2704..564b938 100644
+--- a/hw/hppa/dino.c
++++ b/hw/hppa/dino.c
+@@ -11,6 +11,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
  #include "hw/hw.h"
- #include "sysemu/block-backend.h"
- #include "hw/ssi/ssi.h"
-@@ -541,12 +542,12 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
-     switch (cmd) {
-     case ERASE_4K:
-     case ERASE4_4K:
--        len = 4 << 10;
-+        len = 4 * KiB;
-         capa_to_assert = ER_4K;
-         break;
-     case ERASE_32K:
-     case ERASE4_32K:
--        len = 32 << 10;
-+        len = 32 * KiB;
-         capa_to_assert = ER_32K;
-         break;
-     case ERASE_SECTOR:
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index d5bf95b..65c84e7 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -25,6 +25,7 @@
-  */
+@@ -76,7 +77,7 @@
+ /* #define xxx    0x200 - bit 9 not used */
+ #define RS232INT  0x400
  
- #include "qemu/osdep.h"
+-#define DINO_MEM_CHUNK_SIZE (8 * 1024 * 1024) /* 8MB */
++#define DINO_MEM_CHUNK_SIZE (8 * MiB)
+ 
+ #define DINO_PCI_HOST_BRIDGE(obj) \
+     OBJECT_CHECK(DinoState, (obj), TYPE_DINO_PCI_HOST_BRIDGE)
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index 2ba2696..cf7c61c 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -17,7 +17,7 @@
+ #include "hw/timer/i8254.h"
+ #include "hw/char/serial.h"
+ #include "hppa_sys.h"
+-#include "qemu/cutils.h"
 +#include "qemu/units.h"
- #include "hw/block/block.h"
- #include "hw/hw.h"
- #include "hw/pci/msix.h"
-@@ -648,7 +649,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
+ #include "qapi/error.h"
+ #include "qemu/log.h"
  
- static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
- {
--    static const int data_len = 4096;
-+    static const int data_len = 4 * KiB;
-     uint32_t min_nsid = le32_to_cpu(c->nsid);
-     uint64_t prp1 = le64_to_cpu(c->prp1);
-     uint64_t prp2 = le64_to_cpu(c->prp2);
-diff --git a/hw/block/tc58128.c b/hw/block/tc58128.c
-index 1d9f7ee..808ad76 100644
---- a/hw/block/tc58128.c
-+++ b/hw/block/tc58128.c
-@@ -1,4 +1,5 @@
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "hw/hw.h"
- #include "hw/sh4/sh.h"
- #include "hw/loader.h"
-@@ -26,7 +27,7 @@ typedef struct {
+@@ -178,8 +178,8 @@ static void machine_hppa_init(MachineState *machine)
+         }
+         qemu_log_mask(CPU_LOG_PAGE, "Kernel loaded at 0x%08" PRIx64
+                       "-0x%08" PRIx64 ", entry at 0x%08" PRIx64
+-                      ", size %ld kB.\n",
+-                      kernel_low, kernel_high, kernel_entry, size / 1024);
++                      ", size %" PRIu64 " kB\n",
++                      kernel_low, kernel_high, kernel_entry, size / KiB);
  
- static tc58128_dev tc58128_devs[2];
+         if (kernel_cmdline) {
+             cpu[0]->env.gr[24] = 0x4000;
+@@ -203,8 +203,8 @@ static void machine_hppa_init(MachineState *machine)
+                (1) Due to sign-extension problems and PDC,
+                put the initrd no higher than 1G.
+                (2) Reserve 64k for stack.  */
+-            initrd_base = MIN(ram_size, 1024 * 1024 * 1024);
+-            initrd_base = initrd_base - 64 * 1024;
++            initrd_base = MIN(ram_size, 1 * GiB);
++            initrd_base = initrd_base - 64 * KiB;
+             initrd_base = (initrd_base - initrd_size) & TARGET_PAGE_MASK;
  
--#define FLASH_SIZE (16*1024*1024)
-+#define FLASH_SIZE (16 * MiB)
- 
- static void init_dev(tc58128_dev * dev, const char *filename)
- {
+             if (initrd_base < kernel_high) {
 -- 
 1.8.3.1
