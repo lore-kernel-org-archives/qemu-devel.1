@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fZ4xr-0007MI-G6
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 21:46:16 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fZ5Bg-0001pu-9F
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 22:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fZ4xo-0000C4-Dy
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 21:46:15 -0400
-Received: from [45.249.212.255] (port=55175 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1fZ4xn-0008QP-Vi
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 21:46:12 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Sat, 30 Jun 2018 01:45:29 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB03024F@dggeml511-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <zhangckid@gmail.com>) id 1fZ5Be-0007lp-NE
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 22:00:32 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:55508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fZ5Bd-0007k8-Sz
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 22:00:30 -0400
+Received: by mail-wm0-x234.google.com with SMTP id v16-v6so3832244wmv.5
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 19:00:29 -0700 (PDT)
 MIME-Version: 1.0
-Subject: [Qemu-devel] about live memory snapshot
+In-Reply-To: <20180629091438.GC2568@work-vm>
+References: <20180627204136.4177-1-zhangckid@gmail.com>
+	<20180627204136.4177-12-zhangckid@gmail.com>
+	<3464fd15-6b1c-b524-0445-58fb352c1b42@redhat.com>
+	<20180629091438.GC2568@work-vm>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Sat, 30 Jun 2018 10:00:27 +0800
+Message-ID: <CAK3tnvLF6Hqk6oLurcop7ngQkWLy5FHmJODwGH4sKYTjn2QfKA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V9 11/20] qapi/migration.json: Rename COLO
+ unknown mode to none mode.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "peterx@redhat.com" <peterx@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
 
-Hi Peter,
+On Fri, Jun 29, 2018 at 5:14 PM, Dr. David Alan Gilbert <dgilbert@redhat.com
+> wrote:
 
-As we discussed in LC3 China, the current scheme of "migration to file"=20
-can't fit on production environment, which will cause the snapshot file big=
-ger=20
-and bigger when the guest is under enough memory pressure. We can't
-assume what size the snapshot file is.
-=20
-Pls have a look if we have a simple method to resolve the problem. :)
+> * Eric Blake (eblake@redhat.com) wrote:
+> > On 06/27/2018 03:41 PM, Zhang Chen wrote:
+> > > From: Zhang Chen <chen.zhang@intel.com>
+> > >
+> > > Suggested by Markus Armbruster rename COLO unknown mode to none mode.
+> > >
+> > > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> > > ---
+> > >   migration/colo-failover.c |  2 +-
+> > >   migration/colo.c          |  2 +-
+> > >   qapi/migration.json       | 10 +++++-----
+> > >   3 files changed, 7 insertions(+), 7 deletions(-)
+> >
+> > >   # Since: 2.8
+> > >   ##
+> > >   { 'enum': 'COLOMode',
+> > > -  'data': [ 'unknown', 'primary', 'secondary'] }
+> > > +  'data': [ 'none', 'primary', 'secondary'] }
+> >
+> > The deletion of 'unknown' could potentially be a user-visible regression
+> > visible if COLOMode were in a QMP command; but thankfully the generated
+> > qapi/qapi-introspect.c does not seem to cover this enum, so it just
+> affects
+> > internal code for now.
+>
+> Note that the migration capability to enable colo is still x-colo;
+> so I take that to mean we've still got a free hand to change any part of
+> the COLO interface until we're happy it's right.
+>
+> Dave
+>
+>
+Thanks Eric and Dave.
 
-PS: the below link is zhanghailiang's scheme based on userfaultfd.
-
-https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg00664.html
+Zhang Chen
 
 
-Thanks,
--Gonglei
-=20
+
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> >
+> > --
+> > Eric Blake, Principal Software Engineer
+> > Red Hat, Inc.           +1-919-301-3266
+> > Virtualization:  qemu.org | libvirt.org
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
