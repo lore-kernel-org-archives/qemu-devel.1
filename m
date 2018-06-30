@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fZIiz-0008Tm-Og
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1fZIiz-0008Tk-N8
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fZIiw-0007YH-Vq
+	(envelope-from <armbru@redhat.com>) id 1fZIiy-0007Zz-8h
 	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44760 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32876 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fZIiw-0007XD-Pw
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fZIiy-0007ZJ-2I
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 64D754022414
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 16:27:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A63F3401EF15
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 16:27:47 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat, 30 Jun 2018 18:27:43 +0200
-Message-Id: <20180630162744.15920-5-armbru@redhat.com>
+Date: Sat, 30 Jun 2018 18:27:41 +0200
+Message-Id: <20180630162744.15920-3-armbru@redhat.com>
 In-Reply-To: <20180630162744.15920-1-armbru@redhat.com>
 References: <20180630162744.15920-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] tests: iotests: drop some stderr line
+Subject: [Qemu-devel] [PULL 2/5] monitor: rename *_pop_one to *_pop_any
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +34,86 @@ Cc: Peter Xu <peterx@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-In my Out-Of-Band test, "check -qcow2 060" fail with this:
+The old names are confusing since both of the old functions are popping
+an item from multiple queues rather than a single queue.  In that
+sense, *_pop_any() suites better than *_pop_one().
 
-  --- /home/peterx/git/qemu/tests/qemu-iotests/060.out
-  +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad
-  @@ -427,8 +427,8 @@
-  QMP_VERSION
-  {"return": {}}
-  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1
-  index: 0); further non-fatal corruption events will be suppressed
-  -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
-  0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-  read failed: Input/output error
-  +{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
-  0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-  {"return": ""}
-  {"return": {}}
-  {"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
-  "event": "SHUTDOWN", "data": {"guest": false}}
+Since at it, touch up the function monitor_qmp_response_pop_any() a bit
+to let the callers pass in a QMPResponse struct instead of returning a
+struct.  Change the return value to boolean to mark whether we have
+popped a valid response instead.
 
-The order of the event and the in/out error line is swapped.  I didn't
-dig up the reason, but AFAIU what we want to verify is the event rather
-than stderr.  Let's drop the stderr line directly for this test.
-
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180620073223.31964-5-peterx@redhat.com>
-[Commit message touched up]
+Message-Id: <20180620073223.31964-3-peterx@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/qemu-iotests/060     | 10 +++++++++-
- tests/qemu-iotests/060.out |  1 -
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ monitor.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 7bdf609f3f..74ad371885 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -33,6 +33,14 @@ _cleanup()
+diff --git a/monitor.c b/monitor.c
+index 7b473aad1f..2881345758 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -542,10 +542,10 @@ struct QMPResponse {
+ typedef struct QMPResponse QMPResponse;
+ 
+ /*
+- * Return one QMPResponse.  The response is only valid if
+- * response.data is not NULL.
++ * Pop a QMPResponse from any monitor's response queue into @response.
++ * Return false if all the queues are empty; else true.
+  */
+-static QMPResponse monitor_qmp_response_pop_one(void)
++static bool monitor_qmp_response_pop_any(QMPResponse *response)
+ {
+     Monitor *mon;
+     QObject *data = NULL;
+@@ -556,22 +556,20 @@ static QMPResponse monitor_qmp_response_pop_one(void)
+         data = g_queue_pop_head(mon->qmp.qmp_responses);
+         qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+         if (data) {
++            response->mon = mon;
++            response->data = data;
+             break;
+         }
+     }
+     qemu_mutex_unlock(&monitor_lock);
+-    return (QMPResponse) { .mon = mon, .data = data };
++    return data != NULL;
  }
- trap "_cleanup; exit \$status" 0 1 2 3 15
  
-+# Sometimes the error line might be dumped before/after an event
-+# randomly.  Mask it out for specific test that may trigger this
-+# uncertainty for current test for now.
-+_filter_io_error()
-+{
-+    sed '/Input\/output error/d'
-+}
-+
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-@@ -464,7 +472,7 @@ echo "{'execute': 'qmp_capabilities'}
-                         }}" \
-             -incoming exec:'cat /dev/null' \
-             2>&1 \
--    | _filter_qmp | _filter_qemu_io
-+    | _filter_qmp | _filter_qemu_io | _filter_io_error
+ static void monitor_qmp_bh_responder(void *opaque)
+ {
+     QMPResponse response;
  
- echo
- # Image should not have been marked corrupt
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index bff023d889..d67c6234a4 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -428,7 +428,6 @@ QMP_VERSION
- {"return": {}}
- qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
--read failed: Input/output error
- {"return": ""}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+-    while (true) {
+-        response = monitor_qmp_response_pop_one();
+-        if (!response.data) {
+-            break;
+-        }
++    while (monitor_qmp_response_pop_any(&response)) {
+         monitor_json_emitter_raw(response.mon, response.data);
+         qobject_unref(response.data);
+     }
+@@ -4199,7 +4197,7 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+  * when we process one request on a specific monitor, we put that
+  * monitor to the end of mon_list queue.
+  */
+-static QMPRequest *monitor_qmp_requests_pop_one(void)
++static QMPRequest *monitor_qmp_requests_pop_any(void)
+ {
+     QMPRequest *req_obj = NULL;
+     Monitor *mon;
+@@ -4231,7 +4229,7 @@ static QMPRequest *monitor_qmp_requests_pop_one(void)
+ 
+ static void monitor_qmp_bh_dispatcher(void *data)
+ {
+-    QMPRequest *req_obj = monitor_qmp_requests_pop_one();
++    QMPRequest *req_obj = monitor_qmp_requests_pop_any();
+ 
+     if (req_obj) {
+         trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
 -- 
 2.17.1
