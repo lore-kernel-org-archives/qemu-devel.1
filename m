@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ964-00045l-Ad
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:01 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ967-00048F-3X
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ95z-0001r0-BN
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:00 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:56114)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ966-00023H-3s
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:03 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:34816)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fZ95z-0001pL-4E
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:55 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id v16-v6so4105790wmv.5
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:10:55 -0700 (PDT)
+	id 1fZ965-00021z-T0
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:02 -0400
+Received: by mail-wm0-x233.google.com with SMTP id z137-v6so3958443wmc.0
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:01 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 30 Jun 2018 08:10:04 +0200
-Message-Id: <20180630061040.6018-12-pbonzini@redhat.com>
+Date: Sat, 30 Jun 2018 08:10:10 +0200
+Message-Id: <20180630061040.6018-18-pbonzini@redhat.com>
 In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
 References: <20180630061040.6018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/47] hw/scsi: Use the IEC binary prefix
+Subject: [Qemu-devel] [PULL 17/47] hw/misc: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,41 +45,54 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180625124238.25339-10-f4bug@amsat.org>
+Message-Id: <20180625124238.25339-16-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ hw/misc/auxbus.c | 3 ++-
+ hw/misc/edu.c    | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 55a34b3..32f3f96 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -29,6 +29,7 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
- #endif
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index b4cacd6..b8a8721 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -27,6 +27,7 @@
+  */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/scsi/scsi.h"
-@@ -44,13 +45,13 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
- #include <scsi/sg.h>
- #endif
+ #include "qemu/log.h"
+ #include "hw/misc/auxbus.h"
+ #include "hw/i2c/i2c.h"
+@@ -68,7 +69,7 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
  
--#define SCSI_WRITE_SAME_MAX         524288
--#define SCSI_DMA_BUF_SIZE           131072
-+#define SCSI_WRITE_SAME_MAX         (512 * KiB)
-+#define SCSI_DMA_BUF_SIZE           (128 * KiB)
- #define SCSI_MAX_INQUIRY_LEN        256
- #define SCSI_MAX_MODE_LEN           256
+     /* Memory related. */
+     bus->aux_io = g_malloc(sizeof(*bus->aux_io));
+-    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", (1 << 20));
++    memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", 1 * MiB);
+     address_space_init(&bus->aux_addr_space, bus->aux_io, "aux-io");
+     return bus;
+ }
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index 34eb05d..df26a4d 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -23,6 +23,7 @@
+  */
  
--#define DEFAULT_DISCARD_GRANULARITY 4096
--#define DEFAULT_MAX_UNMAP_SIZE      (1 << 30)   /* 1 GB */
-+#define DEFAULT_DISCARD_GRANULARITY (4 * KiB)
-+#define DEFAULT_MAX_UNMAP_SIZE      (1 * GiB)
- #define DEFAULT_MAX_IO_SIZE         INT_MAX     /* 2 GB - 1 block */
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msi.h"
+ #include "qemu/timer.h"
+@@ -357,7 +358,7 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+                        edu, QEMU_THREAD_JOINABLE);
  
- #define TYPE_SCSI_DISK_BASE         "scsi-disk-base"
+     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+-                    "edu-mmio", 1 << 20);
++                    "edu-mmio", 1 * MiB);
+     pci_register_bar(pdev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &edu->mmio);
+ }
+ 
 -- 
 1.8.3.1
