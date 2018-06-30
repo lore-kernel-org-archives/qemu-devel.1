@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZF4k-0002uV-I4
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 08:34:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fZFOO-0007As-4w
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 08:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZF4j-0000vy-KJ
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 08:34:02 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44358)
+	(envelope-from <peter.maydell@linaro.org>) id 1fZFON-0005b9-33
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 08:54:20 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34839)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fZF4j-0000vE-E9
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 08:34:01 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s198-v6so6960243oih.11
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 05:34:00 -0700 (PDT)
+	id 1fZFOM-0005aF-T9
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 08:54:19 -0400
+Received: by mail-ot0-x242.google.com with SMTP id j8-v6so10015887otl.2
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 05:54:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180629145347.652-1-peter.maydell@linaro.org>
-References: <20180629145347.652-1-peter.maydell@linaro.org>
+In-Reply-To: <20180629172215.29475-1-alistair.francis@wdc.com>
+References: <20180629172215.29475-1-alistair.francis@wdc.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 30 Jun 2018 13:33:39 +0100
-Message-ID: <CAFEAcA-3Aen5edk_9nT3+-L9GpZVQ5OJcN3uTy5CmsbbqSmQ8A@mail.gmail.com>
+Date: Sat, 30 Jun 2018 13:53:57 +0100
+Message-ID: <CAFEAcA8ceyqpyBg6RNoMQsuyvCbjiew2OJDyBVP80bO8L4Y_iQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/55] target-arm queue
+Subject: Re: [Qemu-devel] [PULL v2 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair.francis@wdc.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>
 
-On 29 June 2018 at 15:52, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Hopefully last target-arm queue before softfreeze;
-> this one's largest part is the remainder of the SVE patches,
-> but there are a selection of other minor things too.
+On 29 June 2018 at 18:22, Alistair Francis <alistair.francis@wdc.com> wrote:
+> The following changes since commit 75507f1aba6feb73ae43329922d51571550b9128:
 >
-> thanks
-> -- PMM
->
-> The following changes since commit 109b25045b3651f9c5d02c3766c0b3ff63e6d193:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-06-29 12:30:29 +0100)
+>   Merge remote-tracking branch 'remotes/berrange/tags/min-glib-pull-request' into staging (2018-06-29 15:04:20 +0100)
 >
 > are available in the Git repository at:
 >
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180629
+>   git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180629
 >
-> for you to fetch changes up to 802abf4024d23e48d45373ac3f2b580124b54b47:
+> for you to fetch changes up to e4847c96685e210649e6ec90fecd732a744dad75:
 >
->   target/arm: Add ID_ISAR6 (2018-06-29 15:30:54 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * last of the SVE patches; SVE is now enabled for aarch64 linux-user
->  * sd: Don't trace SDRequest crc field (coverity bugfix)
->  * target/arm: Mark PMINTENSET accesses as possibly doing IO
->  * clean up v7VE feature bit handling
->  * i.mx7d: minor cleanups
->  * target/arm: support reading of CNT[VCT|FRQ]_EL0 from user-space
->  * target/arm: Implement ARMv8.2-DotProd
->  * virt: add addresses to dt node names (which stops dtc from
->    complaining that they're not correctly named)
->  * cleanups: replace error_setg(&error_fatal) by error_report() + exit()
+>   hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device (2018-06-29 09:51:05 -0700)
 >
 > ----------------------------------------------------------------
+> RISC-V: SoCify SiFive boards and connect GEM
+>
+> This series has three tasks:
+>  1. To convert the SiFive U and E machines into SoCs and boards
+>  2. To connect the Cadence GEM device to the SiFive U board
+>  3. Fix some device tree problems with the SiFive U board
+>
+> After this series the SiFive E and U boards have their SoCs split into
+> seperate QEMU objects, which can be used on future boards if desired.
+>
+> The RISC-V Virt and Spike boards have not been converted. They haven't
+> been converted as they aren't physical boards, so it doesn't make a
+> whole lot of sense to split them into an SoC and board. The only
+> disadvantage with this is that they now differ to the SiFive boards.
+>
+> This series also connect the Cadence GEM device to the SiFive U board.
+> There are some interrupt line changes requried before this is possible.
 
-Applied, thanks.
+Hi; this fails to build I'm afraid:
 
+  LINK    riscv32-softmmu/qemu-system-riscv32
+../fsdev/qemu-fsdev.o:(.data.rel.ro+0x8): undefined reference to `local_ops'
+../fsdev/qemu-fsdev.o:(.data.rel.ro+0x18): undefined reference to `handle_ops'
+../fsdev/qemu-fsdev.o:(.data.rel.ro+0x28): undefined reference to `synth_ops'
+../fsdev/qemu-fsdev.o:(.data.rel.ro+0x38): undefined reference to `proxy_ops'
+
+I'm not sure exactly what's going on here but I suspect
+commit e4847c96685, which made the riscv default-config
+files stop including virtio.mak.
+
+I think the bit of code that defines these _ops structs and the
+bit of code that's using them aren't guarded by exactly the same
+set of CONFIG_* defines. That inconsistency is arguably a bug,
+but nobody notices it because you just use virtio.mak to get all
+the virtio defines.
+
+The definitions are guarded by "CONFIG_VIRTIO_9P || CONFIG_XEN"
+but the use by "CONFIG_VIRTFS && (CONFIG_VIRTIO || CONFIG_XEN)",
+so if you define CONFIG_VIRTIO without CONFIG_VIRTIO_9P you're
+going to run into this.
+
+The guard on the definitions was only added in commit b5dfdb082fc350f3,
+so you've had an unfortunate race with that pullreq I think.
+
+All that said, it looks to me like e4847c98 should not have been
+changing how the virtio configs are set -- the commit message
+doesn't say anything about it -- so the simplest thing is just to
+fix that up.
+
+thanks
 -- PMM
