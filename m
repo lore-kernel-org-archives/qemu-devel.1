@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fZ3Lm-0002F4-Rw
+	(envelope-from <richard.henderson@linaro.org>) id 1fZ3Lm-0002F5-Sr
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 20:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fZ3Lj-00077d-P6
+	(envelope-from <richard.henderson@linaro.org>) id 1fZ3Lm-0007CM-22
 	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 20:02:50 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:36269)
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:38980)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fZ3Lj-00076B-IE
-	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 20:02:47 -0400
-Received: by mail-pl0-x241.google.com with SMTP id a7-v6so5168726plp.3
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 17:02:47 -0700 (PDT)
+	id 1fZ3Ll-0007Az-TQ
+	for qemu-devel@nongnu.org; Fri, 29 Jun 2018 20:02:50 -0400
+Received: by mail-pl0-x242.google.com with SMTP id s24-v6so5168348plq.6
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 17:02:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 29 Jun 2018 17:02:40 -0700
-Message-Id: <20180630000242.29594-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] Fix qemu-system-aarch64 crash
+Date: Fri, 29 Jun 2018 17:02:42 -0700
+Message-Id: <20180630000242.29594-3-richard.henderson@linaro.org>
+In-Reply-To: <20180630000242.29594-1-richard.henderson@linaro.org>
+References: <20180630000242.29594-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/2] cpu: Assert asidx_from_attrs return value
+ in range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +30,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-The sequence of events was
-  (1) Kernel executed a disabled sve insn,
-  (2) Undefined Instruction trap went to EL3,
-  (3) Lookup of the exception handler saw el3 and returned asidx 1,
-  (4) Which hadn't been set up.
-
-So there's definitely a bug with SVE exception routing.
-That said...
-
-With just the first patch, the kernel goes into a silly exception loop
-which is understandable.  With just the second patch, qemu gets SIGABRT
-instead of SIGSEGV, which is definitely easier to debug.
-
-I think I'm in favor of both patches, but you might say we shouldn't
-have to have the first one and just apply the second.
-
-
-r~
-
-
-Richard Henderson (2):
-  target/arm: Always return ARMASIdx_NS when num_ases == 1
-  cpu: Assert asidx_from_attrs return value in range
-
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
  include/qom/cpu.h | 6 ++++--
- target/arm/cpu.h  | 2 +-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index cce2fd6acc..bd796579ee 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -620,11 +620,13 @@ static inline hwaddr cpu_get_phys_page_debug(CPUState *cpu, vaddr addr)
+ static inline int cpu_asidx_from_attrs(CPUState *cpu, MemTxAttrs attrs)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
++    int ret = 0;
+ 
+     if (cc->asidx_from_attrs) {
+-        return cc->asidx_from_attrs(cpu, attrs);
++        ret = cc->asidx_from_attrs(cpu, attrs);
++        assert(ret < cpu->num_ases && ret >= 0);
+     }
+-    return 0;
++    return ret;
+ }
+ #endif
+ 
 -- 
 2.17.1
