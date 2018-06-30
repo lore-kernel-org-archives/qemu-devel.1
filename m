@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ968-0004AS-3i
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ968-0004CR-VY
 	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ967-00024k-6j
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ968-000264-15
 	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:04 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:34554)
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34556)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fZ967-00023R-02
+	id 1fZ967-00024f-QH
 	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:03 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id l15-v6so3502415wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:02 -0700 (PDT)
+Received: by mail-wm0-x22d.google.com with SMTP id l15-v6so3502429wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:03 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 30 Jun 2018 08:10:11 +0200
-Message-Id: <20180630061040.6018-19-pbonzini@redhat.com>
+Date: Sat, 30 Jun 2018 08:10:12 +0200
+Message-Id: <20180630061040.6018-20-pbonzini@redhat.com>
 In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
 References: <20180630061040.6018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 18/47] hw/riscv: Use the IEC binary prefix
+Subject: [Qemu-devel] [PULL 19/47] hw/m68k: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,33 +45,33 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Michael Clark <mjc@sifive.com>
-Message-Id: <20180625124238.25339-17-f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@tuxfamily.org>
+Message-Id: <20180625124238.25339-18-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/riscv/virt.c | 3 ++-
+ hw/m68k/mcf5208.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index ad03113..34d4899 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -19,6 +19,7 @@
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index ae3dcc9..0f2245d 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -6,6 +6,7 @@
+  * This code is licensed under the GPL
   */
- 
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "qemu/log.h"
  #include "qemu/error-report.h"
  #include "qapi/error.h"
-@@ -84,7 +85,7 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
-      * halfway into RAM, and for boards with 256MB of RAM or more we put
-      * the initrd at 128MB.
-      */
--    *start = kernel_entry + MIN(mem_size / 2, 128 * 1024 * 1024);
-+    *start = kernel_entry + MIN(mem_size / 2, 128 * MiB);
+ #include "qemu-common.h"
+@@ -241,7 +242,7 @@ static void mcf5208evb_init(MachineState *machine)
+     memory_region_add_subregion(address_space_mem, 0x40000000, ram);
  
-     size = load_ramdisk(filename, *start, mem_size - *start);
-     if (size == -1) {
+     /* Internal SRAM.  */
+-    memory_region_init_ram(sram, NULL, "mcf5208.sram", 16384, &error_fatal);
++    memory_region_init_ram(sram, NULL, "mcf5208.sram", 16 * KiB, &error_fatal);
+     memory_region_add_subregion(address_space_mem, 0x80000000, sram);
+ 
+     /* Internal peripherals.  */
 -- 
 1.8.3.1
