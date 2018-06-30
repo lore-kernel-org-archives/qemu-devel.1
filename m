@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fZ98e-0006VU-Qi
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:13:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fZ9F2-0004LU-TC
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:20:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fZ98Z-00070M-RZ
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:13:40 -0400
-Received: from mout.web.de ([212.227.17.11]:38509)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1fZ98Z-0006yL-H4
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:13:35 -0400
-From: Jan Kiszka <jan.kiszka@web.de>
-References: <bfb309be-3ef4-bd01-b4f8-3ebdeaa64374@web.de>
-Message-ID: <6b6e45bf-362f-1305-6991-69749d5f02f9@web.de>
-Date: Sat, 30 Jun 2018 08:13:29 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fZ9Ey-0001uN-UK
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:20:16 -0400
+Date: Sat, 30 Jun 2018 16:14:43 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180630061443.GP3422@umbus.fritz.box>
+References: <20180618215601.8974-1-mail@sebastianbauer.info>
+	<20180618235557.GB25461@umbus.fritz.box>
+	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
+	<20180619043631.GC11674@umbus.fritz.box>
+	<607559ef0fd95f557b5001a5db29883f@sebastianbauer.info>
 MIME-Version: 1.0
-In-Reply-To: <bfb309be-3ef4-bd01-b4f8-3ebdeaa64374@web.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] e1000e: Prevent MSI/MSI-X storms
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="1LW0Rr0Uq98qh6Rv"
+Content-Disposition: inline
+In-Reply-To: <607559ef0fd95f557b5001a5db29883f@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, balaton@eik.bme.hu, qemu-ppc@nongnu.org
 
-On 2018-04-05 19:41, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
-> 
-> Only signal MSI/MSI-X events on rising edges. So far we re-triggered the
-> interrupt sources even if the guest did no consumed the pending one,
-> easily causing interrupt storms.
-> 
-> Issue was observable with Linux 4.16 e1000e driver when MSI-X was used.
-> Vector 2 was causing interrupt storms after the driver activated the
-> device.
-> 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> ---
-> 
-> Changes in v2:
->  - also update msi_causes_pending after EIAC changes (required because
->    there is no e1000e_update_interrupt_state after that
-> 
->  hw/net/e1000e_core.c | 11 +++++++++++
->  hw/net/e1000e_core.h |  2 ++
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index c93c4661ed..d6ddd59986 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -2027,6 +2027,7 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
->      }
->  
->      core->mac[ICR] &= ~effective_eiac;
-> +    core->msi_causes_pending &= ~effective_eiac;
->  
->      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->          core->mac[IMS] &= ~effective_eiac;
-> @@ -2123,6 +2124,13 @@ e1000e_send_msi(E1000ECore *core, bool msix)
->  {
->      uint32_t causes = core->mac[ICR] & core->mac[IMS] & ~E1000_ICR_ASSERTED;
->  
-> +    core->msi_causes_pending &= causes;
-> +    causes ^= core->msi_causes_pending;
-> +    if (causes == 0) {
-> +        return;
-> +    }
-> +    core->msi_causes_pending |= causes;
-> +
->      if (msix) {
->          e1000e_msix_notify(core, causes);
->      } else {
-> @@ -2160,6 +2168,9 @@ e1000e_update_interrupt_state(E1000ECore *core)
->      core->mac[ICS] = core->mac[ICR];
->  
->      interrupts_pending = (core->mac[IMS] & core->mac[ICR]) ? true : false;
-> +    if (!interrupts_pending) {
-> +        core->msi_causes_pending = 0;
-> +    }
->  
->      trace_e1000e_irq_pending_interrupts(core->mac[ICR] & core->mac[IMS],
->                                          core->mac[ICR], core->mac[IMS]);
-> diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
-> index 7d8ff41890..63a15510cc 100644
-> --- a/hw/net/e1000e_core.h
-> +++ b/hw/net/e1000e_core.h
-> @@ -109,6 +109,8 @@ struct E1000Core {
->      NICState *owner_nic;
->      PCIDevice *owner;
->      void (*owner_start_recv)(PCIDevice *d);
-> +
-> +    uint32_t msi_causes_pending;
->  };
->  
->  void
-> 
 
-Ping again, this one is still open.
+--1LW0Rr0Uq98qh6Rv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Jan
+On Fri, Jun 29, 2018 at 08:06:10PM +0200, Sebastian Bauer wrote:
+> Hi,
+>=20
+> Am 2018-06-19 06:36, schrieb David Gibson:
+> > Ok.  However, your patch doesn't apply against the ppc-for-3.0 tree.
+> > It looks like you've made it against a tree including some of BALATON
+> > Zoltan's proposed but not yet merged patches.
+> >=20
+> > Please make sure your patches are against the current ppc-for-3.0 tree
+> > before posting.
+>=20
+> The patch seems to apply now to ppc-for-3.0 without any problem as Zoltan=
+'s
+> changes have been integrated. Let me know if I shall resend the patch or =
+if
+> you can use the original one. Thanks.
+
+Resend please.  Assuming it would need a respin, I didn't keep it
+around.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--1LW0Rr0Uq98qh6Rv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls3H9EACgkQbDjKyiDZ
+s5LJ8g//YH1qK29hwnezBWRFMRYFm0jE9tj7C35et74NDJJZyr0zTpbDfPQP4Xcy
+uvhD4Dm/nM6uOR2ynsNTYXTvS759OR2Bmc/iyfrpZvxf0aUdXVY5si4lhbhQJuZV
+8almie9J6LNfidTvkeZPAlJWU3CVd0Yxa7Oh1PQYStYDdbawqjtEPPuqvjYvyLWV
+6iP+ii1M3YF6qMSj+LSEgMuLWzSnt5uBBMWLZWg0Kf56/cT+5cqIQKfOsPCxWpYh
+Na9o8Zb7FYIpKsybritHekI3XUkY855v1qPI5Lfl5jW5wqgdmHRjmVMWEXVngRNL
+vnC0Rx7OcgLf33VX/xWkR9u4EXJh3HhvOzs7c/7ub+8hsBoaZlyGuXLm2RDZhRn4
+mL3Oxr1UgLKstIoO+ppEdaKtbtbD2kNDzT0eotHI48dArj5/cFEL6MvxVR0/Zbmi
+/C//P2LzlIpKcKPn143Hbz4uKZ6h4NDtUBbQnWh5PoJ4iSkMMFnE3edQcqzxYnD3
+sW4QjSA96hhxtR82majzEncdClI4VnAGkhftsUYfpPVT6O87G1djhZncfwWCU+PM
+BH+xOk+sK9v6wVgT6D7RkklgBKZJ+4cTOT9NGiXeg6x8eDUaf641KpaN7vkcRK10
+svgyL04xV1WXpzuelfzCrn9cfJfBvNKk0ijUqCJ0Vse1SzJAOOA=
+=Hoza
+-----END PGP SIGNATURE-----
+
+--1LW0Rr0Uq98qh6Rv--
