@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96Q-0004VV-0k
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:23 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96Q-0004WN-Q9
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96O-0002iD-JP
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:21 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35934)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96P-0002lR-Jo
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:22 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35839)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fZ96O-0002gX-CX
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:20 -0400
-Received: by mail-wr0-x244.google.com with SMTP id f16-v6so10646309wrm.3
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:20 -0700 (PDT)
+	id 1fZ96P-0002ie-Ca
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:21 -0400
+Received: by mail-wm0-x231.google.com with SMTP id z137-v6so3958813wmc.0
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:21 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 30 Jun 2018 08:10:28 +0200
-Message-Id: <20180630061040.6018-36-pbonzini@redhat.com>
+Date: Sat, 30 Jun 2018 08:10:29 +0200
+Message-Id: <20180630061040.6018-37-pbonzini@redhat.com>
 In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
 References: <20180630061040.6018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 35/47] hw/net: Use the IEC binary prefix
+Subject: [Qemu-devel] [PULL 36/47] hw/usb: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,126 +45,111 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-Message-Id: <20180625124238.25339-35-f4bug@amsat.org>
+Message-Id: <20180625124238.25339-36-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/net/e1000e.c                 | 7 ++++---
- hw/net/e1000x_common.c          | 3 ++-
- hw/net/eepro100.c               | 3 +--
- hw/net/ne2000.h                 | 5 +++--
- include/hw/net/allwinner_emac.h | 5 +++--
- 5 files changed, 13 insertions(+), 10 deletions(-)
+ hw/usb/ccid-card-passthru.c   | 9 +++++----
+ hw/usb/combined-packet.c      | 3 ++-
+ hw/usb/dev-smartcard-reader.c | 3 ++-
+ hw/usb/redirect.c             | 3 ++-
+ 4 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index cda8d48..510ddb3 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -34,6 +34,7 @@
- */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "net/net.h"
- #include "net/tap.h"
- #include "qemu/range.h"
-@@ -81,10 +82,10 @@ typedef struct E1000EState {
- #define E1000E_IO_IDX       2
- #define E1000E_MSIX_IDX     3
- 
--#define E1000E_MMIO_SIZE    (128 * 1024)
--#define E1000E_FLASH_SIZE   (128 * 1024)
-+#define E1000E_MMIO_SIZE    (128 * KiB)
-+#define E1000E_FLASH_SIZE   (128 * KiB)
- #define E1000E_IO_SIZE      (32)
--#define E1000E_MSIX_SIZE    (16 * 1024)
-+#define E1000E_MSIX_SIZE    (16 * KiB)
- 
- #define E1000E_MSIX_TABLE   (0x0000)
- #define E1000E_MSIX_PBA     (0x2000)
-diff --git a/hw/net/e1000x_common.c b/hw/net/e1000x_common.c
-index eb0e097..0904780 100644
---- a/hw/net/e1000x_common.c
-+++ b/hw/net/e1000x_common.c
-@@ -23,6 +23,7 @@
- */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "net/net.h"
-@@ -111,7 +112,7 @@ bool e1000x_is_oversized(uint32_t *mac, size_t size)
-     static const int maximum_ethernet_vlan_size = 1522;
-     /* this is the size past which hardware will
-        drop packets when setting LPE=1 */
--    static const int maximum_ethernet_lpe_size = 16384;
-+    static const int maximum_ethernet_lpe_size = 16 * KiB;
- 
-     if ((size > maximum_ethernet_lpe_size ||
-         (size > maximum_ethernet_vlan_size
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index a07a632..e761daf 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -41,6 +41,7 @@
+diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+index 25fb19b..0a6c657 100644
+--- a/hw/usb/ccid-card-passthru.c
++++ b/hw/usb/ccid-card-passthru.c
+@@ -9,6 +9,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "net/net.h"
-@@ -60,8 +61,6 @@
-  * changed to pad short packets itself. */
- #define CONFIG_PAD_RECEIVED_FRAMES
+ #include <libcacard.h>
+ #include "chardev/char-fe.h"
+ #include "qemu/error-report.h"
+@@ -40,7 +41,7 @@ static const uint8_t DEFAULT_ATR[] = {
+  0x13, 0x08
+ };
  
--#define KiB 1024
--
- /* Debug EEPRO100 card. */
- #if 0
- # define DEBUG_EEPRO100
-diff --git a/hw/net/ne2000.h b/hw/net/ne2000.h
-index adb8021..2cd193e 100644
---- a/hw/net/ne2000.h
-+++ b/hw/net/ne2000.h
-@@ -1,11 +1,12 @@
- #ifndef HW_NE2000_H
- #define HW_NE2000_H
+-#define VSCARD_IN_SIZE 65536
++#define VSCARD_IN_SIZE      (64 * KiB)
  
+ /* maximum size of ATR - from 7816-3 */
+ #define MAX_ATR_SIZE        40
+@@ -275,9 +276,9 @@ static void ccid_card_vscard_read(void *opaque, const uint8_t *buf, int size)
+     VSCMsgHeader *hdr;
+ 
+     if (card->vscard_in_pos + size > VSCARD_IN_SIZE) {
+-        error_report(
+-            "no room for data: pos %d +  size %d > %d. dropping connection.",
+-            card->vscard_in_pos, size, VSCARD_IN_SIZE);
++        error_report("no room for data: pos %u +  size %d > %" PRId64 "."
++                     " dropping connection.",
++                     card->vscard_in_pos, size, VSCARD_IN_SIZE);
+         ccid_card_vscard_drop_connection(card);
+         return;
+     }
+diff --git a/hw/usb/combined-packet.c b/hw/usb/combined-packet.c
+index 48cac87..01a7ed0 100644
+--- a/hw/usb/combined-packet.c
++++ b/hw/usb/combined-packet.c
+@@ -20,6 +20,7 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "hw/hw.h"
- #include "net/net.h"
+ #include "qemu-common.h"
+ #include "hw/usb.h"
+ #include "qemu/iov.h"
+@@ -171,7 +172,7 @@ void usb_ep_combine_input_packets(USBEndpoint *ep)
+         if ((p->iov.size % ep->max_packet_size) != 0 || !p->short_not_ok ||
+                 next == NULL ||
+                 /* Work around for Linux usbfs bulk splitting + migration */
+-                (totalsize == 16348 && p->int_req)) {
++                (totalsize == (16 * KiB - 36) && p->int_req)) {
+             usb_device_handle_data(ep->dev, first);
+             assert(first->status == USB_RET_ASYNC);
+             if (first->combined) {
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
+index 13d0bef..8f716fc 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -35,6 +35,7 @@
+  */
  
--#define NE2000_PMEM_SIZE    (32*1024)
--#define NE2000_PMEM_START   (16*1024)
-+#define NE2000_PMEM_SIZE    (32 * KiB)
-+#define NE2000_PMEM_START   (16 * KiB)
- #define NE2000_PMEM_END     (NE2000_PMEM_SIZE+NE2000_PMEM_START)
- #define NE2000_MEM_SIZE     NE2000_PMEM_END
- 
-diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner_emac.h
-index 4cc8aab..905a43d 100644
---- a/include/hw/net/allwinner_emac.h
-+++ b/include/hw/net/allwinner_emac.h
-@@ -23,6 +23,7 @@
- #ifndef ALLWINNER_EMAC_H
- #define ALLWINNER_EMAC_H
- 
+ #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "net/net.h"
- #include "qemu/fifo8.h"
- #include "hw/net/mii.h"
-@@ -125,8 +126,8 @@
- #define EMAC_INT_RX         (1 << 8)
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+@@ -63,7 +64,7 @@ do { \
+  * or handle the migration complexity - VMState doesn't handle this case.
+  * sizes are expected never to be exceeded, unless guest misbehaves.
+  */
+-#define BULK_OUT_DATA_SIZE 65536
++#define BULK_OUT_DATA_SIZE  (64 * KiB)
+ #define PENDING_ANSWERS_NUM 128
  
- /* Due to lack of specifications, size of fifos is chosen arbitrarily */
--#define TX_FIFO_SIZE        (4 * 1024)
--#define RX_FIFO_SIZE        (32 * 1024)
-+#define TX_FIFO_SIZE        (4 * KiB)
-+#define RX_FIFO_SIZE        (32 * KiB)
+ #define BULK_IN_BUF_SIZE 384
+diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+index 58e8f7f..99094a7 100644
+--- a/hw/usb/redirect.c
++++ b/hw/usb/redirect.c
+@@ -26,6 +26,7 @@
+  */
  
- #define NUM_TX_FIFOS        2
- #define RX_HDR_SIZE         8
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+@@ -1298,7 +1299,7 @@ static int usbredir_chardev_can_read(void *opaque)
+     }
+ 
+     /* usbredir_parser_do_read will consume *all* data we give it */
+-    return 1024 * 1024;
++    return 1 * MiB;
+ }
+ 
+ static void usbredir_chardev_read(void *opaque, const uint8_t *buf, int size)
 -- 
 1.8.3.1
