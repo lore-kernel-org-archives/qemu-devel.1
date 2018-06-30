@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ95t-0003yJ-KS
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:51 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ95x-00040i-O9
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ95o-0001cU-Uy
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:49 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:55236)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ95w-0001lq-Ij
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:53 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:34561)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fZ95o-0001bV-Mo
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:44 -0400
-Received: by mail-wm0-x235.google.com with SMTP id i139-v6so4085130wmf.4
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:10:44 -0700 (PDT)
+	id 1fZ95w-0001kF-Ay
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:10:52 -0400
+Received: by mail-wm0-x233.google.com with SMTP id l15-v6so3502204wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:10:52 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 30 Jun 2018 08:09:54 +0200
-Message-Id: <20180630061040.6018-2-pbonzini@redhat.com>
+Date: Sat, 30 Jun 2018 08:10:01 +0200
+Message-Id: <20180630061040.6018-9-pbonzini@redhat.com>
 In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
 References: <20180630061040.6018-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/47] i386/kvm: add support for Hyper-V TLB
- flush
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 08/47] hw: Directly use "qemu/units.h" instead
+ of "qemu/cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +32,150 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Add support for Hyper-V TLB flush which recently got added to KVM.
+These files don't use anything exposed by "qemu/cutils.h",
+simplify preprocessing including directly "qemu/units.h".
 
-Just like regular Hyper-V we announce HV_EX_PROCESSOR_MASKS_RECOMMENDED
-regardless of how many vCPUs we have. Windows is 'smart' and uses less
-expensive non-EX Hypercall whenever possible (when it wants to flush TLB
-for all vCPUs or the maximum vCPU index in the vCPU set requires flushing
-is less than 64).
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20180610184927.19309-1-vkuznets@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au> (ppc parts)
+Message-Id: <20180625124238.25339-7-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c          |  1 +
- target/i386/cpu.h          |  1 +
- target/i386/hyperv-proto.h |  1 +
- target/i386/kvm.c          | 15 ++++++++++++++-
- 4 files changed, 17 insertions(+), 1 deletion(-)
+ hw/arm/msf2-soc.c  | 2 +-
+ hw/arm/msf2-som.c  | 2 +-
+ hw/core/machine.c  | 2 +-
+ hw/display/sm501.c | 2 +-
+ hw/mips/boston.c   | 2 +-
+ hw/ppc/pnv.c       | 2 +-
+ hw/ppc/ppc440_uc.c | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 1e6a7d0..d57f310 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5415,6 +5415,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
-     DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
-     DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
-+    DEFINE_PROP_BOOL("hv-tlbflush", X86CPU, hyperv_tlbflush, false),
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
-     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8eaefee..8b1ddfe 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1367,6 +1367,7 @@ struct X86CPU {
-     bool hyperv_stimer;
-     bool hyperv_frequencies;
-     bool hyperv_reenlightenment;
-+    bool hyperv_tlbflush;
-     bool check_cpuid;
-     bool enforce_cpuid;
-     bool expose_kvm;
-diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-index 93352eb..d6d5a79 100644
---- a/target/i386/hyperv-proto.h
-+++ b/target/i386/hyperv-proto.h
-@@ -58,6 +58,7 @@
- #define HV_APIC_ACCESS_RECOMMENDED          (1u << 3)
- #define HV_SYSTEM_RESET_RECOMMENDED         (1u << 4)
- #define HV_RELAXED_TIMING_RECOMMENDED       (1u << 5)
-+#define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index 530e461..edb3ba8 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -23,13 +23,13 @@
+  */
  
- /*
-  * Basic virtualized MSRs
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 032f0ad..ebb2d23 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -601,7 +601,8 @@ static bool hyperv_enabled(X86CPU *cpu)
-             cpu->hyperv_runtime ||
-             cpu->hyperv_synic ||
-             cpu->hyperv_stimer ||
--            cpu->hyperv_reenlightenment);
-+            cpu->hyperv_reenlightenment ||
-+            cpu->hyperv_tlbflush);
- }
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "hw/arm/arm.h"
+ #include "exec/address-spaces.h"
+ #include "hw/char/serial.h"
+ #include "hw/boards.h"
+-#include "qemu/cutils.h"
+ #include "hw/arm/msf2-soc.h"
+ #include "hw/misc/unimp.h"
  
- static int kvm_arch_set_tsc_khz(CPUState *cs)
-@@ -839,6 +840,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         if (cpu->hyperv_vapic) {
-             c->eax |= HV_APIC_ACCESS_RECOMMENDED;
-         }
-+        if (cpu->hyperv_tlbflush) {
-+            if (kvm_check_extension(cs->kvm_state,
-+                                    KVM_CAP_HYPERV_TLBFLUSH) <= 0) {
-+                fprintf(stderr, "Hyper-V TLB flush support "
-+                        "(requested by 'hv-tlbflush' cpu flag) "
-+                        " is not supported by kernel\n");
-+                return -ENOSYS;
-+            }
-+            c->eax |= HV_REMOTE_TLB_FLUSH_RECOMMENDED;
-+            c->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
-+        }
-+
-         c->ebx = cpu->hyperv_spinlock_attempts;
+diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+index ed533bb..2432b5e 100644
+--- a/hw/arm/msf2-som.c
++++ b/hw/arm/msf2-som.c
+@@ -23,12 +23,12 @@
+  */
  
-         c = &cpuid_data.entries[cpuid_i++];
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/boards.h"
+ #include "hw/arm/arm.h"
+ #include "exec/address-spaces.h"
+-#include "qemu/cutils.h"
+ #include "hw/arm/msf2-soc.h"
+ #include "cpu.h"
+ 
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index ccf3a4b..2077328 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "hw/boards.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-visit-common.h"
+@@ -19,7 +20,6 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
+ #include "qemu/error-report.h"
+-#include "qemu/cutils.h"
+ #include "sysemu/qtest.h"
+ 
+ static char *machine_get_accel(Object *obj, Error **errp)
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 3bd8716..9dec0d3 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -24,7 +24,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu/cutils.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index 939cef5..6c9c20a 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qemu-common.h"
+ 
+ #include "exec/address-spaces.h"
+@@ -32,7 +33,6 @@
+ #include "hw/mips/cpudevs.h"
+ #include "hw/pci-host/xilinx-pcie.h"
+ #include "qapi/error.h"
+-#include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "chardev/char.h"
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 5fdac62..346f5e7 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
+@@ -31,7 +32,6 @@
+ #include "hw/ppc/pnv_core.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
+-#include "qemu/cutils.h"
+ #include "qapi/visitor.h"
+ #include "monitor/monitor.h"
+ #include "hw/intc/intc.h"
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index b5b31b4..1ab2235 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -9,8 +9,8 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qemu-common.h"
+-#include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
 -- 
 1.8.3.1
