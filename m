@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fZL1u-0006gl-Tz
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 14:55:31 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fZLQ4-0004dC-3q
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 15:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fZL1u-000466-4Q
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 14:55:30 -0400
-Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:40544)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fZL1t-00044K-E3
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 14:55:29 -0400
-Received: by mail-yb0-x241.google.com with SMTP id y11-v6so245701ybm.7
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 11:55:29 -0700 (PDT)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fZLQ3-0003SA-9Q
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 15:20:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180622135823.32421-1-peter.maydell@linaro.org>
-References: <20180622135823.32421-1-peter.maydell@linaro.org>
+In-Reply-To: <20180620130619.11362-2-peter.maydell@linaro.org>
+References: <20180620130619.11362-1-peter.maydell@linaro.org>
+	<20180620130619.11362-2-peter.maydell@linaro.org>
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sat, 30 Jun 2018 11:55:28 -0700
-Message-ID: <CAMo8BfLsASNPVKix0U2sP55omcbcVUQJen4kpcoLjH=86PdPgA@mail.gmail.com>
+Date: Sat, 30 Jun 2018 12:20:24 -0700
+Message-ID: <CAMo8BfLRr16q4_nj0vacK4N4fb0EBymXZB6SHon72h7BJ9M5jw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH] xtensa: Avoid calling
- get_page_addr_code() from helper function
+Subject: Re: [Qemu-devel] [PATCH 1/3] tcg: Support MMU protection regions
+ smaller than TARGET_PAGE_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +24,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Patch Tracking <patches@linaro.org>
 
-On Fri, Jun 22, 2018 at 6:58 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The xtensa frontend calls get_page_addr_code() from its
-> itlb_hit_test helper function. This function is really part
-> of the TCG core's internals, and calling it from a target
-> helper makes it awkward to make changes to that core code.
-> It also means that we don't pass the correct retaddr to
-> tlb_fill(), so we won't correctly handle the case where
-> an exception is generated.
+Hi Peter,
+
+On Wed, Jun 20, 2018 at 6:06 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Add support for MMU protection regions that are smaller than
+> TARGET_PAGE_SIZE. We do this by marking the TLB entry for those
+> pages with a flag TLB_RECHECK. This flag causes us to always
+> take the slow-path for accesses. In the slow path we can then
+> special case them to always call tlb_fill() again, so we have
+> the correct information for the exact address being accessed.
 >
-> The helper is used for the instructions IHI, IHU and IPFL.
->
-> Change it to call cpu_ldb_code_ra() instead.
+> This change allows us to handle reading and writing from small
+> regions; we cannot deal with execution from the small region.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> This retains the current behaviour that all these insns
-> may cause exceptions both for MMU permissions checks
-> failures and also for "resulting physaddr doesn't point
-> at memory".
->
-> My reading of the ISA manual is that this isn't strictly
-> correct for IHI and IHU, which ought to only cause MMU
-> exceptions but not actually do a memory access. If we
-> wanted to fix that, the right thing would be to split
-> them into their own helper function, which could then
-> just do a tlb_fill().
->
-> Tagged as RFC because I don't have any xtensa test images.
->
-> My motivation here is that at some point I'd like us to
-> support execution from arbitrary MMIO/small MPU regions/etc,
-> for which purpose get_page_addr_code() will change to return
-> -1 to mean "this isn't RAM, load a single insn into a
-> throwaway TB and execute it"...
+>  accel/tcg/softmmu_template.h |  24 ++++---
+>  include/exec/cpu-all.h       |   5 +-
+>  accel/tcg/cputlb.c           | 131 +++++++++++++++++++++++++++++------
+>  3 files changed, 130 insertions(+), 30 deletions(-)
 
-I'm taking this patch, thank you. This test is not worse than
-what is done for the data cache. And if it causes problem it'd
-be easy to spot, because an exception code for accessing
-nonexistent physical memory is very unusual.
+I'm observing the following failure with xtensa tests:
+
+(qemu) qemu: fatal: Unable to handle guest executing from RAM within a
+small MPU region at 0xd0000804
+
+Bisection points to this patch. Any idea what happened?
 
 -- 
 Thanks.
