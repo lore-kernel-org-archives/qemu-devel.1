@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fZIiz-0008To-PM
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1fZIiz-0008Tm-Og
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fZIiy-0007aA-A4
+	(envelope-from <armbru@redhat.com>) id 1fZIiw-0007YH-Vq
 	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39146 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44760 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fZIiy-0007ZW-4T
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fZIiw-0007XD-Pw
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 12:27:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFFA17B4A7
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 16:27:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 64D754022414
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 16:27:46 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat, 30 Jun 2018 18:27:42 +0200
-Message-Id: <20180630162744.15920-4-armbru@redhat.com>
+Date: Sat, 30 Jun 2018 18:27:43 +0200
+Message-Id: <20180630162744.15920-5-armbru@redhat.com>
 In-Reply-To: <20180630162744.15920-1-armbru@redhat.com>
 References: <20180630162744.15920-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 3/5] monitor: flush qmp responses when CLOSED
+Subject: [Qemu-devel] [PULL 4/5] tests: iotests: drop some stderr line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,143 +34,77 @@ Cc: Peter Xu <peterx@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-Previously we clean up the queues when we got CLOSED event.  It was used
-to make sure we won't send leftover replies/events of a old client to a
-new client which makes perfect sense. However this will also drop the
-replies/events even if the output port of the previous chardev backend
-is still open, which can lead to missing of the last replies/events.
-Now this patch does an extra operation to flush the response queue
-before cleaning up.
+In my Out-Of-Band test, "check -qcow2 060" fail with this:
 
-In most cases, a QMP session will be based on a bidirectional channel (a
-TCP port, for example, we read/write to the same socket handle), so in
-port and out port of the backend chardev are fundamentally the same
-port. In these cases, it does not really matter much on whether we'll
-flush the response queue since flushing will fail anyway.  However there
-can be cases where in & out ports of the QMP monitor's backend chardev
-are separated.  Here is an example:
-
-  cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
-
-In this case, the backend is fd-typed, and it is connected to stdio
-where in port is stdin and out port is stdout.  Now if we drop all the
-events on the response queue then filter_command process might miss some
-events that it might expect.  The thing is that, when stdin closes,
-stdout might still be there alive!
-
-In practice, I encountered SHUTDOWN event missing when running test with
-iotest 087 with Out-Of-Band enabled.  Here is one of the ways that this
-can happen (after "quit" command is executed and QEMU quits the main
-loop):
-
-1. [main thread] QEMU queues a SHUTDOWN event into response queue.
-
-2. "cat" terminates (to distinguish it from the animal, I quote it).
-
-3. [monitor iothread] QEMU's monitor iothread reads EOF from stdin.
-
-4. [monitor iothread] QEMU's monitor iothread calls the CLOSED event
-   hook for the monitor, which will destroy the response queue of the
-   monitor, then the SHUTDOWN event is dropped.
-
-5. [main thread] QEMU's main thread cleans up the monitors in
-   monitor_cleanup().  When trying to flush pending responses, it sees
-   nothing.  SHUTDOWN is lost forever.
-
-Note that before the monitor iothread was introduced, step [4]/[5] could
-never happen since the main loop was the only place to detect the EOF
-event of stdin and run the CLOSED event hooks.  Now things can happen in
-parallel in the iothread.
-
-Without this patch, iotest 087 will have ~10% chance to miss the
-SHUTDOWN event and fail when with Out-Of-Band enabled:
-
-  --- /home/peterx/git/qemu/tests/qemu-iotests/087.out
-  +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad
-  @@ -8,7 +8,6 @@
+  --- /home/peterx/git/qemu/tests/qemu-iotests/060.out
+  +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad
+  @@ -427,8 +427,8 @@
+  QMP_VERSION
   {"return": {}}
-  {"error": {"class": "GenericError", "desc": "'node-name' must be
-  specified for the root node"}}
+  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1
+  index: 0); further non-fatal corruption events will be suppressed
+  -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
+  0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+  read failed: Input/output error
+  +{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
+  0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+  {"return": ""}
   {"return": {}}
-  -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+  {"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
+  "event": "SHUTDOWN", "data": {"guest": false}}
 
-  === Duplicate ID ===
-  @@ -53,7 +52,6 @@
-  {"return": {}}
-  {"return": {}}
-  {"return": {}}
+The order of the event and the in/out error line is swapped.  I didn't
+dig up the reason, but AFAIU what we want to verify is the event rather
+than stderr.  Let's drop the stderr line directly for this test.
 
-  -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-
-This patch fixes the problem.
-
-Fixes: 6d2d563f8c ("qmp: cleanup qmp queues properly", 2018-03-27)
-Suggested-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180620073223.31964-4-peterx@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Commit message and a comment touched up]
+Message-Id: <20180620073223.31964-5-peterx@redhat.com>
+[Commit message touched up]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/060     | 10 +++++++++-
+ tests/qemu-iotests/060.out |  1 -
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 2881345758..567668a0e7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -541,6 +541,27 @@ struct QMPResponse {
- };
- typedef struct QMPResponse QMPResponse;
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 7bdf609f3f..74ad371885 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -33,6 +33,14 @@ _cleanup()
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-+static QObject *monitor_qmp_response_pop_one(Monitor *mon)
++# Sometimes the error line might be dumped before/after an event
++# randomly.  Mask it out for specific test that may trigger this
++# uncertainty for current test for now.
++_filter_io_error()
 +{
-+    QObject *data;
-+
-+    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-+    data = g_queue_pop_head(mon->qmp.qmp_responses);
-+    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+
-+    return data;
++    sed '/Input\/output error/d'
 +}
 +
-+static void monitor_qmp_response_flush(Monitor *mon)
-+{
-+    QObject *data;
-+
-+    while ((data = monitor_qmp_response_pop_one(mon))) {
-+        monitor_json_emitter_raw(mon, data);
-+        qobject_unref(data);
-+    }
-+}
-+
- /*
-  * Pop a QMPResponse from any monitor's response queue into @response.
-  * Return false if all the queues are empty; else true.
-@@ -552,9 +573,7 @@ static bool monitor_qmp_response_pop_any(QMPResponse *response)
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+@@ -464,7 +472,7 @@ echo "{'execute': 'qmp_capabilities'}
+                         }}" \
+             -incoming exec:'cat /dev/null' \
+             2>&1 \
+-    | _filter_qmp | _filter_qemu_io
++    | _filter_qmp | _filter_qemu_io | _filter_io_error
  
-     qemu_mutex_lock(&monitor_lock);
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
--        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
--        data = g_queue_pop_head(mon->qmp.qmp_responses);
--        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-+        data = monitor_qmp_response_pop_one(mon);
-         if (data) {
-             response->mon = mon;
-             response->data = data;
-@@ -4456,6 +4475,13 @@ static void monitor_qmp_event(void *opaque, int event)
-         mon_refcount++;
-         break;
-     case CHR_EVENT_CLOSED:
-+        /*
-+         * Note: this is only useful when the output of the chardev
-+         * backend is still open.  For example, when the backend is
-+         * stdio, it's possible that stdout is still open when stdin
-+         * is closed.
-+         */
-+        monitor_qmp_response_flush(mon);
-         monitor_qmp_cleanup_queues(mon);
-         json_message_parser_destroy(&mon->qmp.parser);
-         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+ echo
+ # Image should not have been marked corrupt
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index bff023d889..d67c6234a4 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -428,7 +428,6 @@ QMP_VERSION
+ {"return": {}}
+ qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+-read failed: Input/output error
+ {"return": ""}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 -- 
 2.17.1
