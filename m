@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZ9F2-0004LU-TC
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:20:17 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fZBKd-0003XM-1u
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZ9Ey-0001uN-UK
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:20:16 -0400
-Date: Sat, 30 Jun 2018 16:14:43 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180630061443.GP3422@umbus.fritz.box>
-References: <20180618215601.8974-1-mail@sebastianbauer.info>
-	<20180618235557.GB25461@umbus.fritz.box>
-	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
-	<20180619043631.GC11674@umbus.fritz.box>
-	<607559ef0fd95f557b5001a5db29883f@sebastianbauer.info>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1LW0Rr0Uq98qh6Rv"
-Content-Disposition: inline
-In-Reply-To: <607559ef0fd95f557b5001a5db29883f@sebastianbauer.info>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Include vga cirrus card into the
- compiling process
+	(envelope-from <th.huth@gmail.com>) id 1fZBKZ-0001K8-Uk
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:11 -0400
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:47090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fZBKZ-0001Iy-OS
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 04:34:07 -0400
+Received: by mail-wr0-f193.google.com with SMTP id s11-v6so1614619wra.13
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 01:34:07 -0700 (PDT)
+From: Thomas Huth <huth@tuxfamily.org>
+Date: Sat, 30 Jun 2018 10:33:53 +0200
+Message-Id: <20180630083357.23489-1-huth@tuxfamily.org>
+Subject: [Qemu-devel] [PATCH v1 0/4] m68k: Add basic support for the
+ NeXTcube machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sebastian Bauer <mail@sebastianbauer.info>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, balaton@eik.bme.hu, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Bryce Lanham <blanham@gmail.com>, Natalia Portillo <claunia@claunia.com>
 
+During Google Summer of Code 2011, Bryce Lanham added the possibility to
+emulate the NeXTcube machine in QEMU, e.g. see this URL for some details:
 
---1LW0Rr0Uq98qh6Rv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+https://wiki.qemu.org/Google_Summer_of_Code_2011#NeXT_machines_system_emulation
 
-On Fri, Jun 29, 2018 at 08:06:10PM +0200, Sebastian Bauer wrote:
-> Hi,
->=20
-> Am 2018-06-19 06:36, schrieb David Gibson:
-> > Ok.  However, your patch doesn't apply against the ppc-for-3.0 tree.
-> > It looks like you've made it against a tree including some of BALATON
-> > Zoltan's proposed but not yet merged patches.
-> >=20
-> > Please make sure your patches are against the current ppc-for-3.0 tree
-> > before posting.
->=20
-> The patch seems to apply now to ppc-for-3.0 without any problem as Zoltan=
-'s
-> changes have been integrated. Let me know if I shall resend the patch or =
-if
-> you can use the original one. Thanks.
+But since the machine requires a 68040 CPU and this was not included in
+upstream QEMU in 2011 yet, the patches have never been merged to upstream.
+Now in 2018, Laurent completed the full 680x0 support in upstream QEMU, so
+we could finally merge the NeXTcube support, too.
 
-Resend please.  Assuming it would need a respin, I didn't keep it
-around.
+The QEMU interfaces changed a lot since 2011, so I had to modify the
+sources quite a bit, but with the attached patches, it is now possible
+to boot up to the firmware monitor again.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Note that boot device emulation is either still missing (network), or
+not working correctly yet (SCSI), so you can not boot any operating
+systems with this machine yet.
 
---1LW0Rr0Uq98qh6Rv
-Content-Type: application/pgp-signature; name="signature.asc"
+Please ignore the checkpatch warnings about C99 "//" comments. There
+are many of those in the sources, used to comment out alternative code
+lines. I did not want to remove those yet, since some of them could
+still be helpful while improving the machine emulation in the future.
 
------BEGIN PGP SIGNATURE-----
+Thomas Huth (4):
+  m68k: Add NeXTcube framebuffer device emulation
+  m68k: Add NeXTcube keyboard device
+  m68k: Add NeXTcube machine
+  m68k: Add an entry for the NeXTcube machine to the MAINTAINERS file
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls3H9EACgkQbDjKyiDZ
-s5LJ8g//YH1qK29hwnezBWRFMRYFm0jE9tj7C35et74NDJJZyr0zTpbDfPQP4Xcy
-uvhD4Dm/nM6uOR2ynsNTYXTvS759OR2Bmc/iyfrpZvxf0aUdXVY5si4lhbhQJuZV
-8almie9J6LNfidTvkeZPAlJWU3CVd0Yxa7Oh1PQYStYDdbawqjtEPPuqvjYvyLWV
-6iP+ii1M3YF6qMSj+LSEgMuLWzSnt5uBBMWLZWg0Kf56/cT+5cqIQKfOsPCxWpYh
-Na9o8Zb7FYIpKsybritHekI3XUkY855v1qPI5Lfl5jW5wqgdmHRjmVMWEXVngRNL
-vnC0Rx7OcgLf33VX/xWkR9u4EXJh3HhvOzs7c/7ub+8hsBoaZlyGuXLm2RDZhRn4
-mL3Oxr1UgLKstIoO+ppEdaKtbtbD2kNDzT0eotHI48dArj5/cFEL6MvxVR0/Zbmi
-/C//P2LzlIpKcKPn143Hbz4uKZ6h4NDtUBbQnWh5PoJ4iSkMMFnE3edQcqzxYnD3
-sW4QjSA96hhxtR82majzEncdClI4VnAGkhftsUYfpPVT6O87G1djhZncfwWCU+PM
-BH+xOk+sK9v6wVgT6D7RkklgBKZJ+4cTOT9NGiXeg6x8eDUaf641KpaN7vkcRK10
-svgyL04xV1WXpzuelfzCrn9cfJfBvNKk0ijUqCJ0Vse1SzJAOOA=
-=Hoza
------END PGP SIGNATURE-----
+ MAINTAINERS                      |    7 +
+ default-configs/m68k-softmmu.mak |    4 +
+ hw/display/Makefile.objs         |    1 +
+ hw/display/next-fb.c             |  152 ++++
+ hw/m68k/Makefile.objs            |    5 +-
+ hw/m68k/next-cube.c              | 1103 ++++++++++++++++++++++++++++++
+ hw/m68k/next-kbd.c               |  289 ++++++++
+ include/hw/m68k/next-cube.h      |   49 ++
+ 8 files changed, 1608 insertions(+), 2 deletions(-)
+ create mode 100644 hw/display/next-fb.c
+ create mode 100644 hw/m68k/next-cube.c
+ create mode 100644 hw/m68k/next-kbd.c
+ create mode 100644 include/hw/m68k/next-cube.h
 
---1LW0Rr0Uq98qh6Rv--
+-- 
+2.17.1
