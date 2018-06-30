@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fZMBz-0001aH-Tt
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 16:10:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fZMCR-0001uR-LU
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 16:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fZMBw-0001ei-NO
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 16:09:59 -0400
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:38952)
+	(envelope-from <peter.maydell@linaro.org>) id 1fZMCN-0002Qk-W2
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 16:10:24 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:42442)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fZMBw-0001cl-G3
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 16:09:56 -0400
-Received: by mail-wm0-f66.google.com with SMTP id p11-v6so5074426wmc.4
-	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 13:09:56 -0700 (PDT)
-Date: Sat, 30 Jun 2018 22:09:52 +0200
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <20180630220952.60cd6d26@thl530.multi.box>
-In-Reply-To: <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
-References: <20180630083357.23489-1-huth@tuxfamily.org>
-	<bb109e75-6c00-45b2-bb17-7d09ff3a8112@ilande.co.uk>
-	<20180630151444.2f0b30cb@thl530.multi.box>
-	<CAFEAcA_wo8t2CTRj4oizRPUbG7fa0MgdACpAnLvR53Pp+piLjQ@mail.gmail.com>
-	<20180630153422.03f0146f@thl530.multi.box>
-	<CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fZMCN-0002PK-R8
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 16:10:23 -0400
+Received: by mail-oi0-x241.google.com with SMTP id n84-v6so11433325oib.9
+	for <qemu-devel@nongnu.org>; Sat, 30 Jun 2018 13:10:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 0/4] m68k: Add basic support for the
- NeXTcube machine
+In-Reply-To: <CAFEAcA-dNr76uh_x98Uz_7h3xWxgd2Q_WdB5OSZVo6K9kruB=w@mail.gmail.com>
+References: <20180620130619.11362-1-peter.maydell@linaro.org>
+	<20180620130619.11362-2-peter.maydell@linaro.org>
+	<CAMo8BfLRr16q4_nj0vacK4N4fb0EBymXZB6SHon72h7BJ9M5jw@mail.gmail.com>
+	<CAMo8Bf+iV3fTRtSKx8Y-Y4_e16i21shLOch2PS3v_xR_c+L0ww@mail.gmail.com>
+	<CAFEAcA-dNr76uh_x98Uz_7h3xWxgd2Q_WdB5OSZVo6K9kruB=w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 30 Jun 2018 21:10:02 +0100
+Message-ID: <CAFEAcA8u=R_wCbnuiAbzHCm_6r+Q7zMij-tCEDkNnLcaoi9jBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/3] tcg: Support MMU protection regions
+ smaller than TARGET_PAGE_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bryce Lanham <blanham@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Natalia Portillo <claunia@claunia.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Patch Tracking <patches@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-Am Sat, 30 Jun 2018 12:07:01 -0500
-schrieb Bryce Lanham <blanham@gmail.com>:
+On 30 June 2018 at 21:08, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 30 June 2018 at 20:42, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>> On Sat, Jun 30, 2018 at 12:20 PM, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>>> I'm observing the following failure with xtensa tests:
+>>>
+>>> (qemu) qemu: fatal: Unable to handle guest executing from RAM within a
+>>> small MPU region at 0xd0000804
+>>>
+>>> Bisection points to this patch. Any idea what happened?
+>>
+>> Ok, I think I've found the issue: the following check in the
+>> get_page_addr_code does not work correctly when -1 is in the
+>> addr_code in the QEMU TLB:
+>>
+>> if (unlikely(env->tlb_table[mmu_idx][index].addr_code & TLB_RECHECK))
+>
+> Yes, Laurent ran into that and I sent a fix out on Friday:
+> http://patchwork.ozlabs.org/project/qemu-devel/list/?series=52914
 
-> Oh hi!
->=20
-> Luckily gmail brought this to the top since I don=E2=80=99t pay attention=
- to
-> the list. I=E2=80=99m away from my computer at the moment, but I had more
-> than this working, including interrupts, Ethernet, and SCSI for sure.
-> ( https://i.imgur.com/Py0FO.png) I=E2=80=99d love to dive back into this =
-now
-> that 68040 support is complete and merged.
+...oh, no, wait, you've hit the other bug I sent a fix for:
+http://patchwork.ozlabs.org/patch/937029/
 
- Hi Bryce,
-
-great to hear that you are still around! If you like to take care of
-this again, that would be very welcome! So I'll keep my hands off these
-patches for now, and let you handle this again :-)
-
-For what it's worth, I've pushed my final state of the patches here:
-
- https://gitlab.com/huth/qemu/tree/next-cube
-
-I've also managed to get the next-nic.c code compilable again, but as I
-mentioned earlier, it's currently not working anymore. Not sure, but I
-think there is some wrong overlap in the memory mapping of the 0x110 and
-0x150 DMA registers between next-nic.c and next-cube.c in there.
-
-Anyway, feel free to use my patches as a base for your new work, or
-simply ignore them if you prefer to start with your old codebase again.
-Either way I'm just glad if we finally get an additional 68k machine in
-QEMU :-)
-
- Cheers,
-  Thomas
+thanks
+-- PMM
