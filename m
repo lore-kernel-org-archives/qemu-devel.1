@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96F-0004K2-Lh
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96F-0004JD-0R
 	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96E-0002GA-HG
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:11 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:36492)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fZ96B-0002AZ-QK
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:10 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:40592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fZ96E-0002EG-9L
-	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:10 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id u18-v6so3959490wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:10 -0700 (PDT)
+	id 1fZ96B-00029a-I8
+	for qemu-devel@nongnu.org; Sat, 30 Jun 2018 02:11:07 -0400
+Received: by mail-wm0-x234.google.com with SMTP id z13-v6so3944778wma.5
+	for <qemu-devel@nongnu.org>; Fri, 29 Jun 2018 23:11:07 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 30 Jun 2018 08:10:19 +0200
-Message-Id: <20180630061040.6018-27-pbonzini@redhat.com>
+Date: Sat, 30 Jun 2018 08:10:16 +0200
+Message-Id: <20180630061040.6018-24-pbonzini@redhat.com>
 In-Reply-To: <20180630061040.6018-1-pbonzini@redhat.com>
 References: <20180630061040.6018-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 26/47] hw/microblaze: Use the IEC binary prefix
+Subject: [Qemu-devel] [PULL 23/47] hw/xtensa: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -41,80 +41,91 @@ It eases code review, unit is explicit.
 Patch generated using:
 
   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
+  $ git grep -n '[<>][<>]= ?[1-5]0'
 
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180625124238.25339-25-f4bug@amsat.org>
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+Message-Id: <20180625124238.25339-22-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/microblaze/petalogix_ml605_mmu.c      | 7 ++++---
- hw/microblaze/petalogix_s3adsp1800_mmu.c | 7 ++++---
+ hw/xtensa/xtfpga.c     | 9 +++++----
+ target/xtensa/helper.c | 5 +++--
  2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
-index 6c4a544..c730878 100644
---- a/hw/microblaze/petalogix_ml605_mmu.c
-+++ b/hw/microblaze/petalogix_ml605_mmu.c
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 5dc1303..b3161de 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
 @@ -26,6 +26,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
  #include "qapi/error.h"
- #include "qemu-common.h"
  #include "cpu.h"
-@@ -44,8 +45,8 @@
+ #include "sysemu/sysemu.h"
+@@ -152,7 +153,7 @@ static void xtfpga_net_init(MemoryRegion *address_space,
+             sysbus_mmio_get_region(s, 1));
  
- #include "hw/stream.h"
+     ram = g_malloc(sizeof(*ram));
+-    memory_region_init_ram_nomigrate(ram, OBJECT(s), "open_eth.ram", 16384,
++    memory_region_init_ram_nomigrate(ram, OBJECT(s), "open_eth.ram", 16 * KiB,
+                            &error_fatal);
+     vmstate_register_ram_global(ram);
+     memory_region_add_subregion(address_space, buffers, ram);
+@@ -229,7 +230,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+     const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
+     const char *dtb_filename = qemu_opt_get(machine_opts, "dtb");
+     const char *initrd_filename = qemu_opt_get(machine_opts, "initrd");
+-    const unsigned system_io_size = 224 * 1024 * 1024;
++    const unsigned system_io_size = 224 * MiB;
+     int n;
  
--#define LMB_BRAM_SIZE  (128 * 1024)
--#define FLASH_SIZE     (32 * 1024 * 1024)
-+#define LMB_BRAM_SIZE  (128 * KiB)
-+#define FLASH_SIZE     (32 * MiB)
- 
- #define BINARY_DEVICE_TREE_FILE "petalogix-ml605.dtb"
- 
-@@ -109,7 +110,7 @@ petalogix_ml605_init(MachineState *machine)
-     pflash_cfi01_register(FLASH_BASEADDR,
-                           NULL, "petalogix_ml605.flash", FLASH_SIZE,
-                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
--                          (64 * 1024), FLASH_SIZE >> 16,
-+                          64 * KiB, FLASH_SIZE >> 16,
-                           2, 0x89, 0x18, 0x0000, 0x0, 0);
- 
- 
-diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/petalogix_s3adsp1800_mmu.c
-index 0da3e62..5cf7b84 100644
---- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
-+++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
-@@ -24,6 +24,7 @@
+     for (n = 0; n < smp_cpus; n++) {
+@@ -342,7 +343,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+             cpu_physical_memory_write(cur_lowmem, fdt, fdt_size);
+             cur_tagptr = put_tag(cur_tagptr, BP_TAG_FDT,
+                                  sizeof(dtb_addr), &dtb_addr);
+-            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + fdt_size, 4096);
++            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + fdt_size, 4 * KiB);
+         }
+ #else
+         if (dtb_filename) {
+@@ -370,7 +371,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+             initrd_location.end = tswap32(cur_lowmem + initrd_size);
+             cur_tagptr = put_tag(cur_tagptr, BP_TAG_INITRD,
+                                  sizeof(initrd_location), &initrd_location);
+-            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + initrd_size, 4096);
++            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + initrd_size, 4 * KiB);
+         }
+         cur_tagptr = put_tag(cur_tagptr, BP_TAG_LAST, 0, NULL);
+         env->regs[2] = tagptr;
+diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
+index 34844ee..c9a6132 100644
+--- a/target/xtensa/helper.c
++++ b/target/xtensa/helper.c
+@@ -26,6 +26,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
  #include "cpu.h"
-@@ -39,8 +40,8 @@
+ #include "exec/exec-all.h"
+ #include "exec/gdbstub.h"
+@@ -726,10 +727,10 @@ static void dump_tlb(FILE *f, fprintf_function cpu_fprintf,
+         bool print_header = true;
  
- #include "boot.h"
+         if (sz >= 0x100000) {
+-            sz >>= 20;
++            sz /= MiB;
+             sz_text = "MB";
+         } else {
+-            sz >>= 10;
++            sz /= KiB;
+             sz_text = "KB";
+         }
  
--#define LMB_BRAM_SIZE  (128 * 1024)
--#define FLASH_SIZE     (16 * 1024 * 1024)
-+#define LMB_BRAM_SIZE  (128 * KiB)
-+#define FLASH_SIZE     (16 * MiB)
- 
- #define BINARY_DEVICE_TREE_FILE "petalogix-s3adsp1800.dtb"
- 
-@@ -87,7 +88,7 @@ petalogix_s3adsp1800_init(MachineState *machine)
-     pflash_cfi01_register(FLASH_BASEADDR,
-                           NULL, "petalogix_s3adsp1800.flash", FLASH_SIZE,
-                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
--                          (64 * 1024), FLASH_SIZE >> 16,
-+                          64 * KiB, FLASH_SIZE >> 16,
-                           1, 0x89, 0x18, 0x0000, 0x0, 1);
- 
-     dev = qdev_create(NULL, "xlnx.xps-intc");
 -- 
 1.8.3.1
