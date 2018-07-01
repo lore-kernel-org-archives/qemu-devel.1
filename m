@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herbert@gondor.apana.org.au>) id 1fZcFv-0001kP-Qa
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 09:19:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fZdCb-0000gT-9M
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 10:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herbert@gondor.apana.org.au>) id 1fZcFs-0008LY-M6
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 09:19:07 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:58450
-	helo=deadmen.hmeau.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <herbert@gondor.apana.org.au>)
-	id 1fZcFs-0008Kf-Aw
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 09:19:04 -0400
-Date: Sun, 1 Jul 2018 21:18:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Message-ID: <20180701131855.5sjnvyvhiq7ktzg3@gondor.apana.org.au>
-References: <cover.1529422492.git.alifm@linux.ibm.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fZdCY-0002lQ-5D
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 10:19:45 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fZdCX-0002ku-KV
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 10:19:42 -0400
+Received: by mail-pg0-x244.google.com with SMTP id c9-v6so5978182pgf.5
+	for <qemu-devel@nongnu.org>; Sun, 01 Jul 2018 07:19:41 -0700 (PDT)
+References: <20180701051147.31649-1-shorne@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <99a76cbb-c711-70f2-75db-a966259438ff@linaro.org>
+Date: Sun, 1 Jul 2018 07:19:37 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1529422492.git.alifm@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] Detect & register virtio-crypto
- algos only if it can be supported by backend
+In-Reply-To: <20180701051147.31649-1-shorne@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/openrisc: Fix delay slot exception
+ flag to match spec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, arei.gonglei@huawei.com, longpeng2@huawei.com, pasic@linux.ibm.com, frankja@linux.ibm.com, jasowang@redhat.com, mst@redhat.com
+To: Stafford Horne <shorne@gmail.com>, QEMU Development <qemu-devel@nongnu.org>
+Cc: Openrisc <openrisc@lists.librecores.org>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jun 19, 2018 at 11:41:32AM -0400, Farhan Ali wrote:
-> Hi,
+On 06/30/2018 10:11 PM, Stafford Horne wrote:
+> The delay slot exception flag is only set on the SR register during
+> exception.  Previously it was being set on both the ESR and SR this
+> caused QEMU to differ from the spec.  The was apparent as the linux
+> kernel had a bug where it could boot on QEMU but not on real hardware.
 > 
-> Currently the Linux virtio-crypto driver registers the crypto
-> algorithm without verifying if the backend actually supports the
-> algorithm.
+> The fixed logic now matches hardware.
 > 
-> This kernel patch series adds support for registering algorithm
-> with Linux crypto layer, only if the algorithm is supported by
-> the backend device. This also makes the driver more compliant with
-> the virtio-crypto spec [1].
-> 
-> I would appreciate any feedback or comments on this.
-> 
-> Thank you
-> Farhan
-> 
-> Reference
-> ---------
-> [1] Virtio crypto spec proposal https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00816.html
-> 
-> ChangeLog
-> ---------
-> v2 -> v3
->     - Add Christian Borntrager's acks for the patches.
-> 
-> v1 -> v2
->    - Modify comment as suggested by Arei (patch 1)
->    - Modify error message as suggested by Arei (patch 2)
-> 
-> Farhan Ali (2):
->   crypto/virtio-crypto: Read crypto services and algorithm masks
->   crypto/virtio-crypto: Register an algo only if it's supported
-> 
->  drivers/crypto/virtio/virtio_crypto_algs.c   | 112 ++++++++++++++++++---------
->  drivers/crypto/virtio/virtio_crypto_common.h |  25 +++++-
->  drivers/crypto/virtio/virtio_crypto_core.c   |  29 +++++++
->  drivers/crypto/virtio/virtio_crypto_mgr.c    |  81 +++++++++++++++++--
->  4 files changed, 202 insertions(+), 45 deletions(-)
+> Signed-off-by: Stafford Horne <shorne@gmail.com>
+> ---
+>  target/openrisc/interrupt.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
