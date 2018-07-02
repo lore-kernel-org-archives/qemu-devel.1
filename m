@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fa35B-0001dO-12
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:57:50 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fa36e-0002lP-4M
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fa35A-0008TZ-1X
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:57:49 -0400
-Date: Mon, 2 Jul 2018 10:57:40 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180702175740.GA14904@roeck-us.net>
-References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
-	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
-	<20180626175900.GA4307@roeck-us.net>
-	<CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
-	<20180626200008.GA680@roeck-us.net>
-	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
-	<20180702162733.GB32333@roeck-us.net>
-	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
-	<20180702170522.GA9885@roeck-us.net>
-	<CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fa36b-0000yA-20
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:59:20 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34485)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fa36a-0000wt-Js
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:59:16 -0400
+Received: by mail-wr0-x243.google.com with SMTP id a12-v6so16409158wro.1
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 10:59:16 -0700 (PDT)
+References: <20180702143021.18864-1-alex.bennee@linaro.org>
+	<20180702143021.18864-10-alex.bennee@linaro.org>
+	<19661f74-d44b-590f-2226-cdcab27ab82b@amsat.org>
+	<9c899d98-3ee4-9315-f0d4-92a047bfddd0@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <9c899d98-3ee4-9315-f0d4-92a047bfddd0@amsat.org>
+Date: Mon, 02 Jul 2018 18:59:14 +0100
+Message-ID: <87woud8qod.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
- identify and set one-shot mode
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 09/20] linux-user: introduce
+ preexit_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: famz@redhat.com, berrange@redhat.com, Peter Maydell <peter.maydell@linaro.org>, cota@braap.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On Mon, Jul 02, 2018 at 06:10:36PM +0100, Peter Maydell wrote:
-> On 2 July 2018 at 18:05, Guenter Roeck <linux@roeck-us.net> wrote:
-> > I don't think I'll have more time available to spend on this
-> > anytime soon. If it works for you, just drop the patch. I can
-> > keep it local in my branch. My version of qemu is different anyway,
-> > after all.
-> 
-> I'd kind of like to fix the bug, though. I'd just like you
-> to provide the image you're testing with...
-> 
 
-Ah, but that won't help. We are dealing with a heisenbug, and me using
-a different host than you (or even a different gcc version) may be
-sufficient to make the problem disappear on your system.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-The mps2 images use high resolution timers, which is likely what is
-triggering here. My working assumption is that those timers trigger at
-the wrong time because the timer is set up in periodic instead of one-time
-mode. With that, behavior is more or less random. On some systems it will
-work, on some systems it won't. Since we can not agree that setting the
-timer in periodic mode instead of one-shot mode is a problem, I don't
-really see how we can proceed. I would somehow have to prove to you that
-there is an observable problem in the first place, well beyond of what
-I already did. That might take a lot of time - much more than I would
-be able to spend on it.
+> On 07/02/2018 01:22 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Using:
+>>
+>> 'configure' '--enable-gprof' '--enable-gcov' '--disable-pie' --static
+>> [...]
+>> C compiler        gcc-8
+>> CFLAGS            -fprofile-arcs -ftest-coverage -g -g
+>> LDFLAGS           -Wl,--warn-common -fprofile-arcs -ftest-coverage -m64
+>> -static -g
+>> gprof enabled     yes
+>> static build      yes
+>> PIE               no
+>> gcov              gcov
+>> gcov enabled      yes
+>> docker            yes
+>>
+>> I get:
+>>
+>> $ make subdir-ppc-linux-user
+>> [...]
+>>   CC      ppc-linux-user/linux-user/exit.o
+>> linux-user/exit.c: In function =E2=80=98preexit_cleanup=E2=80=99:
+>> linux-user/exit.c:29:9: error: implicit declaration of function
+>> =E2=80=98_mcleanup=E2=80=99 [-Werror=3Dimplicit-function-declaration]
+>>          _mcleanup();
+>>          ^~~~~~~~~
+>> linux-user/exit.c:29:9: error: nested extern declaration of =E2=80=98_mc=
+leanup=E2=80=99
+>> [-Werror=3Dnested-externs]
+>> cc1: all warnings being treated as errors
+>> make[1]: *** [rules.mak:69: linux-user/exit.o] Error 1
+>> make: *** [Makefile:481: subdir-ppc-linux-user] Error 2
+>>
+>> I suppose gprof and static builds are exclusive.
 
-Guenter
+Yeah I guess this must have always been there because I didn't change
+the gprof code, just moved it.
+
+>
+> I just noticed we don't have --static builds covered by our continuous
+> integration.
+> Yet too many matrix cases to cover?
+> We could ignore it for 'system' builds, but we should enable it for
+> --linux-user which is used by various distributions for with the binfmt
+> packages.
+
+Yeah certainly a --disable-system --static build makes sense.
+
+>
+> Regards,
+>
+> Phil.
+
+
+--
+Alex Benn=C3=A9e
