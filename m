@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fZvHe-0005SB-P8
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:38:12 -0400
+	(envelope-from <david@redhat.com>) id 1fZvLN-0008Vz-PT
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fZvHd-0006tZ-Ev
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:38:10 -0400
+	(envelope-from <david@redhat.com>) id 1fZvLI-0001Fj-Oo
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43036 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fZvLI-0001ET-K1
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:41:56 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  2 Jul 2018 11:37:55 +0200
-Message-Id: <20180702093755.7384-5-david@redhat.com>
-In-Reply-To: <20180702093755.7384-1-david@redhat.com>
-References: <20180702093755.7384-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] pc-dimm: assign and verify the "addr"
- property during pre_plug
+Date: Mon,  2 Jul 2018 11:41:52 +0200
+Message-Id: <20180702094152.7882-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] machine: properly free device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,200 +22,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, David Hildenbrand <david@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Hildenbrand <david@redhat.com>
 
-We can assign and verify the slot before realizing and trying to plug.
-reading/writing the address property should never fail for DIMMs, so let's
-reduce error handling a bit by using &error_abort. Getting access to the
-memory region now might however fail. So forward errors from
-get_memory_region() properly.
-
-As all memory devices should use the alignment of the underlying memory
-region for guest physical address asignment, do detection of the
-alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
-alignment for compatibility handling.
+Machines might have inititalized device_memory if they support memory
+devices, so let's properly free it.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/i386/pc.c             | 16 ++++---------
- hw/mem/pc-dimm.c         | 50 +++++++++++++++++++++-------------------
- hw/ppc/spapr.c           |  7 +++---
- include/hw/mem/pc-dimm.h |  6 ++---
- 4 files changed, 37 insertions(+), 42 deletions(-)
+ hw/core/machine.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 934b7155b1..54f3c954a5 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1678,7 +1678,9 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
- {
-     const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-+    const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-+    const uint64_t legacy_align = TARGET_PAGE_SIZE;
- 
-     /*
-      * When -no-acpi is used with Q35 machine type, no ACPI is built,
-@@ -1696,7 +1698,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
-+    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev),
-+                     pcmc->enforce_aligned_dimm ? NULL : &legacy_align, errp);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 617e5f8d75..ae3e713e90 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -674,6 +674,7 @@ static void machine_finalize(Object *obj)
+     g_free(ms->dumpdtb);
+     g_free(ms->dt_compatible);
+     g_free(ms->firmware);
++    g_free(ms->device_memory);
  }
  
- static void pc_memory_plug(HotplugHandler *hotplug_dev,
-@@ -1705,18 +1708,9 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
-     HotplugHandlerClass *hhc;
-     Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
--    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
--    PCDIMMDevice *dimm = PC_DIMM(dev);
--    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
--    uint64_t align = TARGET_PAGE_SIZE;
-     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
- 
--    if (pcmc->enforce_aligned_dimm) {
--        align = memory_region_get_alignment(mr);
--    }
--
--    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
-+    pc_dimm_plug(dev, MACHINE(pcms), &local_err);
-     if (local_err) {
-         goto out;
-     }
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index e56c4daef2..fb6bcaedc4 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -29,9 +29,14 @@
- 
- static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
-+void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
-+                      const uint64_t *legacy_align, Error **errp)
- {
-+    PCDIMMDevice *dimm = PC_DIMM(dev);
-+    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     Error *local_err = NULL;
-+    MemoryRegion *mr;
-+    uint64_t addr, align;
-     int slot;
- 
-     slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
-@@ -43,44 +48,41 @@ void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
-     }
-     object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
-     trace_mhp_pc_dimm_assigned_slot(slot);
-+
-+    mr = ddc->get_memory_region(dimm, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+
-+    align = legacy_align ? *legacy_align : memory_region_get_alignment(mr);
-+    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
-+                                    &error_abort);
-+    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
-+                                       memory_region_size(mr), &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    trace_mhp_pc_dimm_assigned_address(addr);
-+    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP,
-+                             &error_abort);
- out:
-     error_propagate(errp, local_err);
- }
- 
--void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
--                  Error **errp)
-+void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp)
- {
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-                                                               &error_abort);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
--    Error *local_err = NULL;
-     uint64_t addr;
- 
--    addr = object_property_get_uint(OBJECT(dimm),
--                                    PC_DIMM_ADDR_PROP, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
--                                       memory_region_size(mr), &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP, &local_err);
--    if (local_err) {
--        goto out;
--    }
--    trace_mhp_pc_dimm_assigned_address(addr);
-+    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
-+                                    &error_abort);
- 
-     memory_device_plug_region(machine, mr, addr);
-     vmstate_register_ram(vmstate_mr, dev);
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bf012235b6..33543c6373 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3150,13 +3150,12 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
--    uint64_t align, size, addr;
-+    uint64_t size, addr;
-     uint32_t node;
- 
--    align = memory_region_get_alignment(mr);
-     size = memory_region_size(mr);
- 
--    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
-+    pc_dimm_plug(dev, MACHINE(ms), &local_err);
-     if (local_err) {
-         goto out;
-     }
-@@ -3223,7 +3222,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
-+    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), NULL, errp);
- }
- 
- struct sPAPRDIMMState {
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 7b120416d1..b382eb4303 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -79,8 +79,8 @@ typedef struct PCDIMMDeviceClass {
-                                                Error **errp);
- } PCDIMMDeviceClass;
- 
--void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
--void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
--                  Error **errp);
-+void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
-+                      const uint64_t *legacy_align, Error **errp);
-+void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp);
- void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
- #endif
+ bool machine_usb(MachineState *machine)
 -- 
 2.17.1
