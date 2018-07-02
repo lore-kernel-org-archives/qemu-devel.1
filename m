@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1qQ-0008G9-4C
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:38:30 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fa1vK-0003vl-AK
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:43:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1qL-0004wZ-8d
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:38:30 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33257)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1qL-0004wT-3x
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:38:25 -0400
-Received: by mail-qk0-x244.google.com with SMTP id c131-v6so8971936qkb.0
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 09:38:25 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180702145513.11481-1-kraxel@redhat.com>
-	<20180702145513.11481-2-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <759f935b-9160-a5e1-0485-c992121abd1b@amsat.org>
-Date: Mon, 2 Jul 2018 13:38:21 -0300
+	(envelope-from <kraxel@redhat.com>) id 1fa1vF-000832-F4
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:43:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa1vF-00082X-7k
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:43:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 626918762D
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:43:28 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-220.phx2.redhat.com
+	[10.3.116.220])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2391B16D23
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:43:28 +0000 (UTC)
+Date: Mon, 2 Jul 2018 18:43:27 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180702164326.ry3qghgjkjrshouh@sirius.home.kraxel.org>
+References: <20180702163345.17892-1-kraxel@redhat.com>
+	<20180702163345.17892-2-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180702145513.11481-2-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] audio/hda: fix CID 1393631
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180702163345.17892-2-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] warn about two vga cards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +37,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 07/02/2018 11:55 AM, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  hw/audio/hda-codec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jul 02, 2018 at 06:33:45PM +0200, Gerd Hoffmann wrote:
+> Two vga cards will try to register for the same legacy (isa) ioports.
+> Due to this conflict only one of the two cards will work correctly in
+> vga mode.
 > 
-> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-> index 9f630fa37f..2b58c3505b 100644
-> --- a/hw/audio/hda-codec.c
-> +++ b/hw/audio/hda-codec.c
-> @@ -189,7 +189,7 @@ struct HDAAudioState {
->  
->  static inline int64_t hda_bytes_per_second(HDAAudioStream *st)
->  {
-> -    return 2 * st->as.nchannels * st->as.freq;
-> +    return 2LL * st->as.nchannels * st->as.freq;
->  }
->  
->  static inline void hda_timer_sync_adjust(HDAAudioStream *st, int64_t target_pos)
-> 
+> Print a warning message in that case.  Also try registering the ports
+> only once, so the first vga added to the system will work properly.
+
+Scratch that, not working as expected.
+Looked like a simple change but appearently isn't.
+
+cheers,
+  Gerd
