@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fZov3-0008FI-Ts
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:50:27 -0400
+	(envelope-from <famz@redhat.com>) id 1fZp3F-0001Dl-JD
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fZov0-0004m8-0l
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:50:25 -0400
-Resent-Message-Id: <E1fZov0-0004m8-0l@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fZouz-0004bO-NA
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:50:21 -0400
-In-Reply-To: <20180625111935.26108-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153049705071.615.1950446241150770208@946cad8fd14e>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 1 Jul 2018 19:04:11 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v1 00/10] Travis updates and code coverage
- tweaks
+	(envelope-from <famz@redhat.com>) id 1fZp3F-0001cB-0T
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:58:53 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Mon,  2 Jul 2018 10:58:33 +0800
+Message-Id: <20180702025836.20957-2-famz@redhat.com>
+In-Reply-To: <20180702025836.20957-1-famz@redhat.com>
+References: <20180702025836.20957-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] qcow2: Drop unused cluster_data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +19,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, cota@braap.orgfamz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjI1MTExOTM1LjI2MTA4LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxIDAwLzEwXSBUcmF2aXMgdXBkYXRlcyBhbmQg
-Y29kZSBjb3ZlcmFnZSB0d2Vha3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
-cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
-VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
-ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
-IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOGMyMjIzYjlkOCBsaW51eC11c2VyOiBhZGQgZ2NvdiBz
-dXBwb3J0IHRvIHByZWV4aXRfY2xlYW51cAo1NzIxZWEwNDBmIGxpbnV4LXVzZXI6IGludHJvZHVj
-ZSBwcmVleGl0X2NsZWFudXAKMGM2ZjJiYTVmZSBidWlsZC1zeXN0ZW06IGFkZCBjb3ZlcmFnZS1y
-ZXBvcnQgdGFyZ2V0CjA3NmM2YTk2NWIgYnVpbGQtc3lzdGVtOiBhZGQgY2xlYW4tY292ZXJhZ2Ug
-dGFyZ2V0CjVkZjkwNGFlYWYgdHJhdmlzOiBhZGQgZ2NvdnIgc3VtbWFyeSBmb3IgR0NPViBidWls
-ZAo5YjFjMGY0YzZhIGRvY2tlcjogYWRkIGdjb3ZyIHRvIHRyYXZpcyBpbWFnZQo4MjM4NDdlOTU5
-IC5naXRpZ25vcmU6IGFkZCAuZ2NvdiBmaWxlcwoyMDdhNjhiZDYwIGJ1aWxkLXN5c3RlbTogcmVt
-b3ZlIHBlci10ZXN0IEdDT1YgcmVwb3J0aW5nCjM4YmMwYjk1ZTUgdHJhdmlzOiB0ZXN0IG91dC1v
-Zi10cmVlIGJ1aWxkcwo1MmUzYTMzZGQxIHRyYXZpczogZG8gbm90IHdhc3RlIHRpbWUgY2xvbmlu
-ZyB1bnVzZWQgc3VibW9kdWxlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS8xMDogdHJhdmlzOiBkbyBub3Qgd2FzdGUgdGltZSBjbG9uaW5nIHVudXNlZCBzdWJtb2R1bGVz
-Li4uCkNoZWNraW5nIFBBVENIIDIvMTA6IHRyYXZpczogdGVzdCBvdXQtb2YtdHJlZSBidWlsZHMu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogYnVpbGQtc3lzdGVtOiByZW1vdmUgcGVyLXRlc3QgR0NP
-ViByZXBvcnRpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMDogLmdpdGlnbm9yZTogYWRkIC5nY292
-IGZpbGVzLi4uCkNoZWNraW5nIFBBVENIIDUvMTA6IGRvY2tlcjogYWRkIGdjb3ZyIHRvIHRyYXZp
-cyBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA2LzEwOiB0cmF2aXM6IGFkZCBnY292ciBzdW1tYXJ5
-IGZvciBHQ09WIGJ1aWxkLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQ3OiAKbmV3IGZpbGUgbW9kZSAx
-MDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDIgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA3LzEwOiBi
-dWlsZC1zeXN0ZW06IGFkZCBjbGVhbi1jb3ZlcmFnZSB0YXJnZXQuLi4KQ2hlY2tpbmcgUEFUQ0gg
-OC8xMDogYnVpbGQtc3lzdGVtOiBhZGQgY292ZXJhZ2UtcmVwb3J0IHRhcmdldC4uLgpDaGVja2lu
-ZyBQQVRDSCA5LzEwOiBsaW51eC11c2VyOiBpbnRyb2R1Y2UgcHJlZXhpdF9jbGVhbnVwLi4uCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzMzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgNzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxMC8xMDogbGludXgtdXNlcjogYWRkIGdjb3Yg
-c3VwcG9ydCB0byBwcmVleGl0X2NsZWFudXAuLi4KRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2
-b2lkZWQgaW4gLmMgZmlsZXMKIzI3OiBGSUxFOiBsaW51eC11c2VyL2V4aXQuYzoyMzoKK2V4dGVy
-biB2b2lkIF9fZ2Nvdl9kdW1wKHZvaWQpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
-NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/qcow2.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2f9e58e0c4..3177c72de0 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3338,7 +3338,6 @@ qcow2_co_copy_range_to(BlockDriverState *bs,
+     int ret;
+     unsigned int cur_bytes; /* number of sectors in current iteration */
+     uint64_t cluster_offset;
+-    uint8_t *cluster_data = NULL;
+     QCowL2Meta *l2meta = NULL;
+ 
+     assert(!bs->encrypted);
+@@ -3397,7 +3396,6 @@ fail:
+ 
+     qemu_co_mutex_unlock(&s->lock);
+ 
+-    qemu_vfree(cluster_data);
+     trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
+ 
+     return ret;
+-- 
+2.17.1
