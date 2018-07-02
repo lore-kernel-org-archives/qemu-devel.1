@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fa0TM-0003ji-9c
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:39 -0400
+	(envelope-from <shorne@gmail.com>) id 1fa0TV-0003pF-D1
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fa0TH-0007VU-3g
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa0TG-0007UU-PV
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:31 -0400
-Date: Mon, 2 Jul 2018 17:10:28 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180702151027.nsio3ncp7ma6d5nq@sirius.home.kraxel.org>
-References: <20180620124719.16450-1-kraxel@redhat.com>
+	(envelope-from <shorne@gmail.com>) id 1fa0TS-0007h0-Ux
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:45 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:44243)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0TS-0007fw-7b
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:42 -0400
+Received: by mail-pf0-x241.google.com with SMTP id j3-v6so7649652pfh.11
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:10:41 -0700 (PDT)
+From: Stafford Horne <shorne@gmail.com>
+Date: Tue,  3 Jul 2018 00:09:59 +0900
+Message-Id: <20180702151023.24532-2-shorne@gmail.com>
+In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
+References: <20180702151023.24532-1-shorne@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180620124719.16450-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] seabios: 1.11.2 update
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 01/25] target/openrisc: Fix mtspr shadow gprs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: seabios@seabios.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
 
-  Hi,
+From: Richard Henderson <richard.henderson@linaro.org>
 
-> seabios 1.11.2 is not released yet.  The plan is to cherry-pick the
-> changes needed to support the new qemu 3.0 display devices
-> (bochs-display and ramfb) into the 1.11-stable branch for the 1.11.2
-> release.  Current state is here:
->    https://git.kraxel.org/cgit/seabios/log/?h=1.11-stable-testing
+Missing break when this feature was added in 89e71e873d
+("target/openrisc: implement shadow registers").  This was causing
+strange issues as we get writes into the translation block jump cache
+and other bits of state.
 
-seabios release 1.11.2 tagged and pushed now.  Re-created the branch to
-make sure the commit ids in the log are correct (they changed due to a
-repo setup issue).  Cherry-picked one additional bugfix commit.
+Fixes: 89e71e873d ("target/openrisc: implement shadow registers")
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
+ target/openrisc/sys_helper.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-cheers,
-  Gerd
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index b284064381..2f337363ec 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -98,6 +98,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+         idx = (spr - 1024);
+         env->shadow_gpr[idx / 32][idx % 32] = rb;
++        break;
+ 
+     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
+-- 
+2.17.0
