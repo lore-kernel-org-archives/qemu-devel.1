@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2Xa-0008IL-Ah
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:07 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa2Xa-0008IO-Cc
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2XZ-0006JJ-89
+	(envelope-from <eric.auger@redhat.com>) id 1fa2XZ-0006J2-0I
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:06 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  2 Jul 2018 19:22:29 +0200
-Message-Id: <1530552162-15533-3-git-send-email-eric.auger@redhat.com>
+Date: Mon,  2 Jul 2018 19:22:28 +0200
+Message-Id: <1530552162-15533-2-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
 References: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 02/15] hw/boards: Add a MachineState parameter
- to kvm_type callback
+Subject: [Qemu-devel] [RFC v2 01/15] linux-headers: header update for
+ KVM/ARM KVM_ARM_GET_MAX_VM_PHYS_SHIFT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +23,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-On ARM, the kvm_type will be resolved by querying the KVMState.
-Let's add the MachineState handle to the callback so that we
-can retrieve the  KVMState handle. in kvm_init, when the callback
-is called, the kvm_state variable is not yet set.
+This is a header update against
+
+git://linux-arm.org/linux-skp.git ipa52/v3
+
+to get the KVM_ARM_GET_MAX_VM_PHYS_SHIFT ioctl. This allows to retrieve
+the IPA address range KVM supports.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-[ppc parts]
 ---
- accel/kvm/kvm-all.c   | 2 +-
- hw/ppc/mac_newworld.c | 2 +-
- hw/ppc/mac_oldworld.c | 2 +-
- hw/ppc/spapr.c        | 2 +-
- include/hw/boards.h   | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ include/standard-headers/linux/virtio_config.h | 16 ++++++++++++----
+ linux-headers/asm-mips/unistd.h                | 18 ++++++++++++------
+ linux-headers/asm-powerpc/kvm.h                |  1 +
+ linux-headers/linux/kvm.h                      | 16 ++++++++++++++++
+ 4 files changed, 41 insertions(+), 10 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index eb7db92..37ac834 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1549,7 +1549,7 @@ static int kvm_init(MachineState *ms)
+diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+index b777069..0b19436 100644
+--- a/include/standard-headers/linux/virtio_config.h
++++ b/include/standard-headers/linux/virtio_config.h
+@@ -45,11 +45,14 @@
+ /* We've given up on this device. */
+ #define VIRTIO_CONFIG_S_FAILED		0x80
  
-     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
-     if (mc->kvm_type) {
--        type = mc->kvm_type(kvm_type);
-+        type = mc->kvm_type(ms, kvm_type);
-     } else if (kvm_type) {
-         ret = -EINVAL;
-         fprintf(stderr, "Invalid argument kvm-type=%s\n", kvm_type);
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index ff715ff..606b827 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -511,7 +511,7 @@ static void ppc_core99_init(MachineState *machine)
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
- }
+-/* Some virtio feature bits (currently bits 28 through 32) are reserved for the
+- * transport being used (eg. virtio_ring), the rest are per-device feature
+- * bits. */
++/*
++ * Virtio feature bits VIRTIO_TRANSPORT_F_START through
++ * VIRTIO_TRANSPORT_F_END are reserved for the transport
++ * being used (e.g. virtio_ring, virtio_pci etc.), the
++ * rest are per-device feature bits.
++ */
+ #define VIRTIO_TRANSPORT_F_START	28
+-#define VIRTIO_TRANSPORT_F_END		34
++#define VIRTIO_TRANSPORT_F_END		38
  
--static int core99_kvm_type(const char *arg)
-+static int core99_kvm_type(MachineState *ms, const char *arg)
- {
-     /* Always force PR KVM */
-     return 2;
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 4608bab..1211fcd 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -363,7 +363,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
- }
+ #ifndef VIRTIO_CONFIG_NO_LEGACY
+ /* Do we get callbacks when the ring is completely used, even if we've
+@@ -71,4 +74,9 @@
+  * this is for compatibility with legacy systems.
+  */
+ #define VIRTIO_F_IOMMU_PLATFORM		33
++
++/*
++ * Does the device support Single Root I/O Virtualization?
++ */
++#define VIRTIO_F_SR_IOV			37
+ #endif /* _LINUX_VIRTIO_CONFIG_H */
+diff --git a/linux-headers/asm-mips/unistd.h b/linux-headers/asm-mips/unistd.h
+index 9bfef7f..d4a85ef 100644
+--- a/linux-headers/asm-mips/unistd.h
++++ b/linux-headers/asm-mips/unistd.h
+@@ -388,17 +388,19 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 364)
+ #define __NR_pkey_free			(__NR_Linux + 365)
+ #define __NR_statx			(__NR_Linux + 366)
++#define __NR_rseq			(__NR_Linux + 367)
++#define __NR_io_pgetevents		(__NR_Linux + 368)
  
--static int heathrow_kvm_type(const char *arg)
-+static int heathrow_kvm_type(MachineState *ms, const char *arg)
- {
-     /* Always force PR KVM */
-     return 2;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b32b971..db6b018 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2841,7 +2841,7 @@ static void spapr_machine_init(MachineState *machine)
-     }
- }
  
--static int spapr_kvm_type(const char *vm_type)
-+static int spapr_kvm_type(MachineState *ms, const char *vm_type)
- {
-     if (!vm_type) {
-         return 0;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 79069dd..3ac9594 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -173,7 +173,7 @@ struct MachineClass {
-     void (*init)(MachineState *state);
-     void (*reset)(void);
-     void (*hot_add_cpu)(const int64_t id, Error **errp);
--    int (*kvm_type)(const char *arg);
-+    int (*kvm_type)(MachineState *ms, const char *arg);
+ /*
+  * Offset of the last Linux o32 flavoured syscall
+  */
+-#define __NR_Linux_syscalls		366
++#define __NR_Linux_syscalls		368
  
-     BlockInterfaceType block_default_type;
-     int units_per_default_bus;
+ #endif /* _MIPS_SIM == _MIPS_SIM_ABI32 */
+ 
+ #define __NR_O32_Linux			4000
+-#define __NR_O32_Linux_syscalls		366
++#define __NR_O32_Linux_syscalls		368
+ 
+ #if _MIPS_SIM == _MIPS_SIM_ABI64
+ 
+@@ -733,16 +735,18 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 324)
+ #define __NR_pkey_free			(__NR_Linux + 325)
+ #define __NR_statx			(__NR_Linux + 326)
++#define __NR_rseq			(__NR_Linux + 327)
++#define __NR_io_pgetevents		(__NR_Linux + 328)
+ 
+ /*
+  * Offset of the last Linux 64-bit flavoured syscall
+  */
+-#define __NR_Linux_syscalls		326
++#define __NR_Linux_syscalls		328
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_ABI64 */
+ 
+ #define __NR_64_Linux			5000
+-#define __NR_64_Linux_syscalls		326
++#define __NR_64_Linux_syscalls		328
+ 
+ #if _MIPS_SIM == _MIPS_SIM_NABI32
+ 
+@@ -1081,15 +1085,17 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 328)
+ #define __NR_pkey_free			(__NR_Linux + 329)
+ #define __NR_statx			(__NR_Linux + 330)
++#define __NR_rseq			(__NR_Linux + 331)
++#define __NR_io_pgetevents		(__NR_Linux + 332)
+ 
+ /*
+  * Offset of the last N32 flavoured syscall
+  */
+-#define __NR_Linux_syscalls		330
++#define __NR_Linux_syscalls		332
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_NABI32 */
+ 
+ #define __NR_N32_Linux			6000
+-#define __NR_N32_Linux_syscalls		330
++#define __NR_N32_Linux_syscalls		332
+ 
+ #endif /* _ASM_UNISTD_H */
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 833ed9a..1b32b56 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -633,6 +633,7 @@ struct kvm_ppc_cpu_char {
+ #define KVM_REG_PPC_PSSCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbd)
+ 
+ #define KVM_REG_PPC_DEC_EXPIRY	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbe)
++#define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
+ 
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 98f389a..0a90115 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -751,6 +751,16 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_S390_SIE_PAGE_OFFSET 1
+ 
+ /*
++ * On arm/arm64, machine type can be used to request the physical
++ * address size for the VM. Bits [7-0] have been reserved for the
++ * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
++ * value 0 implies the default IPA size, which is 40bits.
++ */
++#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK	0xff
++#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)		\
++	((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
++
++/*
+  * ioctls for /dev/kvm fds:
+  */
+ #define KVM_GET_API_VERSION       _IO(KVMIO,   0x00)
+@@ -775,6 +785,12 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_GET_MSR_FEATURE_INDEX_LIST    _IOWR(KVMIO, 0x0a, struct kvm_msr_list)
+ 
+ /*
++ * Get the maximum physical address size supported by the host.
++ * Returns log2(Max-Physical-Address-Size)
++ */
++#define KVM_ARM_GET_MAX_VM_PHYS_SHIFT	_IO(KVMIO, 0x0b)
++
++/*
+  * Extension capability list.
+  */
+ #define KVM_CAP_IRQCHIP	  0
 -- 
 2.5.5
