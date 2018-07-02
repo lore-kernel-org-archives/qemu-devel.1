@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1TA-0000zC-Jl
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:14:29 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fa1UK-000264-7Q
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1T6-0001hT-HK
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:14:28 -0400
-Received: from mail-qk0-x22f.google.com ([2607:f8b0:400d:c09::22f]:34934)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1T6-0001hF-Au
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:14:24 -0400
-Received: by mail-qk0-x22f.google.com with SMTP id u21-v6so8926536qku.2
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 09:14:24 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1530546340-4366-1-git-send-email-pbonzini@redhat.com>
-	<1530546340-4366-5-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <744144cb-dd97-5a27-5b64-bcd3701276a0@amsat.org>
-Date: Mon, 2 Jul 2018 13:14:19 -0300
-MIME-Version: 1.0
-In-Reply-To: <1530546340-4366-5-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 50/50] tcg: simplify !CONFIG_TCG handling of
- tb_invalidate_*
+	(envelope-from <kraxel@redhat.com>) id 1fa1UG-0002Tk-4D
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:15:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa1UF-0002Sc-T1
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:15:36 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D74713A9A
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:15:35 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  2 Jul 2018 18:15:24 +0200
+Message-Id: <20180702161524.17268-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] audio: add audio timer trace points
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 07/02/2018 12:45 PM, Paolo Bonzini wrote:
-> There is no need for a stub, since tb_invalidate_phys_addr can be excised
-> altogether when TCG is disabled.  This is a bit cleaner since it avoids
-> using code that is clearly specific to user-mode emulation (it calls
-> mmap_lock/unlock) for the !CONFIG_TCG case.
+Track audio timer starts and stops.  Also trace delayed audio timer calls.
 
-Cleaner :)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ audio/audio.c      | 28 +++++++++++++++++++++++++---
+ audio/trace-events |  5 +++++
+ 2 files changed, 30 insertions(+), 3 deletions(-)
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  accel/stubs/tcg-stub.c  | 6 ------
->  exec.c                  | 6 +++++-
->  include/exec/exec-all.h | 8 +++-----
->  3 files changed, 8 insertions(+), 12 deletions(-)
-> 
-> diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-> index 8ee85ed..76ae461 100644
-> --- a/accel/stubs/tcg-stub.c
-> +++ b/accel/stubs/tcg-stub.c
-> @@ -16,7 +16,6 @@
->  #include "tcg/tcg.h"
->  #include "exec/cpu-common.h"
->  #include "exec/exec-all.h"
-> -#include "translate-all.h"
->  
->  void tb_flush(CPUState *cpu)
->  {
-> @@ -25,8 +24,3 @@ void tb_flush(CPUState *cpu)
->  void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
->  {
->  }
-> -
-> -void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-> -                                   int is_cpu_write_access)
-> -{
-> -}
-> diff --git a/exec.c b/exec.c
-> index ee72688..4f5df07 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1027,7 +1027,7 @@ const char *parse_cpu_model(const char *cpu_model)
->      return cpu_type;
->  }
->  
-> -#if defined(CONFIG_USER_ONLY) || !defined(CONFIG_TCG)
-> +#if defined(CONFIG_USER_ONLY)
->  void tb_invalidate_phys_addr(target_ulong addr)
->  {
->      mmap_lock();
-> @@ -1046,6 +1046,10 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
->      MemoryRegion *mr;
->      hwaddr l = 1;
->  
-> +    if (!tcg_enabled()) {
-> +        return;
-> +    }
-> +
->      rcu_read_lock();
->      mr = address_space_translate(as, addr, &addr, &l, false, attrs);
->      if (!(memory_region_is_ram(mr)
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index cb497de..da73e3b 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -412,13 +412,11 @@ static inline uint32_t curr_cflags(void)
->  }
->  
->  /* TranslationBlock invalidate API */
-> -#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-> -void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs);
-> -#else
-> -void tb_invalidate_phys_addr(target_ulong addr);
-> -#endif
->  #if defined(CONFIG_USER_ONLY)
-> +void tb_invalidate_phys_addr(target_ulong addr);
->  void tb_invalidate_phys_range(target_ulong start, target_ulong end);
-> +#else
-> +void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs);
->  #endif
->  void tb_flush(CPUState *cpu);
->  void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
-> 
+diff --git a/audio/audio.c b/audio/audio.c
+index d6e91901aa..1ace47f510 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -29,6 +29,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/cutils.h"
+ #include "sysemu/replay.h"
++#include "trace.h"
+ 
+ #define AUDIO_CAP "audio"
+ #include "audio_int.h"
+@@ -1129,6 +1130,10 @@ static void audio_pcm_print_info (const char *cap, struct audio_pcm_info *info)
+ /*
+  * Timer
+  */
++
++static bool audio_timer_running;
++static uint64_t audio_timer_last;
++
+ static int audio_is_timer_needed (void)
+ {
+     HWVoiceIn *hwi = NULL;
+@@ -1148,14 +1153,31 @@ static void audio_reset_timer (AudioState *s)
+     if (audio_is_timer_needed ()) {
+         timer_mod_anticipate_ns(s->ts,
+             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
+-    }
+-    else {
+-        timer_del (s->ts);
++        if (!audio_timer_running) {
++            audio_timer_running = true;
++            audio_timer_last = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++            trace_audio_timer_start(conf.period.ticks / SCALE_MS);
++        }
++    } else {
++        timer_del(s->ts);
++        if (audio_timer_running) {
++            audio_timer_running = false;
++            trace_audio_timer_stop();
++        }
+     }
+ }
+ 
+ static void audio_timer (void *opaque)
+ {
++    int64_t now, diff;
++
++    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    diff = now - audio_timer_last;
++    if (diff > conf.period.ticks * 3 / 2) {
++        trace_audio_timer_delayed(diff / SCALE_MS);
++    }
++    audio_timer_last = now;
++
+     audio_run ("timer");
+     audio_reset_timer (opaque);
+ }
+diff --git a/audio/trace-events b/audio/trace-events
+index d37639e611..c986469319 100644
+--- a/audio/trace-events
++++ b/audio/trace-events
+@@ -15,3 +15,8 @@ alsa_no_frames(int state) "No frames available and ALSA state is %d"
+ # audio/ossaudio.c
+ oss_version(int version) "OSS version = 0x%x"
+ oss_invalid_available_size(int size, int bufsize) "Invalid available size, size=%d bufsize=%d"
++
++# audio/audio.c
++audio_timer_start(int interval) "interval %d ms"
++audio_timer_stop(void) ""
++audio_timer_delayed(int interval) "interval %d ms"
+-- 
+2.9.3
