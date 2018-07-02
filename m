@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bergwolf@gmail.com>) id 1fZzFn-000847-Ok
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:52:33 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa0Ix-0003UJ-LN
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:59:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bergwolf@gmail.com>) id 1fZzFm-0005CF-E5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:52:31 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:41467)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bergwolf@gmail.com>) id 1fZzFm-0005Bk-44
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:52:30 -0400
-Received: by mail-wr0-x241.google.com with SMTP id h10-v6so15637544wrq.8
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:52:29 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1fa0Iu-0001lK-JX
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:59:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40186 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fa0Iu-0001kq-E8
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:59:48 -0400
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-12-git-send-email-suzuki.poulose@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8faab60c-3025-d37f-6dd2-4f26bc32447c@redhat.com>
+Date: Mon, 2 Jul 2018 16:59:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180702131054.GE2155@stefanha-x1.localdomain>
-References: <20180331084500.33313-1-jiangshanlai@gmail.com>
-	<20180702131054.GE2155@stefanha-x1.localdomain>
-From: Peng Tao <bergwolf@gmail.com>
-Date: Mon, 2 Jul 2018 21:52:08 +0800
-Message-ID: <CA+a=Yy72YN1DAczTnb47b4ZW_vummOVuK3M=F2CF5KF3mRD2Zw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: add capability to bypass the
- shared memory
+In-Reply-To: <1530270944-11351-12-git-send-email-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 11/20] kvm: arm64: Helper for computing
+ VTCR_EL2.SL0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +29,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, Xu Wang <gnawux@gmail.com>, qemu-devel@nongnu.org, "James O . D . Hunt" <james.o.hunt@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, julien.grall@arm.com, james.morse@arm.com, Christoffer Dall <cdall@arm.com>, kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 2, 2018 at 9:10 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Sat, Mar 31, 2018 at 04:45:00PM +0800, Lai Jiangshan wrote:
->> a) feature: qemu-local-migration, qemu-live-update
->> Set the mem-path on the tmpfs and set share=3Don for it when
->> start the vm. example:
->> -object \
->> memory-backend-file,id=3Dmem,size=3D128M,mem-path=3D/dev/shm/memory,shar=
-e=3Don \
->> -numa node,nodeid=3D0,cpus=3D0-7,memdev=3Dmem
->>
->> when you want to migrate the vm locally (after fixed a security bug
->> of the qemu-binary, or other reason), you can start a new qemu with
->> the same command line and -incoming, then you can migrate the
->> vm from the old qemu to the new qemu with the migration capability
->> 'bypass-shared-memory' set. The migration will migrate the device-state
->> *ONLY*, the memory is the origin memory backed by tmpfs file.
->
-> Marcelo, Andrea, Paolo: There was a more complex local migration
-> approach in 2013 with fd passing and vmsplice.  They specifically
-> avoided the approach proposed in this patch, but I don't remember why.
->
-> The closest to an explanation I've found is this message from Marcelo:
->
->   Another possibility is to use memory that is not anonymous for guest
->   RAM, such as hugetlbfs or tmpfs.
->
->   IIRC ksm and thp have limitations wrt tmpfs.
->
-> https://www.spinics.net/lists/linux-mm/msg67437.html
->
-> Have the limitations been been solved since then?
->
->> c)  feature: vm-template, vm-fast-live-clone
->> the template vm is started as 1), and paused when the guest reaches
->> the template point(example: the guest app is ready), then the template
->> vm is saved. (the qemu process of the template can be killed now, becaus=
-e
->> we need only the memory and the device state files (in tmpfs)).
->>
->> Then we can launch one or multiple VMs base on the template vm states,
->> the new VMs are started without the =E2=80=9Cshare=3Don=E2=80=9D, all th=
-e new VMs share
->> the initial memory from the memory file, they save a lot of memory.
->> all the new VMs start from the template point, the guest app can go to
->> work quickly.
->>
->> The new VM booted from template vm can=E2=80=99t become template again,
->> if you need this unusual chained-template feature, you can write
->> a cloneable-tmpfs kernel module for it.
->>
->> The libvirt toolkit can=E2=80=99t manage vm-template currently, in the
->> hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
->> =E2=80=9Clibvrit managed template=E2=80=9D feature to libvirt.
->
-> This feature has been discussed multiple times in the past and probably
-> the reason why it's not in libvirt yet is that no one wants it badly
-> enough that they have solved the security issues.
->
-> RAM and disk contain secrets like address-space layout randomization,
-> random number generator state, cryptographic keys, etc.  Both the kernel
-> and userspace handle secrets, making it hard to isolate all secrets and
-> wipe them when cloning.
->
-Hi Stefan,
+Hi Suzuki,
 
-> Risks:
-> 1. If one cloned VM is exploited then all other VMs are more likely to
->    be exploitable (e.g. kernel address space layout randomization).
-w.r.t. KASLR, any memory duplication technology would expose it. I
-remember there are CVEs (e.g., CVE-2015-2877) specific to this kind
-attack against KSM and it was stated that "Basically if you care about
-this attack vector, disable deduplication.". Share-until-written
-approaches for memory conservation among mutually untrusting tenants
-are inherently detectable for information disclosure, and can be
-classified as potentially misunderstood behaviors rather than
-vulnerabilities. [1]
+On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
+> VTCR_EL2 holds the following key stage2 translation table
+> parameters:
+>   SL0  - Entry level in the page table lookup.
+>   T0SZ - Denotes the size of the memory addressed by the table.
+> 
+> We have been using fixed values for the SL0 depending on the
+> page size as we have a fixed IPA size. But since we are about
+> to make it dynamic, we need to calculate the SL0 at runtime
+> per VM. This patch adds a helper to comput the value of SL0 for
+compute
+> a given IPA.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v2:
+>  - Part 2 of split from VTCR & VTTBR dynamic configuration
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 35 ++++++++++++++++++++++++++++++++---
+>  1 file changed, 32 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index c557f45..11a7db0 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -153,7 +153,8 @@
+>   * 2 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		38
+> +#define VTCR_EL2_TGRAN_SL0_BASE		3UL
+> +
+>  #elif defined(CONFIG_ARM64_16K_PAGES)
+>  /*
+>   * Stage2 translation configuration:
+> @@ -161,7 +162,7 @@
+>   * 2 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		42
+> +#define VTCR_EL2_TGRAN_SL0_BASE		3UL
+>  #else	/* 4K */
+>  /*
+>   * Stage2 translation configuration:
+> @@ -169,11 +170,39 @@
+>   * 3 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		37
+> +#define VTCR_EL2_TGRAN_SL0_BASE		2UL
+>  #endif
+>  
+>  #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
+>  /*
+> + * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
+> + * Interestingly, it depends on the page size.
+> + * See D.10.2.110, VTCR_EL2, in ARM DDI 0487B.b
+update ref to the last one?
+> + *
+> + *	-----------------------------------------
+> + *	| Entry level		|  4K  | 16K/64K |
+> + *	------------------------------------------
+> + *	| Level: 0		|  2   |   -     |
+> + *	------------------------------------------
+> + *	| Level: 1		|  1   |   2     |
+> + *	------------------------------------------
+> + *	| Level: 2		|  0   |   1     |
+> + *	------------------------------------------
+> + *	| Level: 3		|  -   |   0     |
+> + *	------------------------------------------
+> + *
+> + * That table roughly translates to :
+> + *
+> + *	SL0(PAGE_SIZE, Entry_level) = SL0_BASE(PAGE_SIZE) - Entry_Level
+> + *
+> + * Where SL0_BASE(4K) = 2 and SL0_BASE(16K) = 3, SL0_BASE(64K) = 3, provided
+> + * we take care of ruling out the unsupported cases and
+> + * Entry_Level = 4 - Number_of_levels.
+> + *
+> + */
+> +#define VTCR_EL2_SL0(levels) \
+> +	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
+> +/*
+>   * ARM VMSAv8-64 defines an algorithm for finding the translation table
+>   * descriptors in section D4.2.8 in ARM DDI 0487B.b.
+>   *
+> 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-I think the same applies to vm templating as well. Actually VM
-templating is more useful (than KSM) in this regard since we can
-create a template for each trusted tenant where as with KSM all VMs on
-a host are treated equally.
+Thanks
 
-[1] https://access.redhat.com/security/cve/cve-2015-2877
-
-> 2. If you give VMs cloned from the same template to untrusted users,
->    they may be able to determine the secrets other users' VMs.
-In kata and runv, vm templating is used carefully so that we do not
-use or save any secret keys before creating the template VM. IOW, the
-feature is not supposed to be used generally to create any template
-VMs at any stage.
-
->
-> How are you wiping secrets and re-randomizing cloned VMs?
-I think we can write some host generated random seeds to guest's
-urandom device, when cloning VMs from the same template before handing
-it to users. Is it enough or do you think there are more to do w/
-re-randomizing?
-
->  Security is a
-> major factor for using Kata, so it's important not to leak secrets
-> between cloned VMs.
->
-Yes, indeed! And it is all about trade-offs, VM templating or KSM. If
-we want security above anything, we should just disable all the
-sharing. But there is actually no ceiling (think about physical
-isolation!). So it's more about trade-offs. With Kata, VM templating
-and KSM give users options to achieve better performance and lower
-memory footprint with little sacrifice. The security advantage of
-running VM-based containers is still there.
-
-Cheers,
-Tao
+Eric
