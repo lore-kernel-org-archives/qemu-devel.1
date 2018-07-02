@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fZy3p-0007xa-Pv
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:36:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fZy5D-0000GN-K2
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fZy3o-0000a8-ON
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:36:05 -0400
-References: <20180702025836.20957-1-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <02d1f79b-c055-bb2a-edd5-3429ff64af90@redhat.com>
-Date: Mon, 2 Jul 2018 14:35:53 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fZy59-0001b4-Lm
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:37:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39308 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fZy59-0001at-Gf
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:37:27 -0400
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-5-f4bug@amsat.org>
+	<9a30c2d7-b6b7-c6e9-1c70-0fd4a90bca0c@redhat.com>
+	<9376a63ed1790a79dadaaf0aac72455f6e7e2942.camel@perches.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <57f942b9-9d49-1006-52fa-50b9f4461ff9@redhat.com>
+Date: Mon, 2 Jul 2018 14:37:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180702025836.20957-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4"
-Subject: Re: [Qemu-devel] [PATCH 0/4] block: Trivial fixes in offloading code
+In-Reply-To: <9376a63ed1790a79dadaaf0aac72455f6e7e2942.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 04/46] checkpatch: Recognize IEC binary
+ prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Joe Perches <joe@perches.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Su Hang <suhang16@mails.ucas.ac.cn>, Pasi Savanainen <pasi.savanainen@nixu.com>, =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <02d1f79b-c055-bb2a-edd5-3429ff64af90@redhat.com>
-Subject: Re: [PATCH 0/4] block: Trivial fixes in offloading code
-References: <20180702025836.20957-1-famz@redhat.com>
-In-Reply-To: <20180702025836.20957-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 29/06/2018 23:46, Joe Perches wrote:
+>>>      ERROR: "foo * bar" should be "foo *bar"
+>>>      #310: FILE: hw/ppc/ppc440_uc.c:564:
+>>>      +        size = 8 * MiB * sh;
+>>>      total: 1 errors, 0 warnings, 433 lines checked
+> Does the linux kernel use these?
+> I don't believe so.
+> 
 
-On 2018-07-02 04:58, Fam Zheng wrote:
-> These are the low priority ones spotted by Kevin and Max last week.
->=20
-> Fam Zheng (4):
->   qcow2: Drop unused cluster_data
->   file-posix: Fix fd_open check in raw_co_copy_range_to
->   qcow2: Drop unreachable break
->   raw: Drop superfluous semicolon
->=20
->  block/file-posix.c | 2 +-
->  block/qcow2.c      | 3 ---
->  block/raw-format.c | 2 +-
->  3 files changed, 2 insertions(+), 5 deletions(-)
+No, I'm not sure why you were CCed. :)
 
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-
-Do you want to make qcow2_co_copy_range_to() do something special on
-BDRV_REQ_ZERO_WRITE?  To me, it seems natural, but on the other hand
-maybe it wouldn't bring anything.  If the protocol layer supports copy
-offloading, then it'll probably do that zero write efficiently anyway.
-If it doesn't, qemu-img convert will just fall back to the usual
-implementation which involves writing zeroes when zeroes are read, so...
- What's your opinion?
-
-Max
-
-
---bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAls6HCkACgkQ9AfbAGHV
-z0A4xgf+MDcvhALFvPD3TqvvlkyvMdnQSd/jBgkRannb7yDEyDPqn8U06/KZkhfh
-DWr73T6nCleBNFYgm0lqbS0sF4Im7nU8X7S6lK+q+ZemvdekGezSTXvLhSHqsKpM
-PhzS4XCxKZV62qyT4SAiEkjH/PdA9Figd8686qc34mU6O2JN4Qw34HPGEqsuwgX5
-3aNHKCaP3JdMPwLQQnQOZYDCSi9+Vd/uWmok32nuihnuivOCKZPCK87mN2tQA+0K
-IhNjJWF7YqEqaCDNjUvcyMWLM2/96ehh0jZBxtNlP0ZrOIjCoorE8BOiRpk28m+f
-JJvNmu4XAiLKF//ySfoIrgBHVXGorw==
-=DjK2
------END PGP SIGNATURE-----
-
---bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4--
+Paolo
