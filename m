@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fa1dF-0006Oy-M9
+	(envelope-from <kraxel@redhat.com>) id 1fa1dF-0006Od-A3
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fa1dE-0007vg-Nu
+	(envelope-from <kraxel@redhat.com>) id 1fa1dC-0007uD-5P
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:24:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44764)
+Received: from mx1.redhat.com ([209.132.183.28]:58362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa1dE-0007vE-Hq
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:24:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa1dB-0007tv-VF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:24:50 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D21C85F72D
-	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:24:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A6E23003064
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:24:49 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  2 Jul 2018 18:24:41 +0200
-Message-Id: <20180702162443.16796-2-kraxel@redhat.com>
+Date: Mon,  2 Jul 2018 18:24:42 +0200
+Message-Id: <20180702162443.16796-3-kraxel@redhat.com>
 In-Reply-To: <20180702162443.16796-1-kraxel@redhat.com>
 References: <20180702162443.16796-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] virtio-gpu: tweak scanout disable.
+Subject: [Qemu-devel] [PATCH 2/3] virtio-gpu: update old resource too.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +32,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-- Factor out the code to virtio_gpu_disable_scanout().
-- Allow disable scanout 0, show a message then.
-- Clear scanout->resource_id.
+When switching scanout from one resource to another we must update the
+scanout_bitmask field for both new (set bit) and old (clear bit)
+resource.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/virtio-gpu.c | 47 +++++++++++++++++++++++++++++------------------
- 1 file changed, 29 insertions(+), 18 deletions(-)
+ hw/display/virtio-gpu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 2dd3c3481a..054ec73c0a 100644
+index 054ec73c0a..336dc59007 100644
 --- a/hw/display/virtio-gpu.c
 +++ b/hw/display/virtio-gpu.c
-@@ -399,6 +399,34 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
-     g->hostmem += res->hostmem;
- }
- 
-+static void virtio_gpu_disable_scanout(VirtIOGPU *g, int scanout_id)
-+{
-+    struct virtio_gpu_scanout *scanout = &g->scanout[scanout_id];
-+    struct virtio_gpu_simple_resource *res;
-+    DisplaySurface *ds = NULL;
-+
-+    if (scanout->resource_id == 0) {
-+        return;
-+    }
-+
-+    res = virtio_gpu_find_resource(g, scanout->resource_id);
-+    if (res) {
-+        res->scanout_bitmask &= ~(1 << scanout_id);
-+    }
-+
-+    if (scanout_id == 0) {
-+        /* primary head */
-+        ds = qemu_create_message_surface(scanout->width  ?: 640,
-+                                         scanout->height ?: 480,
-+                                         "Guest disabled display.");
-+    }
-+    dpy_gfx_replace_surface(scanout->con, ds);
-+    scanout->resource_id = 0;
-+    scanout->ds = NULL;
-+    scanout->width = 0;
-+    scanout->height = 0;
-+}
-+
- static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                         struct virtio_gpu_simple_resource *res)
+@@ -590,7 +590,7 @@ static void virtio_unref_resource(pixman_image_t *image, void *data)
+ static void virtio_gpu_set_scanout(VirtIOGPU *g,
+                                    struct virtio_gpu_ctrl_command *cmd)
  {
-@@ -583,24 +611,7 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
- 
-     g->enable = 1;
-     if (ss.resource_id == 0) {
--        scanout = &g->scanout[ss.scanout_id];
--        if (scanout->resource_id) {
--            res = virtio_gpu_find_resource(g, scanout->resource_id);
--            if (res) {
--                res->scanout_bitmask &= ~(1 << ss.scanout_id);
--            }
--        }
--        if (ss.scanout_id == 0) {
--            qemu_log_mask(LOG_GUEST_ERROR,
--                          "%s: illegal scanout id specified %d",
--                          __func__, ss.scanout_id);
--            cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_SCANOUT_ID;
--            return;
--        }
--        dpy_gfx_replace_surface(g->scanout[ss.scanout_id].con, NULL);
--        scanout->ds = NULL;
--        scanout->width = 0;
--        scanout->height = 0;
-+        virtio_gpu_disable_scanout(g, ss.scanout_id);
-         return;
+-    struct virtio_gpu_simple_resource *res;
++    struct virtio_gpu_simple_resource *res, *ores;
+     struct virtio_gpu_scanout *scanout;
+     pixman_format_code_t format;
+     uint32_t offset;
+@@ -664,6 +664,11 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
+         dpy_gfx_replace_surface(g->scanout[ss.scanout_id].con, scanout->ds);
      }
  
++    ores = virtio_gpu_find_resource(g, scanout->resource_id);
++    if (ores) {
++        ores->scanout_bitmask &= ~(1 << ss.scanout_id);
++    }
++
+     res->scanout_bitmask |= (1 << ss.scanout_id);
+     scanout->resource_id = ss.resource_id;
+     scanout->x = ss.r.x;
 -- 
 2.9.3
