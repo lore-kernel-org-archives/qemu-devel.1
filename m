@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0UO-0004dV-Vg
+	(envelope-from <shorne@gmail.com>) id 1fa0UO-0004dW-Vn
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0UM-0008Oa-Nd
+	(envelope-from <shorne@gmail.com>) id 1fa0UK-0008MY-FD
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:40 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:44779)
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:45041)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0UM-0008NY-HC
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:38 -0400
-Received: by mail-pg0-x244.google.com with SMTP id r1-v6so1582546pgp.11
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0UK-0008MC-9w
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:36 -0400
+Received: by mail-pg0-x22d.google.com with SMTP id r1-v6so1582505pgp.11
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:36 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 00:10:22 +0900
-Message-Id: <20180702151023.24532-25-shorne@gmail.com>
+Date: Tue,  3 Jul 2018 00:10:21 +0900
+Message-Id: <20180702151023.24532-24-shorne@gmail.com>
 In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
 References: <20180702151023.24532-1-shorne@gmail.com>
-Subject: [Qemu-devel] [PULL v2 24/25] target/openrisc: Fix delay slot
- exception flag to match spec
+Subject: [Qemu-devel] [PULL v2 23/25] linux-user: Fix struct sigaltstack for
+ openrisc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +27,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-The delay slot exception flag is only set on the SR register during
-exception.  Previously it was being set on both the ESR and SR this
-caused QEMU to differ from the spec.  The was apparent as the linux
-kernel had a bug where it could boot on QEMU but not on real hardware.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-The fixed logic now matches hardware.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/interrupt.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ linux-user/openrisc/target_signal.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-index 138ad17f00..bbae956361 100644
---- a/target/openrisc/interrupt.c
-+++ b/target/openrisc/interrupt.c
-@@ -35,13 +35,6 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-     int exception = cs->exception_index;
+diff --git a/linux-user/openrisc/target_signal.h b/linux-user/openrisc/target_signal.h
+index c352a8b333..8283eaf544 100644
+--- a/linux-user/openrisc/target_signal.h
++++ b/linux-user/openrisc/target_signal.h
+@@ -5,8 +5,8 @@
  
-     env->epcr = env->pc;
--    if (env->dflag) {
--        env->dflag = 0;
--        env->sr |= SR_DSX;
--        env->epcr -= 4;
--    } else {
--        env->sr &= ~SR_DSX;
--    }
-     if (exception == EXCP_SYSCALL) {
-         env->epcr += 4;
-     }
-@@ -51,7 +44,10 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-         env->eear = env->pc;
-     }
+ typedef struct target_sigaltstack {
+     abi_long ss_sp;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+-    abi_long ss_flags;
+ } target_stack_t;
  
-+    /* During exceptions esr is populared with the pre-exception sr.  */
-     env->esr = cpu_get_sr(env);
-+    /* In parallel sr is updated to disable mmu, interrupts, timers and
-+       set the delay slot exception flag.  */
-     env->sr &= ~SR_DME;
-     env->sr &= ~SR_IME;
-     env->sr |= SR_SM;
-@@ -61,6 +57,15 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-     env->pmr &= ~PMR_SME;
-     env->lock_addr = -1;
- 
-+    /* Set/clear dsx to indicate if we are in a delay slot exception.  */
-+    if (env->dflag) {
-+        env->dflag = 0;
-+        env->sr |= SR_DSX;
-+        env->epcr -= 4;
-+    } else {
-+        env->sr &= ~SR_DSX;
-+    }
-+
-     if (exception > 0 && exception < EXCP_NR) {
-         static const char * const int_name[EXCP_NR] = {
-             [EXCP_RESET]    = "RESET",
+ /* sigaltstack controls  */
 -- 
 2.17.0
