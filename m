@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fa1at-0004RR-CK
+	(envelope-from <armbru@redhat.com>) id 1fa1au-0004SR-BI
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fa1ar-0006em-3g
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47590 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fa1ar-0006fJ-JB
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54938 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fa1aq-0006dG-O2
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fa1ar-0006e0-61
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F2057DAC2
+	by mx1.redhat.com (Postfix) with ESMTPS id B799C40250FF
 	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:22:24 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Jul 2018 18:22:01 +0200
-Message-Id: <20180702162218.13678-16-armbru@redhat.com>
+Date: Mon,  2 Jul 2018 18:22:05 +0200
+Message-Id: <20180702162218.13678-20-armbru@redhat.com>
 In-Reply-To: <20180702162218.13678-1-armbru@redhat.com>
 References: <20180702162218.13678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 15/32] qmp: Simplify code around
- monitor_qmp_dispatch_one()
+Subject: [Qemu-devel] [PATCH 19/32] monitor: Rename use_io_thr to
+ use_io_thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,113 +33,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
 
-Change monitor_qmp_dispatch_one() to take its parameters unwrapped,
-move monitor_resume() to the one caller that needs it, rename the
-function to monitor_qmp_dispatch().
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c | 58 +++++++++++++++++++++++--------------------------------
- 1 file changed, 24 insertions(+), 34 deletions(-)
+ monitor.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 94f5660c3c..51ba1485ad 100644
+index fd83a57dda..10b6634d3e 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -4166,20 +4166,10 @@ static void monitor_qmp_respond(Monitor *mon, QObject *rsp,
-     qobject_unref(rsp);
- }
+@@ -206,11 +206,11 @@ struct Monitor {
+     int flags;
+     int suspend_cnt;            /* Needs to be accessed atomically */
+     bool skip_flush;
+-    bool use_io_thr;
++    bool use_io_thread;
  
--/*
-- * Dispatch one single QMP request. The function will free the req_obj
-- * and objects inside it before return.
-- */
--static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
-+static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
+     /*
+      * State used only in the thread "owning" the monitor.
+-     * If @use_io_thr, this is mon_global.mon_iothread.
++     * If @use_io_thread, this is mon_global.mon_iothread.
+      * Else, it's the main thread.
+      * These members can be safely accessed without locks.
+      */
+@@ -520,7 +520,7 @@ static void monitor_json_emitter_raw(Monitor *mon,
+ 
+ static void monitor_json_emitter(Monitor *mon, QObject *data)
  {
--    Monitor *mon, *old_mon;
--    QObject *req, *rsp = NULL, *id;
--    bool need_resume;
--
--    req = req_obj->req;
--    mon = req_obj->mon;
--    id = req_obj->id;
--    need_resume = req_obj->need_resume;
-+    Monitor *old_mon;
-+    QObject *rsp;
+-    if (mon->use_io_thr) {
++    if (mon->use_io_thread) {
+         /*
+          * If using I/O thread, we need to queue the item so that I/O
+          * thread will do the rest for us.  Take refcount so that
+@@ -766,7 +766,7 @@ static void monitor_qapi_event_init(void)
+ static void handle_hmp_command(Monitor *mon, const char *cmdline);
  
-     old_mon = cur_mon;
-     cur_mon = mon;
-@@ -4188,15 +4178,7 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
- 
-     cur_mon = old_mon;
- 
--    /* Respond if necessary */
-     monitor_qmp_respond(mon, rsp, NULL, qobject_ref(id));
--
--    /* This pairs with the monitor_suspend() in handle_qmp_command(). */
--    if (need_resume) {
--        monitor_resume(mon);
--    }
--
--    qmp_request_free(req_obj);
- }
- 
- /*
-@@ -4240,12 +4222,20 @@ static void monitor_qmp_bh_dispatcher(void *data)
+ static void monitor_data_init(Monitor *mon, bool skip_flush,
+-                              bool use_io_thr)
++                              bool use_io_thread)
  {
-     QMPRequest *req_obj = monitor_qmp_requests_pop_any();
- 
--    if (req_obj) {
--        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
--        monitor_qmp_dispatch_one(req_obj);
--        /* Reschedule instead of looping so the main loop stays responsive */
--        qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
-+    if (!req_obj) {
-+        return;
-     }
-+
-+    trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
-+    monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
-+    if (req_obj->need_resume) {
-+        /* Pairs with the monitor_suspend() in handle_qmp_command() */
-+        monitor_resume(req_obj->mon);
-+    }
-+    qmp_request_free(req_obj);
-+
-+    /* Reschedule instead of looping so the main loop stays responsive */
-+    qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->mon_lock);
+@@ -775,7 +775,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
+     /* Use *mon_cmds by default. */
+     mon->cmd_table = mon_cmds;
+     mon->skip_flush = skip_flush;
+-    mon->use_io_thr = use_io_thr;
++    mon->use_io_thread = use_io_thread;
+     mon->qmp.qmp_requests = g_queue_new();
+     mon->qmp.qmp_responses = g_queue_new();
  }
+@@ -1270,7 +1270,7 @@ static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
+         assert(list->value < QMP_CAPABILITY__MAX);
+         switch (list->value) {
+         case QMP_CAPABILITY_OOB:
+-            if (!mon->use_io_thr) {
++            if (!mon->use_io_thread) {
+                 /*
+                  * Out-of-band only works with monitors that are
+                  * running on dedicated I/O thread.
+@@ -4376,7 +4376,7 @@ void monitor_resume(Monitor *mon)
+              * For QMP monitors that are running in I/O thread, let's
+              * kick the thread in case it's sleeping.
+              */
+-            if (mon->use_io_thr) {
++            if (mon->use_io_thread) {
+                 aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
+             }
+         } else {
+@@ -4396,7 +4396,7 @@ static QObject *get_qmp_greeting(Monitor *mon)
+     qmp_marshal_query_version(NULL, &ver, NULL);
  
- #define  QMP_REQ_QUEUE_LEN_MAX  (8)
-@@ -4291,20 +4281,20 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         goto err;
-     }
+     for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
+-        if (!mon->use_io_thr && cap == QMP_CAPABILITY_OOB) {
++        if (!mon->use_io_thread && cap == QMP_CAPABILITY_OOB) {
+             /* Monitors that are not using I/O thread won't support OOB */
+             continue;
+         }
+@@ -4609,9 +4609,9 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+     Monitor *mon = opaque;
+     GMainContext *context;
  
-+    if (qmp_is_oob(qdict)) {
-+        /* Out-of-band (OOB) requests are executed directly in parser. */
-+        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
-+                                          ?: "");
-+        monitor_qmp_dispatch(mon, req, id);
-+        return;
-+    }
-+
-     req_obj = g_new0(QMPRequest, 1);
-     req_obj->mon = mon;
-     req_obj->id = id;
-     req_obj->req = req;
-     req_obj->need_resume = false;
- 
--    if (qmp_is_oob(qdict)) {
--        /* Out-of-band (OOB) requests are executed directly in parser. */
--        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj->id)
--                                          ?: "");
--        monitor_qmp_dispatch_one(req_obj);
--        return;
--    }
--
-     /* Protect qmp_requests and fetching its length. */
-     qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
- 
+-    if (mon->use_io_thr) {
++    if (mon->use_io_thread) {
+         /*
+-         * When use_io_thr is set, we use the global shared dedicated
++         * When @use_io_thread is set, we use the global shared dedicated
+          * I/O thread for this monitor to handle input/output.
+          */
+         context = monitor_get_io_context();
+@@ -4660,7 +4660,7 @@ void monitor_init(Chardev *chr, int flags)
+     if (monitor_is_qmp(mon)) {
+         qemu_chr_fe_set_echo(&mon->chr, true);
+         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+-        if (mon->use_io_thr) {
++        if (mon->use_io_thread) {
+             /*
+              * Make sure the old iowatch is gone.  It's possible when
+              * e.g. the chardev is in client mode, with wait=on.
 -- 
 2.17.1
