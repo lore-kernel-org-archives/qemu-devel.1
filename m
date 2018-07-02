@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzxw-00035K-Pe
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzxw-00035J-Pj
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzxr-0005BF-PU
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzxv-0005FI-7x
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:08 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:53109)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZzxr-0005Ad-JQ
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:03 -0400
-Received: by mail-wm0-x230.google.com with SMTP id w16-v6so8652847wmc.2
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:38:03 -0700 (PDT)
+	id 1fZzxv-0005EI-0d
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:07 -0400
+Received: by mail-wm0-x243.google.com with SMTP id n17-v6so9010616wmh.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:38:06 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  2 Jul 2018 15:30:20 +0100
-Message-Id: <20180702143021.18864-20-alex.bennee@linaro.org>
+Date: Mon,  2 Jul 2018 15:30:18 +0100
+Message-Id: <20180702143021.18864-18-alex.bennee@linaro.org>
 In-Reply-To: <20180702143021.18864-1-alex.bennee@linaro.org>
 References: <20180702143021.18864-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 19/20] docker: add special rule for
- deboostrapped images
+Subject: [Qemu-devel] [PATCH v3 17/20] docker: debian-bootstrap.pre allow
+ customising of variant/url
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-We might as well have a custom rule for this. For one thing the
-dependencies are different. As the primary dependency for
-docker-image-% could never be docker-image-debian-bootstrap we can
-drop that test in the main rule as well.
+We default to the buildd variant as most of our images are for
+building. However lets give the user the ability to specify "minbase"
+if they want to create a simple base image for experimentation.
+
+Allowing the tweaking of DEB_URL means we can also bootstrap other
+Debian based OS's. For example:
+
+  make docker-binfmt-image-debian-ubuntu-bionic-arm64 \
+       DEB_ARCH=arm64 DEB_TYPE=bionic \
+       DEB_VARIANT=minbase DEB_URL=http://ports.ubuntu.com/ \
+       EXECUTABLE=./aarch64-linux-user/qemu-aarch64
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v3:
-  - changed rule to docker-binfmt-image-debian-%:
-  - leave executable in the main rule
-  - rm stray whitespace fix
----
- tests/docker/Makefile.include | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
+ tests/docker/dockerfiles/debian-bootstrap.pre | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 8641f5da2c..fdc87b8a57 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -49,9 +49,6 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		"CHECK", "$*")
- else
- docker-image-%: $(DOCKER_FILES_DIR)/%.docker
--	@if test "$@" = docker-image-debian-bootstrap -a -z "$(EXECUTABLE)"; then \
--		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
--	fi
- 	$(call quiet-command,\
- 		$(DOCKER_SCRIPT) build qemu:$* $< \
- 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
-@@ -59,6 +56,26 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
-+
-+# Special rule for debootstraped binfmt linux-user images
-+docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/debian-bootstrap.docker
-+	@if test -z "$(EXECUTABLE)"; then \
-+		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
-+	fi
-+	@if test -z "$(DEB_ARCH)"; then 					\
-+		echo WARNING: DEB_ARCH is not set, debootstrap may fail. 2>&1 ; \
-+        fi
-+	@if test -z "$(DEB_TYPE)"; then 					\
-+		echo WARNING: DEB_TYPE is not set, debootstrap may fail. 2>&1 ; \
-+        fi
-+	$(call quiet-command,							\
-+		$(DOCKER_SCRIPT) build qemu:debian-$* $< \
-+		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
-+		$(if $(NOUSER),,--add-current-user) \
-+		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
-+		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)), \
-+		"BUILD","binfmt debian-$* (debootstrapped)")
-+
- endif
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
+index 7c76dce663..56e1aa7a21 100755
+--- a/tests/docker/dockerfiles/debian-bootstrap.pre
++++ b/tests/docker/dockerfiles/debian-bootstrap.pre
+@@ -32,6 +32,15 @@ if [ -z "${DEB_TYPE}" ]; then
  
- # Enforce dependencies for composite images
+ fi
+ 
++# The following allow finer grain control over the defaults
++if [ -z "${DEB_VARIANT}" ]; then
++    DEB_VARIANT=buildd
++fi
++
++if [ -z "${DEB_URL}" ]; then
++    DEB_URL="http://httpredir.debian.org/debian"
++fi
++
+ # We check in order for
+ #
+ #  - DEBOOTSTRAP_DIR pointing at a development checkout
+@@ -107,5 +116,5 @@ fi
+ 
+ echo "Building a rootfs using ${FAKEROOT} and ${DEBOOTSTRAP} ${DEB_ARCH}/${DEB_TYPE}"
+ 
+-${FAKEROOT} ${DEBOOTSTRAP} --variant=buildd --foreign --arch=$DEB_ARCH $DEB_TYPE . http://httpredir.debian.org/debian || exit 1
++${FAKEROOT} ${DEBOOTSTRAP} --variant=$DEB_VARIANT --foreign --arch=$DEB_ARCH $DEB_TYPE . $DEB_URL || exit 1
+ exit 0
 -- 
 2.17.1
