@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZxtO-0003la-RX
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:25:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fZxvg-0004UI-6R
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:27:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZxtJ-0002yQ-TG
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:25:18 -0400
-Date: Mon, 2 Jul 2018 13:25:10 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180702122510.GB2155@stefanha-x1.localdomain>
-References: <20180627143815.1829-1-joel@jms.id.au>
-	<20180627143815.1829-2-joel@jms.id.au>
+	(envelope-from <peter.maydell@linaro.org>) id 1fZxvf-0004dr-8B
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:27:40 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38399)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fZxvf-0004dd-31
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:27:39 -0400
+Received: by mail-oi0-x244.google.com with SMTP id v8-v6so15993565oie.5
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 05:27:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="neYutvxvOLaeuPCA"
-Content-Disposition: inline
-In-Reply-To: <20180627143815.1829-2-joel@jms.id.au>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] arm: Add Nordic Semiconductor nRF51
- SoC
+In-Reply-To: <20180628213158.GO24595@lianli.shorne-pla.net>
+References: <20180628030330.15615-1-richard.henderson@linaro.org>
+	<20180628213158.GO24595@lianli.shorne-pla.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Jul 2018 13:27:17 +0100
+Message-ID: <CAFEAcA_4GqsgTzawem-CgYVieeaAZSS=rKLnLBd5eZG_tHHPVA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 00/23] target/openrisc improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Stafford Horne <shorne@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 28 June 2018 at 22:31, Stafford Horne <shorne@gmail.com> wrote:
+> On Wed, Jun 27, 2018 at 08:03:07PM -0700, Richard Henderson wrote:
+>> Changes since v2:
+>>   * Fix missing mtspr break.
+>>   * Reorg print_insn_or1k and interrupt logging to the start.
+>>   * Adjust exit after mtspr; fixing smp kernel crash.
+>>   * Fix signals patch based on Larent's review.
+>
+> Thanks, I confirmed this is working for me too.
+>
+> As mentioned before there are a few items I am working on.  I will take the
+> series and send the pull request during the merge window.
 
---neYutvxvOLaeuPCA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+QEMU doesn't have "merge windows". We just have a softfreeze
+date. During the "general development" part of the release
+cycle, send pullrequests whenever you like, for new features,
+bugfixes, etc. Prefer "little and often" rather than saving
+up lots of patches and sending huge pull requests infrequently.
 
-On Thu, Jun 28, 2018 at 12:08:13AM +0930, Joel Stanley wrote:
-> +/* TODO: Flash size should be defined by the board. Microbit uses 256KB */
-> +#define FLASH_BASE      0x00000000
-> +#define FLASH_SIZE      (256 * 1024)
-> +
-> +/* TODO: Flash size should be defined by the board. Microbit uses 16KB */
-> +#define SRAM_BASE       0x20000000
-> +#define SRAM_SIZE       (16 * 1024)
+The last pullrequests before softfreeze need to be on the
+mailing list by the softfreeze date. After softfreeze, only
+bug fixes should be submitted. We get gradually stricter
+about how bad the bug has to be to justify allowing in a
+fix as we go along; so in rc1 we're fairly relaxed about
+larger changes that fix bugs, and by the time we get to
+rc3 or rc4 we really only want safe small changes that
+fix bugs that are regressions from the previous release.
 
-Making FLASH_SIZE and SRAM_SIZE properties of the NRF51State object.
-Then microbit.c can set them.
+Pull request cover letters during the freeze part of the
+release cycle should include enough detail about the bugs
+being fixed to let me judge whether they match the criteria
+for going into the next rc, especially at the end of the cycle.
 
-> +static void nrf51_soc_init(Object *obj)
-> +{
-> +    NRF51State *s = NRF51_SOC(obj);
-> +
-> +    memory_region_init(&s->container, obj, "nrf51-container", UINT64_MAX);
-> +
-> +    /* TODO: implement a cortex m0 and update this */
-
-Please see "[PATCH v2 0/3] arm: add skeleton Cortex M0 CPU model".  It
-should work with TYPE_ARMV7M -> TYPE_ARMV6M and "cortex-m3" ->
-"cortex-m0".
-
-Julia is currently completing the Cortex M0 emulation but at this point
-guest software may already run successfully.  If not, then the patches
-she sends over the next week or two ought to do the trick.
-
-> +typedef struct NRF51State {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    char *kernel_filename;
-
-Is this used by anything?
-
---neYutvxvOLaeuPCA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbOhmmAAoJEJykq7OBq3PIYsoIAMk7THEXPxeSMgk+Bry8E1/c
-V919F6xt1URYGA0crVnZvOpI1qqLCxbCLY42mwnYzp1WWDeOclYuDhI1WpQso42e
-IoSAOTb+GmeRW+nPYzoqPw6ERzFtWkVlIymSUnq2zIvdTyA+rSv5FurES4wHL5LZ
-jIoDb6v5OBarT9eFumwfR4LDn/QfRfkOaPOU6b4Ah7uHnkKVhuEuPwKsC0tldyqy
-manmB5l5Qh457RCVwl7r/RU19JIC2hF+n074IYGPI38Ugtry/HsL54cxzv3XWAfo
-jLwTVPJDO/pp9sEfXoZWPXjHDS8og3hzvkMK3KY2C8Yc7hGONapj5QlzzhXI9GY=
-=4Jmd
------END PGP SIGNATURE-----
-
---neYutvxvOLaeuPCA--
+thanks
+-- PMM
