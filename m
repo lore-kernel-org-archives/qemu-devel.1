@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzLj-0002PO-FI
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:40 -0400
+	(envelope-from <shorne@gmail.com>) id 1fZzLo-0002T1-31
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzLi-00087s-JE
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:39 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:34258)
+	(envelope-from <shorne@gmail.com>) id 1fZzLl-000895-0o
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:44 -0400
+Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:35259)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzLi-00087U-Ci
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:38 -0400
-Received: by mail-pg0-x235.google.com with SMTP id y5-v6so917339pgv.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzLk-00088m-On
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:40 -0400
+Received: by mail-pg0-x233.google.com with SMTP id i7-v6so7198179pgp.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:40 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon,  2 Jul 2018 22:57:51 +0900
-Message-Id: <20180702135806.7087-11-shorne@gmail.com>
+Date: Mon,  2 Jul 2018 22:57:52 +0900
+Message-Id: <20180702135806.7087-12-shorne@gmail.com>
 In-Reply-To: <20180702135806.7087-1-shorne@gmail.com>
 References: <20180702135806.7087-1-shorne@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/25] target/openrisc: Form the spr index from
- tcg
+Subject: [Qemu-devel] [PULL 11/25] target/openrisc: Merge tlb allocation
+ into CPUOpenRISCState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +31,333 @@ Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henders
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Rather than pass base+offset to the helper, pass the full index.
-In most cases the base is r0 and optimization yields a constant.
+There is no reason to allocate this separately.  This was probably
+copied from target/mips which makes the same mistake.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+While doing so, move tlb into the clear-on-reset range.  While not
+all of the TLB bits are guaranteed zero on reset, all of the valid
+bits are cleared, and the rest of the bits are unspecified.
+Therefore clearing the whole of the TLB is correct.
+
+Reviewed-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/helper.h     |  4 ++--
- target/openrisc/sys_helper.c |  9 +++------
- target/openrisc/translate.c  | 16 +++++++++-------
- 3 files changed, 14 insertions(+), 15 deletions(-)
+ target/openrisc/cpu.h              |  6 ++++--
+ target/openrisc/interrupt.c        |  4 ++--
+ target/openrisc/interrupt_helper.c |  8 +++----
+ target/openrisc/machine.c          | 15 ++++++-------
+ target/openrisc/mmu.c              | 34 ++++++++++++++----------------
+ target/openrisc/sys_helper.c       | 28 ++++++++++++------------
+ 6 files changed, 46 insertions(+), 49 deletions(-)
 
-diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-index e37dabc77a..9db9bf3963 100644
---- a/target/openrisc/helper.h
-+++ b/target/openrisc/helper.h
-@@ -56,5 +56,5 @@ FOP_CMP(le)
- DEF_HELPER_FLAGS_1(rfe, 0, void, env)
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index c871d6bfe1..96b7f58659 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -301,6 +301,10 @@ typedef struct CPUOpenRISCState {
  
- /* sys */
--DEF_HELPER_FLAGS_4(mtspr, 0, void, env, tl, tl, tl)
--DEF_HELPER_FLAGS_4(mfspr, TCG_CALL_NO_WG, tl, env, tl, tl, tl)
-+DEF_HELPER_FLAGS_3(mtspr, 0, void, env, tl, tl)
-+DEF_HELPER_FLAGS_3(mfspr, TCG_CALL_NO_WG, tl, env, tl, tl)
+     uint32_t dflag;           /* In delay slot (boolean) */
+ 
++#ifndef CONFIG_USER_ONLY
++    CPUOpenRISCTLBContext tlb;
++#endif
++
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+@@ -310,8 +314,6 @@ typedef struct CPUOpenRISCState {
+     uint32_t cpucfgr;         /* CPU configure register */
+ 
+ #ifndef CONFIG_USER_ONLY
+-    CPUOpenRISCTLBContext * tlb;
+-
+     QEMUTimer *timer;
+     uint32_t ttmr;          /* Timer tick mode register */
+     int is_counting;
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index 25351d5de3..2d0b55afa9 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -63,8 +63,8 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     env->sr &= ~SR_TEE;
+     env->pmr &= ~PMR_DME;
+     env->pmr &= ~PMR_SME;
+-    env->tlb->cpu_openrisc_map_address_data = &cpu_openrisc_get_phys_nommu;
+-    env->tlb->cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
++    env->tlb.cpu_openrisc_map_address_data = &cpu_openrisc_get_phys_nommu;
++    env->tlb.cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
+     env->lock_addr = -1;
+ 
+     if (exception > 0 && exception < EXCP_NR) {
+diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
+index b865738f8b..dc97b38704 100644
+--- a/target/openrisc/interrupt_helper.c
++++ b/target/openrisc/interrupt_helper.c
+@@ -36,18 +36,18 @@ void HELPER(rfe)(CPUOpenRISCState *env)
+ 
+ #ifndef CONFIG_USER_ONLY
+     if (cpu->env.sr & SR_DME) {
+-        cpu->env.tlb->cpu_openrisc_map_address_data =
++        cpu->env.tlb.cpu_openrisc_map_address_data =
+             &cpu_openrisc_get_phys_data;
+     } else {
+-        cpu->env.tlb->cpu_openrisc_map_address_data =
++        cpu->env.tlb.cpu_openrisc_map_address_data =
+             &cpu_openrisc_get_phys_nommu;
+     }
+ 
+     if (cpu->env.sr & SR_IME) {
+-        cpu->env.tlb->cpu_openrisc_map_address_code =
++        cpu->env.tlb.cpu_openrisc_map_address_code =
+             &cpu_openrisc_get_phys_code;
+     } else {
+-        cpu->env.tlb->cpu_openrisc_map_address_code =
++        cpu->env.tlb.cpu_openrisc_map_address_code =
+             &cpu_openrisc_get_phys_nommu;
+     }
+ 
+diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
+index 0a793eb14d..c10d28b055 100644
+--- a/target/openrisc/machine.c
++++ b/target/openrisc/machine.c
+@@ -30,18 +30,18 @@ static int env_post_load(void *opaque, int version_id)
+ 
+     /* Restore MMU handlers */
+     if (env->sr & SR_DME) {
+-        env->tlb->cpu_openrisc_map_address_data =
++        env->tlb.cpu_openrisc_map_address_data =
+             &cpu_openrisc_get_phys_data;
+     } else {
+-        env->tlb->cpu_openrisc_map_address_data =
++        env->tlb.cpu_openrisc_map_address_data =
+             &cpu_openrisc_get_phys_nommu;
+     }
+ 
+     if (env->sr & SR_IME) {
+-        env->tlb->cpu_openrisc_map_address_code =
++        env->tlb.cpu_openrisc_map_address_code =
+             &cpu_openrisc_get_phys_code;
+     } else {
+-        env->tlb->cpu_openrisc_map_address_code =
++        env->tlb.cpu_openrisc_map_address_code =
+             &cpu_openrisc_get_phys_nommu;
+     }
+ 
+@@ -77,10 +77,6 @@ static const VMStateDescription vmstate_cpu_tlb = {
+     }
+ };
+ 
+-#define VMSTATE_CPU_TLB(_f, _s)                             \
+-    VMSTATE_STRUCT_POINTER(_f, _s, vmstate_cpu_tlb, CPUOpenRISCTLBContext)
+-
+-
+ static int get_sr(QEMUFile *f, void *opaque, size_t size, VMStateField *field)
+ {
+     CPUOpenRISCState *env = opaque;
+@@ -143,7 +139,8 @@ static const VMStateDescription vmstate_env = {
+         VMSTATE_UINT32(fpcsr, CPUOpenRISCState),
+         VMSTATE_UINT64(mac, CPUOpenRISCState),
+ 
+-        VMSTATE_CPU_TLB(tlb, CPUOpenRISCState),
++        VMSTATE_STRUCT(tlb, CPUOpenRISCState, 1,
++                       vmstate_cpu_tlb, CPUOpenRISCTLBContext),
+ 
+         VMSTATE_TIMER_PTR(timer, CPUOpenRISCState),
+         VMSTATE_UINT32(ttmr, CPUOpenRISCState),
+diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
+index 2bd782f89b..5665bb7cc9 100644
+--- a/target/openrisc/mmu.c
++++ b/target/openrisc/mmu.c
+@@ -46,19 +46,19 @@ int cpu_openrisc_get_phys_code(OpenRISCCPU *cpu,
+     int idx = vpn & ITLB_MASK;
+     int right = 0;
+ 
+-    if ((cpu->env.tlb->itlb[0][idx].mr >> TARGET_PAGE_BITS) != vpn) {
++    if ((cpu->env.tlb.itlb[0][idx].mr >> TARGET_PAGE_BITS) != vpn) {
+         return TLBRET_NOMATCH;
+     }
+-    if (!(cpu->env.tlb->itlb[0][idx].mr & 1)) {
++    if (!(cpu->env.tlb.itlb[0][idx].mr & 1)) {
+         return TLBRET_INVALID;
+     }
+ 
+     if (cpu->env.sr & SR_SM) { /* supervisor mode */
+-        if (cpu->env.tlb->itlb[0][idx].tr & SXE) {
++        if (cpu->env.tlb.itlb[0][idx].tr & SXE) {
+             right |= PAGE_EXEC;
+         }
+     } else {
+-        if (cpu->env.tlb->itlb[0][idx].tr & UXE) {
++        if (cpu->env.tlb.itlb[0][idx].tr & UXE) {
+             right |= PAGE_EXEC;
+         }
+     }
+@@ -67,7 +67,7 @@ int cpu_openrisc_get_phys_code(OpenRISCCPU *cpu,
+         return TLBRET_BADADDR;
+     }
+ 
+-    *physical = (cpu->env.tlb->itlb[0][idx].tr & TARGET_PAGE_MASK) |
++    *physical = (cpu->env.tlb.itlb[0][idx].tr & TARGET_PAGE_MASK) |
+                 (address & (TARGET_PAGE_SIZE-1));
+     *prot = right;
+     return TLBRET_MATCH;
+@@ -81,25 +81,25 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
+     int idx = vpn & DTLB_MASK;
+     int right = 0;
+ 
+-    if ((cpu->env.tlb->dtlb[0][idx].mr >> TARGET_PAGE_BITS) != vpn) {
++    if ((cpu->env.tlb.dtlb[0][idx].mr >> TARGET_PAGE_BITS) != vpn) {
+         return TLBRET_NOMATCH;
+     }
+-    if (!(cpu->env.tlb->dtlb[0][idx].mr & 1)) {
++    if (!(cpu->env.tlb.dtlb[0][idx].mr & 1)) {
+         return TLBRET_INVALID;
+     }
+ 
+     if (cpu->env.sr & SR_SM) { /* supervisor mode */
+-        if (cpu->env.tlb->dtlb[0][idx].tr & SRE) {
++        if (cpu->env.tlb.dtlb[0][idx].tr & SRE) {
+             right |= PAGE_READ;
+         }
+-        if (cpu->env.tlb->dtlb[0][idx].tr & SWE) {
++        if (cpu->env.tlb.dtlb[0][idx].tr & SWE) {
+             right |= PAGE_WRITE;
+         }
+     } else {
+-        if (cpu->env.tlb->dtlb[0][idx].tr & URE) {
++        if (cpu->env.tlb.dtlb[0][idx].tr & URE) {
+             right |= PAGE_READ;
+         }
+-        if (cpu->env.tlb->dtlb[0][idx].tr & UWE) {
++        if (cpu->env.tlb.dtlb[0][idx].tr & UWE) {
+             right |= PAGE_WRITE;
+         }
+     }
+@@ -111,7 +111,7 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
+         return TLBRET_BADADDR;
+     }
+ 
+-    *physical = (cpu->env.tlb->dtlb[0][idx].tr & TARGET_PAGE_MASK) |
++    *physical = (cpu->env.tlb.dtlb[0][idx].tr & TARGET_PAGE_MASK) |
+                 (address & (TARGET_PAGE_SIZE-1));
+     *prot = right;
+     return TLBRET_MATCH;
+@@ -126,10 +126,10 @@ static int cpu_openrisc_get_phys_addr(OpenRISCCPU *cpu,
+ 
+     if (rw == MMU_INST_FETCH) {    /* ITLB */
+        *physical = 0;
+-        ret = cpu->env.tlb->cpu_openrisc_map_address_code(cpu, physical,
++        ret = cpu->env.tlb.cpu_openrisc_map_address_code(cpu, physical,
+                                                           prot, address, rw);
+     } else {          /* DTLB */
+-        ret = cpu->env.tlb->cpu_openrisc_map_address_data(cpu, physical,
++        ret = cpu->env.tlb.cpu_openrisc_map_address_data(cpu, physical,
+                                                           prot, address, rw);
+     }
+ 
+@@ -247,9 +247,7 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ 
+ void cpu_openrisc_mmu_init(OpenRISCCPU *cpu)
+ {
+-    cpu->env.tlb = g_malloc0(sizeof(CPUOpenRISCTLBContext));
+-
+-    cpu->env.tlb->cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
+-    cpu->env.tlb->cpu_openrisc_map_address_data = &cpu_openrisc_get_phys_nommu;
++    cpu->env.tlb.cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
++    cpu->env.tlb.cpu_openrisc_map_address_data = &cpu_openrisc_get_phys_nommu;
+ }
+ #endif
 diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 2f337363ec..2c959f63f4 100644
+index 2c959f63f4..ff315f6f1a 100644
 --- a/target/openrisc/sys_helper.c
 +++ b/target/openrisc/sys_helper.c
-@@ -27,13 +27,11 @@
- 
- #define TO_SPR(group, number) (((group) << 11) + (number))
- 
--void HELPER(mtspr)(CPUOpenRISCState *env,
--                   target_ulong ra, target_ulong rb, target_ulong offset)
-+void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
- {
- #ifndef CONFIG_USER_ONLY
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
--    int spr = (ra | offset);
-     int idx;
- 
-     switch (spr) {
-@@ -202,13 +200,12 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
- #endif
- }
- 
--target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
--                           target_ulong rd, target_ulong ra, uint32_t offset)
-+target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-+                           target_ulong spr)
- {
- #ifndef CONFIG_USER_ONLY
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
--    int spr = (ra | offset);
-     int idx;
- 
-     switch (spr) {
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 59605aacca..64b5e84630 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -865,9 +865,10 @@ static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
-     if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
--        TCGv_i32 ti = tcg_const_i32(a->k);
--        gen_helper_mfspr(cpu_R[a->d], cpu_env, cpu_R[a->d], cpu_R[a->a], ti);
--        tcg_temp_free_i32(ti);
-+        TCGv spr = tcg_temp_new();
-+        tcg_gen_ori_tl(spr, cpu_R[a->a], a->k);
-+        gen_helper_mfspr(cpu_R[a->d], cpu_env, cpu_R[a->d], spr);
-+        tcg_temp_free(spr);
-     }
-     return true;
- }
-@@ -877,7 +878,7 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
-     if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
--        TCGv_i32 ti;
-+        TCGv spr;
- 
-         /* For SR, we will need to exit the TB to recognize the new
-          * exception state.  For NPC, in theory this counts as a branch
-@@ -892,9 +893,10 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+@@ -61,18 +61,18 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
          }
-         dc->base.is_jmp = DISAS_EXIT;
+         cpu_set_sr(env, rb);
+         if (env->sr & SR_DME) {
+-            env->tlb->cpu_openrisc_map_address_data =
++            env->tlb.cpu_openrisc_map_address_data =
+                 &cpu_openrisc_get_phys_data;
+         } else {
+-            env->tlb->cpu_openrisc_map_address_data =
++            env->tlb.cpu_openrisc_map_address_data =
+                 &cpu_openrisc_get_phys_nommu;
+         }
  
--        ti = tcg_const_i32(a->k);
--        gen_helper_mtspr(cpu_env, cpu_R[a->a], cpu_R[a->b], ti);
--        tcg_temp_free_i32(ti);
-+        spr = tcg_temp_new();
-+        tcg_gen_ori_tl(spr, cpu_R[a->a], a->k);
-+        gen_helper_mtspr(cpu_env, spr, cpu_R[a->b]);
-+        tcg_temp_free(spr);
-     }
-     return true;
- }
+         if (env->sr & SR_IME) {
+-            env->tlb->cpu_openrisc_map_address_code =
++            env->tlb.cpu_openrisc_map_address_code =
+                 &cpu_openrisc_get_phys_code;
+         } else {
+-            env->tlb->cpu_openrisc_map_address_code =
++            env->tlb.cpu_openrisc_map_address_code =
+                 &cpu_openrisc_get_phys_nommu;
+         }
+         break;
+@@ -101,14 +101,14 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
+         if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb->dtlb[0][idx].mr & TARGET_PAGE_MASK);
++            tlb_flush_page(cs, env->tlb.dtlb[0][idx].mr & TARGET_PAGE_MASK);
+         }
+-        env->tlb->dtlb[0][idx].mr = rb;
++        env->tlb.dtlb[0][idx].mr = rb;
+         break;
+ 
+     case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
+         idx = spr - TO_SPR(1, 640);
+-        env->tlb->dtlb[0][idx].tr = rb;
++        env->tlb.dtlb[0][idx].tr = rb;
+         break;
+     case TO_SPR(1, 768) ... TO_SPR(1, 895):   /* DTLBW1MR 0-127 */
+     case TO_SPR(1, 896) ... TO_SPR(1, 1023):  /* DTLBW1TR 0-127 */
+@@ -120,14 +120,14 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
+         idx = spr - TO_SPR(2, 512);
+         if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb->itlb[0][idx].mr & TARGET_PAGE_MASK);
++            tlb_flush_page(cs, env->tlb.itlb[0][idx].mr & TARGET_PAGE_MASK);
+         }
+-        env->tlb->itlb[0][idx].mr = rb;
++        env->tlb.itlb[0][idx].mr = rb;
+         break;
+ 
+     case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
+         idx = spr - TO_SPR(2, 640);
+-        env->tlb->itlb[0][idx].tr = rb;
++        env->tlb.itlb[0][idx].tr = rb;
+         break;
+     case TO_SPR(2, 768) ... TO_SPR(2, 895):   /* ITLBW1MR 0-127 */
+     case TO_SPR(2, 896) ... TO_SPR(2, 1023):  /* ITLBW1TR 0-127 */
+@@ -259,11 +259,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
+ 
+     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
+-        return env->tlb->dtlb[0][idx].mr;
++        return env->tlb.dtlb[0][idx].mr;
+ 
+     case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
+         idx = spr - TO_SPR(1, 640);
+-        return env->tlb->dtlb[0][idx].tr;
++        return env->tlb.dtlb[0][idx].tr;
+ 
+     case TO_SPR(1, 768) ... TO_SPR(1, 895):   /* DTLBW1MR 0-127 */
+     case TO_SPR(1, 896) ... TO_SPR(1, 1023):  /* DTLBW1TR 0-127 */
+@@ -275,11 +275,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
+ 
+     case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1): /* ITLBW0MR 0-127 */
+         idx = spr - TO_SPR(2, 512);
+-        return env->tlb->itlb[0][idx].mr;
++        return env->tlb.itlb[0][idx].mr;
+ 
+     case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
+         idx = spr - TO_SPR(2, 640);
+-        return env->tlb->itlb[0][idx].tr;
++        return env->tlb.itlb[0][idx].tr;
+ 
+     case TO_SPR(2, 768) ... TO_SPR(2, 895):   /* ITLBW1MR 0-127 */
+     case TO_SPR(2, 896) ... TO_SPR(2, 1023):  /* ITLBW1TR 0-127 */
 -- 
 2.17.0
