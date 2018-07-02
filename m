@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzqW-0005M0-AM
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzqX-0005ML-N2
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzqV-0000RZ-7B
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:28 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33806)
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzqW-0000Sj-R6
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:29 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:39181)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZzqU-0000R1-SH
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:27 -0400
-Received: by mail-wr0-x230.google.com with SMTP id a12-v6so15791266wro.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:30:26 -0700 (PDT)
+	id 1fZzqW-0000S6-Ku
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:28 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id p11-v6so8928968wmc.4
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:30:28 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  2 Jul 2018 15:30:04 +0100
-Message-Id: <20180702143021.18864-4-alex.bennee@linaro.org>
+Date: Mon,  2 Jul 2018 15:30:06 +0100
+Message-Id: <20180702143021.18864-6-alex.bennee@linaro.org>
 In-Reply-To: <20180702143021.18864-1-alex.bennee@linaro.org>
 References: <20180702143021.18864-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/20] build-system: remove per-test GCOV
- reporting
+Subject: [Qemu-devel] [PATCH v3 05/20] docker: add gcovr to travis image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +32,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-I'm not entirely sure who's using this information and certainly in a
-CI environment it just washes over as additional noise. Later patches
-will provide new reporting options so a user who wants to analyse
-individual tests will be able to use that to get the information.
+Useful for debugging if nothing else as the gcovr on the Travis images
+are a little old.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- docs/devel/testing.rst | 11 +++++------
- tests/Makefile.include | 10 ----------
- 2 files changed, 5 insertions(+), 16 deletions(-)
+ tests/docker/dockerfiles/travis.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index f33e5a8423..66ef219f69 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -158,12 +158,11 @@ rarely used. See "QEMU iotests" section below for more information.
- GCC gcov support
- ----------------
- 
--``gcov`` is a GCC tool to analyze the testing coverage by instrumenting the
--tested code. To use it, configure QEMU with ``--enable-gcov`` option and build.
--Then run ``make check`` as usual. There will be additional ``gcov`` output as
--the testing goes on, showing the test coverage percentage numbers per analyzed
--source file. More detailed reports can be obtained by running ``gcov`` command
--on the output files under ``$build_dir/tests/``, please read the ``gcov``
-+``gcov`` is a GCC tool to analyze the testing coverage by
-+instrumenting the tested code. To use it, configure QEMU with
-+``--enable-gcov`` option and build. Then run ``make check`` as usual.
-+Reports can be obtained by running ``gcov`` command on the output
-+files under ``$build_dir/tests/``, please read the ``gcov``
- documentation for more information.
- 
- QEMU iotests
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e8bb2d8f66..756474814a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -891,26 +891,16 @@ GCOV_OPTIONS = -n $(if $(V),-f,)
- 
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
--	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
- 		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
- 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
- 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
--	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
--	  echo Gcov report for $$f:;\
--	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
--	done,)
- 
- .PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
- $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
--	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command, \
- 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
- 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
--	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
--	  echo Gcov report for $$f:;\
--	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
--	done,)
- 
- # gtester tests with XML output
- 
+diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
+index c5ad39b533..03ebfb0ef2 100644
+--- a/tests/docker/dockerfiles/travis.docker
++++ b/tests/docker/dockerfiles/travis.docker
+@@ -5,7 +5,7 @@ ENV LC_ALL en_US.UTF-8
+ RUN cat /etc/apt/sources.list | sed "s/# deb-src/deb-src/" >> /etc/apt/sources.list
+ RUN apt-get update
+ RUN apt-get -y build-dep qemu
+-RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
++RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools gcovr
+ # Travis tools require PhantomJS / Neo4j / Maven accessible
+ # in their PATH (QEMU build won't access them).
+ ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/local/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 -- 
 2.17.1
