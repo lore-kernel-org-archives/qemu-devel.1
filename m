@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fa8Xc-0008BC-Vp
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 19:47:34 -0400
+	(envelope-from <mst@redhat.com>) id 1fa8YL-0008U8-Et
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 19:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fa8Xb-0006iN-N5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 19:47:33 -0400
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3a5a035f-5997-b87f-0dde-c69fdcabee0f@redhat.com>
-Date: Mon, 2 Jul 2018 19:47:24 -0400
+	(envelope-from <mst@redhat.com>) id 1fa8YK-0007GD-CL
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 19:48:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52854 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fa8YK-0007Fv-7V
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 19:48:16 -0400
+Date: Tue, 3 Jul 2018 02:48:14 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180702234631.12268-2-mst@redhat.com>
+References: <20180702234631.12268-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] 2018-07-02 Incremental Backup Status Report
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180702234631.12268-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 1/3] hw/i386: Fix IVHD entry length for AMD IOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,122 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-I'm tracking the following series for Incremental Backup right now; if
-it's not on this list, I don't know about it:
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-[Qemu-devel] [PATCH v4 0/2] block: formalize and test fleecing=E2=80=8B
-[Qemu-devel] [PATCH v2 0/3] image fleecing
-[Qemu-devel] [PATCH] migration: Appease coverity, skip empty block trees
-[Qemu-devel] [PATCH v2 0/2] test NBD bitmap export
-[Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic=E2=80=8B
-[Qemu-devel] [PATCH 0/2] dirty bitmap fixes=E2=80=8B
-[Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap directory
-[Qemu-devel] [PATCH 0/1] blockdev: implement n-ary bitmap merge
-[Qemu-devel] [PATCH v2 00/10] qemu-img: add bitmap info output=E2=80=8B
+Counting from the IVHD ID field to the all-devices entry, we have 28
+bytes, not 36.
 
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/acpi-build.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Now, in a little more detail below;
-
-
-# Image fleecing:
-
-In order to support pull-model semantics for incremental backup, we need
-working point in time NBD export of live disk images. This was thought
-supported/finished for quite some time, but we've had no iotests.
-
-There are two series in flight here:
-
-- [Qemu-devel] [PATCH v4 0/2] block: formalize and test fleecing=E2=80=8B
-- [Qemu-devel] [PATCH v2 0/3] image fleecing
-
-The first listed there simply loosens restrictions on blockdev-backup
-and adds an iotest that this approach works in the simple case.
-
-The second series adds a fleecing filter to combat deficiencies in the
-IO serialization that may allow the fleecing node to sometimes see new,
-live data instead of the PIT data. See
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00150.html for
-details.
-
-Our current plan is to merge the first series and to continue looking
-into the fleecing filter during freeze as a potential bugfix.
-
-
-# NBD:
-
-- [Qemu-devel] [PATCH v2 0/2] test NBD bitmap export
-
-Eric's series that adds a quick hack to our NBD client and an iotest 223
-that demos that the bitmap support in our NBD server is working
-correctly. Notably, we don't have an iotest that combines this with the
-image fleecing workflow, so there's discussion there that I've started
-for how to combine the two, comments appreciated:
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00476.html
-
-
-# Migration/Persistence:
-
-- [Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic=E2=80=8B
-
-Needs review, but can go in after freeze as a fix.
-
-
-# Bitmap manipulation:
-
-- [Qemu-devel] [PATCH 0/1] blockdev: implement n-ary bitmap merge=E2=80=8B
-
-Possibly important to have if we wish to add merge into transactions, as
-this will greatly simplify the commands needed to be issued to QEMU. Not
-yet reviewed, but I might submit a PR for this tomorrow in anticipation
-of its usefulness over the 1-bitmap version.
-
-- [Qemu-devel] [PATCH v2 00/10] qemu-img: add bitmap info output=E2=80=8B
-
-On hold until persistence is settled, due to interactions with
-attempting to cache the bitmap metadata. "offline" bitmap manipulation
-will need to occur via QMP on QEMU with no running guest in the
-meantime. We will still need a patch for `qemu-img check -r` that allows
-us to delete corrupted bitmaps, however. That can be a bugfix for 3.0.
-
-There is a follow-up series that's also on hold because it's blocked on
-this series, that adds the actual add/delete/clear offline functionality.
-
-
-# Miscellaneous:
-
-- [Qemu-devel] [PATCH] migration: Appease coverity, skip empty block tree=
-s
-
-Needs a respin based on Stefan's feedback. Only important so that it
-doesn't keep annoying Peter Maydell, does not actually fix a bug.
-
-- [Qemu-devel] [PATCH 0/2] dirty bitmap fixes=E2=80=8B
-
-Staged: https://github.com/jnsnow/qemu/commits/bitmaps
-
-- [Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap directory
-
-Needs a V3 after review from Max. Not crucial for release, but nice to ha=
-ve.
-
-
-
-
-So in order to put together a demo from QEMU's point-of-view that both
-push and pull model are working, I think we still need:
-
-- iotest 222 and 223 merged, with their respective enablement patches.
-- A new iotest (224?) that combines functionality of both; which makes
-use of perhaps some new features that allow us to tie bitmap
-manipulation to the start of the node fleecing.
-- All of the various bugfixes above reviewed and merged.
-
-
-
-Please let me know if this roadmap is missing anything.
-
-Thanks,
---js
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 9bc6d97ea1..fff1059a31 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2537,7 +2537,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+                              (1UL << 7),  /* PPRSup       */
+                              1);
+     /* IVHD length */
+-    build_append_int_noprefix(table_data, 0x24, 2);
++    build_append_int_noprefix(table_data, 28, 2);
+     /* DeviceID */
+     build_append_int_noprefix(table_data, s->devid, 2);
+     /* Capability offset */
+-- 
+MST
