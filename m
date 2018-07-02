@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fa1aw-0004VO-Oa
+	(envelope-from <armbru@redhat.com>) id 1fa1av-0004Te-7k
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fa1as-0006gw-Dn
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54122 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fa1as-0006gH-2I
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40456 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fa1ar-0006f7-S7
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fa1ar-0006et-Ji
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 429854023336
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DB978011454
 	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:22:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Jul 2018 18:22:16 +0200
-Message-Id: <20180702162218.13678-31-armbru@redhat.com>
+Date: Mon,  2 Jul 2018 18:22:12 +0200
+Message-Id: <20180702162218.13678-27-armbru@redhat.com>
 In-Reply-To: <20180702162218.13678-1-armbru@redhat.com>
 References: <20180702162218.13678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 30/32] qmp: Clean up capability negotiation
- after commit 02130314d8c
+Subject: [Qemu-devel] [PATCH 26/32] qmp: Simplify monitor_qmp_respond()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,169 +32,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
 
-qmp_greeting() offers capabilities to the client, and
-qmp_qmp_capabilities() accepts or denies capabilities requested by the
-client.  The two compute the set of available capabilities
-independently.  Not nice.
+monitor_qmp_respond() takes both a response object and an error
+object.  If an error object is non-null, the response object must be
+null, and the response is built from the error object.
 
-Clean this up as follows.  Compute available capabilities just once in
-monitor_qmp_caps_reset(), and store them in Monitor member
-qmp.capab_offered[].  Have qmp_greeting() and qmp_qmp_capabilities()
-use that.  Both are now oblivious of capability details.
+Of the two callers, one always passes a null response object, and one
+a null error object.  Move building the response object from the error
+object to the latter, and drop the error object parameter.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c | 93 ++++++++++++++++++++++++-------------------------------
- 1 file changed, 40 insertions(+), 53 deletions(-)
+ monitor.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 876a3a23a7..590e5b5b04 100644
+index ba3124514c..876a3a23a7 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -172,7 +172,8 @@ typedef struct {
-      * mode.
-      */
-     QmpCommandList *commands;
--    bool qmp_caps[QMP_CAPABILITY__MAX];
-+    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-+    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-     /*
-      * Protects qmp request/response queue.  Please take monitor_lock
-      * first when used together.
-@@ -1252,52 +1253,56 @@ static void monitor_init_qmp_commands(void)
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
+@@ -4099,18 +4099,12 @@ static int monitor_can_read(void *opaque)
  }
  
--static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
--{
--    return mon->qmp.qmp_caps[cap];
--}
+ /*
+- * 1. This function takes ownership of rsp, err, and id.
+- * 2. rsp, err, and id may be NULL.
+- * 3. If err != NULL then rsp must be NULL.
++ * Emit QMP response @rsp with ID @id to @mon.
++ * Null @rsp can only happen for commands with QCO_NO_SUCCESS_RESP.
++ * Nothing is emitted then.
+  */
+-static void monitor_qmp_respond(Monitor *mon, QDict *rsp,
+-                                Error *err, QObject *id)
++static void monitor_qmp_respond(Monitor *mon, QDict *rsp, QObject *id)
+ {
+-    if (err) {
+-        assert(!rsp);
+-        rsp = qmp_error_response(err);
+-    }
 -
- static bool qmp_oob_enabled(Monitor *mon)
- {
--    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
-+    return mon->qmp.capab[QMP_CAPABILITY_OOB];
+     if (rsp) {
+         if (id) {
+             qdict_put_obj(rsp, "id", qobject_ref(id));
+@@ -4118,9 +4112,6 @@ static void monitor_qmp_respond(Monitor *mon, QDict *rsp,
+ 
+         qmp_queue_response(mon, rsp);
+     }
+-
+-    qobject_unref(id);
+-    qobject_unref(rsp);
  }
  
--static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
--                           Error **errp)
-+static void monitor_qmp_caps_reset(Monitor *mon)
- {
-+    memset(mon->qmp.capab_offered, 0, sizeof(mon->qmp.capab_offered));
-+    memset(mon->qmp.capab, 0, sizeof(mon->qmp.capab));
-+    mon->qmp.capab_offered[QMP_CAPABILITY_OOB] = mon->use_io_thread;
-+}
-+
-+/*
-+ * Accept QMP capabilities in @list for @mon.
-+ * On success, set mon->qmp.capab[], and return true.
-+ * On error, set @errp, and return false.
-+ */
-+static bool qmp_caps_accept(Monitor *mon, QMPCapabilityList *list,
-+                            Error **errp)
-+{
-+    GString *unavailable = NULL;
-+    bool capab[QMP_CAPABILITY__MAX];
-+
-+    memset(capab, 0, sizeof(capab));
-+
-     for (; list; list = list->next) {
--        assert(list->value < QMP_CAPABILITY__MAX);
--        switch (list->value) {
--        case QMP_CAPABILITY_OOB:
--            if (!mon->use_io_thread) {
--                /*
--                 * Out-of-band only works with monitors that are
--                 * running on dedicated I/O thread.
--                 */
--                error_setg(errp, "This monitor does not support "
--                           "out-of-band (OOB)");
--                return;
-+        if (!mon->qmp.capab_offered[list->value]) {
-+            if (!unavailable) {
-+                unavailable = g_string_new(QMPCapability_str(list->value));
-+            } else {
-+                g_string_append_printf(unavailable, ", %s",
-+                                      QMPCapability_str(list->value));
-             }
--            break;
--        default:
--            break;
+ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
+@@ -4148,8 +4139,8 @@ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
          }
-+        capab[list->value] = true;
      }
--}
  
--/* This function should only be called after capabilities are checked. */
--static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
--{
--    for (; list; list = list->next) {
--        mon->qmp.qmp_caps[list->value] = true;
-+    if (unavailable) {
-+        error_setg(errp, "Capability %s not available", unavailable->str);
-+        g_string_free(unavailable, true);
-+        return false;
-     }
-+
-+    memcpy(mon->qmp.capab, capab, sizeof(capab));
-+    return true;
+-    /* Respond if necessary */
+-    monitor_qmp_respond(mon, rsp, NULL, qobject_ref(id));
++    monitor_qmp_respond(mon, rsp, id);
++    qobject_unref(rsp);
  }
  
- void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-                           Error **errp)
+ /*
+@@ -4192,6 +4183,7 @@ static QMPRequest *monitor_qmp_requests_pop_any(void)
+ static void monitor_qmp_bh_dispatcher(void *data)
  {
--    Error *local_err = NULL;
--
-     if (cur_mon->qmp.commands == &qmp_commands) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "Capabilities negotiation is already complete, command "
-@@ -1305,19 +1310,8 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+     QMPRequest *req_obj = monitor_qmp_requests_pop_any();
++    QDict *rsp;
+ 
+     if (!req_obj) {
          return;
+@@ -4202,7 +4194,9 @@ static void monitor_qmp_bh_dispatcher(void *data)
+         monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
+     } else {
+         assert(req_obj->err);
+-        monitor_qmp_respond(req_obj->mon, NULL, req_obj->err, NULL);
++        rsp = qmp_error_response(req_obj->err);
++        monitor_qmp_respond(req_obj->mon, rsp, NULL);
++        qobject_unref(rsp);
      }
  
--    /* Enable QMP capabilities provided by the client if applicable. */
--    if (has_enable) {
--        qmp_caps_check(cur_mon, enable, &local_err);
--        if (local_err) {
--            /*
--             * Failed check on any of the capabilities will fail the
--             * entire command (and thus not apply any of the other
--             * capabilities that were also requested).
--             */
--            error_propagate(errp, local_err);
--            return;
--        }
--        qmp_caps_apply(cur_mon, enable);
-+    if (!qmp_caps_accept(cur_mon, enable, errp)) {
-+        return;
-     }
- 
-     cur_mon->qmp.commands = &qmp_commands;
-@@ -4384,11 +4378,9 @@ static QDict *qmp_greeting(Monitor *mon)
-     qmp_marshal_query_version(NULL, &ver, NULL);
- 
-     for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
--        if (!mon->use_io_thread && cap == QMP_CAPABILITY_OOB) {
--            /* Monitors that are not using I/O thread won't support OOB */
--            continue;
-+        if (mon->qmp.capab_offered[cap]) {
-+            qlist_append_str(cap_list, QMPCapability_str(cap));
-         }
--        qlist_append_str(cap_list, QMPCapability_str(cap));
-     }
- 
-     return qdict_from_jsonf_nofail(
-@@ -4396,11 +4388,6 @@ static QDict *qmp_greeting(Monitor *mon)
-         ver, cap_list);
- }
- 
--static void monitor_qmp_caps_reset(Monitor *mon)
--{
--    memset(mon->qmp.qmp_caps, 0, sizeof(mon->qmp.qmp_caps));
--}
--
- static void monitor_qmp_event(void *opaque, int event)
- {
-     QDict *data;
+     if (req_obj->need_resume) {
 -- 
 2.17.1
