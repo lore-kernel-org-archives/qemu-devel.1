@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZyAo-0003Zc-ND
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:43:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fZyC3-0004CP-6w
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:44:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZyAn-0003kd-Ql
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:43:18 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35369)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fZyAn-0003k6-KT
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:43:17 -0400
-Received: by mail-oi0-x242.google.com with SMTP id i12-v6so11675042oik.2
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 05:43:17 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1fZyBz-00049K-8j
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:44:35 -0400
+Date: Mon, 2 Jul 2018 14:44:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180702144422.18f451c9@redhat.com>
+In-Reply-To: <1bb74240-d1ce-7a1e-69df-f2c7c70d1fd9@redhat.com>
+References: <20180702093755.7384-1-david@redhat.com>
+	<20180702093755.7384-5-david@redhat.com>
+	<20180702123141.4a499198@redhat.com>
+	<1bb74240-d1ce-7a1e-69df-f2c7c70d1fd9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180629200710.27626-1-f4bug@amsat.org>
-References: <20180629200710.27626-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Jul 2018 13:42:56 +0100
-Message-ID: <CAFEAcA-9tsQn+YNVrJPScfG024BZWuLcqNKnOOT0g-DZ3K13_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix --disable-tcg build breakage
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] pc-dimm: assign and verify the
+ "addr" property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G . Cota" <cota@braap.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 29 June 2018 at 21:07, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Fix the --disable-tcg breakage introduced by 8bca9a03ec60d:
->
->     $ configure --disable-tcg
->     [...]
->     $ make -C i386-softmmu exec.o
->     make: Entering directory 'i386-softmmu'
->       CC      exec.o
->     In file included from source/qemu/exec.c:62:0:
->     source/qemu/include/exec/ram_addr.h:96:6: error: conflicting types fo=
-r =E2=80=98tb_invalidate_phys_range=E2=80=99
->      void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end);
->           ^~~~~~~~~~~~~~~~~~~~~~~~
->     In file included from source/qemu/exec.c:24:0:
->     source/qemu/include/exec/exec-all.h:309:6: note: previous declaration=
- of =E2=80=98tb_invalidate_phys_range=E2=80=99 was here
->      void tb_invalidate_phys_range(target_ulong start, target_ulong end);
->           ^~~~~~~~~~~~~~~~~~~~~~~~
->     source/qemu/exec.c:1043:6: error: conflicting types for =E2=80=98tb_i=
-nvalidate_phys_addr=E2=80=99
->      void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAtt=
-rs attrs)
->           ^~~~~~~~~~~~~~~~~~~~~~~
->     In file included from source/qemu/exec.c:24:0:
->     source/qemu/include/exec/exec-all.h:308:6: note: previous declaration=
- of =E2=80=98tb_invalidate_phys_addr=E2=80=99 was here
->      void tb_invalidate_phys_addr(target_ulong addr);
->           ^~~~~~~~~~~~~~~~~~~~~~~
->     make: *** [source/qemu/rules.mak:69: exec.o] Error 1
->     make: Leaving directory 'i386-softmmu'
->
-> Tested to build x86_64-softmmu and i386-softmmu targets.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Mon, 2 Jul 2018 12:39:43 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Thanks; applied to master as a build fix.
+> On 02.07.2018 12:31, Igor Mammedov wrote:
+> > On Mon,  2 Jul 2018 11:37:55 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> We can assign and verify the slot before realizing and trying to plug.  
+> > s/slot/"addr"/
+> >   
+> >> reading/writing the address property should never fail for DIMMs, so let's
+> >> reduce error handling a bit by using &error_abort. Getting access to the
+> >> memory region now might however fail. So forward errors from
+> >> get_memory_region() properly.
+> >>
+> >> As all memory devices should use the alignment of the underlying memory
+> >> region for guest physical address asignment, do detection of the
+> >> alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
+> >> alignment for compatibility handling.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>  
+> > with commit message fixup,
+> > 
+> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > For future reference, I don't really like 2 things about patch
+> >  1: mixes both error handling and functional changes (should be separate patches)
+> >  2: that property setter may crash QEMU at preplug stage
+> >     where it should gracefully error out (so put proper error check
+> >     as follow up patch or respin this one maybe taking in account #1.)  
+> 
+> Thanks for the review.
+> 
+> 1. could have been factored out into a separate patch.
+> 
+> Regarding 2, I won't respin as long there is nothing else to take care
+> of. As long as we are in the pc-dimm world and we have static
+> properties, I don't see any reason to add error handling that cannot
+> happen. It will be different once we factor out more stuff into memory
+> device code. I assume you have a different opinion about that, but I
+> consider these nits.
+it's not really nits. it happens to work now but static properties are
+just current impl. detail which can easily change without amending
+*plug handlers.
+It's cleaner/safer to handle errors properly and keeping device model
+separate from machine helpers as much as possible from maintainer pov,
+even at expense of extra boiler plate.
 
-(I've also added a notcg config to my test set for merge builds.)
-
--- PMM
+I expect you to re-introduce proper error checking when you
+factor out memory_device_pre_plug() part /it's condition for my ack
+on this patch/.
