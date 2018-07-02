@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzLM-000263-N6
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:17 -0400
+	(envelope-from <shorne@gmail.com>) id 1fZzLN-00026O-Cw
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzLJ-0007lx-N8
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:16 -0400
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:42840)
+	(envelope-from <shorne@gmail.com>) id 1fZzLM-0007nJ-G7
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:17 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:46152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzLJ-0007lh-Gx
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:13 -0400
-Received: by mail-pg0-x233.google.com with SMTP id c10-v6so7195063pgu.9
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzLM-0007mu-9y
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:16 -0400
+Received: by mail-pg0-x244.google.com with SMTP id q14-v6so7184234pgt.13
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:16 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon,  2 Jul 2018 22:57:41 +0900
-Message-Id: <20180702135806.7087-1-shorne@gmail.com>
+Date: Mon,  2 Jul 2018 22:57:42 +0900
+Message-Id: <20180702135806.7087-2-shorne@gmail.com>
+In-Reply-To: <20180702135806.7087-1-shorne@gmail.com>
+References: <20180702135806.7087-1-shorne@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/25] OpenRISC updates for 3.0
+Subject: [Qemu-devel] [PULL 01/25] target/openrisc: Fix mtspr shadow gprs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +29,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
 
-Hello Peter,
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Changes since Richards v3:
- - Brought into my queue
- - Fixed the format warnings the print_insn_or1k patch
- - Added RB's
+Missing break when this feature was added in 89e71e873d
+("target/openrisc: implement shadow registers").  This was causing
+strange issues as we get writes into the translation block jump cache
+and other bits of state.
 
-Please consider for pull.
+Fixes: 89e71e873d ("target/openrisc: implement shadow registers")
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
+ target/openrisc/sys_helper.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
-
-  tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
-
-are available in the Git repository at:
-
-  git@github.com:stffrdhrn/qemu.git tags/pull-or-20180702
-
-for you to fetch changes up to 11d2bfa3429d32af4a0dc03af91646ea9e6a2b8c:
-
-  target/openrisc: Fix writes to interrupt mask register (2018-07-02 22:31:59 +0900)
-
-----------------------------------------------------------------
-OpenRISC cleanups and Fixes for QEMU 3.0
-
-Mostly patches from Richard Henderson fixing multiple things:
- * Fix singlestepping in GDB.
- * Use more TB linking.
- * Fixes to exit TB after updating SPRs to enable registering of state
-   changes.
- * Significant optimizations and refactors to the TLB
- * Split out disassembly from translation.
- * Add qemu-or1k to qemu-binfmt-conf.sh.
- * Implement signal handling for linux-user.
-
-Then there are a few fixups from me:
- * Fix delay slot detections to match hardware, this was masking a bug
-   in the linus kernel.
- * Fix stores to the PIC mask register
-
-----------------------------------------------------------------
-Richard Henderson (23):
-  target/openrisc: Fix mtspr shadow gprs
-  target/openrisc: Add print_insn_or1k
-  target/openrisc: Log interrupts
-  target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP
-  target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB
-  target/openrisc: Fix singlestep_enabled
-  target/openrisc: Link more translation blocks
-  target/openrisc: Split out is_user
-  target/openrisc: Exit the TB after l.mtspr
-  target/openrisc: Form the spr index from tcg
-  target/openrisc: Merge tlb allocation into CPUOpenRISCState
-  target/openrisc: Remove indirect function calls for mmu
-  target/openrisc: Merge mmu_helper.c into mmu.c
-  target/openrisc: Reduce tlb to a single dimension
-  target/openrisc: Fix tlb flushing in mtspr
-  target/openrisc: Fix cpu_mmu_index
-  target/openrisc: Use identical sizes for ITLB and DTLB
-  target/openrisc: Stub out handle_mmu_fault for softmmu
-  target/openrisc: Increase the TLB size
-  target/openrisc: Reorg tlb lookup
-  target/openrisc: Add support in scripts/qemu-binfmt-conf.sh
-  linux-user: Implement signals for openrisc
-  linux-user: Fix struct sigaltstack for openrisc
-
-Stafford Horne (2):
-  target/openrisc: Fix delay slot exception flag to match spec
-  target/openrisc: Fix writes to interrupt mask register
-
- linux-user/openrisc/signal.c         | 217 ++++++++-----------
- linux-user/openrisc/target_signal.h  |   2 +-
- linux-user/openrisc/target_syscall.h |  28 +--
- linux-user/signal.c                  |   2 +-
- scripts/qemu-binfmt-conf.sh          |  10 +-
- target/openrisc/Makefile.objs        |   5 +-
- target/openrisc/cpu.c                |  17 +-
- target/openrisc/cpu.h                |  61 +++---
- target/openrisc/disas.c              | 170 +++++++++++++++
- target/openrisc/helper.h             |   4 +-
- target/openrisc/interrupt.c          |  55 +++--
- target/openrisc/interrupt_helper.c   |  35 +---
- target/openrisc/machine.c            |  44 +---
- target/openrisc/mmu.c                | 279 +++++++++---------------
- target/openrisc/mmu_helper.c         |  40 ----
- target/openrisc/sys_helper.c         |  84 ++++----
- target/openrisc/translate.c          | 303 ++++++++++-----------------
- 17 files changed, 603 insertions(+), 753 deletions(-)
- create mode 100644 target/openrisc/disas.c
- delete mode 100644 target/openrisc/mmu_helper.c
-
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index b284064381..2f337363ec 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -98,6 +98,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+         idx = (spr - 1024);
+         env->shadow_gpr[idx / 32][idx % 32] = rb;
++        break;
+ 
+     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
 -- 
 2.17.0
