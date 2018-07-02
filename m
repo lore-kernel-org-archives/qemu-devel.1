@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzxw-00035Q-Qm
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzxw-00035K-Pe
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzxu-0005E3-87
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzxr-0005BF-PU
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:08 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33853)
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:53109)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZzxt-0005Cn-V5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:06 -0400
-Received: by mail-wr0-x229.google.com with SMTP id a12-v6so15817041wro.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:38:05 -0700 (PDT)
+	id 1fZzxr-0005Ad-JQ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:03 -0400
+Received: by mail-wm0-x230.google.com with SMTP id w16-v6so8652847wmc.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:38:03 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  2 Jul 2018 15:30:13 +0100
-Message-Id: <20180702143021.18864-13-alex.bennee@linaro.org>
+Date: Mon,  2 Jul 2018 15:30:20 +0100
+Message-Id: <20180702143021.18864-20-alex.bennee@linaro.org>
 In-Reply-To: <20180702143021.18864-1-alex.bennee@linaro.org>
 References: <20180702143021.18864-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 12/20] docker: ubuntu: Update the package
- list before installing new ones
+Subject: [Qemu-devel] [PATCH v3 19/20] docker: add special rule for
+ deboostrapped images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +33,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+We might as well have a custom rule for this. For one thing the
+dependencies are different. As the primary dependency for
+docker-image-% could never be docker-image-debian-bootstrap we can
+drop that test in the main rule as well.
 
-Since docker caches the different layers, updating the package
-list does not invalidate the previous "apt-get update" layer,
-and it is likely "apt-get install" hits an outdated repository.
-
-See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#apt-get
-
-This fixes:
-
-  $ make docker-image-ubuntu V=1
-  ./tests/docker/docker.py build qemu:ubuntu tests/docker/dockerfiles/ubuntu.docker   --add-current-user
-  Sending build context to Docker daemon  3.072kB
-  [...]
-  E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/main/m/mesa/libgles2-mesa_17.0.7-0ubuntu0.16.04.2_amd64.deb  404  Not Found
-  E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/main/m/mesa/libgles2-mesa-dev_17.0.7-0ubuntu0.16.04.2_amd64.deb  404  Not Found
-  E: Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?
-  The command '/bin/sh -c apt-get -y install $PACKAGES' returned a non-zero code: 100
-  tests/docker/Makefile.include:40: recipe for target 'docker-image-ubuntu' failed
-  make: *** [docker-image-ubuntu] Error 1
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/dockerfiles/ubuntu.docker | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index dabbf2a8a4..c03520ce3f 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -1,7 +1,6 @@
- FROM ubuntu:16.04
- RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
-     /etc/apt/sources.list
--RUN apt-get update
- ENV PACKAGES flex bison \
-     libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
-     libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
-@@ -13,6 +12,7 @@ ENV PACKAGES flex bison \
-     libjemalloc-dev libcacard-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
-     texinfo \
-     gettext git make ccache python-yaml gcc clang sparse
--RUN apt-get -y install $PACKAGES
-+RUN apt-get update && \
-+    apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
- ENV FEATURES clang pyyaml
+---
+v3:
+  - changed rule to docker-binfmt-image-debian-%:
+  - leave executable in the main rule
+  - rm stray whitespace fix
+---
+ tests/docker/Makefile.include | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 8641f5da2c..fdc87b8a57 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -49,9 +49,6 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		"CHECK", "$*")
+ else
+ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+-	@if test "$@" = docker-image-debian-bootstrap -a -z "$(EXECUTABLE)"; then \
+-		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
+-	fi
+ 	$(call quiet-command,\
+ 		$(DOCKER_SCRIPT) build qemu:$* $< \
+ 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+@@ -59,6 +56,26 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+ 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+ 		"BUILD","$*")
++
++# Special rule for debootstraped binfmt linux-user images
++docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/debian-bootstrap.docker
++	@if test -z "$(EXECUTABLE)"; then \
++		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
++	fi
++	@if test -z "$(DEB_ARCH)"; then 					\
++		echo WARNING: DEB_ARCH is not set, debootstrap may fail. 2>&1 ; \
++        fi
++	@if test -z "$(DEB_TYPE)"; then 					\
++		echo WARNING: DEB_TYPE is not set, debootstrap may fail. 2>&1 ; \
++        fi
++	$(call quiet-command,							\
++		$(DOCKER_SCRIPT) build qemu:debian-$* $< \
++		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
++		$(if $(NOUSER),,--add-current-user) \
++		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
++		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)), \
++		"BUILD","binfmt debian-$* (debootstrapped)")
++
+ endif
+ 
+ # Enforce dependencies for composite images
 -- 
 2.17.1
