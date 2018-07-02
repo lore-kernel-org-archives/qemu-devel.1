@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0U7-0004Np-Gn
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:24 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fa0U9-0004Pj-Hn
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0U6-0008CR-5n
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:23 -0400
-Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:43654)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fa0U4-0008AX-Jw
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:25 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34965)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0U5-0008Bi-Tx
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:22 -0400
-Received: by mail-pg0-x229.google.com with SMTP id v13-v6so1650433pgr.10
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:21 -0700 (PDT)
-From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 00:10:15 +0900
-Message-Id: <20180702151023.24532-18-shorne@gmail.com>
-In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
-References: <20180702151023.24532-1-shorne@gmail.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fa0U4-00089l-FW
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:20 -0400
+Received: by mail-qt0-x244.google.com with SMTP id z6-v6so14074832qti.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:20 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180628153535.1411-1-f4bug@amsat.org>
+	<20180628153535.1411-2-f4bug@amsat.org>
+	<20180702071205.GI26002@lemon.usersys.redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <beca5523-ea92-6c2b-c931-6b3523f18460@amsat.org>
+Date: Mon, 2 Jul 2018 12:11:14 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180702071205.GI26002@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 17/25] target/openrisc: Use identical sizes
- for ITLB and DTLB
+Subject: Re: [Qemu-devel] [PATCH 1/4] tests/vm: Support proxy / corporate
+ firewall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,157 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Hi Fam,
 
-The sizes are already the same, however, we can improve things
-if they are identical by design.
+On 07/02/2018 04:12 AM, Fam Zheng wrote:
+> On Thu, 06/28 12:35, Philippe Mathieu-Daudé wrote:
+>> If ftp_proxy/http_proxy/https_proxy standard environment variables
+>> are available, pass them to the vm images.
+>>
+>> As per 06cc3551714:
+>> This is required when building behind corporate proxy/firewall, but
+>> also help when using local cache server (ie: apt/yum).
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  tests/vm/ubuntu.i386 | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+>> index fc319e0e6e..be16ceed50 100755
+>> --- a/tests/vm/ubuntu.i386
+>> +++ b/tests/vm/ubuntu.i386
+>> @@ -68,6 +68,10 @@ class UbuntuX86VM(basevm.BaseVM):
+>>          self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
+>>          self.wait_ssh()
+>>          self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+>> +        for k, v in os.environ.iteritems():
+>> +            kl = k.lower()
+>> +            if kl in ['ftp_proxy', 'http_proxy', 'https_proxy']:
+>> +                self.ssh_root_check("echo 'Acquire::{}::Proxy \"{}\";' >> /etc/apt/apt.conf.d/01proxy".format(kl[:-6].upper(), v))
+> 
+> Reasonable, but do we want it for other apps and images? How about setting these
+> env vars to ssh commands?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stafford Horne <shorne@gmail.com>
----
- target/openrisc/cpu.h        | 10 ++++------
- target/openrisc/machine.c    |  4 ++--
- target/openrisc/mmu.c        |  4 ++--
- target/openrisc/sys_helper.c | 16 ++++++++--------
- 4 files changed, 16 insertions(+), 18 deletions(-)
+I see 2 different network usages:
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index c3a968ec4d..47e94659e1 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -222,10 +222,8 @@ enum {
- 
- /* TLB size */
- enum {
--    DTLB_SIZE = 64,
--    DTLB_MASK = (DTLB_SIZE-1),
--    ITLB_SIZE = 64,
--    ITLB_MASK = (ITLB_SIZE-1),
-+    TLB_SIZE = 64,
-+    TLB_MASK = TLB_SIZE - 1,
- };
- 
- /* TLB prot */
-@@ -254,8 +252,8 @@ typedef struct OpenRISCTLBEntry {
- 
- #ifndef CONFIG_USER_ONLY
- typedef struct CPUOpenRISCTLBContext {
--    OpenRISCTLBEntry itlb[ITLB_SIZE];
--    OpenRISCTLBEntry dtlb[DTLB_SIZE];
-+    OpenRISCTLBEntry itlb[TLB_SIZE];
-+    OpenRISCTLBEntry dtlb[TLB_SIZE];
- 
-     int (*cpu_openrisc_map_address_code)(struct OpenRISCCPU *cpu,
-                                          hwaddr *physical,
-diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-index b795b56dc6..3fc837b925 100644
---- a/target/openrisc/machine.c
-+++ b/target/openrisc/machine.c
-@@ -42,9 +42,9 @@ static const VMStateDescription vmstate_cpu_tlb = {
-     .minimum_version_id = 1,
-     .minimum_version_id_old = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, ITLB_SIZE, 0,
-+        VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
-                              vmstate_tlb_entry, OpenRISCTLBEntry),
--        VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, DTLB_SIZE, 0,
-+        VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
-                              vmstate_tlb_entry, OpenRISCTLBEntry),
-         VMSTATE_END_OF_LIST()
-     }
-diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-index b293b64e98..a4613e9ae4 100644
---- a/target/openrisc/mmu.c
-+++ b/target/openrisc/mmu.c
-@@ -41,7 +41,7 @@ static int get_phys_code(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-                          target_ulong address, int rw, bool supervisor)
- {
-     int vpn = address >> TARGET_PAGE_BITS;
--    int idx = vpn & ITLB_MASK;
-+    int idx = vpn & TLB_MASK;
-     int right = 0;
-     uint32_t mr = cpu->env.tlb.itlb[idx].mr;
-     uint32_t tr = cpu->env.tlb.itlb[idx].tr;
-@@ -74,7 +74,7 @@ static int get_phys_data(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-                          target_ulong address, int rw, bool supervisor)
- {
-     int vpn = address >> TARGET_PAGE_BITS;
--    int idx = vpn & DTLB_MASK;
-+    int idx = vpn & TLB_MASK;
-     int right = 0;
-     uint32_t mr = cpu->env.tlb.dtlb[idx].mr;
-     uint32_t tr = cpu->env.tlb.dtlb[idx].tr;
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 852b219f9b..541615bfb3 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -80,7 +80,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         env->shadow_gpr[idx / 32][idx % 32] = rb;
-         break;
- 
--    case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
-+    case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
-         mr = env->tlb.dtlb[idx].mr;
-         if (mr & 1) {
-@@ -91,7 +91,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         env->tlb.dtlb[idx].mr = rb;
-         break;
--    case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
-+    case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1): /* DTLBW0TR 0-127 */
-         idx = spr - TO_SPR(1, 640);
-         env->tlb.dtlb[idx].tr = rb;
-         break;
-@@ -103,7 +103,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
-         break;
- 
--    case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
-+    case TO_SPR(2, 512) ... TO_SPR(2, 512 + TLB_SIZE - 1): /* ITLBW0MR 0-127 */
-         idx = spr - TO_SPR(2, 512);
-         mr = env->tlb.itlb[idx].mr;
-         if (mr & 1) {
-@@ -114,7 +114,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         env->tlb.itlb[idx].mr = rb;
-         break;
--    case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
-+    case TO_SPR(2, 640) ... TO_SPR(2, 640 + TLB_SIZE - 1): /* ITLBW0TR 0-127 */
-         idx = spr - TO_SPR(2, 640);
-         env->tlb.itlb[idx].tr = rb;
-         break;
-@@ -247,11 +247,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-         idx = (spr - 1024);
-         return env->shadow_gpr[idx / 32][idx % 32];
- 
--    case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
-+    case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
-         return env->tlb.dtlb[idx].mr;
- 
--    case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
-+    case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1): /* DTLBW0TR 0-127 */
-         idx = spr - TO_SPR(1, 640);
-         return env->tlb.dtlb[idx].tr;
- 
-@@ -263,11 +263,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
-         break;
- 
--    case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1): /* ITLBW0MR 0-127 */
-+    case TO_SPR(2, 512) ... TO_SPR(2, 512 + TLB_SIZE - 1): /* ITLBW0MR 0-127 */
-         idx = spr - TO_SPR(2, 512);
-         return env->tlb.itlb[idx].mr;
- 
--    case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
-+    case TO_SPR(2, 640) ... TO_SPR(2, 640 + TLB_SIZE - 1): /* ITLBW0TR 0-127 */
-         idx = spr - TO_SPR(2, 640);
-         return env->tlb.itlb[idx].tr;
- 
--- 
-2.17.0
+1/ how the guest connect to the outer world, this goes via the firewall.
+Here the change only affects apt* based commands (via the apt.conf file).
+Do we have other commands requiring network connectivity? If we have,
+then yes, we should add the same env vars in the guest.
+One case I think of is "git submodule init" calling "git clone".
+
+2/ how the host connect to the guest (ex: SSH).
+In this case we use the loopback interface, thus no need to change.
+
+>>          self.ssh_root_check("apt-get update")
+>>          self.ssh_root_check("apt-get install -y cloud-initramfs-growroot")
+>>          # Don't check the status in case the guest hang up too quickly
+>> -- 
+>> 2.18.0
+>>
