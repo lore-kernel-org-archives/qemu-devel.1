@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZq6c-0006cu-HN
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:06:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1fZqTV-0002EV-MD
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZq6b-00072Z-Ht
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:06:26 -0400
-Date: Mon, 2 Jul 2018 14:06:14 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180702040614.GV3422@umbus.fritz.box>
-References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
-	<153018091454.336571.7311461748726927045.stgit@bahia>
-	<20180629190822.GW7451@localhost.localdomain>
+	(envelope-from <bounces@canonical.com>) id 1fZqTS-0004ix-Il
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:30:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fZqTS-0004iQ-DC
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:30:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fZqTQ-0001LA-UY
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 04:30:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E38F32E8198
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 04:30:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Ln+iIw7POnzHEEo5"
-Content-Disposition: inline
-In-Reply-To: <20180629190822.GW7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 2/3] spapr: compute default value of
- "hpt-max-page-size" later
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Jul 2018 04:17:28 -0000
+From: Launchpad Bug Tracker <1314667@bugs.launchpad.net>
+Reply-To: Bug 1314667 <1314667@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140430150437.26914.15156.malonedeb@gac.canonical.com>
+Message-Id: <153050504905.6988.15818972826311023055.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1314667] Re: PMPrebUSB - appcrash of qemu in
+ Win-7-64bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
---Ln+iIw7POnzHEEo5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On Fri, Jun 29, 2018 at 04:08:22PM -0300, Eduardo Habkost wrote:
-> On Thu, Jun 28, 2018 at 12:15:14PM +0200, Greg Kurz wrote:
-> [...]
-> > @@ -2527,6 +2527,18 @@ static void spapr_machine_init(MachineState *mac=
-hine)
-> >      QLIST_INIT(&spapr->phbs);
-> >      QTAILQ_INIT(&spapr->pending_dimm_unplugs);
-> > =20
-> > +    /* This is for pseries-2.12 and older machine types */
-> > +    if (!smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
-> > +        uint8_t mps;
-> > +
-> > +        if (kvmppc_hpt_needs_host_contiguous_pages()) {
-> > +            mps =3D ctz64(qemu_getrampagesize());
-> > +        } else {
-> > +            mps =3D 34; /* allow everything up to 16GiB, i.e. everythi=
-ng */
-> > +        }
-> > +        smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
->=20
-> Initializing class fields on instance init functions is a sign
-> that the information doesn't belong to the class struct.  Can't
-> this be handled at default_caps_with_cpu()?
+-- =
 
-Yeah, doing it inside default_caps_with_cpu() probably makes more
-sense.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1314667
 
-> > +    }
-> > +
-> >      /* Determine capabilities to run with */
-> >      spapr_caps_init(spapr);
-> > =20
-> > @@ -4103,17 +4115,16 @@ static void spapr_machine_2_12_instance_options=
-(MachineState *machine)
-> >  static void spapr_machine_2_12_class_options(MachineClass *mc)
-> >  {
-> >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > -    uint8_t mps;
-> > =20
-> >      spapr_machine_3_0_class_options(mc);
-> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
-> > =20
-> > -    if (kvmppc_hpt_needs_host_contiguous_pages()) {
-> > -        mps =3D ctz64(qemu_getrampagesize());
-> > -    } else {
-> > -        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
-> > -    }
-> > -    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
-> > +    /* We depend on kvm_enabled() to choose a default value for the
-> > +     * hpt-max-page-size capability. Of course we can't do it here
-> > +     * because this is too early and the HW accelerator isn't initialz=
-ed
-> > +     * yet. Postpone this to spapr_machine_init().
-> > +     */
-> > +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 0;
-> >  }
-> > =20
-> >  DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
-> >=20
->=20
+Title:
+  PMPrebUSB - appcrash of qemu in Win-7-64bit
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Status in QEMU:
+  Expired
 
---Ln+iIw7POnzHEEo5
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  I am not sure if this issue is a bug of qemu or by Win-7.
+  I want to test in advance with QEMU the ability if my USB-Rescue-Drive is =
 
------BEGIN PGP SIGNATURE-----
+  booting correctly. I have Win-7-64 and run qemu v.o.15.1.0 out of the ins=
+talled RMPrepUSB v.2.1.719 =
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls5pLUACgkQbDjKyiDZ
-s5JdmhAA0OJI5iDC8eEFCp2WHAWBc8O8/1aeYP+aL/pKe+YyXb+M7ix4yqtb0622
-v6ClCL48/knY4C6UpN6xVHn6PCdvrDNld7qNWZ9DSBFlQMASluu/xYgygAppgznn
-nDjYSx340fq8ERncGnTPF9any35lgqz383mK/1hPvGnkBP+A2D/mOxo1j/tTDr1s
-CxE9EZGYZvOO1OgOUji8H9wWrv/W0Dbs8kPAwJO4fLazjqxS17N4OoxqGcBdjckj
-gxEuHtjHHp0F3Xl/3pHmhzcYbaeykrT6RaTn5zYefxwN1OOrfvHSaHLxaJmwDkwz
-Ce/X6y7xPurw6V2uxFTy1fih6QoRUoThDzuhwTPO1GYBNxnX6DY6qPLnYRo4Lvd3
-KM+rugj7iYBqlNxpKekkCsCCQxIw4+QC2DeCvbiPMn6MJKIQ8hjntrhg4pZKLUz6
-7AQhnd/aFFECqUxGa8tk4OsWKdQPs5QrHxo+ASJ1ytDtv1mO+33q9VEUP1/3KLQR
-lieNJWl8E1CUxN0vuo29wFoPGKp+O7YloLmQWACr/vN+gv2QklDosJ23ZXy+WGKr
-+Dm41csYFhyXr3Vb0iD5QQ1fxYeajkaYxZRyvea/2Q/YyFQ7WaVQYxZszaTqzYar
-mYWZOGWZ2xlOwZfHDy5850UM5QS6DIhqHw51BJb5hw87fsxBM0g=
-=1atg
------END PGP SIGNATURE-----
+  program. The settings for the preparation of my USB drive were FAT32 boot=
+ as
+  HD, bootloader WinPE/Win-7/Vista, set for running iso-files directly in %=
+_ISO
+  \MAINMENU\Hiren=E2=80=99sBootCD.iso. When I run Qemu I get the messages i=
+n the cmd starting window it says:
 
---Ln+iIw7POnzHEEo5--
+  Administrator: RMPrepUSB QEMU Launcher
+  **************************************
+  EXECUTING "C:\Program Files (x86)\RMPrepUSB\qemu\STARTFROMUSB.cmd"
+  DRIVE NUMBER=3D3
+  MEMORY SIZE=3D1000
+  HARD DISK IMAGE=3Dharddisk.img
+  NOWRITE=3D
+  Found OS=3DVISTA_OR_LATER
+  Sending command Start_VM.exe 3 500 qemu.exe -L . -name "RMPrepUSB Emulati=
+on =
+
+  Session  RAM=3D1000MB VirtualHDD=3Dharddisk.i
+  lt+LCtrl)" -boot c -m 1000 -drive file=3D\\.
+  \PhysicalDrive3,if=3Dide,index=3D0,media=3Ddisk -hdb harddisk.img to shel=
+l...
+
+  Win-7: in the second window appears:
+  ***********************************
+  -->qemu funktioniert nicht mehr
+  Problemsignatur:
+    Problemereignisname:	APPCRASH
+    Anwendungsname:	qemu.exe
+    Anwendungsversion:	0.15.1.0
+    Anwendungszeitstempel:	4f478c16
+    Fehlermodulname:	qemu.exe
+    Fehlermodulversion:	0.15.1.0
+    Fehlermodulzeitstempel:	4f478c16
+    Ausnahmecode:	40000015
+    Ausnahmeoffset:	00053b06
+    Betriebsystemversion:	6.1.7601.2.1.0.256.48
+    Gebietsschema-ID:	1031
+    Zusatzinformation 1:	bf8d
+    Zusatzinformation 2:	bf8d49108a2e5a0707fc48438e01652a
+    Zusatzinformation 3:	b0f1
+    Zusatzinformation 4:	b0f155b0f1de9c5eb22bd6d100737cbe
+
+  If somebody can understand that behaviour I appreciate everybodies help. =
+Thank you with regards
+  H.O.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1314667/+subscriptions
