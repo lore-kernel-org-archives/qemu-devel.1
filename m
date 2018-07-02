@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoxinhua@huawei.com>) id 1fZn2I-0002kf-DX
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 20:49:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fZnpV-0002Kd-2L
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 21:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoxinhua@huawei.com>) id 1fZn2F-00081W-AI
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 20:49:46 -0400
-Received: from [45.249.212.35] (port=45075 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <caoxinhua@huawei.com>)
-	id 1fZn2E-0007yG-Tn
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 20:49:43 -0400
-From: xinhua.Cao <caoxinhua@huawei.com>
-Date: Mon, 2 Jul 2018 08:49:10 +0800
-Message-ID: <20180702004910.13216-1-caoxinhua@huawei.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fZnpR-0004CI-45
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 21:40:37 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Sun,  1 Jul 2018 22:40:22 -0300
+Message-Id: <20180702014022.12395-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] qemu-char: reset errno before qemu char write
- or read action
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] milkymist-minimac2: Use
+ qemu_log_mask(GUEST_ERROR) instead of error_report
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, marcandre.lureau@redhat.com, eblake@redhat.com, anton.nefedov@virtuozzo.com, vsementsov@virtuozzo.com
-Cc: weidong.huang@huawei.com, weifuqiang@huawei.com, king.wang@huawei.com, arei.gonglei@huawei.com, liuyongan@huawei.com, qemu-devel@nongnu.org, "xinhua.Cao" <caoxinhua@huawei.com>
+To: Michael Walle <michael@walle.cc>, Jason Wang <jasowang@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-In the tcp_chr_write function, we checked errno,
-but errno was not reset before a read or write operation.
-Therefore, this check of errno's actions is often
-incorrect after EAGAIN has occurred.
-We reset errno before reading and writing to
-ensure the correctness of errno's judgment
+qemu_log_mask(GUEST_ERROR) is more appropriate:
 
-Signed-off-by: xinhua.Cao <caoxinhua@huawei.com>
+  $ qemu -d help
+  Log items (comma separated):
+  guest_errors    log when the guest OS does something invalid (eg accessing a non-existent register)
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- chardev/char-fe.c | 1 +
- chardev/char.c    | 2 ++
- 2 files changed, 3 insertions(+)
+v2: do not remove "qemu/error-report.h" (patchew)
 
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index b1f228e..d96ca6f 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -69,6 +69,7 @@ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
+ hw/net/milkymist-minimac2.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
+index 3eaa19dfde..322fb77e46 100644
+--- a/hw/net/milkymist-minimac2.c
++++ b/hw/net/milkymist-minimac2.c
+@@ -30,6 +30,7 @@
+ #include "hw/sysbus.h"
+ #include "trace.h"
+ #include "net/net.h"
++#include "qemu/log.h"
+ #include "qemu/error-report.h"
  
-     while (offset < len) {
-     retry:
-+        errno = 0;
-         res = CHARDEV_GET_CLASS(s)->chr_sync_read(s, buf + offset,
-                                                   len - offset);
-         if (res == -1 && errno == EAGAIN) {
-diff --git a/chardev/char.c b/chardev/char.c
-index 76d866e..3387442 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -85,6 +85,7 @@ static void qemu_chr_write_log(Chardev *s, const uint8_t *buf, size_t len)
+ #include <zlib.h>
+@@ -214,7 +215,8 @@ static size_t assemble_frame(uint8_t *buf, size_t size,
+     uint32_t crc;
  
-     while (done < len) {
-     retry:
-+        errno = 0;
-         ret = write(s->logfd, buf + done, len - done);
-         if (ret == -1 && errno == EAGAIN) {
-             g_usleep(100);
-@@ -109,6 +110,7 @@ static int qemu_chr_write_buffer(Chardev *s,
-     qemu_mutex_lock(&s->chr_write_lock);
-     while (*offset < len) {
-     retry:
-+        errno = 0;
-         res = cc->chr_write(s, buf + *offset, len - *offset);
-         if (res < 0 && errno == EAGAIN && write_all) {
-             g_usleep(100);
+     if (size < payload_size + 12) {
+-        error_report("milkymist_minimac2: received too big ethernet frame");
++        qemu_log_mask(LOG_GUEST_ERROR, "milkymist_minimac2: frame too big "
++                      "(%zd bytes)\n", payload_size);
+         return 0;
+     }
+ 
+@@ -347,8 +349,9 @@ minimac2_read(void *opaque, hwaddr addr, unsigned size)
+         break;
+ 
+     default:
+-        error_report("milkymist_minimac2: read access to unknown register 0x"
+-                TARGET_FMT_plx, addr << 2);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "milkymist_minimac2_rd%d: 0x%" HWADDR_PRIx "\n",
++                      size, addr << 2);
+         break;
+     }
+ 
+@@ -413,8 +416,9 @@ minimac2_write(void *opaque, hwaddr addr, uint64_t value,
+         break;
+ 
+     default:
+-        error_report("milkymist_minimac2: write access to unknown register 0x"
+-                TARGET_FMT_plx, addr << 2);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "milkymist_minimac2_wr%d: 0x%" HWADDR_PRIx " = 0x%lx\n",
++                      size, addr << 2, value);
+         break;
+     }
+ }
 -- 
-2.8.3
+2.18.0
