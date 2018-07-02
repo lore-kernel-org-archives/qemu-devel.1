@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fa3Dk-0005FX-8j
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:06:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fa3ES-0005dt-NJ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fa3Dj-0006qa-C3
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:06:40 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34299)
+	(envelope-from <peter.maydell@linaro.org>) id 1fa3ER-0007NS-S8
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:07:24 -0400
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:46123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fa3Dj-0006q1-3Q
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:06:39 -0400
-Received: by mail-oi0-x244.google.com with SMTP id 13-v6so5644116ois.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 11:06:39 -0700 (PDT)
+	id 1fa3ER-0007N4-Mb
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:07:23 -0400
+Received: by mail-oi0-x22a.google.com with SMTP id y207-v6so18044362oie.13
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 11:07:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180702175740.GA14904@roeck-us.net>
-References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
-	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
-	<20180626175900.GA4307@roeck-us.net>
-	<CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
-	<20180626200008.GA680@roeck-us.net>
-	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
-	<20180702162733.GB32333@roeck-us.net>
-	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
-	<20180702170522.GA9885@roeck-us.net>
-	<CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
-	<20180702175740.GA14904@roeck-us.net>
+In-Reply-To: <20180702160546.31969-1-richard.henderson@linaro.org>
+References: <20180702160546.31969-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Jul 2018 19:06:17 +0100
-Message-ID: <CAFEAcA8noUOGt_9LpfRTRX52n4Z66XzudYFfW=180c92vzPH-g@mail.gmail.com>
+Date: Mon, 2 Jul 2018 19:07:02 +0100
+Message-ID: <CAFEAcA9FvHZComukPjAA6gwUBAgryFVW2P=yLwmTFqLb_LR5YQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
- identify and set one-shot mode
+Subject: Re: [Qemu-devel] [PULL 0/6] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,46 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 2 July 2018 at 18:57, Guenter Roeck <linux@roeck-us.net> wrote:
-> On Mon, Jul 02, 2018 at 06:10:36PM +0100, Peter Maydell wrote:
->> On 2 July 2018 at 18:05, Guenter Roeck <linux@roeck-us.net> wrote:
->> > I don't think I'll have more time available to spend on this
->> > anytime soon. If it works for you, just drop the patch. I can
->> > keep it local in my branch. My version of qemu is different anyway,
->> > after all.
->>
->> I'd kind of like to fix the bug, though. I'd just like you
->> to provide the image you're testing with...
->>
+On 2 July 2018 at 17:05, Richard Henderson <richard.henderson@linaro.org> wrote:
+> The following changes since commit 2d58e33ec1b76990f09bc1e3412e0b36e1ac4634:
 >
-> Ah, but that won't help. We are dealing with a heisenbug, and me using
-> a different host than you (or even a different gcc version) may be
-> sufficient to make the problem disappear on your system.
+>   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-3.0-pull-request' into staging (2018-07-02 13:43:10 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20180702
+>
+> for you to fetch changes up to 9c8c334b0637bf3c592d432b0c11f3b62dd5dba3:
+>
+>   cpu: Assert asidx_from_attrs return value in range (2018-07-02 08:09:49 -0700)
+>
+> ----------------------------------------------------------------
+> Assorted tlb and tb caching fixes
+>
+> ----------------------------------------------------------------
+> Emilio G. Cota (1):
+>       translate-all: fix locking of TBs whose two pages share the same physical page
+>
+> Peter Maydell (3):
+>       tcg: Define and use new tlb_hit() and tlb_hit_page() functions
+>       accel/tcg: Correct "is this a TLB miss" check in get_page_addr_code()
+>       accel/tcg: Don't treat invalid TLB entries as needing recheck
+>
+> Richard Henderson (2):
+>       accel/tcg: Avoid caching overwritten tlb entries
+>       cpu: Assert asidx_from_attrs return value in range
 
-True, but we can at least rule out some differences between
-your setup and mine. (For instance, your kernel config and
-version and rootfs are all going to be different from what
-I've been testing.)
+Applied, thanks.
 
-> The mps2 images use high resolution timers, which is likely what is
-> triggering here. My working assumption is that those timers trigger at
-> the wrong time because the timer is set up in periodic instead of one-time
-> mode. With that, behavior is more or less random. On some systems it will
-> work, on some systems it won't. Since we can not agree that setting the
-> timer in periodic mode instead of one-shot mode is a problem, I don't
-> really see how we can proceed. I would somehow have to prove to you that
-> there is an observable problem in the first place, well beyond of what
-> I already did. That might take a lot of time - much more than I would
-> be able to spend on it.
-
-I certainly believe you that there's an observable problem.
-I just disagree about your proposed fix, because I don't see
-from the code why it would make any difference. So I want to
-get to a point where I can run exactly the same thing you're
-running on my system to have a look at what's happening.
-
-thanks
 -- PMM
