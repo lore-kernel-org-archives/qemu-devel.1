@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fZwqe-0002MF-Rx
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:18:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1fZwvM-0006Fu-KU
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fZwqd-0006J4-2r
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:18:24 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  2 Jul 2018 13:17:37 +0200
-Message-Id: <20180702111737.18970-16-cohuck@redhat.com>
-In-Reply-To: <20180702111737.18970-1-cohuck@redhat.com>
-References: <20180702111737.18970-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 15/15] s390x/tcg: fix locking problem with
- tcg_s390_tod_updated
+	(envelope-from <peterx@redhat.com>) id 1fZwvL-0000jj-7V
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:23:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45482 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fZwvL-0000jO-2L
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:23:15 -0400
+Date: Mon, 2 Jul 2018 19:23:08 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180702112308.GO2455@xz-mi>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,89 +26,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+On Fri, Jun 29, 2018 at 11:03:13AM +0300, Denis Plotnikov wrote:
+> The patch set adds the ability to make external snapshots while VM is running.
 
-tcg_s390_tod_updated() is always called with the iothread being locked
-(e.g. from S390TODClass->set() e.g. via HELPER(sck) or on incoming
-migration). The helper we call takes the lock itself - bad.
+Hi, Denis,
 
-Let's change that by factoring out updating the ckc timer. This now looks
-much nicer than having to call a helper from another function.
+This work is interesting, though I have a few questions to ask in
+general below.
 
-While touching it we also make sure that env->ckc is updated even if the
-new value is -1ULL, for now it would not have been modified in that case.
+> 
+> The workflow to make a snapshot is the following:
+> 1. Pause the vm
+> 2. Make a snapshot of block devices using the scheme of your choice
 
-Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180629170520.13671-1-david@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/misc_helper.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+Here you explicitly took the snapshot for the block device, then...
 
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 7656a9b90a..3f91579570 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -149,26 +149,23 @@ uint64_t HELPER(stck)(CPUS390XState *env)
-     return tod.low;
- }
- 
--/* Set Clock Comparator */
--void HELPER(sckc)(CPUS390XState *env, uint64_t time)
-+static void update_ckc_timer(CPUS390XState *env)
- {
-     S390TODState *td = s390_get_todstate();
-+    uint64_t time;
- 
-     /* stop the timer and remove pending CKC IRQs */
-     timer_del(env->tod_timer);
--    qemu_mutex_lock_iothread();
-+    g_assert(qemu_mutex_iothread_locked());
-     env->pending_int &= ~INTERRUPT_EXT_CLOCK_COMPARATOR;
--    qemu_mutex_unlock_iothread();
- 
-     /* the tod has to exceed the ckc, this can never happen if ckc is all 1's */
--    if (time == -1ULL) {
-+    if (env->ckc == -1ULL) {
-         return;
-     }
- 
--    env->ckc = time;
--
-     /* difference between origins */
--    time -= td->base.low;
-+    time = env->ckc - td->base.low;
- 
-     /* nanoseconds */
-     time = tod2time(time);
-@@ -176,12 +173,21 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
-     timer_mod(env->tod_timer, time);
- }
- 
-+/* Set Clock Comparator */
-+void HELPER(sckc)(CPUS390XState *env, uint64_t ckc)
-+{
-+    env->ckc = ckc;
-+
-+    qemu_mutex_lock_iothread();
-+    update_ckc_timer(env);
-+    qemu_mutex_unlock_iothread();
-+}
-+
- void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
- {
-     S390CPU *cpu = S390_CPU(cs);
--    CPUS390XState *env = &cpu->env;
- 
--    helper_sckc(env, env->ckc);
-+    update_ckc_timer(&cpu->env);
- }
- 
- /* Set Clock */
+> 3. Turn on background-snapshot migration capability
+> 4. Start the migration using the destination (migration stream) of your choice.
+
+... here you started the VM snapshot.  How did you make sure that the
+VM snapshot (e.g., the RAM data) and the block snapshot will be
+aligned?
+
+For example, in current save_snapshot() we'll quiesce disk IOs before
+migrating the last pieces of RAM data to make sure they are aligned.
+I didn't figure out myself on how that's done in this work.
+
+>    The migration will resume the vm execution by itself
+>    when it has the devices' states saved  and is ready to start ram writing
+>    to the migration stream.
+> 5. Listen to the migration finish event
+> 
+> The feature relies on KVM unapplied ability to report the faulting address.
+> Please find the KVM patch snippet to make the patchset work below:
+> 
+> +++ b/arch/x86/kvm/vmx.c
+> @@ -XXXX,X +XXXX,XX @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>  
+>         vcpu->arch.exit_qualification = exit_qualification;
+>  
+> -       return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +       r = kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +        if (r == -EFAULT) {
+> +               unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gpa >> PAGE_SHIFT);
+> +
+> +               vcpu->run->exit_reason = KVM_EXIT_FAIL_MEM_ACCESS;
+> +               vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_VIOLATION;
+> +               vcpu->run->fail_mem_access.hva = hva | (gpa & (PAGE_SIZE-1));
+> +               r = 0;
+> +
+> +       }
+> +       return r;
+
+Just to make sure I fully understand here: so this is some extra KVM
+work just to make sure the mprotect() trick will work even for KVM
+vcpu threads, am I right?
+
+Meanwhile, I see that you only modified EPT violation code, then how
+about the legacy hardwares and softmmu case?
+
+Thanks,
+
+> 
+> The patch to KVM can be sent if the patch set approved
+> 
+> Denis Plotnikov (7):
+>   migration: add background snapshot capability
+>   bitops: add some atomic versions of bitmap operations
+>   threads: add infrastructure to process sigsegv
+>   migration: add background snapshot infrastructure
+>   kvm: add failed memeory access exit reason
+>   kvm: add vCPU failed memeory access processing
+>   migration: add background snapshotting
+> 
+>  include/exec/ram_addr.h   |   7 +
+>  include/exec/ramlist.h    |   4 +-
+>  include/qemu/bitops.h     |  24 +++
+>  include/qemu/thread.h     |   5 +
+>  linux-headers/linux/kvm.h |   5 +
+>  migration/migration.c     | 141 +++++++++++++++-
+>  migration/migration.h     |   1 +
+>  migration/ram.c           | 333 ++++++++++++++++++++++++++++++++++++--
+>  migration/ram.h           |  11 +-
+>  migration/savevm.c        |  91 ++++++-----
+>  migration/savevm.h        |   2 +
+>  qapi/migration.json       |   6 +-
+>  target/i386/kvm.c         |  18 +++
+>  util/qemu-thread-posix.c  |  50 ++++++
+>  14 files changed, 635 insertions(+), 63 deletions(-)
+> 
+> -- 
+> 2.17.0
+> 
+> 
+
 -- 
-2.14.4
+Peter Xu
