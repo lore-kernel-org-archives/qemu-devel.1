@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzqh-0005WM-EW
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:40 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fZzvD-0000g2-Rx
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fZzqg-0000ZL-7h
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:39 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43591)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fZzqg-0000YV-0L
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:30:38 -0400
-Received: by mail-wr0-x243.google.com with SMTP id f18-v6so2067630wre.10
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:30:37 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  2 Jul 2018 15:30:21 +0100
-Message-Id: <20180702143021.18864-21-alex.bennee@linaro.org>
-In-Reply-To: <20180702143021.18864-1-alex.bennee@linaro.org>
-References: <20180702143021.18864-1-alex.bennee@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1fZzvA-0002iE-JN
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:35:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39326 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fZzv9-0002hq-WA
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:35:16 -0400
+References: <20180702140558.18267-1-esposem@usi.ch>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e1605e06-dd05-3ffb-fff3-fbb18bc66a50@redhat.com>
+Date: Mon, 2 Jul 2018 16:35:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 20/20] docker: add linux-user powered cross
- builder for QEMU
+In-Reply-To: <20180702140558.18267-1-esposem@usi.ch>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qpci_free_pc: sdhci-test and
+ vhost-user-test could free() NULL pointers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Emanuele Giuseppe Esposito <esposem@usi.ch>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-We can't use cross compilers in the current Debian stable and Debian
-sid is sketchy as hell. So for powerpc fall back to dog-fooding our
-own linux-user to do the build.
+On 02/07/2018 16:05, Emanuele Giuseppe Esposito wrote:
+> @@ -152,6 +152,8 @@ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAlloca=
+tor *alloc)
+> =20
+>  void qpci_free_pc(QPCIBus *bus)
+>  {
+> +    g_assert(bus);
+> +
+>      QPCIBusPC *s =3D container_of(bus, QPCIBusPC, bus);
+> =20
+>      g_free(s);
+> diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+> index 1d825eb010..9b486b93bf 100644
+> --- a/tests/sdhci-test.c
+> +++ b/tests/sdhci-test.c
+> @@ -209,7 +209,9 @@ static QSDHCI *machine_start(const struct sdhci_t *=
+test)
+> =20
+>  static void machine_stop(QSDHCI *s)
+>  {
+> -    qpci_free_pc(s->pci.bus);
+> +    if (s->pci.bus) {
+> +        qpci_free_pc(s->pci.bus);
+> +    }
 
-As we can only build the base image with a suitably configured
-source tree we fall back to checking for it's existence when we can't
-build it from scratch. However this does mean you don't have to keep
-a static powerpc-linux-user in your active configuration just to
-update the cross build image.
+Sorry for chiming in just now.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+In general, freeing a NULL pointer is a fine thing to do in C.  In your
+code you do
 
----
-v3
-  - fix for rename of docker-binfmt-image-debian-powerpc-user
----
- tests/docker/Makefile.include                 | 29 +++++++++++++++++++
- .../debian-powerpc-user-cross.docker          | 13 +++++++++
- 2 files changed, 42 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-powerpc-user-cross.docker
+    QPCIBusPC *ret =3D g_new0(QPCIBusPC, 1);
+    qpci_set_pc(ret, qts, alloc);
+    return &ret->bus;
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index fdc87b8a57..85801702dd 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -119,6 +119,31 @@ docker-image-travis: NOUSER=1
- # Specialist build images, sometimes very limited tools
- docker-image-tricore-cross: docker-image-debian9
- 
-+# Rules for building linux-user powered images
-+#
-+# These are slower than using native cross compiler setups but can
-+# work around issues with poorly working multi-arch systems and broken
-+# packages.
-+
-+ifeq ($(filter ppc-linux-user,$(TARGET_LIST))$(CONFIG_STATIC),ppc-linux-usery)
-+# Jessie is the last supported release for powerpc, but multi-arch is
-+# broken so we need a qemu-linux-user for this target
-+docker-binfmt-image-debian-powerpc-user: DEB_ARCH = powerpc
-+docker-binfmt-image-debian-powerpc-user: DEB_TYPE = jessie
-+docker-binfmt-image-debian-powerpc-user: EXECUTABLE = ${BUILD_DIR}/ppc-linux-user/qemu-ppc
-+DOCKER_USER_IMAGES += debian-powerpc-user
-+else
-+docker-binfmt-image-debian-powerpc-user:
-+	$(call quiet-command, \
-+		$(DOCKER_SCRIPT) check --quiet qemu:debian-powerpc-user \
-+			$(DOCKER_FILES_DIR)/debian-bootstrap.docker, \
-+		"CHECK", "debian-powerpc-user exists")
-+endif
-+
-+# We build the QEMU compiler environment on top of the base image
-+docker-image-debian-powerpc-user-cross: docker-binfmt-image-debian-powerpc-user
-+
-+
- # Expand all the pre-requistes for each docker image and test combination
- $(foreach i,$(filter-out $(DOCKER_INTERMEDIATE_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES)), \
- 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
-@@ -154,6 +179,10 @@ docker:
- 	@echo
- 	@echo 'Available container images:'
- 	@echo '    $(DOCKER_IMAGES)'
-+ifneq ($(DOCKER_USER_IMAGES),)
-+	@echo 'Available linux-user images:'
-+	@echo '    $(DOCKER_USER_IMAGES)'
-+endif
- 	@echo
- 	@echo 'Available tests:'
- 	@echo '    $(DOCKER_TESTS)'
-diff --git a/tests/docker/dockerfiles/debian-powerpc-user-cross.docker b/tests/docker/dockerfiles/debian-powerpc-user-cross.docker
-new file mode 100644
-index 0000000000..eadb142792
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-powerpc-user-cross.docker
-@@ -0,0 +1,13 @@
-+#
-+# Docker powerpc cross-compiler target for QEMU
-+#
-+# We can't use current Debian stable cross-compilers to build powerpc
-+# as it has been dropped as a release architecture. Using Debian Sid
-+# is just far too sketchy a build environment. This leaves us the
-+# final option of using linux-user. This image is based of the
-+# debootstrapped qemu:debian-powerpc-user but doesn't need any extra
-+# magic once it is setup.
-+#
-+FROM qemu:debian-powerpc-user
-+
-+RUN apt-get update && apt-get build-dep -yy qemu
--- 
-2.17.1
+But now &ret->bus can be inside the pointer.  qpci_free_pc must
+therefore check for NULL before doing the container_of.
+
+It is debatable whether this change should go in QEMU before your code,
+or together with it.  There are good arguments for both sides:
+
+- the container_of is assuming that QPCIBus is the first field of the
+struct, but that's a strange assumption: container_of usually is used to
+go from an interior pointer to an outside struct, and passing NULL to it
+is usually wrong
+
+- but, the struct _does_ have QPCIBus as the first field, so we can
+assume that if bus =3D=3D NULL, s will be NULL too.  And g_free(NULL) is =
+okay.
+
+I suggest that you add the "if (!bus) { return; }" in your code, in the
+same patch that adds the field before QPCIBusPC.
+
+Thanks,
+
+Paolo
