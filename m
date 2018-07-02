@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1it-0002jd-9v
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:30:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fa1jc-0003Gr-MJ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1iq-0001t5-68
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:30:43 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa1iq-0001t0-0v
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:30:40 -0400
-Received: by mail-qk0-x242.google.com with SMTP id b66-v6so8951711qkj.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 09:30:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180702143021.18864-1-alex.bennee@linaro.org>
-	<20180702143021.18864-10-alex.bennee@linaro.org>
-	<19661f74-d44b-590f-2226-cdcab27ab82b@amsat.org>
-Message-ID: <9c899d98-3ee4-9315-f0d4-92a047bfddd0@amsat.org>
-Date: Mon, 2 Jul 2018 13:30:32 -0300
-MIME-Version: 1.0
-In-Reply-To: <19661f74-d44b-590f-2226-cdcab27ab82b@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 09/20] linux-user: introduce
- preexit_cleanup
+	(envelope-from <pbonzini@redhat.com>) id 1fa1jb-0002CI-RQ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:31:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48032 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fa1jb-0002C8-MQ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:31:27 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  2 Jul 2018 18:31:25 +0200
+Message-Id: <20180702163125.28729-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] fsdev: fix compilation with VIRTIO but not
+ VIRTIO_9P
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, famz@redhat.com, berrange@redhat.com, Peter Maydell <peter.maydell@linaro.org>
-Cc: cota@braap.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: groug@kaod.org
 
-On 07/02/2018 01:22 PM, Philippe Mathieu-Daudé wrote:
-> Using:
-> 
-> 'configure' '--enable-gprof' '--enable-gcov' '--disable-pie' --static
-> [...]
-> C compiler        gcc-8
-> CFLAGS            -fprofile-arcs -ftest-coverage -g -g
-> LDFLAGS           -Wl,--warn-common -fprofile-arcs -ftest-coverage -m64
-> -static -g
-> gprof enabled     yes
-> static build      yes
-> PIE               no
-> gcov              gcov
-> gcov enabled      yes
-> docker            yes
-> 
-> I get:
-> 
-> $ make subdir-ppc-linux-user
-> [...]
->   CC      ppc-linux-user/linux-user/exit.o
-> linux-user/exit.c: In function ‘preexit_cleanup’:
-> linux-user/exit.c:29:9: error: implicit declaration of function
-> ‘_mcleanup’ [-Werror=implicit-function-declaration]
->          _mcleanup();
->          ^~~~~~~~~
-> linux-user/exit.c:29:9: error: nested extern declaration of ‘_mcleanup’
-> [-Werror=nested-externs]
-> cc1: all warnings being treated as errors
-> make[1]: *** [rules.mak:69: linux-user/exit.o] Error 1
-> make: *** [Makefile:481: subdir-ppc-linux-user] Error 2
-> 
-> I suppose gprof and static builds are exclusive.
+hw/9pfs/Makefile.objs uses CONFIG_VIRTIO_9P to guard the definition for
+FileOperations structs, while fsdev/Makefile.objs uses CONFIG_VIRTIO
+to guard the use.  Mismatch causes linking to fail when CONFIG_VIRTIO
+is set but CONFIG_VIRTIO_9P is not.
 
-I just noticed we don't have --static builds covered by our continuous
-integration.
-Yet too many matrix cases to cover?
-We could ignore it for 'system' builds, but we should enable it for
---linux-user which is used by various distributions for with the binfmt
-packages.
+Fix it and use if/else to clarify that the two lines are for opposite
+conditions.
 
-Regards,
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: b5dfdb082fc350f3e68dfa61dc988d97cad28cfe
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ fsdev/Makefile.objs | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Phil.
+diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+index fb38017c0b..24bbb3e75c 100644
+--- a/fsdev/Makefile.objs
++++ b/fsdev/Makefile.objs
+@@ -1,7 +1,10 @@
+ # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+ # only pull in the actual 9p backend if we also enabled virtio or xen.
+-common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+-common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN)))) = qemu-fsdev-dummy.o
++ifeq ($(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN))),y)
++common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
++else
++common-obj-y = qemu-fsdev-dummy.o
++endif
+ common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+ 
+ # Toplevel always builds this; targets without virtio will put it in
+-- 
+2.17.1
