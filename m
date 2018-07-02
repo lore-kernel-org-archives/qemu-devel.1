@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fZwq6-0001vJ-Kg
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:17:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fZwq9-0001vY-4y
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:17:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fZwq4-0005xi-0K
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:17:50 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fZwq7-0005zq-O7
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:17:53 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon,  2 Jul 2018 13:17:22 +0200
-Message-Id: <20180702111737.18970-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 00/15] s390x patches for 3.0
+Date: Mon,  2 Jul 2018 13:17:24 +0200
+Message-Id: <20180702111737.18970-3-cohuck@redhat.com>
+In-Reply-To: <20180702111737.18970-1-cohuck@redhat.com>
+References: <20180702111737.18970-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 02/15] loader: Check access size when calling
+ rom_ptr() to avoid crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,84 +23,223 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-The following changes since commit 281bd281222776229d5dbf84d1a5c6d8d9d2a34b:
+From: Thomas Huth <thuth@redhat.com>
 
-  Merge remote-tracking branch 'remotes/xtensa/tags/20180630-xtensa' into staging (2018-06-30 22:23:51 +0100)
+The rom_ptr() function allows direct access to the ROM blobs that we
+load during startup. However, there are currently no checks for the
+size of the accesses, so it's currently possible to crash QEMU for
+example with:
 
-are available in the Git repository at:
+$ echo "Insane in the mainframe" > /tmp/test.txt
+$ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
+Segmentation fault (core dumped)
+$ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
+Segmentation fault (core dumped)
+$ echo -n HdrS > /tmp/hdr.txt
+$ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/hdr.txt -initrd /tmp/hdr.txt
+Segmentation fault (core dumped)
 
-  git://github.com/cohuck/qemu tags/s390x-20180702
+We need a possibility to check the size of the ROM area that we want
+to access, thus let's add a size parameter to the rom_ptr() function
+to avoid these problems.
 
-for you to fetch changes up to 30c8db0e219a3c1d8b39c19e8b858830cb141738:
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1530005740-25254-1-git-send-email-thuth@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/core/loader.c     | 10 +++++-----
+ hw/mips/mips_malta.c |  6 ++++--
+ hw/s390x/ipl.c       | 18 ++++++++++++------
+ hw/sparc/sun4m.c     |  4 ++--
+ hw/sparc64/sun4u.c   |  4 ++--
+ include/hw/loader.h  |  2 +-
+ target/arm/cpu.c     |  2 +-
+ 7 files changed, 27 insertions(+), 19 deletions(-)
 
-  s390x/tcg: fix locking problem with tcg_s390_tod_updated (2018-07-02 10:37:38 +0200)
-
-----------------------------------------------------------------
-s390x updates:
-- add bpb/ppa15 features to default cpu model for z196 and later
-- rework TOD handling and fix cpu hotplug under tcg
-- various fixes
-
-----------------------------------------------------------------
-
-Christian Borntraeger (2):
-  s390/ipl: fix ipl with -no-reboot
-  s390x/cpumodel: default enable bpb and ppa15 for z196 and later
-
-David Hildenbrand (12):
-  s390x/tcg: avoid overflows in time2tod/tod2time
-  s390x/kvm: pass values instead of pointers to kvm_s390_set_clock_*()
-  s390x/tod: factor out TOD into separate device
-  s390x/tcg: drop tod_basetime
-  s390x/tcg: properly implement the TOD
-  s390x/tcg: SET CLOCK COMPARATOR can clear CKC interrupts
-  s390x/tcg: implement SET CLOCK
-  s390x/tcg: rearm the CKC timer during migration
-  s390x/tcg: fix CPU hotplug with single-threaded TCG
-  s390x/kvm: legacy_s390_alloc() only supports one allocation
-  s390x/kvm: indicate alignment in legacy_s390_alloc()
-  s390x/tcg: fix locking problem with tcg_s390_tod_updated
-
-Thomas Huth (1):
-  loader: Check access size when calling rom_ptr() to avoid crashes
-
- hw/core/loader.c            |  10 ++--
- hw/mips/mips_malta.c        |   6 +-
- hw/s390x/Makefile.objs      |   3 +
- hw/s390x/ipl.c              |  26 ++++++---
- hw/s390x/s390-virtio-ccw.c  |  59 ++------------------
- hw/s390x/tod-kvm.c          |  64 ++++++++++++++++++++++
- hw/s390x/tod-qemu.c         |  87 +++++++++++++++++++++++++++++
- hw/s390x/tod.c              | 130 ++++++++++++++++++++++++++++++++++++++++++++
- hw/sparc/sun4m.c            |   4 +-
- hw/sparc64/sun4u.c          |   4 +-
- include/hw/loader.h         |   2 +-
- include/hw/s390x/tod.h      |  65 ++++++++++++++++++++++
- include/sysemu/sysemu.h     |   4 ++
- target/arm/cpu.c            |   2 +-
- target/s390x/Makefile.objs  |   1 +
- target/s390x/cpu.c          |  57 ++++---------------
- target/s390x/cpu.h          |   4 --
- target/s390x/gen-features.c |   2 +
- target/s390x/helper.h       |   1 +
- target/s390x/insn-data.def  |   3 +-
- target/s390x/internal.h     |  15 -----
- target/s390x/kvm-stub.c     |   4 +-
- target/s390x/kvm.c          |  27 ++++++---
- target/s390x/kvm_s390x.h    |   6 +-
- target/s390x/machine.c      |   6 ++
- target/s390x/misc_helper.c  |  66 ++++++++++++++++++----
- target/s390x/tcg-stub.c     |  20 +++++++
- target/s390x/tcg_s390x.h    |  18 ++++++
- target/s390x/translate.c    |   9 +++
- vl.c                        |   4 +-
- 30 files changed, 543 insertions(+), 166 deletions(-)
- create mode 100644 hw/s390x/tod-kvm.c
- create mode 100644 hw/s390x/tod-qemu.c
- create mode 100644 hw/s390x/tod.c
- create mode 100644 include/hw/s390x/tod.h
- create mode 100644 target/s390x/tcg-stub.c
- create mode 100644 target/s390x/tcg_s390x.h
-
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 06bdbca537..bbb6e65bb5 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -191,7 +191,7 @@ void pstrcpy_targphys(const char *name, hwaddr dest, int buf_size,
+         rom_add_blob_fixed(name, source, (nulp - source) + 1, dest);
+     } else {
+         rom_add_blob_fixed(name, source, buf_size, dest);
+-        ptr = rom_ptr(dest + buf_size - 1);
++        ptr = rom_ptr(dest + buf_size - 1, sizeof(*ptr));
+         *ptr = 0;
+     }
+ }
+@@ -1165,7 +1165,7 @@ void rom_reset_order_override(void)
+     fw_cfg_reset_order_override(fw_cfg);
+ }
+ 
+-static Rom *find_rom(hwaddr addr)
++static Rom *find_rom(hwaddr addr, size_t size)
+ {
+     Rom *rom;
+ 
+@@ -1179,7 +1179,7 @@ static Rom *find_rom(hwaddr addr)
+         if (rom->addr > addr) {
+             continue;
+         }
+-        if (rom->addr + rom->romsize < addr) {
++        if (rom->addr + rom->romsize < addr + size) {
+             continue;
+         }
+         return rom;
+@@ -1249,11 +1249,11 @@ int rom_copy(uint8_t *dest, hwaddr addr, size_t size)
+     return (d + l) - dest;
+ }
+ 
+-void *rom_ptr(hwaddr addr)
++void *rom_ptr(hwaddr addr, size_t size)
+ {
+     Rom *rom;
+ 
+-    rom = find_rom(addr);
++    rom = find_rom(addr, size);
+     if (!rom || !rom->data)
+         return NULL;
+     return rom->data + (addr - rom->addr);
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index b9d92bf47e..1b4e32e58e 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1133,11 +1133,13 @@ void mips_malta_init(MachineState *machine)
+            a neat trick which allows bi-endian firmware. */
+ #ifndef TARGET_WORDS_BIGENDIAN
+         {
+-            uint32_t *end, *addr = rom_ptr(FLASH_ADDRESS);
++            uint32_t *end, *addr;
++            const size_t swapsize = MIN(bios_size, 0x3e0000);
++            addr = rom_ptr(FLASH_ADDRESS, swapsize);
+             if (!addr) {
+                 addr = memory_region_get_ram_ptr(bios);
+             }
+-            end = (void *)addr + MIN(bios_size, 0x3e0000);
++            end = (void *)addr + swapsize;
+             while (addr < end) {
+                 bswap32s(addr);
+                 addr++;
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index f278036fa7..21f64ad26a 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -33,7 +33,6 @@
+ #define KERN_PARM_AREA                  0x010480UL
+ #define INITRD_START                    0x800000UL
+ #define INITRD_PARM_START               0x010408UL
+-#define INITRD_PARM_SIZE                0x010410UL
+ #define PARMFILE_START                  0x001000UL
+ #define ZIPL_IMAGE_START                0x009000UL
+ #define IPL_PSW_MASK                    (PSW_MASK_32 | PSW_MASK_64)
+@@ -165,12 +164,12 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+                 goto error;
+             }
+             /* if this is Linux use KERN_IMAGE_START */
+-            magic = rom_ptr(LINUX_MAGIC_ADDR);
++            magic = rom_ptr(LINUX_MAGIC_ADDR, 6);
+             if (magic && !memcmp(magic, "S390EP", 6)) {
+                 pentry = KERN_IMAGE_START;
+             } else {
+                 /* if not Linux load the address of the (short) IPL PSW */
+-                ipl_psw = rom_ptr(4);
++                ipl_psw = rom_ptr(4, 4);
+                 if (ipl_psw) {
+                     pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
+                 } else {
+@@ -186,9 +185,12 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+          * loader) and it won't work. For this case we force it to 0x10000, too.
+          */
+         if (pentry == KERN_IMAGE_START || pentry == 0x800) {
++            char *parm_area = rom_ptr(KERN_PARM_AREA, strlen(ipl->cmdline) + 1);
+             ipl->start_addr = KERN_IMAGE_START;
+             /* Overwrite parameters in the kernel image, which are "rom" */
+-            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
++            if (parm_area) {
++                strcpy(parm_area, ipl->cmdline);
++            }
+         } else {
+             ipl->start_addr = pentry;
+         }
+@@ -196,6 +198,7 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+         if (ipl->initrd) {
+             ram_addr_t initrd_offset;
+             int initrd_size;
++            uint64_t *romptr;
+ 
+             initrd_offset = INITRD_START;
+             while (kernel_size + 0x100000 > initrd_offset) {
+@@ -212,8 +215,11 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+              * we have to overwrite values in the kernel image,
+              * which are "rom"
+              */
+-            stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
+-            stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
++            romptr = rom_ptr(INITRD_PARM_START, 16);
++            if (romptr) {
++                stq_p(romptr, initrd_offset);
++                stq_p(romptr + 1, initrd_size);
++            }
+         }
+     }
+     /*
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index b984d2da0e..21078cc121 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -272,8 +272,8 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
+         }
+         if (initrd_size > 0) {
+             for (i = 0; i < 64 * TARGET_PAGE_SIZE; i += TARGET_PAGE_SIZE) {
+-                ptr = rom_ptr(KERNEL_LOAD_ADDR + i);
+-                if (ldl_p(ptr) == 0x48647253) { // HdrS
++                ptr = rom_ptr(KERNEL_LOAD_ADDR + i, 24);
++                if (ptr && ldl_p(ptr) == 0x48647253) { /* HdrS */
+                     stl_p(ptr + 16, INITRD_LOAD_ADDR);
+                     stl_p(ptr + 20, initrd_size);
+                     break;
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 3975a7b65a..334dd7008e 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -186,8 +186,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
+         }
+         if (*initrd_size > 0) {
+             for (i = 0; i < 64 * TARGET_PAGE_SIZE; i += TARGET_PAGE_SIZE) {
+-                ptr = rom_ptr(*kernel_addr + i);
+-                if (ldl_p(ptr + 8) == 0x48647253) { /* HdrS */
++                ptr = rom_ptr(*kernel_addr + i, 32);
++                if (ptr && ldl_p(ptr + 8) == 0x48647253) { /* HdrS */
+                     stl_p(ptr + 24, *initrd_addr + *kernel_addr);
+                     stl_p(ptr + 28, *initrd_size);
+                     break;
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 5ed3fd8ae6..e98b84b8f9 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -226,7 +226,7 @@ void rom_set_fw(FWCfgState *f);
+ void rom_set_order_override(int order);
+ void rom_reset_order_override(void);
+ int rom_copy(uint8_t *dest, hwaddr addr, size_t size);
+-void *rom_ptr(hwaddr addr);
++void *rom_ptr(hwaddr addr, size_t size);
+ void hmp_info_roms(Monitor *mon, const QDict *qdict);
+ 
+ #define rom_add_file_fixed(_f, _a, _i)          \
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 82ff450f9a..64a8005a4b 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -239,7 +239,7 @@ static void arm_cpu_reset(CPUState *s)
+ 
+         /* Load the initial SP and PC from offset 0 and 4 in the vector table */
+         vecbase = env->v7m.vecbase[env->v7m.secure];
+-        rom = rom_ptr(vecbase);
++        rom = rom_ptr(vecbase, 8);
+         if (rom) {
+             /* Address zero is covered by ROM which hasn't yet been
+              * copied into physical memory.
 -- 
 2.14.4
