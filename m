@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fa0KS-00056R-3T
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa0Kk-0005KO-DS
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fa0KI-0002VO-Gp
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:24 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41859)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fa0KI-0002V1-89
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:14 -0400
-Received: by mail-wr0-x243.google.com with SMTP id h10-v6so15872351wrq.8
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:01:14 -0700 (PDT)
-Date: Mon, 2 Jul 2018 16:01:11 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180702150111.GI2155@stefanha-x1.localdomain>
-References: <20180702004910.13216-1-caoxinhua@huawei.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fa0Kc-0002nI-S1
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44740 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fa0Kc-0002mO-M6
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:34 -0400
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ac15d082-22eb-54d1-d695-6a0a3ac2d1eb@redhat.com>
+Date: Mon, 2 Jul 2018 17:01:31 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9iyR+p8Z2cn535Lj"
-Content-Disposition: inline
-In-Reply-To: <20180702004910.13216-1-caoxinhua@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-char: reset errno before qemu char
- write or read action
+In-Reply-To: <1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 08/20] kvm: arm/arm64: Abstract stage2
+ pgd table allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "xinhua.Cao" <caoxinhua@huawei.com>
-Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, eblake@redhat.com, anton.nefedov@virtuozzo.com, vsementsov@virtuozzo.com, weidong.huang@huawei.com, weifuqiang@huawei.com, qemu-devel@nongnu.org, king.wang@huawei.com, liuyongan@huawei.com, arei.gonglei@huawei.com
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 
+Hi Suzuki
 
---9iyR+p8Z2cn535Lj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
+> Abstract the allocation of stage2 entry level tables for
+> given VM, so that later we can choose to fall back to the
+> normal page table levels (i.e, avoid entry level table
+> concatenation) on arm64.
 
-On Mon, Jul 02, 2018 at 08:49:10AM +0800, xinhua.Cao wrote:
-> In the tcp_chr_write function, we checked errno,
-> but errno was not reset before a read or write operation.
-> Therefore, this check of errno's actions is often
-> incorrect after EAGAIN has occurred.
-> We reset errno before reading and writing to
-> ensure the correctness of errno's judgment
->=20
-> Signed-off-by: xinhua.Cao <caoxinhua@huawei.com>
+the justification is not crystal clear to me but it does no harm I think.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->  chardev/char-fe.c | 1 +
->  chardev/char.c    | 2 ++
->  2 files changed, 3 insertions(+)
+> Changes since V2:
+>  - New patch
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   | 6 ++++++
+>  arch/arm64/include/asm/kvm_mmu.h | 6 ++++++
+>  virt/kvm/arm/mmu.c               | 2 +-
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index f36eb20..b2da5a4 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -372,6 +372,12 @@ static inline int hyp_map_aux_data(void)
+>  	return 0;
+>  }
+>  
+> +static inline void *stage2_alloc_pgd(struct kvm *kvm)
+> +{
+> +	return alloc_pages_exact(stage2_pgd_size(kvm),
+> +				 GFP_KERNEL | __GFP_ZERO);
+> +}
+> +
+>  #define kvm_phys_to_vttbr(addr)		(addr)
+>  
+>  #endif	/* !__ASSEMBLY__ */
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 5da8f52..dbaf513 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -501,5 +501,11 @@ static inline int hyp_map_aux_data(void)
+>  
+>  #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
+>  
+> +static inline void *stage2_alloc_pgd(struct kvm *kvm)
+> +{
+> +	return alloc_pages_exact(stage2_pgd_size(kvm),
+> +				 GFP_KERNEL | __GFP_ZERO);
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 82dd571..a339e00 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -868,7 +868,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>  	}
+>  
+>  	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+> -	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
+> +	pgd = stage2_alloc_pgd(kvm);
+>  	if (!pgd)
+>  		return -ENOMEM;
+>  
+> 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-The C11x standard "7.4 Errors <errno.h>" says that errno "is never set
-to zero by any library function".  Please follow the errno usage
-convention described in the C standard.
+Thanks
 
-Instead of making functions called by tcp_chr_write() clear errno,
-please fix tcp_chr_write() so that errno is only accessed when ret < 0.
-
-Thanks,
-Stefan
-
---9iyR+p8Z2cn535Lj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbOj43AAoJEJykq7OBq3PIIjEH/20Yi2CPiGZK4TKlorytMRwY
-gASQN2w5lHdUuMvegUJY8hk9pndoxANZGAAWBQjOSF4hM7pX+pM9Pd6rBHEDLn0j
-ecWMsADubdm9CCsurhXClz+kSznhq4NZ3RFzrpuvLbruFTGyFTE5dAqjzdFIRiHE
-XNmkhnrathSW5XcsdG2zspWM9rEldq/CRUSdQi6RWHtX5EZ8QrT9TMdPq4bhuaIE
-ndNm3o2bDBrVYd/z4++7ncX+XR3HGoJ5ehJwdQSSev2CVvLB00ubGXTQBiMkiO04
-3dsBxnUfXMdFWEj/r7wriWvTytRyFOBPcoR0pcunHqwoieMTG04mCs7oQ6nR+aQ=
-=MWYu
------END PGP SIGNATURE-----
-
---9iyR+p8Z2cn535Lj--
+Eric
