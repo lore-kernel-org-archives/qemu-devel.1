@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fZxT6-0001fp-NY
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:58:13 -0400
+	(envelope-from <shorne@gmail.com>) id 1fZxWO-0003qd-2k
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fZxT4-00066L-P7
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:58:08 -0400
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-	<20180629151524.138542-3-vsementsov@virtuozzo.com>
-	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0f766c07-dfe5-1886-5635-f76780220757@virtuozzo.com>
-Date: Mon, 2 Jul 2018 14:57:48 +0300
+	(envelope-from <shorne@gmail.com>) id 1fZxWH-0007m6-Ky
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:01:32 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:38021)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZxWH-0007lf-Aa
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:01:25 -0400
+Received: by mail-pg0-x243.google.com with SMTP id c9-v6so7061500pgf.5
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 05:01:24 -0700 (PDT)
+Date: Mon, 2 Jul 2018 21:01:19 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20180702120119.GP24595@lianli.shorne-pla.net>
+References: <20180628030330.15615-1-richard.henderson@linaro.org>
+	<153049914837.615.12803592704677471272@946cad8fd14e>
 MIME-Version: 1.0
-In-Reply-To: <32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
- driver for fleecing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <153049914837.615.12803592704677471272@946cad8fd14e>
+Subject: Re: [Qemu-devel] [PATCH v3 00/23] target/openrisc improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,222 +29,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org, famz@redhat.com
 
-29.06.2018 20:30, John Snow wrote:
->
-> On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
->> We need to synchronize backup job with reading from fleecing image
->> like it was done in block/replication.c.
->>
->> Otherwise, the following situation is theoretically possible:
->>
->> 1. client start reading
->> 2. client understand, that there is no corresponding cluster in
->>     fleecing image
-> I don't think the client refocuses the read, but QEMU does. (the client
-> has no idea if it is reading from the fleecing node or the backing file.)
->
-> ... but understood:
->
->> 3. client is going to read from backing file (i.e. active image)
->> 4. guest writes to active image
-> My question here is if QEMU will allow reads and writes to interleave in
-> general. If the client is reading from the backing file, the active
-> image, will QEMU allow a write to modify that data before we're done
-> getting that data?
+On Sun, Jul 01, 2018 at 07:39:08PM -0700, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Message-id: 20180628030330.15615-1-richard.henderson@linaro.org
+> Subject: [Qemu-devel] [PATCH v3 00/23] target/openrisc improvements
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> d2fcddb810 linux-user: Fix struct sigaltstack for openrisc
+> 54bf3816e0 linux-user: Implement signals for openrisc
+> afd05358f9 target/openrisc: Add support in scripts/qemu-binfmt-conf.sh
+> 6c3691e32d target/openrisc: Reorg tlb lookup
+> f53e2facc7 target/openrisc: Increase the TLB size
+> 0d21fc5c8c target/openrisc: Stub out handle_mmu_fault for softmmu
+> f62561d1b7 target/openrisc: Use identical sizes for ITLB and DTLB
+> 836489970f target/openrisc: Fix cpu_mmu_index
+> 82ec0e63d4 target/openrisc: Fix tlb flushing in mtspr
+> 7657ccb683 target/openrisc: Reduce tlb to a single dimension
+> 0dedf4e4b9 target/openrisc: Merge mmu_helper.c into mmu.c
+> 55d39fdea4 target/openrisc: Remove indirect function calls for mmu
+> 68faceb291 target/openrisc: Merge tlb allocation into CPUOpenRISCState
+> bb22ed4bd0 target/openrisc: Form the spr index from tcg
+> aee6c05885 target/openrisc: Exit the TB after l.mtspr
+> 2fa87705e3 target/openrisc: Split out is_user
+> 8ffdeef89c target/openrisc: Link more translation blocks
+> 14800ca37d target/openrisc: Fix singlestep_enabled
+> d40522dde7 target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB
+> 3571c024ff target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP
+> 7ae2154034 target/openrisc: Log interrupts
+> f1f81972ff target/openrisc: Add print_insn_or1k
+> 92ac734d19 target/openrisc: Fix mtspr shadow gprs
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/23: target/openrisc: Fix mtspr shadow gprs...
+> Checking PATCH 2/23: target/openrisc: Add print_insn_or1k...
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #69: 
+> new file mode 100644
+> 
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #104: FILE: target/openrisc/disas.c:31:
+> +#define output(mnemonic, format, ...) \
+> +    info->fprintf_func(info->stream, "%-9s " format, \
+> +                       mnemonic, ##__VA_ARGS__)
+> 
+> ERROR: spaces required around that '*' (ctx:WxV)
+> #129: FILE: target/openrisc/disas.c:56:
+> +    arg_l_##opcode *a, uint32_t insn)                   \
+>                     ^
+> 
+> ERROR: spaces required around that '*' (ctx:WxV)
+> #224: FILE: target/openrisc/disas.c:151:
+> +    arg_lf_##opcode##_##suffix *a, uint32_t insn)                \
+>                                 ^
 
-If I understand correctly: yes. Physical drives allows intersecting 
-operations too and there no guarantee on result. We have serializing 
-requests, but in general only unaligned requests are marked serializing.
+I have fixed these on my branch.
 
->
->> 5. this write is stopped by backup(sync=none) and cluster is copied to
->>     fleecing image
->> 6. guest write continues...
->> 7. and client reads _new_ (or partly new) date from active image
->>
-> I can't answer this for myself one way or the other right now, but I
-> imagine you observed a failure in practice in your test setups, which
-> motivated this patch?
+  https://github.com/stffrdhrn/qemu/tree/or1k-fixes-212-1
 
-No. I just found this code in Qemu: block/replication already use the 
-same scheme with backup(sync=none). And it uses the synchronization as 
-in this patch. I've discussed it on list a bit:
-http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg01807.html
-https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg03025.html
+> total: 3 errors, 1 warnings, 923 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 3/23: target/openrisc: Log interrupts...
+> Checking PATCH 4/23: target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP...
+> Checking PATCH 5/23: target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB...
+> Checking PATCH 6/23: target/openrisc: Fix singlestep_enabled...
+> Checking PATCH 7/23: target/openrisc: Link more translation blocks...
+> Checking PATCH 8/23: target/openrisc: Split out is_user...
+> Checking PATCH 9/23: target/openrisc: Exit the TB after l.mtspr...
+> Checking PATCH 10/23: target/openrisc: Form the spr index from tcg...
+> Checking PATCH 11/23: target/openrisc: Merge tlb allocation into CPUOpenRISCState...
+> Checking PATCH 12/23: target/openrisc: Remove indirect function calls for mmu...
+> Checking PATCH 13/23: target/openrisc: Merge mmu_helper.c into mmu.c...
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #49: 
+> deleted file mode 100644
+> 
+> total: 0 errors, 1 warnings, 23 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> Checking PATCH 14/23: target/openrisc: Reduce tlb to a single dimension...
+> Checking PATCH 15/23: target/openrisc: Fix tlb flushing in mtspr...
+> Checking PATCH 16/23: target/openrisc: Fix cpu_mmu_index...
+> Checking PATCH 17/23: target/openrisc: Use identical sizes for ITLB and DTLB...
+> Checking PATCH 18/23: target/openrisc: Stub out handle_mmu_fault for softmmu...
+> Checking PATCH 19/23: target/openrisc: Increase the TLB size...
+> Checking PATCH 20/23: target/openrisc: Reorg tlb lookup...
+> Checking PATCH 21/23: target/openrisc: Add support in scripts/qemu-binfmt-conf.sh...
+> WARNING: line over 80 characters
+> #32: FILE: scripts/qemu-binfmt-conf.sh:127:
+> +or1k_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x5c'
+> 
+> ERROR: line over 90 characters
+> #33: FILE: scripts/qemu-binfmt-conf.sh:128:
+> +or1k_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
 
->
-> A test or some proof would help justification for this patch. It would
-> also help prove that it solves what it claims to!
+I will not fix this one.  All other lines are just like this.
 
-Agree, a reproducer is better than any theoretical reflections. I'm 
-thinking about it, but don't see simple solution...
+I just realized the merge window is nearing an end.  I will send a pull request
+soon.
 
->
->> So, this fleecing-filter should be above fleecing image, the whole
->> picture of fleecing looks like this:
->>
->>      +-------+           +------------+
->>      |       |           |            |
->>      | guest |           | NBD client +<------+
->>      |       |           |            |       |
->>      ++-----++           +------------+       |only read
->>       |     ^                                 |
->>       | IO  |                                 |
->>       v     |                           +-----+------+
->>      ++-----+---------+                 |            |
->>      |                |                 |  internal  |
->>      |  active image  +----+            | NBD server |
->>      |                |    |            |            |
->>      +-+--------------+    |backup      +-+----------+
->>        ^                   |sync=none     ^
->>        |backing            |              |only read
->>        |                   |              |
->>      +-+--------------+    |       +------+----------+
->>      |                |    |       |                 |
->>      | fleecing image +<---+       | fleecing filter |
->>      |                |            |                 |
->>      +--------+-------+            +-----+-----------+
->>               ^                          |
->>               |                          |
->>               +--------------------------+
->>                         file
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   qapi/block-core.json    |  6 ++--
->>   block/fleecing-filter.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++
->>   block/Makefile.objs     |  1 +
->>   3 files changed, 85 insertions(+), 2 deletions(-)
->>   create mode 100644 block/fleecing-filter.c
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 577ce5e999..43872c3d79 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -2542,7 +2542,8 @@
->>               'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
->>               'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
->>               'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
->> -            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
->> +            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs',
->> +            'fleecing-filter' ] }
->>   
->>   ##
->>   # @BlockdevOptionsFile:
->> @@ -3594,7 +3595,8 @@
->>         'vmdk':       'BlockdevOptionsGenericCOWFormat',
->>         'vpc':        'BlockdevOptionsGenericFormat',
->>         'vvfat':      'BlockdevOptionsVVFAT',
->> -      'vxhs':       'BlockdevOptionsVxHS'
->> +      'vxhs':       'BlockdevOptionsVxHS',
->> +      'fleecing-filter': 'BlockdevOptionsGenericFormat'
->>     } }
->>   
->>   ##
->> diff --git a/block/fleecing-filter.c b/block/fleecing-filter.c
->> new file mode 100644
->> index 0000000000..b501887c10
->> --- /dev/null
->> +++ b/block/fleecing-filter.c
->> @@ -0,0 +1,80 @@
->> +#include "qemu/osdep.h"
->> +#include "qemu-common.h"
->> +#include "block/blockjob.h"
->> +#include "block/block_int.h"
->> +#include "block/block_backup.h"
->> +
->> +static int64_t fleecing_getlength(BlockDriverState *bs)
->> +{
->> +    return bdrv_getlength(bs->file->bs);
->> +}
->> +
->> +static coroutine_fn int fleecing_co_preadv(BlockDriverState *bs,
->> +                                           uint64_t offset, uint64_t bytes,
->> +                                           QEMUIOVector *qiov, int flags)
->> +{
->> +    int ret;
->> +    BlockJob *job = bs->file->bs->backing->bs->job;
->> +    CowRequest req;
->> +
->> +    backup_wait_for_overlapping_requests(job, offset, bytes);
->> +    backup_cow_request_begin(&req, job, offset, bytes);
->> +
->> +    ret = bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
->> +
->> +    backup_cow_request_end(&req);
->> +
->> +    return ret;
->> +}
->> +
->> +static coroutine_fn int fleecing_co_pwritev(BlockDriverState *bs,
->> +                                            uint64_t offset, uint64_t bytes,
->> +                                            QEMUIOVector *qiov, int flags)
->> +{
->> +    return -EINVAL;
->> +}
->> +
->> +static bool fleecing_recurse_is_first_non_filter(BlockDriverState *bs,
->> +                                                 BlockDriverState *candidate)
->> +{
->> +    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
->> +}
->> +
->> +static int fleecing_open(BlockDriverState *bs, QDict *options,
->> +                         int flags, Error **errp)
->> +{
->> +    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
->> +                               errp);
->> +
->> +    return bs->file ? 0 : -EINVAL;
->> +}
->> +
->> +static void fleecing_close(BlockDriverState *bs)
->> +{
->> +    /* Do nothing, we have to add .bdrv_close, because bdrv_close() don't check
->> +     * it, just call. */
->> +}
->> +
->> +BlockDriver bdrv_fleecing_filter = {
->> +    .format_name = "fleecing-filter",
->> +    .protocol_name = "fleecing-filter",
->> +    .instance_size = 0,
->> +
->> +    .bdrv_open = fleecing_open,
->> +    .bdrv_close = fleecing_close,
->> +
->> +    .bdrv_getlength = fleecing_getlength,
->> +    .bdrv_co_preadv = fleecing_co_preadv,
->> +    .bdrv_co_pwritev = fleecing_co_pwritev,
->> +
->> +    .is_filter = true,
->> +    .bdrv_recurse_is_first_non_filter = fleecing_recurse_is_first_non_filter,
->> +    .bdrv_child_perm        = bdrv_filter_default_perms,
->> +};
->> +
->> +static void bdrv_fleecing_init(void)
->> +{
->> +    bdrv_register(&bdrv_fleecing_filter);
->> +}
->> +
->> +block_init(bdrv_fleecing_init);
->> diff --git a/block/Makefile.objs b/block/Makefile.objs
->> index 899bfb5e2c..aa0a6dd971 100644
->> --- a/block/Makefile.objs
->> +++ b/block/Makefile.objs
->> @@ -27,6 +27,7 @@ block-obj-y += write-threshold.o
->>   block-obj-y += backup.o
->>   block-obj-$(CONFIG_REPLICATION) += replication.o
->>   block-obj-y += throttle.o copy-on-read.o
->> +block-obj-y += fleecing-filter.o
->>   
->>   block-obj-y += crypto.o
->>   
->>
+-Stafford
 
-
--- 
-Best regards,
-Vladimir
+> total: 1 errors, 1 warnings, 23 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 22/23: linux-user: Implement signals for openrisc...
+> Checking PATCH 23/23: linux-user: Fix struct sigaltstack for openrisc...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
