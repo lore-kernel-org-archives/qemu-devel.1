@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fa0iB-0007e2-18
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fa0lc-00028J-6q
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fa0i7-0006fX-30
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45474 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fa0i6-0006et-SS
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:51 -0400
-References: <20180702065237.27899-1-jusual@mail.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1015ce8a-4559-2b8f-8c3b-93fe4616a014@redhat.com>
-Date: Mon, 2 Jul 2018 17:25:43 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fa0la-0008AP-UN
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:29:28 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:32838)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fa0la-00089z-Gb
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:29:26 -0400
+Received: by mail-oi0-x241.google.com with SMTP id c6-v6so17138202oiy.0
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:29:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180702065237.27899-1-jusual@mail.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qtest: Use cpu address space instead of
- system memory
+In-Reply-To: <CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
+References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
+	<20180626175900.GA4307@roeck-us.net>
+	<CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
+	<20180626200008.GA680@roeck-us.net>
+	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Jul 2018 16:29:05 +0100
+Message-ID: <CAFEAcA_LPE+qgEWVdYLyHPvD97i3aAqFLzS3qn4_RJ8hLfxtdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
+ identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 02/07/2018 08:52, Julia Suvorova wrote:
-> Some devices (like nvic in armv7m) are not accessable through
-> address_space_memory, therefore can not be tested with qtest.
-> 
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
->  qtest.c | 39 ++++++++++++++++++++++++++-------------
->  1 file changed, 26 insertions(+), 13 deletions(-)
-> 
-> diff --git a/qtest.c b/qtest.c
-> index cbbfb71114..69b9e9962b 100644
-> --- a/qtest.c
-> +++ b/qtest.c
-> @@ -387,19 +387,23 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->  
->          if (words[0][5] == 'b') {
->              uint8_t data = value;
-> -            cpu_physical_memory_write(addr, &data, 1);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             &data, 1, true);
->          } else if (words[0][5] == 'w') {
->              uint16_t data = value;
->              tswap16s(&data);
-> -            cpu_physical_memory_write(addr, &data, 2);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             (uint8_t *) &data, 2, true);
->          } else if (words[0][5] == 'l') {
->              uint32_t data = value;
->              tswap32s(&data);
-> -            cpu_physical_memory_write(addr, &data, 4);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             (uint8_t *) &data, 4, true);
->          } else if (words[0][5] == 'q') {
->              uint64_t data = value;
->              tswap64s(&data);
-> -            cpu_physical_memory_write(addr, &data, 8);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             (uint8_t *) &data, 8, true);
->          }
->          qtest_send_prefix(chr);
->          qtest_send(chr, "OK\n");
-> @@ -417,18 +421,22 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->  
->          if (words[0][4] == 'b') {
->              uint8_t data;
-> -            cpu_physical_memory_read(addr, &data, 1);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             &data, 1, false);
->              value = data;
->          } else if (words[0][4] == 'w') {
->              uint16_t data;
-> -            cpu_physical_memory_read(addr, &data, 2);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             (uint8_t *) &data, 2, false);
->              value = tswap16(data);
->          } else if (words[0][4] == 'l') {
->              uint32_t data;
-> -            cpu_physical_memory_read(addr, &data, 4);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             (uint8_t *) &data, 4, false);
->              value = tswap32(data);
->          } else if (words[0][4] == 'q') {
-> -            cpu_physical_memory_read(addr, &value, 8);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             (uint8_t *) &value, 8, false);
->              tswap64s(&value);
->          }
->          qtest_send_prefix(chr);
-> @@ -448,7 +456,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->          g_assert(len);
->  
->          data = g_malloc(len);
-> -        cpu_physical_memory_read(addr, data, len);
-> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                         data, len, false);
->  
->          enc = g_malloc(2 * len + 1);
->          for (i = 0; i < len; i++) {
-> @@ -473,7 +482,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->          g_assert(ret == 0);
->  
->          data = g_malloc(len);
-> -        cpu_physical_memory_read(addr, data, len);
-> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                         data, len, false);
->          b64_data = g_base64_encode(data, len);
->          qtest_send_prefix(chr);
->          qtest_sendf(chr, "OK %s\n", b64_data);
-> @@ -507,7 +517,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->                  data[i] = 0;
->              }
->          }
-> -        cpu_physical_memory_write(addr, data, len);
-> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                         data, len, true);
->          g_free(data);
->  
->          qtest_send_prefix(chr);
-> @@ -529,7 +540,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->          if (len) {
->              data = g_malloc(len);
->              memset(data, pattern, len);
-> -            cpu_physical_memory_write(addr, data, len);
-> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                             data, len, true);
->              g_free(data);
->          }
->  
-> @@ -562,7 +574,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->              out_len = MIN(out_len, len);
->          }
->  
-> -        cpu_physical_memory_write(addr, data, out_len);
-> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                         data, len, true);
->  
->          qtest_send_prefix(chr);
->          qtest_send(chr, "OK\n");
-> 
+On 2 July 2018 at 16:05, Peter Maydell <peter.maydell@linaro.org> wrote:
+> One thing I do notice reading the code is that we don't
+> actually do anything to re-enable the timer on a write to
+> the VALUE register. We call ptimer_set_count(), but that will
+> not reenable the timer if it was disabled -- the cmsdk timer
+> code needs to call ptimer_run() if necessary, I think. But
+> that bug should manifest whether we're setting the timer up
+> as a one-shot or as a periodic with a 0 limit, because
+> ptimer_tick() will disable the timer when it fires whichever
+> way we do that.
 
-Queued, thanks.
+...but as it happens the Linux driver doesn't rely on this:
+https://elixir.bootlin.com/linux/v4.18-rc3/source/drivers/clocksource/mps2-timer.c#L66
+mps2_timer_set_next_event() always writes both VALUE and
+the CTRL register, so it will re-enable the timer anyway
+and avoid this QEMU bug.
 
-Paolo
+thanks
+-- PMM
