@@ -1,30 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fZtow-0002xs-PU
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 04:04:27 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fZtpV-0003OJ-WD
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 04:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fZtov-0001Dm-RB
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 04:04:26 -0400
-Date: Mon, 2 Jul 2018 10:04:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180702080411.GA4299@localhost.localdomain>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622143146.GQ23296@redhat.com>
-	<20180625095322.GC18580@redhat.com>
-	<20180625114106.GJ5024@localhost.localdomain>
-	<20180625114528.GL16514@angien.pipo.sk>
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fZtpP-0001SV-Ec
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 04:05:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47174
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1fZtpP-0001RQ-7J
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 04:04:55 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6284Ib1145533
+	for <qemu-devel@nongnu.org>; Mon, 2 Jul 2018 04:04:53 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jyby4153p-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 04:04:52 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Mon, 2 Jul 2018 09:04:51 +0100
+Date: Mon, 2 Jul 2018 13:34:45 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20180627132246.5576-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180625114528.GL16514@angien.pipo.sk>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+In-Reply-To: <20180627132246.5576-1-peterx@redhat.com>
+Message-Id: <20180702080445.GA7894@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] migation: unbreak postcopy recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +41,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Wed, Jun 27, 2018 at 09:22:42PM +0800, Peter Xu wrote:
+> v3:
+> - keep the recovery logic even for RDMA by dropping the 3rd patch and
+>   touch up the original 4th patch (current 3rd patch) to suite that [Dave]
+> 
+> v2:
+> - break the first patch into several
+> - fix a QEMUFile leak
+> 
+> Please review.  Thanks,
+Hi Peter,
 
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I have applied this patchset with upstream Qemu for testing postcopy
+pause recover feature in PowerPC,
 
-Am 25.06.2018 um 13:45 hat Peter Krempa geschrieben:
-> On Mon, Jun 25, 2018 at 13:41:06 +0200, Kevin Wolf wrote:
-> > Am 25.06.2018 um 11:53 hat Daniel P. Berrang=E9 geschrieben:
-> > > On Fri, Jun 22, 2018 at 03:31:46PM +0100, Daniel P. Berrang=E9 wrote:
-> > > > On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
-> > > > > Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
->=20
-> [...]
->=20
-> >=20
-> > Thanks!
-> >=20
-> > I'll look into werror/rerror support for usb-storage. It shouldn't be
-> > too hard, though it's strictly speaking a separate problem related to
-> > using -blockdev rather than option deprecation.
-> >=20
-> > If Peter wants to wait for QEMU support before converting werror/rerror
->=20
-> Definitely. I don't want to keep around yet another hack that will
-> satisfy one specific case and then add another capability for it. We
-> should then gate the moving of the feature based on the presence of
-> werror for usb-storage.
->=20
-> > to -device, maybe it would make sense to split your patch for v2 so that
-> > geometry and serial can get fixed right away?
->=20
-> Yes this can be done right away.
+I used NFS shared qcow2 between source and target host
 
-Has serial/gemoetry been fixed meanwhile and will it make it into the
-next release?
+source:
+# ppc64-softmmu/qemu-system-ppc64 --enable-kvm --nographic -vga none \
+-machine pseries -m 64G,slots=128,maxmem=128G -smp 16,maxcpus=32 \
+-device virtio-blk-pci,drive=rootdisk -drive \
+file=/home/bala/sharing/hostos-ppc64le.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
+-monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=virtio \
+-net user -redir tcp:2000::22
 
-Kevin
+To keep the VM with workload I ran stress-ng inside guest,
 
---dDRMvlgZJXvWKvBx
-Content-Type: application/pgp-signature; name="signature.asc"
+# stress-ng --cpu 6 --vm 6 --io 6
 
------BEGIN PGP SIGNATURE-----
+target:
+# ppc64-softmmu/qemu-system-ppc64 --enable-kvm --nographic -vga none \
+-machine pseries -m 64G,slots=128,maxmem=128G -smp 16,maxcpus=32 \
+-device virtio-blk-pci,drive=rootdisk -drive \
+file=/home/bala/sharing/hostos-ppc64le.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
+-monitor telnet:127.0.0.1:1235,server,nowait -net nic,model=virtio \
+-net user -redir tcp:2001::22 -incoming tcp:0:4445
 
-iQIcBAEBAgAGBQJbOdx7AAoJEH8JsnLIjy/WoMwP/0LBF4t2iB1+8wK9uco62pc7
-o3znnAaoJhi2ihIzFaxx325lZVYVzIhF3ak73fJTksPQ8O9eOj6/SmoWNSwO3GYD
-RNEfpEtfAlyF1tAFAoMMsO0KKrFANTjOuSIMvNxMW7AnvsxbqJi/MdsOqH2XCkLy
-QU0sZ/bBY8kI2GhjOR68/9UcYWnv9EVPTUqy+HjcF2Xg3o38awaX/lOJhHM3qxbB
-83Ji1ZvP2Sn7+Q9ou5mJ9lk2inuA7vGZmsWa20gKgMOAHrjWV1PePui2nDZk8Hbg
-/UMbMsT4WMjOAJ0SnxVOzcaHubbrlHD4l930t19efFwaCQ6qYA+yXw2EqwREPulO
-KJzqxiQbr0tJHhcTefLg/4pBP3tIyEn+V/BnMoREaS1OERSmrO2yqpZuBVYla8H0
-4qWH18HC9Has6p1qg2inke7lwmgNqjsVg1uZVykbIgBKUG+Zj/mUlnjH8bLrBJIQ
-O431XBdSOVeNexCtVhyHNaNVCSd2e04hSpse+XDLiol+U2s6bEkmfGg0UTbdjT3n
-/QgzbXLEJwRqCDRzHqf5DZ0ZZASLCWoVhHFoVnbESpq5aMDNfD5fzf03EWiZ5VO6
-qiNm51/VuFFHFySsYPAf5a+nNL3mUCwR1xoAzuNNSMnjj4gdPvevNzw3OYCxXBxS
-Bk9yLS0mJhpbLVXLaLGT
-=Uhx4
------END PGP SIGNATURE-----
+enabled postcopy on both source and destination from qemu monitor
 
---dDRMvlgZJXvWKvBx--
+(qemu) migrate_set_capability postcopy-ram on
+
+>From source qemu monitor,
+(qemu) migrate -d tcp:10.45.70.203:4445
+(qemu) info migrate
+globals:
+store-global-state: on
+only-migratable: off
+send-configuration: on
+send-section-footer: on
+decompress-error-check: on
+capabilities: xbzrle: off rdma-pin-all: off auto-converge: off
+zero-blocks: off compress: off events: off postcopy-ram: on x-colo: off
+release-ram: off block: off return-path: off pause-before-switchover:
+off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
+late-block-activate: off 
+Migration status: active
+total time: 2331 milliseconds
+expected downtime: 300 milliseconds
+setup: 65 milliseconds
+transferred ram: 38914 kbytes
+throughput: 273.16 mbps
+remaining ram: 67063784 kbytes
+total ram: 67109120 kbytes
+duplicate: 1627 pages
+skipped: 0 pages
+normal: 9706 pages
+normal bytes: 38824 kbytes
+dirty sync count: 1
+page size: 4 kbytes
+multifd bytes: 0 kbytes
+
+triggered postcopy from source,
+(qemu) migrate_start_postcopy
+
+After triggering postcopy from source, in target I tried to pause the
+postcopy migration
+
+(qemu) migrate_pause
+
+In target I see error as,
+error while loading state section id 4(ram)
+qemu-system-ppc64: Detected IO failure for postcopy. Migration paused.
+
+In source I see error as,
+qemu-system-ppc64: Detected IO failure for postcopy. Migration paused.
+
+Later from target I try for recovery from target monitor,
+(qemu) migrate_recover qemu+ssh://10.45.70.203/system
+Migrate recovery is triggered already
+
+but in source still it remains to be in postcopy-paused state
+(qemu) info migrate
+globals:
+store-global-state: on
+only-migratable: off
+send-configuration: on
+send-section-footer: on
+decompress-error-check: on
+capabilities: xbzrle: off rdma-pin-all: off auto-converge: off
+zero-blocks: off compress: off events: off postcopy-ram: on x-colo: off
+release-ram: off block: off return-path: off pause-before-switchover:
+off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
+late-block-activate: off 
+Migration status: postcopy-paused
+total time: 222841 milliseconds
+expected downtime: 382991 milliseconds
+setup: 65 milliseconds
+transferred ram: 385270 kbytes
+throughput: 265.06 mbps
+remaining ram: 8150528 kbytes
+total ram: 67109120 kbytes
+duplicate: 14679647 pages
+skipped: 0 pages
+normal: 63937 pages
+normal bytes: 255748 kbytes
+dirty sync count: 2
+page size: 4 kbytes
+multifd bytes: 0 kbytes
+dirty pages rate: 854740 pages
+postcopy request count: 374
+
+later I also tried to recover postcopy in source monitor,
+(qemu) migrate_recover qemu+ssh://10.45.193.21/system
+Migrate recover can only be run when postcopy is paused.
+
+Looks to be it is broken, please help me if I missed something
+in this test.
+
+Thank you,
+Bala
+> 
+> Peter Xu (4):
+>   migration: delay postcopy paused state
+>   migration: move income process out of multifd
+>   migration: unbreak postcopy recovery
+>   migration: unify incoming processing
+> 
+>  migration/ram.h       |  2 +-
+>  migration/exec.c      |  3 ---
+>  migration/fd.c        |  3 ---
+>  migration/migration.c | 44 ++++++++++++++++++++++++++++++++++++-------
+>  migration/ram.c       | 11 +++++------
+>  migration/savevm.c    |  6 +++---
+>  migration/socket.c    |  5 -----
+>  7 files changed, 46 insertions(+), 28 deletions(-)
+> 
+> -- 
+> 2.17.1
+> 
+> 
