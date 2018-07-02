@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fZpho-0001eK-Vo
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 23:40:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1fZpy9-0003qE-MK
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 23:57:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fZphk-00042v-V7
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 23:40:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34080 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fZpy6-0000HP-H5
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 23:57:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34386 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fZphk-00040i-PD
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 23:40:44 -0400
-References: <bfb309be-3ef4-bd01-b4f8-3ebdeaa64374@web.de>
-	<6b6e45bf-362f-1305-6991-69749d5f02f9@web.de>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a5f14cd7-1334-e3f8-c3c8-e40443351372@redhat.com>
-Date: Mon, 2 Jul 2018 11:40:37 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fZpy6-0000GX-Ao
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 23:57:38 -0400
+Date: Mon, 2 Jul 2018 11:57:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180702035726.GK2455@xz-mi>
+References: <20180701171953.9921-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <6b6e45bf-362f-1305-6991-69749d5f02f9@web.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180701171953.9921-1-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] e1000e: Prevent MSI/MSI-X storms
+Subject: Re: [Qemu-devel] [PATCH] exec.c: check RAMBlock validity before
+ changing its flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@web.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
+On Sun, Jul 01, 2018 at 07:19:53PM +0200, C=C3=A9dric Le Goater wrote:
+> When a PCI device is unplugged, the PCI memory regions are deleted
+> before the optional ROM RAMBlock is flagged non-migratable. But, when
+> this is done, the RAMBlock has already been cleared from the region,
+> leading to a segv.
+>=20
+> Fix the issue by testing the RAMBlock before flagging it, as it is
+> done in qemu_ram_unset_idstr()
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  I caught this bug while deleting a passthrough device from a pseries
+>  machine. Here is the stack:
+>   =20
+>    #0  qemu_ram_unset_migratable (rb=3D0x0) at /home/legoater/work/qemu=
+/qemu-xive-3.0.git/exec.c:1994
+>    #1  0x000000010072def0 in vmstate_unregister_ram (mr=3D0x101796af0, =
+dev=3D<optimized out>)
+>    #2  0x0000000100694e5c in pci_del_option_rom (pdev=3D0x101796330)
+>    #3  pci_qdev_unrealize (dev=3D<optimized out>, errp=3D<optimized out=
+>)
+>    #4  0x00000001005ff910 in device_set_realized (obj=3D0x101796330, va=
+lue=3D<optimized out>, errp=3D0x0)
+>    #5  0x00000001007a487c in property_set_bool (obj=3D0x101796330, v=3D=
+<optimized out>, name=3D<optimized out>,=20
+>    #6  0x00000001007a7878 in object_property_set (obj=3D0x101796330, v=3D=
+0x7fff70033110,=20
+>    #7  0x00000001007aaf1c in object_property_set_qobject (obj=3D0x10179=
+6330, value=3D<optimized out>,=20
+>    #8  0x00000001007a7b90 in object_property_set_bool (obj=3D0x10179633=
+0, value=3D<optimized out>,=20
+>    #9  0x00000001005fcdd8 in device_unparent (obj=3D0x101796330)
+>    #10 0x00000001007a6dd0 in object_finalize_child_property (obj=3D<opt=
+imized out>, name=3D<optimized out>,=20
+>    #11 0x00000001007a50c0 in object_property_del_child (obj=3D0x10111f8=
+00, child=3D0x101796330,=20
+>    #12 0x0000000100425cc0 in spapr_phb_remove_pci_device_cb (dev=3D0x10=
+1796330)
+>    #13 0x0000000100427974 in spapr_drc_release (drc=3D0x1017e2df0)
+>    #14 0x0000000100429098 in spapr_drc_detach (drc=3D0x1017e2df0)
+>    #15 0x00000001004294e0 in drc_isolate_physical (drc=3D0x1017e2df0)
+>    #16 0x000000010042a50c in rtas_set_isolation_state (state=3D0, idx=3D=
+<optimized out>)
+>=20
+>  May be we should call pci_del_option_rom() before
+>  pci_unregister_io_regions() ?
 
+This seems to make more sense to me.
 
-On 2018=E5=B9=B406=E6=9C=8830=E6=97=A5 14:13, Jan Kiszka wrote:
-> On 2018-04-05 19:41, Jan Kiszka wrote:
->> From: Jan Kiszka <jan.kiszka@siemens.com>
->>
->> Only signal MSI/MSI-X events on rising edges. So far we re-triggered t=
-he
->> interrupt sources even if the guest did no consumed the pending one,
->> easily causing interrupt storms.
->>
->> Issue was observable with Linux 4.16 e1000e driver when MSI-X was used=
-.
->> Vector 2 was causing interrupt storms after the driver activated the
->> device.
->>
->> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->> ---
->>
->> Changes in v2:
->>   - also update msi_causes_pending after EIAC changes (required becaus=
-e
->>     there is no e1000e_update_interrupt_state after that
->>
->>   hw/net/e1000e_core.c | 11 +++++++++++
->>   hw/net/e1000e_core.h |  2 ++
->>   2 files changed, 13 insertions(+)
->>
->> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->> index c93c4661ed..d6ddd59986 100644
->> --- a/hw/net/e1000e_core.c
->> +++ b/hw/net/e1000e_core.c
->> @@ -2027,6 +2027,7 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_=
-t cause, uint32_t int_cfg)
->>       }
->>  =20
->>       core->mac[ICR] &=3D ~effective_eiac;
->> +    core->msi_causes_pending &=3D ~effective_eiac;
->>  =20
->>       if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->>           core->mac[IMS] &=3D ~effective_eiac;
->> @@ -2123,6 +2124,13 @@ e1000e_send_msi(E1000ECore *core, bool msix)
->>   {
->>       uint32_t causes =3D core->mac[ICR] & core->mac[IMS] & ~E1000_ICR=
-_ASSERTED;
->>  =20
->> +    core->msi_causes_pending &=3D causes;
->> +    causes ^=3D core->msi_causes_pending;
->> +    if (causes =3D=3D 0) {
->> +        return;
->> +    }
->> +    core->msi_causes_pending |=3D causes;
->> +
->>       if (msix) {
->>           e1000e_msix_notify(core, causes);
->>       } else {
->> @@ -2160,6 +2168,9 @@ e1000e_update_interrupt_state(E1000ECore *core)
->>       core->mac[ICS] =3D core->mac[ICR];
->>  =20
->>       interrupts_pending =3D (core->mac[IMS] & core->mac[ICR]) ? true =
-: false;
->> +    if (!interrupts_pending) {
->> +        core->msi_causes_pending =3D 0;
->> +    }
->>  =20
->>       trace_e1000e_irq_pending_interrupts(core->mac[ICR] & core->mac[I=
-MS],
->>                                           core->mac[ICR], core->mac[IM=
-S]);
->> diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
->> index 7d8ff41890..63a15510cc 100644
->> --- a/hw/net/e1000e_core.h
->> +++ b/hw/net/e1000e_core.h
->> @@ -109,6 +109,8 @@ struct E1000Core {
->>       NICState *owner_nic;
->>       PCIDevice *owner;
->>       void (*owner_start_recv)(PCIDevice *d);
->> +
->> +    uint32_t msi_causes_pending;
->>   };
->>  =20
->>   void
->>
-> Ping again, this one is still open.
->
-> Jan
+Meanwhile I assume the name pci_del_option_rom() is a bit misleading -
+it's not really deleting the ROM but unregistering the ROM only.
+Instead IIUC it's pci_unregister_io_regions() which deleted that. So
+maybe we can either rename the function pci_del_option_rom(), or we
+can pick the ROM destruction out of pci_unregister_io_regions() and
+put it into pci_del_option_rom() to make sure it's done as the last
+step?
 
-Sorry for the late.
+Regards,
 
-Just one thing to confirm, I think the reason that we don't need to=20
-migrate msi_cause_pending is that it can only lead at most one more=20
-signal of MSI on destination?
+>=20
+>  exec.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/exec.c b/exec.c
+> index ebadc0e302ad..0dabf7380438 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1992,7 +1992,9 @@ void qemu_ram_set_migratable(RAMBlock *rb)
+> =20
+>  void qemu_ram_unset_migratable(RAMBlock *rb)
+>  {
+> -    rb->flags &=3D ~RAM_MIGRATABLE;
+> +    if (rb) {
+> +        rb->flags &=3D ~RAM_MIGRATABLE;
+> +    }
+>  }
+> =20
+>  /* Called with iothread lock held.  */
+> --=20
+> 2.13.6
+>=20
+>=20
 
-Thanks
+--=20
+Peter Xu
