@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZzcu-0007Bu-Og
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:16:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fZzmj-00046R-8d
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZzct-0000sX-UO
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:16:24 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36750)
+	(envelope-from <richard.henderson@linaro.org>) id 1fZzmg-00078f-3n
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:26:33 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:46188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fZzct-0000rB-GX
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:16:23 -0400
-Received: by mail-oi0-x243.google.com with SMTP id r16-v6so16153153oie.3
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:16:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fZzmf-000771-T4
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:26:30 -0400
+Received: by mail-pl0-x244.google.com with SMTP id 30-v6so8034705pld.13
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:26:29 -0700 (PDT)
+References: <20180628030330.15615-1-richard.henderson@linaro.org>
+	<153049914837.615.12803592704677471272@946cad8fd14e>
+	<20180702120119.GP24595@lianli.shorne-pla.net>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b6bd1555-1bc3-f7f4-ec3c-e6dfceee6507@linaro.org>
+Date: Mon, 2 Jul 2018 07:26:26 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180630000242.29594-3-richard.henderson@linaro.org>
-References: <20180630000242.29594-1-richard.henderson@linaro.org>
-	<20180630000242.29594-3-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Jul 2018 15:16:02 +0100
-Message-ID: <CAFEAcA_SCb7s+mqK01LmWDt2hmoNNJcdpsMwuA4KKxuByQddkg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] cpu: Assert asidx_from_attrs return
- value in range
+In-Reply-To: <20180702120119.GP24595@lianli.shorne-pla.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 00/23] target/openrisc improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stafford Horne <shorne@gmail.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On 30 June 2018 at 01:02, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/qom/cpu.h | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index cce2fd6acc..bd796579ee 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -620,11 +620,13 @@ static inline hwaddr cpu_get_phys_page_debug(CPUState *cpu, vaddr addr)
->  static inline int cpu_asidx_from_attrs(CPUState *cpu, MemTxAttrs attrs)
->  {
->      CPUClass *cc = CPU_GET_CLASS(cpu);
-> +    int ret = 0;
->
->      if (cc->asidx_from_attrs) {
-> -        return cc->asidx_from_attrs(cpu, attrs);
-> +        ret = cc->asidx_from_attrs(cpu, attrs);
-> +        assert(ret < cpu->num_ases && ret >= 0);
->      }
-> -    return 0;
-> +    return ret;
->  }
->  #endif
->
+On 07/02/2018 05:01 AM, Stafford Horne wrote:
+>> ERROR: spaces required around that '*' (ctx:WxV)
+>> #129: FILE: target/openrisc/disas.c:56:
+>> +    arg_l_##opcode *a, uint32_t insn)                   \
+>>                     ^
+>>
+>> ERROR: spaces required around that '*' (ctx:WxV)
+>> #224: FILE: target/openrisc/disas.c:151:
+>> +    arg_lf_##opcode##_##suffix *a, uint32_t insn)                \
+>>                                 ^
+> 
+> I have fixed these on my branch.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+These should not have been "fixed".
 
-thanks
--- PMM
+This is checkpatch being stupid and not realizing that
+the thing on the left is a type and this is a pointer
+declaration, not a multiplication.
+
+
+r~
