@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa0Kk-0005KO-DS
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:48 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fa0MT-0006bA-3E
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa0Kc-0002nI-S1
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44740 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fa0MQ-0003c9-0c
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:03:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fa0Kc-0002mO-M6
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:01:34 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ac15d082-22eb-54d1-d695-6a0a3ac2d1eb@redhat.com>
-Date: Mon, 2 Jul 2018 17:01:31 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa0MP-0003bn-QJ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:03:25 -0400
+Date: Mon, 2 Jul 2018 17:03:23 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180702150323.ext4p462m444p7qj@sirius.home.kraxel.org>
+References: <20180625222718.4488-1-mail@sebastianbauer.info>
 MIME-Version: 1.0
-In-Reply-To: <1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 08/20] kvm: arm/arm64: Abstract stage2
- pgd table allocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180625222718.4488-1-mail@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] ehci: Don't fetch a NULL current qtd but
+ advance the queue instead.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org, balaton@eik.bme.hu
 
-Hi Suzuki
-
-On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
-> Abstract the allocation of stage2 entry level tables for
-> given VM, so that later we can choose to fall back to the
-> normal page table levels (i.e, avoid entry level table
-> concatenation) on arm64.
-
-the justification is not crystal clear to me but it does no harm I think.
+On Tue, Jun 26, 2018 at 12:27:18AM +0200, Sebastian Bauer wrote:
+> Fetching qtd with the NULL address most likely makes no sense so from now
+> on, we handle it this case similarly as if the terminate (T) bit is not
+> set, which is already an exception as according to section 3.6 of the EHCI
+> spec there is no T bit defined for the current_qtd field.
 > 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
-> Changes since V2:
->  - New patch
-> ---
->  arch/arm/include/asm/kvm_mmu.h   | 6 ++++++
->  arch/arm64/include/asm/kvm_mmu.h | 6 ++++++
->  virt/kvm/arm/mmu.c               | 2 +-
->  3 files changed, 13 insertions(+), 1 deletion(-)
+> The spec is a bit vague on how an EHCI driver should initialize these
+> fields: "The general operational model is that the host controller can
+> detect whether the overlay area contains a description of an active
+> transfer" (p. 49). QEMU primarily uses the QTD_TOKEN_ACTIVE bit of the
+> queue header to infer the activity state but there are other ways
+> conceivable.
 > 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index f36eb20..b2da5a4 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -372,6 +372,12 @@ static inline int hyp_map_aux_data(void)
->  	return 0;
->  }
->  
-> +static inline void *stage2_alloc_pgd(struct kvm *kvm)
-> +{
-> +	return alloc_pages_exact(stage2_pgd_size(kvm),
-> +				 GFP_KERNEL | __GFP_ZERO);
-> +}
-> +
->  #define kvm_phys_to_vttbr(addr)		(addr)
->  
->  #endif	/* !__ASSEMBLY__ */
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 5da8f52..dbaf513 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -501,5 +501,11 @@ static inline int hyp_map_aux_data(void)
->  
->  #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
->  
-> +static inline void *stage2_alloc_pgd(struct kvm *kvm)
-> +{
-> +	return alloc_pages_exact(stage2_pgd_size(kvm),
-> +				 GFP_KERNEL | __GFP_ZERO);
-> +}
-> +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __ARM64_KVM_MMU_H__ */
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 82dd571..a339e00 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -868,7 +868,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
->  	}
->  
->  	/* Allocate the HW PGD, making sure that each page gets its own refcount */
-> -	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
-> +	pgd = stage2_alloc_pgd(kvm);
->  	if (!pgd)
->  		return -ENOMEM;
->  
+> This change allows QEMU to boot further into AmigaOS. The public available
+> version of the EHCI driver recycles queue heads in some rare conditions but
+> only clears the current_qtd field but not the status field. This works with
+> many available EHCI PCI cards but e.g., not with the Freescale USB
+> controller's found on the P5040. On the emulated EHCI controller of QEMU
+> the consequence is that some garbage was read in, which resulted in a
+> reset of the controller. This change fixes the problem.
 > 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
 
-Thanks
+Added to usb queue.
 
-Eric
+thanks,
+  Gerd
