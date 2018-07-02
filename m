@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42596)
+Received: from eggs.gnu.org ([208.118.235.92]:43330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fZvFC-0004UT-V7
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:35:40 -0400
+	(envelope-from <david@redhat.com>) id 1fZvHa-0005Nw-4E
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fZvF7-00056J-Vr
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:35:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42460)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fZvF7-00055b-Mt
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:35:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fZvF6-0006EU-8T
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 09:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3AD1D2E8019
-	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 09:35:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Jul 2018 09:24:25 -0000
-From: He Yi <1779634@bugs.launchpad.net>
-Reply-To: Bug 1779634 <1779634@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153052346519.30029.15773821079672320069.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1779634] [NEW] qemu-x86_64 on aarch64 reports
- "Synchronous External Abort"
+	(envelope-from <david@redhat.com>) id 1fZvHV-0006iv-7G
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:38:06 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon,  2 Jul 2018 11:37:51 +0200
+Message-Id: <20180702093755.7384-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] pc-dimm: pre_plug "slot" and "addr"
+ assignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,188 +19,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, David Hildenbrand <david@redhat.com>
 
-Public bug reported:
+As requested by Igor, assign and verify "slot" and "addr" in the
+pre_plug handler. Factor out the compatibility handling/configuration
+for detecting the alignment to be used when searching for an address
+in guest physical memory for a memory device.
 
-Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network ad=
-apters' firmware upgrade tools)
-System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-45=
--generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarch6=
-4 aarch64 GNU/Linux
+This is another part of the original series
+    [PATCH v4 00/14] MemoryDevice: use multi stage hotplug handlers
 
-Reproduce:
-1) build linux-user qemu-x86_64 static from source (tried both version 2.12=
-.0 & 2.11.2)
-=C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable-s=
-ystem --static --enable-linux-user
+This refactoring is the last step before factoring out pre_plug, plug and
+unplug logic of memory devices completely into memory-device.c
 
-2) install the interpreter into binfmt_misc filesystem
-=C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003e00
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffffff
+v2 -> v3:
+- "util/oslib-win32: indicate alignment for qemu_anon_ram_alloc()"
+-- take allocation granularity into account
+-- drop comment
+- "pc-dimm: assign and verify the "addr" property during pre_plug"
+-- compat_align -> legacy_align
+-- shortened align detection as proposed by Igor
+-- trace address asignment in pre_plug
 
-3) packaging Intel/Dell upgrade utilities into docker images, I've publishe=
-d two on docker hub:
-=C2=A0=C2=A0=C2=A0REPOSITORY          TAG
-=C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
-=C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
+v1 -> v2:
+- dropped "machine: factor out enforce_aligned_dimm into memory_device_align"
+- dropped "pc-dimm/memory-device: detect alignment internally"
+- added "util/oslib-win32: indicate alignment for qemu_anon_ram_alloc()"
+-- indicate the alignment and therefor simplify compat handling for
+   Windows as we can ...
+- added "pc: drop memory region alignment check for 0"
+-- ... drop a check for memory_region_get_alignment(mr), allowing us to
+   factor out compat handling for pc DIMM/NVDIMM alignment in a clean way.
+- "pc-dimm: assign and verify the "addr" property during pre_plug"
+-- Default to "memory_region_get_alignment(mr)" if no compat alignment
+   has been specified.
 
-4) run the docker container on aarch64 server platform:
-=C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /usr/=
-local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
+David Hildenbrand (4):
+  pc-dimm: assign and verify the "slot" property during pre_plug
+  util/oslib-win32: indicate alignment for qemu_anon_ram_alloc()
+  pc: drop memory region alignment check for 0
+  pc-dimm: assign and verify the "addr" property during pre_plug
 
-5) finally, within docker container run the upgrade tool:
-=C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
+ hw/i386/pc.c             | 16 ++++-------
+ hw/mem/pc-dimm.c         | 61 +++++++++++++++++++++-------------------
+ hw/ppc/spapr.c           | 14 ++++++---
+ include/hw/mem/pc-dimm.h |  5 ++--
+ util/oslib-win32.c       | 15 ++++++++--
+ 5 files changed, 63 insertions(+), 48 deletions(-)
 
-Errors: in dmesg it reports excessive 'Synchronous External Abort':
-
-kernel: [242850.159893] Synchronous External Abort: synchronous external ab=
-ort (0x92000610) at 0x0000000000429958
-kernel: [242850.169199] Unhandled fault: synchronous external abort (0x9200=
-0610) at 0x0000000000429958
-
-thanks and best regards, Yi
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Description changed:
-
-  Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network =
-adapters' firmware upgrade tools)
-  System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-=
-45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarc=
-h64 aarch64 GNU/Linux
-  =
-
-  Reproduce:
-- 1) build linux-user qemu-x86_64 static from source (tried both version 1.=
-12.0 & 1.11.02)
--    ./configure --target-list=3Dx86_64-linux-user --disable-system --stati=
-c --enable-linux-user
-+ 1) build linux-user qemu-x86_64 static from source (tried both version 2.=
-12.0 & 2.11.2)
-+ =C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable=
--system --static --enable-linux-user
-  =
-
-  2) install the interpreter into binfmt_misc filesystem
--    $ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
--      enabled
--      interpreter /usr/local/bin/qemu-x86_64
--      flags:
--      offset 0
--      magic 7f454c4602010100000000000000000002003e00
--      mask fffffffffffefefcfffffffffffffffffeffffff
-+ =C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003=
-e00
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffff=
-ff
-  =
-
-  3) packaging Intel/Dell upgrade utilities into docker images, I've publis=
-hed two on docker hub:
--    REPOSITORY          TAG                 IMAGE ID            CREATED   =
-          SIZE
--    heyi/dellupdate     latest              8e013f5511cd        6 hours ag=
-o         210MB
--    heyi/nvmupdate64e   latest              9d2de9d0edaa        3 days ago=
-          451MB
-+ =C2=A0=C2=A0=C2=A0REPOSITORY          TAG
-+ =C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
-+ =C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
-  =
-
-  4) run the docker container on aarch64 server platform:
--    docker run -it --privileged --network host --volume /usr/local/bin/qem=
-u-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
-+ =C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /us=
-r/local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
-  =
-
-  5) finally, within docker container run the upgrade tool:
--    # ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
-+ =C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
-  =
-
-  Errors: in dmesg it reports excessive 'Synchronous External Abort':
-  =
-
-  kernel: [242850.159893] Synchronous External Abort: synchronous external =
-abort (0x92000610) at 0x0000000000429958
-  kernel: [242850.169199] Unhandled fault: synchronous external abort (0x92=
-000610) at 0x0000000000429958
-  =
-
-  thanks and best regards, Yi
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1779634
-
-Title:
-  qemu-x86_64 on aarch64 reports "Synchronous External Abort"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network =
-adapters' firmware upgrade tools)
-  System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-=
-45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarc=
-h64 aarch64 GNU/Linux
-
-  Reproduce:
-  1) build linux-user qemu-x86_64 static from source (tried both version 2.=
-12.0 & 2.11.2)
-  =C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable=
--system --static --enable-linux-user
-
-  2) install the interpreter into binfmt_misc filesystem
-  =C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003=
-e00
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffff=
-ff
-
-  3) packaging Intel/Dell upgrade utilities into docker images, I've publis=
-hed two on docker hub:
-  =C2=A0=C2=A0=C2=A0REPOSITORY          TAG
-  =C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
-  =C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
-
-  4) run the docker container on aarch64 server platform:
-  =C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /us=
-r/local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
-
-  5) finally, within docker container run the upgrade tool:
-  =C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
-
-  Errors: in dmesg it reports excessive 'Synchronous External Abort':
-
-  kernel: [242850.159893] Synchronous External Abort: synchronous external =
-abort (0x92000610) at 0x0000000000429958
-  kernel: [242850.169199] Unhandled fault: synchronous external abort (0x92=
-000610) at 0x0000000000429958
-
-  thanks and best regards, Yi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1779634/+subscriptions
+-- 
+2.17.1
