@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fZvge-0001E9-R5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:04:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1fZvnG-0002x7-EU
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fZvga-0005NY-Tn
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:04:00 -0400
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:36894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fZvga-0005Ls-Mv
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:03:56 -0400
-Received: from player793.ha.ovh.net (unknown [10.109.108.28])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0407F13CA94
-	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 12:03:54 +0200 (CEST)
-References: <20180619140729.21949-1-clg@kaod.org>
-	<20180619140729.21949-2-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <eb1ad8ca-89f7-b059-3a3c-412375871113@kaod.org>
-Date: Mon, 2 Jul 2018 12:03:48 +0200
+	(envelope-from <bounces@canonical.com>) id 1fZvnD-0000ZC-5e
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:10:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fZvnC-0000Yr-VY
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:10:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fZvnB-0002q4-P8
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 10:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B884F2E8198
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 10:10:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180619140729.21949-2-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] spapr: introduce a fixed IRQ number
- space
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Jul 2018 10:03:31 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1779634 <1779634@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153052346519.30029.15773821079672320069.malonedeb@wampee.canonical.com>
+Message-Id: <153052581114.18216.7147048207635928587.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779634] Re: qemu-x86_64 on aarch64 reports
+ "Synchronous External Abort"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
 
-> --- a/hw/ppc/spapr_vio.c
-> +++ b/hw/ppc/spapr_vio.c
-> @@ -436,6 +436,9 @@ static void spapr_vio_busdev_reset(DeviceState *qdev)
->      }
->  }
->  
-> +/* TODO : poor VIO device indexing ... */
-> +static uint32_t vio_index;
+You could confirm this hypothesis by using strace and looking for
+whether it's doing mmap() of /dev/mem or /dev/kmem. If it's true, then
+the program would not work even if you had the source and recompiled it
+for aarch64 -- it would require bugfixes (code changes) to achieve
+whatever it's trying to do.
 
-I think we could also use (dev->reg & 0xff) as an index for 
-the VIO devices.
+-- =
 
-The unit address of the virtual IOA is simply allocated using 
-an increment of bus->next_reg, next_reg being initialized at
-0x71000000.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779634
 
-I did not see any restrictions in the PAPR specs or in QEMU 
-that would break the above.
+Title:
+  qemu-x86_64 on aarch64 reports "Synchronous External Abort"
 
-C.
+Status in QEMU:
+  New
 
+Bug description:
+  Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network =
+adapters' firmware upgrade tools)
+  System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-=
+45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarc=
+h64 aarch64 GNU/Linux
 
->  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
->  {
->      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> @@ -476,10 +479,18 @@ static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
->      }
->  
->      if (!dev->irq) {
-> -        dev->irq = spapr_irq_findone(spapr, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            return;
-> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +            dev->irq = spapr_irq_findone(spapr, &local_err);
-> +            if (local_err) {
-> +                error_propagate(errp, local_err);
-> +                return;
-> +            }
-> +        } else {
-> +            dev->irq = SPAPR_IRQ_VIO + vio_index++;
-> +            if (dev->irq == SPAPR_IRQ_PCI_LSI) {
-> +                error_setg(errp, "Too many VIO devices");
-> +                return;
-> +            }
+  Reproduce:
+  1) build linux-user qemu-x86_64 static from source (tried both version 2.=
+12.0 & 2.11.2)
+  =C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable=
+-system --static --enable-linux-user
 
- 
+  2) install the interpreter into binfmt_misc filesystem
+  =C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003=
+e00
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffff=
+ff
+
+  3) packaging Intel/Dell upgrade utilities into docker images, I've publis=
+hed two on docker hub:
+  =C2=A0=C2=A0=C2=A0REPOSITORY          TAG
+  =C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
+  =C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
+
+  4) run the docker container on aarch64 server platform:
+  =C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /us=
+r/local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
+
+  5) finally, within docker container run the upgrade tool:
+  =C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
+
+  Errors: in dmesg it reports excessive 'Synchronous External Abort':
+
+  kernel: [242850.159893] Synchronous External Abort: synchronous external =
+abort (0x92000610) at 0x0000000000429958
+  kernel: [242850.169199] Unhandled fault: synchronous external abort (0x92=
+000610) at 0x0000000000429958
+
+  thanks and best regards, Yi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779634/+subscriptions
