@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fZsNN-0000It-W2
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:31:54 -0400
+	(envelope-from <famz@redhat.com>) id 1fZsQq-0001Ck-AU
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:35:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fZsNJ-0006zx-WD
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:31:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55940 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fZsNJ-0006yE-RP
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:31:49 -0400
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Mon,  2 Jul 2018 12:01:39 +0530
-Message-Id: <20180702063139.7935-1-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] virtio-rng: process pending requests when
- driver is ready
+	(envelope-from <famz@redhat.com>) id 1fZsQp-0000Lh-Dm
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:35:28 -0400
+Date: Mon, 2 Jul 2018 14:35:15 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180702063515.GE26002@lemon.usersys.redhat.com>
+References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+	<20180629151524.138542-3-vsementsov@virtuozzo.com>
+	<8ecd1901-4148-6dc5-667d-d3c13260f534@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ecd1901-4148-6dc5-667d-d3c13260f534@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
+ driver for fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +25,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, slopezpa@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org
 
- virtio-rng device causing old guest kernels(2.6.32) to hang on latest qemu.
- The driver attempts to read from the virtio-rng device too early in it's
- initialization. Qemu detects guest is not ready and returns, resulting in
- hang.
+On Fri, 06/29 12:24, Eric Blake wrote:
+> On 06/29/2018 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> > We need to synchronize backup job with reading from fleecing image
+> > like it was done in block/replication.c.
+> > 
+> > Otherwise, the following situation is theoretically possible:
+> > 
+> 
+> Grammar suggestions:
+> 
+> > 1. client start reading
+> 
+> client starts reading
+> 
+> > 2. client understand, that there is no corresponding cluster in
+> >     fleecing image
+> > 3. client is going to read from backing file (i.e. active image)
+> 
+> client sees that no corresponding cluster has been allocated in the fleecing
+> image, so the request is forwarded to the backing file
+> 
+> > 4. guest writes to active image
+> > 5. this write is stopped by backup(sync=none) and cluster is copied to
+> >     fleecing image
+> > 6. guest write continues...
+> > 7. and client reads _new_ (or partly new) date from active image
+> 
+> Interesting race. Can it actually happen, or does our read code already
+> serialize writes to the same area while a read is underway?
 
- Fix is to handle pending request when guest is running and driver status is
- set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
+Yes, I wonder why wait_serialising_requests() is not enough. If it's possible,
+can we have a test case (with help of blkdebug, for example)?
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
-v2->v3: Add comment to explain virtio-rng early status update (Stefan)
-v1->v2: Update new status value early only for virtio-rng (Stefan)
+> 
+> In short, I see what problem you are claiming exists: the moment the client
+> starts reading from the backing file, that portion of the backing file must
+> remain unchanged until after the client is done reading.  But I don't know
+> enough details of the block layer to know if this is actually a problem, or
+> if adding the new filter is just overhead.
 
- hw/virtio/virtio-rng.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 289bbcac03..0b586bd750 100644
---- a/hw/virtio/virtio-rng.c
-+++ b/hw/virtio/virtio-rng.c
-@@ -156,6 +156,24 @@ static void check_rate_limit(void *opaque)
-     vrng->activate_timer = true;
- }
- 
-+static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
-+{
-+    VirtIORNG *vrng = VIRTIO_RNG(vdev);
-+
-+    if (!vdev->vm_running) {
-+        return;
-+    }
-+    /* Set device status in VirtIODevice object. Its used in 'is_guest_ready'
-+     * function to check if guest is ready and process the pending requests.
-+     * Other virtio devices might be dependent on old value of status, so
-+     * update status early only for virtio-rng.
-+     */
-+    vdev->status = status;
-+
-+    /* Something changed, try to process buffers */
-+    virtio_rng_process(vrng);
-+}
-+
- static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -261,6 +279,7 @@ static void virtio_rng_class_init(ObjectClass *klass, void *data)
-     vdc->realize = virtio_rng_device_realize;
-     vdc->unrealize = virtio_rng_device_unrealize;
-     vdc->get_features = get_features;
-+    vdc->set_status = virtio_rng_set_status;
- }
- 
- static const TypeInfo virtio_rng_info = {
--- 
-2.14.3
+Fam
