@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fZt9R-0001yC-4x
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:21:33 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fZtAu-0002aW-JZ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fZt9M-0000Qm-8u
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:21:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55776 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fZt9M-0000QR-4S
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:21:28 -0400
-Date: Mon, 2 Jul 2018 15:21:24 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180702072124.GK26002@lemon.usersys.redhat.com>
-References: <20180628153535.1411-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180628153535.1411-1-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/4] tests/vm: various trivial fixes
+	(envelope-from <aik@ozlabs.ru>) id 1fZtAp-0001Dn-M3
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:23:04 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Mon,  2 Jul 2018 17:22:23 +1000
+Message-Id: <20180702072223.7943-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
+ firmware image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,14 +18,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Thu, 06/28 12:35, Philippe Mathieu-Daud=E9 wrote:
-> Hi,
->=20
-> These are various fixes I added to have the VM tests working for me.
+The following changes since commit edb1fb337f65f82fe32b989c4f018efe85c1dddb:
 
-Queued the last two patches. Thanks.
+  pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
 
-Fam
+are available in the git repository at:
+
+  git@github.com:aik/qemu.git tags/qemu-slof-20180702
+
+for you to fetch changes up to edb1fb337f65f82fe32b989c4f018efe85c1dddb:
+
+  pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
+
+----------------------------------------------------------------
+
+I am reposting it as I could not find it in my mail so probably
+it did not go through.
+
+*** Note: this is not for master, this is for pseries
