@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZrxT-0002Jl-AR
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:05:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fZrxW-0002Js-6L
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZrxS-0003Dd-2M
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:05:07 -0400
-Date: Mon, 2 Jul 2018 16:01:05 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fZrxS-0003Di-2n
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:05:10 -0400
+Date: Mon, 2 Jul 2018 16:04:54 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180702060105.GA3422@umbus.fritz.box>
+Message-ID: <20180702060454.GB3422@umbus.fritz.box>
 References: <153026568125.394407.16374811229961951138.stgit@bahia.lan>
-	<153026571205.394407.1842744312813398945.stgit@bahia.lan>
+	<153026572065.394407.16369067299697377597.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ELawpaRm0uGyL1wg"
+	protocol="application/pgp-signature"; boundary="JoJCGVnM/36AiBh+"
 Content-Disposition: inline
-In-Reply-To: <153026571205.394407.1842744312813398945.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] target/ppc/kvm: don't pass cpu to
- kvm_get_smmu_info()
+In-Reply-To: <153026572065.394407.16369067299697377597.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] spapr: compute default value of
+ "hpt-max-page-size" later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +29,121 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
 
---ELawpaRm0uGyL1wg
+--JoJCGVnM/36AiBh+
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 29, 2018 at 11:48:32AM +0200, Greg Kurz wrote:
-11;rgb:ffff/ffff/ffff> In a future patch the machine code will need to retr=
-ieve the MMU
-> information from KVM during machine initialization before the CPUs
-> are created.
+On Fri, Jun 29, 2018 at 11:48:40AM +0200, Greg Kurz wrote:
+> It is currently not possible to run a pseries-2.12 or older machine
+> with HV KVM. QEMU prints the following and exits right away.
 >=20
-> Actually, KVM_PPC_GET_SMMU_INFO is a VM class ioctl, and thus, we
-> don't need to have a CPU object around. We just need for KVM to
-> be initialized and use the kvm_state global. This patch just does
-> that.
+> qemu-system-ppc64: KVM doesn't support for base page shift 34
+>=20
+> The "hpt-max-page-size" capability was recently added to spapr to hide
+> host configuration details from HPT mode guests. Its default value for
+> newer machine types is 64k.
+>=20
+> For backwards compatibility, pseries-2.12 and older machine types need
+> a different value. This is handled as usual in a class init function.
+> The default value is 16G, ie, all page sizes supported by POWER7 and
+> newer CPUs, but HV KVM requires guest pages to be hpa contiguous as
+> well as gpa contiguous. The default value is the page size used to
+> back the guest RAM in this case.
+>=20
+> Unfortunately kvmppc_hpt_needs_host_contiguous_pages()->kvm_enabled() is
+> called way before KVM init and returns false, even if the user requested
+> KVM. We thus end up selecting 16G, which isn't supported by HV KVM. The
+> default value must be set during machine init, because we can safely
+> assume that KVM is initialized at this point.
+>=20
+> We fix this by moving the logic to a fixup helper to be called by
+> spapr_caps_init(). Since the user cannot pass cap-hpt-max-page-size=3D0,
+> we set the default to 0 in the pseries-2.12 class init function and use
+> that as a flag to do the real work.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v2: - moved logic under spapr_caps_init()
 
-Applied to ppc-for-3.0.
+As discussed in another thread, it would actually be better to put
+this logic into default_caps_with_cpu().  At the moment that just
+deals with cpu-dependent defaults, but that's just because that was
+the only thing that previously required "late" default calculation.
+Now we have another thing, so it makes sense to put them together, and
+avoids altering the class structure at runtime.
 
 > ---
-> v2: - fallback code was dropped by a previous patch
-> ---
->  target/ppc/kvm.c |   17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr.c      |   13 ++++++-------
+>  hw/ppc/spapr_caps.c |   20 ++++++++++++++++++++
+>  2 files changed, 26 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index b6000f12b98f..9211ee2ee1a0 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -248,19 +248,19 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
-> =20
-> =20
->  #if defined(TARGET_PPC64)
-> -static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info =
-*info,
-> -                              Error **errp)
-> +static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **er=
-rp)
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 8cc996d0b822..f6c60f2a1248 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4103,17 +4103,16 @@ static void spapr_machine_2_12_instance_options(M=
+achineState *machine)
+>  static void spapr_machine_2_12_class_options(MachineClass *mc)
 >  {
-> -    CPUState *cs =3D CPU(cpu);
->      int ret;
+>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> -    uint8_t mps;
 > =20
-> -    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
-> +    assert(kvm_state !=3D NULL);
-> +
-> +    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
->          error_setg(errp, "KVM doesn't expose the MMU features it support=
-s");
->          error_append_hint(errp, "Consider switching to a newer KVM\n");
->          return;
->      }
+>      spapr_machine_3_0_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
 > =20
-> -    ret =3D kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, info);
-> +    ret =3D kvm_vm_ioctl(kvm_state, KVM_PPC_GET_SMMU_INFO, info);
->      if (ret =3D=3D 0) {
->          return;
->      }
-> @@ -326,14 +326,13 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cp=
-u,
-> =20
->  bool kvmppc_hpt_needs_host_contiguous_pages(void)
->  {
-> -    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
->      static struct kvm_ppc_smmu_info smmu_info;
-> =20
->      if (!kvm_enabled()) {
->          return false;
->      }
-> =20
-> -    kvm_get_smmu_info(cpu, &smmu_info, &error_fatal);
-> +    kvm_get_smmu_info(&smmu_info, &error_fatal);
->      return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
+> -    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> -        mps =3D ctz64(qemu_getrampagesize());
+> -    } else {
+> -        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
+> -    }
+> -    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
+> +    /* We depend on kvm_enabled() to choose a default value for the
+> +     * hpt-max-page-size capability. Of course we can't do it here
+> +     * because this is too early and the HW accelerator isn't initialzed
+> +     * yet. Postpone this to spapr_caps_init().
+> +     */
+> +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 0;
 >  }
 > =20
-> @@ -348,7 +347,7 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
->          return;
->      }
+>  DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 62663ebdf51a..e307161f6425 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -552,11 +552,31 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+>  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+>  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
 > =20
-> -    kvm_get_smmu_info(cpu, &smmu_info, &local_err);
-> +    kvm_get_smmu_info(&smmu_info, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> @@ -2091,7 +2090,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
-igned int hash_shift)
+> +static void fixup_default_cap_hpt_maxpagesize_pre_3_0(sPAPRMachineState =
+*spapr)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    uint8_t mps;
+> +
+> +    /* If it is already set, then this is a 3.0 or newer machine */
+> +    if (smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
+> +        return;
+> +    }
+> +
+> +    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> +        mps =3D ctz64(qemu_getrampagesize());
+> +    } else {
+> +        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
+> +    }
+> +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
+> +}
+> +
+>  void spapr_caps_init(sPAPRMachineState *spapr)
+>  {
+>      sPAPRCapabilities default_caps;
+>      int i;
 > =20
->      /* Find the largest hardware supported page size that's less than
->       * or equal to the (logical) backing page size of guest RAM */
-> -    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info, &error_fatal);
-> +    kvm_get_smmu_info(&info, &error_fatal);
->      rampagesize =3D qemu_getrampagesize();
->      best_page_shift =3D 0;
+> +    fixup_default_cap_hpt_maxpagesize_pre_3_0(spapr);
+> +
+>      /* Compute the actual set of caps we should run with */
+>      default_caps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_ty=
+pe);
 > =20
 >=20
 
@@ -131,24 +153,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ELawpaRm0uGyL1wg
+--JoJCGVnM/36AiBh+
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls5v6EACgkQbDjKyiDZ
-s5K4Dw//SvnopgpVqDDd2XbYVsIwpH0qMOix9gXXKdA2/QRdL2tSXJy2I1UIdHsH
-qCbg6M6bCMuPdQ7VYpC4/10CyGfvwlMjmAQ7rCJn+yU4OHgO9yekMq1MxmNVYVi2
-+m5ik9w2pMRobuRxdEcLyAcnacKx1q6XwjuF/DoZLDQ2LH6XBwY9f+CD15M9UYHR
-DPfi/9i+CPn5YDon/mlNXQavJlumcwAU0z7Nx1dVRVHC1x/hVSvzuKIGEgbZ5Kux
-2dEmB7XNBP7zzKoSSlCIgEQzfa5sLv6PgWq+j8AsXPGFW4+5y41ZdGyzUynUAeh4
-tXY1qZY6WUB6MsrmEhGMtBfZLXiEPxg7doxi0B6UHEk89TCoArqXM+wkvWfHOOOy
-nraOP4Pt+LLMnFuO3tbxshcXRRXLvC0yqZTyMwcZFsk0VQx0hEEDPT00HcTvQggV
-Op8xWLZ+LVAnNngv5aXSzyL6OhCG5WVZlJCtvniq1H2Q3BAtYeMEPkFmkO6alwl+
-Ivr40E3Y0H88zGEMmcbhGbt3hViNeVwUFTWwbJ5DxnP19r5HFUY5lNZ8ew8G2+Q4
-LI8T6MyvZ3zntlXwDssHV5kIFj5gI1Wif6cZ5Rn7LciuMMsyDoQOtl+tHM/gnP7u
-Axt/Vw1bcKqsGztR8HSGq5r9kH9PAh2b8Wyp8c0/voF6accd0NY=
-=Cn83
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls5wIYACgkQbDjKyiDZ
+s5I4rw//XkZ+/ZcXOIgkWpHrM04Q6n++Al1B0KpJvkUtvmmlVP0Yx8mj2n1KEkll
+A4qsDsQhGXWmeq+xQODygzp9kRctdu3fLeUK1SPNElJ49a+GMohdu9cZSU1sVVUC
+V+xHC8PDAkTKG0RuPLNTD7G+Y1LoxchZoIIcYLP7IBna2x+zpvquQqIgABgzgvZW
+Sp0+YvRquBYdEs3hq5975ZNO5sVDNAHss6KIiLu86/6oaYtBpnIJFhOmjQvJW7CO
+I9NN23voqGsf02Ovh8Xmbby/oQEm4QhtxlofYYf/jlYms0k3BYV7jmNhElerLnnR
+napeSTuYEm3Igz6CdQUzgZS+f7CWfzWS98o7BOVeCwW/WDLkHcC//U+V/iiVOxc8
+Qe79GRKYYtQycEDIBfCPrXXW47BdPwyIqcXA8zYzqoKvI21Lh9Ozb+PKdStSfyhd
+qd8HI3OQ6Ku+Cztr356XaaBnWq0YmSs7Laz66Zm8QxTubJH51gqa1+QxvXukGDxq
+CUxzcdXfI4tRxiitopXYjlySqxAqE8k1Z9IF4Ts2Bb6niIyxznk6wzom5L2SHZdI
+87bNTJfF8/JrQ1MAVSl1+pBHDkmu3QHTwpnhV3pDBmrDBlNY3XhJVDY6Ww/bdGoP
+Z8ahUb378PTEOk794q1feTQEuPmgyTy2CFJmNO1E/quJZE8+nuE=
+=oSxP
 -----END PGP SIGNATURE-----
 
---ELawpaRm0uGyL1wg--
+--JoJCGVnM/36AiBh+--
