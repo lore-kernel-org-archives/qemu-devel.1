@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fa55x-00013p-UJ
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:06:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fa5Iz-0003fH-VL
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fa55q-0004eq-0c
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:06:45 -0400
-Resent-Message-Id: <E1fa55q-0004eq-0c@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fa55p-0004di-Om
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:06:37 -0400
-In-Reply-To: <20180702143021.18864-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153055923809.678.17170367532368976740@946cad8fd14e>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fa5Iv-00064f-Kq
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:20:13 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:37864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fa5Iv-00063H-Fz
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:20:09 -0400
+Received: by mail-qk0-x243.google.com with SMTP id t79-v6so9349764qke.4
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 13:20:09 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180702143021.18864-1-alex.bennee@linaro.org>
+	<20180702143021.18864-18-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <55a47a01-1f11-b4a9-fd7a-e7aa7443fdf8@amsat.org>
+Date: Mon, 2 Jul 2018 17:20:03 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 2 Jul 2018 12:20:38 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/20] Travis,
- Code Coverage and Cross Build updates
+In-Reply-To: <20180702143021.18864-18-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 17/20] docker: debian-bootstrap.pre
+ allow customising of variant/url
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +36,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, cota@braap.orgfamz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzAyMTQzMDIxLjE4ODY0LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzIwXSBUcmF2aXMsIENvZGUgQ292ZXJh
-Z2UgYW5kIENyb3NzIEJ1aWxkIHVwZGF0ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDg3M2U3MTA0NyBkb2NrZXI6IGFkZCBsaW51
-eC11c2VyIHBvd2VyZWQgY3Jvc3MgYnVpbGRlciBmb3IgUUVNVQozNGY1NzdjZGE0IGRvY2tlcjog
-YWRkIHNwZWNpYWwgcnVsZSBmb3IgZGVib29zdHJhcHBlZCBpbWFnZXMKYmJiZTQ5NDkzZSBkb2Nr
-ZXI6IGFkZCBzcGVjaWFsIGhhbmRsaW5nIGZvciBGUk9NOmRlYmlhbi0lLXVzZXIgdGFyZ2V0cwoz
-YWRjMmFiMTY2IGRvY2tlcjogZGViaWFuLWJvb3RzdHJhcC5wcmUgYWxsb3cgY3VzdG9taXNpbmcg
-b2YgdmFyaWFudC91cmwKNjFjZDdiYjFmNCBkb2NrZXI6IGRyb3AgUUVNVSBidWlsZC1kZXAgZnJv
-bSBib290c3RyYXAKMDAyNDc4NTQyOCBkb2NrZXI6IERvIG5vdCBydW4gdGVzdHMgaW4gJ2ludGVy
-bWVkaWF0ZScgaW1hZ2VzCjBmMTQyZjY3MTMgZG9ja2VyOiBDbGVhbiB0aGUgTVhFIGJhc2UgaW1h
-Z2UKODc3OTA1M2JjOCBkb2NrZXI6IHVidW50dTogVXNlIFNETDIKMzA1ZGMxYWQyZiBkb2NrZXI6
-IHVidW50dTogVXBkYXRlIHRoZSBwYWNrYWdlIGxpc3QgYmVmb3JlIGluc3RhbGxpbmcgbmV3IG9u
-ZXMKNThiZDU2OTM2YSBkb2NrZXI6IGZpbHRlciBvdXQgbGludXgtdXNlciBidWlsZHMgZm9yIG1p
-bmd3CjU4OWNjOTIyMTIgbGludXgtdXNlcjogYWRkIGdjb3Ygc3VwcG9ydCB0byBwcmVleGl0X2Ns
-ZWFudXAKNTdkY2Y5MmJlYSBsaW51eC11c2VyOiBpbnRyb2R1Y2UgcHJlZXhpdF9jbGVhbnVwCmY2
-N2JhZjlmNTcgYnVpbGQtc3lzdGVtOiBhZGQgY292ZXJhZ2UtcmVwb3J0IHRhcmdldAo5ZDU4MTE4
-YmM3IGJ1aWxkLXN5c3RlbTogYWRkIGNsZWFuLWNvdmVyYWdlIHRhcmdldApkNzUwZDgyNWRjIHRy
-YXZpczogYWRkIGdjb3ZyIHN1bW1hcnkgZm9yIEdDT1YgYnVpbGQKYjFmYTlmZjZkNiBkb2NrZXI6
-IGFkZCBnY292ciB0byB0cmF2aXMgaW1hZ2UKOGQ4N2Y4NWJiMCAuZ2l0aWdub3JlOiBhZGQgLmdj
-b3YgZmlsZXMKY2UyZDc0NWI4ZCBidWlsZC1zeXN0ZW06IHJlbW92ZSBwZXItdGVzdCBHQ09WIHJl
-cG9ydGluZwo4N2JjMjE1MGRiIHRyYXZpczogdGVzdCBvdXQtb2YtdHJlZSBidWlsZHMKMWI0NGQ2
-NmY2ZSB0cmF2aXM6IGRvIG5vdCB3YXN0ZSB0aW1lIGNsb25pbmcgdW51c2VkIHN1Ym1vZHVsZXMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjA6IHRyYXZpczogZG8gbm90
-IHdhc3RlIHRpbWUgY2xvbmluZyB1bnVzZWQgc3VibW9kdWxlcy4uLgpDaGVja2luZyBQQVRDSCAy
-LzIwOiB0cmF2aXM6IHRlc3Qgb3V0LW9mLXRyZWUgYnVpbGRzLi4uCkNoZWNraW5nIFBBVENIIDMv
-MjA6IGJ1aWxkLXN5c3RlbTogcmVtb3ZlIHBlci10ZXN0IEdDT1YgcmVwb3J0aW5nLi4uCkNoZWNr
-aW5nIFBBVENIIDQvMjA6IC5naXRpZ25vcmU6IGFkZCAuZ2NvdiBmaWxlcy4uLgpDaGVja2luZyBQ
-QVRDSCA1LzIwOiBkb2NrZXI6IGFkZCBnY292ciB0byB0cmF2aXMgaW1hZ2UuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNi8yMDogdHJhdmlzOiBhZGQgZ2NvdnIgc3VtbWFyeSBmb3IgR0NPViBidWlsZC4uLgpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiM1ODogCm5ldyBmaWxlIG1vZGUgMTAwNzU1Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDQ5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNy8yMDogYnVpbGQtc3lzdGVtOiBhZGQgY2xl
-YW4tY292ZXJhZ2UgdGFyZ2V0Li4uCkNoZWNraW5nIFBBVENIIDgvMjA6IGJ1aWxkLXN5c3RlbTog
-YWRkIGNvdmVyYWdlLXJlcG9ydCB0YXJnZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yMDogbGludXgt
-dXNlcjogaW50cm9kdWNlIHByZWV4aXRfY2xlYW51cC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMzog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDcyIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tp
-bmcgUEFUQ0ggMTAvMjA6IGxpbnV4LXVzZXI6IGFkZCBnY292IHN1cHBvcnQgdG8gcHJlZXhpdF9j
-bGVhbnVwLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMy
-NzogRklMRTogbGludXgtdXNlci9leGl0LmM6MjM6CitleHRlcm4gdm9pZCBfX2djb3ZfZHVtcCh2
-b2lkKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTcgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMjA6
-IGRvY2tlcjogZmlsdGVyIG91dCBsaW51eC11c2VyIGJ1aWxkcyBmb3IgbWluZ3cuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTIvMjA6IGRvY2tlcjogdWJ1bnR1OiBVcGRhdGUgdGhlIHBhY2thZ2UgbGlzdCBi
-ZWZvcmUgaW5zdGFsbGluZyBuZXcgb25lcy4uLgpDaGVja2luZyBQQVRDSCAxMy8yMDogZG9ja2Vy
-OiB1YnVudHU6IFVzZSBTREwyLi4uCkNoZWNraW5nIFBBVENIIDE0LzIwOiBkb2NrZXI6IENsZWFu
-IHRoZSBNWEUgYmFzZSBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCAxNS8yMDogZG9ja2VyOiBEbyBu
-b3QgcnVuIHRlc3RzIGluICdpbnRlcm1lZGlhdGUnIGltYWdlcy4uLgpDaGVja2luZyBQQVRDSCAx
-Ni8yMDogZG9ja2VyOiBkcm9wIFFFTVUgYnVpbGQtZGVwIGZyb20gYm9vdHN0cmFwLi4uCkNoZWNr
-aW5nIFBBVENIIDE3LzIwOiBkb2NrZXI6IGRlYmlhbi1ib290c3RyYXAucHJlIGFsbG93IGN1c3Rv
-bWlzaW5nIG9mIHZhcmlhbnQvdXJsLi4uCkNoZWNraW5nIFBBVENIIDE4LzIwOiBkb2NrZXI6IGFk
-ZCBzcGVjaWFsIGhhbmRsaW5nIGZvciBGUk9NOmRlYmlhbi0lLXVzZXIgdGFyZ2V0cy4uLgpDaGVj
-a2luZyBQQVRDSCAxOS8yMDogZG9ja2VyOiBhZGQgc3BlY2lhbCBydWxlIGZvciBkZWJvb3N0cmFw
-cGVkIGltYWdlcy4uLgpDaGVja2luZyBQQVRDSCAyMC8yMDogZG9ja2VyOiBhZGQgbGludXgtdXNl
-ciBwb3dlcmVkIGNyb3NzIGJ1aWxkZXIgZm9yIFFFTVUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzE6
-IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NCBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 07/02/2018 11:30 AM, Alex Bennée wrote:
+> We default to the buildd variant as most of our images are for
+> building. However lets give the user the ability to specify "minbase"
+> if they want to create a simple base image for experimentation.
+> 
+> Allowing the tweaking of DEB_URL means we can also bootstrap other
+> Debian based OS's. For example:
+> 
+>   make docker-binfmt-image-debian-ubuntu-bionic-arm64 \
+>        DEB_ARCH=arm64 DEB_TYPE=bionic \
+>        DEB_VARIANT=minbase DEB_URL=http://ports.ubuntu.com/ \
+>        EXECUTABLE=./aarch64-linux-user/qemu-aarch64
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  tests/docker/dockerfiles/debian-bootstrap.pre | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
+> index 7c76dce663..56e1aa7a21 100755
+> --- a/tests/docker/dockerfiles/debian-bootstrap.pre
+> +++ b/tests/docker/dockerfiles/debian-bootstrap.pre
+> @@ -32,6 +32,15 @@ if [ -z "${DEB_TYPE}" ]; then
+>  
+>  fi
+>  
+> +# The following allow finer grain control over the defaults
+> +if [ -z "${DEB_VARIANT}" ]; then
+> +    DEB_VARIANT=buildd
+> +fi
+> +
+> +if [ -z "${DEB_URL}" ]; then
+> +    DEB_URL="http://httpredir.debian.org/debian"
+> +fi
+> +
+>  # We check in order for
+>  #
+>  #  - DEBOOTSTRAP_DIR pointing at a development checkout
+> @@ -107,5 +116,5 @@ fi
+>  
+>  echo "Building a rootfs using ${FAKEROOT} and ${DEBOOTSTRAP} ${DEB_ARCH}/${DEB_TYPE}"
+>  
+> -${FAKEROOT} ${DEBOOTSTRAP} --variant=buildd --foreign --arch=$DEB_ARCH $DEB_TYPE . http://httpredir.debian.org/debian || exit 1
+> +${FAKEROOT} ${DEBOOTSTRAP} --variant=$DEB_VARIANT --foreign --arch=$DEB_ARCH $DEB_TYPE . $DEB_URL || exit 1
+>  exit 0
+> 
