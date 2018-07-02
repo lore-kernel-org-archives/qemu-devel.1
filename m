@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fZshw-0005dp-Kt
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:53:09 -0400
+	(envelope-from <famz@redhat.com>) id 1fZt0P-0008Nr-12
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fZsht-0001SY-GY
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:53:08 -0400
-Received: from smtp33.i.mail.ru ([94.100.177.93]:42540)
+	(envelope-from <famz@redhat.com>) id 1fZt0L-0004Gu-NF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:12:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53072 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fZsht-0001Ol-5a
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 02:53:05 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Mon,  2 Jul 2018 09:52:37 +0300
-Message-Id: <20180702065237.27899-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH] qtest: Use cpu address space instead of system
- memory
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fZt0L-0004G8-IK
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:12:09 -0400
+Date: Mon, 2 Jul 2018 15:12:05 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180702071205.GI26002@lemon.usersys.redhat.com>
+References: <20180628153535.1411-1-f4bug@amsat.org>
+	<20180628153535.1411-2-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180628153535.1411-2-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] tests/vm: Support proxy / corporate
+ firewall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,125 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-Some devices (like nvic in armv7m) are not accessable through
-address_space_memory, therefore can not be tested with qtest.
+On Thu, 06/28 12:35, Philippe Mathieu-Daud=E9 wrote:
+> If ftp_proxy/http_proxy/https_proxy standard environment variables
+> are available, pass them to the vm images.
+>=20
+> As per 06cc3551714:
+> This is required when building behind corporate proxy/firewall, but
+> also help when using local cache server (ie: apt/yum).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/vm/ubuntu.i386 | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+> index fc319e0e6e..be16ceed50 100755
+> --- a/tests/vm/ubuntu.i386
+> +++ b/tests/vm/ubuntu.i386
+> @@ -68,6 +68,10 @@ class UbuntuX86VM(basevm.BaseVM):
+>          self.boot(img_tmp, extra_args =3D ["-cdrom", self._gen_cloud_i=
+nit_iso()])
+>          self.wait_ssh()
+>          self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+> +        for k, v in os.environ.iteritems():
+> +            kl =3D k.lower()
+> +            if kl in ['ftp_proxy', 'http_proxy', 'https_proxy']:
+> +                self.ssh_root_check("echo 'Acquire::{}::Proxy \"{}\";'=
+ >> /etc/apt/apt.conf.d/01proxy".format(kl[:-6].upper(), v))
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- qtest.c | 39 ++++++++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 13 deletions(-)
+Reasonable, but do we want it for other apps and images? How about settin=
+g these
+env vars to ssh commands?
 
-diff --git a/qtest.c b/qtest.c
-index cbbfb71114..69b9e9962b 100644
---- a/qtest.c
-+++ b/qtest.c
-@@ -387,19 +387,23 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
- 
-         if (words[0][5] == 'b') {
-             uint8_t data = value;
--            cpu_physical_memory_write(addr, &data, 1);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             &data, 1, true);
-         } else if (words[0][5] == 'w') {
-             uint16_t data = value;
-             tswap16s(&data);
--            cpu_physical_memory_write(addr, &data, 2);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             (uint8_t *) &data, 2, true);
-         } else if (words[0][5] == 'l') {
-             uint32_t data = value;
-             tswap32s(&data);
--            cpu_physical_memory_write(addr, &data, 4);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             (uint8_t *) &data, 4, true);
-         } else if (words[0][5] == 'q') {
-             uint64_t data = value;
-             tswap64s(&data);
--            cpu_physical_memory_write(addr, &data, 8);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             (uint8_t *) &data, 8, true);
-         }
-         qtest_send_prefix(chr);
-         qtest_send(chr, "OK\n");
-@@ -417,18 +421,22 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
- 
-         if (words[0][4] == 'b') {
-             uint8_t data;
--            cpu_physical_memory_read(addr, &data, 1);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             &data, 1, false);
-             value = data;
-         } else if (words[0][4] == 'w') {
-             uint16_t data;
--            cpu_physical_memory_read(addr, &data, 2);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             (uint8_t *) &data, 2, false);
-             value = tswap16(data);
-         } else if (words[0][4] == 'l') {
-             uint32_t data;
--            cpu_physical_memory_read(addr, &data, 4);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             (uint8_t *) &data, 4, false);
-             value = tswap32(data);
-         } else if (words[0][4] == 'q') {
--            cpu_physical_memory_read(addr, &value, 8);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             (uint8_t *) &value, 8, false);
-             tswap64s(&value);
-         }
-         qtest_send_prefix(chr);
-@@ -448,7 +456,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         g_assert(len);
- 
-         data = g_malloc(len);
--        cpu_physical_memory_read(addr, data, len);
-+        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                         data, len, false);
- 
-         enc = g_malloc(2 * len + 1);
-         for (i = 0; i < len; i++) {
-@@ -473,7 +482,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         g_assert(ret == 0);
- 
-         data = g_malloc(len);
--        cpu_physical_memory_read(addr, data, len);
-+        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                         data, len, false);
-         b64_data = g_base64_encode(data, len);
-         qtest_send_prefix(chr);
-         qtest_sendf(chr, "OK %s\n", b64_data);
-@@ -507,7 +517,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-                 data[i] = 0;
-             }
-         }
--        cpu_physical_memory_write(addr, data, len);
-+        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                         data, len, true);
-         g_free(data);
- 
-         qtest_send_prefix(chr);
-@@ -529,7 +540,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         if (len) {
-             data = g_malloc(len);
-             memset(data, pattern, len);
--            cpu_physical_memory_write(addr, data, len);
-+            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                             data, len, true);
-             g_free(data);
-         }
- 
-@@ -562,7 +574,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-             out_len = MIN(out_len, len);
-         }
- 
--        cpu_physical_memory_write(addr, data, out_len);
-+        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-+                         data, len, true);
- 
-         qtest_send_prefix(chr);
-         qtest_send(chr, "OK\n");
--- 
-2.17.1
+Fam
+
+>          self.ssh_root_check("apt-get update")
+>          self.ssh_root_check("apt-get install -y cloud-initramfs-growro=
+ot")
+>          # Don't check the status in case the guest hang up too quickly
+> --=20
+> 2.18.0
+>=20
