@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fZveh-00006G-MQ
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:02:00 -0400
+	(envelope-from <clg@kaod.org>) id 1fZvge-0001E9-R5
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:04:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fZved-0004Wm-Pk
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:01:59 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:35664
-	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fZved-0004WO-IR
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:01:55 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-7-git-send-email-suzuki.poulose@arm.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Message-ID: <daa9d67d-069a-c413-223f-28444341d99d@arm.com>
-Date: Mon, 2 Jul 2018 11:01:51 +0100
+	(envelope-from <clg@kaod.org>) id 1fZvga-0005NY-Tn
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:04:00 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:36894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fZvga-0005Ls-Mv
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:03:56 -0400
+Received: from player793.ha.ovh.net (unknown [10.109.108.28])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0407F13CA94
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 12:03:54 +0200 (CEST)
+References: <20180619140729.21949-1-clg@kaod.org>
+	<20180619140729.21949-2-clg@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <eb1ad8ca-89f7-b059-3a3c-412375871113@kaod.org>
+Date: Mon, 2 Jul 2018 12:03:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <1530270944-11351-7-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <20180619140729.21949-2-clg@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/20] kvm: arm/arm64: Remove spurious
- WARN_ON
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On 29/06/18 12:15, Suzuki K Poulose wrote:
-> On a 4-level page table pgd entry can be empty, unlike a 3-level
-> page table. Remove the spurious WARN_ON() in stage_get_pud().
-> 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Acked-by: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  virt/kvm/arm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 061e6b3..308171c 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -976,7 +976,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->  	pud_t *pud;
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -436,6 +436,9 @@ static void spapr_vio_busdev_reset(DeviceState *qdev)
+>      }
+>  }
 >  
->  	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
-> -	if (WARN_ON(stage2_pgd_none(*pgd))) {
-> +	if (stage2_pgd_none(*pgd)) {
->  		if (!cache)
->  			return NULL;
->  		pud = mmu_memory_cache_alloc(cache);
-> 
+> +/* TODO : poor VIO device indexing ... */
+> +static uint32_t vio_index;
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+I think we could also use (dev->reg & 0xff) as an index for 
+the VIO devices.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+The unit address of the virtual IOA is simply allocated using 
+an increment of bus->next_reg, next_reg being initialized at
+0x71000000.
+
+I did not see any restrictions in the PAPR specs or in QEMU 
+that would break the above.
+
+C.
+
+
+>  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+>  {
+>      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> @@ -476,10 +479,18 @@ static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+>      }
+>  
+>      if (!dev->irq) {
+> -        dev->irq = spapr_irq_findone(spapr, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +            dev->irq = spapr_irq_findone(spapr, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                return;
+> +            }
+> +        } else {
+> +            dev->irq = SPAPR_IRQ_VIO + vio_index++;
+> +            if (dev->irq == SPAPR_IRQ_PCI_LSI) {
+> +                error_setg(errp, "Too many VIO devices");
+> +                return;
+> +            }
+
+ 
