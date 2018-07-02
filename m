@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzM1-0002gH-Jk
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:58 -0400
+	(envelope-from <shorne@gmail.com>) id 1fZzM3-0002iC-Jq
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:59:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzM0-0008Kk-E1
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:57 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:42841)
+	(envelope-from <shorne@gmail.com>) id 1fZzM2-0008M2-Og
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:59 -0400
+Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:35356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzM0-0008KD-4N
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:56 -0400
-Received: by mail-pg0-x232.google.com with SMTP id c10-v6so7195869pgu.9
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzM2-0008La-Ij
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:58 -0400
+Received: by mail-pl0-x231.google.com with SMTP id k1-v6so8010346plt.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:58 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon,  2 Jul 2018 22:57:58 +0900
-Message-Id: <20180702135806.7087-18-shorne@gmail.com>
+Date: Mon,  2 Jul 2018 22:57:59 +0900
+Message-Id: <20180702135806.7087-19-shorne@gmail.com>
 In-Reply-To: <20180702135806.7087-1-shorne@gmail.com>
 References: <20180702135806.7087-1-shorne@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/25] target/openrisc: Use identical sizes for
- ITLB and DTLB
+Subject: [Qemu-devel] [PULL 18/25] target/openrisc: Stub out
+ handle_mmu_fault for softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,152 +31,65 @@ Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henders
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-The sizes are already the same, however, we can improve things
-if they are identical by design.
+This hook is only used by CONFIG_USER_ONLY.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/cpu.h        | 10 ++++------
- target/openrisc/machine.c    |  4 ++--
- target/openrisc/mmu.c        |  4 ++--
- target/openrisc/sys_helper.c | 16 ++++++++--------
- 4 files changed, 16 insertions(+), 18 deletions(-)
+ target/openrisc/mmu.c | 35 +++++------------------------------
+ 1 file changed, 5 insertions(+), 30 deletions(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index c3a968ec4d..47e94659e1 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -222,10 +222,8 @@ enum {
- 
- /* TLB size */
- enum {
--    DTLB_SIZE = 64,
--    DTLB_MASK = (DTLB_SIZE-1),
--    ITLB_SIZE = 64,
--    ITLB_MASK = (ITLB_SIZE-1),
-+    TLB_SIZE = 64,
-+    TLB_MASK = TLB_SIZE - 1,
- };
- 
- /* TLB prot */
-@@ -254,8 +252,8 @@ typedef struct OpenRISCTLBEntry {
- 
- #ifndef CONFIG_USER_ONLY
- typedef struct CPUOpenRISCTLBContext {
--    OpenRISCTLBEntry itlb[ITLB_SIZE];
--    OpenRISCTLBEntry dtlb[DTLB_SIZE];
-+    OpenRISCTLBEntry itlb[TLB_SIZE];
-+    OpenRISCTLBEntry dtlb[TLB_SIZE];
- 
-     int (*cpu_openrisc_map_address_code)(struct OpenRISCCPU *cpu,
-                                          hwaddr *physical,
-diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-index b795b56dc6..3fc837b925 100644
---- a/target/openrisc/machine.c
-+++ b/target/openrisc/machine.c
-@@ -42,9 +42,9 @@ static const VMStateDescription vmstate_cpu_tlb = {
-     .minimum_version_id = 1,
-     .minimum_version_id_old = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, ITLB_SIZE, 0,
-+        VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
-                              vmstate_tlb_entry, OpenRISCTLBEntry),
--        VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, DTLB_SIZE, 0,
-+        VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
-                              vmstate_tlb_entry, OpenRISCTLBEntry),
-         VMSTATE_END_OF_LIST()
-     }
 diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-index b293b64e98..a4613e9ae4 100644
+index a4613e9ae4..f4c0a3e217 100644
 --- a/target/openrisc/mmu.c
 +++ b/target/openrisc/mmu.c
-@@ -41,7 +41,7 @@ static int get_phys_code(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-                          target_ulong address, int rw, bool supervisor)
+@@ -177,42 +177,17 @@ static void cpu_openrisc_raise_mmu_exception(OpenRISCCPU *cpu,
+     cpu->env.lock_addr = -1;
+ }
+ 
+-#ifndef CONFIG_USER_ONLY
+ int openrisc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+                                   int rw, int mmu_idx)
  {
-     int vpn = address >> TARGET_PAGE_BITS;
--    int idx = vpn & ITLB_MASK;
-+    int idx = vpn & TLB_MASK;
-     int right = 0;
-     uint32_t mr = cpu->env.tlb.itlb[idx].mr;
-     uint32_t tr = cpu->env.tlb.itlb[idx].tr;
-@@ -74,7 +74,7 @@ static int get_phys_data(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-                          target_ulong address, int rw, bool supervisor)
- {
-     int vpn = address >> TARGET_PAGE_BITS;
--    int idx = vpn & DTLB_MASK;
-+    int idx = vpn & TLB_MASK;
-     int right = 0;
-     uint32_t mr = cpu->env.tlb.dtlb[idx].mr;
-     uint32_t tr = cpu->env.tlb.dtlb[idx].tr;
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 852b219f9b..541615bfb3 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -80,7 +80,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         env->shadow_gpr[idx / 32][idx % 32] = rb;
-         break;
++#ifdef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+-    int ret = 0;
+-    hwaddr physical = 0;
+-    int prot = 0;
+-
+-    ret = get_phys_addr(cpu, &physical, &prot, address, rw);
+-
+-    if (ret == TLBRET_MATCH) {
+-        tlb_set_page(cs, address & TARGET_PAGE_MASK,
+-                     physical & TARGET_PAGE_MASK, prot,
+-                     mmu_idx, TARGET_PAGE_SIZE);
+-        ret = 0;
+-    } else if (ret < 0) {
+-        cpu_openrisc_raise_mmu_exception(cpu, address, rw, ret);
+-        ret = 1;
+-    }
+-
+-    return ret;
+-}
++    cpu_openrisc_raise_mmu_exception(cpu, address, rw, 0);
++    return 1;
+ #else
+-int openrisc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                                  int rw, int mmu_idx)
+-{
+-    OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+-    int ret = 0;
+-
+-    cpu_openrisc_raise_mmu_exception(cpu, address, rw, ret);
+-    ret = 1;
+-
+-    return ret;
+-}
++    g_assert_not_reached();
+ #endif
++}
  
--    case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
-+    case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
-         mr = env->tlb.dtlb[idx].mr;
-         if (mr & 1) {
-@@ -91,7 +91,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         env->tlb.dtlb[idx].mr = rb;
-         break;
--    case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
-+    case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1): /* DTLBW0TR 0-127 */
-         idx = spr - TO_SPR(1, 640);
-         env->tlb.dtlb[idx].tr = rb;
-         break;
-@@ -103,7 +103,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
-         break;
- 
--    case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
-+    case TO_SPR(2, 512) ... TO_SPR(2, 512 + TLB_SIZE - 1): /* ITLBW0MR 0-127 */
-         idx = spr - TO_SPR(2, 512);
-         mr = env->tlb.itlb[idx].mr;
-         if (mr & 1) {
-@@ -114,7 +114,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         env->tlb.itlb[idx].mr = rb;
-         break;
--    case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
-+    case TO_SPR(2, 640) ... TO_SPR(2, 640 + TLB_SIZE - 1): /* ITLBW0TR 0-127 */
-         idx = spr - TO_SPR(2, 640);
-         env->tlb.itlb[idx].tr = rb;
-         break;
-@@ -247,11 +247,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-         idx = (spr - 1024);
-         return env->shadow_gpr[idx / 32][idx % 32];
- 
--    case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
-+    case TO_SPR(1, 512) ... TO_SPR(1, 512 + TLB_SIZE - 1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
-         return env->tlb.dtlb[idx].mr;
- 
--    case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
-+    case TO_SPR(1, 640) ... TO_SPR(1, 640 + TLB_SIZE - 1): /* DTLBW0TR 0-127 */
-         idx = spr - TO_SPR(1, 640);
-         return env->tlb.dtlb[idx].tr;
- 
-@@ -263,11 +263,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
-     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
-         break;
- 
--    case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1): /* ITLBW0MR 0-127 */
-+    case TO_SPR(2, 512) ... TO_SPR(2, 512 + TLB_SIZE - 1): /* ITLBW0MR 0-127 */
-         idx = spr - TO_SPR(2, 512);
-         return env->tlb.itlb[idx].mr;
- 
--    case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
-+    case TO_SPR(2, 640) ... TO_SPR(2, 640 + TLB_SIZE - 1): /* ITLBW0TR 0-127 */
-         idx = spr - TO_SPR(2, 640);
-         return env->tlb.itlb[idx].tr;
- 
+ #ifndef CONFIG_USER_ONLY
+ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
 -- 
 2.17.0
