@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60469)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa2ll-0002QO-9d
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:37:46 -0400
+	id 1fa2yK-0004xL-2T
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa2lh-0000pv-8r
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:37:45 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:35117)
+	id 1fa2yG-0003Xo-4s
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:50:44 -0400
+Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:39840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa2lh-0000ph-2C
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:37:41 -0400
-Received: by mail-vk0-x242.google.com with SMTP id o202-v6so9607867vko.2
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 10:37:40 -0700 (PDT)
+	id 1fa2yF-0003Xc-TR
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:50:40 -0400
+Received: by mail-vk0-x236.google.com with SMTP id v16-v6so6539002vkd.6
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 10:50:39 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180628034652.24152-1-f4bug@amsat.org>
-	<20180628034652.24152-4-f4bug@amsat.org>
-	<ef46c1d4-c680-1f3c-58c2-23230b19dff8@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <44a63db6-c4ab-55d7-a51d-523595bec18c@amsat.org>
-Date: Mon, 2 Jul 2018 14:37:36 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  2 Jul 2018 14:50:17 -0300
+Message-Id: <20180702175030.18621-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <ef46c1d4-c680-1f3c-58c2-23230b19dff8@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/12] linux-user/strace: Add
- print_timezone()
+Subject: [Qemu-devel] [PATCH v3 00/13] linux-user: strace improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +32,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
 
-On 07/01/2018 04:44 PM, Laurent Vivier wrote:
-> Le 28/06/2018 à 05:46, Philippe Mathieu-Daudé a écrit :
->> Suggested-by: Laurent Vivier <laurent@vivier.eu>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  linux-user/strace.c | 20 ++++++++++++++++++++
->>  1 file changed, 20 insertions(+)
->>
->> diff --git a/linux-user/strace.c b/linux-user/strace.c
->> index bd897a3f20..b43a21f48b 100644
->> --- a/linux-user/strace.c
->> +++ b/linux-user/strace.c
->> @@ -63,6 +63,7 @@ UNUSED static void print_string(abi_long, int);
->>  UNUSED static void print_buf(abi_long addr, abi_long len, int last);
->>  UNUSED static void print_raw_param(const char *, abi_long, int);
->>  UNUSED static void print_timeval(abi_ulong, int);
->> +UNUSED static void print_timezone(abi_ulong, int);
->>  UNUSED static void print_number(abi_long, int);
->>  UNUSED static void print_signal(abi_ulong, int);
->>  UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
->> @@ -1182,6 +1183,25 @@ print_timeval(abi_ulong tv_addr, int last)
->>          gemu_log("NULL%s", get_comma(last));
->>  }
->>  
->> +static void
->> +print_timezone(abi_ulong tz_addr, int last)
->> +{
->> +    if (tz_addr) {
->> +        struct target_timezone *tz;
->> +
->> +        tz = lock_user(VERIFY_READ, tz_addr, sizeof(*tz), 1);
->> +        if (!tz) {
-> 
-> you should use print_pointer(tz_addr, last) instead of ignoring the value.
+Hi Laurent,
 
-I copied print_timeval(). Same applies there then. I'll update both.
+Few patches I'v been writting while trying to figure out this issue:
+http://lists.nongnu.org/archive/html/qemu-arm/2018-01/msg00514.html
 
-Thanks,
+As usual with linux-user files, this series will trigger some checkpatch
+benign warnings.
+
+Regards,
 
 Phil.
+
+Since v2:
+- display invalid pointer in print_timeval() and print_timezone()
+- do not display gettimeofday() arguments
+
+Since v1:
+- addressed Laurent comments
+- added 'last' argument to print_sockaddr()
+- reordered series, so patches already correct can get applied directly
+- dropped "linux-user/syscall: simplify recvfrom()" for now
+
+v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg05855.html
+v2: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08216.html
+
+$ git backport-diff
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/13:[----] [--] 'linux-user/syscall: Verify recvfrom(addr) is user-writable'
+002/13:[----] [--] 'linux-user/strace: Improve capget()/capset() output'
+003/13:[down] 'linux-user/strace: Display invalid pointer in print_timeval()'
+004/13:[0001] [FC] 'linux-user/strace: Add print_timezone()'
+005/13:[down] 'linux-user/strace: Improve settimeofday()'
+006/13:[----] [--] 'linux-user/strace: Dump AF_NETLINK sockaddr content'
+007/13:[----] [--] 'linux-user/strace: Improve recvmsg() output'
+008/13:[----] [--] 'linux-user/strace: Improve bind() output'
+009/13:[----] [--] 'linux-user/strace: improve sendto() output'
+010/13:[----] [--] 'linux-user/strace: Let print_sockaddr() have a 'last' argument'
+011/13:[----] [--] 'linux-user/strace: Add print_sockaddr_ptr() to handle plain/pointer addrlen'
+012/13:[----] [--] 'linux-user/strace: Improve getsockname() output'
+013/13:[----] [--] 'linux-user/strace: Improve recvfrom() output'
+
+Philippe Mathieu-Daudé (13):
+  linux-user/syscall: Verify recvfrom(addr) is user-writable
+  linux-user/strace: Improve capget()/capset() output
+  linux-user/strace: Display invalid pointer in print_timeval()
+  linux-user/strace: Add print_timezone()
+  linux-user/strace: Improve settimeofday()
+  linux-user/strace: Dump AF_NETLINK sockaddr content
+  linux-user/strace: Improve recvmsg() output
+  linux-user/strace: Improve bind() output
+  linux-user/strace: improve sendto() output
+  linux-user/strace: Let print_sockaddr() have a 'last' argument
+  linux-user/strace: Add print_sockaddr_ptr() to handle plain/pointer addrlen
+  linux-user/strace: Improve getsockname() output
+  linux-user/strace: Improve recvfrom() output
+
+ linux-user/syscall_defs.h |   7 ++
+ linux-user/strace.c       | 164 ++++++++++++++++++++++++++++++++++++--
+ linux-user/syscall.c      |  11 ++-
+ linux-user/strace.list    |  16 ++--
+ 4 files changed, 182 insertions(+), 16 deletions(-)
+
+-- 
+2.18.0
