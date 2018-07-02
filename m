@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzMK-00030T-DP
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:59:17 -0400
+	(envelope-from <emanuele.giuseppe.esposito@usi.ch>)
+	id 1fZzTX-0000RT-Fn
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzMJ-0008Uk-K8
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:59:16 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:42963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzMJ-0008UY-Di
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:59:15 -0400
-Received: by mail-pg0-x244.google.com with SMTP id c10-v6so7196214pgu.9
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:59:15 -0700 (PDT)
-From: Stafford Horne <shorne@gmail.com>
-Date: Mon,  2 Jul 2018 22:58:06 +0900
-Message-Id: <20180702135806.7087-26-shorne@gmail.com>
-In-Reply-To: <20180702135806.7087-1-shorne@gmail.com>
-References: <20180702135806.7087-1-shorne@gmail.com>
-Subject: [Qemu-devel] [PULL 25/25] target/openrisc: Fix writes to interrupt
- mask register
+	(envelope-from <emanuele.giuseppe.esposito@usi.ch>)
+	id 1fZzTU-0003mR-Av
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:06:43 -0400
+Received: from mail-he1eur02on0600.outbound.protection.outlook.com
+	([2a01:111:f400:fe05::600]:6611
+	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <emanuele.giuseppe.esposito@usi.ch>)
+	id 1fZzTT-0003kA-L9
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:06:40 -0400
+From: Emanuele Giuseppe Esposito <esposem@usi.ch>
+Date: Mon,  2 Jul 2018 16:05:58 +0200
+Message-Id: <20180702140558.18267-1-esposem@usi.ch>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] qpci_free_pc: sdhci-test and
+ vhost-user-test could free() NULL pointers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Emanuele Giuseppe Esposito <esposem@usi.ch>
 
-The interrupt controller mask register (PICMR) allows writing any value
-to any of the 32 interrupt mask bits.  Writing a 0 masks the interrupt
-writing a 1 unmasks (enables) the the interrupt.
+server->bus in _test_server_free() could be NULL, since TestServer *dest in
+test_migrate() was not properly initialized like TestServer *s. Added
+init_virtio_dev(dest) and uninit_virtio_dev(dest), so the fields are properly
+set and when test_server_free(dest); is called, they can be correctly freed.
 
-For some reason the old code was or'ing the write values to the PICMR
-meaning it was not possible to ever mask a interrupt once it was
-enabled.
+Same applies to s->pci.bus, since it is set depending on the architecture.
 
-I have tested this by running linux 4.18 and my regular checks, I don't
-see any issues.
+Problem came out once I modified  pci-pc.c and pci-pc.h, modifying QPCIBusPC
+by adding another field before QPCIBus bus. Re-running the tests showed
+vhost-user-test failing.
 
-Reported-by: Davidson Francis <davidsondfgl@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stafford Horne <shorne@gmail.com>
+Signed-off-by: Emanuele Giuseppe Esposito <esposem@usi.ch>
 ---
- target/openrisc/sys_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/libqos/pci-pc.c   | 2 ++
+ tests/sdhci-test.c      | 4 +++-
+ tests/vhost-user-test.c | 2 ++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 541615bfb3..b66a45c1e0 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -142,7 +142,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         break;
-     case TO_SPR(9, 0):  /* PICMR */
--        env->picmr |= rb;
-+        env->picmr = rb;
-         break;
-     case TO_SPR(9, 2):  /* PICSR */
-         env->picsr &= ~rb;
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index a7803308b7..c126b08ff5 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -152,6 +152,8 @@ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+ 
+ void qpci_free_pc(QPCIBus *bus)
+ {
++    g_assert(bus);
++
+     QPCIBusPC *s = container_of(bus, QPCIBusPC, bus);
+ 
+     g_free(s);
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+index 1d825eb010..9b486b93bf 100644
+--- a/tests/sdhci-test.c
++++ b/tests/sdhci-test.c
+@@ -209,7 +209,9 @@ static QSDHCI *machine_start(const struct sdhci_t *test)
+ 
+ static void machine_stop(QSDHCI *s)
+ {
+-    qpci_free_pc(s->pci.bus);
++    if (s->pci.bus) {
++        qpci_free_pc(s->pci.bus);
++    }
+     g_free(s->pci.dev);
+     qtest_quit(global_qtest);
+     g_free(s);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 8ff2106d32..a8a02c45cd 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -684,6 +684,7 @@ static void test_migrate(void)
+     g_free(cmd);
+ 
+     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
+     wait_for_fds(s);
+     size = get_log_size(s);
+     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
+@@ -739,6 +740,7 @@ static void test_migrate(void)
+     read_guest_mem_server(dest);
+ 
+     uninit_virtio_dev(s);
++    uninit_virtio_dev(dest);
+ 
+     g_source_destroy(source);
+     g_source_unref(source);
 -- 
-2.17.0
+2.17.1
