@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fZwZh-0005vl-NF
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:00:59 -0400
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1fZwbz-0006rt-CI
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fZwZe-0005i6-I6
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:00:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41688)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fZwZe-0005hr-B5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:00:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fZwZd-00040c-D3
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 11:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5E5F12E8005
-	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 11:00:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Jul 2018 10:51:32 -0000
-From: Bastien Orivel <1779650@bugs.launchpad.net>
-Reply-To: Bug 1779650 <1779650@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153052869210.7093.11788523328636614698.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1779650] [NEW] The display stays black after
- waking up a domain via SPICE with a QXL card
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1fZwbw-00074B-4z
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:03:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35278
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
+	id 1fZwbw-000738-0a
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:03:12 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w62AsprE083281
+	for <qemu-devel@nongnu.org>; Mon, 2 Jul 2018 07:03:10 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jygdhp6sw-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:03:09 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
+	Mon, 2 Jul 2018 12:03:07 +0100
+From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Date: Mon,  2 Jul 2018 13:03:04 +0200
+Message-Id: <1530529384-3848-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 1/1] s390x/storage attributes: fix
+ CMMA_BLOCK_SIZE usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: cohuck@redhat.com
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-Public bug reported:
+The macro CMMA_BLOCK_SIZE was defined but not used, and a hardcoded
+value was instead used in the code.
 
-As the title says, in a jessie VM, waking up a VM via the spice remote
-view works with a VGA graphic card. With a QXL card though, the domain
-wakes up but the display stays black (the keyboard is working though).
+This patch fixes the value of CMMA_BLOCK_SIZE and uses it in the
+appropriate place in the code.
 
-Qemu: Master, 281bd281222776229d5dbf84d1a5c6d8d9d2a34b
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+---
+ hw/s390x/s390-stattrib.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1779650
-
-Title:
-  The display stays black after waking up a domain via SPICE with a QXL
-  card
-
-Status in QEMU:
-  New
-
-Bug description:
-  As the title says, in a jessie VM, waking up a VM via the spice remote
-  view works with a VGA graphic card. With a QXL card though, the domain
-  wakes up but the display stays black (the keyboard is working though).
-
-  Qemu: Master, 281bd281222776229d5dbf84d1a5c6d8d9d2a34b
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1779650/+subscriptions
+diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
+index 70b9555..a788cdb 100644
+--- a/hw/s390x/s390-stattrib.c
++++ b/hw/s390x/s390-stattrib.c
+@@ -20,7 +20,8 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ 
+-#define CMMA_BLOCK_SIZE  (1 << 10)
++/* 512kB cover 2GB of guest memory */
++#define CMMA_BLOCK_SIZE  (1 << 19)
+ 
+ #define STATTR_FLAG_EOS     0x01ULL
+ #define STATTR_FLAG_MORE    0x02ULL
+@@ -202,7 +203,7 @@ static int cmma_save(QEMUFile *f, void *opaque, int final)
+     S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
+     uint8_t *buf;
+     int r, cx, reallen = 0, ret = 0;
+-    uint32_t buflen = 1 << 19;   /* 512kB cover 2GB of guest memory */
++    uint32_t buflen = CMMA_BLOCK_SIZE;
+     uint64_t start_gfn = sas->migration_cur_gfn;
+ 
+     buf = g_try_malloc(buflen);
+-- 
+2.7.4
