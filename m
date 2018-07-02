@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fZtd7-0008HK-3F
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:52:14 -0400
+	(envelope-from <kchamart@redhat.com>) id 1fZtkW-0001PR-LC
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fZtd6-0002ko-4b
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:52:13 -0400
-Date: Mon, 2 Jul 2018 08:52:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180702075201.GA4257@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180628184624.5867-1-rjones@redhat.com>
-	<20180628184624.5867-2-rjones@redhat.com>
-	<20180629170343.GY27016@redhat.com>
-	<20180629174029.GR1455@redhat.com>
+	(envelope-from <kchamart@redhat.com>) id 1fZtkU-0006vN-IG
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 03:59:52 -0400
+Date: Mon, 2 Jul 2018 09:59:39 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180702075939.GE24405@paraplu>
+References: <20180628180042.3881-1-jsnow@redhat.com>
+	<20180628180042.3881-2-jsnow@redhat.com>
+	<3a32f921-7800-a4f3-12ac-195212cbe828@redhat.com>
+	<05a181af-5038-826f-2873-dec4a04f22e9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180629174029.GR1455@redhat.com>
+In-Reply-To: <05a181af-5038-826f-2873-dec4a04f22e9@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] crypto: Implement TLS Pre-Shared Keys
- (PSK).
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] block: allow blockdev-backup from
+ any source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, Jun 29, 2018 at 06:40:29PM +0100, Richard W.M. Jones wrote:
-> On Fri, Jun 29, 2018 at 06:03:43PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Thu, Jun 28, 2018 at 07:46:24PM +0100, Richard W.M. Jones wrote:
-> > > diff --git a/crypto/tlssession.c b/crypto/tlssession.c
-> > > index 96a02deb69..50df64e0a9 100644
-> > > --- a/crypto/tlssession.c
-> > > +++ b/crypto/tlssession.c
-> > > @@ -21,6 +21,7 @@
-> > >  #include "qemu/osdep.h"
-> > >  #include "crypto/tlssession.h"
-> > >  #include "crypto/tlscredsanon.h"
-> > > +#include "crypto/tlscredspsk.h"
-> > >  #include "crypto/tlscredsx509.h"
-> > >  #include "qapi/error.h"
-> > >  #include "qemu/acl.h"
-> > > @@ -88,6 +89,8 @@ qcrypto_tls_session_pull(void *opaque, void *buf,=
- size_t len)
-> > >      return session->readFunc(buf, len, session->opaque);
-> > >  }
-> > > =20
-> > > +#define TLS_PRIORITY_ADDITIONAL_ANON "+ANON-DH"
-> > > +#define TLS_PRIORITY_ADDITIONAL_PSK  "+ECDHE-PSK:+DHE-PSK:+PSK"
-> >=20
-> > Unfortunately in testing this I learn ECDHE-PSK is only supported whe=
-n
-> > using GNUTLS >=3D 3.0, so can you make this conditional based on=20
-> > GNUTLS_VERSION_MAJOR  >=3D 3
+On Thu, Jun 28, 2018 at 05:19:37PM -0400, John Snow wrote:
 >=20
-> GnuTLS 3.0 was released in 2011, and the last 2.x version seems to be
-> from 2009.  Do we need to support such old versions?
+>=20
+> On 06/28/2018 02:05 PM, Eric Blake wrote:
+> > On 06/28/2018 01:00 PM, John Snow wrote:
+> >> In the case of image fleecing, the node we choose as the source
+> >> for a blockdev-backup is going to be both a root node AND the
+> >> backing node for the exported image. It does not qualify as a root
+> >> image in this case.
+> >>
+> >> Loosen the restriction.
+> >>
+> >> Signed-off-by: John Snow <jsnow@redhat.com>
+> >> ---
+> >> =A0 blockdev.c | 2 +-
+> >> =A0 1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > In v1, you mentioned that this used to work but then regressed,
+> > pinpointing that detail in the commit message might be nice, but not
+> > essential (since we didn't test it until now).=A0 So,
+> >=20
+>=20
+> Really not sure when it regressed; I consider it unimportant as nothing
+> uses it presently: no docs, no tests, nothing in libvirt.
+>=20
+> My guess, though, is that it worked prior to
+> cef34eebf3d0f252a3b3e9a2a459b6c3ecc56f68.
 
-With our recently introduced platform support guidelines, I think we can
-likely drop 2.x. The issue is timing though - feature freeze deadline is
-tomorrow, and I really want to get your PSK patch included without more
-delay. So just making it conditional is the simplest way to achieve it.
+So the above commit adds the ability to assign node names for
+`blockdev-backup`, which wasn't possible during 2.8 timeframe.
 
-> I looked at the configure script.  It seems as if we will try to use
-> any version of GnuTLS, even ancient ones (although other sub-features
-> require later versions of GnuTLS).  But if I'm understanding it
-> correctly, by forcing both GnuTLS >=3D 3.0.0 and Nettle we could
-> eliminate all the conditionals there, except for one Nettle test.
+> In 2.8, possibly?
+>=20
+> Kashyap might know, I think he's experimented with this sometime in tha=
+t
+> timezone.
 
-We still need support for gcrypt unfortunately, since nettle is not cover=
-ed
-by FIPS certs. So while we will be able to delete a bunch of compat code,
-we'll need to refactor much of the configure test logic. I don't want to
-risk doing that the day before feature freeze.
+I don't recall doing the "allow blockdev-backup from any source" test
+with 2.8.  (But I recall gradually moving from figuring out the source
+block device via wading through the output of `query-named-block-nodes`
+to using the 'node-name'.)
 
-Regards,
-Daniel
+Looking at my test notes with QEMU 2.8, this was my
+workflow (see how `blockdev-backup` still doesn't use 'node-name's):
+
+(QEMU) blockdev-add driver=3Dqcow2 node-name=3Dnode2 file=3D{"driver":"fi=
+le","filename":"/export/target.qcow2"} backing=3D{"driver":"qcow2","file"=
+:{"driver":"file","filename":"/export/base.qcow2"}}
+(QEMU) query-named-block-nodes # To dig through the source block device "=
+#blockYYY"
+(QEMU) blockdev-backup device=3D#block197 target=3Dnode1 sync=3Dnone
+(QEMU) nbd-server-start addr=3D{"type":"unix","data":{"path":"./nbd-sock"=
+}}
+(QEMU) nbd-server-add device=3Dnode1
+(QEMU) nbd-server-stop
+
+Later on I moved (thanks to the Git commit you mentioned earlier) to the
+much cleaner approach of using 'node-name' (the below syntax is
+from my test notes with QEMU 2.12):
+
+(QEMU) blockdev-add driver=3Dqcow2 node-name=3Dnode-E file=3D{"driver":"f=
+ile","filename":"e.qcow2"}
+(QEMU) blockdev-backup device=3Dnode-B target=3Dnode-E sync=3Dfull job-id=
+=3Djob0
+[...]
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+/kashyap
