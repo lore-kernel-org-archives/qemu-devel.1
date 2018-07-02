@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0UO-0004dW-Vn
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fa0bO-00022p-Qr
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0UK-0008MY-FD
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:40 -0400
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:45041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0UK-0008MC-9w
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:36 -0400
-Received: by mail-pg0-x22d.google.com with SMTP id r1-v6so1582505pgp.11
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:36 -0700 (PDT)
-From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 00:10:21 +0900
-Message-Id: <20180702151023.24532-24-shorne@gmail.com>
-In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
-References: <20180702151023.24532-1-shorne@gmail.com>
-Subject: [Qemu-devel] [PULL v2 23/25] linux-user: Fix struct sigaltstack for
- openrisc
+	(envelope-from <stefanha@gmail.com>) id 1fa0bO-0003tu-1j
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:18:54 -0400
+Date: Mon, 2 Jul 2018 16:18:43 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180702151843.GJ2155@stefanha-x1.localdomain>
+References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="451BZW+OUuJBCAYj"
+Content-Disposition: inline
+In-Reply-To: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v0 0/2] Postponed actions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +23,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: kwolf@redhat.com, reitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-stable@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Stafford Horne <shorne@gmail.com>
----
- linux-user/openrisc/target_signal.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--451BZW+OUuJBCAYj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/linux-user/openrisc/target_signal.h b/linux-user/openrisc/target_signal.h
-index c352a8b333..8283eaf544 100644
---- a/linux-user/openrisc/target_signal.h
-+++ b/linux-user/openrisc/target_signal.h
-@@ -5,8 +5,8 @@
- 
- typedef struct target_sigaltstack {
-     abi_long ss_sp;
-+    abi_int ss_flags;
-     abi_ulong ss_size;
--    abi_long ss_flags;
- } target_stack_t;
- 
- /* sigaltstack controls  */
--- 
-2.17.0
+On Fri, Jun 29, 2018 at 03:40:50PM +0300, Denis Plotnikov wrote:
+> There are cases when a request to a block driver state shouldn't have
+> appeared producing dangerous race conditions.
+> This misbehaviour is usually happens with storage devices emulated
+> without eventfd for guest to host notifications like IDE.
+>=20
+> The issue arises when the context is in the "drained" section
+> and doesn't expect the request to come, but request comes from the
+> device not using iothread and which context is processed by the main loop.
+>=20
+> The main loop apart of the iothread event loop isn't blocked by the
+> "drained" section.
+> The request coming and processing while in "drained" section can spoil the
+> block driver state consistency.
+>=20
+> This behavior can be observed in the following KVM-based case:
+>=20
+> 1. Setup a VM with an IDE disk.
+> 2. Inside a VM start a disk writing load for the IDE device
+>   e.g: dd if=3D<file> of=3D<file> bs=3DX count=3DY oflag=3Ddirect
+> 3. On the host create a mirroring block job for the IDE device
+>   e.g: drive_mirror <your_IDE> <your_path>
+> 4. On the host finish the block job
+>   e.g: block_job_complete <your_IDE>
+> =20
+> Having done the 4th action, you could get an assert:
+> assert(QLIST_EMPTY(&bs->tracked_requests)) from mirror_run.
+> On my setup, the assert is 1/3 reproducible.
+>=20
+> The patch series introduces the mechanism to postpone the requests
+> until the BDS leaves "drained" section for the devices not using iothread=
+s.
+> Also, it modifies the asynchronous block backend infrastructure to use
+> that mechanism to release the assert bug for IDE devices.
+
+I don't understand the scenario.  IDE emulation runs in the vcpu and
+main loop threads.  These threads hold the global mutex when executing
+QEMU code.  If thread A is in a drained region with the global mutex,
+then thread B cannot run QEMU code since it would need to global mutex.
+
+So I guess the problem is not that thread B will submit new requests,
+but maybe that the IDE DMA code will run a completion in thread A and
+submit another request in the drained region?
+
+Stefan
+
+--451BZW+OUuJBCAYj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbOkJTAAoJEJykq7OBq3PIIXUH/2/N9HgqD1TgkBzBGz2izhGB
+WH3G3+iwe5HyrkcusrUFLU0SnbFVFxmVW7JQdDfmuqtj2ADxQ9oJAeN54LEt3urW
+mt/VzumVAvQm5O//wxVzfJeN9sB1rNlvKfuRvl9HjOc/XvG09JBKd5WPD1NNPMoj
+A6bxB2qZZ/jwpsAyQhfIIEOsjtfbrIS5TOSUqWW6OQCR32RFk0mvnYBN3yZIRWNr
+5SOTSO96oY6dQMD0YvoDTUmu5m34DZFI6DiPdIIarK83mD39Ibm3Rzwvc6idyJFw
+OcuAV+dIK8D7VZEQuhDSI+Wx1VkD7FccbRGR3YmqVLuIqzT5ei6HM0dGtNUzSTY=
+=a0Gv
+-----END PGP SIGNATURE-----
+
+--451BZW+OUuJBCAYj--
