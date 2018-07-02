@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fa5rI-0004si-QO
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:55:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1fa5uC-0005h7-KF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fa5rE-0000GS-LK
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:55:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50986 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fa5u8-00020w-0f
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:58:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48778 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fa5rE-0000G5-Ao
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:55:36 -0400
-References: <20180702165842.11423-1-rkagan@virtuozzo.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fa5u7-00020N-N0
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 16:58:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F6C781A4EB9
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 20:58:35 +0000 (UTC)
+References: <20180702162218.13678-1-armbru@redhat.com>
+	<20180702162218.13678-5-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <42e1ca43-c31a-43a7-950e-57695c5ddd7f@redhat.com>
-Date: Mon, 2 Jul 2018 15:55:33 -0500
+Message-ID: <50e5e338-6361-f9e9-8c16-70abdb4952a8@redhat.com>
+Date: Mon, 2 Jul 2018 15:58:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180702165842.11423-1-rkagan@virtuozzo.com>
+In-Reply-To: <20180702162218.13678-5-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/6] hyperv: refactor HvSintRoute management
+Subject: Re: [Qemu-devel] [PATCH 04/32] qmp: Document COMMAND_DROPPED design
+ flaw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: peterx@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
 
-On 07/02/2018 11:58 AM, Roman Kagan wrote:
-> This series modifies the management of HvSintRoute, which is an
-> important building block in Hyper-V emulation infrastructure, to make it
-> easier to maintain and enhance, and paves the way to the more complete
-> Synthetic Interrupt Controller (SynIC) emulation.
+On 07/02/2018 11:21 AM, Markus Armbruster wrote:
+> Events are broadcast to all monitors.  If another monitor's client has
+> a command with the same ID in flight, the event will incorrectly claim
+> that command was dropped.  This must be fixed before out-of-band
+> execution can graduate from "experimental".
 > 
-> This series applies on top of "[PATCH 0/2] hyperv: ensure VP index equal
-> to QEMU cpu_index" series (message-id:
-> <20180702134156.13404-1-rkagan@virtuozzo.com>).
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   monitor.c      | 6 ++++++
+>   qapi/misc.json | 3 +++
+>   2 files changed, 9 insertions(+)
+> 
 
-Rewriting that in a form that patchew can parse:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Based-on: 20180702134156.13404-1-rkagan@virtuozzo.com
+(Seems like we'll get this bug fixed in time for 3.0, even if it misses 
+soft freeze)
 
 -- 
 Eric Blake, Principal Software Engineer
