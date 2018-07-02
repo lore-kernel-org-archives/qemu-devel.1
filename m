@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa2FC-0003Gr-EU
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:04:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1fa2Gb-0004L2-Fi
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa2F8-00087S-EL
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:04:06 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:42823)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fa2F8-000870-AV
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:04:02 -0400
-Received: by mail-qt0-x241.google.com with SMTP id y31-v6so14366581qty.9
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 10:04:02 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180702163345.17892-1-kraxel@redhat.com>
-	<20180702163345.17892-2-kraxel@redhat.com>
-	<20180702164326.ry3qghgjkjrshouh@sirius.home.kraxel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6fba740c-3006-e6fd-9008-4ff3ed221b9b@amsat.org>
-Date: Mon, 2 Jul 2018 14:03:58 -0300
+	(envelope-from <berrange@redhat.com>) id 1fa2GX-0000kJ-GG
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41804 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fa2GX-0000jc-AF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:29 -0400
+Date: Mon, 2 Jul 2018 18:05:24 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180702170524.GE6438@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180702164326.ry3qghgjkjrshouh@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] warn about two vga cards
+Content-Disposition: inline
+In-Reply-To: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] i386: fix '-cpu ?' output for host cpu type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 07/02/2018 01:43 PM, Gerd Hoffmann wrote:
-> On Mon, Jul 02, 2018 at 06:33:45PM +0200, Gerd Hoffmann wrote:
->> Two vga cards will try to register for the same legacy (isa) ioports.
->> Due to this conflict only one of the two cards will work correctly in
->> vga mode.
->>
->> Print a warning message in that case.  Also try registering the ports
->> only once, so the first vga added to the system will work properly.
-> 
-> Scratch that, not working as expected.
+On Mon, Jul 02, 2018 at 06:56:06PM +0200, Greg Kurz wrote:
+> Since commit d6dcc5583e7, '-cpu ?' shows the description of the
+> X86_CPU_TYPE_NAME("max") for the host CPU model:
+>=20
+> Enables all features supported by the accelerator in the current host
+>=20
+> instead of the expected:
+>=20
+> KVM processor with all supported host features
+>=20
+> or
+>=20
+> HVF processor with all supported host features
+>=20
+> This is caused by the early use of kvm_enabled() and hvf_enabled() in
+> a class_init function. Since the accelerator isn't configured yet, both
+> helpers return false unconditionally.
+>=20
+> A QEMU binary will only be compiled with one of these accelerators, not
+> both. The appropriate description can thus be decided at build time.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  target/i386/cpu.c |   14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 1e6a7d0a7504..e5da60b28973 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2838,13 +2838,13 @@ static void host_x86_cpu_class_init(ObjectClass=
+ *oc, void *data)
 
-Uh what's wrong?
+Sigh, yet another case of relying on runtime state during class_init impl=
+s.
 
-/me missed it.
+>      xcc->host_cpuid_required =3D true;
+>      xcc->ordering =3D 8;
+> =20
+> -    if (kvm_enabled()) {
+> -        xcc->model_description =3D
+> -            "KVM processor with all supported host features ";
+> -    } else if (hvf_enabled()) {
+> -        xcc->model_description =3D
+> -            "HVF processor with all supported host features ";
+> -    }
+> +#if defined(CONFIG_KVM)
+> +    xcc->model_description =3D
+> +        "KVM processor with all supported host features ";
+> +#elif defined(CONFIG_HVF)
+> +    xcc->model_description =3D
+> +        "HVF processor with all supported host features ";
+> +#endif
+>  }
+> =20
+>  static const TypeInfo host_x86_cpu_type_info =3D {
 
-> Looked like a simple change but appearently isn't.
-> 
-> cheers,
->   Gerd
-> 
-> 
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
