@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fa4I3-00016J-FM
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:15:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1fa4Q2-0006E7-MU
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fa4I1-0006sc-OL
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:15:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1fa4Px-00040u-Rg
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:23:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48116 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fa4Px-00040S-NU
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:23:21 -0400
+References: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  2 Jul 2018 14:14:58 -0500
-Message-Id: <20180702191458.28741-3-eblake@redhat.com>
-In-Reply-To: <20180702191458.28741-1-eblake@redhat.com>
-References: <20180702191458.28741-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] iotests: New test 223 for exporting
- dirty bitmap over NBD
+Message-ID: <72864d18-e647-4070-bcb4-cbfca67ede8d@redhat.com>
+Date: Mon, 2 Jul 2018 14:23:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] i386: fix '-cpu ?' output for host cpu type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,241 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Although this test is NOT a full test of image fleecing (as it
-intentionally uses just a single block device directly exported
-over NBD, rather than trying to set up a blockdev-backup job with
-multiple BDS involved), it DOES prove that qemu as a server is
-able to properly expose a dirty bitmap over NBD.
+On 07/02/2018 11:56 AM, Greg Kurz wrote:
+> Since commit d6dcc5583e7, '-cpu ?' shows the description of the
+> X86_CPU_TYPE_NAME("max") for the host CPU model:
 
-When coupled with image fleecing, it is then possible for a
-third-party client to do an incremental backup by using
-qemu-img map with the x-dirty-bitmap option to learn which parts
-of the file are dirty (perhaps confusingly, they are the portions
-mapped as "data":false - which is part of the reason this is
-still in the x- experimental namespace), along with another
-normal client (perhaps 'qemu-nbd -c' to expose the server over
-/dev/nbd0 and then just use normal I/O on that block device) to
-read the dirty sections.
+In the subject line and here, let's favor '-cpu help' as the preferred 
+spelling for this command line option.  (-cpu ? requires shell quoting 
+to avoid unintentionally globbing to one-letter files in the current 
+directory)
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/223     | 138 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/223.out |  49 ++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 188 insertions(+)
- create mode 100755 tests/qemu-iotests/223
- create mode 100644 tests/qemu-iotests/223.out
-
-diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
-new file mode 100755
-index 00000000000..b63b7a4f9e1
---- /dev/null
-+++ b/tests/qemu-iotests/223
-@@ -0,0 +1,138 @@
-+#!/bin/bash
-+#
-+# Test reading dirty bitmap over NBD
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1 # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    _cleanup_qemu
-+    rm -f "$TEST_DIR/nbd"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2
-+_supported_proto file # uses NBD as well
-+_supported_os Linux
-+
-+function do_run_qemu()
-+{
-+    echo Testing: "$@"
-+    $QEMU -nographic -qmp stdio -serial none "$@"
-+    echo
-+}
-+
-+function run_qemu()
-+{
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
-+                          | _filter_qemu | _filter_imgfmt \
-+                          | _filter_actual_image_size
-+}
-+
-+echo
-+echo "=== Create partially sparse image, then add dirty bitmap ==="
-+echo
-+
-+_make_test_img 4M
-+$QEMU_IO -c 'w -P 0x11 1M 2M' "$TEST_IMG" | _filter_qemu_io
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "$IMGFMT",
-+    "node-name": "n",
-+    "file": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG"
-+    }
-+  }
-+}
-+{ "execute": "block-dirty-bitmap-add",
-+  "arguments": {
-+    "node": "n",
-+    "name": "b",
-+    "persistent": true
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "=== Write part of the file under active bitmap ==="
-+echo
-+
-+$QEMU_IO -c 'w -P 0x22 2M 2M' "$TEST_IMG" | _filter_qemu_io
-+
-+echo
-+echo "=== End dirty bitmap, and start serving image over NBD ==="
-+echo
-+
-+_launch_qemu 2> >(_filter_nbd)
-+
-+silent=
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"qmp_capabilities"}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-add",
-+  "arguments":{"driver":"qcow2", "node-name":"n",
-+    "file":{"driver":"file", "filename":"'"$TEST_IMG"'"}}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
-+  "arguments":{"node":"n", "name":"b"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
-+  "arguments":{"addr":{"type":"unix",
-+    "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-+  "arguments":{"device":"n"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
-+  "arguments":{"name":"n", "bitmap":"b"}}' "return"
-+
-+echo
-+echo "=== Contrast normal status with dirty-bitmap status ==="
-+echo
-+
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+IMG="driver=nbd,export=n,server.type=unix,server.path=$TEST_DIR/nbd"
-+$QEMU_IO -r -c 'r -P 0 0 1m' -c 'r -P 0x11 1m 1m' \
-+  -c 'r -P 0x22 2m 2m' --image-opts "$IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json --image-opts \
-+  "$IMG" | _filter_qemu_img_map
-+$QEMU_IMG map --output=json --image-opts \
-+  "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b" | _filter_qemu_img_map
-+
-+echo
-+echo "=== End NBD server ==="
-+echo
-+
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
-+  "arguments":{"name":"n"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-new file mode 100644
-index 00000000000..33021c8e6a1
---- /dev/null
-+++ b/tests/qemu-iotests/223.out
-@@ -0,0 +1,49 @@
-+QA output created by 223
-+
-+=== Create partially sparse image, then add dirty bitmap ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4194304
-+wrote 2097152/2097152 bytes at offset 1048576
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+
-+=== Write part of the file under active bitmap ===
-+
-+wrote 2097152/2097152 bytes at offset 2097152
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== End dirty bitmap, and start serving image over NBD ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+
-+=== Contrast normal status with dirty-bitmap status ===
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 2097152/2097152 bytes at offset 2097152
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false},
-+{ "start": 1048576, "length": 3145728, "depth": 0, "zero": false, "data": true}]
-+[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": true},
-+{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data": false}]
-+
-+=== End NBD server ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index eea75819d2a..a446476583e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -220,3 +220,4 @@
- 218 rw auto quick
- 219 rw auto
- 221 rw auto quick
-+223 rw auto quick
 -- 
-2.14.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
