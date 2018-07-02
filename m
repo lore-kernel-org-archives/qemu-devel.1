@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fa491-0005s1-U9
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:05:53 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fa4Gt-00009C-NB
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fa48w-0008Na-W1
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:05:51 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:41899)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fa48w-0008MN-Ls
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:05:46 -0400
-References: <20180702175030.18621-1-f4bug@amsat.org>
-	<20180702175030.18621-7-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <0efbb3ec-a168-aabd-4808-a5c69280c8d7@vivier.eu>
-Date: Mon, 2 Jul 2018 21:05:32 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180702175030.18621-7-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/13] linux-user/strace: Dump
- AF_NETLINK sockaddr content
+	(envelope-from <mail@sebastianbauer.info>) id 1fa4Gq-0005uw-FI
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 15:13:59 -0400
+From: Sebastian Bauer <mail@sebastianbauer.info>
+Date: Mon,  2 Jul 2018 21:13:45 +0200
+Message-Id: <20180702191345.19120-1-mail@sebastianbauer.info>
+Subject: [Qemu-devel] [PATCH v2] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +18,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+To: mail@sebastianbauer.info
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, thuth@redhat.com, balaton@eik.bme.hu, qemu-ppc@nongnu.org
 
-Le 02/07/2018 à 19:50, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Tested-By: Guido Günther <agx@sigxcpu.org>
-> ---
->  linux-user/syscall_defs.h |  7 +++++++
->  linux-user/strace.c       | 34 ++++++++++++++++++++++++++++++++++
->  linux-user/syscall.c      |  6 ++++--
->  3 files changed, 45 insertions(+), 2 deletions(-)
+Drivers for this card exists on PPC-based AmigaOS guests so it is useful to
+allow users to emulate the graphics card for PPC machines.
 
-Could you split this patch in two parts:
-- one to introduce target_sockaddr_nl and modify syscall.c
-- one to add the strace part
+As cirrus vga is currently preferred over std(vga) in absence of any user
+choice, this change also sets the default display of spapr machines to
+std as otherwise qemu refuses to start these machines. Not specifying an
+explicit graphics mode is for instance done by 'make check'.
 
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 40bb60ef4c..5a0b76721f 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -152,6 +152,13 @@ struct target_sockaddr_un {
->      uint8_t sun_path[108];
->  };
->  
-> +struct target_sockaddr_nl {
-> +    uint16_t nl_family;     /* AF_NETLINK */
-> +    uint16_t __pad;
-> +    uint32_t nl_pid;
-> +    uint32_t nl_groups;
-> +};
-> +
->  struct target_in_addr {
->      uint32_t s_addr; /* big endian */
->  };
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 8a21d3bcfc..77e36467cd 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -8,6 +8,7 @@
->  #include <arpa/inet.h>
->  #include <netinet/tcp.h>
->  #include <linux/if_packet.h>
-> +#include <linux/netlink.h>
->  #include <sched.h>
->  #include "qemu.h"
->  
-> @@ -398,6 +399,12 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
->              gemu_log("}");
->              break;
->          }
-> +        case AF_NETLINK: {
-> +            struct target_sockaddr_nl *nl = (struct target_sockaddr_nl *)sa;
-> +            gemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
-> +                     nl->nl_pid, nl->nl_groups);
-> +            break;
-> +        }
->          default:
->              gemu_log("{sa_family=%d, sa_data={", sa->sa_family);
->              for (i = 0; i < 13; i++) {
-> @@ -424,6 +431,9 @@ print_socket_domain(int domain)
->      case PF_INET:
->          gemu_log("PF_INET");
->          break;
-> +    case PF_NETLINK:
-> +        gemu_log("PF_NETLINK");
-> +        break;
->      case PF_PACKET:
->          gemu_log("PF_PACKET");
->          break;
-> @@ -473,6 +483,30 @@ print_socket_protocol(int domain, int type, int protocol)
->          return;
->      }
->  
-> +    if (domain == AF_NETLINK) {
+Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
 
-domain uses PF_NETLINK
+---
 
-> +        switch (protocol) {
-> +        case NETLINK_ROUTE:
-> +            gemu_log("NETLINK_ROUTE");
-> +            break;
-> +        case NETLINK_AUDIT:
-> +            gemu_log("NETLINK_AUDIT");
-> +            break;
-> +        case NETLINK_NETFILTER:
-> +            gemu_log("NETLINK_NETFILTER");
-> +            break;
-> +        case NETLINK_RDMA:
-> +            gemu_log("NETLINK_RDMA");
-> +            break;
-> +        case NETLINK_CRYPTO:
-> +            gemu_log("NETLINK_CRYPTO");
-> +            break;
-> +        default:
-> +            gemu_log("%d", protocol);
-> +            break;
-> +        }
+v2
+Adds std as default display for spapr machines
 
-add NETLINK_KOBJECT_UEVENT, it is managed in syscall.c
+Notes
+This change will make all other ppc machines to use cirrusgd as default
+display because QEMU internally prefers that card. If this is considered
+as being too risky, setting the default mode for the other machines as it
+has been done for spapr would bring them back to the previous level.
+However, this is rarely used in the exiting code base.
 
-Thanks,
-Laurent
+Alternatively, using the cirrusgd is possibly considered more an exception
+than the rule these days, so altering the code to prefer stdvga over
+cirrusgd may be the better solution (this should also render the changes
+of v2 obsolete).
+
+Feedback on how to proceed is welcome.
+
+The patch applies to current ppc-for-3.0 minus v1 of the patch.
+---
+ default-configs/ppc-softmmu.mak | 1 +
+ hw/ppc/spapr.c                  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 7e1a3d8135..6f12bf84f0 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -29,6 +29,7 @@ CONFIG_IDE_SII3112=y
+ CONFIG_I2C=y
+ CONFIG_BITBANG_I2C=y
+ CONFIG_M41T80=y
++CONFIG_VGA_CIRRUS=y
+ 
+ # For Macs
+ CONFIG_MAC=y
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b2baec026f..0c12c404d4 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3962,6 +3962,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     mc->no_parallel = 1;
+     mc->default_boot_order = "";
+     mc->default_ram_size = 512 * M_BYTE;
++    mc->default_display = "std";
+     mc->kvm_type = spapr_kvm_type;
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SPAPR_PCI_HOST_BRIDGE);
+     mc->pci_allow_0_address = true;
+-- 
+2.18.0
