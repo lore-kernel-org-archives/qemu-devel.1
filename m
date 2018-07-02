@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fa11R-0007jN-5r
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:45:50 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fa11S-0007kO-QW
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:45:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fa11N-0000Cn-VX
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:45:49 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38156)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fa11Q-0000DO-GZ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:45:50 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:42449)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fa11N-0000CX-LP
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:45:45 -0400
-Received: by mail-wm0-x233.google.com with SMTP id 69-v6so9189477wmf.3
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:45:45 -0700 (PDT)
-Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
-	q17-v6sm19087521wrr.7.2018.07.02.08.45.42 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 02 Jul 2018 08:45:43 -0700 (PDT)
+	id 1fa11Q-0000D9-4p
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:45:48 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id p1-v6so16040727wrs.9
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:45:47 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  2 Jul 2018 17:45:36 +0200
-Message-Id: <1530546340-4366-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/50] More misc patches for 3.0 soft freeze
+Date: Mon,  2 Jul 2018 17:45:38 +0200
+Message-Id: <1530546340-4366-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1530546340-4366-1-git-send-email-pbonzini@redhat.com>
+References: <1530546340-4366-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 48/50] target-i386: Add NPT support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,222 +28,511 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Jan Kiszka <jan.kiszka@siemens.com>
 
-The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-  tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
+This implements NPT suport for SVM by hooking into
+x86_cpu_handle_mmu_fault where it reads the stage-1 page table. Whether
+we need to perform this 2nd stage translation, and how, is decided
+during vmrun and stored in hflags2, along with nested_cr3 and
+nested_pg_mode.
 
-are available in the git repository at:
+As get_hphys performs a direct cpu_vmexit in case of NPT faults, we need
+retaddr in that function. To avoid changing the signature of
+cpu_handle_mmu_fault, this passes the value from tlb_fill to get_hphys
+via the CPU state.
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+This was tested successfully via the Jailhouse hypervisor.
 
-for you to fetch changes up to c40d479207b1bb6569ffde06e9a58e85cd529de0:
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Message-Id: <567473a0-6005-5843-4c73-951f476085ca@web.de>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/cpu.c         |   2 +-
+ target/i386/cpu.h         |   6 ++
+ target/i386/excp_helper.c | 216 +++++++++++++++++++++++++++++++++++++++++++++-
+ target/i386/machine.c     |  21 +++++
+ target/i386/mem_helper.c  |   6 +-
+ target/i386/svm.h         |  14 +++
+ target/i386/svm_helper.c  |  22 +++++
+ 7 files changed, 281 insertions(+), 6 deletions(-)
 
-  tcg: simplify !CONFIG_TCG handling of tb_invalidate_* (2018-07-02 15:41:18 +0200)
-
-----------------------------------------------------------------
-* IEC units series (Philippe)
-* Hyper-V PV TLB flush (Vitaly)
-* git archive detection (Daniel)
-* host serial passthrough fix (David)
-* NPT support for SVM emulation (Jan)
-* x86 "info mem" and "info tlb" fix (Doug)
-
-----------------------------------------------------------------
-Daniel P. Berrangé (1):
-      configure: add sanity check to catch builds from "git archive"
-
-Doug Gale (1):
-      i386/monitor.c: make addresses canonical for "info mem" and "info tlb"
-
-Dr. David Alan Gilbert (1):
-      serial: Open non-block
-
-Jan Kiszka (1):
-      target-i386: Add NPT support
-
-Paolo Bonzini (2):
-      hw/i386: Use the IEC binary prefix definitions
-      tcg: simplify !CONFIG_TCG handling of tb_invalidate_*
-
-Philippe Mathieu-Daudé (43):
-      include: Add IEC binary prefixes in "qemu/units.h"
-      vdi: Use definitions from "qemu/units.h"
-      x86/cpu: Use definitions from "qemu/units.h"
-      checkpatch: Recognize IEC binary prefix definitions
-      hw: Use IEC binary prefix definitions from "qemu/units.h"
-      hw: Directly use "qemu/units.h" instead of "qemu/cutils.h"
-      hw/ivshmem: Use the IEC binary prefix definitions
-      hw/ipack: Use the IEC binary prefix definitions
-      hw/scsi: Use the IEC binary prefix definitions
-      hw/smbios: Use the IEC binary prefix definitions
-      hw/xen: Use the IEC binary prefix definitions
-      hw/tpm: Use the IEC binary prefix definitions
-      hw/block: Use the IEC binary prefix definitions
-      hw/display: Use the IEC binary prefix definitions
-      hw/misc: Use the IEC binary prefix definitions
-      hw/riscv: Use the IEC binary prefix definitions
-      hw/m68k: Use the IEC binary prefix definitions
-      hw/sparc: Use the IEC binary prefix definitions
-      hw/s390x: Use the IEC binary prefix definitions
-      hw/hppa: Use the IEC binary prefix definitions
-      hw/xtensa: Use the IEC binary prefix definitions
-      hw/alpha: Use the IEC binary prefix definitions
-      hw/tricore: Use the IEC binary prefix definitions
-      hw/microblaze: Use the IEC binary prefix definitions
-      hw/nios2: Use the IEC binary prefix definitions
-      hw/cris: Use the IEC binary prefix definitions
-      hw/lm32: Use the IEC binary prefix definitions
-      hw/sh4: Use the IEC binary prefix definitions
-      hw/mips/r4k: Constify params_size
-      hw/mips: Use the IEC binary prefix definitions
-      hw/ppc: Use the IEC binary prefix definitions
-      hw/net: Use the IEC binary prefix definitions
-      hw/usb: Use the IEC binary prefix definitions
-      hw/sd: Use the IEC binary prefix definitions
-      hw/vfio: Use the IEC binary prefix definitions
-      hw/virtio: Use the IEC binary prefix definitions
-      hw/rdma: Use the IEC binary prefix definitions
-      cutils: Do not include "qemu/units.h" directly
-      monitor: Use the IEC binary prefix definitions
-      vl: Use the IEC binary prefix definitions
-      tests/crypto: Use the IEC binary prefix definitions
-      linux-user: Use the IEC binary prefix definitions
-      bsd-user: Use the IEC binary prefix definitions
-
-Vitaly Kuznetsov (1):
-      i386/kvm: add support for Hyper-V TLB flush
-
- accel/stubs/tcg-stub.c                   |   6 -
- block/vdi.c                              |   7 +-
- bsd-user/main.c                          |   5 +-
- chardev/char-serial.c                    |   3 +-
- configure                                |  18 +++
- exec.c                                   |   6 +-
- hw/alpha/typhoon.c                       |  17 ++-
- hw/arm/msf2-soc.c                        |   6 +-
- hw/arm/msf2-som.c                        |   8 +-
- hw/block/m25p80.c                        |   5 +-
- hw/block/nvme.c                          |   3 +-
- hw/block/tc58128.c                       |   3 +-
- hw/block/xen_disk.c                      |   3 +-
- hw/core/loader-fit.c                     |   3 +-
- hw/core/machine.c                        |   4 +-
- hw/cris/axis_dev88.c                     |   3 +-
- hw/display/bochs-display.c               |   9 +-
- hw/display/cirrus_vga.c                  |  10 +-
- hw/display/g364fb.c                      |   4 +-
- hw/display/qxl.c                         |  30 ++---
- hw/display/sm501.c                       |  16 +--
- hw/display/vga-isa-mm.c                  |   5 +-
- hw/display/vga.c                         |   5 +-
- hw/display/virtio-gpu.c                  |   4 +-
- hw/display/vmware_vga.c                  |   3 +-
- hw/display/xenfb.c                       |   3 +-
- hw/hppa/dino.c                           |   3 +-
- hw/hppa/machine.c                        |  12 +-
- hw/i386/acpi-build.c                     |   4 +-
- hw/i386/pc.c                             |  23 ++--
- hw/i386/pc_piix.c                        |   3 +-
- hw/i386/pc_q35.c                         |   3 +-
- hw/i386/pc_sysfw.c                       |  10 +-
- hw/i386/xen/xen-mapcache.c               |   3 +-
- hw/ipack/tpci200.c                       |   5 +-
- hw/lm32/lm32_boards.c                    |  13 +-
- hw/lm32/milkymist.c                      |  10 +-
- hw/m68k/mcf5208.c                        |   3 +-
- hw/microblaze/petalogix_ml605_mmu.c      |   7 +-
- hw/microblaze/petalogix_s3adsp1800_mmu.c |   7 +-
- hw/mips/boston.c                         |  30 ++---
- hw/mips/mips_fulong2e.c                  |   7 +-
- hw/mips/mips_malta.c                     |  25 ++--
- hw/mips/mips_r4k.c                       |  15 ++-
- hw/misc/auxbus.c                         |   3 +-
- hw/misc/edu.c                            |   3 +-
- hw/misc/ivshmem.c                        |   3 +-
- hw/misc/mips_itu.c                       |   3 +-
- hw/net/e1000e.c                          |   7 +-
- hw/net/e1000x_common.c                   |   3 +-
- hw/net/eepro100.c                        |   3 +-
- hw/net/ne2000.h                          |   5 +-
- hw/nios2/boot.c                          |   6 +-
- hw/nvram/spapr_nvram.c                   |  11 +-
- hw/pci-host/prep.c                       |   3 +-
- hw/pci-host/xilinx-pcie.c                |   5 +-
- hw/ppc/e500.c                            |  13 +-
- hw/ppc/e500plat.c                        |   3 +-
- hw/ppc/mac.h                             |   3 +-
- hw/ppc/mac_newworld.c                    |   1 -
- hw/ppc/mac_oldworld.c                    |   9 +-
- hw/ppc/pnv.c                             |   6 +-
- hw/ppc/ppc405_boards.c                   |   9 +-
- hw/ppc/ppc405_uc.c                       |   7 +-
- hw/ppc/ppc440_bamboo.c                   |   5 +-
- hw/ppc/ppc440_uc.c                       |  28 ++--
- hw/ppc/ppc4xx_devs.c                     |  22 ++--
- hw/ppc/ppce500_spin.c                    |   3 +-
- hw/ppc/prep.c                            |   6 +-
- hw/ppc/rs6000_mc.c                       |  13 +-
- hw/ppc/sam460ex.c                        |  18 +--
- hw/ppc/spapr.c                           |  18 +--
- hw/ppc/spapr_rtas.c                      |   4 +-
- hw/ppc/virtex_ml507.c                    |   7 +-
- hw/rdma/vmw/pvrdma.h                     |   3 +-
- hw/riscv/virt.c                          |   3 +-
- hw/s390x/s390-skeys.c                    |   3 +-
- hw/s390x/s390-stattrib.c                 |   3 +-
- hw/s390x/sclp.c                          |   3 +-
- hw/scsi/scsi-disk.c                      |   9 +-
- hw/sd/sd.c                               |   8 +-
- hw/sd/sdhci.c                            |   8 +-
- hw/sh4/r2d.c                             |   3 +-
- hw/smbios/smbios.c                       |  15 +--
- hw/sparc/leon3.c                         |  10 +-
- hw/sparc/sun4m.c                         |  10 +-
- hw/sparc64/niagara.c                     |   3 +-
- hw/sparc64/sun4u.c                       |   4 +-
- hw/tricore/tricore_testboard.c           |  13 +-
- hw/usb/ccid-card-passthru.c              |   9 +-
- hw/usb/combined-packet.c                 |   3 +-
- hw/usb/dev-smartcard-reader.c            |   3 +-
- hw/usb/redirect.c                        |   3 +-
- hw/vfio/pci-quirks.c                     |   9 +-
- hw/vfio/pci.c                            |   3 +-
- hw/xenpv/xen_domainbuild.c               |  13 +-
- hw/xtensa/xtfpga.c                       |   9 +-
- include/exec/exec-all.h                  |   8 +-
- include/hw/acpi/tpm.h                    |   3 +-
- include/hw/display/xlnx_dp.h             |   5 +-
- include/hw/intc/mips_gic.h               |   3 +-
- include/hw/mips/bios.h                   |   3 +-
- include/hw/net/allwinner_emac.h          |   5 +-
- include/hw/ppc/spapr.h                   |   5 +-
- include/hw/virtio/virtio-net.h           |   3 +-
- include/qemu/cutils.h                    |   7 -
- include/qemu/units.h                     |  20 +++
- linux-user/main.c                        |   5 +-
- monitor.c                                |   3 +-
- scripts/checkpatch.pl                    |   1 +
- target/i386/cpu.c                        |   7 +-
- target/i386/cpu.h                        |   7 +
- target/i386/excp_helper.c                | 216 ++++++++++++++++++++++++++++++-
- target/i386/hyperv-proto.h               |   1 +
- target/i386/kvm.c                        |  15 ++-
- target/i386/machine.c                    |  21 +++
- target/i386/mem_helper.c                 |   6 +-
- target/i386/monitor.c                    |  76 ++++++-----
- target/i386/svm.h                        |  14 ++
- target/i386/svm_helper.c                 |  22 ++++
- target/ppc/mmu_helper.c                  |   8 +-
- target/xtensa/helper.c                   |   5 +-
- tests/benchmark-crypto-cipher.c          |   6 +-
- tests/benchmark-crypto-hash.c            |   5 +-
- tests/benchmark-crypto-hmac.c            |   6 +-
- tests/test-cutils.c                      |  21 +--
- tests/test-keyval.c                      |   7 +-
- tests/test-qemu-opts.c                   |   9 +-
- vl.c                                     |   5 +-
- 129 files changed, 840 insertions(+), 440 deletions(-)
- create mode 100644 include/qemu/units.h
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index bdbd446..b0b87c3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -749,7 +749,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+ #define TCG_EXT3_FEATURES (CPUID_EXT3_LAHF_LM | CPUID_EXT3_SVM | \
+           CPUID_EXT3_CR8LEG | CPUID_EXT3_ABM | CPUID_EXT3_SSE4A)
+ #define TCG_EXT4_FEATURES 0
+-#define TCG_SVM_FEATURES 0
++#define TCG_SVM_FEATURES CPUID_SVM_NPT
+ #define TCG_KVM_FEATURES 0
+ #define TCG_7_0_EBX_FEATURES (CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_SMAP | \
+           CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ADX | \
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 8b1ddfe..2c5a0d9 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -211,6 +211,7 @@ typedef enum X86Seg {
+ #define HF2_VINTR_SHIFT          3 /* value of V_INTR_MASKING bit */
+ #define HF2_SMM_INSIDE_NMI_SHIFT 4 /* CPU serving SMI nested inside NMI */
+ #define HF2_MPX_PR_SHIFT         5 /* BNDCFGx.BNDPRESERVE */
++#define HF2_NPT_SHIFT            6 /* Nested Paging enabled */
+ 
+ #define HF2_GIF_MASK            (1 << HF2_GIF_SHIFT)
+ #define HF2_HIF_MASK            (1 << HF2_HIF_SHIFT)
+@@ -218,6 +219,7 @@ typedef enum X86Seg {
+ #define HF2_VINTR_MASK          (1 << HF2_VINTR_SHIFT)
+ #define HF2_SMM_INSIDE_NMI_MASK (1 << HF2_SMM_INSIDE_NMI_SHIFT)
+ #define HF2_MPX_PR_MASK         (1 << HF2_MPX_PR_SHIFT)
++#define HF2_NPT_MASK            (1 << HF2_NPT_SHIFT)
+ 
+ #define CR0_PE_SHIFT 0
+ #define CR0_MP_SHIFT 1
+@@ -1265,12 +1267,16 @@ typedef struct CPUX86State {
+     uint16_t intercept_dr_read;
+     uint16_t intercept_dr_write;
+     uint32_t intercept_exceptions;
++    uint64_t nested_cr3;
++    uint32_t nested_pg_mode;
+     uint8_t v_tpr;
+ 
+     /* KVM states, automatically cleared on reset */
+     uint8_t nmi_injected;
+     uint8_t nmi_pending;
+ 
++    uintptr_t retaddr;
++
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
+index cb4d1b7..37a33d5 100644
+--- a/target/i386/excp_helper.c
++++ b/target/i386/excp_helper.c
+@@ -157,6 +157,209 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+ 
+ #else
+ 
++static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
++                        int *prot)
++{
++    CPUX86State *env = &X86_CPU(cs)->env;
++    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
++    uint64_t ptep, pte;
++    uint64_t exit_info_1 = 0;
++    target_ulong pde_addr, pte_addr;
++    uint32_t page_offset;
++    int page_size;
++
++    if (likely(!(env->hflags2 & HF2_NPT_MASK))) {
++        return gphys;
++    }
++
++    if (!(env->nested_pg_mode & SVM_NPT_NXE)) {
++        rsvd_mask |= PG_NX_MASK;
++    }
++
++    if (env->nested_pg_mode & SVM_NPT_PAE) {
++        uint64_t pde, pdpe;
++        target_ulong pdpe_addr;
++
++#ifdef TARGET_X86_64
++        if (env->nested_pg_mode & SVM_NPT_LMA) {
++            uint64_t pml5e;
++            uint64_t pml4e_addr, pml4e;
++
++            pml5e = env->nested_cr3;
++            ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
++
++            pml4e_addr = (pml5e & PG_ADDRESS_MASK) +
++                    (((gphys >> 39) & 0x1ff) << 3);
++            pml4e = x86_ldq_phys(cs, pml4e_addr);
++            if (!(pml4e & PG_PRESENT_MASK)) {
++                goto do_fault;
++            }
++            if (pml4e & (rsvd_mask | PG_PSE_MASK)) {
++                goto do_fault_rsvd;
++            }
++            if (!(pml4e & PG_ACCESSED_MASK)) {
++                pml4e |= PG_ACCESSED_MASK;
++                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
++            }
++            ptep &= pml4e ^ PG_NX_MASK;
++            pdpe_addr = (pml4e & PG_ADDRESS_MASK) +
++                    (((gphys >> 30) & 0x1ff) << 3);
++            pdpe = x86_ldq_phys(cs, pdpe_addr);
++            if (!(pdpe & PG_PRESENT_MASK)) {
++                goto do_fault;
++            }
++            if (pdpe & rsvd_mask) {
++                goto do_fault_rsvd;
++            }
++            ptep &= pdpe ^ PG_NX_MASK;
++            if (!(pdpe & PG_ACCESSED_MASK)) {
++                pdpe |= PG_ACCESSED_MASK;
++                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
++            }
++            if (pdpe & PG_PSE_MASK) {
++                /* 1 GB page */
++                page_size = 1024 * 1024 * 1024;
++                pte_addr = pdpe_addr;
++                pte = pdpe;
++                goto do_check_protect;
++            }
++        } else
++#endif
++        {
++            pdpe_addr = (env->nested_cr3 & ~0x1f) + ((gphys >> 27) & 0x18);
++            pdpe = x86_ldq_phys(cs, pdpe_addr);
++            if (!(pdpe & PG_PRESENT_MASK)) {
++                goto do_fault;
++            }
++            rsvd_mask |= PG_HI_USER_MASK;
++            if (pdpe & (rsvd_mask | PG_NX_MASK)) {
++                goto do_fault_rsvd;
++            }
++            ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
++        }
++
++        pde_addr = (pdpe & PG_ADDRESS_MASK) + (((gphys >> 21) & 0x1ff) << 3);
++        pde = x86_ldq_phys(cs, pde_addr);
++        if (!(pde & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        if (pde & rsvd_mask) {
++            goto do_fault_rsvd;
++        }
++        ptep &= pde ^ PG_NX_MASK;
++        if (pde & PG_PSE_MASK) {
++            /* 2 MB page */
++            page_size = 2048 * 1024;
++            pte_addr = pde_addr;
++            pte = pde;
++            goto do_check_protect;
++        }
++        /* 4 KB page */
++        if (!(pde & PG_ACCESSED_MASK)) {
++            pde |= PG_ACCESSED_MASK;
++            x86_stl_phys_notdirty(cs, pde_addr, pde);
++        }
++        pte_addr = (pde & PG_ADDRESS_MASK) + (((gphys >> 12) & 0x1ff) << 3);
++        pte = x86_ldq_phys(cs, pte_addr);
++        if (!(pte & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        if (pte & rsvd_mask) {
++            goto do_fault_rsvd;
++        }
++        /* combine pde and pte nx, user and rw protections */
++        ptep &= pte ^ PG_NX_MASK;
++        page_size = 4096;
++    } else {
++        uint32_t pde;
++
++        /* page directory entry */
++        pde_addr = (env->nested_cr3 & ~0xfff) + ((gphys >> 20) & 0xffc);
++        pde = x86_ldl_phys(cs, pde_addr);
++        if (!(pde & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        ptep = pde | PG_NX_MASK;
++
++        /* if PSE bit is set, then we use a 4MB page */
++        if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
++            page_size = 4096 * 1024;
++            pte_addr = pde_addr;
++
++            /* Bits 20-13 provide bits 39-32 of the address, bit 21 is reserved.
++             * Leave bits 20-13 in place for setting accessed/dirty bits below.
++             */
++            pte = pde | ((pde & 0x1fe000LL) << (32 - 13));
++            rsvd_mask = 0x200000;
++            goto do_check_protect_pse36;
++        }
++
++        if (!(pde & PG_ACCESSED_MASK)) {
++            pde |= PG_ACCESSED_MASK;
++            x86_stl_phys_notdirty(cs, pde_addr, pde);
++        }
++
++        /* page directory entry */
++        pte_addr = (pde & ~0xfff) + ((gphys >> 10) & 0xffc);
++        pte = x86_ldl_phys(cs, pte_addr);
++        if (!(pte & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        /* combine pde and pte user and rw protections */
++        ptep &= pte | PG_NX_MASK;
++        page_size = 4096;
++        rsvd_mask = 0;
++    }
++
++ do_check_protect:
++    rsvd_mask |= (page_size - 1) & PG_ADDRESS_MASK & ~PG_PSE_PAT_MASK;
++ do_check_protect_pse36:
++    if (pte & rsvd_mask) {
++        goto do_fault_rsvd;
++    }
++    ptep ^= PG_NX_MASK;
++
++    if (!(ptep & PG_USER_MASK)) {
++        goto do_fault_protect;
++    }
++    if (ptep & PG_NX_MASK) {
++        if (access_type == MMU_INST_FETCH) {
++            goto do_fault_protect;
++        }
++        *prot &= ~PAGE_EXEC;
++    }
++    if (!(ptep & PG_RW_MASK)) {
++        if (access_type == MMU_DATA_STORE) {
++            goto do_fault_protect;
++        }
++        *prot &= ~PAGE_WRITE;
++    }
++
++    pte &= PG_ADDRESS_MASK & ~(page_size - 1);
++    page_offset = gphys & (page_size - 1);
++    return pte + page_offset;
++
++ do_fault_rsvd:
++    exit_info_1 |= SVM_NPTEXIT_RSVD;
++ do_fault_protect:
++    exit_info_1 |= SVM_NPTEXIT_P;
++ do_fault:
++    x86_stq_phys(cs, env->vm_vmcb + offsetof(struct vmcb, control.exit_info_2),
++                 gphys);
++    exit_info_1 |= SVM_NPTEXIT_US;
++    if (access_type == MMU_DATA_STORE) {
++        exit_info_1 |= SVM_NPTEXIT_RW;
++    } else if (access_type == MMU_INST_FETCH) {
++        exit_info_1 |= SVM_NPTEXIT_ID;
++    }
++    if (prot) {
++        exit_info_1 |= SVM_NPTEXIT_GPA;
++    } else { /* page table access */
++        exit_info_1 |= SVM_NPTEXIT_GPT;
++    }
++    cpu_vmexit(env, SVM_EXIT_NPF, exit_info_1, env->retaddr);
++}
++
+ /* return value:
+  * -1 = cannot handle fault
+  * 0  = nothing more to do
+@@ -224,6 +427,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+             if (la57) {
+                 pml5e_addr = ((env->cr[3] & ~0xfff) +
+                         (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
++                pml5e_addr = get_hphys(cs, pml5e_addr, MMU_DATA_STORE, NULL);
+                 pml5e = x86_ldq_phys(cs, pml5e_addr);
+                 if (!(pml5e & PG_PRESENT_MASK)) {
+                     goto do_fault;
+@@ -243,6 +447,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+ 
+             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+                     (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
++            pml4e_addr = get_hphys(cs, pml4e_addr, MMU_DATA_STORE, false);
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -257,6 +462,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+             ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+                 a20_mask;
++            pdpe_addr = get_hphys(cs, pdpe_addr, MMU_DATA_STORE, NULL);
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -282,6 +488,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+             /* XXX: load them when cr3 is loaded ? */
+             pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+                 a20_mask;
++            pdpe_addr = get_hphys(cs, pdpe_addr, MMU_DATA_STORE, false);
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -295,6 +502,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+ 
+         pde_addr = ((pdpe & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
+             a20_mask;
++        pde_addr = get_hphys(cs, pde_addr, MMU_DATA_STORE, NULL);
+         pde = x86_ldq_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -317,6 +525,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         }
+         pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+             a20_mask;
++        pte_addr = get_hphys(cs, pte_addr, MMU_DATA_STORE, NULL);
+         pte = x86_ldq_phys(cs, pte_addr);
+         if (!(pte & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -333,6 +542,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         /* page directory entry */
+         pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) &
+             a20_mask;
++        pde_addr = get_hphys(cs, pde_addr, MMU_DATA_STORE, NULL);
+         pde = x86_ldl_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -360,6 +570,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         /* page directory entry */
+         pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) &
+             a20_mask;
++        pte_addr = get_hphys(cs, pte_addr, MMU_DATA_STORE, NULL);
+         pte = x86_ldl_phys(cs, pte_addr);
+         if (!(pte & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -442,12 +653,13 @@ do_check_protect_pse36:
+ 
+     /* align to page_size */
+     pte &= PG_ADDRESS_MASK & ~(page_size - 1);
++    page_offset = addr & (page_size - 1);
++    paddr = get_hphys(cs, pte + page_offset, is_write1, &prot);
+ 
+     /* Even if 4MB pages, we map only one 4KB page in the cache to
+        avoid filling it too fast */
+     vaddr = addr & TARGET_PAGE_MASK;
+-    page_offset = vaddr & (page_size - 1);
+-    paddr = pte + page_offset;
++    paddr &= TARGET_PAGE_MASK;
+ 
+     assert(prot & (1 << is_write1));
+     tlb_set_page_with_attrs(cs, vaddr, paddr, cpu_get_mem_attrs(env),
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 4d98d36..8b64dff 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -935,6 +935,26 @@ static const VMStateDescription vmstate_msr_virt_ssbd = {
+     }
+ };
+ 
++static bool svm_npt_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return !!(env->hflags2 & HF2_NPT_MASK);
++}
++
++static const VMStateDescription vmstate_svm_npt = {
++    .name = "cpu/svn_npt",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = svm_npt_needed,
++    .fields = (VMStateField[]){
++        VMSTATE_UINT64(env.nested_cr3, X86CPU),
++        VMSTATE_UINT32(env.nested_pg_mode, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ VMStateDescription vmstate_x86_cpu = {
+     .name = "cpu",
+     .version_id = 12,
+@@ -1059,6 +1079,7 @@ VMStateDescription vmstate_x86_cpu = {
+         &vmstate_mcg_ext_ctl,
+         &vmstate_msr_intel_pt,
+         &vmstate_msr_virt_ssbd,
++        &vmstate_svm_npt,
+         NULL
+     }
+ };
+diff --git a/target/i386/mem_helper.c b/target/i386/mem_helper.c
+index a8ae694..30c26b9 100644
+--- a/target/i386/mem_helper.c
++++ b/target/i386/mem_helper.c
+@@ -202,13 +202,13 @@ void helper_boundl(CPUX86State *env, target_ulong a0, int v)
+ void tlb_fill(CPUState *cs, target_ulong addr, int size,
+               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+ {
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
+     int ret;
+ 
++    env->retaddr = retaddr;
+     ret = x86_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+     if (ret) {
+-        X86CPU *cpu = X86_CPU(cs);
+-        CPUX86State *env = &cpu->env;
+-
+         raise_exception_err_ra(env, cs->exception_index, env->error_code, retaddr);
+     }
+ }
+diff --git a/target/i386/svm.h b/target/i386/svm.h
+index 922c8fd..23a3a04 100644
+--- a/target/i386/svm.h
++++ b/target/i386/svm.h
+@@ -130,6 +130,20 @@
+ 
+ #define SVM_CR0_SELECTIVE_MASK (1 << 3 | 1) /* TS and MP */
+ 
++#define SVM_NPT_ENABLED     (1 << 0)
++
++#define SVM_NPT_PAE         (1 << 0)
++#define SVM_NPT_LMA         (1 << 1)
++#define SVM_NPT_NXE         (1 << 2)
++
++#define SVM_NPTEXIT_P       (1ULL << 0)
++#define SVM_NPTEXIT_RW      (1ULL << 1)
++#define SVM_NPTEXIT_US      (1ULL << 2)
++#define SVM_NPTEXIT_RSVD    (1ULL << 3)
++#define SVM_NPTEXIT_ID      (1ULL << 4)
++#define SVM_NPTEXIT_GPA     (1ULL << 32)
++#define SVM_NPTEXIT_GPT     (1ULL << 33)
++
+ struct QEMU_PACKED vmcb_control_area {
+ 	uint16_t intercept_cr_read;
+ 	uint16_t intercept_cr_write;
+diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+index f245aec..342ece0 100644
+--- a/target/i386/svm_helper.c
++++ b/target/i386/svm_helper.c
+@@ -124,6 +124,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
+ {
+     CPUState *cs = CPU(x86_env_get_cpu(env));
+     target_ulong addr;
++    uint64_t nested_ctl;
+     uint32_t event_inj;
+     uint32_t int_ctl;
+ 
+@@ -206,6 +207,26 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
+                                                   control.intercept_exceptions
+                                                   ));
+ 
++    nested_ctl = x86_ldq_phys(cs, env->vm_vmcb + offsetof(struct vmcb,
++                                                          control.nested_ctl));
++    if (nested_ctl & SVM_NPT_ENABLED) {
++        env->nested_cr3 = x86_ldq_phys(cs,
++                                env->vm_vmcb + offsetof(struct vmcb,
++                                                        control.nested_cr3));
++        env->hflags2 |= HF2_NPT_MASK;
++
++        env->nested_pg_mode = 0;
++        if (env->cr[4] & CR4_PAE_MASK) {
++            env->nested_pg_mode |= SVM_NPT_PAE;
++        }
++        if (env->hflags & HF_LMA_MASK) {
++            env->nested_pg_mode |= SVM_NPT_LMA;
++        }
++        if (env->efer & MSR_EFER_NXE) {
++            env->nested_pg_mode |= SVM_NPT_NXE;
++        }
++    }
++
+     /* enable intercepts */
+     env->hflags |= HF_SVMI_MASK;
+ 
+@@ -616,6 +637,7 @@ void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
+         x86_stl_phys(cs,
+                  env->vm_vmcb + offsetof(struct vmcb, control.int_state), 0);
+     }
++    env->hflags2 &= ~HF2_NPT_MASK;
+ 
+     /* Save the VM state in the vmcb */
+     svm_save_seg(env, env->vm_vmcb + offsetof(struct vmcb, save.es),
 -- 
 1.8.3.1
