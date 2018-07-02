@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fZwFM-0005wX-Vp
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:39:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fZwMP-0007Xk-EH
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:47:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fZwFI-0005IG-W2
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:39:53 -0400
-References: <20180702093755.7384-1-david@redhat.com>
-	<20180702093755.7384-5-david@redhat.com>
-	<20180702123141.4a499198@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <1bb74240-d1ce-7a1e-69df-f2c7c70d1fd9@redhat.com>
-Date: Mon, 2 Jul 2018 12:39:43 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fZwMO-0000LH-PW
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:47:09 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:39690)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fZwMO-0000LB-KR
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 06:47:08 -0400
+Received: by mail-oi0-x241.google.com with SMTP id d189-v6so6762912oib.6
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 03:47:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180702123141.4a499198@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] pc-dimm: assign and verify the
- "addr" property during pre_plug
+In-Reply-To: <20180630000242.29594-1-richard.henderson@linaro.org>
+References: <20180630000242.29594-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Jul 2018 11:46:47 +0100
+Message-ID: <CAFEAcA-go_e5=NP1ZMbkCz9MomPwUe8F=YU7JQM59ZR+p+JC9Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix qemu-system-aarch64 crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 02.07.2018 12:31, Igor Mammedov wrote:
-> On Mon,  2 Jul 2018 11:37:55 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> We can assign and verify the slot before realizing and trying to plug.
-> s/slot/"addr"/
-> 
->> reading/writing the address property should never fail for DIMMs, so let's
->> reduce error handling a bit by using &error_abort. Getting access to the
->> memory region now might however fail. So forward errors from
->> get_memory_region() properly.
->>
->> As all memory devices should use the alignment of the underlying memory
->> region for guest physical address asignment, do detection of the
->> alignment in pc_dimm_pre_plug(), but allow pc.c to overwrite the
->> alignment for compatibility handling.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> with commit message fixup,
-> 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> For future reference, I don't really like 2 things about patch
->  1: mixes both error handling and functional changes (should be separate patches)
->  2: that property setter may crash QEMU at preplug stage
->     where it should gracefully error out (so put proper error check
->     as follow up patch or respin this one maybe taking in account #1.)
+On 30 June 2018 at 01:02, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The sequence of events was
+>   (1) Kernel executed a disabled sve insn,
+>   (2) Undefined Instruction trap went to EL3,
+>   (3) Lookup of the exception handler saw el3 and returned asidx 1,
+>   (4) Which hadn't been set up.
+>
+> So there's definitely a bug with SVE exception routing.
+> That said...
+>
+> With just the first patch, the kernel goes into a silly exception loop
+> which is understandable.  With just the second patch, qemu gets SIGABRT
+> instead of SIGSEGV, which is definitely easier to debug.
+>
+> I think I'm in favor of both patches, but you might say we shouldn't
+> have to have the first one and just apply the second.
 
-Thanks for the review.
+I think my vote is for just the second -- a CPU without the
+security extensions should never be emitting transactions
+with attrs.secure true, so that's a bug we want to track down.
+Suitably placed assert()s do a better job of that than sweeping
+the problem under the carpet by squashing the attributes
+in arm_asidx_from_attrs().
 
-1. could have been factored out into a separate patch.
-
-Regarding 2, I won't respin as long there is nothing else to take care
-of. As long as we are in the pc-dimm world and we have static
-properties, I don't see any reason to add error handling that cannot
-happen. It will be different once we factor out more stuff into memory
-device code. I assume you have a different opinion about that, but I
-consider these nits.
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
