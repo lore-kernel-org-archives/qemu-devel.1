@@ -1,13 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fa2Gc-0004Le-9U
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fa2Lq-0008E6-6H
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fa2Ga-0000oL-TT
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:33 -0400
-Date: Mon, 2 Jul 2018 10:05:22 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180702170522.GA9885@roeck-us.net>
+	(envelope-from <peter.maydell@linaro.org>) id 1fa2Lp-0004i2-FN
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:10:58 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fa2Lp-0004hE-AL
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:10:57 -0400
+Received: by mail-oi0-x243.google.com with SMTP id i12-v6so13329353oik.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 10:10:57 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180702170522.GA9885@roeck-us.net>
 References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
 	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
 	<20180626175900.GA4307@roeck-us.net>
@@ -16,10 +22,11 @@ References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
 	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
 	<20180702162733.GB32333@roeck-us.net>
 	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
+	<20180702170522.GA9885@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Jul 2018 18:10:36 +0100
+Message-ID: <CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
  identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
@@ -30,35 +37,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Guenter Roeck <linux@roeck-us.net>
 Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jul 02, 2018 at 05:46:39PM +0100, Peter Maydell wrote:
-> On 2 July 2018 at 17:27, Guenter Roeck <linux@roeck-us.net> wrote:
-> > Again, in my observation the boot sometimes stalls without my
-> > patch. Maybe there is a better fix, but the code as-is doesn't
-> > work for me. All I can say is that the current code does not set
-> > one-shot mode when it should, and that seems wrong.
-> >
-> > You could of course take out the zero delta warning. Personally
-> > I would caution against that - whenever I have seen that warning,
-> > it suggested that something is wrong with the emulation, and it
-> > helped me track down the problem. Your call, of course. Also,
-> > I don't think taking out the warning would fix my stall problem.
-> 
-> Can you provide me with something I can reproduce with, then,
-> please? My kernel + buildroot don't repro the problem: it always
-> seems to boot fine. I had a look at your testbuild git repo
-> but couldn't manage to figure out how to build a binary
-> from it. I'm ok with building a QEMU from your branch for
-> testing this, but I'd rather not try to figure out how to
-> reproduce your kernel and root filesystem setup.
-> 
+On 2 July 2018 at 18:05, Guenter Roeck <linux@roeck-us.net> wrote:
+> I don't think I'll have more time available to spend on this
+> anytime soon. If it works for you, just drop the patch. I can
+> keep it local in my branch. My version of qemu is different anyway,
+> after all.
 
-I don't think I'll have more time available to spend on this
-anytime soon. If it works for you, just drop the patch. I can
-keep it local in my branch. My version of qemu is different anyway,
-after all.
+I'd kind of like to fix the bug, though. I'd just like you
+to provide the image you're testing with...
 
-Thanks,
-Guenter
+thanks
+-- PMM
