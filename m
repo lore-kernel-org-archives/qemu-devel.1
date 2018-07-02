@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0Tg-0003wB-6k
+	(envelope-from <shorne@gmail.com>) id 1fa0Tg-0003wJ-BI
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0Tc-0007oD-Td
+	(envelope-from <shorne@gmail.com>) id 1fa0Tf-0007pP-8S
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:56 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:44825)
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:40443)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0Tc-0007nv-Oz
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:52 -0400
-Received: by mail-pl0-x241.google.com with SMTP id m16-v6so8092925pls.11
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:10:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0Tf-0007pF-2R
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:55 -0400
+Received: by mail-pf0-x22c.google.com with SMTP id z24-v6so7656123pfe.7
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:10:55 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 00:10:03 +0900
-Message-Id: <20180702151023.24532-6-shorne@gmail.com>
+Date: Tue,  3 Jul 2018 00:10:04 +0900
+Message-Id: <20180702151023.24532-7-shorne@gmail.com>
 In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
 References: <20180702151023.24532-1-shorne@gmail.com>
-Subject: [Qemu-devel] [PULL v2 05/25] target/openrisc: Use exit_tb instead
- of CPU_INTERRUPT_EXITTB
+Subject: [Qemu-devel] [PULL v2 06/25] target/openrisc: Fix singlestep_enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +30,68 @@ Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henders
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-No need to use the interrupt mechanisms when we can
-simply exit the tb directly.
+We failed to store to cpu_pc before raising the exception,
+which caused us to re-execute the same insn that we stepped.
 
 Reviewed-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/interrupt_helper.c | 3 +--
- target/openrisc/translate.c        | 6 +++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ target/openrisc/translate.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
-index 56620e0571..b865738f8b 100644
---- a/target/openrisc/interrupt_helper.c
-+++ b/target/openrisc/interrupt_helper.c
-@@ -26,7 +26,6 @@
- void HELPER(rfe)(CPUOpenRISCState *env)
- {
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
- #ifndef CONFIG_USER_ONLY
-     int need_flush_tlb = (cpu->env.sr & (SR_SM | SR_IME | SR_DME)) ^
-                          (cpu->env.esr & (SR_SM | SR_IME | SR_DME));
-@@ -53,8 +52,8 @@ void HELPER(rfe)(CPUOpenRISCState *env)
-     }
- 
-     if (need_flush_tlb) {
-+        CPUState *cs = CPU(cpu);
-         tlb_flush(cs);
-     }
- #endif
--    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
- }
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index f5af515979..43bdf378eb 100644
+index 43bdf378eb..22848b17ad 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -37,6 +37,7 @@
- #include "exec/log.h"
+@@ -1335,31 +1335,30 @@ static void openrisc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
  
- /* is_jmp field values */
-+#define DISAS_EXIT    DISAS_TARGET_0  /* force exit to main loop */
- #define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
- 
- typedef struct DisasContext {
-@@ -1133,7 +1134,7 @@ static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
-         gen_illegal_exception(dc);
-     } else {
-         gen_helper_rfe(cpu_env);
--        dc->base.is_jmp = DISAS_UPDATE;
-+        dc->base.is_jmp = DISAS_EXIT;
++    /* If we have already exited the TB, nothing following has effect.  */
++    if (dc->base.is_jmp == DISAS_NORETURN) {
++        return;
++    }
++
+     if ((dc->tb_flags & TB_FLAGS_DFLAG ? 1 : 0) != (dc->delayed_branch != 0)) {
+         tcg_gen_movi_i32(cpu_dflag, dc->delayed_branch != 0);
      }
- #endif
-     return true;
-@@ -1353,8 +1354,7 @@ static void openrisc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
-         case DISAS_NORETURN:
-             break;
-         case DISAS_UPDATE:
--            /* indicate that the hash table must be used
--               to find the next TB */
-+        case DISAS_EXIT:
+ 
+     tcg_gen_movi_tl(cpu_ppc, dc->base.pc_next - 4);
+-    if (dc->base.is_jmp == DISAS_NEXT) {
+-        dc->base.is_jmp = DISAS_UPDATE;
+-        tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
+-    }
+-    if (unlikely(dc->base.singlestep_enabled)) {
+-        gen_exception(dc, EXCP_DEBUG);
+-    } else {
+-        switch (dc->base.is_jmp) {
+-        case DISAS_TOO_MANY:
+-            gen_goto_tb(dc, 0, dc->base.pc_next);
+-            break;
+-        case DISAS_NORETURN:
+-            break;
+-        case DISAS_UPDATE:
+-        case DISAS_EXIT:
++    switch (dc->base.is_jmp) {
++    case DISAS_TOO_MANY:
++        gen_goto_tb(dc, 0, dc->base.pc_next);
++        break;
++    case DISAS_UPDATE:
++    case DISAS_EXIT:
++        if (unlikely(dc->base.singlestep_enabled)) {
++            gen_exception(dc, EXCP_DEBUG);
++        } else {
              tcg_gen_exit_tb(NULL, 0);
-             break;
-         default:
+-            break;
+-        default:
+-            g_assert_not_reached();
+         }
++        break;
++    default:
++        g_assert_not_reached();
+     }
+ }
+ 
 -- 
 2.17.0
