@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fa6AS-00059E-QQ
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 17:15:29 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fa6J1-0007z2-RX
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 17:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fa6AO-0007pb-QP
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 17:15:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51602 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fa6AO-0007p2-Cj
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 17:15:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0793D401EF2E
-	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 21:15:24 +0000 (UTC)
-References: <20180702162218.13678-1-armbru@redhat.com>
-	<20180702162218.13678-9-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <42a6b4dd-c278-2ca2-1843-61f35968c0ef@redhat.com>
-Date: Mon, 2 Jul 2018 16:15:18 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1fa6Iy-0004w3-NQ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 17:24:19 -0400
+Date: Mon, 2 Jul 2018 18:24:11 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180702212411.GG7451@localhost.localdomain>
+References: <153052169663.619548.17452930454532662595.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180702162218.13678-9-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/32] tests/test-qga: Demonstrate the
- guest-agent ignores "id"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <153052169663.619548.17452930454532662595.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v3] spapr: compute default value of
+ "hpt-max-page-size" later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: peterx@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-On 07/02/2018 11:21 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/test-qga.c | 17 +++++++++++++++++
->   1 file changed, 17 insertions(+)
+On Mon, Jul 02, 2018 at 10:54:56AM +0200, Greg Kurz wrote:
+> It is currently not possible to run a pseries-2.12 or older machine
+> with HV KVM. QEMU prints the following and exits right away.
 > 
-> diff --git a/tests/test-qga.c b/tests/test-qga.c
-> index 30c9643257..4edd35535d 100644
-> --- a/tests/test-qga.c
-> +++ b/tests/test-qga.c
-> @@ -227,6 +227,22 @@ static void test_qga_ping(gconstpointer fix)
->       qobject_unref(ret);
->   }
->   
-> +static void test_qga_invalid_id(gconstpointer fix)
-> +{
-> +    /* FIXME "id" is ignored; it should be rejected */
+> qemu-system-ppc64: KVM doesn't support for base page shift 34
+> 
+> The "hpt-max-page-size" capability was recently added to spapr to hide
+> host configuration details from HPT mode guests. Its default value for
+> newer machine types is 64k.
+> 
+> For backwards compatibility, pseries-2.12 and older machine types need
+> a different value. This is handled as usual in a class init function.
+> The default value is 16G, ie, all page sizes supported by POWER7 and
+> newer CPUs, but HV KVM requires guest pages to be hpa contiguous as
+> well as gpa contiguous. The default value is the page size used to
+> back the guest RAM in this case.
+> 
+> Unfortunately kvmppc_hpt_needs_host_contiguous_pages()->kvm_enabled() is
+> called way before KVM init and returns false, even if the user requested
+> KVM. We thus end up selecting 16G, which isn't supported by HV KVM. The
+> default value must be set during machine init, because we can safely
+> assume that KVM is initialized at this point.
+> 
+> We fix this by moving the logic to default_caps_with_cpu(). Since the
+> user cannot pass cap-hpt-max-page-size=0, we set the default to 0 in
+> the pseries-2.12 class init function and use that as a flag to do the
+> real work.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-I might have written:
-
-/* FIXME "id" is ignored; it should either be repeated in the reply, or 
-rejected on input */
-
-> +    const TestFixture *fixture = fix;
-> +    QDict *ret, *val;
-> +
-> +    ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping', 'id': 1}");
-> +    g_assert_nonnull(ret);
-> +    qmp_assert_no_error(ret);
-> +
-> +    val = qdict_get_qdict(ret, "return");
-> +    g_assert(!qdict_haskey(val, "id"));
-
-This is documenting what currently happens, along with the FIXME showing 
-that it is not ideal, so whether or not you improve the comment:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
