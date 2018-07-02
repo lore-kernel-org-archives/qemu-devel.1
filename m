@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2Xv-0000AM-Me
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa2Xw-0000B9-Cw
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2Xu-0006dg-EX
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:27 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa2Xu-0006eK-UF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:28 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  2 Jul 2018 19:22:34 +0200
-Message-Id: <1530552162-15533-8-git-send-email-eric.auger@redhat.com>
+Date: Mon,  2 Jul 2018 19:22:33 +0200
+Message-Id: <1530552162-15533-7-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
 References: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 07/15] hw/arm/virt: Add memory hotplug
- framework
+Subject: [Qemu-devel] [RFC v2 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,143 +22,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+We define a new hotpluggable RAM region (aka. device memory).
+Its base is 2TB GPA. This obviously requires 42b IPA support
+in KVM/ARM, FW and guest kernel. At the moment the device
+memory region is max 2TB.
 
-This patch adds the the memory hot-plug/hot-unplug infrastructure
-in machvirt.
+This is largely inspired of device memory initialization in
+pc machine code.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-
 ---
+ hw/arm/virt.c         | 104 ++++++++++++++++++++++++++++++++++++--------------
+ include/hw/arm/arm.h  |   2 +
+ include/hw/arm/virt.h |   1 +
+ 3 files changed, 79 insertions(+), 28 deletions(-)
 
-v1 -> v2:
-- s/virt_dimm_plug|unplug/virt_memory_plug|unplug
-- s/pc_dimm_memory_plug/pc_dimm_plug
-- reworded title and commit message
-- added pre_plug cb
-- don't handle get_memory_region failure anymore
----
- default-configs/arm-softmmu.mak |  2 ++
- hw/arm/virt.c                   | 68 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 69 insertions(+), 1 deletion(-)
-
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 834d45c..28fe8f3 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -152,3 +152,5 @@ CONFIG_PCI_DESIGNWARE=y
- CONFIG_STRONGARM=y
- CONFIG_HIGHBANK=y
- CONFIG_MUSICPAL=y
-+CONFIG_MEM_HOTPLUG=y
-+
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 6fefb78..7190962 100644
+index 5a4d0bf..6fefb78 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -60,6 +60,8 @@
+@@ -59,6 +59,7 @@
+ #include "qapi/visitor.h"
  #include "standard-headers/linux/input.h"
  #include "hw/arm/smmuv3.h"
- #include "hw/acpi/acpi.h"
-+#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
++#include "hw/acpi/acpi.h"
  
  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1785,6 +1787,53 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
+@@ -94,34 +95,25 @@
+ 
+ #define PLATFORM_BUS_NUM_IRQS 64
+ 
+-/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+- * RAM can go up to the 256GB mark, leaving 256GB of the physical
+- * address space unallocated and free for future use between 256G and 512G.
+- * If we need to provide more RAM to VMs in the future then we need to:
+- *  * allocate a second bank of RAM starting at 2TB and working up
+- *  * fix the DT and ACPI table generation code in QEMU to correctly
+- *    report two split lumps of RAM to the guest
+- *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
+- * (We don't want to fill all the way up to 512GB with RAM because
+- * we might want it for non-RAM purposes later. Conversely it seems
+- * reasonable to assume that anybody configuring a VM with a quarter
+- * of a terabyte of RAM will be doing it on a host with more than a
+- * terabyte of physical address space.)
+- */
+-#define RAMLIMIT_GB 255
+-#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
++#define SZ_64K 0x10000
++#define SZ_1G (1024ULL * 1024 * 1024)
+ 
+ /* Addresses and sizes of our components.
+- * 0..128MB is space for a flash device so we can run bootrom code such as UEFI.
+- * 128MB..256MB is used for miscellaneous device I/O.
+- * 256MB..1GB is reserved for possible future PCI support (ie where the
+- * PCI memory window will go if we add a PCI host controller).
+- * 1GB and up is RAM (which may happily spill over into the
+- * high memory region beyond 4GB).
+- * This represents a compromise between how much RAM can be given to
+- * a 32 bit VM and leaving space for expansion and in particular for PCI.
+- * Note that devices should generally be placed at multiples of 0x10000,
++ * 0..128MB is space for a flash device so we can run bootrom code such as UEFI,
++ * 128MB..256MB is used for miscellaneous device I/O,
++ * 256MB..1GB is used for PCI host controller,
++ * 1GB..256GB is RAM (not hotpluggable),
++ * 256GB..512GB: is left for device I/O (non RAM purpose),
++ * 512GB..1TB: high mem PCI MMIO region,
++ * 2TB..4TB is used for hot-pluggable DIMM (assumes 42b GPA is supported).
++ *
++ * Note that IO devices should generally be placed at multiples of 0x10000,
+  * to accommodate guests using 64K pages.
++ *
++ * Conversely it seems reasonable to assume that anybody configuring a VM
++ * with a quarter of a terabyte of RAM will be doing it on a host with more
++ * than a terabyte of physical address space.)
++ *
+  */
+ static const MemMapEntry a15memmap[] = {
+     /* Space up to 0x8000000 is reserved for a boot ROM */
+@@ -148,12 +140,13 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_PCIE_MMIO] =          { 0x10000000, 0x2eff0000 },
+     [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+     [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+-    [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
++    [VIRT_MEM] =                { SZ_1G , 255 * SZ_1G },
+     /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+     [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000 },
+     [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
+     /* Second PCIe window, 512GB wide at the 512GB boundary */
+-    [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
++    [VIRT_PCIE_MMIO_HIGH] =     { 512 * SZ_1G, 512 * SZ_1G },
++    [VIRT_HOTPLUG_MEM] =        { 2048 * SZ_1G, 2048 * SZ_1G },
+ };
+ 
+ static const int a15irqmap[] = {
+@@ -1223,6 +1216,58 @@ static void create_secure_ram(VirtMachineState *vms,
+     g_free(nodename);
  }
  
-+static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                 Error **errp)
++static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
 +{
-+    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
++    MachineState *ms = MACHINE(vms);
++    uint64_t device_memory_size;
++    uint64_t align = SZ_64K;
 +
-+    if (is_nvdimm) {
-+        error_setg(errp, "nvdimm is not yet supported");
++    /* always allocate the device memory information */
++    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
++
++    if (vms->max_vm_phys_shift < 42) {
++        /* device memory starts at 2TB whereas this VM supports less than
++         * 2TB GPA */
++        if (ms->maxram_size > ms->ram_size || ms->ram_slots) {
++            MachineClass *mc = MACHINE_GET_CLASS(ms);
++
++            error_report("\"-memory 'slots|maxmem'\" is not supported by %s "
++                         "since KVM does not support more than 41b IPA",
++                         mc->name);
++            exit(EXIT_FAILURE);
++        }
 +        return;
 +    }
-+}
 +
-+static void virt_memory_plug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    PCDIMMDevice *dimm = PC_DIMM(dev);
-+    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-+    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-+    Error *local_err = NULL;
-+    uint64_t align;
-+
-+    if (memory_region_get_alignment(mr)) {
-+        align = memory_region_get_alignment(mr);
-+    } else {
-+        /* by default we align on 64KB page size */
-+        align = SZ_64K;
++    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
++        error_report("unsupported number of memory slots: %"PRIu64,
++                     ms->ram_slots);
++        exit(EXIT_FAILURE);
 +    }
 +
-+    pc_dimm_plug(dev, MACHINE(hotplug_dev), align, &local_err);
-+
-+    error_propagate(errp, local_err);
-+}
-+
-+static void virt_memory_unplug(HotplugHandler *hotplug_dev,
-+                               DeviceState *dev, Error **errp)
-+{
-+    pc_dimm_unplug(dev, MACHINE(hotplug_dev));
-+    object_unparent(OBJECT(dev));
-+}
-+
-+static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_pre_plug(hotplug_dev, dev, errp);
++    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
++        error_report("maximum memory size must be aligned to multiple of 0x%"
++                     PRIx64, align);
++            exit(EXIT_FAILURE);
 +    }
++
++    ms->device_memory->base = vms->memmap[VIRT_HOTPLUG_MEM].base;
++    device_memory_size = ms->maxram_size - ms->ram_size;
++
++    if (device_memory_size > vms->memmap[VIRT_HOTPLUG_MEM].size) {
++        error_report("unsupported amount of maximum memory: " RAM_ADDR_FMT,
++                         ms->maxram_size);
++        exit(EXIT_FAILURE);
++    }
++
++    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
++                       "device-memory", device_memory_size);
++    memory_region_add_subregion(sysmem, ms->device_memory->base,
++                                &ms->device_memory->mr);
++    vms->bootinfo.device_memory_start = ms->device_memory->base;
++    vms->bootinfo.device_memory_size = device_memory_size;
 +}
 +
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
+ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
  {
-@@ -1796,12 +1845,27 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
-         }
-     }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+            virt_memory_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
-+static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_unplug(hotplug_dev, dev, errp);
-+    } else {
-+        error_setg(errp, "device unplug request for unsupported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
-+    }
- }
+     const VirtMachineState *board = container_of(binfo, VirtMachineState,
+@@ -1430,7 +1475,8 @@ static void machvirt_init(MachineState *machine)
+     vms->smp_cpus = smp_cpus;
  
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-                                                         DeviceState *dev)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
+     if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
+-        error_report("mach-virt: cannot model more than %dGB RAM", RAMLIMIT_GB);
++        error_report("mach-virt: cannot model more than %dGB RAM",
++                     (int)(vms->memmap[VIRT_MEM].size / SZ_1G));
+         exit(1);
      }
  
-@@ -1861,7 +1925,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-+    hc->pre_plug = virt_machine_device_pre_plug_cb;
-     hc->plug = virt_machine_device_plug_cb;
-+    hc->unplug = virt_machine_device_unplug_cb;
- }
+@@ -1525,6 +1571,8 @@ static void machvirt_init(MachineState *machine)
+                                          machine->ram_size);
+     memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
  
- static const TypeInfo virt_machine_info = {
++    create_device_memory(vms, sysmem);
++
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+ 
+     create_gic(vms, pic);
+diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+index ffed392..76269e6 100644
+--- a/include/hw/arm/arm.h
++++ b/include/hw/arm/arm.h
+@@ -116,6 +116,8 @@ struct arm_boot_info {
+     bool secure_board_setup;
+ 
+     arm_endianness endianness;
++    hwaddr device_memory_start;
++    hwaddr device_memory_size;
+ };
+ 
+ /**
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 91f6de2..173938d 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -78,6 +78,7 @@ enum {
+     VIRT_GPIO,
+     VIRT_SECURE_UART,
+     VIRT_SECURE_MEM,
++    VIRT_HOTPLUG_MEM,
+ };
+ 
+ typedef enum VirtIOMMUType {
 -- 
 2.5.5
