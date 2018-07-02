@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZq53-0005Jg-N4
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:04:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fZq6c-0006cu-HN
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fZq50-0005XY-K6
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:04:49 -0400
-Date: Mon, 2 Jul 2018 14:02:39 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fZq6b-00072Z-Ht
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 00:06:26 -0400
+Date: Mon, 2 Jul 2018 14:06:14 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180702040239.GS3422@umbus.fritz.box>
-References: <20180618215601.8974-1-mail@sebastianbauer.info>
-	<20180618235557.GB25461@umbus.fritz.box>
-	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
-	<20180619043631.GC11674@umbus.fritz.box>
-	<607559ef0fd95f557b5001a5db29883f@sebastianbauer.info>
-	<20180630061443.GP3422@umbus.fritz.box>
-	<alpine.BSF.2.21.1806301325320.13465@zero.eik.bme.hu>
+Message-ID: <20180702040614.GV3422@umbus.fritz.box>
+References: <153018086531.336571.17029459443980070626.stgit@bahia.lan>
+	<153018091454.336571.7311461748726927045.stgit@bahia>
+	<20180629190822.GW7451@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WVXkb2QE2eH0aWe4"
+	protocol="application/pgp-signature"; boundary="Ln+iIw7POnzHEEo5"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806301325320.13465@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Include vga cirrus card into the
- compiling process
+In-Reply-To: <20180629190822.GW7451@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 2/3] spapr: compute default value of
+ "hpt-max-page-size" later
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Sebastian Bauer <mail@sebastianbauer.info>, qemu-devel@nongnu.org, thuth@redhat.com, qemu-ppc@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
 
---WVXkb2QE2eH0aWe4
+--Ln+iIw7POnzHEEo5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 30, 2018 at 01:29:05PM +0200, BALATON Zoltan wrote:
-11;rgb:ffff/ffff/ffff> On Sat, 30 Jun 2018, David Gibson wrote:
-> > On Fri, Jun 29, 2018 at 08:06:10PM +0200, Sebastian Bauer wrote:
-> > > Hi,
-> > >=20
-> > > Am 2018-06-19 06:36, schrieb David Gibson:
-> > > > Ok.  However, your patch doesn't apply against the ppc-for-3.0 tree.
-> > > > It looks like you've made it against a tree including some of BALAT=
-ON
-> > > > Zoltan's proposed but not yet merged patches.
-> > > >=20
-> > > > Please make sure your patches are against the current ppc-for-3.0 t=
-ree
-> > > > before posting.
-> > >=20
-> > > The patch seems to apply now to ppc-for-3.0 without any problem as Zo=
-ltan's
-> > > changes have been integrated. Let me know if I shall resend the patch=
- or if
-> > > you can use the original one. Thanks.
-> >=20
-> > Resend please.  Assuming it would need a respin, I didn't keep it
-> > around.
+On Fri, Jun 29, 2018 at 04:08:22PM -0300, Eduardo Habkost wrote:
+> On Thu, Jun 28, 2018 at 12:15:14PM +0200, Greg Kurz wrote:
+> [...]
+> > @@ -2527,6 +2527,18 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+> >      QLIST_INIT(&spapr->phbs);
+> >      QTAILQ_INIT(&spapr->pending_dimm_unplugs);
+> > =20
+> > +    /* This is for pseries-2.12 and older machine types */
+> > +    if (!smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE]) {
+> > +        uint8_t mps;
+> > +
+> > +        if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> > +            mps =3D ctz64(qemu_getrampagesize());
+> > +        } else {
+> > +            mps =3D 34; /* allow everything up to 16GiB, i.e. everythi=
+ng */
+> > +        }
+> > +        smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
 >=20
-> Still avalilable here:
->=20
-> http://patchwork.ozlabs.org/patch/931209/
->=20
-> or here
->=20
-> http://patchew.org/QEMU/20180618215601.8974-1-mail@sebastianbauer.info/
+> Initializing class fields on instance init functions is a sign
+> that the information doesn't belong to the class struct.  Can't
+> this be handled at default_caps_with_cpu()?
 
-Ok, applied.
+Yeah, doing it inside default_caps_with_cpu() probably makes more
+sense.
+
+> > +    }
+> > +
+> >      /* Determine capabilities to run with */
+> >      spapr_caps_init(spapr);
+> > =20
+> > @@ -4103,17 +4115,16 @@ static void spapr_machine_2_12_instance_options=
+(MachineState *machine)
+> >  static void spapr_machine_2_12_class_options(MachineClass *mc)
+> >  {
+> >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> > -    uint8_t mps;
+> > =20
+> >      spapr_machine_3_0_class_options(mc);
+> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
+> > =20
+> > -    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> > -        mps =3D ctz64(qemu_getrampagesize());
+> > -    } else {
+> > -        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
+> > -    }
+> > -    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
+> > +    /* We depend on kvm_enabled() to choose a default value for the
+> > +     * hpt-max-page-size capability. Of course we can't do it here
+> > +     * because this is too early and the HW accelerator isn't initialz=
+ed
+> > +     * yet. Postpone this to spapr_machine_init().
+> > +     */
+> > +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 0;
+> >  }
+> > =20
+> >  DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -79,24 +102,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---WVXkb2QE2eH0aWe4
+--Ln+iIw7POnzHEEo5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls5o90ACgkQbDjKyiDZ
-s5I+BRAAq2MY+0lQ7uuPbAB3ZMNDsLjKU8txRzJQiwTpmyjtEA1vohQKNFVVoO3p
-BgOxGmqUbJYLADqeNHhNSEmzwGkNQ/9eGy6PgoDm+THjVqMTDE/NR5rMUb1Ia/Y9
-QWbrKmNqmx403ChHsvXmbNKkcyAP8FDbG1sPmaQ0+vfhSTdks28o2ms8Zdibffid
-2zE8VOazK0ztrhO9nXOx88ZXv+Y9Ps/3tHiDMCtSjNItJ4V7VpzgN/DpTTQfxjbT
-bbX1MsxHqXYvDu2HbOMuPfm2UHlxoCHOfsB8G+mzIfzWfVJr1ng5RLA6eVwKUYWz
-1ZShMJMwENsDMFFCH8oQr+sEbnYCyPKXsZFqncFywfvX8f8LMeRvDzs4sZeCzuGQ
-GeuDkNgHo0sJu/rFRUVC3Xb4afg5HSjcgL+rwglOyPmK33ElZqv3U7x5T7xOaTIK
-+u4KlxmjwRObI1Zf+O1TvhV39Ob+cwdoo1KjGSjin/idu2v/9r3xtp/twize/KTb
-pRFMgcE0ZvGP2RVkiOJgIF3X7NGhcu8XRS0963S8dHSi3hX2uonAf2B3j2REDIEz
-Y8cXkuqrOuBDsIFbea5s6Bbo3rvHnzA+63TpBm8uPq/I/yeK9FkrR4nmTxeiml7m
-ITNUg66jWvc9CT8TPBoWPB2/d28f5LQ5Ia3uKr6sS83FDEc1RpY=
-=DzJJ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls5pLUACgkQbDjKyiDZ
+s5JdmhAA0OJI5iDC8eEFCp2WHAWBc8O8/1aeYP+aL/pKe+YyXb+M7ix4yqtb0622
+v6ClCL48/knY4C6UpN6xVHn6PCdvrDNld7qNWZ9DSBFlQMASluu/xYgygAppgznn
+nDjYSx340fq8ERncGnTPF9any35lgqz383mK/1hPvGnkBP+A2D/mOxo1j/tTDr1s
+CxE9EZGYZvOO1OgOUji8H9wWrv/W0Dbs8kPAwJO4fLazjqxS17N4OoxqGcBdjckj
+gxEuHtjHHp0F3Xl/3pHmhzcYbaeykrT6RaTn5zYefxwN1OOrfvHSaHLxaJmwDkwz
+Ce/X6y7xPurw6V2uxFTy1fih6QoRUoThDzuhwTPO1GYBNxnX6DY6qPLnYRo4Lvd3
+KM+rugj7iYBqlNxpKekkCsCCQxIw4+QC2DeCvbiPMn6MJKIQ8hjntrhg4pZKLUz6
+7AQhnd/aFFECqUxGa8tk4OsWKdQPs5QrHxo+ASJ1ytDtv1mO+33q9VEUP1/3KLQR
+lieNJWl8E1CUxN0vuo29wFoPGKp+O7YloLmQWACr/vN+gv2QklDosJ23ZXy+WGKr
++Dm41csYFhyXr3Vb0iD5QQ1fxYeajkaYxZRyvea/2Q/YyFQ7WaVQYxZszaTqzYar
+mYWZOGWZ2xlOwZfHDy5850UM5QS6DIhqHw51BJb5hw87fsxBM0g=
+=1atg
 -----END PGP SIGNATURE-----
 
---WVXkb2QE2eH0aWe4--
+--Ln+iIw7POnzHEEo5--
