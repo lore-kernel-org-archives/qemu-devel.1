@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzLg-0002NE-Vx
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:37 -0400
+	(envelope-from <shorne@gmail.com>) id 1fZzLj-0002PO-FI
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fZzLg-00086v-Ag
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:37 -0400
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:34347)
+	(envelope-from <shorne@gmail.com>) id 1fZzLi-00087s-JE
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:39 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:34258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzLg-00086f-3S
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:36 -0400
-Received: by mail-pf0-x22e.google.com with SMTP id e10-v6so996073pfn.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fZzLi-00087U-Ci
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:58:38 -0400
+Received: by mail-pg0-x235.google.com with SMTP id y5-v6so917339pgv.1
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:58:38 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon,  2 Jul 2018 22:57:50 +0900
-Message-Id: <20180702135806.7087-10-shorne@gmail.com>
+Date: Mon,  2 Jul 2018 22:57:51 +0900
+Message-Id: <20180702135806.7087-11-shorne@gmail.com>
 In-Reply-To: <20180702135806.7087-1-shorne@gmail.com>
 References: <20180702135806.7087-1-shorne@gmail.com>
-Subject: [Qemu-devel] [PULL 09/25] target/openrisc: Exit the TB after l.mtspr
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 10/25] target/openrisc: Form the spr index from
+ tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +34,105 @@ Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henders
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-A store to SR changes interrupt state, which should return
-to the main loop to recognize that state.
+Rather than pass base+offset to the helper, pass the full index.
+In most cases the base is r0 and optimization yields a constant.
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/translate.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ target/openrisc/helper.h     |  4 ++--
+ target/openrisc/sys_helper.c |  9 +++------
+ target/openrisc/translate.c  | 16 +++++++++-------
+ 3 files changed, 14 insertions(+), 15 deletions(-)
 
+diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
+index e37dabc77a..9db9bf3963 100644
+--- a/target/openrisc/helper.h
++++ b/target/openrisc/helper.h
+@@ -56,5 +56,5 @@ FOP_CMP(le)
+ DEF_HELPER_FLAGS_1(rfe, 0, void, env)
+ 
+ /* sys */
+-DEF_HELPER_FLAGS_4(mtspr, 0, void, env, tl, tl, tl)
+-DEF_HELPER_FLAGS_4(mfspr, TCG_CALL_NO_WG, tl, env, tl, tl, tl)
++DEF_HELPER_FLAGS_3(mtspr, 0, void, env, tl, tl)
++DEF_HELPER_FLAGS_3(mfspr, TCG_CALL_NO_WG, tl, env, tl, tl)
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 2f337363ec..2c959f63f4 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -27,13 +27,11 @@
+ 
+ #define TO_SPR(group, number) (((group) << 11) + (number))
+ 
+-void HELPER(mtspr)(CPUOpenRISCState *env,
+-                   target_ulong ra, target_ulong rb, target_ulong offset)
++void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ {
+ #ifndef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+-    int spr = (ra | offset);
+     int idx;
+ 
+     switch (spr) {
+@@ -202,13 +200,12 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+ #endif
+ }
+ 
+-target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
+-                           target_ulong rd, target_ulong ra, uint32_t offset)
++target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
++                           target_ulong spr)
+ {
+ #ifndef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+-    int spr = (ra | offset);
+     int idx;
+ 
+     switch (spr) {
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index db149986af..59605aacca 100644
+index 59605aacca..64b5e84630 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -877,7 +877,22 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+@@ -865,9 +865,10 @@ static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
      if (is_user(dc)) {
          gen_illegal_exception(dc);
      } else {
 -        TCGv_i32 ti = tcg_const_i32(a->k);
-+        TCGv_i32 ti;
-+
-+        /* For SR, we will need to exit the TB to recognize the new
-+         * exception state.  For NPC, in theory this counts as a branch
-+         * (although the SPR only exists for use by an ICE).  Save all
-+         * of the cpu state first, allowing it to be overwritten.
-+         */
-+        if (dc->delayed_branch) {
-+            tcg_gen_mov_tl(cpu_pc, jmp_pc);
-+            tcg_gen_discard_tl(jmp_pc);
-+        } else {
-+            tcg_gen_movi_tl(cpu_pc, dc->base.pc_next + 4);
-+        }
-+        dc->base.is_jmp = DISAS_EXIT;
-+
-+        ti = tcg_const_i32(a->k);
-         gen_helper_mtspr(cpu_env, cpu_R[a->a], cpu_R[a->b], ti);
-         tcg_temp_free_i32(ti);
+-        gen_helper_mfspr(cpu_R[a->d], cpu_env, cpu_R[a->d], cpu_R[a->a], ti);
+-        tcg_temp_free_i32(ti);
++        TCGv spr = tcg_temp_new();
++        tcg_gen_ori_tl(spr, cpu_R[a->a], a->k);
++        gen_helper_mfspr(cpu_R[a->d], cpu_env, cpu_R[a->d], spr);
++        tcg_temp_free(spr);
      }
+     return true;
+ }
+@@ -877,7 +878,7 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+     if (is_user(dc)) {
+         gen_illegal_exception(dc);
+     } else {
+-        TCGv_i32 ti;
++        TCGv spr;
+ 
+         /* For SR, we will need to exit the TB to recognize the new
+          * exception state.  For NPC, in theory this counts as a branch
+@@ -892,9 +893,10 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+         }
+         dc->base.is_jmp = DISAS_EXIT;
+ 
+-        ti = tcg_const_i32(a->k);
+-        gen_helper_mtspr(cpu_env, cpu_R[a->a], cpu_R[a->b], ti);
+-        tcg_temp_free_i32(ti);
++        spr = tcg_temp_new();
++        tcg_gen_ori_tl(spr, cpu_R[a->a], a->k);
++        gen_helper_mtspr(cpu_env, spr, cpu_R[a->b]);
++        tcg_temp_free(spr);
+     }
+     return true;
+ }
 -- 
 2.17.0
