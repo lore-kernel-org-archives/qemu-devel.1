@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fa3h9-0005bl-AN
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:37:04 -0400
+	(envelope-from <linux@roeck-us.net>) id 1fa3hZ-0005nV-5R
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fa3h6-0003Zn-8Z
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:37:03 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:59961)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fa3h5-0003YO-Up
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:37:00 -0400
-References: <20180702175030.18621-1-f4bug@amsat.org>
-	<20180702175030.18621-10-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <0a983a01-f808-3658-fde5-9d70a30e9153@vivier.eu>
-Date: Mon, 2 Jul 2018 20:36:45 +0200
+	(envelope-from <linux@roeck-us.net>) id 1fa3hY-0003pz-2p
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 14:37:29 -0400
+Date: Mon, 2 Jul 2018 11:37:17 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180702183717.GA22482@roeck-us.net>
+References: <20180626175900.GA4307@roeck-us.net>
+	<CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
+	<20180626200008.GA680@roeck-us.net>
+	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
+	<20180702162733.GB32333@roeck-us.net>
+	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
+	<20180702170522.GA9885@roeck-us.net>
+	<CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
+	<20180702175740.GA14904@roeck-us.net>
+	<CAFEAcA8noUOGt_9LpfRTRX52n4Z66XzudYFfW=180c92vzPH-g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180702175030.18621-10-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 09/13] linux-user/strace: improve
- sendto() output
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8noUOGt_9LpfRTRX52n4Z66XzudYFfW=180c92vzPH-g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
+ identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Le 02/07/2018 à 19:50, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Tested-By: Guido Günther <agx@sigxcpu.org>
-> ---
->  linux-user/strace.c    | 16 ++++++++++++++++
->  linux-user/strace.list |  2 +-
->  2 files changed, 17 insertions(+), 1 deletion(-)
+On Mon, Jul 02, 2018 at 07:06:17PM +0100, Peter Maydell wrote:
+> On 2 July 2018 at 18:57, Guenter Roeck <linux@roeck-us.net> wrote:
+> > On Mon, Jul 02, 2018 at 06:10:36PM +0100, Peter Maydell wrote:
+> >> On 2 July 2018 at 18:05, Guenter Roeck <linux@roeck-us.net> wrote:
+> >> > I don't think I'll have more time available to spend on this
+> >> > anytime soon. If it works for you, just drop the patch. I can
+> >> > keep it local in my branch. My version of qemu is different anyway,
+> >> > after all.
+> >>
+> >> I'd kind of like to fix the bug, though. I'd just like you
+> >> to provide the image you're testing with...
+> >>
+> >
+> > Ah, but that won't help. We are dealing with a heisenbug, and me using
+> > a different host than you (or even a different gcc version) may be
+> > sufficient to make the problem disappear on your system.
 > 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index b8e585a87d..390a50d45a 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -1971,6 +1971,22 @@ print_bind(const struct syscallname *name,
->  }
->  #endif
->  
-> +#if defined(TARGET_NR_sendto)
-> +static void
-> +print_sendto(const struct syscallname *name,
-> +             abi_long arg0, abi_long arg1, abi_long arg2,
-> +             abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_raw_param("%d", arg0, 0);
+> True, but we can at least rule out some differences between
+> your setup and mine. (For instance, your kernel config and
+> version and rootfs are all going to be different from what
+> I've been testing.)
+> 
+> > The mps2 images use high resolution timers, which is likely what is
+> > triggering here. My working assumption is that those timers trigger at
+> > the wrong time because the timer is set up in periodic instead of one-time
+> > mode. With that, behavior is more or less random. On some systems it will
+> > work, on some systems it won't. Since we can not agree that setting the
+> > timer in periodic mode instead of one-shot mode is a problem, I don't
+> > really see how we can proceed. I would somehow have to prove to you that
+> > there is an observable problem in the first place, well beyond of what
+> > I already did. That might take a lot of time - much more than I would
+> > be able to spend on it.
+> 
+> I certainly believe you that there's an observable problem.
+> I just disagree about your proposed fix, because I don't see
+> from the code why it would make any difference. So I want to
+> get to a point where I can run exactly the same thing you're
+> running on my system to have a look at what's happening.
+> 
 
-TARGET_ABI_FMT_ld
+Please try http://server.roeck-us.net/qemu/an385/
 
-otherwise:
+vmlinux is plain v4.18-rc3 compiled with the provided defconfig and
+the provided toolchain (position independent, created with buildroot).
+defconfig is mps2_defconfig+CONFIG_BLK_DEV_INITRD=y. Older kernels work
+as well (I tested as far back as 4.9.y), with the same configuration.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+qemu is from the master-local branch in my repository, built with
+https://github.com/groeck/linux-build-test/blob/master/qemu/buildall.sh.
+
+The boot wrapper was generated from
+https://github.com/groeck/linux-build-test/tree/master/rootfs/arm/arm-m3-bootwrapper/.
+
+run.sh should boot the system into a shell (at least it does for me).
+
+Guenter
