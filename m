@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fZwgA-00080K-EF
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:07:35 -0400
+	(envelope-from <clg@kaod.org>) id 1fZwjo-0000jb-Lg
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fZwg7-0000aU-Oe
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:07:34 -0400
-Received: from mail-eopbgr70098.outbound.protection.outlook.com
-	([40.107.7.98]:26496
-	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1fZwg6-0000Zi-Qq
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:07:31 -0400
-References: <33183CC9F5247A488A2544077AF19020DB03024F@dggeml511-mbx.china.huawei.com>
-	<20180702105325.GN2455@xz-mi>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <b498e409-5753-38a5-ae92-bb48dc2f4806@virtuozzo.com>
-Date: Mon, 2 Jul 2018 14:07:20 +0300
+	(envelope-from <clg@kaod.org>) id 1fZwjm-0002DK-2M
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:11:20 -0400
+Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:54827)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fZwjl-0002Ag-QE
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:11:17 -0400
+Received: from player732.ha.ovh.net (unknown [10.109.108.13])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 2EA38B900F
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 13:11:16 +0200 (CEST)
+References: <20180619140729.21949-1-clg@kaod.org>
+	<20180619140729.21949-2-clg@kaod.org>
+	<eb1ad8ca-89f7-b059-3a3c-412375871113@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <bc3ec7a5-a6c5-2a0d-7ac1-6583a182807b@kaod.org>
+Date: Mon, 2 Jul 2018 13:11:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180702105325.GN2455@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <eb1ad8ca-89f7-b059-3a3c-412375871113@kaod.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] about live memory snapshot
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+
+On 07/02/2018 12:03 PM, C=C3=A9dric Le Goater wrote:
+>> --- a/hw/ppc/spapr_vio.c
+>> +++ b/hw/ppc/spapr_vio.c
+>> @@ -436,6 +436,9 @@ static void spapr_vio_busdev_reset(DeviceState *qd=
+ev)
+>>      }
+>>  }
+>> =20
+>> +/* TODO : poor VIO device indexing ... */
+>> +static uint32_t vio_index;
+>=20
+> I think we could also use (dev->reg & 0xff) as an index for=20
+> the VIO devices.
+>=20
+> The unit address of the virtual IOA is simply allocated using=20
+> an increment of bus->next_reg, next_reg being initialized at
+> 0x71000000.
+>=20
+> I did not see any restrictions in the PAPR specs or in QEMU=20
+> that would break the above.
+
+That was until I discovered this macro :=20
+
+  #define DEFINE_SPAPR_PROPERTIES(type, field)           \
+        DEFINE_PROP_UINT32("reg", type, field.reg, -1)
 
 
+so 'reg' could have any value. We can not use it ...
 
-On 02.07.2018 13:53, Peter Xu wrote:
-> On Sat, Jun 30, 2018 at 01:45:29AM +0000, Gonglei (Arei) wrote:
->> Hi Peter,
->>
->> As we discussed in LC3 China, the current scheme of "migration to file"
->> can't fit on production environment, which will cause the snapshot file bigger
->> and bigger when the guest is under enough memory pressure. We can't
->> assume what size the snapshot file is.
->>   
->> Pls have a look if we have a simple method to resolve the problem. :)
-> 
-> Yeah, it seems that the requirement of this live snapshot feature is
-> there for a long time but we haven't yet figured out a good way to
-> solve it.
-> 
->>
->> PS: the below link is zhanghailiang's scheme based on userfaultfd.
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg00664.html
-> 
-> Thanks for the pointer!
-> 
-> Just to mention that there is another ongoing work from Denis that
-> implemented similar feature but with mprotect() and a new
-> (to-be-proposed?) kvm interface:
-> 
-I recently emailed the patch set with of my approach to the mainstream.
-The patch set is called "Background snapshots".
-
-Please, feel free to review it.
-
-Denis
-
-> http://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08684.html
-> 
-> Hopefully we can figure something out soon on the list.
-> 
-> Regards,
-> 
+C.
