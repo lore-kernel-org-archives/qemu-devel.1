@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZvLp-0000Pb-PM
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:30 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fZvMH-0000iM-PL
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fZvLo-0001m6-Vq
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:29 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:44593)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fZvLo-0001la-Fu
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:28 -0400
-Received: by mail-oi0-x243.google.com with SMTP id s198-v6so11312528oih.11
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 02:42:28 -0700 (PDT)
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fZvMC-00027U-On
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1fZvMC-000270-EZ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 05:42:52 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w629dStQ054739
+	for <qemu-devel@nongnu.org>; Mon, 2 Jul 2018 05:42:51 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jyh1m1r03-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 05:42:50 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Mon, 2 Jul 2018 10:42:48 +0100
+Date: Mon, 2 Jul 2018 15:12:41 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20180627132246.5576-1-peterx@redhat.com>
+	<20180702080445.GA7894@localhost.localdomain>
+	<20180702084618.GL2455@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1806302231400.45338@zero.eik.bme.hu>
-References: <cover.1530047900.git.balaton@eik.bme.hu>
-	<alpine.BSF.2.21.1806302231400.45338@zero.eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Jul 2018 10:42:07 +0100
-Message-ID: <CAFEAcA_ymngY5i5BWQ6-xAveCWjs0QKrORSAy9nH1A8m9672Fg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Misc sm501 improvements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180702084618.GL2455@xz-mi>
+Message-Id: <20180702094241.GA6746@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] migation: unbreak postcopy recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +42,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 30 June 2018 at 21:34, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> On Tue, 26 Jun 2018, BALATON Zoltan wrote:
->>
->> Version 2 of the sm501 changes with fixes that are needed to get
->> AmigaOS 4.1FE to boot and able to produce graphics.
->>
->> The strange blue-white colors that first appear are actually correct
->> and because of AmigaOS selecting a low resolution PAL mode by default
->> instead of a board specific mode. To work around this one can select
->> the last option to boot the live CD and then select a better board
->> specific mode from ScreenMode Prefs. It takes a while for the
->> ScreenMode window to appear and graphics operations are slow which
->> could use some improvement but at least it seems to work correctly now
->> apart from some unimplemented drawing modes for compositing.
->>
->> If this could be merged before the freeze with the sam460ex patches
->> and Sebastian's ehci patch then QEMU 3.0 could be the first version
->> that can boot AmigaOS.
->
->
-> Ping? Sorry to push it but it would be great if this could get in for 3.0.
-> Peter, this may need your attention like last time as it's not clear whose
-> tree it should go through and David did not seem to be confident taking it
-> via the ppc tree.
+On Mon, Jul 02, 2018 at 04:46:18PM +0800, Peter Xu wrote:
+> On Mon, Jul 02, 2018 at 01:34:45PM +0530, Balamuruhan S wrote:
+> > On Wed, Jun 27, 2018 at 09:22:42PM +0800, Peter Xu wrote:
+> > > v3:
+> > > - keep the recovery logic even for RDMA by dropping the 3rd patch and
+> > >   touch up the original 4th patch (current 3rd patch) to suite that [Dave]
+> > > 
+> > > v2:
+> > > - break the first patch into several
+> > > - fix a QEMUFile leak
+> > > 
+> > > Please review.  Thanks,
+> > Hi Peter,
+> 
+> Hi, Balamuruhan,
+> 
+> Glad to know that you are playing this stuff with ppc.  I think the
+> major steps are correct, though...
+> 
 
-I can have a look, but really I think these should go via the
-ppc tree -- the device is used in a ppc machine and an sh4 one,
-and the ppc tree is much more active than sh4.
+Thank you Peter for correcting my mistake, It works like a charm.
+Nice feature!
 
-thanks
--- PMM
+Tested-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+
+> > 
+> > I have applied this patchset with upstream Qemu for testing postcopy
+> > pause recover feature in PowerPC,
+> > 
+> > I used NFS shared qcow2 between source and target host
+> > 
+> > source:
+> > # ppc64-softmmu/qemu-system-ppc64 --enable-kvm --nographic -vga none \
+> > -machine pseries -m 64G,slots=128,maxmem=128G -smp 16,maxcpus=32 \
+> > -device virtio-blk-pci,drive=rootdisk -drive \
+> > file=/home/bala/sharing/hostos-ppc64le.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
+> > -monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=virtio \
+> > -net user -redir tcp:2000::22
+> > 
+> > To keep the VM with workload I ran stress-ng inside guest,
+> > 
+> > # stress-ng --cpu 6 --vm 6 --io 6
+> > 
+> > target:
+> > # ppc64-softmmu/qemu-system-ppc64 --enable-kvm --nographic -vga none \
+> > -machine pseries -m 64G,slots=128,maxmem=128G -smp 16,maxcpus=32 \
+> > -device virtio-blk-pci,drive=rootdisk -drive \
+> > file=/home/bala/sharing/hostos-ppc64le.qcow2,if=none,cache=none,format=qcow2,id=rootdisk \
+> > -monitor telnet:127.0.0.1:1235,server,nowait -net nic,model=virtio \
+> > -net user -redir tcp:2001::22 -incoming tcp:0:4445
+> > 
+> > enabled postcopy on both source and destination from qemu monitor
+> > 
+> > (qemu) migrate_set_capability postcopy-ram on
+> > 
+> > From source qemu monitor,
+> > (qemu) migrate -d tcp:10.45.70.203:4445
+> 
+> [1]
+> 
+> > (qemu) info migrate
+> > globals:
+> > store-global-state: on
+> > only-migratable: off
+> > send-configuration: on
+> > send-section-footer: on
+> > decompress-error-check: on
+> > capabilities: xbzrle: off rdma-pin-all: off auto-converge: off
+> > zero-blocks: off compress: off events: off postcopy-ram: on x-colo: off
+> > release-ram: off block: off return-path: off pause-before-switchover:
+> > off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
+> > late-block-activate: off 
+> > Migration status: active
+> > total time: 2331 milliseconds
+> > expected downtime: 300 milliseconds
+> > setup: 65 milliseconds
+> > transferred ram: 38914 kbytes
+> > throughput: 273.16 mbps
+> > remaining ram: 67063784 kbytes
+> > total ram: 67109120 kbytes
+> > duplicate: 1627 pages
+> > skipped: 0 pages
+> > normal: 9706 pages
+> > normal bytes: 38824 kbytes
+> > dirty sync count: 1
+> > page size: 4 kbytes
+> > multifd bytes: 0 kbytes
+> > 
+> > triggered postcopy from source,
+> > (qemu) migrate_start_postcopy
+> > 
+> > After triggering postcopy from source, in target I tried to pause the
+> > postcopy migration
+> > 
+> > (qemu) migrate_pause
+> > 
+> > In target I see error as,
+> > error while loading state section id 4(ram)
+> > qemu-system-ppc64: Detected IO failure for postcopy. Migration paused.
+> > 
+> > In source I see error as,
+> > qemu-system-ppc64: Detected IO failure for postcopy. Migration paused.
+> > 
+> > Later from target I try for recovery from target monitor,
+> > (qemu) migrate_recover qemu+ssh://10.45.70.203/system
+> 
+> ... here is that URI for libvirt only?
+> 
+> Normally I'll use something similar to [1] above.
+> 
+> > Migrate recovery is triggered already
+> 
+> And this means that you have already sent one recovery command before
+> hand.  In the future we'd better allow the recovery command to be run
+> more than once (in case the first one mistyped...).
+> 
+> > 
+> > but in source still it remains to be in postcopy-paused state
+> > (qemu) info migrate
+> > globals:
+> > store-global-state: on
+> > only-migratable: off
+> > send-configuration: on
+> > send-section-footer: on
+> > decompress-error-check: on
+> > capabilities: xbzrle: off rdma-pin-all: off auto-converge: off
+> > zero-blocks: off compress: off events: off postcopy-ram: on x-colo: off
+> > release-ram: off block: off return-path: off pause-before-switchover:
+> > off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
+> > late-block-activate: off 
+> > Migration status: postcopy-paused
+> > total time: 222841 milliseconds
+> > expected downtime: 382991 milliseconds
+> > setup: 65 milliseconds
+> > transferred ram: 385270 kbytes
+> > throughput: 265.06 mbps
+> > remaining ram: 8150528 kbytes
+> > total ram: 67109120 kbytes
+> > duplicate: 14679647 pages
+> > skipped: 0 pages
+> > normal: 63937 pages
+> > normal bytes: 255748 kbytes
+> > dirty sync count: 2
+> > page size: 4 kbytes
+> > multifd bytes: 0 kbytes
+> > dirty pages rate: 854740 pages
+> > postcopy request count: 374
+> > 
+> > later I also tried to recover postcopy in source monitor,
+> > (qemu) migrate_recover qemu+ssh://10.45.193.21/system
+> 
+> This command should be run on destination side only.  Here the
+> "migrate-recover" command on destination will start a new listening
+> port there waiting for the migration to be continued.  Then after that
+> command we need an extra command on source to start the recovery:
+> 
+>   (HMP) migrate -r $URI
+> 
+> Here $URI should be the only you specified in the "migrate-recover"
+> command on destination machine.
+> 
+> > Migrate recover can only be run when postcopy is paused.
+> 
+> I can try to fix up this error.  Basically we shouldn't allow this
+> command to be run on source machine.
+
+Sure, :+1:
+
+> 
+> > 
+> > Looks to be it is broken, please help me if I missed something
+> > in this test.
+> 
+> Btw, I'm writting up an unit test for postcopy recovery recently, that
+> could be a good reference for the new feature.  Meanwhile I think I
+> should write up some documents too afterwards.
+
+fine, I am also working on writing test scenario in tp-qemu using Avocado-VT
+for postcopy pause/recover and multifd features.
+
+-- Bala
+> 
+> Regards,
+> 
+> > 
+> > Thank you,
+> > Bala
+> > > 
+> > > Peter Xu (4):
+> > >   migration: delay postcopy paused state
+> > >   migration: move income process out of multifd
+> > >   migration: unbreak postcopy recovery
+> > >   migration: unify incoming processing
+> > > 
+> > >  migration/ram.h       |  2 +-
+> > >  migration/exec.c      |  3 ---
+> > >  migration/fd.c        |  3 ---
+> > >  migration/migration.c | 44 ++++++++++++++++++++++++++++++++++++-------
+> > >  migration/ram.c       | 11 +++++------
+> > >  migration/savevm.c    |  6 +++---
+> > >  migration/socket.c    |  5 -----
+> > >  7 files changed, 46 insertions(+), 28 deletions(-)
+> > > 
+> > > -- 
+> > > 2.17.1
+> > > 
+> > > 
+> > 
+> 
+> -- 
+> Peter Xu
+> 
