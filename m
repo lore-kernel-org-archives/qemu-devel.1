@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fZxSr-0001Ui-Hk
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:57:54 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fZxT6-0001fp-NY
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:58:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fZxSn-0005yd-6f
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:57:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46638 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fZxSn-0005yT-2g
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:57:49 -0400
-Date: Mon, 2 Jul 2018 13:57:46 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180702135746.717e668d@redhat.com>
-In-Reply-To: <89c2a128-3679-8b44-f00a-7f94bd3bdf0d@linux.vnet.ibm.com>
-References: <20180628172657.11646-1-marcandre.lureau@redhat.com>
-	<89c2a128-3679-8b44-f00a-7f94bd3bdf0d@linux.vnet.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fZxT4-00066L-P7
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 07:58:08 -0400
+References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+	<20180629151524.138542-3-vsementsov@virtuozzo.com>
+	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0f766c07-dfe5-1886-5635-f76780220757@virtuozzo.com>
+Date: Mon, 2 Jul 2018 14:57:48 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] Add support for TPM Physical
- Presence interface
+In-Reply-To: <32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
+ driver for fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +26,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
 
-On Fri, 29 Jun 2018 08:20:38 -0400
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+29.06.2018 20:30, John Snow wrote:
+>
+> On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> We need to synchronize backup job with reading from fleecing image
+>> like it was done in block/replication.c.
+>>
+>> Otherwise, the following situation is theoretically possible:
+>>
+>> 1. client start reading
+>> 2. client understand, that there is no corresponding cluster in
+>>     fleecing image
+> I don't think the client refocuses the read, but QEMU does. (the client
+> has no idea if it is reading from the fleecing node or the backing file.)
+>
+> ... but understood:
+>
+>> 3. client is going to read from backing file (i.e. active image)
+>> 4. guest writes to active image
+> My question here is if QEMU will allow reads and writes to interleave in
+> general. If the client is reading from the backing file, the active
+> image, will QEMU allow a write to modify that data before we're done
+> getting that data?
 
-> On 06/28/2018 01:26 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > The following patches implement the TPM Physical Presence Interface
-> > that allows a user to set a command via ACPI (sysfs entry in Linux)
-> > that, upon the next reboot, the firmware looks for and acts upon by
-> > sending sequences of commands to the TPM.
-> >
-> > A dedicated memory region is added to the TPM CRB & TIS devices, at
-> > address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
-> > holds the location for that PPI region and some version details, to
-> > allow for future flexibility.
-> >
-> > With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
-> > now runs successfully.
-> >
-> > It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
-> > Implement Physical Presence interface for TPM 1.2 and 2")
-> >
-> > The edk2 support is merged upstream. =20
->=20
-> The least I could do now is test this... So, I tested this now with the=20
-> SeaBIOS support I have for this series. It's here:
->=20
-> https://github.com/stefanberger/seabios-tpm/tree/qemu-ppi.v6
->=20
-> It works fine with at least an attached TPM 1.2. I haven't tried TPM 2=20
-> yet but would not expect complications from QEMU level. A operation=20
-> request value put into Linux's PPI interface can be read back also after=
-=20
-> a VM suspend / resume operation. The list of supported operations is=20
-> shown correctly (needs Linux extensions for TPM 2 operation values=20
-> beyond a certain number iirc). The request operation is executed=20
-> correctly and the response shows the last operation and its result. So=20
-> it seems to work fine.
->=20
->=20
->  =C2=A0=C2=A0 Stefan
->=20
+If I understand correctly: yes. Physical drives allows intersecting 
+operations too and there no guarantee on result. We have serializing 
+requests, but in general only unaligned requests are marked serializing.
 
-Are there any instructions how to test it?
+>
+>> 5. this write is stopped by backup(sync=none) and cluster is copied to
+>>     fleecing image
+>> 6. guest write continues...
+>> 7. and client reads _new_ (or partly new) date from active image
+>>
+> I can't answer this for myself one way or the other right now, but I
+> imagine you observed a failure in practice in your test setups, which
+> motivated this patch?
+
+No. I just found this code in Qemu: block/replication already use the 
+same scheme with backup(sync=none). And it uses the synchronization as 
+in this patch. I've discussed it on list a bit:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg01807.html
+https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg03025.html
+
+>
+> A test or some proof would help justification for this patch. It would
+> also help prove that it solves what it claims to!
+
+Agree, a reproducer is better than any theoretical reflections. I'm 
+thinking about it, but don't see simple solution...
+
+>
+>> So, this fleecing-filter should be above fleecing image, the whole
+>> picture of fleecing looks like this:
+>>
+>>      +-------+           +------------+
+>>      |       |           |            |
+>>      | guest |           | NBD client +<------+
+>>      |       |           |            |       |
+>>      ++-----++           +------------+       |only read
+>>       |     ^                                 |
+>>       | IO  |                                 |
+>>       v     |                           +-----+------+
+>>      ++-----+---------+                 |            |
+>>      |                |                 |  internal  |
+>>      |  active image  +----+            | NBD server |
+>>      |                |    |            |            |
+>>      +-+--------------+    |backup      +-+----------+
+>>        ^                   |sync=none     ^
+>>        |backing            |              |only read
+>>        |                   |              |
+>>      +-+--------------+    |       +------+----------+
+>>      |                |    |       |                 |
+>>      | fleecing image +<---+       | fleecing filter |
+>>      |                |            |                 |
+>>      +--------+-------+            +-----+-----------+
+>>               ^                          |
+>>               |                          |
+>>               +--------------------------+
+>>                         file
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   qapi/block-core.json    |  6 ++--
+>>   block/fleecing-filter.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>   block/Makefile.objs     |  1 +
+>>   3 files changed, 85 insertions(+), 2 deletions(-)
+>>   create mode 100644 block/fleecing-filter.c
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 577ce5e999..43872c3d79 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2542,7 +2542,8 @@
+>>               'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+>>               'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
+>>               'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+>> -            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
+>> +            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs',
+>> +            'fleecing-filter' ] }
+>>   
+>>   ##
+>>   # @BlockdevOptionsFile:
+>> @@ -3594,7 +3595,8 @@
+>>         'vmdk':       'BlockdevOptionsGenericCOWFormat',
+>>         'vpc':        'BlockdevOptionsGenericFormat',
+>>         'vvfat':      'BlockdevOptionsVVFAT',
+>> -      'vxhs':       'BlockdevOptionsVxHS'
+>> +      'vxhs':       'BlockdevOptionsVxHS',
+>> +      'fleecing-filter': 'BlockdevOptionsGenericFormat'
+>>     } }
+>>   
+>>   ##
+>> diff --git a/block/fleecing-filter.c b/block/fleecing-filter.c
+>> new file mode 100644
+>> index 0000000000..b501887c10
+>> --- /dev/null
+>> +++ b/block/fleecing-filter.c
+>> @@ -0,0 +1,80 @@
+>> +#include "qemu/osdep.h"
+>> +#include "qemu-common.h"
+>> +#include "block/blockjob.h"
+>> +#include "block/block_int.h"
+>> +#include "block/block_backup.h"
+>> +
+>> +static int64_t fleecing_getlength(BlockDriverState *bs)
+>> +{
+>> +    return bdrv_getlength(bs->file->bs);
+>> +}
+>> +
+>> +static coroutine_fn int fleecing_co_preadv(BlockDriverState *bs,
+>> +                                           uint64_t offset, uint64_t bytes,
+>> +                                           QEMUIOVector *qiov, int flags)
+>> +{
+>> +    int ret;
+>> +    BlockJob *job = bs->file->bs->backing->bs->job;
+>> +    CowRequest req;
+>> +
+>> +    backup_wait_for_overlapping_requests(job, offset, bytes);
+>> +    backup_cow_request_begin(&req, job, offset, bytes);
+>> +
+>> +    ret = bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
+>> +
+>> +    backup_cow_request_end(&req);
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static coroutine_fn int fleecing_co_pwritev(BlockDriverState *bs,
+>> +                                            uint64_t offset, uint64_t bytes,
+>> +                                            QEMUIOVector *qiov, int flags)
+>> +{
+>> +    return -EINVAL;
+>> +}
+>> +
+>> +static bool fleecing_recurse_is_first_non_filter(BlockDriverState *bs,
+>> +                                                 BlockDriverState *candidate)
+>> +{
+>> +    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
+>> +}
+>> +
+>> +static int fleecing_open(BlockDriverState *bs, QDict *options,
+>> +                         int flags, Error **errp)
+>> +{
+>> +    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
+>> +                               errp);
+>> +
+>> +    return bs->file ? 0 : -EINVAL;
+>> +}
+>> +
+>> +static void fleecing_close(BlockDriverState *bs)
+>> +{
+>> +    /* Do nothing, we have to add .bdrv_close, because bdrv_close() don't check
+>> +     * it, just call. */
+>> +}
+>> +
+>> +BlockDriver bdrv_fleecing_filter = {
+>> +    .format_name = "fleecing-filter",
+>> +    .protocol_name = "fleecing-filter",
+>> +    .instance_size = 0,
+>> +
+>> +    .bdrv_open = fleecing_open,
+>> +    .bdrv_close = fleecing_close,
+>> +
+>> +    .bdrv_getlength = fleecing_getlength,
+>> +    .bdrv_co_preadv = fleecing_co_preadv,
+>> +    .bdrv_co_pwritev = fleecing_co_pwritev,
+>> +
+>> +    .is_filter = true,
+>> +    .bdrv_recurse_is_first_non_filter = fleecing_recurse_is_first_non_filter,
+>> +    .bdrv_child_perm        = bdrv_filter_default_perms,
+>> +};
+>> +
+>> +static void bdrv_fleecing_init(void)
+>> +{
+>> +    bdrv_register(&bdrv_fleecing_filter);
+>> +}
+>> +
+>> +block_init(bdrv_fleecing_init);
+>> diff --git a/block/Makefile.objs b/block/Makefile.objs
+>> index 899bfb5e2c..aa0a6dd971 100644
+>> --- a/block/Makefile.objs
+>> +++ b/block/Makefile.objs
+>> @@ -27,6 +27,7 @@ block-obj-y += write-threshold.o
+>>   block-obj-y += backup.o
+>>   block-obj-$(CONFIG_REPLICATION) += replication.o
+>>   block-obj-y += throttle.o copy-on-read.o
+>> +block-obj-y += fleecing-filter.o
+>>   
+>>   block-obj-y += crypto.o
+>>   
+>>
+
+
+-- 
+Best regards,
+Vladimir
