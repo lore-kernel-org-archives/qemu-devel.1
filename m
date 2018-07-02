@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0UP-0004eR-UN
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:42 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0UP-0008Qc-10
+	(envelope-from <shorne@gmail.com>) id 1fa0UO-0004dV-Vg
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:41 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35715)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0UO-0008QN-S0
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <shorne@gmail.com>) id 1fa0UM-0008Oa-Nd
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:40 -0400
-Received: by mail-pg0-x243.google.com with SMTP id i7-v6so7283886pgp.2
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:40 -0700 (PDT)
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:44779)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0UM-0008NY-HC
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:11:38 -0400
+Received: by mail-pg0-x244.google.com with SMTP id r1-v6so1582546pgp.11
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:11:38 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 00:10:23 +0900
-Message-Id: <20180702151023.24532-26-shorne@gmail.com>
+Date: Tue,  3 Jul 2018 00:10:22 +0900
+Message-Id: <20180702151023.24532-25-shorne@gmail.com>
 In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
 References: <20180702151023.24532-1-shorne@gmail.com>
-Subject: [Qemu-devel] [PULL v2 25/25] target/openrisc: Fix writes to
- interrupt mask register
+Subject: [Qemu-devel] [PULL v2 24/25] target/openrisc: Fix delay slot
+ exception flag to match spec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +29,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
 
-The interrupt controller mask register (PICMR) allows writing any value
-to any of the 32 interrupt mask bits.  Writing a 0 masks the interrupt
-writing a 1 unmasks (enables) the the interrupt.
+The delay slot exception flag is only set on the SR register during
+exception.  Previously it was being set on both the ESR and SR this
+caused QEMU to differ from the spec.  The was apparent as the linux
+kernel had a bug where it could boot on QEMU but not on real hardware.
 
-For some reason the old code was or'ing the write values to the PICMR
-meaning it was not possible to ever mask a interrupt once it was
-enabled.
+The fixed logic now matches hardware.
 
-I have tested this by running linux 4.18 and my regular checks, I don't
-see any issues.
-
-Reported-by: Davidson Francis <davidsondfgl@gmail.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/sys_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/openrisc/interrupt.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 541615bfb3..b66a45c1e0 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -142,7 +142,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-         }
-         break;
-     case TO_SPR(9, 0):  /* PICMR */
--        env->picmr |= rb;
-+        env->picmr = rb;
-         break;
-     case TO_SPR(9, 2):  /* PICSR */
-         env->picsr &= ~rb;
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index 138ad17f00..bbae956361 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -35,13 +35,6 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     int exception = cs->exception_index;
+ 
+     env->epcr = env->pc;
+-    if (env->dflag) {
+-        env->dflag = 0;
+-        env->sr |= SR_DSX;
+-        env->epcr -= 4;
+-    } else {
+-        env->sr &= ~SR_DSX;
+-    }
+     if (exception == EXCP_SYSCALL) {
+         env->epcr += 4;
+     }
+@@ -51,7 +44,10 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+         env->eear = env->pc;
+     }
+ 
++    /* During exceptions esr is populared with the pre-exception sr.  */
+     env->esr = cpu_get_sr(env);
++    /* In parallel sr is updated to disable mmu, interrupts, timers and
++       set the delay slot exception flag.  */
+     env->sr &= ~SR_DME;
+     env->sr &= ~SR_IME;
+     env->sr |= SR_SM;
+@@ -61,6 +57,15 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     env->pmr &= ~PMR_SME;
+     env->lock_addr = -1;
+ 
++    /* Set/clear dsx to indicate if we are in a delay slot exception.  */
++    if (env->dflag) {
++        env->dflag = 0;
++        env->sr |= SR_DSX;
++        env->epcr -= 4;
++    } else {
++        env->sr &= ~SR_DSX;
++    }
++
+     if (exception > 0 && exception < EXCP_NR) {
+         static const char * const int_name[EXCP_NR] = {
+             [EXCP_RESET]    = "RESET",
 -- 
 2.17.0
