@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fZzvD-0000g2-Rx
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:35:20 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzxw-00035G-OU
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fZzvA-0002iE-JN
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:35:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39326 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fZzv9-0002hq-WA
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:35:16 -0400
-References: <20180702140558.18267-1-esposem@usi.ch>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e1605e06-dd05-3ffb-fff3-fbb18bc66a50@redhat.com>
-Date: Mon, 2 Jul 2018 16:35:12 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fZzxs-0005Bu-ED
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:08 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33862)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fZzxs-0005Ax-83
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 10:38:04 -0400
+Received: by mail-wr0-x233.google.com with SMTP id a12-v6so15816933wro.1
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 07:38:04 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon,  2 Jul 2018 15:30:17 +0100
+Message-Id: <20180702143021.18864-17-alex.bennee@linaro.org>
+In-Reply-To: <20180702143021.18864-1-alex.bennee@linaro.org>
+References: <20180702143021.18864-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180702140558.18267-1-esposem@usi.ch>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qpci_free_pc: sdhci-test and
- vhost-user-test could free() NULL pointers.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 16/20] docker: drop QEMU build-dep from
+ bootstrap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Emanuele Giuseppe Esposito <esposem@usi.ch>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 02/07/2018 16:05, Emanuele Giuseppe Esposito wrote:
-> @@ -152,6 +152,8 @@ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAlloca=
-tor *alloc)
-> =20
->  void qpci_free_pc(QPCIBus *bus)
->  {
-> +    g_assert(bus);
-> +
->      QPCIBusPC *s =3D container_of(bus, QPCIBusPC, bus);
-> =20
->      g_free(s);
-> diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-> index 1d825eb010..9b486b93bf 100644
-> --- a/tests/sdhci-test.c
-> +++ b/tests/sdhci-test.c
-> @@ -209,7 +209,9 @@ static QSDHCI *machine_start(const struct sdhci_t *=
-test)
-> =20
->  static void machine_stop(QSDHCI *s)
->  {
-> -    qpci_free_pc(s->pci.bus);
-> +    if (s->pci.bus) {
-> +        qpci_free_pc(s->pci.bus);
-> +    }
+This is best done with any child images that actually need it.
 
-Sorry for chiming in just now.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/dockerfiles/debian-bootstrap.docker | 2 --
+ 1 file changed, 2 deletions(-)
 
-In general, freeing a NULL pointer is a fine thing to do in C.  In your
-code you do
-
-    QPCIBusPC *ret =3D g_new0(QPCIBusPC, 1);
-    qpci_set_pc(ret, qts, alloc);
-    return &ret->bus;
-
-But now &ret->bus can be inside the pointer.  qpci_free_pc must
-therefore check for NULL before doing the container_of.
-
-It is debatable whether this change should go in QEMU before your code,
-or together with it.  There are good arguments for both sides:
-
-- the container_of is assuming that QPCIBus is the first field of the
-struct, but that's a strange assumption: container_of usually is used to
-go from an interior pointer to an outside struct, and passing NULL to it
-is usually wrong
-
-- but, the struct _does_ have QPCIBus as the first field, so we can
-assume that if bus =3D=3D NULL, s will be NULL too.  And g_free(NULL) is =
-okay.
-
-I suggest that you add the "if (!bus) { return; }" in your code, in the
-same patch that adds the field before QPCIBusPC.
-
-Thanks,
-
-Paolo
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.docker b/tests/docker/dockerfiles/debian-bootstrap.docker
+index 3a9125e497..14212b9cf4 100644
+--- a/tests/docker/dockerfiles/debian-bootstrap.docker
++++ b/tests/docker/dockerfiles/debian-bootstrap.docker
+@@ -17,5 +17,3 @@ RUN /debootstrap/debootstrap --second-stage
+ # At this point we can install additional packages if we want
+ # Duplicate deb line as deb-src
+ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+-RUN apt-get update
+-RUN apt-get -y build-dep qemu
+-- 
+2.17.1
