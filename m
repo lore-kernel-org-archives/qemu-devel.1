@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZxvg-0004UJ-Eq
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:27:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fZxwM-0004yk-4i
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZxvb-0004cI-TP
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:27:40 -0400
-Date: Mon, 2 Jul 2018 13:27:33 +0100
+	(envelope-from <stefanha@gmail.com>) id 1fZxwH-0004wS-73
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:28:22 -0400
+Date: Mon, 2 Jul 2018 13:28:14 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180702122733.GC2155@stefanha-x1.localdomain>
+Message-ID: <20180702122814.GD2155@stefanha-x1.localdomain>
 References: <20180627143815.1829-1-joel@jms.id.au>
-	<20180627143815.1829-3-joel@jms.id.au>
+	<20180627143815.1829-4-joel@jms.id.au>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/e2eDi0V/xtL+Mc8"
+	protocol="application/pgp-signature"; boundary="+B+y8wtTXqdUj1xM"
 Content-Disposition: inline
-In-Reply-To: <20180627143815.1829-3-joel@jms.id.au>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] arm: Add BBC micro:bit machine
+In-Reply-To: <20180627143815.1829-4-joel@jms.id.au>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] MAINTAINERS: Add NRF51 entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +28,49 @@ To: Joel Stanley <joel@jms.id.au>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
 
---/e2eDi0V/xtL+Mc8
+--+B+y8wtTXqdUj1xM
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 28, 2018 at 12:08:14AM +0930, Joel Stanley wrote:
-> diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-> new file mode 100644
-> index 000000000000..e9e0d35ca79c
-> --- /dev/null
-> +++ b/hw/arm/microbit.c
-> @@ -0,0 +1,56 @@
-> +/*
-> + * BBC micro:bit machine
-> + * http://tech.microbit.org/hardware/
-> + *
-> + * Copyright 2018 Joel Stanley <joel@jms.id.au>
-> + *
-> + * This code is licensed under the GPL version 2 or later.  See
-> + * the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/boards.h"
-> +#include "hw/arm/arm.h"
-> +#include "exec/address-spaces.h"
-> +
-> +#include "hw/arm/nrf51_soc.h"
-> +
-> +#define FLASH_BASE      0x00000000
+On Thu, Jun 28, 2018 at 12:08:15AM +0930, Joel Stanley wrote:
+> This contains the NRF51, and the machine that uses it, the BBC
+> micro:bit.
+>=20
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  MAINTAINERS | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8c626f6a079e..fef3d71dbef7 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -656,6 +656,14 @@ F: include/hw/*/*aspeed*
+>  F: hw/net/ftgmac100.c
+>  F: include/hw/net/ftgmac100.h
+> =20
+> +NRF51
+> +M: Joel Stanley <joel@jms.id.au>
+> +L: qemu-arm@nognu.org
 
-Unused, please remove.
+s/nognu/nongnu/
 
 Aside from that:
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---/e2eDi0V/xtL+Mc8
+--+B+y8wtTXqdUj1xM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbOho1AAoJEJykq7OBq3PIjJYH/RiWVrGgbbchLAaGMs1293/A
-CrxioGLNC9QM4DtQJ2gPLX1E93rPxB2MD/Y4+M7s5RoHEB4AbXKZ8LvLpX5swjvC
-IGok8Ju6LGozwnmOm8ijQN3uqCDQcTTo+n8AVzZgbiZyvFbtrYGo6P/ePQxjetK+
-oiT+acdlwM3THPL/8HECSreWoC5wyqHL7gM6g5TeKTVy9bSPlWsrrxEELl/47NTq
-i3OuDKvNmuIzx2CZyx/0614okauNG5Q1v7M0EEn2wCJ4kiwmF80k6S3Qa8AKqJMx
-wka7vUgX5hKq6uGd1rujRT0VsM+HiAS8gTphrjnUqtkSMjM2E4oI23Wk45eW8ps=
-=TIVn
+iQEcBAEBAgAGBQJbOhpeAAoJEJykq7OBq3PI724H/35xM0f3PMkg50f8sE2POCgY
+R4rl7eZW858ODZCEazHRuGVca4Oa+Y7fryvWbw/SHCvxyxH5feeal+KSLlcLx+0i
+J4u/OyOCq3l8xcGbsmp15Gec84j/rXpPSrh7f+npD2c2+vdw8VxKux8QvLYLzGIp
+SLu6ZKIdA34MUg2DZCAof92lW7cGHXLV4jH01+4rPZIWmcBLNhkqznSjdPvyZDwg
+O0V47GHgZHuSJlWICmwIo0KTZQ5pqJU3K+UtognzlCmZ464vYq+pPei9J1uLqoAa
+zF8RZAn/kEMw5wMUj42zPKf5XCyc2EuuTZWZJX0buD7yfU1GeHdV60iDhAo/xY8=
+=tKSU
 -----END PGP SIGNATURE-----
 
---/e2eDi0V/xtL+Mc8--
+--+B+y8wtTXqdUj1xM--
