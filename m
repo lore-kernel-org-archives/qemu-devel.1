@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fa0iA-0007d9-Ds
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:55 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fa0iB-0007e2-18
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fa0i6-0006f6-Eq
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:54 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fa0i6-0006eV-7G
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:50 -0400
-Received: by mail-wm0-x241.google.com with SMTP id v16-v6so9495073wmv.5
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:25:50 -0700 (PDT)
-Date: Mon, 2 Jul 2018 16:25:42 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180702152542.GL2155@stefanha-x1.localdomain>
-References: <20180702063725.8087-1-pagupta@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fa0i7-0006fX-30
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45474 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fa0i6-0006et-SS
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:25:51 -0400
+References: <20180702065237.27899-1-jusual@mail.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1015ce8a-4559-2b8f-8c3b-93fe4616a014@redhat.com>
+Date: Mon, 2 Jul 2018 17:25:43 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="00hq2S6J2Jlg6EbK"
-Content-Disposition: inline
-In-Reply-To: <20180702063725.8087-1-pagupta@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] virtio-rng: process pending requests
- when driver is ready
+In-Reply-To: <20180702065237.27899-1-jusual@mail.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qtest: Use cpu address space instead of
+ system memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: mst@redhat.com, amit@kernel.org, qemu-devel@nongnu.org, slopezpa@redhat.com, stefanha@redhat.com
+To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
 
-
---00hq2S6J2Jlg6EbK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 02, 2018 at 12:07:25PM +0530, Pankaj Gupta wrote:
->  virtio-rng device causing old guest kernels(2.6.32) to hang on latest qe=
-mu.
->  The driver attempts to read from the virtio-rng device too early in it's
->  initialization. Qemu detects guest is not ready and returns, resulting in
->  hang.
->=20
->  Fix is to handle pending request when guest is running and driver status=
- is
->  set to 'VIRTIO_CONFIG_S_DRIVER_OK'.
->=20
-> Reported-by: Sergio lopez <slopezpa@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+On 02/07/2018 08:52, Julia Suvorova wrote:
+> Some devices (like nvic in armv7m) are not accessable through
+> address_space_memory, therefore can not be tested with qtest.
+> 
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
 > ---
-> v3->v4: Added signed-off & reported-by tags again.
-> v2->v3: Add comment to explain virtio-rng early status update (Stefan)
-> v1->v2: Update new status value early only for virtio-rng (Stefan)
->=20
->  hw/virtio/virtio-rng.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->=20
-> diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-> index 289bbcac03..0b586bd750 100644
-> --- a/hw/virtio/virtio-rng.c
-> +++ b/hw/virtio/virtio-rng.c
-> @@ -156,6 +156,24 @@ static void check_rate_limit(void *opaque)
->      vrng->activate_timer =3D true;
->  }
-> =20
-> +static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
-> +{
-> +    VirtIORNG *vrng =3D VIRTIO_RNG(vdev);
-> +
-> +    if (!vdev->vm_running) {
-> +        return;
-> +    }
-> +    /* Set device status in VirtIODevice object. Its used in 'is_guest_r=
-eady'
+>  qtest.c | 39 ++++++++++++++++++++++++++-------------
+>  1 file changed, 26 insertions(+), 13 deletions(-)
+> 
+> diff --git a/qtest.c b/qtest.c
+> index cbbfb71114..69b9e9962b 100644
+> --- a/qtest.c
+> +++ b/qtest.c
+> @@ -387,19 +387,23 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>  
+>          if (words[0][5] == 'b') {
+>              uint8_t data = value;
+> -            cpu_physical_memory_write(addr, &data, 1);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             &data, 1, true);
+>          } else if (words[0][5] == 'w') {
+>              uint16_t data = value;
+>              tswap16s(&data);
+> -            cpu_physical_memory_write(addr, &data, 2);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             (uint8_t *) &data, 2, true);
+>          } else if (words[0][5] == 'l') {
+>              uint32_t data = value;
+>              tswap32s(&data);
+> -            cpu_physical_memory_write(addr, &data, 4);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             (uint8_t *) &data, 4, true);
+>          } else if (words[0][5] == 'q') {
+>              uint64_t data = value;
+>              tswap64s(&data);
+> -            cpu_physical_memory_write(addr, &data, 8);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             (uint8_t *) &data, 8, true);
+>          }
+>          qtest_send_prefix(chr);
+>          qtest_send(chr, "OK\n");
+> @@ -417,18 +421,22 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>  
+>          if (words[0][4] == 'b') {
+>              uint8_t data;
+> -            cpu_physical_memory_read(addr, &data, 1);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             &data, 1, false);
+>              value = data;
+>          } else if (words[0][4] == 'w') {
+>              uint16_t data;
+> -            cpu_physical_memory_read(addr, &data, 2);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             (uint8_t *) &data, 2, false);
+>              value = tswap16(data);
+>          } else if (words[0][4] == 'l') {
+>              uint32_t data;
+> -            cpu_physical_memory_read(addr, &data, 4);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             (uint8_t *) &data, 4, false);
+>              value = tswap32(data);
+>          } else if (words[0][4] == 'q') {
+> -            cpu_physical_memory_read(addr, &value, 8);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             (uint8_t *) &value, 8, false);
+>              tswap64s(&value);
+>          }
+>          qtest_send_prefix(chr);
+> @@ -448,7 +456,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>          g_assert(len);
+>  
+>          data = g_malloc(len);
+> -        cpu_physical_memory_read(addr, data, len);
+> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                         data, len, false);
+>  
+>          enc = g_malloc(2 * len + 1);
+>          for (i = 0; i < len; i++) {
+> @@ -473,7 +482,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>          g_assert(ret == 0);
+>  
+>          data = g_malloc(len);
+> -        cpu_physical_memory_read(addr, data, len);
+> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                         data, len, false);
+>          b64_data = g_base64_encode(data, len);
+>          qtest_send_prefix(chr);
+>          qtest_sendf(chr, "OK %s\n", b64_data);
+> @@ -507,7 +517,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>                  data[i] = 0;
+>              }
+>          }
+> -        cpu_physical_memory_write(addr, data, len);
+> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                         data, len, true);
+>          g_free(data);
+>  
+>          qtest_send_prefix(chr);
+> @@ -529,7 +540,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>          if (len) {
+>              data = g_malloc(len);
+>              memset(data, pattern, len);
+> -            cpu_physical_memory_write(addr, data, len);
+> +            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                             data, len, true);
+>              g_free(data);
+>          }
+>  
+> @@ -562,7 +574,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+>              out_len = MIN(out_len, len);
+>          }
+>  
+> -        cpu_physical_memory_write(addr, data, out_len);
+> +        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                         data, len, true);
+>  
+>          qtest_send_prefix(chr);
+>          qtest_send(chr, "OK\n");
+> 
 
-s/Its/It's/
+Queued, thanks.
 
-Can be fixed when merging.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---00hq2S6J2Jlg6EbK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbOkP2AAoJEJykq7OBq3PIUQMH/2PXpOkXDKDr+Qbg7vKY+O14
-YF5lIfgxFc8C1Px6nEh5n/TsTezUyCUkQQDMRx6JgixwExaL9BUB+k5iIUaQwIgC
-WC/CUNZeanBjomRTk9ElEzYCGSy5dUMvttgJUFTT44u5Me3cP6QXsM9Z0wecXmJO
-HqIVEJQ8IeIim3FmvpF0bW/3OxXyN8ujyGoYZ/NT6rt+9WEDAbFy2Gl7U9TFy088
-3fUJ7k3//hGxibih6C6qxeJgeRxsUA20J7N/lR4HIEkBoDOe3p0cH5Gy3uXD51o+
-+mS+B68mHS6oRQTlK/kom3UBToeiCv8ATrTaEEF7bBuqg42bEc7MQC77LPufAmE=
-=WE6W
------END PGP SIGNATURE-----
-
---00hq2S6J2Jlg6EbK--
+Paolo
