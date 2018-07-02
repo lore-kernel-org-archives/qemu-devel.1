@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fa1av-0004TQ-0P
+	(envelope-from <armbru@redhat.com>) id 1fa1aw-0004UX-1g
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fa1as-0006gP-4L
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42850 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fa1as-0006gl-B0
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54944 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fa1ar-0006ev-Jz
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fa1ar-0006fB-SA
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 12:22:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 20CEB401EF07
+	by mx1.redhat.com (Postfix) with ESMTPS id 4BC3840704BB
 	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 16:22:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Jul 2018 18:22:10 +0200
-Message-Id: <20180702162218.13678-25-armbru@redhat.com>
+Date: Mon,  2 Jul 2018 18:22:18 +0200
+Message-Id: <20180702162218.13678-33-armbru@redhat.com>
 In-Reply-To: <20180702162218.13678-1-armbru@redhat.com>
 References: <20180702162218.13678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 24/32] qmp: Replace monitor_json_emitter{,
- raw}() by qmp_{queue, send}_response()
+Subject: [Qemu-devel] [PATCH 32/32] qapi: Polish command flags documentation
+ in qapi-code-gen.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,110 +33,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
 
-monitor_json_emitter() and monitor_json_emitter_raw() are
-unnecessarily general: they can send arbitrary JSON values, even
-though we only ever use them for QMP, which may send only JSON
-objects.
-
-Specialize the argument from QObject * to QDict *, and rename to
-qmp_queue_response(), qmp_send_response().
-
-All callers but one lose an upcast.  The lone exception gains a
-downcast; the next commit will get rid of it.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ docs/devel/qapi-code-gen.txt | 61 +++++++++++++++---------------------
+ 1 file changed, 25 insertions(+), 36 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 0f7a96213f..399ad6b4e0 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -502,9 +502,9 @@ int monitor_fprintf(FILE *stream, const char *fmt, ...)
-     return 0;
- }
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index f020f6bab2..8decd6f17d 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -624,60 +624,48 @@ its return value.
+ In rare cases, QAPI cannot express a type-safe representation of a
+ corresponding Client JSON Protocol command.  You then have to suppress
+ generation of a marshalling function by including a key 'gen' with
+-boolean value false, and instead write your own function.  Please try
+-to avoid adding new commands that rely on this, and instead use
+-type-safe unions.  For an example of this usage:
++boolean value false, and instead write your own function.  For
++example:
  
--static void monitor_json_emitter_raw(Monitor *mon,
--                                     QObject *data)
-+static void qmp_send_response(Monitor *mon, QDict *rsp)
- {
-+    QObject *data = QOBJECT(rsp);
-     QString *json;
+  { 'command': 'netdev_add',
+    'data': {'type': 'str', 'id': 'str'},
+    'gen': false }
  
-     json = mon->flags & MONITOR_USE_PRETTY ? qobject_to_json_pretty(data) :
-@@ -517,7 +517,7 @@ static void monitor_json_emitter_raw(Monitor *mon,
-     qobject_unref(json);
- }
++Please try to avoid adding new commands that rely on this, and instead
++use type-safe unions.
++
+ Normally, the QAPI schema is used to describe synchronous exchanges,
+ where a response is expected.  But in some cases, the action of a
+ command is expected to change state in a way that a successful
+ response is not possible (although the command will still return a
+ normal dictionary error on failure).  When a successful reply is not
+-possible, the command expression should include the optional key
++possible, the command expression includes the optional key
+ 'success-response' with boolean value false.  So far, only QGA makes
+ use of this member.
  
--static void monitor_json_emitter(Monitor *mon, QObject *data)
-+static void qmp_queue_response(Monitor *mon, QDict *rsp)
- {
-     if (mon->use_io_thread) {
-         /*
-@@ -527,8 +527,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
-          * responder thread).
-          */
-         qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
--        g_queue_push_tail(mon->qmp.qmp_responses,
--                          qobject_ref(qobject_to(QDict, data)));
-+        g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(rsp));
-         qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-         qemu_bh_schedule(qmp_respond_bh);
-     } else {
-@@ -536,7 +535,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
-          * If not using monitor I/O thread, then we are in main thread.
-          * Do the emission right away.
-          */
--        monitor_json_emitter_raw(mon, data);
-+        qmp_send_response(mon, rsp);
-     }
- }
+-A command can be declared to support out-of-band (OOB) execution.  By
+-default, commands do not support OOB.  To declare a command that
+-supports it, the schema includes an extra 'allow-oob' field.  For
+-example:
++Key 'allow-oob' declares whether the command supports out-of-band
++(OOB) execution.  It defaults to false.  For example:
  
-@@ -562,7 +561,7 @@ static void monitor_qmp_response_flush(Monitor *mon)
-     QDict *data;
+  { 'command': 'migrate_recover',
+    'data': { 'uri': 'str' }, 'allow-oob': true }
  
-     while ((data = monitor_qmp_response_pop_one(mon))) {
--        monitor_json_emitter_raw(mon, QOBJECT(data));
-+        qmp_send_response(mon, data);
-         qobject_unref(data);
-     }
- }
-@@ -594,7 +593,7 @@ static void monitor_qmp_bh_responder(void *opaque)
-     QMPResponse response;
+-To execute a command with out-of-band priority, the client uses key
+-"exec-oob" instead of "execute".  Example:
++See qmp-spec.txt for out-of-band execution syntax and semantics.
  
-     while (monitor_qmp_response_pop_any(&response)) {
--        monitor_json_emitter_raw(response.mon, QOBJECT(response.data));
-+        qmp_send_response(response.mon, response.data);
-         qobject_unref(response.data);
-     }
- }
-@@ -621,7 +620,7 @@ static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
-         if (monitor_is_qmp(mon)
-             && mon->qmp.commands != &qmp_cap_negotiation_commands) {
--            monitor_json_emitter(mon, QOBJECT(qdict));
-+            qmp_queue_response(mon, qdict);
-         }
-     }
- }
-@@ -4117,7 +4116,7 @@ static void monitor_qmp_respond(Monitor *mon, QDict *rsp,
-             qdict_put_obj(rsp, "id", qobject_ref(id));
-         }
+- => { "exec-oob": "migrate-recover",
+-      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
+- <= { "return": { } }
++Commands supporting out-of-band execution can still be executed
++in-band.
  
--        monitor_json_emitter(mon, QOBJECT(rsp));
-+        qmp_queue_response(mon, rsp);
-     }
+-Without it, even the commands that support out-of-band execution will
+-still be run in-band.
++When a command is executed in-band, its handler runs in the main
++thread with the BQL held.
  
-     qobject_unref(id);
-@@ -4417,7 +4416,7 @@ static void monitor_qmp_event(void *opaque, int event)
-         mon->qmp.commands = &qmp_cap_negotiation_commands;
-         monitor_qmp_caps_reset(mon);
-         data = get_qmp_greeting(mon);
--        monitor_json_emitter(mon, data);
-+        qmp_queue_response(mon, qobject_to(QDict, data));
-         qobject_unref(data);
-         mon_refcount++;
-         break;
+-Under normal QMP command execution, the following apply to each
+-command:
++When a command is executed out-of-band, its handler runs in a
++dedicated monitor I/O thread with the BQL *not* held.
+ 
+-- They are executed in order,
+-- They run only in main thread of QEMU,
+-- They run with the BQL held.
++An OOB-capable command handler must satisfy the following conditions:
+ 
+-When a command is executed with OOB, the following changes occur:
+-
+-- They can be completed before a pending in-band command,
+-- They run in a dedicated monitor thread,
+-- They run with the BQL not held.
+-
+-OOB command handlers must satisfy the following conditions:
+-
+-- It terminates quickly,
+-- It does not invoke system calls that may block,
++- It terminates quickly.
++- It does not invoke system calls that may block.
+ - It does not access guest RAM that may block when userfaultfd is
+-  enabled for postcopy live migration,
++  enabled for postcopy live migration.
+ - It takes only "fast" locks, i.e. all critical sections protected by
+   any lock it takes also satisfy the conditions for OOB command
+   handler code.
+@@ -686,17 +674,18 @@ The restrictions on locking limit access to shared state.  Such access
+ requires synchronization, but OOB commands can't take the BQL or any
+ other "slow" lock.
+ 
+-If in doubt, do not implement OOB execution support.
++When in doubt, do not implement OOB execution support.
+ 
+-A command may use the optional 'allow-preconfig' key to permit its execution
+-at early runtime configuration stage (preconfig runstate).
+-If not specified then a command defaults to 'allow-preconfig': false.
++Key 'allow-preconfig' declares whether the command is available before
++the machine is built.  It defaults to false.  For example:
+ 
+-An example of declaring a command that is enabled during preconfig:
+  { 'command': 'qmp_capabilities',
+    'data': { '*enable': [ 'QMPCapability' ] },
+    'allow-preconfig': true }
+ 
++QMP is available before the machine is built only when QEMU was
++started with --preconfig.
++
+ === Events ===
+ 
+ Usage: { 'event': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
 -- 
 2.17.1
