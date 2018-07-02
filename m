@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fZp3P-0001Jj-GZ
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:59:04 -0400
+	(envelope-from <famz@redhat.com>) id 1fZp3R-0001LF-3k
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:59:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fZp3M-0001iF-Pu
-	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:59:03 -0400
+	(envelope-from <famz@redhat.com>) id 1fZp3Q-0001lq-Eb
+	for qemu-devel@nongnu.org; Sun, 01 Jul 2018 22:59:05 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon,  2 Jul 2018 10:58:35 +0800
-Message-Id: <20180702025836.20957-4-famz@redhat.com>
+Date: Mon,  2 Jul 2018 10:58:36 +0800
+Message-Id: <20180702025836.20957-5-famz@redhat.com>
 In-Reply-To: <20180702025836.20957-1-famz@redhat.com>
 References: <20180702025836.20957-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] qcow2: Drop unreachable break
+Subject: [Qemu-devel] [PATCH 4/4] raw: Drop superfluous semicolon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +25,21 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@non
 Reported-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/qcow2.c | 1 -
- 1 file changed, 1 deletion(-)
+ block/raw-format.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3177c72de0..1a2e498a3c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3292,7 +3292,6 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
-         case QCOW2_CLUSTER_COMPRESSED:
-             ret = -ENOTSUP;
-             goto out;
--            break;
+diff --git a/block/raw-format.c b/block/raw-format.c
+index b78da564d4..8e648a5666 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -177,7 +177,7 @@ static inline int raw_adjust_offset(BlockDriverState *bs, uint64_t *offset,
+         /* There's not enough space for the write, or the read request is
+          * out-of-range. Don't read/write anything to prevent leaking out of
+          * the size specified in options. */
+-        return is_write ? -ENOSPC : -EINVAL;;
++        return is_write ? -ENOSPC : -EINVAL;
+     }
  
-         case QCOW2_CLUSTER_NORMAL:
-             child = bs->file;
+     if (*offset > INT64_MAX - s->offset) {
 -- 
 2.17.1
