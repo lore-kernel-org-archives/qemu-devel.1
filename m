@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZyfu-0004kJ-V8
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:15:28 -0400
+	(envelope-from <Suzuki.Poulose@arm.com>) id 1fZyp6-0006Bd-Us
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZyfp-0002V7-Rr
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:15:26 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:50768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fZyfp-0002Ui-89
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:15:21 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id v25-v6so8058958wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 06:15:21 -0700 (PDT)
-Date: Mon, 2 Jul 2018 14:15:18 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180702131518.GF2155@stefanha-x1.localdomain>
-References: <86b43998-fc9e-75bf-564c-a64d72163793@huawei.com>
+	(envelope-from <Suzuki.Poulose@arm.com>) id 1fZyp2-0007WO-WF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:24:56 -0400
+Received: from foss.arm.com ([217.140.101.70]:39588)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Suzuki.Poulose@arm.com>) id 1fZyp2-0007W9-MS
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 09:24:52 -0400
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-10-git-send-email-suzuki.poulose@arm.com>
+	<65475ac0-d156-c16e-bd91-438377326143@redhat.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Message-ID: <22c070c4-aede-d699-774f-6212d05f7a59@arm.com>
+Date: Mon, 2 Jul 2018 14:24:47 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xkXJwpr35CY/Lc3I"
-Content-Disposition: inline
-In-Reply-To: <86b43998-fc9e-75bf-564c-a64d72163793@huawei.com>
-Subject: Re: [Qemu-devel] question: disk missing in the guest contingently
- when hotplug several virtio scsi disks consecutively.
+In-Reply-To: <65475ac0-d156-c16e-bd91-438377326143@redhat.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 09/20] kvm: arm64: Make stage2 page
+ table layout dynamic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: l00284672 <lizhengui@huawei.com>
-Cc: famz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+
+Hi Eric,
 
 
---xkXJwpr35CY/Lc3I
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 02/07/18 13:14, Auger Eric wrote:
+> Hi Suzuki,
+> 
+> On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
+>> So far we had a static stage2 page table handling code, based on a
+>> fixed IPA of 40bits. As we prepare for a configurable IPA size per
+>> VM, make our stage2 page table code dynamic, to do the right thing
+>> for a given VM. We ensure the existing condition is always true even
+>> when we lift the limit on the IPA. i.e,
+>>
+>> 	page table levels in stage1 >= page table levels in stage2
+>>
+>> Support for the IPA size configuration needs other changes in the way
+>> we configure the EL2 registers (VTTBR and VTCR). So, the IPA is still
+>> fixed to 40bits. The patch also moves the kvm_page_empty() in asm/kvm_mmu.h
+>> to the top, before including the asm/stage2_pgtable.h to avoid a forward
+>> declaration.
+>>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <cdall@kernel.org>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>> Changes since V2
+>>   - Restrict the stage2 page table to allow reusing the host page table
+>>     helpers for now, until we get stage1 independent page table helpers.
+> I would move this up in the commit msg to motivate the fact we enforce
+> the able condition.
 
-On Wed, Jun 27, 2018 at 06:33:16PM +0800, l00284672 wrote:
-> Hi, I found a bug that disk missing (not all disks missing ) in the guest
-> contingently when hotplug several virtio scsi disks consecutively.=A0 Aft=
-er
-> rebooting the guest,
+This is mentioned in the commit message for the patch which lifts the limitation
+on the IPA. This patch only deals with the dynamic page table level handling,
+with the restriction on the levels. Nevertheless, I could add it to the
+description.
 
-For the record, there is also a bug report here:
+>> ---
+>>   arch/arm64/include/asm/kvm_mmu.h              |  14 +-
+>>   arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 ------
+>>   arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
+>>   arch/arm64/include/asm/stage2_pgtable.h       | 207 +++++++++++++++++++-------
+>>   4 files changed, 159 insertions(+), 143 deletions(-)
+>>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
+>>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
+> 
+> with my very limited knowledge of S2 page table walkers I fail to
+> understand why we now can get rid of stage2_pgtable-nopmd.h and
+> stage2_pgtable-nopud.h and associated FOLDED config. Please could you
+> explain it in the commit message?
 
-https://bugs.launchpad.net/qemu/+bug/1779120
+As mentioned above, we have static page table helpers, which are decided
+at compile time (just like the stage1). So these files hold the definitions
+for the cases where PUD/PMD is folded and included for a given stage1 VA.
+But since we are now doing this check per VM, we make the decision
+by checking the kvm_stage2_levels(), instead of hard coding it.
 
-I plan to reproduce this issue soon.
+Does that help ? A short version of that is already there. May be I could
+elaborate that a bit.
 
-Stefan
+>> -
+>> -#define stage2_pgd_index(kvm, addr) \
+>> -	(((addr) >> S2_PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
+>> +static inline unsigned long stage2_pgd_index(struct kvm *kvm, phys_addr_t addr)
+>> +{
+>> +	return (addr >> stage2_pgdir_shift(kvm)) & (stage2_pgd_ptrs(kvm) - 1);
+>> +}
+>>   
+>>   static inline phys_addr_t
+>>   stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+>>   {
+>> -	phys_addr_t boundary = (addr + S2_PGDIR_SIZE) & S2_PGDIR_MASK;
+>> +	phys_addr_t boundary;
+>>   
+>> +	boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
+>>   	return (boundary - 1 < end - 1) ? boundary : end;
+>>   }
+>>   
+>>
+> 
+> Globally this patch is pretty hard to review. I don't know if it is
+> possible to split into 2. 1) Addition of some helper macros. 2) removal
+> of nopud and nopmd and implementation of the corresponding macros?
 
---xkXJwpr35CY/Lc3I
-Content-Type: application/pgp-signature; name="signature.asc"
+I acknowledge that. The patch redefines the "existing" macros to make the
+decision at runtime based on the VM's setting. I will see if there is a
+better way to do it.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbOiVmAAoJEJykq7OBq3PIfDIH/1BcBSAnSx9jdOK7Fk7R0MvP
-8lIxGKheQlpjytcBjCW3u3S/WxXH9aKYsHR/7Y1U8KDde6RFclIis0yBVWm0kKA5
-i7rrzdBXb4D1q9fJIuNUNss8h0jE2xqbjM9Ne1vQRLpSF0B7fbuX8+ffOhyCpT2I
-VVN3LYqNtgoh9DkJU1AsYMOgtfQuBbpSOB4seHzFTNOK49QNnGQsBQNTaCv+7LSV
-ePKK4YghDIw3xIvmaFn2Om36WxpIT/uwuxU+WU9p0h4Imhj6PrO7bA4EO3pLWufc
-FVV4XegBsTF/HqVSZZDofwSFb1sQ2dM1hHH0fBXK7e7H6X/5ptk1EALfoICjMg8=
-=dVBv
------END PGP SIGNATURE-----
-
---xkXJwpr35CY/Lc3I--
+Cheers
+Suzuki
