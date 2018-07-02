@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2Xs-00007H-Vq
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:26 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa2Xv-0000AM-Me
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2Xn-0006Xc-Ui
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:24 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa2Xu-0006dg-EX
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:27 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  2 Jul 2018 19:22:31 +0200
-Message-Id: <1530552162-15533-5-git-send-email-eric.auger@redhat.com>
+Date: Mon,  2 Jul 2018 19:22:34 +0200
+Message-Id: <1530552162-15533-8-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
 References: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 04/15] hw/arm/virt: support kvm_type property
+Subject: [Qemu-devel] [RFC v2 07/15] hw/arm/virt: Add memory hotplug
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,113 +23,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-The kvm-type property currently is used to pass
-a user parameter to KVM_CREATE_VM. This matches
-the way KVM/ARM expects to pass the max_vm_phys_shift
-parameter.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-This patch adds the support or the kvm-type property in
-machvirt and also implements the machine class kvm_type()
-callback so that it either returns the kvm-type value
-provided by the user or returns the max_vm_phys_shift
-exposed by KVM.
-
-for instance, the usespace can use the following option to
-instantiate a 42b IPA guest: -machine kvm-type=42
+This patch adds the the memory hot-plug/hot-unplug infrastructure
+in machvirt.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt.c         | 44 ++++++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 45 insertions(+)
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
 
+---
+
+v1 -> v2:
+- s/virt_dimm_plug|unplug/virt_memory_plug|unplug
+- s/pc_dimm_memory_plug/pc_dimm_plug
+- reworded title and commit message
+- added pre_plug cb
+- don't handle get_memory_region failure anymore
+---
+ default-configs/arm-softmmu.mak |  2 ++
+ hw/arm/virt.c                   | 68 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 69 insertions(+), 1 deletion(-)
+
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 834d45c..28fe8f3 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -152,3 +152,5 @@ CONFIG_PCI_DESIGNWARE=y
+ CONFIG_STRONGARM=y
+ CONFIG_HIGHBANK=y
+ CONFIG_MUSICPAL=y
++CONFIG_MEM_HOTPLUG=y
++
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 281ddcd..04a32de 100644
+index 6fefb78..7190962 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1649,6 +1649,21 @@ static void virt_set_iommu(Object *obj, const char *value, Error **errp)
-     }
+@@ -60,6 +60,8 @@
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
+ #include "hw/acpi/acpi.h"
++#include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1785,6 +1787,53 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+     return ms->possible_cpus;
  }
  
-+static char *virt_get_kvm_type(Object *obj, Error **errp)
++static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                                 Error **errp)
 +{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
 +
-+    return g_strdup(vms->kvm_type);
-+}
-+
-+static void virt_set_kvm_type(Object *obj, const char *value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    g_free(vms->kvm_type);
-+    vms->kvm_type = g_strdup(value);
-+}
-+
- static CpuInstanceProperties
- virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- {
-@@ -1710,6 +1725,31 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
-+static int virt_kvm_type(MachineState *ms, const char *type_str)
-+{
-+    int max_vm_phys_shift, ret = 0;
-+    uint64_t type;
-+
-+    if (!type_str) {
-+        max_vm_phys_shift = kvm_arm_get_max_vm_phys_shift(ms);
-+        if (max_vm_phys_shift < 0) {
-+            goto out;
-+        }
-+    } else {
-+        type = g_ascii_strtoll(type_str, NULL, 0);
-+        type &= 0xFF;
-+        max_vm_phys_shift = (int)type;
-+        if (max_vm_phys_shift < 40 || max_vm_phys_shift > 52) {
-+            warn_report("valid kvm-type type values are within [40, 52]:"
-+                        " option is ignored and VM is created with 40b IPA");
-+            goto out;
-+        }
++    if (is_nvdimm) {
++        error_setg(errp, "nvdimm is not yet supported");
++        return;
 +    }
-+    ret = max_vm_phys_shift;
-+out:
-+    return ret;
 +}
 +
- static void virt_machine_class_init(ObjectClass *oc, void *data)
++static void virt_memory_plug(HotplugHandler *hotplug_dev,
++                             DeviceState *dev, Error **errp)
++{
++    PCDIMMDevice *dimm = PC_DIMM(dev);
++    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
++    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
++    Error *local_err = NULL;
++    uint64_t align;
++
++    if (memory_region_get_alignment(mr)) {
++        align = memory_region_get_alignment(mr);
++    } else {
++        /* by default we align on 64KB page size */
++        align = SZ_64K;
++    }
++
++    pc_dimm_plug(dev, MACHINE(hotplug_dev), align, &local_err);
++
++    error_propagate(errp, local_err);
++}
++
++static void virt_memory_unplug(HotplugHandler *hotplug_dev,
++                               DeviceState *dev, Error **errp)
++{
++    pc_dimm_unplug(dev, MACHINE(hotplug_dev));
++    object_unparent(OBJECT(dev));
++}
++
++static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
++                                            DeviceState *dev, Error **errp)
++{
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++        virt_memory_pre_plug(hotplug_dev, dev, errp);
++    }
++}
++
+ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                         DeviceState *dev, Error **errp)
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1733,6 +1773,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-+    mc->kvm_type = virt_kvm_type;
+@@ -1796,12 +1845,27 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                      SYS_BUS_DEVICE(dev));
+         }
+     }
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++            virt_memory_plug(hotplug_dev, dev, errp);
++    }
++}
++
++static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
++                                          DeviceState *dev, Error **errp)
++{
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
++        virt_memory_unplug(hotplug_dev, dev, errp);
++    } else {
++        error_setg(errp, "device unplug request for unsupported device"
++                   " type: %s", object_get_typename(OBJECT(dev)));
++    }
+ }
+ 
+ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+                                                         DeviceState *dev)
+ {
+-    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
++    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
++       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
+         return HOTPLUG_HANDLER(machine);
+     }
+ 
+@@ -1861,7 +1925,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->kvm_type = virt_kvm_type;
      assert(!mc->get_hotplug_handler);
      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
++    hc->pre_plug = virt_machine_device_pre_plug_cb;
      hc->plug = virt_machine_device_plug_cb;
-@@ -1826,6 +1867,9 @@ static void virt_3_0_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
- 
-+    object_property_add_str(obj, "kvm-type",
-+                            virt_get_kvm_type, virt_set_kvm_type, NULL);
-+
-     vms->memmap = a15memmap;
-     vms->irqmap = a15irqmap;
++    hc->unplug = virt_machine_device_unplug_cb;
  }
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 9a870cc..1a90ffc 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -124,6 +124,7 @@ typedef struct {
-     uint32_t msi_phandle;
-     uint32_t iommu_phandle;
-     int psci_conduit;
-+    char *kvm_type;
- } VirtMachineState;
  
- #define VIRT_ECAM_ID(high) (high ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM)
+ static const TypeInfo virt_machine_info = {
 -- 
 2.5.5
