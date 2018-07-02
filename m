@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2XZ-0008Hw-Sy
+	(envelope-from <eric.auger@redhat.com>) id 1fa2Xa-0008IL-Ah
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fa2XY-0006I3-5r
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:05 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fa2XZ-0006JJ-89
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:23:06 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  2 Jul 2018 19:22:27 +0200
-Message-Id: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 00/15] ARM virt: PCDIMM/NVDIMM at 2TB
+Date: Mon,  2 Jul 2018 19:22:29 +0200
+Message-Id: <1530552162-15533-3-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
+References: <1530552162-15533-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v2 02/15] hw/boards: Add a MachineState parameter
+ to kvm_type callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,141 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-This series aims at supporting PCDIMM/NVDIMM intantiation in
-machvirt at 2TB guest physical address.
+On ARM, the kvm_type will be resolved by querying the KVMState.
+Let's add the MachineState handle to the callback so that we
+can retrieve the  KVMState handle. in kvm_init, when the callback
+is called, the kvm_state variable is not yet set.
 
-This is achieved in 3 steps:
-1) support more than 40b IPA/GPA
-2) support PCDIMM instantiation
-3) support NVDIMM instantiation
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+[ppc parts]
+---
+ accel/kvm/kvm-all.c   | 2 +-
+ hw/ppc/mac_newworld.c | 2 +-
+ hw/ppc/mac_oldworld.c | 2 +-
+ hw/ppc/spapr.c        | 2 +-
+ include/hw/boards.h   | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-This series reuses/rebases patches initially submitted by Shameer in [1]
-and Kwangwoo in [2].
-
-I put all parts all together for consistency and due to dependencies
-however as soon as the kernel dependency is resolved we can consider
-upstreaming them separately.
-
-Support more than 40b IPA/GPA [ patches 1 - 5 ]
------------------------------------------------
-was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
-
-At the moment the guest physical address space is limited to 40b
-due to KVM limitations. [0] bumps this limitation and allows to
-create a VM with up to 52b GPA address space.
-
-With this series, QEMU creates a virt VM with the max IPA range
-reported by the host kernel or 40b by default.
-
-This choice can be overriden by using the -machine kvm-type=<bits>
-option with bits within [40, 52]. If <bits> are not supported by
-the host, the legacy 40b value is used.
-
-Currently the EDK2 FW also hardcodes the max number of GPA bits to
-40. This will need to be fixed.
-
-PCDIMM Support [ patches 6 - 11 ]
----------------------------------
-was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
-
-We instantiate the device_memory at 2TB. Using it obviously requires
-at least 42b of IPA/GPA. While its max capacity is currently limited
-to 2TB, the actual size depends on the initial guest RAM size and
-maxmem parameter.
-
-Actual hot-plug and hot-unplug of PC-DIMM is not suported due to lack
-of support of those features in baremetal.
-
-NVDIMM support [ patches 12 - 15 ]
-----------------------------------
-
-Once the memory hotplug framework is in place it is fairly
-straightforward to add support for NVDIMM. the machine "nvdimm" option
-turns the capability on.
-
-Best Regards
-
-Eric
-
-References:
-
-[0] [PATCH v3 00/20] arm64: Dynamic & 52bit IPA support
-https://www.spinics.net/lists/kernel/msg2841735.html
-
-[1] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
-http://patchwork.ozlabs.org/cover/914694/
-
-[2] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
-https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
-
-Tests:
-- On Cavium Gigabyte, a 48b VM was created.
-- Migration tests were performed between kernel supporting the
-  feature and destination kernel not suporting it
-- test with ACPI: to overcome the limitation of EDK2 FW, virt
-  memory map was hacked to move the device memory below 1TB.
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v2.12.0-dimm-2tb-v1
-
-History:
-v1:
-- kvm_get_max_vm_phys_shift moved in arch specific file
-- addition of NVDIMM part
-- single series
-- rebase on David's refactoring
-
-Best Regards
-
-Eric
-
-
-Eric Auger (9):
-  linux-headers: header update for KVM/ARM KVM_ARM_GET_MAX_VM_PHYS_SHIFT
-  hw/boards: Add a MachineState parameter to kvm_type callback
-  kvm: add kvm_arm_get_max_vm_phys_shift
-  hw/arm/virt: support kvm_type property
-  hw/arm/virt: handle max_vm_phys_shift conflicts on migration
-  hw/arm/virt: Allocate device_memory
-  acpi: move build_srat_hotpluggable_memory to generic ACPI source
-  hw/arm/boot: Expose the pmem nodes in the DT
-  hw/arm/virt: Add nvdimm and nvdimm-persistence options
-
-Kwangwoo Lee (2):
-  nvdimm: use configurable ACPI IO base and size
-  hw/arm/virt: Add nvdimm hot-plug infrastructure
-
-Shameer Kolothum (4):
-  hw/arm/virt: Add memory hotplug framework
-  hw/arm/boot: introduce fdt_add_memory_node helper
-  hw/arm/boot: Expose the PC-DIMM nodes in the DT
-  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
-
- accel/kvm/kvm-all.c                            |   2 +-
- default-configs/arm-softmmu.mak                |   4 +
- hw/acpi/aml-build.c                            |  51 ++++
- hw/acpi/nvdimm.c                               |  28 ++-
- hw/arm/boot.c                                  | 123 +++++++--
- hw/arm/virt-acpi-build.c                       |  10 +
- hw/arm/virt.c                                  | 330 ++++++++++++++++++++++---
- hw/i386/acpi-build.c                           |  49 ----
- hw/i386/pc_piix.c                              |   8 +-
- hw/i386/pc_q35.c                               |   8 +-
- hw/ppc/mac_newworld.c                          |   2 +-
- hw/ppc/mac_oldworld.c                          |   2 +-
- hw/ppc/spapr.c                                 |   2 +-
- include/hw/acpi/aml-build.h                    |   3 +
- include/hw/arm/arm.h                           |   2 +
- include/hw/arm/virt.h                          |   7 +
- include/hw/boards.h                            |   2 +-
- include/hw/mem/nvdimm.h                        |  12 +
- include/standard-headers/linux/virtio_config.h |  16 +-
- linux-headers/asm-mips/unistd.h                |  18 +-
- linux-headers/asm-powerpc/kvm.h                |   1 +
- linux-headers/linux/kvm.h                      |  16 ++
- target/arm/kvm.c                               |   9 +
- target/arm/kvm_arm.h                           |  16 ++
- 24 files changed, 597 insertions(+), 124 deletions(-)
-
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index eb7db92..37ac834 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1549,7 +1549,7 @@ static int kvm_init(MachineState *ms)
+ 
+     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
+     if (mc->kvm_type) {
+-        type = mc->kvm_type(kvm_type);
++        type = mc->kvm_type(ms, kvm_type);
+     } else if (kvm_type) {
+         ret = -EINVAL;
+         fprintf(stderr, "Invalid argument kvm-type=%s\n", kvm_type);
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index ff715ff..606b827 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -511,7 +511,7 @@ static void ppc_core99_init(MachineState *machine)
+     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+ }
+ 
+-static int core99_kvm_type(const char *arg)
++static int core99_kvm_type(MachineState *ms, const char *arg)
+ {
+     /* Always force PR KVM */
+     return 2;
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 4608bab..1211fcd 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -363,7 +363,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+ }
+ 
+-static int heathrow_kvm_type(const char *arg)
++static int heathrow_kvm_type(MachineState *ms, const char *arg)
+ {
+     /* Always force PR KVM */
+     return 2;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b32b971..db6b018 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2841,7 +2841,7 @@ static void spapr_machine_init(MachineState *machine)
+     }
+ }
+ 
+-static int spapr_kvm_type(const char *vm_type)
++static int spapr_kvm_type(MachineState *ms, const char *vm_type)
+ {
+     if (!vm_type) {
+         return 0;
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 79069dd..3ac9594 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -173,7 +173,7 @@ struct MachineClass {
+     void (*init)(MachineState *state);
+     void (*reset)(void);
+     void (*hot_add_cpu)(const int64_t id, Error **errp);
+-    int (*kvm_type)(const char *arg);
++    int (*kvm_type)(MachineState *ms, const char *arg);
+ 
+     BlockInterfaceType block_default_type;
+     int units_per_default_bus;
 -- 
 2.5.5
