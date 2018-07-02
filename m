@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0TV-0003pG-D7
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:46 -0400
+	(envelope-from <shorne@gmail.com>) id 1fa0TY-0003sQ-Vh
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fa0TQ-0007fD-FD
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:45 -0400
-Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:45679)
+	(envelope-from <shorne@gmail.com>) id 1fa0TX-0007kM-SB
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:48 -0400
+Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:36633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0TP-0007es-SW
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:40 -0400
-Received: by mail-pf0-x234.google.com with SMTP id y24-v6so3396647pfe.12
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:10:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fa0TX-0007jy-LR
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:10:47 -0400
+Received: by mail-pl0-x22d.google.com with SMTP id a7-v6so8094534plp.3
+	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:10:47 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 00:09:58 +0900
-Message-Id: <20180702151023.24532-1-shorne@gmail.com>
+Date: Tue,  3 Jul 2018 00:10:01 +0900
+Message-Id: <20180702151023.24532-4-shorne@gmail.com>
+In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
+References: <20180702151023.24532-1-shorne@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/25] OpenRISC updates for 3.0
+Subject: [Qemu-devel] [PULL v2 03/25] target/openrisc: Log interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +29,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
 
-Hi Peter,
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Changes since v1:
- - Un"fixed" an incorrect checkpatch warning pointed out by Richard.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
+ target/openrisc/interrupt.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
-Please consider for pull.
-
-The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
-
-  tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
-
-are available in the Git repository at:
-
-  git@github.com:stffrdhrn/qemu.git tags/pull-or-20180702
-
-for you to fetch changes up to 33e1acf437ce4f0b67c262fc93b436e2e306f278:
-
-  target/openrisc: Fix writes to interrupt mask register (2018-07-03 00:05:28 +0900)
-
-----------------------------------------------------------------
-OpenRISC cleanups and Fixes for QEMU 3.0
-
-Mostly patches from Richard Henderson fixing multiple things:
- * Fix singlestepping in GDB.
- * Use more TB linking.
- * Fixes to exit TB after updating SPRs to enable registering of state
-   changes.
- * Significant optimizations and refactors to the TLB
- * Split out disassembly from translation.
- * Add qemu-or1k to qemu-binfmt-conf.sh.
- * Implement signal handling for linux-user.
-
-Then there are a few fixups from me:
- * Fix delay slot detections to match hardware, this was masking a bug
-   in the linus kernel.
- * Fix stores to the PIC mask register
-
-----------------------------------------------------------------
-
-
-Richard Henderson (23):
-  target/openrisc: Fix mtspr shadow gprs
-  target/openrisc: Add print_insn_or1k
-  target/openrisc: Log interrupts
-  target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP
-  target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB
-  target/openrisc: Fix singlestep_enabled
-  target/openrisc: Link more translation blocks
-  target/openrisc: Split out is_user
-  target/openrisc: Exit the TB after l.mtspr
-  target/openrisc: Form the spr index from tcg
-  target/openrisc: Merge tlb allocation into CPUOpenRISCState
-  target/openrisc: Remove indirect function calls for mmu
-  target/openrisc: Merge mmu_helper.c into mmu.c
-  target/openrisc: Reduce tlb to a single dimension
-  target/openrisc: Fix tlb flushing in mtspr
-  target/openrisc: Fix cpu_mmu_index
-  target/openrisc: Use identical sizes for ITLB and DTLB
-  target/openrisc: Stub out handle_mmu_fault for softmmu
-  target/openrisc: Increase the TLB size
-  target/openrisc: Reorg tlb lookup
-  target/openrisc: Add support in scripts/qemu-binfmt-conf.sh
-  linux-user: Implement signals for openrisc
-  linux-user: Fix struct sigaltstack for openrisc
-
-Stafford Horne (2):
-  target/openrisc: Fix delay slot exception flag to match spec
-  target/openrisc: Fix writes to interrupt mask register
-
- linux-user/openrisc/signal.c         | 217 ++++++++-----------
- linux-user/openrisc/target_signal.h  |   2 +-
- linux-user/openrisc/target_syscall.h |  28 +--
- linux-user/signal.c                  |   2 +-
- scripts/qemu-binfmt-conf.sh          |  10 +-
- target/openrisc/Makefile.objs        |   5 +-
- target/openrisc/cpu.c                |  17 +-
- target/openrisc/cpu.h                |  61 +++---
- target/openrisc/disas.c              | 170 +++++++++++++++
- target/openrisc/helper.h             |   4 +-
- target/openrisc/interrupt.c          |  55 +++--
- target/openrisc/interrupt_helper.c   |  35 +---
- target/openrisc/machine.c            |  44 +---
- target/openrisc/mmu.c                | 279 +++++++++---------------
- target/openrisc/mmu_helper.c         |  40 ----
- target/openrisc/sys_helper.c         |  84 ++++----
- target/openrisc/translate.c          | 303 ++++++++++-----------------
- 17 files changed, 603 insertions(+), 753 deletions(-)
- create mode 100644 target/openrisc/disas.c
- delete mode 100644 target/openrisc/mmu_helper.c
-
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index 3959671c59..25351d5de3 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -32,6 +32,7 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+ #ifndef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+     CPUOpenRISCState *env = &cpu->env;
++    int exception = cs->exception_index;
+ 
+     env->epcr = env->pc;
+     if (env->dflag) {
+@@ -41,12 +42,12 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     } else {
+         env->sr &= ~SR_DSX;
+     }
+-    if (cs->exception_index == EXCP_SYSCALL) {
++    if (exception == EXCP_SYSCALL) {
+         env->epcr += 4;
+     }
+     /* When we have an illegal instruction the error effective address
+        shall be set to the illegal instruction address.  */
+-    if (cs->exception_index == EXCP_ILLEGAL) {
++    if (exception == EXCP_ILLEGAL) {
+         env->eear = env->pc;
+     }
+ 
+@@ -66,8 +67,27 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     env->tlb->cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
+     env->lock_addr = -1;
+ 
+-    if (cs->exception_index > 0 && cs->exception_index < EXCP_NR) {
+-        hwaddr vect_pc = cs->exception_index << 8;
++    if (exception > 0 && exception < EXCP_NR) {
++        static const char * const int_name[EXCP_NR] = {
++            [EXCP_RESET]    = "RESET",
++            [EXCP_BUSERR]   = "BUSERR (bus error)",
++            [EXCP_DPF]      = "DFP (data protection fault)",
++            [EXCP_IPF]      = "IPF (code protection fault)",
++            [EXCP_TICK]     = "TICK (timer interrupt)",
++            [EXCP_ALIGN]    = "ALIGN",
++            [EXCP_ILLEGAL]  = "ILLEGAL",
++            [EXCP_INT]      = "INT (device interrupt)",
++            [EXCP_DTLBMISS] = "DTLBMISS (data tlb miss)",
++            [EXCP_ITLBMISS] = "ITLBMISS (code tlb miss)",
++            [EXCP_RANGE]    = "RANGE",
++            [EXCP_SYSCALL]  = "SYSCALL",
++            [EXCP_FPE]      = "FPE",
++            [EXCP_TRAP]     = "TRAP",
++        };
++
++        qemu_log_mask(CPU_LOG_INT, "INT: %s\n", int_name[exception]);
++
++        hwaddr vect_pc = exception << 8;
+         if (env->cpucfgr & CPUCFGR_EVBARP) {
+             vect_pc |= env->evbar;
+         }
+@@ -76,7 +96,7 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+         }
+         env->pc = vect_pc;
+     } else {
+-        cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
++        cpu_abort(cs, "Unhandled exception 0x%x\n", exception);
+     }
+ #endif
+ 
 -- 
 2.17.0
