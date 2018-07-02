@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fa0sS-0007p0-Sr
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:36:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fa0yC-0004aI-4B
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fa0sR-0002p8-TK
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:36:32 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:32901)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fa0sR-0002oy-OY
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:36:31 -0400
-Received: by mail-oi0-x244.google.com with SMTP id c6-v6so17180729oiy.0
-	for <qemu-devel@nongnu.org>; Mon, 02 Jul 2018 08:36:31 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180702151023.24532-1-shorne@gmail.com>
-References: <20180702151023.24532-1-shorne@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Jul 2018 16:36:10 +0100
-Message-ID: <CAFEAcA8EPj=-ExxZeitao_gN-7XPUGQ=eOj+Q0mBU-x0QTepPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/25] OpenRISC updates for 3.0
+	(envelope-from <kraxel@redhat.com>) id 1fa0yA-0006FW-Nn
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:42:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fa0yA-0006FB-IJ
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 11:42:26 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9F56C049D7F
+	for <qemu-devel@nongnu.org>; Mon,  2 Jul 2018 15:42:25 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  2 Jul 2018 17:42:16 +0200
+Message-Id: <20180702154222.3130-2-kraxel@redhat.com>
+In-Reply-To: <20180702154222.3130-1-kraxel@redhat.com>
+References: <20180702154222.3130-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 1/7] seabios: update submodule to release 1.11.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: QEMU Development <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 2 July 2018 at 16:09, Stafford Horne <shorne@gmail.com> wrote:
-> Hi Peter,
->
-> Changes since v1:
->  - Un"fixed" an incorrect checkpatch warning pointed out by Richard.
->
-> Please consider for pull.
->
-> The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
->
->   tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
->
-> are available in the Git repository at:
->
->   git@github.com:stffrdhrn/qemu.git tags/pull-or-20180702
->
-> for you to fetch changes up to 33e1acf437ce4f0b67c262fc93b436e2e306f278:
->
->   target/openrisc: Fix writes to interrupt mask register (2018-07-03 00:05:28 +0900)
->
-> ----------------------------------------------------------------
-> OpenRISC cleanups and Fixes for QEMU 3.0
->
-> Mostly patches from Richard Henderson fixing multiple things:
->  * Fix singlestepping in GDB.
->  * Use more TB linking.
->  * Fixes to exit TB after updating SPRs to enable registering of state
->    changes.
->  * Significant optimizations and refactors to the TLB
->  * Split out disassembly from translation.
->  * Add qemu-or1k to qemu-binfmt-conf.sh.
->  * Implement signal handling for linux-user.
->
-> Then there are a few fixups from me:
->  * Fix delay slot detections to match hardware, this was masking a bug
->    in the linus kernel.
->  * Fix stores to the PIC mask register
->
-> ----------------------------------------------------------------
+git shortlog rel-1.11.1..rel-1.11.2
+-----------------------------------
 
-Compile failure, for the windows crossbuilds:
+Gerd Hoffmann (11):
+      optionrom: enable non-vga display devices
+      cbvga: factor out cbvga_setup_modes()
+      qemu: add bochs-display support
+      cbvga_setup_modes: use real mode number instead of 0x140
+      cbvga_list_modes: don't list current mode twice
+      cbvga_set_mode: disable clearmem in windows x86 emulator.
+      bochs_display_setup: return error on failure
+      pmm: use tmp zone on oom
+      vgasrc: add allocate_pmm()
+      qemu: add qemu ramfb support
+      cbvga_set_mode: refine clear display logic
 
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c: In function
-'openrisc_cpu_get_phys_page_debug':
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:133:29: error:
-'PROT_EXEC' undeclared (first use in this function)
-                             PROT_EXEC | PROT_READ | PROT_WRITE,
-                             ^
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:133:29: note:
-each undeclared identifier is reported only once for each function it
-appears in
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:133:41: error:
-'PROT_READ' undeclared (first use in this function)
-                             PROT_EXEC | PROT_READ | PROT_WRITE,
-                                         ^
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:133:53: error:
-'PROT_WRITE' undeclared (first use in this function)
-                             PROT_EXEC | PROT_READ | PROT_WRITE,
-                                                     ^
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c: In function 'tlb_fill':
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:169:53: error:
-'PROT_EXEC' undeclared (first use in this function)
-         int need = (access_type == MMU_INST_FETCH ? PROT_EXEC
-                                                     ^
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:170:55: error:
-'PROT_WRITE' undeclared (first use in this function)
-                     : access_type == MMU_DATA_STORE ? PROT_WRITE
-                                                       ^
-/home/petmay01/qemu-for-merges/target/openrisc/mmu.c:171:23: error:
-'PROT_READ' undeclared (first use in this function)
-                     : PROT_READ);
-                       ^
-/home/petmay01/qemu-for-merges/rules.mak:69: recipe for target
-'target/openrisc/mmu.o' failed
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ roms/seabios | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-PROT_READ/WRITE/EXEC are the Posix flags for mmap().
-The flags for the 'prot' argument to tlb_set_page()
-and similar places are PAGE_READ/WRITE/EXEC.
-
-PS: for trivial respins of a pullreq you don't need to resend
-the whole thing, you can just resend the cover letter (and
-any individual patches which got major changes).
-
-thanks
--- PMM
+diff --git a/roms/seabios b/roms/seabios
+index 0551a4be2c..f9626ccb91 160000
+--- a/roms/seabios
++++ b/roms/seabios
+@@ -1 +1 @@
+-Subproject commit 0551a4be2ce599fb60e478b4c15e06ab6587822c
++Subproject commit f9626ccb91e771f990fbb2da92e427a399d7d918
+-- 
+2.9.3
