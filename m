@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fa2Gb-0004L2-Fi
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:35 -0400
+	(envelope-from <linux@roeck-us.net>) id 1fa2Gc-0004Le-9U
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fa2GX-0000kJ-GG
+	(envelope-from <linux@roeck-us.net>) id 1fa2Ga-0000oL-TT
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41804 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fa2GX-0000jc-AF
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 13:05:29 -0400
-Date: Mon, 2 Jul 2018 18:05:24 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180702170524.GE6438@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
+Date: Mon, 2 Jul 2018 10:05:22 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180702170522.GA9885@roeck-us.net>
+References: <1529374119-27015-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA_8TAWdkgTzPPE7eggP4UAHjVPmcXiEa_-RCxDBphJ4HA@mail.gmail.com>
+	<20180626175900.GA4307@roeck-us.net>
+	<CAFEAcA8PPF1mDWMGSm0r6NtYijwQQG7QnNEJ3iwaaEZU8GTu7g@mail.gmail.com>
+	<20180626200008.GA680@roeck-us.net>
+	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
+	<20180702162733.GB32333@roeck-us.net>
+	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] i386: fix '-cpu ?' output for host cpu type
+In-Reply-To: <CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
+ identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jul 02, 2018 at 06:56:06PM +0200, Greg Kurz wrote:
-> Since commit d6dcc5583e7, '-cpu ?' shows the description of the
-> X86_CPU_TYPE_NAME("max") for the host CPU model:
->=20
-> Enables all features supported by the accelerator in the current host
->=20
-> instead of the expected:
->=20
-> KVM processor with all supported host features
->=20
-> or
->=20
-> HVF processor with all supported host features
->=20
-> This is caused by the early use of kvm_enabled() and hvf_enabled() in
-> a class_init function. Since the accelerator isn't configured yet, both
-> helpers return false unconditionally.
->=20
-> A QEMU binary will only be compiled with one of these accelerators, not
-> both. The appropriate description can thus be decided at build time.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  target/i386/cpu.c |   14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1e6a7d0a7504..e5da60b28973 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2838,13 +2838,13 @@ static void host_x86_cpu_class_init(ObjectClass=
- *oc, void *data)
+On Mon, Jul 02, 2018 at 05:46:39PM +0100, Peter Maydell wrote:
+> On 2 July 2018 at 17:27, Guenter Roeck <linux@roeck-us.net> wrote:
+> > Again, in my observation the boot sometimes stalls without my
+> > patch. Maybe there is a better fix, but the code as-is doesn't
+> > work for me. All I can say is that the current code does not set
+> > one-shot mode when it should, and that seems wrong.
+> >
+> > You could of course take out the zero delta warning. Personally
+> > I would caution against that - whenever I have seen that warning,
+> > it suggested that something is wrong with the emulation, and it
+> > helped me track down the problem. Your call, of course. Also,
+> > I don't think taking out the warning would fix my stall problem.
+> 
+> Can you provide me with something I can reproduce with, then,
+> please? My kernel + buildroot don't repro the problem: it always
+> seems to boot fine. I had a look at your testbuild git repo
+> but couldn't manage to figure out how to build a binary
+> from it. I'm ok with building a QEMU from your branch for
+> testing this, but I'd rather not try to figure out how to
+> reproduce your kernel and root filesystem setup.
+> 
 
-Sigh, yet another case of relying on runtime state during class_init impl=
-s.
+I don't think I'll have more time available to spend on this
+anytime soon. If it works for you, just drop the patch. I can
+keep it local in my branch. My version of qemu is different anyway,
+after all.
 
->      xcc->host_cpuid_required =3D true;
->      xcc->ordering =3D 8;
-> =20
-> -    if (kvm_enabled()) {
-> -        xcc->model_description =3D
-> -            "KVM processor with all supported host features ";
-> -    } else if (hvf_enabled()) {
-> -        xcc->model_description =3D
-> -            "HVF processor with all supported host features ";
-> -    }
-> +#if defined(CONFIG_KVM)
-> +    xcc->model_description =3D
-> +        "KVM processor with all supported host features ";
-> +#elif defined(CONFIG_HVF)
-> +    xcc->model_description =3D
-> +        "HVF processor with all supported host features ";
-> +#endif
->  }
-> =20
->  static const TypeInfo host_x86_cpu_type_info =3D {
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks,
+Guenter
