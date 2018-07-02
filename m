@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZxwM-0004yk-4i
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:28:23 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fZy3p-0007xa-Pv
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fZxwH-0004wS-73
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:28:22 -0400
-Date: Mon, 2 Jul 2018 13:28:14 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180702122814.GD2155@stefanha-x1.localdomain>
-References: <20180627143815.1829-1-joel@jms.id.au>
-	<20180627143815.1829-4-joel@jms.id.au>
+	(envelope-from <mreitz@redhat.com>) id 1fZy3o-0000a8-ON
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 08:36:05 -0400
+References: <20180702025836.20957-1-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <02d1f79b-c055-bb2a-edd5-3429ff64af90@redhat.com>
+Date: Mon, 2 Jul 2018 14:35:53 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+B+y8wtTXqdUj1xM"
-Content-Disposition: inline
-In-Reply-To: <20180627143815.1829-4-joel@jms.id.au>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] MAINTAINERS: Add NRF51 entry
+In-Reply-To: <20180702025836.20957-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4"
+Subject: Re: [Qemu-devel] [PATCH 0/4] block: Trivial fixes in offloading code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-
---+B+y8wtTXqdUj1xM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <02d1f79b-c055-bb2a-edd5-3429ff64af90@redhat.com>
+Subject: Re: [PATCH 0/4] block: Trivial fixes in offloading code
+References: <20180702025836.20957-1-famz@redhat.com>
+In-Reply-To: <20180702025836.20957-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 28, 2018 at 12:08:15AM +0930, Joel Stanley wrote:
-> This contains the NRF51, and the machine that uses it, the BBC
-> micro:bit.
+On 2018-07-02 04:58, Fam Zheng wrote:
+> These are the low priority ones spotted by Kevin and Max last week.
 >=20
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
->  MAINTAINERS | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> Fam Zheng (4):
+>   qcow2: Drop unused cluster_data
+>   file-posix: Fix fd_open check in raw_co_copy_range_to
+>   qcow2: Drop unreachable break
+>   raw: Drop superfluous semicolon
 >=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8c626f6a079e..fef3d71dbef7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -656,6 +656,14 @@ F: include/hw/*/*aspeed*
->  F: hw/net/ftgmac100.c
->  F: include/hw/net/ftgmac100.h
-> =20
-> +NRF51
-> +M: Joel Stanley <joel@jms.id.au>
-> +L: qemu-arm@nognu.org
+>  block/file-posix.c | 2 +-
+>  block/qcow2.c      | 3 ---
+>  block/raw-format.c | 2 +-
+>  3 files changed, 2 insertions(+), 5 deletions(-)
 
-s/nognu/nongnu/
+Thanks, applied to my block branch:
 
-Aside from that:
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
---+B+y8wtTXqdUj1xM
+
+Do you want to make qcow2_co_copy_range_to() do something special on
+BDRV_REQ_ZERO_WRITE?  To me, it seems natural, but on the other hand
+maybe it wouldn't bring anything.  If the protocol layer supports copy
+offloading, then it'll probably do that zero write efficiently anyway.
+If it doesn't, qemu-img convert will just fall back to the usual
+implementation which involves writing zeroes when zeroes are read, so...
+ What's your opinion?
+
+Max
+
+
+--bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbOhpeAAoJEJykq7OBq3PI724H/35xM0f3PMkg50f8sE2POCgY
-R4rl7eZW858ODZCEazHRuGVca4Oa+Y7fryvWbw/SHCvxyxH5feeal+KSLlcLx+0i
-J4u/OyOCq3l8xcGbsmp15Gec84j/rXpPSrh7f+npD2c2+vdw8VxKux8QvLYLzGIp
-SLu6ZKIdA34MUg2DZCAof92lW7cGHXLV4jH01+4rPZIWmcBLNhkqznSjdPvyZDwg
-O0V47GHgZHuSJlWICmwIo0KTZQ5pqJU3K+UtognzlCmZ464vYq+pPei9J1uLqoAa
-zF8RZAn/kEMw5wMUj42zPKf5XCyc2EuuTZWZJX0buD7yfU1GeHdV60iDhAo/xY8=
-=tKSU
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAls6HCkACgkQ9AfbAGHV
+z0A4xgf+MDcvhALFvPD3TqvvlkyvMdnQSd/jBgkRannb7yDEyDPqn8U06/KZkhfh
+DWr73T6nCleBNFYgm0lqbS0sF4Im7nU8X7S6lK+q+ZemvdekGezSTXvLhSHqsKpM
+PhzS4XCxKZV62qyT4SAiEkjH/PdA9Figd8686qc34mU6O2JN4Qw34HPGEqsuwgX5
+3aNHKCaP3JdMPwLQQnQOZYDCSi9+Vd/uWmok32nuihnuivOCKZPCK87mN2tQA+0K
+IhNjJWF7YqEqaCDNjUvcyMWLM2/96ehh0jZBxtNlP0ZrOIjCoorE8BOiRpk28m+f
+JJvNmu4XAiLKF//ySfoIrgBHVXGorw==
+=DjK2
 -----END PGP SIGNATURE-----
 
---+B+y8wtTXqdUj1xM--
+--bvmtgL1W5cka6CqNaSyA8VrAI756bKfD4--
