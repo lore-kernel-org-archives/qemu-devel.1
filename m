@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53700)
+Received: from eggs.gnu.org ([208.118.235.92]:52933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFkU-0004qG-Af
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:39 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFkh-0004VA-On
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFgp-0001d9-U9
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:29:09 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFgp-0001cI-He
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:29:31 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  3 Jul 2018 09:19:46 +0200
-Message-Id: <1530602398-16127-4-git-send-email-eric.auger@redhat.com>
+Date: Tue,  3 Jul 2018 09:19:48 +0200
+Message-Id: <1530602398-16127-6-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
 References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 03/15] kvm: add kvm_arm_get_max_vm_phys_shift
+Subject: [Qemu-devel] [RFC v3 05/15] hw/arm/virt: handle max_vm_phys_shift
+ conflicts on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,85 +23,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-Add the kvm_arm_get_max_vm_phys_shift() helper that returns the
-log of the maximum IPA size supported by KVM. This capability
-needs to be known to create the VM with a correct IPA max size
-(kvm_type passed along KVM_CREATE_VM ioctl.
+When migrating a VM, we must make sure the destination host
+supports as many IPA bits as the source. Otherwise the migration
+must fail.
+
+We add a VMState infrastructure to machvirt. On pre_save(),
+the current source max_vm_phys_shift is saved.
+
+On destination, we cannot use this information when creating the
+VM. The VM is created using the max value reported by the
+destination host - or the kvm_type inherited value -. However on
+post_load() we can check that this value is compatible with the
+source saved value.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-v1 -> v2:
-- put this in ARM specific code
----
- target/arm/kvm.c     |  9 +++++++++
- target/arm/kvm_arm.h | 16 ++++++++++++++++
- 2 files changed, 25 insertions(+)
+ hw/arm/virt.c         | 37 +++++++++++++++++++++++++++++++++++++
+ include/hw/arm/virt.h |  2 ++
+ 2 files changed, 39 insertions(+)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 65f867d..7d501ca 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -18,6 +18,7 @@
- #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/kvm_int.h"
- #include "kvm_arm.h"
- #include "cpu.h"
- #include "trace.h"
-@@ -154,6 +155,13 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-     env->features = arm_host_cpu_features.features;
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 04a32de..5a4d0bf 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1316,6 +1316,40 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+     return arm_cpu_mp_affinity(idx, clustersz);
  }
  
-+int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
++static int virt_post_load(void *opaque, int version_id)
 +{
-+    KVMState *s = KVM_STATE(ms->accelerator);
++    VirtMachineState *vms = (VirtMachineState *)opaque;
 +
-+    return kvm_ioctl(s, KVM_ARM_GET_MAX_VM_PHYS_SHIFT, 0);
++    if (vms->max_vm_phys_shift < vms->source_max_vm_phys_shift) {
++        error_report("This host kernel only supports %d IPA bits whereas "
++                     "the guest requires %d GPA bits", vms->max_vm_phys_shift,
++                     vms->source_max_vm_phys_shift);
++        return -1;
++    }
++    return 0;
 +}
 +
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     /* For ARM interrupt delivery is always asynchronous,
-@@ -713,3 +721,4 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
- {
-     return (data - 32) & 0xffff;
- }
-+
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 863f205..ee973f6 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -183,6 +183,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
- void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
- 
- /**
-+ * kvm_arm_get_max_vm_phys_shift - Returns log2 of the max IPA size
-+ * supported by KVM
-+ *
-+ * @s: Machine state handle
-+ *
-+ * Return the max number of IPA bits or a negative value if
-+ * the host kernel does not expose this value.
-+ */
-+int kvm_arm_get_max_vm_phys_shift(MachineState *ms);
-+
-+/**
-  * kvm_arm_sync_mpstate_to_kvm
-  * @cpu: ARMCPU
-  *
-@@ -214,6 +225,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-     cpu->host_cpu_probe_failed = true;
- }
- 
-+static inline int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
++static int virt_pre_save(void *opaque)
 +{
-+    return -ENOENT;
++    VirtMachineState *vms = (VirtMachineState *)opaque;
++
++    vms->source_max_vm_phys_shift = vms->max_vm_phys_shift;
++    return 0;
 +}
 +
- static inline int kvm_arm_vgic_probe(void)
++static const VMStateDescription vmstate_virt = {
++    .name = "virt",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = virt_post_load,
++    .pre_save = virt_pre_save,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(source_max_vm_phys_shift, VirtMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++
+ static void machvirt_init(MachineState *machine)
  {
-     return 0;
+     VirtMachineState *vms = VIRT_MACHINE(machine);
+@@ -1537,6 +1571,7 @@ static void machvirt_init(MachineState *machine)
+ 
+     vms->machine_done.notify = virt_machine_done;
+     qemu_add_machine_init_done_notifier(&vms->machine_done);
++    vmstate_register(NULL, 0, &vmstate_virt, vms);
+ }
+ 
+ static bool virt_get_secure(Object *obj, Error **errp)
+@@ -1727,6 +1762,7 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+ 
+ static int virt_kvm_type(MachineState *ms, const char *type_str)
+ {
++    VirtMachineState *vms = VIRT_MACHINE(ms);
+     int max_vm_phys_shift, ret = 0;
+     uint64_t type;
+ 
+@@ -1747,6 +1783,7 @@ static int virt_kvm_type(MachineState *ms, const char *type_str)
+     }
+     ret = max_vm_phys_shift;
+ out:
++    vms->max_vm_phys_shift = (max_vm_phys_shift > 0) ? ret : 40;
+     return ret;
+ }
+ 
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 1a90ffc..91f6de2 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -125,6 +125,8 @@ typedef struct {
+     uint32_t iommu_phandle;
+     int psci_conduit;
+     char *kvm_type;
++    int32_t max_vm_phys_shift;
++    int32_t source_max_vm_phys_shift;
+ } VirtMachineState;
+ 
+ #define VIRT_ECAM_ID(high) (high ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM)
 -- 
 2.5.5
