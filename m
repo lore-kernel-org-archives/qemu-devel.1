@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1faHnx-0000KC-PV
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:41:07 -0400
+	(envelope-from <kraxel@redhat.com>) id 1faHs8-0001kB-Az
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1faHnu-0002HN-Mg
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:41:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1faHnu-0002GM-Ey
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:40:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1faHnt-0004ak-0Y
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 09:40:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CFB5F2E819B
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 09:40:56 +0000 (UTC)
+	(envelope-from <kraxel@redhat.com>) id 1faHs6-00050m-C8
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1faHs6-0004z1-6a
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 60418308404B
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 09:45:17 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  3 Jul 2018 11:45:07 +0200
+Message-Id: <20180703094508.25987-4-kraxel@redhat.com>
+In-Reply-To: <20180703094508.25987-1-kraxel@redhat.com>
+References: <20180703094508.25987-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Jul 2018 09:34:05 -0000
-From: He Yi <1779634@bugs.launchpad.net>
-Reply-To: Bug 1779634 <1779634@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153052346519.30029.15773821079672320069.malonedeb@wampee.canonical.com>
-Message-Id: <153061044579.12612.12436670370929639726.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1779634] Re: qemu-x86_64 on aarch64 reports
- "Synchronous External Abort"
+Subject: [Qemu-devel] [PULL 3/4] virtio-gpu: disable scanout when backing
+ resource is destroyed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,72 +34,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-thanks Peter, yes I tried to run an x86 strace under QEMU.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180702162443.16796-4-kraxel@redhat.com
+---
+ hw/display/virtio-gpu.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-I'll stop this experiment since you are right this won't work for
-utilities with device-level I/O and memory operations, I will raise this
-requirement to Intel support website firstly.
-
-Best Regards, Yi
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1779634
-
-Title:
-  qemu-x86_64 on aarch64 reports "Synchronous External Abort"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network =
-adapters' firmware upgrade tools)
-  System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-=
-45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarc=
-h64 aarch64 GNU/Linux
-
-  Reproduce:
-  1) build linux-user qemu-x86_64 static from source (tried both version 2.=
-12.0 & 2.11.2)
-  =C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable=
--system --static --enable-linux-user
-
-  2) install the interpreter into binfmt_misc filesystem
-  =C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003=
-e00
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffff=
-ff
-
-  3) packaging Intel/Dell upgrade utilities into docker images, I've publis=
-hed two on docker hub:
-  =C2=A0=C2=A0=C2=A0REPOSITORY          TAG
-  =C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
-  =C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
-
-  4) run the docker container on aarch64 server platform:
-  =C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /us=
-r/local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
-
-  5) finally, within docker container run the upgrade tool:
-  =C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
-
-  Errors: in dmesg it reports excessive 'Synchronous External Abort':
-
-  kernel: [242850.159893] Synchronous External Abort: synchronous external =
-abort (0x92000610) at 0x0000000000429958
-  kernel: [242850.169199] Unhandled fault: synchronous external abort (0x92=
-000610) at 0x0000000000429958
-
-  thanks and best regards, Yi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1779634/+subscriptions
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 336dc59007..08cd567218 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
+ int scanout_id)
+ static void virtio_gpu_resource_destroy(VirtIOGPU *g,
+                                         struct virtio_gpu_simple_resourc=
+e *res)
+ {
++    int i;
++
++    if (res->scanout_bitmask) {
++        for (i =3D 0; i < g->conf.max_outputs; i++) {
++            if (res->scanout_bitmask & (1 << i)) {
++                virtio_gpu_disable_scanout(g, i);
++            }
++        }
++    }
++
+     pixman_image_unref(res->image);
+     virtio_gpu_cleanup_mapping(res);
+     QTAILQ_REMOVE(&g->reslist, res, next);
+--=20
+2.9.3
