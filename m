@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1faGx6-0005vZ-0S
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:46:25 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1faGz2-0006bh-0n
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1faGx5-0001dR-8Y
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:46:24 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:40849)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1faGx5-0001cZ-25
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:46:23 -0400
-Received: by mail-oi0-x244.google.com with SMTP id w126-v6so2226903oie.7
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 01:46:22 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180703100044.5d265acb@bahia.lan>
-References: <20180702163125.28729-1-pbonzini@redhat.com>
-	<20180703100044.5d265acb@bahia.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Jul 2018 09:46:01 +0100
-Message-ID: <CAFEAcA9qdYYnCNTNSotEfMzvOPCBj_baxANmixGmQKBbHejnww@mail.gmail.com>
+	(envelope-from <robert.hu@linux.intel.com>) id 1faGyz-0003YF-F8
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:48:24 -0400
+Received: from mga01.intel.com ([192.55.52.88]:28554)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1faGyy-0003Xr-Uo
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:48:21 -0400
+Message-ID: <1530607697.22880.46.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Tue, 03 Jul 2018 16:48:17 +0800
+In-Reply-To: <ce3282a7-310c-6c53-05b8-f00afb787279@redhat.com>
+References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
+	<1530098844-236851-2-git-send-email-robert.hu@linux.intel.com>
+	<20180627170304.GD914@localhost.localdomain>
+	<1530177956.22880.32.camel@linux.intel.com>
+	<ce3282a7-310c-6c53-05b8-f00afb787279@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] fsdev: fix compilation with VIRTIO but not
- VIRTIO_9P
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] i386: Add support for IA32_PRED_CMD
+ and IA32_ARCH_CAPABILITIES MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, rth@twiddle.net, wei.w.wang@intel.com
 
-On 3 July 2018 at 09:00, Greg Kurz <groug@kaod.org> wrote:
-> On Mon,  2 Jul 2018 18:31:25 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->> hw/9pfs/Makefile.objs uses CONFIG_VIRTIO_9P to guard the definition for
->> FileOperations structs, while fsdev/Makefile.objs uses CONFIG_VIRTIO
->> to guard the use.  Mismatch causes linking to fail when CONFIG_VIRTIO
->> is set but CONFIG_VIRTIO_9P is not.
->>
->> Fix it and use if/else to clarify that the two lines are for opposite
->> conditions.
->>
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Fixes: b5dfdb082fc350f3e68dfa61dc988d97cad28cfe
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->
-> Acked-by: Greg Kurz <groug@kaod.org>
-> Tested-by: Greg Kurz <groug@kaod.org>
->
-> Peter,
->
-> I see this patch is needed for the latest RISC-V pull req.
+On Thu, 2018-06-28 at 16:20 +0200, Paolo Bonzini wrote:
+> On 28/06/2018 11:25, Robert Hoo wrote:
+> >>> +    uint64_t pred_cmd;
+> >>> +    uint64_t arch_capabilities;
+> >> What's the purpose of those CPUX86State fields, if the migration
+> >> sections were removed in v2?
+> >>
+> > Thanks Eduardo. Going to clean up in v3. Any more comments, regarding
+> > other patches?
+> 
+> Yes - something like arch_capabilities must stay, as it will be filled
+> in with "CPUID-like" feature bits that are actually visible to the guest
+> via the MSR.
+> 
+> However, I suggest adding it to the FeatureWord enum, since everything
+> that handles FeatureWord applies to this new kind of MSR as well.
+> Currently FeatureWord is only for CPUID leaves, but it doesn't have to
+> be like that.
+> 
+I think this will be changing struct FeatureWordInfo, which is designed
+for cpuid enumerations. You must not want to do that. May I know more
+details about your thought?
 
-It isn't, because that pullreq only fails because of what
-looks to me like a rebase mismerge that made it change how
-the riscv default-configs enable virtio. The riscv pullreq
-should be fixed. This is just a cleanup, really.
-
-thanks
--- PMM
+And, if I implemented ARCH_CAPABILITIES-bits features in FeatureWord,
+then no necessity of having it in kvm_msr_entries, right?
+> Paolo
