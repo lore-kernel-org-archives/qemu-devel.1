@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1faJJO-0005O1-LR
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:17:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1faJNz-0006pz-Hn
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:22:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1faJJN-00025k-DS
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:17:34 -0400
-Date: Tue, 3 Jul 2018 12:17:23 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180703111723.GA24516@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180703080303.17355-1-rjones@redhat.com>
-	<20180703080303.17355-2-rjones@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1faJNy-0004G7-OC
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:22:19 -0400
+Date: Tue, 3 Jul 2018 13:22:11 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180703112211.GC3812@localhost.localdomain>
+References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+	<20180629151524.138542-3-vsementsov@virtuozzo.com>
+	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
+	<0f766c07-dfe5-1886-5635-f76780220757@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180703080303.17355-2-rjones@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6] crypto: Implement TLS Pre-Shared Keys
- (PSK).
+In-Reply-To: <0f766c07-dfe5-1886-5635-f76780220757@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
+ driver for fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +26,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
 
-On Tue, Jul 03, 2018 at 09:03:03AM +0100, Richard W.M. Jones wrote:
-> Pre-Shared Keys (PSK) is a simpler mechanism for enabling TLS
-> connections than using certificates.  It requires only a simple secret
-> key:
->=20
->   $ mkdir -m 0700 /tmp/keys
->   $ psktool -u rjones -p /tmp/keys/keys.psk
->   $ cat /tmp/keys/keys.psk
->   rjones:d543770c15ad93d76443fb56f501a31969235f47e999720ae8d2336f6a13fc=
-bc
->=20
-> The key can be secretly shared between clients and servers.  Clients
-> must specify the directory containing the "keys.psk" file and a
-> username (defaults to "qemu").  Servers must specify only the
-> directory.
->=20
-> Example NBD client:
->=20
->   $ qemu-img info \
->     --object tls-creds-psk,id=3Dtls0,dir=3D/tmp/keys,username=3Drjones,=
-endpoint=3Dclient \
->     --image-opts \
->     file.driver=3Dnbd,file.host=3Dlocalhost,file.port=3D10809,file.tls-=
-creds=3Dtls0,file.export=3D/
->=20
-> Example NBD server using qemu-nbd:
->=20
->   $ qemu-nbd -t -x / \
->     --object tls-creds-psk,id=3Dtls0,endpoint=3Dserver,dir=3D/tmp/keys =
-\
->     --tls-creds tls0 \
->     image.qcow2
->=20
-> Example NBD server using nbdkit:
->=20
->   $ nbdkit -n -e / -fv \
->     --tls=3Don --tls-psk=3D/tmp/keys/keys.psk \
->     file file=3Ddisk.img
->=20
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> ---
->  crypto/Makefile.objs           |   1 +
->  crypto/tlscredspsk.c           | 308 +++++++++++++++++++++++++++++++++
->  crypto/tlssession.c            |  56 +++++-
->  crypto/trace-events            |   3 +
->  include/crypto/tlscredspsk.h   | 106 ++++++++++++
->  qemu-doc.texi                  |  37 ++++
->  qemu-options.hx                |  24 +++
->  tests/Makefile.include         |   4 +-
->  tests/crypto-tls-psk-helpers.c |  50 ++++++
->  tests/crypto-tls-psk-helpers.h |  29 ++++
->  tests/test-crypto-tlssession.c | 185 +++++++++++++++++---
->  11 files changed, 777 insertions(+), 26 deletions(-)
+Am 02.07.2018 um 13:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 29.06.2018 20:30, John Snow wrote:
+> > 
+> > On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> > > We need to synchronize backup job with reading from fleecing image
+> > > like it was done in block/replication.c.
+> > > 
+> > > Otherwise, the following situation is theoretically possible:
+> > > 
+> > > 1. client start reading
+> > > 2. client understand, that there is no corresponding cluster in
+> > >     fleecing image
+> > I don't think the client refocuses the read, but QEMU does. (the client
+> > has no idea if it is reading from the fleecing node or the backing file.)
+> > 
+> > ... but understood:
+> > 
+> > > 3. client is going to read from backing file (i.e. active image)
+> > > 4. guest writes to active image
+> > My question here is if QEMU will allow reads and writes to interleave in
+> > general. If the client is reading from the backing file, the active
+> > image, will QEMU allow a write to modify that data before we're done
+> > getting that data?
+> 
+> If I understand correctly: yes. Physical drives allows intersecting
+> operations too and there no guarantee on result. We have serializing
+> requests, but in general only unaligned requests are marked serializing.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Copy on read (in the context of image streaming) is the feature which
+actually introduced it. It has some similarities with the backup job, so
+the idea of using it for backup, too, isn't exactly revolutionary.
 
-
-I'll send a pull request with it shortly
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Kevin
