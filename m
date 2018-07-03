@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faLWN-0001Jy-DL
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:39:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1faLc2-00059m-3t
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faLWJ-0001eZ-E4
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:39:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33682 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1faLby-0005kt-Up
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:44:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60408 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1faLWJ-0001eS-8F
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:39:03 -0400
-References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
-	<1530098844-236851-2-git-send-email-robert.hu@linux.intel.com>
-	<20180627170304.GD914@localhost.localdomain>
-	<1530177956.22880.32.camel@linux.intel.com>
-	<ce3282a7-310c-6c53-05b8-f00afb787279@redhat.com>
-	<1530607697.22880.46.camel@linux.intel.com>
-	<b7c410af-ebc0-537c-84c4-588842fec111@redhat.com>
-	<1530616071.22880.52.camel@linux.intel.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1faLby-0005ka-P8
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:44:54 -0400
+References: <20180703101444.23778-1-alex.bennee@linaro.org>
+	<20180703101444.23778-12-alex.bennee@linaro.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6ef13b94-7aa1-78c2-95ca-8fec04510454@redhat.com>
-Date: Tue, 3 Jul 2018 15:38:57 +0200
+Message-ID: <8976a555-af38-2998-5b95-5ab294b66520@redhat.com>
+Date: Tue, 3 Jul 2018 15:44:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <1530616071.22880.52.camel@linux.intel.com>
+In-Reply-To: <20180703101444.23778-12-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] i386: Add support for IA32_PRED_CMD
- and IA32_ARCH_CAPABILITIES MSRs
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 11/20] docker: filter out linux-user builds
+ for mingw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 
-On 03/07/2018 13:07, Robert Hoo wrote:
->>      FEAT_XSAVE_COMP_LO, /* CPUID[EAX=0xd,ECX=0].EAX */
->>      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
->> +    FEATURE_WORDS_NUM_CPUID,
->> +    FEATURE_WORDS_FIRST_MSR = FEATURE_WORDS_NUM_CPUID,
->> +    FEAT_MSR_ARCH_CAPABILITIES = FEATURE_WORDS_FIRST_MSR,
->>      FEATURE_WORDS,
->> };
->>
->> #define FEATURE_WORDS_NUM_MSRS (FEATURE_WORDS - \
->>                                 FEATURE_WORDS_FIRST_MSR)
->>
->> Then the existing loops that use FeatureWordInfo can go up to
->> FEATURE_WORDS_NUM_CPUID.
-> Emm... Understand your point now. It is a little risky, all references
-> to FEATURE_WORDS need to be updated carefully.
-> OK, let me try to think in this way.
-> Perhaps, I'll need to define a new 'struct FeautureWordMsrInfo' to
-> describe feature words from MSR, in parallel to current FeatureWordInfo
-> (or better rename it to FeatureWordCpuidInfo).
+On 03/07/2018 12:14, Alex Benn=C3=A9e wrote:
+> The recent change from TARGET_DIRS to TARGET_LIST (208ecb3e1) had the
+> effect of defaulting all docker builds to the current configured set
+> of targets. This is actually reasonable behaviour but does run into
+> problems if you have linux-user builds configured and you want to test
+> the windows cross builds. This commit fixes that by adding a
+> DOCKER_FILTER_TARGETS variable which is special-cased for mingw builds
+> so we don't pass the whole set down.
 
-Yes, probably.  The plan seems fine.
+> +# Special cases
+> +#  mingw/windows builds cannot build linux-user
+> +docker-%-win32-cross: DOCKER_FILTER_TARGETS =3D %-linux-user
+> +docker-%-win64-cross: DOCKER_FILTER_TARGETS =3D %-linux-user
+> +docker-test-mingw@%: DOCKER_FILTER_TARGETS =3D %-linux-user
+
+Some questions:
+
+1) Any reason to keep all three?
+
+2) Can we do it in the test script instead?
+
+3) DEF_TARGET_LIST in the test script becomes meaningless.
+
+4) You now have to override TARGET_LIST with "make
+TARGET_LIST=3Dfoo-softmmu docker-test-mingw@fedora".  Does this interact
+badly with other uses of TARGET_LIST in the Makefile?
+
+Thanks,
 
 Paolo
