@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKT-0002pS-Md
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKU-0002pt-3c
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKS-0006x1-0q
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKS-0006xV-B2
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:22 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:46 +1000
-Message-Id: <20180703055804.13449-18-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:45 +1000
+Message-Id: <20180703055804.13449-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 17/35] target/ppc: Split out gen_load_locked
+Subject: [Qemu-devel] [PULL 16/35] target/ppc: Tidy gen_conditional_store
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +24,66 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, ag
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Leave only the minimal amount of code within the LDAR macro,
-moving the rest of the code into gen_load_locked.  Use MO_ALIGN
-and remove the explicit call to gen_check_align.
+Leave only the minimal amount of code within the STCX macro,
+moving the rest of the code into gen_conditional_store.
+Remove the explicit call to gen_check_align; the matching LDAX will
+have already checked alignment, and we verify the same address.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ target/ppc/translate.c | 28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
 
 diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e751072404..f48fcbeefb 100644
+index 03e8c5df03..e751072404 100644
 --- a/target/ppc/translate.c
 +++ b/target/ppc/translate.c
-@@ -3070,23 +3070,24 @@ static void gen_isync(DisasContext *ctx)
+@@ -3201,14 +3201,17 @@ ST_ATOMIC(stwat, DEF_MEMOP(MO_UL), i32, trunc_tl_i32)
+ ST_ATOMIC(stdat, DEF_MEMOP(MO_Q), i64, mov_i64)
+ #endif
  
- #define MEMOP_GET_SIZE(x)  (1 << ((x) & MO_SIZE))
- 
--#define LARX(name, memop)                                            \
--static void gen_##name(DisasContext *ctx)                            \
--{                                                                    \
--    TCGv t0;                                                         \
--    TCGv gpr = cpu_gpr[rD(ctx->opcode)];                             \
--    int len = MEMOP_GET_SIZE(memop);                                 \
--    gen_set_access_type(ctx, ACCESS_RES);                            \
--    t0 = tcg_temp_local_new();                                       \
--    gen_addr_reg_index(ctx, t0);                                     \
--    if ((len) > 1) {                                                 \
--        gen_check_align(ctx, t0, (len)-1);                           \
--    }                                                                \
--    tcg_gen_qemu_ld_tl(gpr, t0, ctx->mem_idx, memop);                \
--    tcg_gen_mov_tl(cpu_reserve, t0);                                 \
--    tcg_gen_mov_tl(cpu_reserve_val, gpr);                            \
--    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);                           \
--    tcg_temp_free(t0);                                               \
-+static void gen_load_locked(DisasContext *ctx, TCGMemOp memop)
-+{
-+    TCGv gpr = cpu_gpr[rD(ctx->opcode)];
+-static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+-                                  int reg, int memop)
++static void gen_conditional_store(DisasContext *ctx, TCGMemOp memop)
+ {
+     TCGLabel *l1 = gen_new_label();
+     TCGLabel *l2 = gen_new_label();
+-    TCGv t0;
 +    TCGv t0 = tcg_temp_new();
-+
++    int reg = rS(ctx->opcode);
+ 
+-    tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
 +    gen_set_access_type(ctx, ACCESS_RES);
 +    gen_addr_reg_index(ctx, t0);
-+    tcg_gen_qemu_ld_tl(gpr, t0, ctx->mem_idx, memop | MO_ALIGN);
-+    tcg_gen_mov_tl(cpu_reserve, t0);
-+    tcg_gen_mov_tl(cpu_reserve_val, gpr);
-+    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
++    tcg_gen_brcond_tl(TCG_COND_NE, t0, cpu_reserve, l1);
 +    tcg_temp_free(t0);
-+}
-+
-+#define LARX(name, memop)                  \
-+static void gen_##name(DisasContext *ctx)  \
-+{                                          \
-+    gen_load_locked(ctx, memop);           \
+ 
+     t0 = tcg_temp_new();
+     tcg_gen_atomic_cmpxchg_tl(t0, cpu_reserve, cpu_reserve_val,
+@@ -3232,19 +3235,10 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+     tcg_gen_movi_tl(cpu_reserve, -1);
  }
  
- /* lwarx */
+-#define STCX(name, memop)                                   \
+-static void gen_##name(DisasContext *ctx)                   \
+-{                                                           \
+-    TCGv t0;                                                \
+-    int len = MEMOP_GET_SIZE(memop);                        \
+-    gen_set_access_type(ctx, ACCESS_RES);                   \
+-    t0 = tcg_temp_local_new();                              \
+-    gen_addr_reg_index(ctx, t0);                            \
+-    if (len > 1) {                                          \
+-        gen_check_align(ctx, t0, (len) - 1);                \
+-    }                                                       \
+-    gen_conditional_store(ctx, t0, rS(ctx->opcode), memop); \
+-    tcg_temp_free(t0);                                      \
++#define STCX(name, memop)                  \
++static void gen_##name(DisasContext *ctx)  \
++{                                          \
++    gen_conditional_store(ctx, memop);     \
+ }
+ 
+ STCX(stbcx_, DEF_MEMOP(MO_UB))
 -- 
 2.17.1
