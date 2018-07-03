@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1faCHe-0004Tu-Dg
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:47:20 -0400
+	(envelope-from <jcody@redhat.com>) id 1faCHl-0004Z6-VN
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1faCHd-0001nC-HN
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:47:18 -0400
+	(envelope-from <jcody@redhat.com>) id 1faCHi-0001q3-Ry
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:47:26 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon,  2 Jul 2018 23:46:54 -0400
-Message-Id: <20180703034655.792039-3-jcody@redhat.com>
+Date: Mon,  2 Jul 2018 23:46:55 -0400
+Message-Id: <20180703034655.792039-4-jcody@redhat.com>
 In-Reply-To: <20180703034655.792039-1-jcody@redhat.com>
 References: <20180703034655.792039-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] block: Honour BDRV_REQ_NO_SERIALISING in
- copy range
+Subject: [Qemu-devel] [PULL 3/3] backup: Use copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +24,243 @@ Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
-This semantics is needed by drive-backup so implement it before using
-this API there.
+The implementation is similar to the 'qemu-img convert'. In the
+beginning of the job, offloaded copy is attempted. If it fails, further
+I/O will go through the existing bounce buffer code path.
+
+Then, as Kevin pointed out, both this and qemu-img convert can benefit
+from a local check if one request fails because of, for example, the
+offset is beyond EOF, but another may well be accepted by the protocol
+layer. This will be implemented separately.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-id: 20180703023758.14422-3-famz@redhat.com
+Message-id: 20180703023758.14422-4-famz@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/io.c            | 6 ++++--
- include/block/block.h | 5 +++--
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ block/backup.c     | 150 ++++++++++++++++++++++++++++++++-------------
+ block/trace-events |   1 +
+ 2 files changed, 110 insertions(+), 41 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index b8845708d7..1a2272fad3 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2930,8 +2930,10 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
-     tracked_request_begin(&dst_req, dst->bs, dst_offset,
-                           bytes, BDRV_TRACKED_WRITE);
+diff --git a/block/backup.c b/block/backup.c
+index d18be40caf..81895ddbe2 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -45,6 +45,8 @@ typedef struct BackupBlockJob {
+     QLIST_HEAD(, CowRequest) inflight_reqs;
  
--    wait_serialising_requests(&src_req);
--    wait_serialising_requests(&dst_req);
-+    if (!(flags & BDRV_REQ_NO_SERIALISING)) {
-+        wait_serialising_requests(&src_req);
-+        wait_serialising_requests(&dst_req);
+     HBitmap *copy_bitmap;
++    bool use_copy_range;
++    int64_t copy_range_size;
+ } BackupBlockJob;
+ 
+ static const BlockJobDriver backup_job_driver;
+@@ -86,19 +88,101 @@ static void cow_request_end(CowRequest *req)
+     qemu_co_queue_restart_all(&req->wait_queue);
+ }
+ 
++/* Copy range to target with a bounce buffer and return the bytes copied. If
++ * error occured, return a negative error number */
++static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
++                                                      int64_t start,
++                                                      int64_t end,
++                                                      bool is_write_notifier,
++                                                      bool *error_is_read,
++                                                      void **bounce_buffer)
++{
++    int ret;
++    struct iovec iov;
++    QEMUIOVector qiov;
++    BlockBackend *blk = job->common.blk;
++    int nbytes;
++
++    hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
++    nbytes = MIN(job->cluster_size, job->len - start);
++    if (!*bounce_buffer) {
++        *bounce_buffer = blk_blockalign(blk, job->cluster_size);
 +    }
-     if (recurse_src) {
-         ret = src->bs->drv->bdrv_co_copy_range_from(src->bs,
-                                                     src, src_offset,
-diff --git a/include/block/block.h b/include/block/block.h
-index 2ffc1c64c6..e5c7759a0c 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -659,13 +659,14 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
-  * @dst: Destination child to copy data to
-  * @dst_offset: offset in @dst image to write data
-  * @bytes: number of bytes to copy
-- * @flags: request flags. Must be one of:
-- *         0 - actually read data from src;
-+ * @flags: request flags. Supported flags:
-  *         BDRV_REQ_ZERO_WRITE - treat the @src range as zero data and do zero
-  *                               write on @dst as if bdrv_co_pwrite_zeroes is
-  *                               called. Used to simplify caller code, or
-  *                               during BlockDriver.bdrv_co_copy_range_from()
-  *                               recursion.
-+ *         BDRV_REQ_NO_SERIALISING - do not serialize with other overlapping
-+ *                                   requests currently in flight.
-  *
-  * Returns: 0 if succeeded; negative error code if failed.
-  **/
++    iov.iov_base = *bounce_buffer;
++    iov.iov_len = nbytes;
++    qemu_iovec_init_external(&qiov, &iov, 1);
++
++    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
++                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
++    if (ret < 0) {
++        trace_backup_do_cow_read_fail(job, start, ret);
++        if (error_is_read) {
++            *error_is_read = true;
++        }
++        goto fail;
++    }
++
++    if (qemu_iovec_is_zero(&qiov)) {
++        ret = blk_co_pwrite_zeroes(job->target, start,
++                                   qiov.size, BDRV_REQ_MAY_UNMAP);
++    } else {
++        ret = blk_co_pwritev(job->target, start,
++                             qiov.size, &qiov,
++                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
++    }
++    if (ret < 0) {
++        trace_backup_do_cow_write_fail(job, start, ret);
++        if (error_is_read) {
++            *error_is_read = false;
++        }
++        goto fail;
++    }
++
++    return nbytes;
++fail:
++    hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
++    return ret;
++
++}
++
++/* Copy range to target and return the bytes copied. If error occured, return a
++ * negative error number. */
++static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
++                                                int64_t start,
++                                                int64_t end,
++                                                bool is_write_notifier)
++{
++    int ret;
++    int nr_clusters;
++    BlockBackend *blk = job->common.blk;
++    int nbytes;
++
++    assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
++    nbytes = MIN(job->copy_range_size, end - start);
++    nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
++    hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
++                  nr_clusters);
++    ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
++                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
++    if (ret < 0) {
++        trace_backup_do_cow_copy_range_fail(job, start, ret);
++        hbitmap_set(job->copy_bitmap, start / job->cluster_size,
++                    nr_clusters);
++        return ret;
++    }
++
++    return nbytes;
++}
++
+ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+                                       int64_t offset, uint64_t bytes,
+                                       bool *error_is_read,
+                                       bool is_write_notifier)
+ {
+-    BlockBackend *blk = job->common.blk;
+     CowRequest cow_request;
+-    struct iovec iov;
+-    QEMUIOVector bounce_qiov;
+-    void *bounce_buffer = NULL;
+     int ret = 0;
+     int64_t start, end; /* bytes */
+-    int n; /* bytes */
++    void *bounce_buffer = NULL;
+ 
+     qemu_co_rwlock_rdlock(&job->flush_rwlock);
+ 
+@@ -110,60 +194,38 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+     wait_for_overlapping_requests(job, start, end);
+     cow_request_begin(&cow_request, job, start, end);
+ 
+-    for (; start < end; start += job->cluster_size) {
++    while (start < end) {
+         if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
+             trace_backup_do_cow_skip(job, start);
++            start += job->cluster_size;
+             continue; /* already copied */
+         }
+-        hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
+ 
+         trace_backup_do_cow_process(job, start);
+ 
+-        n = MIN(job->cluster_size, job->len - start);
+-
+-        if (!bounce_buffer) {
+-            bounce_buffer = blk_blockalign(blk, job->cluster_size);
+-        }
+-        iov.iov_base = bounce_buffer;
+-        iov.iov_len = n;
+-        qemu_iovec_init_external(&bounce_qiov, &iov, 1);
+-
+-        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
+-                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
+-        if (ret < 0) {
+-            trace_backup_do_cow_read_fail(job, start, ret);
+-            if (error_is_read) {
+-                *error_is_read = true;
++        if (job->use_copy_range) {
++            ret = backup_cow_with_offload(job, start, end, is_write_notifier);
++            if (ret < 0) {
++                job->use_copy_range = false;
+             }
+-            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
+-            goto out;
+         }
+-
+-        if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
+-            ret = blk_co_pwrite_zeroes(job->target, start,
+-                                       bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
+-        } else {
+-            ret = blk_co_pwritev(job->target, start,
+-                                 bounce_qiov.size, &bounce_qiov,
+-                                 job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
++        if (!job->use_copy_range) {
++            ret = backup_cow_with_bounce_buffer(job, start, end, is_write_notifier,
++                                                error_is_read, &bounce_buffer);
+         }
+         if (ret < 0) {
+-            trace_backup_do_cow_write_fail(job, start, ret);
+-            if (error_is_read) {
+-                *error_is_read = false;
+-            }
+-            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
+-            goto out;
++            break;
+         }
+ 
+         /* Publish progress, guest I/O counts as progress too.  Note that the
+          * offset field is an opaque progress value, it is not a disk offset.
+          */
+-        job->bytes_read += n;
+-        job_progress_update(&job->common.job, n);
++        start += ret;
++        job->bytes_read += ret;
++        job_progress_update(&job->common.job, ret);
++        ret = 0;
+     }
+ 
+-out:
+     if (bounce_buffer) {
+         qemu_vfree(bounce_buffer);
+     }
+@@ -665,6 +727,12 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+     } else {
+         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
+     }
++    job->use_copy_range = true;
++    job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
++                                        blk_get_max_transfer(job->target));
++    job->copy_range_size = MAX(job->cluster_size,
++                               QEMU_ALIGN_UP(job->copy_range_size,
++                                             job->cluster_size));
+ 
+     /* Required permissions are already taken with target's blk_new() */
+     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
+diff --git a/block/trace-events b/block/trace-events
+index 2d59b53fd3..c35287b48a 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -42,6 +42,7 @@ backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
+ backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
+ backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
+ backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
++backup_do_cow_copy_range_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
+ 
+ # blockdev.c
+ qmp_block_job_cancel(void *job) "job %p"
 -- 
 2.17.1
