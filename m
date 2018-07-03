@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfl-000213-Ec
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfl-00021M-PN
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfi-0003Lg-7n
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:56:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37104 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfj-0003P2-TF
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:56:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36756 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1faNfi-0003LA-1S
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:56:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	id 1faNfj-0003Np-Mm
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:56:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8CBA2DFE3
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:56:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2DC63408042B
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:56:55 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jul 2018 17:56:35 +0200
-Message-Id: <20180703155648.11933-2-marcandre.lureau@redhat.com>
+Date: Tue,  3 Jul 2018 17:56:36 +0200
+Message-Id: <20180703155648.11933-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 01/14] qapi: add 'if' to top-level
- expressions
+Subject: [Qemu-devel] [PATCH v7 02/14] qapi: pass 'if' condition into
+ QAPISchemaEntity objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,423 +37,318 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Accept 'if' key in top-level elements, accepted as string or list of
-string type. The following patches will modify the test visitor to
-check the value is correctly saved, and generate #if/#endif code (as a
-single #if/endif line or a series for a list).
-
-Example of 'if' key:
-{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-  'if': 'defined(TEST_IF_STRUCT)' }
-
-The generated code is for now *unconditional*. Later patches generate
-the conditionals.
-
-A following patch for qapi-code-gen.txt will provide more complete
-documentation for 'if' usage.
+Built-in objects remain unconditional.  Explicitly defined objects use
+the condition specified in the schema.  Implicitly defined objects
+inherit their condition from their users.  For most of them, there is
+exactly one user, so the condition to use is obvious.  The exception
+is wrapped types generated for simple union variants, which can be
+shared by any number of simple unions.  The tight condition would be
+the disjunction of the conditions of these simple unions.  For now,
+use the wrapped type's condition instead.  Much simpler and good
+enough for now.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py                   | 35 ++++++++++++++++++++----
- tests/test-qmp-cmds.c                    | 12 ++++++++
- docs/devel/qapi-code-gen.txt             | 22 +++++++++++++++
- tests/Makefile.include                   |  4 +++
- tests/qapi-schema/bad-if-empty-list.err  |  1 +
- tests/qapi-schema/bad-if-empty-list.exit |  1 +
- tests/qapi-schema/bad-if-empty-list.json |  3 ++
- tests/qapi-schema/bad-if-empty-list.out  |  0
- tests/qapi-schema/bad-if-empty.err       |  1 +
- tests/qapi-schema/bad-if-empty.exit      |  1 +
- tests/qapi-schema/bad-if-empty.json      |  3 ++
- tests/qapi-schema/bad-if-empty.out       |  0
- tests/qapi-schema/bad-if-list.err        |  1 +
- tests/qapi-schema/bad-if-list.exit       |  1 +
- tests/qapi-schema/bad-if-list.json       |  3 ++
- tests/qapi-schema/bad-if-list.out        |  0
- tests/qapi-schema/bad-if.err             |  1 +
- tests/qapi-schema/bad-if.exit            |  1 +
- tests/qapi-schema/bad-if.json            |  3 ++
- tests/qapi-schema/bad-if.out             |  0
- tests/qapi-schema/qapi-schema-test.json  | 26 ++++++++++++++++++
- tests/qapi-schema/qapi-schema-test.out   | 26 ++++++++++++++++++
- 22 files changed, 139 insertions(+), 6 deletions(-)
- create mode 100644 tests/qapi-schema/bad-if-empty-list.err
- create mode 100644 tests/qapi-schema/bad-if-empty-list.exit
- create mode 100644 tests/qapi-schema/bad-if-empty-list.json
- create mode 100644 tests/qapi-schema/bad-if-empty-list.out
- create mode 100644 tests/qapi-schema/bad-if-empty.err
- create mode 100644 tests/qapi-schema/bad-if-empty.exit
- create mode 100644 tests/qapi-schema/bad-if-empty.json
- create mode 100644 tests/qapi-schema/bad-if-empty.out
- create mode 100644 tests/qapi-schema/bad-if-list.err
- create mode 100644 tests/qapi-schema/bad-if-list.exit
- create mode 100644 tests/qapi-schema/bad-if-list.json
- create mode 100644 tests/qapi-schema/bad-if-list.out
- create mode 100644 tests/qapi-schema/bad-if.err
- create mode 100644 tests/qapi-schema/bad-if.exit
- create mode 100644 tests/qapi-schema/bad-if.json
- create mode 100644 tests/qapi-schema/bad-if.out
+ scripts/qapi/common.py | 97 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 65 insertions(+), 32 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 8b6708dbf1..991045a478 100644
+index 991045a478..4f4014b387 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -638,6 +638,27 @@ def add_name(name, info, meta, implicit=3DFalse):
-     all_names[name] =3D meta
+@@ -1001,8 +1001,16 @@ def check_exprs(exprs):
+ # Schema compiler frontend
+ #
+=20
++def listify_cond(ifcond):
++    if not ifcond:
++        return []
++    if not isinstance(ifcond, list):
++        return [ifcond]
++    return ifcond
++
++
+ class QAPISchemaEntity(object):
+-    def __init__(self, name, info, doc):
++    def __init__(self, name, info, doc, ifcond=3DNone):
+         assert name is None or isinstance(name, str)
+         self.name =3D name
+         self.module =3D None
+@@ -1013,6 +1021,7 @@ class QAPISchemaEntity(object):
+         # such place).
+         self.info =3D info
+         self.doc =3D doc
++        self.ifcond =3D listify_cond(ifcond)
+=20
+     def c_name(self):
+         return c_name(self.name)
+@@ -1145,8 +1154,8 @@ class QAPISchemaBuiltinType(QAPISchemaType):
 =20
 =20
-+def check_if(expr, info):
-+
-+    def check_if_str(ifcond, info):
-+        if not isinstance(ifcond, str):
-+            raise QAPISemError(
-+                info, "'if' condition must be a string or a list of stri=
-ngs")
-+        if ifcond =3D=3D '':
-+            raise QAPISemError(info, "'if' condition '' makes no sense")
-+
-+    ifcond =3D expr.get('if')
-+    if ifcond is None:
-+        return
-+    if isinstance(ifcond, list):
-+        if ifcond =3D=3D []:
-+            raise QAPISemError(info, "'if' condition [] is useless")
-+        for elt in ifcond:
-+            check_if_str(elt, info)
-+    else:
-+        check_if_str(ifcond, info)
-+
-+
- def check_type(info, source, value, allow_array=3DFalse,
-                allow_dict=3DFalse, allow_optional=3DFalse,
-                allow_metas=3D[]):
-@@ -871,6 +892,8 @@ def check_keys(expr_elem, meta, required, optional=3D=
-[]):
-             raise QAPISemError(info,
-                                "'%s' of %s '%s' should only use true val=
-ue"
-                                % (key, meta, name))
-+        if key =3D=3D 'if':
-+            check_if(expr, info)
-     for key in required:
-         if key not in expr:
-             raise QAPISemError(info, "Key '%s' is missing from %s '%s'"
-@@ -899,28 +922,28 @@ def check_exprs(exprs):
+ class QAPISchemaEnumType(QAPISchemaType):
+-    def __init__(self, name, info, doc, values, prefix):
+-        QAPISchemaType.__init__(self, name, info, doc)
++    def __init__(self, name, info, doc, ifcond, values, prefix):
++        QAPISchemaType.__init__(self, name, info, doc, ifcond)
+         for v in values:
+             assert isinstance(v, QAPISchemaMember)
+             v.set_owner(name)
+@@ -1181,7 +1190,7 @@ class QAPISchemaEnumType(QAPISchemaType):
 =20
-         if 'enum' in expr:
-             meta =3D 'enum'
--            check_keys(expr_elem, 'enum', ['data'], ['prefix'])
-+            check_keys(expr_elem, 'enum', ['data'], ['if', 'prefix'])
-             enum_types[expr[meta]] =3D expr
-         elif 'union' in expr:
-             meta =3D 'union'
-             check_keys(expr_elem, 'union', ['data'],
--                       ['base', 'discriminator'])
-+                       ['base', 'discriminator', 'if'])
-             union_types[expr[meta]] =3D expr
-         elif 'alternate' in expr:
-             meta =3D 'alternate'
--            check_keys(expr_elem, 'alternate', ['data'])
-+            check_keys(expr_elem, 'alternate', ['data'], ['if'])
-         elif 'struct' in expr:
-             meta =3D 'struct'
--            check_keys(expr_elem, 'struct', ['data'], ['base'])
-+            check_keys(expr_elem, 'struct', ['data'], ['base', 'if'])
-             struct_types[expr[meta]] =3D expr
-         elif 'command' in expr:
-             meta =3D 'command'
-             check_keys(expr_elem, 'command', [],
-                        ['data', 'returns', 'gen', 'success-response',
--                        'boxed', 'allow-oob', 'allow-preconfig'])
-+                        'boxed', 'allow-oob', 'allow-preconfig', 'if'])
-         elif 'event' in expr:
-             meta =3D 'event'
--            check_keys(expr_elem, 'event', [], ['data', 'boxed'])
-+            check_keys(expr_elem, 'event', [], ['data', 'boxed', 'if'])
+ class QAPISchemaArrayType(QAPISchemaType):
+     def __init__(self, name, info, element_type):
+-        QAPISchemaType.__init__(self, name, info, None)
++        QAPISchemaType.__init__(self, name, info, None, None)
+         assert isinstance(element_type, str)
+         self._element_type_name =3D element_type
+         self.element_type =3D None
+@@ -1189,6 +1198,7 @@ class QAPISchemaArrayType(QAPISchemaType):
+     def check(self, schema):
+         self.element_type =3D schema.lookup_type(self._element_type_name=
+)
+         assert self.element_type
++        self.ifcond =3D self.element_type.ifcond
+=20
+     def is_implicit(self):
+         return True
+@@ -1210,11 +1220,12 @@ class QAPISchemaArrayType(QAPISchemaType):
+=20
+=20
+ class QAPISchemaObjectType(QAPISchemaType):
+-    def __init__(self, name, info, doc, base, local_members, variants):
++    def __init__(self, name, info, doc, ifcond,
++                 base, local_members, variants):
+         # struct has local_members, optional base, and no variants
+         # flat union has base, variants, and no local_members
+         # simple union has local_members, variants, and no base
+-        QAPISchemaType.__init__(self, name, info, doc)
++        QAPISchemaType.__init__(self, name, info, doc, ifcond)
+         assert base is None or isinstance(base, str)
+         for m in local_members:
+             assert isinstance(m, QAPISchemaObjectTypeMember)
+@@ -1410,8 +1421,8 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectT=
+ypeMember):
+=20
+=20
+ class QAPISchemaAlternateType(QAPISchemaType):
+-    def __init__(self, name, info, doc, variants):
+-        QAPISchemaType.__init__(self, name, info, doc)
++    def __init__(self, name, info, doc, ifcond, variants):
++        QAPISchemaType.__init__(self, name, info, doc, ifcond)
+         assert isinstance(variants, QAPISchemaObjectTypeVariants)
+         assert variants.tag_member
+         variants.set_owner(name)
+@@ -1447,9 +1458,9 @@ class QAPISchemaAlternateType(QAPISchemaType):
+=20
+=20
+ class QAPISchemaCommand(QAPISchemaEntity):
+-    def __init__(self, name, info, doc, arg_type, ret_type,
++    def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
+                  gen, success_response, boxed, allow_oob, allow_preconfi=
+g):
+-        QAPISchemaEntity.__init__(self, name, info, doc)
++        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
+         assert not arg_type or isinstance(arg_type, str)
+         assert not ret_type or isinstance(ret_type, str)
+         self._arg_type_name =3D arg_type
+@@ -1490,8 +1501,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+=20
+=20
+ class QAPISchemaEvent(QAPISchemaEntity):
+-    def __init__(self, name, info, doc, arg_type, boxed):
+-        QAPISchemaEntity.__init__(self, name, info, doc)
++    def __init__(self, name, info, doc, ifcond, arg_type, boxed):
++        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
+         assert not arg_type or isinstance(arg_type, str)
+         self._arg_type_name =3D arg_type
+         self.arg_type =3D None
+@@ -1590,22 +1601,22 @@ class QAPISchema(object):
+                   ('null',   'null',    'QNull' + pointer_suffix)]:
+             self._def_builtin_type(*t)
+         self.the_empty_object_type =3D QAPISchemaObjectType(
+-            'q_empty', None, None, None, [], None)
++            'q_empty', None, None, None, None, [], None)
+         self._def_entity(self.the_empty_object_type)
+         qtype_values =3D self._make_enum_members(['none', 'qnull', 'qnum=
+',
+                                                 'qstring', 'qdict', 'qli=
+st',
+                                                 'qbool'])
+-        self._def_entity(QAPISchemaEnumType('QType', None, None,
++        self._def_entity(QAPISchemaEnumType('QType', None, None, None,
+                                             qtype_values, 'QTYPE'))
+=20
+     def _make_enum_members(self, values):
+         return [QAPISchemaMember(v) for v in values]
+=20
+-    def _make_implicit_enum_type(self, name, info, values):
++    def _make_implicit_enum_type(self, name, info, ifcond, values):
+         # See also QAPISchemaObjectTypeMember._pretty_owner()
+         name =3D name + 'Kind'   # Use namespace reserved by add_name()
+         self._def_entity(QAPISchemaEnumType(
+-            name, info, None, self._make_enum_members(values), None))
++            name, info, None, ifcond, self._make_enum_members(values), N=
+one))
+         return name
+=20
+     def _make_array_type(self, element_type, info):
+@@ -1614,22 +1625,37 @@ class QAPISchema(object):
+             self._def_entity(QAPISchemaArrayType(name, info, element_typ=
+e))
+         return name
+=20
+-    def _make_implicit_object_type(self, name, info, doc, role, members)=
+:
++    def _make_implicit_object_type(self, name, info, doc, ifcond,
++                                   role, members):
+         if not members:
+             return None
+         # See also QAPISchemaObjectTypeMember._pretty_owner()
+         name =3D 'q_obj_%s-%s' % (name, role)
+-        if not self.lookup_entity(name, QAPISchemaObjectType):
+-            self._def_entity(QAPISchemaObjectType(name, info, doc, None,
+-                                                  members, None))
++        typ =3D self.lookup_entity(name, QAPISchemaObjectType)
++        if typ:
++            # The implicit object type has multiple users.  This can
++            # happen only for simple unions' implicit wrapper types.
++            # Its ifcond should be the disjunction of its user's
++            # ifconds.  Not implemented.  Instead, we always pass the
++            # wrapped type's ifcond, which is trivially the same for all
++            # users.  It's also necessary for the wrapper to compile.
++            # But it's not tight: the disjunction need not imply it.  We
++            # may end up compiling useless wrapper types.
++            # TODO kill simple unions or implement the disjunction
++            assert ifcond =3D=3D typ.ifcond
++        else:
++            self._def_entity(QAPISchemaObjectType(name, info, doc, ifcon=
+d,
++                                                  None, members, None))
+         return name
+=20
+     def _def_enum_type(self, expr, info, doc):
+         name =3D expr['enum']
+         data =3D expr['data']
+         prefix =3D expr.get('prefix')
++        ifcond =3D expr.get('if')
+         self._def_entity(QAPISchemaEnumType(
+-            name, info, doc, self._make_enum_members(data), prefix))
++            name, info, doc, ifcond,
++            self._make_enum_members(data), prefix))
+=20
+     def _make_member(self, name, typ, info):
+         optional =3D False
+@@ -1649,7 +1675,8 @@ class QAPISchema(object):
+         name =3D expr['struct']
+         base =3D expr.get('base')
+         data =3D expr['data']
+-        self._def_entity(QAPISchemaObjectType(name, info, doc, base,
++        ifcond =3D expr.get('if')
++        self._def_entity(QAPISchemaObjectType(name, info, doc, ifcond, b=
+ase,
+                                               self._make_members(data, i=
+nfo),
+                                               None))
+=20
+@@ -1661,18 +1688,21 @@ class QAPISchema(object):
+             assert len(typ) =3D=3D 1
+             typ =3D self._make_array_type(typ[0], info)
+         typ =3D self._make_implicit_object_type(
+-            typ, info, None, 'wrapper', [self._make_member('data', typ, =
+info)])
++            typ, info, None, self.lookup_type(typ).ifcond,
++            'wrapper', [self._make_member('data', typ, info)])
+         return QAPISchemaObjectTypeVariant(case, typ)
+=20
+     def _def_union_type(self, expr, info, doc):
+         name =3D expr['union']
+         data =3D expr['data']
+         base =3D expr.get('base')
++        ifcond =3D expr.get('if')
+         tag_name =3D expr.get('discriminator')
+         tag_member =3D None
+         if isinstance(base, dict):
+-            base =3D (self._make_implicit_object_type(
+-                name, info, doc, 'base', self._make_members(base, info))=
+)
++            base =3D self._make_implicit_object_type(
++                name, info, doc, ifcond,
++                'base', self._make_members(base, info))
+         if tag_name:
+             variants =3D [self._make_variant(key, value)
+                         for (key, value) in data.items()]
+@@ -1680,12 +1710,12 @@ class QAPISchema(object):
          else:
-             raise QAPISemError(expr_elem['info'],
-                                "Expression is missing metatype")
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 491b0c4a44..840530b84c 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -12,6 +12,18 @@
+             variants =3D [self._make_simple_variant(key, value, info)
+                         for (key, value) in data.items()]
+-            typ =3D self._make_implicit_enum_type(name, info,
++            typ =3D self._make_implicit_enum_type(name, info, ifcond,
+                                                 [v.name for v in variant=
+s])
+             tag_member =3D QAPISchemaObjectTypeMember('type', typ, False=
+)
+             members =3D [tag_member]
+         self._def_entity(
+-            QAPISchemaObjectType(name, info, doc, base, members,
++            QAPISchemaObjectType(name, info, doc, ifcond, base, members,
+                                  QAPISchemaObjectTypeVariants(tag_name,
+                                                               tag_member=
+,
+                                                               variants))=
+)
+@@ -1693,11 +1723,12 @@ class QAPISchema(object):
+     def _def_alternate_type(self, expr, info, doc):
+         name =3D expr['alternate']
+         data =3D expr['data']
++        ifcond =3D expr.get('if')
+         variants =3D [self._make_variant(key, value)
+                     for (key, value) in data.items()]
+         tag_member =3D QAPISchemaObjectTypeMember('type', 'QType', False=
+)
+         self._def_entity(
+-            QAPISchemaAlternateType(name, info, doc,
++            QAPISchemaAlternateType(name, info, doc, ifcond,
+                                     QAPISchemaObjectTypeVariants(None,
+                                                                  tag_mem=
+ber,
+                                                                  variant=
+s)))
+@@ -1711,13 +1742,14 @@ class QAPISchema(object):
+         boxed =3D expr.get('boxed', False)
+         allow_oob =3D expr.get('allow-oob', False)
+         allow_preconfig =3D expr.get('allow-preconfig', False)
++        ifcond =3D expr.get('if')
+         if isinstance(data, OrderedDict):
+             data =3D self._make_implicit_object_type(
+-                name, info, doc, 'arg', self._make_members(data, info))
++                name, info, doc, ifcond, 'arg', self._make_members(data,=
+ info))
+         if isinstance(rets, list):
+             assert len(rets) =3D=3D 1
+             rets =3D self._make_array_type(rets[0], info)
+-        self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
++        self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data=
+, rets,
+                                            gen, success_response,
+                                            boxed, allow_oob, allow_preco=
+nfig))
 =20
- static QmpCommandList qmp_commands;
+@@ -1725,10 +1757,11 @@ class QAPISchema(object):
+         name =3D expr['event']
+         data =3D expr.get('data')
+         boxed =3D expr.get('boxed', False)
++        ifcond =3D expr.get('if')
+         if isinstance(data, OrderedDict):
+             data =3D self._make_implicit_object_type(
+-                name, info, doc, 'arg', self._make_members(data, info))
+-        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed))
++                name, info, doc, ifcond, 'arg', self._make_members(data,=
+ info))
++        self._def_entity(QAPISchemaEvent(name, info, doc, ifcond, data, =
+boxed))
 =20
-+/* #if defined(TEST_IF_STRUCT) && defined(TEST_IF_CMD) */
-+UserDefThree *qmp_TestIfCmd(TestIfStruct *foo, Error **errp)
-+{
-+    return NULL;
-+}
-+/* #endif */
-+
-+UserDefThree *qmp_TestCmdReturnDefThree(Error **errp)
-+{
-+    return NULL;
-+}
-+
- void qmp_user_def_cmd(Error **errp)
- {
- }
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 94a7e8f4d0..beca020575 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -744,6 +744,28 @@ Example: Red Hat, Inc. controls redhat.com, and may =
-therefore add a
- downstream command __com.redhat_drive-mirror.
-=20
-=20
-+=3D=3D=3D Configuring the schema =3D=3D=3D
-+
-+Top-level QAPI expressions.  The value must be a string or a list of
-+string.  The corresponding generated code will then guard the inclusion
-+of that member in the larger struct or function with #if IFCOND
-+(or several #if lines for a list), where IFCOND is the value of the
-+'if' key.
-+
-+'struct', 'enum', 'union', 'alternate', 'command' and 'event'
-+top-level QAPI expressions can take an 'if' keyword like:
-+
-+{ 'struct': 'IfStruct', 'data': { 'foo': 'int' },
-+  'if': 'defined(IFCOND)' }
-+
-+Please note that you are responsible to ensure that the C code will
-+compile with an arbitrary combination of conditions, since the
-+generators are unable to check it at this point.
-+
-+The presence of 'if' keys in the schema is reflected through to the
-+introspection output depending on the build configuration.
-+
-+
- =3D=3D Client JSON Protocol introspection =3D=3D
-=20
- Clients of a Client JSON Protocol commonly need to figure out what
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e8bb2d8f66..9faefd7cd2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -442,6 +442,10 @@ qapi-schema +=3D args-unknown.json
- qapi-schema +=3D bad-base.json
- qapi-schema +=3D bad-data.json
- qapi-schema +=3D bad-ident.json
-+qapi-schema +=3D bad-if.json
-+qapi-schema +=3D bad-if-empty.json
-+qapi-schema +=3D bad-if-empty-list.json
-+qapi-schema +=3D bad-if-list.json
- qapi-schema +=3D bad-type-bool.json
- qapi-schema +=3D bad-type-dict.json
- qapi-schema +=3D bad-type-int.json
-diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
-bad-if-empty-list.err
-new file mode 100644
-index 0000000000..75fe6497bc
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty-list.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
-diff --git a/tests/qapi-schema/bad-if-empty-list.exit b/tests/qapi-schema=
-/bad-if-empty-list.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty-list.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if-empty-list.json b/tests/qapi-schema=
-/bad-if-empty-list.json
-new file mode 100644
-index 0000000000..94f2eb8670
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty-list.json
-@@ -0,0 +1,3 @@
-+# check empty 'if' list
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': [] }
-diff --git a/tests/qapi-schema/bad-if-empty-list.out b/tests/qapi-schema/=
-bad-if-empty-list.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
-f-empty.err
-new file mode 100644
-index 0000000000..358bdc3e51
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
-diff --git a/tests/qapi-schema/bad-if-empty.exit b/tests/qapi-schema/bad-=
-if-empty.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if-empty.json b/tests/qapi-schema/bad-=
-if-empty.json
-new file mode 100644
-index 0000000000..fe1dd4eca6
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty.json
-@@ -0,0 +1,3 @@
-+# check empty 'if'
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': '' }
-diff --git a/tests/qapi-schema/bad-if-empty.out b/tests/qapi-schema/bad-i=
-f-empty.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/bad-if-list.err b/tests/qapi-schema/bad-if=
--list.err
-new file mode 100644
-index 0000000000..0af6316f78
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-list.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if-list.json:2: 'if' condition '' makes no sense
-diff --git a/tests/qapi-schema/bad-if-list.exit b/tests/qapi-schema/bad-i=
-f-list.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-list.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if-list.json b/tests/qapi-schema/bad-i=
-f-list.json
-new file mode 100644
-index 0000000000..49ced9b9ca
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-list.json
-@@ -0,0 +1,3 @@
-+# check invalid 'if' content
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': ['foo', ''] }
-diff --git a/tests/qapi-schema/bad-if-list.out b/tests/qapi-schema/bad-if=
--list.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
-new file mode 100644
-index 0000000000..c2e3f5f44c
---- /dev/null
-+++ b/tests/qapi-schema/bad-if.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
-st of strings
-diff --git a/tests/qapi-schema/bad-if.exit b/tests/qapi-schema/bad-if.exi=
-t
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if.json b/tests/qapi-schema/bad-if.jso=
-n
-new file mode 100644
-index 0000000000..3edd1a0bf2
---- /dev/null
-+++ b/tests/qapi-schema/bad-if.json
-@@ -0,0 +1,3 @@
-+# check invalid 'if' type
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': { 'value': 'defined(TEST_IF_STRUCT)' } }
-diff --git a/tests/qapi-schema/bad-if.out b/tests/qapi-schema/bad-if.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 7b59817f04..16209b57b3 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -56,6 +56,9 @@
-   'data': { 'string0': 'str',
-             'dict1': 'UserDefTwoDict' } }
-=20
-+{ 'struct': 'UserDefThree',
-+  'data': { 'string0': 'str' } }
-+
- # dummy struct to force generation of array types not otherwise mentione=
-d
- { 'struct': 'ForceArrays',
-   'data': { 'unused1':['UserDefOne'], 'unused2':['UserDefTwo'],
-@@ -193,3 +196,26 @@
-   'data': { 'a': ['__org.qemu_x-Enum'], 'b': ['__org.qemu_x-Struct'],
-             'c': '__org.qemu_x-Union2', 'd': '__org.qemu_x-Alt' },
-   'returns': '__org.qemu_x-Union1' }
-+
-+# test 'if' condition handling
-+
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': 'defined(TEST_IF_STRUCT)' }
-+
-+{ 'enum': 'TestIfEnum', 'data': [ 'foo', 'bar' ],
-+  'if': 'defined(TEST_IF_ENUM)' }
-+
-+{ 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
-+  'if': 'defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)' }
-+
-+{ 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
-ruct' },
-+  'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
-+
-+{ 'command': 'TestIfCmd', 'data': { 'foo': 'TestIfStruct' },
-+  'returns': 'UserDefThree',
-+  'if': ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'] }
-+
-+{ 'command': 'TestCmdReturnDefThree', 'returns': 'UserDefThree' }
-+
-+{ 'event': 'TestIfEvent', 'data': { 'foo': 'TestIfStruct' },
-+  'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 0dbcdafa3c..ed25e5b60c 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -36,6 +36,8 @@ object UserDefTwoDict
- object UserDefTwo
-     member string0: str optional=3DFalse
-     member dict1: UserDefTwoDict optional=3DFalse
-+object UserDefThree
-+    member string0: str optional=3DFalse
- object ForceArrays
-     member unused1: UserDefOneList optional=3DFalse
-     member unused2: UserDefTwoList optional=3DFalse
-@@ -233,3 +235,27 @@ object q_obj___org.qemu_x-command-arg
-     member d: __org.qemu_x-Alt optional=3DFalse
- command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qem=
-u_x-Union1
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-+object TestIfStruct
-+    member foo: int optional=3DFalse
-+enum TestIfEnum ['foo', 'bar']
-+object q_obj_TestStruct-wrapper
-+    member data: TestStruct optional=3DFalse
-+enum TestIfUnionKind ['foo']
-+object TestIfUnion
-+    member type: TestIfUnionKind optional=3DFalse
-+    tag type
-+    case foo: q_obj_TestStruct-wrapper
-+alternate TestIfAlternate
-+    tag type
-+    case foo: int
-+    case bar: TestStruct
-+object q_obj_TestIfCmd-arg
-+    member foo: TestIfStruct optional=3DFalse
-+command TestIfCmd q_obj_TestIfCmd-arg -> UserDefThree
-+   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-+command TestCmdReturnDefThree None -> UserDefThree
-+   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-+object q_obj_TestIfEvent-arg
-+    member foo: TestIfStruct optional=3DFalse
-+event TestIfEvent q_obj_TestIfEvent-arg
-+   boxed=3DFalse
+     def _def_exprs(self, exprs):
+         for expr_elem in exprs:
 --=20
 2.18.0.rc1
