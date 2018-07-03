@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faIKq-0006ry-4J
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:15:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faIKo-0008Ug-VV
+	(envelope-from <alex.bennee@linaro.org>) id 1faIKp-0006r5-6w
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:15:00 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52681)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1faIKm-0008So-1U
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:59 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33251)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1faIKo-0008UC-Q2
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:58 -0400
-Received: by mail-wm0-x244.google.com with SMTP id w16-v6so1696814wmc.2
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:14:58 -0700 (PDT)
+	id 1faIKl-0008SH-QC
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:55 -0400
+Received: by mail-wr0-x235.google.com with SMTP id k7-v6so1371274wrq.0
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:14:55 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  3 Jul 2018 11:14:41 +0100
-Message-Id: <20180703101444.23778-18-alex.bennee@linaro.org>
+Date: Tue,  3 Jul 2018 11:14:34 +0100
+Message-Id: <20180703101444.23778-11-alex.bennee@linaro.org>
 In-Reply-To: <20180703101444.23778-1-alex.bennee@linaro.org>
 References: <20180703101444.23778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/20] docker: debian-bootstrap.pre allow
- customising of variant/url
+Subject: [Qemu-devel] [PULL 10/20] linux-user: add gcov support to
+ preexit_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-We default to the buildd variant as most of our images are for
-building. However lets give the user the ability to specify "minbase"
-if they want to create a simple base image for experimentation.
-
-Allowing the tweaking of DEB_URL means we can also bootstrap other
-Debian based OS's. For example:
-
-  make docker-binfmt-image-debian-ubuntu-bionic-arm64 \
-       DEB_ARCH=arm64 DEB_TYPE=bionic \
-       DEB_VARIANT=minbase DEB_URL=http://ports.ubuntu.com/ \
-       EXECUTABLE=./aarch64-linux-user/qemu-aarch64
+As we don't always take the normal exit path when running a guest we
+can skip the normal exit destructors where gcov normally dumps it's
+info. The GCC manual suggests long running programs use __gcov_dump()
+to flush out the coverage state periodically so we use that here.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
-index 7c76dce663..56e1aa7a21 100755
---- a/tests/docker/dockerfiles/debian-bootstrap.pre
-+++ b/tests/docker/dockerfiles/debian-bootstrap.pre
-@@ -32,6 +32,15 @@ if [ -z "${DEB_TYPE}" ]; then
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+index aed8713fae..14e94e28fa 100644
+--- a/linux-user/exit.c
++++ b/linux-user/exit.c
+@@ -19,10 +19,17 @@
+ #include "qemu/osdep.h"
+ #include "qemu.h"
  
- fi
- 
-+# The following allow finer grain control over the defaults
-+if [ -z "${DEB_VARIANT}" ]; then
-+    DEB_VARIANT=buildd
-+fi
++#ifdef CONFIG_GCOV
++extern void __gcov_dump(void);
++#endif
 +
-+if [ -z "${DEB_URL}" ]; then
-+    DEB_URL="http://httpredir.debian.org/debian"
-+fi
-+
- # We check in order for
- #
- #  - DEBOOTSTRAP_DIR pointing at a development checkout
-@@ -107,5 +116,5 @@ fi
- 
- echo "Building a rootfs using ${FAKEROOT} and ${DEBOOTSTRAP} ${DEB_ARCH}/${DEB_TYPE}"
- 
--${FAKEROOT} ${DEBOOTSTRAP} --variant=buildd --foreign --arch=$DEB_ARCH $DEB_TYPE . http://httpredir.debian.org/debian || exit 1
-+${FAKEROOT} ${DEBOOTSTRAP} --variant=$DEB_VARIANT --foreign --arch=$DEB_ARCH $DEB_TYPE . $DEB_URL || exit 1
- exit 0
+ void preexit_cleanup(CPUArchState *env, int code)
+ {
+ #ifdef TARGET_GPROF
+         _mcleanup();
++#endif
++#ifdef CONFIG_GCOV
++        __gcov_dump();
+ #endif
+         gdb_exit(env, code);
+ }
 -- 
 2.17.1
