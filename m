@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1faOGY-0007r8-9u
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:34:59 -0400
+	(envelope-from <prvs=715e8d879=Alistair.Francis@wdc.com>)
+	id 1faOGl-00084c-9R
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1faOGU-0005aH-BY
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:34:58 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:48403)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1faOGU-0005Zn-0X
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:34:54 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  3 Jul 2018 18:34:47 +0200
-Message-Id: <20180703163451.16936-4-laurent@vivier.eu>
-In-Reply-To: <20180703163451.16936-1-laurent@vivier.eu>
-References: <20180703163451.16936-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 3/7] qemu-binfmt-conf.sh: allow to provide a
- suffix to the interpreter name
+	(envelope-from <prvs=715e8d879=Alistair.Francis@wdc.com>)
+	id 1faOGh-0005kQ-Di
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:11 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:62998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=715e8d879=Alistair.Francis@wdc.com>)
+	id 1faOGg-0005ir-W9
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:07 -0400
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue,  3 Jul 2018 09:34:40 -0700
+Message-Id: <20180703163446.9943-2-alistair.francis@wdc.com>
+In-Reply-To: <20180703163446.9943-1-alistair.francis@wdc.com>
+References: <20180703163446.9943-1-alistair.francis@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL v3 1/7] hw/riscv/sifive_u: Create a SiFive U SoC
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +29,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mjc@sifive.com
+Cc: f4bug@amsat.org, alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
 
-some distros provide a qemu-CPU-static binary beside the qemu-CPU one.
-This change allows to use it by providing "--qemu-suffix -static" to the
-script.
+Create a SiFive Unleashed U54 SoC and use that in the sifive_u machine.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180627205317.10343-4-laurent@vivier.eu>
+We leave the SoC, RAM, device tree and reset/fdt loading as part of the
+machine. All the other device creation has been moved to the SoC.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Michael Clark <mjc@sifive.com>
 ---
- scripts/qemu-binfmt-conf.sh | 41 ++++++++++++++++++++++---------------
- 1 file changed, 24 insertions(+), 17 deletions(-)
+ hw/riscv/sifive_u.c         | 90 ++++++++++++++++++++++++++++---------
+ include/hw/riscv/sifive_u.h | 16 ++++++-
+ 2 files changed, 82 insertions(+), 24 deletions(-)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 00c9c3aa16..23df00ae30 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -161,25 +161,26 @@ usage() {
-     cat <<EOF
- Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                            [--help][--credential yes|no][--exportdir PATH]
--                           [--persistent yes|no]
-+                           [--persistent yes|no][--qemu-suffix SUFFIX]
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index c05dcbba95..45b6aeb36b 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -116,10 +116,10 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
  
-        Configure binfmt_misc to use qemu interpreter
+-    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
++    for (cpu = s->soc.cpus.num_harts - 1; cpu >= 0; cpu--) {
+         nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+-        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
++        char *isa = riscv_isa_string(&s->soc.cpus.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+         qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+                               SIFIVE_U_CLOCK_FREQ);
+@@ -140,8 +140,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         g_free(nodename);
+     }
  
--       --help:       display this usage
--       --qemu-path:  set path to qemu interpreter ($QEMU_PATH)
--       --debian:     don't write into /proc,
--                     instead generate update-binfmts templates
--       --systemd:    don't write into /proc,
--                     instead generate file for systemd-binfmt.service
--                     for the given CPU. If CPU is "ALL", generate a
--                     file for all known cpus
--       --exportdir:  define where to write configuration files
--                     (default: $SYSTEMDDIR or $DEBIANDIR)
--       --credential: if yes, credential and security tokens are
--                     calculated according to the binary to interpret
--       --persistent: if yes, the interpreter is loaded when binfmt is
--                     configured and remains in memory. All future uses
--                     are cloned from the open file.
-+       --help:        display this usage
-+       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
-+       --qemu-suffix: add a suffix to the default interpreter name
-+       --debian:      don't write into /proc,
-+                      instead generate update-binfmts templates
-+       --systemd:     don't write into /proc,
-+                      instead generate file for systemd-binfmt.service
-+                      for the given CPU. If CPU is "ALL", generate a
-+                      file for all known cpus
-+       --exportdir:   define where to write configuration files
-+                      (default: $SYSTEMDDIR or $DEBIANDIR)
-+       --credential:  if yes, credential and security tokens are
-+                      calculated according to the binary to interpret
-+       --persistent:  if yes, the interpreter is loaded when binfmt is
-+                      configured and remains in memory. All future uses
-+                      are cloned from the open file.
+-    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+-    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
++    cells =  g_new0(uint32_t, s->soc.cpus.num_harts * 4);
++    for (cpu = 0; cpu < s->soc.cpus.num_harts; cpu++) {
+         nodename =
+             g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
+@@ -159,12 +159,12 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         0x0, memmap[SIFIVE_U_CLINT].base,
+         0x0, memmap[SIFIVE_U_CLINT].size);
+     qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+-        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
++        cells, s->soc.cpus.num_harts * sizeof(uint32_t) * 4);
+     g_free(cells);
+     g_free(nodename);
  
-     To import templates with update-binfmts, use :
+-    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+-    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
++    cells =  g_new0(uint32_t, s->soc.cpus.num_harts * 4);
++    for (cpu = 0; cpu < s->soc.cpus.num_harts; cpu++) {
+         nodename =
+             g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
+@@ -181,7 +181,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
+     qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
+     qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+-        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
++        cells, s->soc.cpus.num_harts * sizeof(uint32_t) * 4);
+     qemu_fdt_setprop_cells(fdt, nodename, "reg",
+         0x0, memmap[SIFIVE_U_PLIC].base,
+         0x0, memmap[SIFIVE_U_PLIC].size);
+@@ -217,17 +217,12 @@ static void riscv_sifive_u_init(MachineState *machine)
+     SiFiveUState *s = g_new0(SiFiveUState, 1);
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+-    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     int i;
  
-@@ -297,6 +298,7 @@ qemu_set_binfmts() {
-             qemu="$QEMU_PATH/qemu-i386"
-         fi
+-    /* Initialize SOC */
+-    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
++    /* Initialize SoC */
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_U_SOC);
+     object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+                               &error_abort);
+-    object_property_set_str(OBJECT(&s->soc), SIFIVE_U_CPU, "cpu-type",
+-                            &error_abort);
+-    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+-                            &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), true, "realized",
+                             &error_abort);
  
-+        qemu="$qemu$QEMU_SUFFIX"
-         if [ "$host_family" != "$family" ] ; then
-             $BINFMT_SET
-         fi
-@@ -312,8 +314,9 @@ DEBIANDIR="/usr/share/binfmts"
- QEMU_PATH=/usr/local/bin
- CREDENTIAL=no
- PERSISTENT=no
-+QEMU_SUFFIX=""
+@@ -235,17 +230,11 @@ static void riscv_sifive_u_init(MachineState *machine)
+     memory_region_init_ram(main_mem, NULL, "riscv.sifive.u.ram",
+                            machine->ram_size, &error_fatal);
+     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DRAM].base,
+-        main_mem);
++                                main_mem);
  
--options=$(getopt -o ds:Q:e:hc:p: -l debian,systemd:,qemu-path:,exportdir:,help,credential:,persistent: -- "$@")
-+options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
- eval set -- "$options"
+     /* create device tree */
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
  
- while true ; do
-@@ -349,6 +352,10 @@ while true ; do
-         shift
-         QEMU_PATH="$1"
-         ;;
-+    -F|--qemu-suffix)
-+        shift
-+        QEMU_SUFFIX="$1"
-+        ;;
-     -e|--exportdir)
-         shift
-         EXPORTDIR="$1"
+-    /* boot rom */
+-    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.u.mrom",
+-                           memmap[SIFIVE_U_MROM].size, &error_fatal);
+-    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
+-                                mask_rom);
+-
+     if (machine->kernel_filename) {
+         load_kernel(machine->kernel_filename);
+     }
+@@ -284,6 +273,39 @@ static void riscv_sifive_u_init(MachineState *machine)
+     rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+                           memmap[SIFIVE_U_MROM].base + sizeof(reset_vec),
+                           &address_space_memory);
++}
++
++static void riscv_sifive_u_soc_init(Object *obj)
++{
++    const struct MemmapEntry *memmap = sifive_u_memmap;
++
++    SiFiveUSoCState *s = RISCV_U_SOC(obj);
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
++
++    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
++    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
++                              &error_abort);
++    object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
++                            &error_abort);
++    object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
++                            &error_abort);
++
++    /* boot rom */
++    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.u.mrom",
++                           memmap[SIFIVE_U_MROM].size, &error_fatal);
++    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
++                                mask_rom);
++}
++
++static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
++{
++    SiFiveUSoCState *s = RISCV_U_SOC(dev);
++    const struct MemmapEntry *memmap = sifive_u_memmap;
++    MemoryRegion *system_memory = get_system_memory();
++
++    object_property_set_bool(OBJECT(&s->cpus), true, "realized",
++                             &error_abort);
+ 
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+@@ -314,3 +336,27 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
+ }
+ 
+ DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
++
++static void riscv_sifive_u_soc_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = riscv_sifive_u_soc_realize;
++    /* Reason: Uses serial_hds in realize function, thus can't be used twice */
++    dc->user_creatable = false;
++}
++
++static const TypeInfo riscv_sifive_u_soc_type_info = {
++    .name = TYPE_RISCV_U_SOC,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(SiFiveUSoCState),
++    .instance_init = riscv_sifive_u_soc_init,
++    .class_init = riscv_sifive_u_soc_class_init,
++};
++
++static void riscv_sifive_u_soc_register_types(void)
++{
++    type_register_static(&riscv_sifive_u_soc_type_info);
++}
++
++type_init(riscv_sifive_u_soc_register_types)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 94a390566e..49f1946539 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -19,13 +19,25 @@
+ #ifndef HW_SIFIVE_U_H
+ #define HW_SIFIVE_U_H
+ 
+-typedef struct SiFiveUState {
++#define TYPE_RISCV_U_SOC "riscv.sifive.u.soc"
++#define RISCV_U_SOC(obj) \
++    OBJECT_CHECK(SiFiveUSoCState, (obj), TYPE_RISCV_U_SOC)
++
++typedef struct SiFiveUSoCState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+ 
+     /*< public >*/
+-    RISCVHartArrayState soc;
++    RISCVHartArrayState cpus;
+     DeviceState *plic;
++} SiFiveUSoCState;
++
++typedef struct SiFiveUState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    SiFiveUSoCState soc;
+     void *fdt;
+     int fdt_size;
+ } SiFiveUState;
 -- 
 2.17.1
