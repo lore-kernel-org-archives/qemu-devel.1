@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faNMz-0002Mp-8g
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1faNMz-0002NT-VJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faNMx-0005J1-4i
+	(envelope-from <armbru@redhat.com>) id 1faNMy-0005Lm-90
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50126 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36018 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMw-0005HJ-TH
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMx-0005Kg-VR
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:32 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D59A8163C5F
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 904BEDFDF
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A8862026D76
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:30 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C26C2156889
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:31 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 17:37:03 +0200
-Message-Id: <20180703153728.2175-8-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 17:37:14 +0200
+Message-Id: <20180703153728.2175-19-armbru@redhat.com>
 In-Reply-To: <20180703153728.2175-1-armbru@redhat.com>
 References: <20180703153728.2175-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/32] qmp: Make "id" optional again even in
- "oob" monitors
+Subject: [Qemu-devel] [PULL 18/32] qmp: Don't let JSON errors jump the queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,77 +35,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Commit cf869d53172 "qmp: support out-of-band (oob) execution" made
-"id" mandatory for all commands when the client accepted capability
-"oob".  This is rather onerous when you play with QMP by hand, and
-unnecessarily so: only out-of-band commands need an ID for reliable
-matching of response to command.
+handle_qmp_command() reports JSON syntax errors right away.  This is
+wrong when OOB is enabled, because the errors can "jump the queue"
+then.
 
-Revert that part of commit cf869d53172 for now, but have documentation
-advise on the need to use "id" with out-of-band commands.
+The previous commit fixed the same bug for semantic errors, by
+delaying the checking until dispatch.  We can't delay the checking, so
+delay the reporting.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20180703085358.13941-8-armbru@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180703085358.13941-19-armbru@redhat.com>
 ---
- docs/interop/qmp-spec.txt | 13 +++++++------
- monitor.c                 |  7 -------
- 2 files changed, 7 insertions(+), 13 deletions(-)
+ monitor.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-index 6b72b69cb1..a1d6f9ee06 100644
---- a/docs/interop/qmp-spec.txt
-+++ b/docs/interop/qmp-spec.txt
-@@ -103,16 +103,13 @@ The format for command execution is:
-   required. Each command documents what contents will be considered
-   valid when handling the json-argument
- - The "id" member is a transaction identification associated with the
--  command execution.  It is required for all commands if the OOB -
--  capability was enabled at startup, and optional otherwise.  The same
--  "id" field will be part of the response if provided.  The "id"
--  member can be any json-value.  A json-number incremented for each
--  successive command works fine.
-+  command execution, it is optional and will be part of the response
-+  if provided.  The "id" member can be any json-value.  A json-number
-+  incremented for each successive command works fine.
- - The optional "control" member further specifies how the command is
-   to be executed.  Currently, its only member is optional "run-oob".
-   See section "2.3.1 Out-of-band execution" for details.
-=20
--
- 2.3.1 Out-of-band execution
- ---------------------------
-=20
-@@ -128,6 +125,10 @@ possibly overtaking prior in-band commands.  The cli=
-ent may therefore
- receive such a command's response before responses from prior in-band
- commands.
-=20
-+To be able to match responses back to their commands, the client needs
-+to pass "id" with out-of-band commands.  Passing it with all commands
-+is recommended for clients that accept capability "oob".
-+
- To execute a command out-of-band, the client puts "run-oob": true into
- execute's member "control".
-=20
 diff --git a/monitor.c b/monitor.c
-index 3ad89fe1ba..0dd6e22463 100644
+index be2a856d1c..ea5421399a 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -4292,13 +4292,6 @@ static void handle_qmp_command(JSONMessageParser *=
-parser, GQueue *tokens)
-=20
-     id =3D qdict_get(qdict, "id");
-=20
--    /* When OOB is enabled, the "id" field is mandatory. */
--    if (qmp_oob_enabled(mon) && !id) {
--        error_setg(&err, "Out-of-band capability requires that "
--                   "every command contains an 'id' field");
--        goto err;
+@@ -254,8 +254,12 @@ struct QMPRequest {
+     Monitor *mon;
+     /* "id" field of the request */
+     QObject *id;
+-    /* Request object to be handled */
++    /*
++     * Request object to be handled or Error to be reported
++     * (exactly one of them is non-null)
++     */
+     QObject *req;
++    Error *err;
+     /*
+      * Whether we need to resume the monitor afterward.  This flag is
+      * used to emulate the old QMP server behavior that the current
+@@ -360,6 +364,7 @@ static void qmp_request_free(QMPRequest *req)
+ {
+     qobject_unref(req->id);
+     qobject_unref(req->req);
++    error_free(req->err);
+     g_free(req);
+ }
+ 
+@@ -4199,8 +4204,14 @@ static void monitor_qmp_bh_dispatcher(void *data)
+         return;
+     }
+ 
+-    trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
+-    monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
++    if (req_obj->req) {
++        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
++        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
++    } else {
++        assert(req_obj->err);
++        monitor_qmp_respond(req_obj->mon, NULL, req_obj->err, NULL);
++    }
++
+     if (req_obj->need_resume) {
+         /* Pairs with the monitor_suspend() in handle_qmp_command() */
+         monitor_resume(req_obj->mon);
+@@ -4227,11 +4238,6 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         /* json_parser_parse_err() sucks: can fail without setting @err */
+         error_setg(&err, QERR_JSON_PARSING);
+     }
+-    if (err) {
+-        assert(!req);
+-        monitor_qmp_respond(mon, NULL, err, NULL);
+-        return;
 -    }
--
-     req_obj =3D g_new0(QMPRequest, 1);
-     req_obj->mon =3D mon;
-     req_obj->id =3D qobject_ref(id);
---=20
+ 
+     qdict = qobject_to(QDict, req);
+     if (qdict) {
+@@ -4257,6 +4263,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+     req_obj->mon = mon;
+     req_obj->id = id;
+     req_obj->req = req;
++    req_obj->err = err;
+     req_obj->need_resume = false;
+ 
+     /* Protect qmp_requests and fetching its length. */
+-- 
 2.17.1
