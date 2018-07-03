@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faLem-0006sR-70
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:47:49 -0400
+	(envelope-from <shorne@gmail.com>) id 1faLhJ-0008Lg-9h
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faLej-00081W-13
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:47:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59796 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faLei-00081H-QX
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:47:44 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
-	<20180627163551.31610-10-marcandre.lureau@redhat.com>
-	<87efgkbjwc.fsf@dusky.pond.sub.org>
-	<CAJ+F1C+7PNgM=Qq4d4HmG6VfneML6WGPbhh68WwReUicE1B_JA@mail.gmail.com>
-Date: Tue, 03 Jul 2018 15:47:42 +0200
-In-Reply-To: <CAJ+F1C+7PNgM=Qq4d4HmG6VfneML6WGPbhh68WwReUicE1B_JA@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 3 Jul 2018
-	15:11:55 +0200")
-Message-ID: <87h8lga0sh.fsf@dusky.pond.sub.org>
+	(envelope-from <shorne@gmail.com>) id 1faLhF-0000nh-Qd
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:25 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:33739)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1faLhF-0000m7-IS
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:21 -0400
+Received: by mail-pl0-x244.google.com with SMTP id 6-v6so1088287plb.0
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 06:50:21 -0700 (PDT)
+From: Stafford Horne <shorne@gmail.com>
+Date: Tue,  3 Jul 2018 22:50:02 +0900
+Message-Id: <20180703135003.7485-1-shorne@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 09/15] qapi-introspect: add preprocessor
- conditions to generated QLit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v3 00/25] OpenRISC updates for 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Hello Peter,
 
-> Hi
->
-> On Tue, Jul 3, 2018 at 2:09 PM, Markus Armbruster <armbru@redhat.com> wro=
-te:
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->>> The generator will take (obj, condition) tuples to wrap generated QLit
->>> objects for 'obj' with #if/#endif conditions.
->>>
->>> This commit adds 'ifcond' condition to top-level QLit objects.
->>>
->>> See generated tests/test-qmp-introspect.c. Example diff after this patc=
-h:
->>>
->>>     --- before        2018-01-08 11:55:24.757083654 +0100
->>>     +++ tests/test-qmp-introspect.c   2018-01-08 13:08:44.477641629 +01=
-00
->>>     @@ -51,6 +51,8 @@
->>>              { "name", QLIT_QSTR("EVENT_F"), },
->>>              {}
->>>          })),
->>>     +#if defined(TEST_IF_CMD)
->>>     +#if defined(TEST_IF_STRUCT)
->>>          QLIT_QDICT(((QLitDictEntry[]) {
->>>              { "arg-type", QLIT_QSTR("5"), },
->>>              { "meta-type", QLIT_QSTR("command"), },
->>>     @@ -58,12 +60,16 @@
->>>              { "ret-type", QLIT_QSTR("0"), },
->>>              {}
->>>          })),
->>>     +#endif /* defined(TEST_IF_STRUCT) */
->>>     +#endif /* defined(TEST_IF_CMD) */
->>>
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  scripts/qapi/introspect.py | 31 +++++++++++++++++++++----------
->>>  1 file changed, 21 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
->>> index bd7e1219be..71d4a779ce 100644
->>> --- a/scripts/qapi/introspect.py
->>> +++ b/scripts/qapi/introspect.py
->>> @@ -18,6 +18,15 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3D=
-False):
->>>      def indent(level):
->>>          return level * 4 * ' '
->>>
->>> +    if isinstance(obj, tuple):
->>> +        ifobj, ifcond =3D obj
->>> +        ret =3D gen_if(ifcond)
->>> +        ret +=3D to_qlit(ifobj, level)
->>> +        endif =3D gen_endif(ifcond)
->>> +        if endif:
->>> +            ret +=3D '\n' + endif
->>> +        return ret
->>> +
->>>      ret =3D ''
->>>      if not suppress_first_indent:
->>>          ret +=3D indent(level)
->>
->> @obj represents a JSON object.  It consists of dictionaries, lists,
->> strings, booleans and None.  Numbers aren't implemented.  Your patch
->> splices in tuples to represent conditionals at any level.
->>
->> So far, tuples occur only as elements of the outermost list (see
->> ._gen_qlit() below), but to_qlit() supports them anywhere.  I figure
->> that will be needed later.  Can you point me to such a later use?
->
-> It's added in the introspect.py part from "qapi: add #if conditions to
-> generated code members"
+Trying again to send this series, just one difference here so just sending the
+single patch.
 
-Thanks!
+Changes since v2:
+ - Use PAGE_ instead of PROT_ flags in MMU patches to fix windows build.
 
-Let's add a hint to the commit message.  Pergaps:
 
-    qapi-introspect: add preprocessor conditions to generated QLit
+Please consider for pull:
 
-    This commit adds 'ifcond' conditions to top-level QLit objects.
-    Future work will add them to object and enum type members, i.e. within
-    QLit objects.
+The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
 
-    Extend the QLit generator to_qlit() to accept (@obj, @cond) tuples in
-    addition to just @obj.  The tuple causes the QLit generated for
-    objects for @obj with #if/#endif conditions for @cond.
+  tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
 
-    See generated tests/test-qmp-introspect.c.  Example diff after this
-    patch:
-    [...]
+are available in the Git repository at:
+
+  git@github.com:stffrdhrn/qemu.git tags/pull-or-20180703
+
+for you to fetch changes up to dfc84745bbaa0fea2abc8575dd349f6e4bb7edc7:
+
+  target/openrisc: Fix writes to interrupt mask register (2018-07-03 22:40:33 +0900)
+
+----------------------------------------------------------------
+OpenRISC cleanups and Fixes for QEMU 3.0
+
+Mostly patches from Richard Henderson fixing multiple things:
+ * Fix singlestepping in GDB.
+ * Use more TB linking.
+ * Fixes to exit TB after updating SPRs to enable registering of state
+   changes.
+ * Significant optimizations and refactors to the TLB
+ * Split out disassembly from translation.
+ * Add qemu-or1k to qemu-binfmt-conf.sh.
+ * Implement signal handling for linux-user.
+
+Then there are a few fixups from me:
+ * Fix delay slot detections to match hardware, this was masking a bug
+   in the linus kernel.
+ * Fix stores to the PIC mask register
+
+----------------------------------------------------------------
+
+Richard Henderson (23):
+  target/openrisc: Fix mtspr shadow gprs
+  target/openrisc: Add print_insn_or1k
+  target/openrisc: Log interrupts
+  target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP
+  target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB
+  target/openrisc: Fix singlestep_enabled
+  target/openrisc: Link more translation blocks
+  target/openrisc: Split out is_user
+  target/openrisc: Exit the TB after l.mtspr
+  target/openrisc: Form the spr index from tcg
+  target/openrisc: Merge tlb allocation into CPUOpenRISCState
+  target/openrisc: Remove indirect function calls for mmu
+  target/openrisc: Merge mmu_helper.c into mmu.c
+  target/openrisc: Reduce tlb to a single dimension
+  target/openrisc: Fix tlb flushing in mtspr
+  target/openrisc: Fix cpu_mmu_index
+  target/openrisc: Use identical sizes for ITLB and DTLB
+  target/openrisc: Stub out handle_mmu_fault for softmmu
+  target/openrisc: Increase the TLB size
+  target/openrisc: Reorg tlb lookup
+  target/openrisc: Add support in scripts/qemu-binfmt-conf.sh
+  linux-user: Implement signals for openrisc
+  linux-user: Fix struct sigaltstack for openrisc
+
+Stafford Horne (2):
+  target/openrisc: Fix delay slot exception flag to match spec
+  target/openrisc: Fix writes to interrupt mask register
+
+ linux-user/openrisc/signal.c         | 217 ++++++++-----------
+ linux-user/openrisc/target_signal.h  |   2 +-
+ linux-user/openrisc/target_syscall.h |  28 +--
+ linux-user/signal.c                  |   2 +-
+ scripts/qemu-binfmt-conf.sh          |  10 +-
+ target/openrisc/Makefile.objs        |   5 +-
+ target/openrisc/cpu.c                |  17 +-
+ target/openrisc/cpu.h                |  61 +++---
+ target/openrisc/disas.c              | 170 +++++++++++++++
+ target/openrisc/helper.h             |   4 +-
+ target/openrisc/interrupt.c          |  55 +++--
+ target/openrisc/interrupt_helper.c   |  35 +---
+ target/openrisc/machine.c            |  44 +---
+ target/openrisc/mmu.c                | 279 +++++++++---------------
+ target/openrisc/mmu_helper.c         |  40 ----
+ target/openrisc/sys_helper.c         |  84 ++++----
+ target/openrisc/translate.c          | 303 ++++++++++-----------------
+ 17 files changed, 603 insertions(+), 753 deletions(-)
+ create mode 100644 target/openrisc/disas.c
+ delete mode 100644 target/openrisc/mmu_helper.c
+
+-- 
+2.17.0
