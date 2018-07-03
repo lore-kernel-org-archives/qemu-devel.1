@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKY-0002sv-HE
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKR-0002nS-Mt
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKW-00072f-7X
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKP-0006uq-VA
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:56 +1000
-Message-Id: <20180703055804.13449-28-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:43 +1000
+Message-Id: <20180703055804.13449-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/35] hw/timer: Add basic M41T80 emulation
+Subject: [Qemu-devel] [PULL 14/35] target/ppc: Use atomic cmpxchg for STQCX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,183 +20,196 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting time
-of day is implemented. Setting time and RTC alarm are not supported.
+When running in a parallel context, we must use a helper in order
+to perform the 128-bit atomic operation.  When running in a serial
+context, do the compare before the store.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- MAINTAINERS                     |   1 +
- default-configs/ppc-softmmu.mak |   1 +
- hw/timer/Makefile.objs          |   1 +
- hw/timer/m41t80.c               | 117 ++++++++++++++++++++++++++++++++
- 4 files changed, 120 insertions(+)
- create mode 100644 hw/timer/m41t80.c
+ target/ppc/helper.h     |  2 +
+ target/ppc/mem_helper.c | 38 +++++++++++++++++
+ target/ppc/translate.c  | 93 ++++++++++++++++++++++++++---------------
+ 3 files changed, 100 insertions(+), 33 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 42a1892d6a..6630d691d1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -851,6 +851,7 @@ M: BALATON Zoltan <balaton@eik.bme.hu>
- L: qemu-ppc@nongnu.org
- S: Maintained
- F: hw/ide/sii3112.c
-+F: hw/timer/m41t80.c
-=20
- SH4 Machines
- ------------
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-index 475120bda2..7e1a3d8135 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -28,6 +28,7 @@ CONFIG_SM501=3Dy
- CONFIG_IDE_SII3112=3Dy
- CONFIG_I2C=3Dy
- CONFIG_BITBANG_I2C=3Dy
-+CONFIG_M41T80=3Dy
-=20
- # For Macs
- CONFIG_MAC=3Dy
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 8b27a4b7ef..e16b2b913c 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_CADENCE) +=3D cadence_ttc.o
- common-obj-$(CONFIG_DS1338) +=3D ds1338.o
- common-obj-$(CONFIG_HPET) +=3D hpet.o
- common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
-+common-obj-$(CONFIG_M41T80) +=3D m41t80.o
- common-obj-$(CONFIG_M48T59) +=3D m48t59.o
- ifeq ($(CONFIG_ISA_BUS),y)
- common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
-diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
-new file mode 100644
-index 0000000000..734d7d95fc
---- /dev/null
-+++ b/hw/timer/m41t80.c
-@@ -0,0 +1,117 @@
-+/*
-+ * M41T80 serial rtc emulation
-+ *
-+ * Copyright (c) 2018 BALATON Zoltan
-+ *
-+ * This work is licensed under the GNU GPL license version 2 or later.
-+ *
-+ */
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index cbc1228570..5706c2497f 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -807,4 +807,6 @@ DEF_HELPER_FLAGS_5(stq_le_parallel, TCG_CALL_NO_WG,
+                    void, env, tl, i64, i64, i32)
+ DEF_HELPER_FLAGS_5(stq_be_parallel, TCG_CALL_NO_WG,
+                    void, env, tl, i64, i64, i32)
++DEF_HELPER_5(stqcx_le_parallel, i32, env, tl, i64, i64, i32)
++DEF_HELPER_5(stqcx_be_parallel, i32, env, tl, i64, i64, i32)
+ #endif
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 57e301edc3..8f0d86d104 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -245,6 +245,44 @@ void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
+     Int128 val = int128_make128(lo, hi);
+     helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
+ }
 +
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/timer.h"
-+#include "qemu/bcd.h"
-+#include "hw/i2c/i2c.h"
-+
-+#define TYPE_M41T80 "m41t80"
-+#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
-+
-+typedef struct M41t80State {
-+    I2CSlave parent_obj;
-+    int8_t addr;
-+} M41t80State;
-+
-+static void m41t80_realize(DeviceState *dev, Error **errp)
++uint32_t helper_stqcx_le_parallel(CPUPPCState *env, target_ulong addr,
++                                  uint64_t new_lo, uint64_t new_hi,
++                                  uint32_t opidx)
 +{
-+    M41t80State *s =3D M41T80(dev);
++    bool success = false;
 +
-+    s->addr =3D -1;
-+}
++    if (likely(addr == env->reserve_addr)) {
++        Int128 oldv, cmpv, newv;
 +
-+static int m41t80_send(I2CSlave *i2c, uint8_t data)
-+{
-+    M41t80State *s =3D M41T80(i2c);
-+
-+    if (s->addr < 0) {
-+        s->addr =3D data;
-+    } else {
-+        s->addr++;
++        cmpv = int128_make128(env->reserve_val2, env->reserve_val);
++        newv = int128_make128(new_lo, new_hi);
++        oldv = helper_atomic_cmpxchgo_le_mmu(env, addr, cmpv, newv,
++                                             opidx, GETPC());
++        success = int128_eq(oldv, cmpv);
 +    }
-+    return 0;
++    env->reserve_addr = -1;
++    return env->so + success * CRF_EQ_BIT;
 +}
 +
-+static int m41t80_recv(I2CSlave *i2c)
++uint32_t helper_stqcx_be_parallel(CPUPPCState *env, target_ulong addr,
++                                  uint64_t new_lo, uint64_t new_hi,
++                                  uint32_t opidx)
 +{
-+    M41t80State *s =3D M41T80(i2c);
-+    struct tm now;
-+    qemu_timeval tv;
++    bool success = false;
 +
-+    if (s->addr < 0) {
-+        s->addr =3D 0;
++    if (likely(addr == env->reserve_addr)) {
++        Int128 oldv, cmpv, newv;
++
++        cmpv = int128_make128(env->reserve_val2, env->reserve_val);
++        newv = int128_make128(new_lo, new_hi);
++        oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv,
++                                             opidx, GETPC());
++        success = int128_eq(oldv, cmpv);
 +    }
-+    if (s->addr >=3D 1 && s->addr <=3D 7) {
-+        qemu_get_timedate(&now, -1);
-+    }
-+    switch (s->addr++) {
-+    case 0:
-+        qemu_gettimeofday(&tv);
-+        return to_bcd(tv.tv_usec / 10000);
-+    case 1:
-+        return to_bcd(now.tm_sec);
-+    case 2:
-+        return to_bcd(now.tm_min);
-+    case 3:
-+        return to_bcd(now.tm_hour);
-+    case 4:
-+        return to_bcd(now.tm_wday);
-+    case 5:
-+        return to_bcd(now.tm_mday);
-+    case 6:
-+        return to_bcd(now.tm_mon + 1);
-+    case 7:
-+        return to_bcd(now.tm_year % 100);
-+    case 8 ... 19:
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register: %d\n",
-+                      __func__, s->addr - 1);
-+        return 0;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid register: %d\n",
-+                      __func__, s->addr - 1);
-+        return 0;
++    env->reserve_addr = -1;
++    return env->so + success * CRF_EQ_BIT;
++}
+ #endif
+ 
+ /*****************************************************************************/
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 3d63a62269..c7b9d226eb 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3332,50 +3332,77 @@ static void gen_lqarx(DisasContext *ctx)
+ /* stqcx. */
+ static void gen_stqcx_(DisasContext *ctx)
+ {
+-    TCGv EA;
+-    int reg = rS(ctx->opcode);
+-    int len = 16;
+-#if !defined(CONFIG_USER_ONLY)
+-    TCGLabel *l1;
+-    TCGv gpr1, gpr2;
+-#endif
++    int rs = rS(ctx->opcode);
++    TCGv EA, hi, lo;
+ 
+-    if (unlikely((rD(ctx->opcode) & 1))) {
++    if (unlikely(rs & 1)) {
+         gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+         return;
+     }
++
+     gen_set_access_type(ctx, ACCESS_RES);
+-    EA = tcg_temp_local_new();
++    EA = tcg_temp_new();
+     gen_addr_reg_index(ctx, EA);
+-    if (len > 1) {
+-        gen_check_align(ctx, EA, (len) - 1);
+-    }
+ 
+-#if defined(CONFIG_USER_ONLY)
+-    gen_conditional_store(ctx, EA, reg, 16);
+-#else
+-    tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
+-    l1 = gen_new_label();
+-    tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
+-    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
++    /* Note that the low part is always in RS+1, even in LE mode.  */
++    lo = cpu_gpr[rs + 1];
++    hi = cpu_gpr[rs];
+ 
+-    if (unlikely(ctx->le_mode)) {
+-        gpr1 = cpu_gpr[reg + 1];
+-        gpr2 = cpu_gpr[reg];
++    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++        TCGv_i32 oi = tcg_const_i32(DEF_MEMOP(MO_Q) | MO_ALIGN_16);
++#ifdef CONFIG_ATOMIC128
++        if (ctx->le_mode) {
++            gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env, EA, lo, hi, oi);
++        } else {
++            gen_helper_stqcx_le_parallel(cpu_crf[0], cpu_env, EA, lo, hi, oi);
++        }
++#else
++        /* Restart with exclusive lock.  */
++        gen_helper_exit_atomic(cpu_env);
++        ctx->base.is_jmp = DISAS_NORETURN;
++#endif
++        tcg_temp_free(EA);
++        tcg_temp_free_i32(oi);
+     } else {
+-        gpr1 = cpu_gpr[reg];
+-        gpr2 = cpu_gpr[reg + 1];
+-    }
+-    tcg_gen_qemu_st_tl(gpr1, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
+-    gen_addr_add(ctx, EA, EA, 8);
+-    tcg_gen_qemu_st_tl(gpr2, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
++        TCGLabel *lab_fail = gen_new_label();
++        TCGLabel *lab_over = gen_new_label();
++        TCGv_i64 t0 = tcg_temp_new_i64();
++        TCGv_i64 t1 = tcg_temp_new_i64();
+ 
+-    gen_set_label(l1);
+-    tcg_gen_movi_tl(cpu_reserve, -1);
+-#endif
+-    tcg_temp_free(EA);
+-}
++        tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, lab_fail);
++        tcg_temp_free(EA);
++
++        gen_qemu_ld64_i64(ctx, t0, cpu_reserve);
++        tcg_gen_ld_i64(t1, cpu_env, (ctx->le_mode
++                                     ? offsetof(CPUPPCState, reserve_val2)
++                                     : offsetof(CPUPPCState, reserve_val)));
++        tcg_gen_brcond_i64(TCG_COND_NE, t0, t1, lab_fail);
++
++        tcg_gen_addi_i64(t0, cpu_reserve, 8);
++        gen_qemu_ld64_i64(ctx, t0, t0);
++        tcg_gen_ld_i64(t1, cpu_env, (ctx->le_mode
++                                     ? offsetof(CPUPPCState, reserve_val)
++                                     : offsetof(CPUPPCState, reserve_val2)));
++        tcg_gen_brcond_i64(TCG_COND_NE, t0, t1, lab_fail);
++
++        /* Success */
++        gen_qemu_st64_i64(ctx, ctx->le_mode ? lo : hi, cpu_reserve);
++        tcg_gen_addi_i64(t0, cpu_reserve, 8);
++        gen_qemu_st64_i64(ctx, ctx->le_mode ? hi : lo, t0);
++
++        tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
++        tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
++        tcg_gen_br(lab_over);
+ 
++        gen_set_label(lab_fail);
++        tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
++
++        gen_set_label(lab_over);
++        tcg_gen_movi_tl(cpu_reserve, -1);
++        tcg_temp_free_i64(t0);
++        tcg_temp_free_i64(t1);
 +    }
 +}
-+
-+static int m41t80_event(I2CSlave *i2c, enum i2c_event event)
-+{
-+    M41t80State *s =3D M41T80(i2c);
-+
-+    if (event =3D=3D I2C_START_SEND) {
-+        s->addr =3D -1;
-+    }
-+    return 0;
-+}
-+
-+static void m41t80_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    I2CSlaveClass *sc =3D I2C_SLAVE_CLASS(klass);
-+
-+    dc->realize =3D m41t80_realize;
-+    sc->send =3D m41t80_send;
-+    sc->recv =3D m41t80_recv;
-+    sc->event =3D m41t80_event;
-+}
-+
-+static const TypeInfo m41t80_info =3D {
-+    .name          =3D TYPE_M41T80,
-+    .parent        =3D TYPE_I2C_SLAVE,
-+    .instance_size =3D sizeof(M41t80State),
-+    .class_init    =3D m41t80_class_init,
-+};
-+
-+static void m41t80_register_types(void)
-+{
-+    type_register_static(&m41t80_info);
-+}
-+
-+type_init(m41t80_register_types)
---=20
+ #endif /* defined(TARGET_PPC64) */
+ 
+ /* sync */
+-- 
 2.17.1
