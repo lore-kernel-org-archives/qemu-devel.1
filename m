@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faMqi-0003rO-DB
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1faMrI-0004Ac-7V
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faMqd-0000LB-0f
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34302 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faMqc-0000Ki-RS
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:06 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
-	<20180627163551.31610-15-marcandre.lureau@redhat.com>
-Date: Tue, 03 Jul 2018 17:04:04 +0200
-In-Reply-To: <20180627163551.31610-15-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 27 Jun 2018
-	18:35:50 +0200")
-Message-ID: <878t6s8ior.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1faMrH-0000mh-9W
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:48 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1faMrH-0000m9-4H
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:47 -0400
+Received: by mail-oi0-x241.google.com with SMTP id v8-v6so4441273oie.5
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:04:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Jul 2018 16:04:25 +0100
+Message-ID: <CAFEAcA87Fog9mMsUFNSjpyAv3naEO-RSCXu-75HMLynaWim6Ew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 14/15] qapi: add conditions to VNC
- type/commands/events on the schema
+Subject: Re: [Qemu-devel] [PULL 00/35] ppc-for-3.0 queue 20180703
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 3 July 2018 at 06:57, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit ab08440a4ee09032d1a9cb22fdcab23bc7e1c6=
+56:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180702' into =
+staging (2018-07-02 17:57:46 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180703
+>
+> for you to fetch changes up to 29f9cef39eb1ae55e82c6763eb22d7a1bdff7276:
+>
+>   ppc: Include vga cirrus card into the compiling process (2018-07-03 11:=
+23:09 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2018-07-03
+>
+> Here's a last minue pull request before today's soft freeze.  Ideally
+> I would have sent this earlier, but I was waiting for a couple of
+> extra fixes I knew were close.  And the freeze crept up on me, like
+> always.
+>
+> Most of the changes here are bugfixes in any case.  There are some
+> cleanups as well, which have been in my staging tree for a little
+> while.  There are a couple of truly new features (some extensions to
+> the sam460ex platform), but these are low risk, since they only affect
+> a new and not really stabilized machine type anyway.
+>
+> Higlights are:
+>   * Mac platform improvements from Mark Cave-Ayland
+>   * Sam460ex improvements from BALATON Zoltan et al.
+>   * XICS interrupt handler cleanups from C=C3=A9dric Le Goater
+>   * TCG improvements for atomic loads and stores from Richard
+>     Henderson
+>   * Assorted other bugfixes
+>
 
-> Add #if defined(CONFIG_VNC) in generated code, and adjust the
-> qmp/hmp code accordingly.
->
-> query-qmp-schema no longer reports the command/events etc as
-> available when disabled at compile.
->
-> Commands made conditional:
->
-> * query-vnc, query-vnc-servers, change-vnc-password
->
->   Before the patch, the commands for !CONFIG_VNC are stubs that fail
->   like this:
->
->     {"error": {"class": "GenericError",
->                "desc": "The feature 'vnc' is not enabled"}}
->
->   Afterwards, they fail like this:
->
->     {"error": {"class": "CommandNotFound",
->                "desc": "The command FOO has not been found"}}
->
->   I call that an improvement, because it lets clients distinguish
->   between command unavailable (class CommandNotFound) and command failed
->   (class GenericError).
->
-> Events made conditional:
->
-> * VNC_CONNECTED, VNC_INITIALIZED, VNC_DISCONNECTED
->
-> HMP change:
->
-> * info vnc
->
->   Will return "unknown command: 'info vnc'" when VNC is compiled
->   out (same as error for spice when --disable-spice)
->
-> Occurrences of VNC (case insensitive) in the schema that aren't
-> covered by this change:
->
-> * add_client
->
->   Command has other uses, including "socket bases character devices".
->   These are unconditional as far as I can tell.
->
-> * set_password, expire_password
->
->   In theory, these commands could be used for managing any service's
->   password.  In practice, they're used for VNC and SPICE services.
->   They're documented for "remote display session" / "remote display
->   server".
->
->   The service is selected by argument @protocol.  The code special-cases
->   protocol-specific argument checking, then calls a protocol-specific
->   function to do the work.  If it fails, the command fails with "Could
->   not set password".  It does when the service isn't compiled in (it's a
->   stub then).
->
->   We could make these commands conditional on the conjunction of all
->   services [currently: defined(CONFIG_VNC) || defined(CONFIG_SPICE)],
->   but I doubt it's worthwhile.
->
-> * change
->
->   Command has other uses, namely changing media.
->   This patch inlines a stub; no functional change.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Applied, thanks.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- PMM
