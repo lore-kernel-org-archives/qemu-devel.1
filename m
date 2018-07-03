@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSJ1-0008Qw-Vk
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:49 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIz-0008QN-R4
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIw-0000zO-Ld
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60442)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIw-0000z7-DD
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53676)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1faSIw-0000yj-DH
+	id 1faSIw-0000yR-3o
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:42 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w63KnEUj088419
-	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 16:53:41 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k0dpa6kfq-1
+	w63KnB7p056052
+	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 16:53:40 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k0dpjxhrc-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 16:53:41 -0400
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 16:53:40 -0400
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 3 Jul 2018 14:53:40 -0600
+	Tue, 3 Jul 2018 14:53:39 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  3 Jul 2018 15:52:08 -0500
+Date: Tue,  3 Jul 2018 15:52:19 -0500
 In-Reply-To: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
 References: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20180703205221.24788-2-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 01/14] qga: unset frozen state if no mount
- points are frozen
+Message-Id: <20180703205221.24788-13-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL 12/14] qga: removing switch statements,
+ adding run_process_child
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,57 +39,348 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Chen Hanxiao <chenhanxiao@gmail.com>
+Cc: peter.maydell@linaro.org, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-If we set mountpoints to qmp_guest_fsfreeze_freeze_list,
-we may got nothing to freeze as all mountpoints are
-not valid.
-So call ga_unset_frozen in this senario.
+This is a cleanup of the resulting code after detaching
+pmutils and Linux sys state file logic:
 
-Also, if we return 0 frozen fs, there is no need to call
-guest-fsfreeze-thaw.
+- remove the SUSPEND_MODE_* macros and use an enumeration
+instead. At the same time, drop the switch statements
+at the start of each function and use the enumeration
+index to get the right binary/argument;
 
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+- create a new function called run_process_child(). This
+function uses g_spawn_sync() to execute a shell command,
+returning the exit code. This is a common operation in the
+pmutils functions and will be used in the systemd implementation
+as well, so this function will avoid code repetition.
+
+There are more places inside commands-posix.c where this new
+run_process_child function can also be used, but one step
+at a time.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+*check/propagate local_err before setting errp directly
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-posix.c | 6 ++++++
- qga/qapi-schema.json | 4 +++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ qga/commands-posix.c | 215 +++++++++++++++++++++------------------------------
+ 1 file changed, 88 insertions(+), 127 deletions(-)
 
 diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index eae817191b..594d21ef3e 100644
+index 9ebd77b894..1559753d85 100644
 --- a/qga/commands-posix.c
 +++ b/qga/commands-posix.c
-@@ -1274,6 +1274,12 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+@@ -1474,152 +1474,117 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
+ #define LINUX_SYS_STATE_FILE "/sys/power/state"
+ #define SUSPEND_SUPPORTED 0
+ #define SUSPEND_NOT_SUPPORTED 1
+-#define SUSPEND_MODE_DISK 1
+-#define SUSPEND_MODE_RAM 2
+-#define SUSPEND_MODE_HYBRID 3
+ 
+-static bool pmutils_supports_mode(int suspend_mode, Error **errp)
++typedef enum {
++    SUSPEND_MODE_DISK = 0,
++    SUSPEND_MODE_RAM = 1,
++    SUSPEND_MODE_HYBRID = 2,
++} SuspendMode;
++
++/*
++ * Executes a command in a child process using g_spawn_sync,
++ * returning an int >= 0 representing the exit status of the
++ * process.
++ *
++ * If the program wasn't found in path, returns -1.
++ *
++ * If a problem happened when creating the child process,
++ * returns -1 and errp is set.
++ */
++static int run_process_child(const char *command[], Error **errp)
+ {
+-    Error *local_err = NULL;
+-    const char *pmutils_arg;
+-    const char *pmutils_bin = "pm-is-supported";
+-    char *pmutils_path;
+-    pid_t pid;
+-    int status;
+-    bool ret = false;
++    int exit_status, spawn_flag;
++    GError *g_err = NULL;
++    bool success;
+ 
+-    switch (suspend_mode) {
++    spawn_flag = G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_NULL |
++                 G_SPAWN_STDERR_TO_DEV_NULL;
+ 
+-    case SUSPEND_MODE_DISK:
+-        pmutils_arg = "--hibernate";
+-        break;
+-    case SUSPEND_MODE_RAM:
+-        pmutils_arg = "--suspend";
+-        break;
+-    case SUSPEND_MODE_HYBRID:
+-        pmutils_arg = "--suspend-hybrid";
+-        break;
+-    default:
+-        return ret;
++    success =  g_spawn_sync(NULL, (char **)command, environ, spawn_flag,
++                            NULL, NULL, NULL, NULL,
++                            &exit_status, &g_err);
++
++    if (success) {
++        return WEXITSTATUS(exit_status);
      }
  
-     free_fs_mount_list(&mounts);
-+    /* We may not issue any FIFREEZE here.
-+     * Just unset ga_state here and ready for the next call.
-+     */
-+    if (i == 0) {
-+        ga_unset_frozen(ga_state);
-+    }
-     return i;
+-    pmutils_path = g_find_program_in_path(pmutils_bin);
+-    if (!pmutils_path) {
+-        return ret;
++    if (g_err && (g_err->code != G_SPAWN_ERROR_NOENT)) {
++        error_setg(errp, "failed to create child process, error '%s'",
++                   g_err->message);
+     }
  
- error:
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 17884c7c70..1045cef386 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -435,7 +435,9 @@
- # for up to 10 seconds by VSS.
- #
- # Returns: Number of file systems currently frozen. On error, all filesystems
--# will be thawed.
-+# will be thawed. If no filesystems are frozen as a result of this call,
-+# then @guest-fsfreeze-status will remain "thawed" and calling
-+# @guest-fsfreeze-thaw is not necessary.
- #
- # Since: 0.15.0
- ##
+-    pid = fork();
+-    if (!pid) {
+-        setsid();
+-        execle(pmutils_path, pmutils_bin, pmutils_arg, NULL, environ);
+-        /*
+-         * If we get here execle() has failed.
+-         */
+-        _exit(SUSPEND_NOT_SUPPORTED);
+-    } else if (pid < 0) {
+-        error_setg_errno(errp, errno, "failed to create child process");
+-        goto out;
++    g_error_free(g_err);
++    return -1;
++}
++
++static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
++{
++    Error *local_err = NULL;
++    const char *pmutils_args[3] = {"--hibernate", "--suspend",
++                                   "--suspend-hybrid"};
++    const char *cmd[3] = {"pm-is-supported", pmutils_args[mode], NULL};
++    int status;
++
++    status = run_process_child(cmd, &local_err);
++
++    if (status == SUSPEND_SUPPORTED) {
++        return true;
+     }
+ 
+-    ga_wait_child(pid, &status, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        goto out;
++    if ((status == -1) && !local_err) {
++        return false;
+     }
+ 
+-    switch (WEXITSTATUS(status)) {
+-    case SUSPEND_SUPPORTED:
+-        ret = true;
+-        goto out;
+-    case SUSPEND_NOT_SUPPORTED:
+-        goto out;
+-    default:
++    if (local_err) {
++        error_propagate(errp, local_err);
++    } else {
+         error_setg(errp,
+-                   "the helper program '%s' returned an unexpected exit status"
+-                   " code (%d)", pmutils_path, WEXITSTATUS(status));
+-        goto out;
++                   "the helper program '%s' returned an unexpected exit"
++                   " status code (%d)", "pm-is-supported", status);
+     }
+ 
+-out:
+-    g_free(pmutils_path);
+-    return ret;
++    return false;
+ }
+ 
+-static void pmutils_suspend(int suspend_mode, Error **errp)
++static void pmutils_suspend(SuspendMode mode, Error **errp)
+ {
+     Error *local_err = NULL;
+-    const char *pmutils_bin;
+-    char *pmutils_path;
+-    pid_t pid;
++    const char *pmutils_binaries[3] = {"pm-hibernate", "pm-suspend",
++                                       "pm-suspend-hybrid"};
++    const char *cmd[2] = {pmutils_binaries[mode], NULL};
+     int status;
+ 
+-    switch (suspend_mode) {
+-
+-    case SUSPEND_MODE_DISK:
+-        pmutils_bin = "pm-hibernate";
+-        break;
+-    case SUSPEND_MODE_RAM:
+-        pmutils_bin = "pm-suspend";
+-        break;
+-    case SUSPEND_MODE_HYBRID:
+-        pmutils_bin = "pm-suspend-hybrid";
+-        break;
+-    default:
+-        error_setg(errp, "unknown guest suspend mode");
+-        return;
+-    }
++    status = run_process_child(cmd, &local_err);
+ 
+-    pmutils_path = g_find_program_in_path(pmutils_bin);
+-    if (!pmutils_path) {
+-        error_setg(errp, "the helper program '%s' was not found", pmutils_bin);
++    if (status == 0) {
+         return;
+     }
+ 
+-    pid = fork();
+-    if (!pid) {
+-        setsid();
+-        execle(pmutils_path, pmutils_bin, NULL, environ);
+-        /*
+-         * If we get here execle() has failed.
+-         */
+-        _exit(EXIT_FAILURE);
+-    } else if (pid < 0) {
+-        error_setg_errno(errp, errno, "failed to create child process");
+-        goto out;
++    if ((status == -1) && !local_err) {
++        error_setg(errp, "the helper program '%s' was not found",
++                   pmutils_binaries[mode]);
++        return;
+     }
+ 
+-    ga_wait_child(pid, &status, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        goto out;
+-    }
+-
+-    if (WEXITSTATUS(status)) {
++    } else {
+         error_setg(errp,
+-                   "the helper program '%s' returned an unexpected exit status"
+-                   " code (%d)", pmutils_path, WEXITSTATUS(status));
++                   "the helper program '%s' returned an unexpected exit"
++                   " status code (%d)", pmutils_binaries[mode], status);
+     }
+-
+-out:
+-    g_free(pmutils_path);
+ }
+ 
+-static bool linux_sys_state_supports_mode(int suspend_mode, Error **errp)
++static bool linux_sys_state_supports_mode(SuspendMode mode, Error **errp)
+ {
+-    const char *sysfile_str;
++    const char *sysfile_strs[3] = {"disk", "mem", NULL};
++    const char *sysfile_str = sysfile_strs[mode];
+     char buf[32]; /* hopefully big enough */
+     int fd;
+     ssize_t ret;
+ 
+-    switch (suspend_mode) {
+-
+-    case SUSPEND_MODE_DISK:
+-        sysfile_str = "disk";
+-        break;
+-    case SUSPEND_MODE_RAM:
+-        sysfile_str = "mem";
+-        break;
+-    default:
++    if (!sysfile_str) {
++        error_setg(errp, "unknown guest suspend mode");
+         return false;
+     }
+ 
+@@ -1640,22 +1605,15 @@ static bool linux_sys_state_supports_mode(int suspend_mode, Error **errp)
+     return false;
+ }
+ 
+-static void linux_sys_state_suspend(int suspend_mode, Error **errp)
++static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
+ {
+     Error *local_err = NULL;
+-    const char *sysfile_str;
++    const char *sysfile_strs[3] = {"disk", "mem", NULL};
++    const char *sysfile_str = sysfile_strs[mode];
+     pid_t pid;
+     int status;
+ 
+-    switch (suspend_mode) {
+-
+-    case SUSPEND_MODE_DISK:
+-        sysfile_str = "disk";
+-        break;
+-    case SUSPEND_MODE_RAM:
+-        sysfile_str = "mem";
+-        break;
+-    default:
++    if (!sysfile_str) {
+         error_setg(errp, "unknown guest suspend mode");
+         return;
+     }
+@@ -1697,12 +1655,12 @@ static void linux_sys_state_suspend(int suspend_mode, Error **errp)
+ 
+ }
+ 
+-static void bios_supports_mode(int suspend_mode, Error **errp)
++static void bios_supports_mode(SuspendMode mode, Error **errp)
+ {
+     Error *local_err = NULL;
+     bool ret;
+ 
+-    ret = pmutils_supports_mode(suspend_mode, &local_err);
++    ret = pmutils_supports_mode(mode, &local_err);
+     if (ret) {
+         return;
+     }
+@@ -1710,32 +1668,35 @@ static void bios_supports_mode(int suspend_mode, Error **errp)
+         error_propagate(errp, local_err);
+         return;
+     }
+-    ret = linux_sys_state_supports_mode(suspend_mode, errp);
++    ret = linux_sys_state_supports_mode(mode, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+     if (!ret) {
+         error_setg(errp,
+                    "the requested suspend mode is not supported by the guest");
+-        return;
+     }
+ }
+ 
+-static void guest_suspend(int suspend_mode, Error **errp)
++static void guest_suspend(SuspendMode mode, Error **errp)
+ {
+     Error *local_err = NULL;
+ 
+-    bios_supports_mode(suspend_mode, &local_err);
++    bios_supports_mode(mode, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+     }
+ 
+-    pmutils_suspend(suspend_mode, &local_err);
++    pmutils_suspend(mode, &local_err);
+     if (!local_err) {
+         return;
+     }
+ 
+     error_free(local_err);
+ 
+-    linux_sys_state_suspend(suspend_mode, &local_err);
++    linux_sys_state_suspend(mode, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+     }
 -- 
 2.11.0
