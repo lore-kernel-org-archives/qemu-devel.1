@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKO-0002km-VF
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKT-0002pU-Mb
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKK-0006gd-Up
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKR-0006wZ-L4
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:21 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:29 +1000
-Message-Id: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/35] ppc-for-3.0 queue 20180703
+Date: Tue,  3 Jul 2018 15:57:42 +1000
+Message-Id: <20180703055804.13449-14-david@gibson.dropbear.id.au>
+In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 13/35] target/ppc: Use atomic store for STQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,131 +20,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit ab08440a4ee09032d1a9cb22fdcab23bc7e1c6=
-56:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180702' into =
-staging (2018-07-02 17:57:46 +0100)
+Section 1.4 of the Power ISA v3.0B states that this insn is
+single-copy atomic.  As we cannot (yet) issue 128-bit stores
+within TCG, use the generic helpers provided.
 
-are available in the Git repository at:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/helper.h     |  4 ++++
+ target/ppc/mem_helper.c | 14 ++++++++++++++
+ target/ppc/translate.c  | 35 +++++++++++++++++++++++++++--------
+ 3 files changed, 45 insertions(+), 8 deletions(-)
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180703
-
-for you to fetch changes up to 29f9cef39eb1ae55e82c6763eb22d7a1bdff7276:
-
-  ppc: Include vga cirrus card into the compiling process (2018-07-03 11:=
-23:09 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2018-07-03
-
-Here's a last minue pull request before today's soft freeze.  Ideally
-I would have sent this earlier, but I was waiting for a couple of
-extra fixes I knew were close.  And the freeze crept up on me, like
-always.
-
-Most of the changes here are bugfixes in any case.  There are some
-cleanups as well, which have been in my staging tree for a little
-while.  There are a couple of truly new features (some extensions to
-the sam460ex platform), but these are low risk, since they only affect
-a new and not really stabilized machine type anyway.
-
-Higlights are:
-  * Mac platform improvements from Mark Cave-Ayland
-  * Sam460ex improvements from BALATON Zoltan et al.
-  * XICS interrupt handler cleanups from C=C3=A9dric Le Goater
-  * TCG improvements for atomic loads and stores from Richard
-    Henderson
-  * Assorted other bugfixes
-
-----------------------------------------------------------------
-BALATON Zoltan (5):
-      ppc4xx_i2c: Rewrite to model hardware more closely
-      hw/timer: Add basic M41T80 emulation
-      sam460ex: Add RTC device
-      ppc440_uc: Basic emulation of PPC440 DMA controller
-      target/ppc: Relax reserved bitmask of indexed store instructions
-
-C=C3=A9dric Le Goater (7):
-      ppc/xics: introduce ICP DeviceRealize and DeviceReset handlers
-      ppc/xics: introduce a parent_realize in ICSStateClass
-      ppc/xics: move the instance_init handler under the ics-base class
-      ppx/xics: introduce a parent_reset in ICSStateClass
-      ppc/xics: move the vmstate structures under the ics-base class
-      ppc/xics: rework the ICS classes inheritance tree
-      ppc/pnv: fix pnv_core_realize() error handling
-
-David Gibson (1):
-      hw/ppc: Give sam46ex its own config option
-
-Emilio G. Cota (1):
-      target/ppc: set is_jmp on ppc_tr_breakpoint_check
-
-Greg Kurz (3):
-      target/ppc/kvm: get rid of kvm_get_fallback_smmu_info()
-      target/ppc/kvm: don't pass cpu to kvm_get_smmu_info()
-      spapr: compute default value of "hpt-max-page-size" later
-
-Guenter Roeck (1):
-      sam460ex: Fix sam460ex device tree when booting the Linux kernel
-
-John Arbuckle (1):
-      fpu_helper.c: fix setting FPSCR[FI] bit
-
-Mark Cave-Ayland (2):
-      mac_dbdma: only dump commands for debug enabled channels
-      mac_newworld: always enable disable_direct_reg3_writes for ADB mach=
-ines
-
-Richard Henderson (13):
-      target/ppc: Add do_unaligned_access hook
-      target/ppc: Use atomic load for LQ and LQARX
-      target/ppc: Use atomic store for STQ
-      target/ppc: Use atomic cmpxchg for STQCX
-      target/ppc: Remove POWERPC_EXCP_STCX
-      target/ppc: Tidy gen_conditional_store
-      target/ppc: Split out gen_load_locked
-      target/ppc: Split out gen_ld_atomic
-      target/ppc: Split out gen_st_atomic
-      target/ppc: Use MO_ALIGN for EXIWX and ECOWX
-      target/ppc: Use atomic min/max helpers
-      target/ppc: Implement the rest of gen_ld_atomic
-      target/ppc: Implement the rest of gen_st_atomic
-
-Sebastian Bauer (1):
-      ppc: Include vga cirrus card into the compiling process
-
- MAINTAINERS                     |   1 +
- default-configs/ppc-softmmu.mak |   3 +
- hw/i2c/ppc4xx_i2c.c             | 299 ++++++++++---------
- hw/intc/xics.c                  | 174 ++++++-----
- hw/intc/xics_kvm.c              |  80 +++--
- hw/intc/xics_pnv.c              |  15 +-
- hw/misc/macio/mac_dbdma.c       |  21 +-
- hw/ppc/Makefile.objs            |   3 +-
- hw/ppc/mac_newworld.c           |   4 +-
- hw/ppc/pnv_core.c               |   1 +
- hw/ppc/ppc440.h                 |   1 +
- hw/ppc/ppc440_uc.c              | 222 ++++++++++++++
- hw/ppc/sam460ex.c               |  32 ++
- hw/ppc/spapr.c                  |  16 +-
- hw/ppc/spapr_caps.c             |  13 +
- hw/timer/Makefile.objs          |   1 +
- hw/timer/m41t80.c               | 117 ++++++++
- include/hw/i2c/ppc4xx_i2c.h     |   3 +-
- include/hw/ppc/xics.h           |   9 +-
- linux-user/ppc/cpu_loop.c       | 121 ++------
- target/ppc/cpu.h                |   8 +-
- target/ppc/excp_helper.c        |  18 +-
- target/ppc/fpu_helper.c         |   8 +
- target/ppc/helper.h             |  11 +
- target/ppc/internal.h           |   5 +
- target/ppc/kvm.c                | 118 ++------
- target/ppc/mem_helper.c         |  72 ++++-
- target/ppc/translate.c          | 641 +++++++++++++++++++++++++---------=
-------
- target/ppc/translate_init.inc.c |   1 +
- 29 files changed, 1299 insertions(+), 719 deletions(-)
- create mode 100644 hw/timer/m41t80.c
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 3f451a5d7e..cbc1228570 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -803,4 +803,8 @@ DEF_HELPER_FLAGS_1(fixup_thrm, TCG_CALL_NO_RWG, void, env)
+ #if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
+ DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
+ DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
++DEF_HELPER_FLAGS_5(stq_le_parallel, TCG_CALL_NO_WG,
++                   void, env, tl, i64, i64, i32)
++DEF_HELPER_FLAGS_5(stq_be_parallel, TCG_CALL_NO_WG,
++                   void, env, tl, i64, i64, i32)
+ #endif
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 44a8f3445a..57e301edc3 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -231,6 +231,20 @@ uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
+     env->retxh = int128_gethi(ret);
+     return int128_getlo(ret);
+ }
++
++void helper_stq_le_parallel(CPUPPCState *env, target_ulong addr,
++                            uint64_t lo, uint64_t hi, uint32_t opidx)
++{
++    Int128 val = int128_make128(lo, hi);
++    helper_atomic_sto_le_mmu(env, addr, val, opidx, GETPC());
++}
++
++void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
++                            uint64_t lo, uint64_t hi, uint32_t opidx)
++{
++    Int128 val = int128_make128(lo, hi);
++    helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
++}
+ #endif
+ 
+ /*****************************************************************************/
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 0923cc24e3..3d63a62269 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2760,6 +2760,7 @@ static void gen_std(DisasContext *ctx)
+     if ((ctx->opcode & 0x3) == 0x2) { /* stq */
+         bool legal_in_user_mode = (ctx->insns_flags2 & PPC2_LSQ_ISA207) != 0;
+         bool le_is_supported = (ctx->insns_flags2 & PPC2_LSQ_ISA207) != 0;
++        TCGv hi, lo;
+ 
+         if (!(ctx->insns_flags & PPC_64BX)) {
+             gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+@@ -2783,20 +2784,38 @@ static void gen_std(DisasContext *ctx)
+         EA = tcg_temp_new();
+         gen_addr_imm_index(ctx, EA, 0x03);
+ 
+-        /* We only need to swap high and low halves. gen_qemu_st64_i64 does
+-           necessary 64-bit byteswap already. */
+-        if (unlikely(ctx->le_mode)) {
+-            gen_qemu_st64_i64(ctx, cpu_gpr[rs + 1], EA);
++        /* Note that the low part is always in RS+1, even in LE mode.  */
++        lo = cpu_gpr[rs + 1];
++        hi = cpu_gpr[rs];
++
++        if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++#ifdef CONFIG_ATOMIC128
++            TCGv_i32 oi = tcg_temp_new_i32();
++            if (ctx->le_mode) {
++                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
++                gen_helper_stq_le_parallel(cpu_env, EA, lo, hi, oi);
++            } else {
++                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
++                gen_helper_stq_be_parallel(cpu_env, EA, lo, hi, oi);
++            }
++            tcg_temp_free_i32(oi);
++#else
++            /* Restart with exclusive lock.  */
++            gen_helper_exit_atomic(cpu_env);
++            ctx->base.is_jmp = DISAS_NORETURN;
++#endif
++        } else if (ctx->le_mode) {
++            tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_LEQ);
+             gen_addr_add(ctx, EA, EA, 8);
+-            gen_qemu_st64_i64(ctx, cpu_gpr[rs], EA);
++            tcg_gen_qemu_st_i64(hi, EA, ctx->mem_idx, MO_LEQ);
+         } else {
+-            gen_qemu_st64_i64(ctx, cpu_gpr[rs], EA);
++            tcg_gen_qemu_st_i64(hi, EA, ctx->mem_idx, MO_BEQ);
+             gen_addr_add(ctx, EA, EA, 8);
+-            gen_qemu_st64_i64(ctx, cpu_gpr[rs + 1], EA);
++            tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_BEQ);
+         }
+         tcg_temp_free(EA);
+     } else {
+-        /* std / stdu*/
++        /* std / stdu */
+         if (Rc(ctx->opcode)) {
+             if (unlikely(rA(ctx->opcode) == 0)) {
+                 gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+-- 
+2.17.1
