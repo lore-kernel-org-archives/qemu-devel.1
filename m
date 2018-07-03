@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKL-0002k3-RU
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKM-0002k4-0b
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKK-0006gQ-UG
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKK-0006gX-Ub
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:14 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:30 +1000
-Message-Id: <20180703055804.13449-2-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:32 +1000
+Message-Id: <20180703055804.13449-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/35] mac_dbdma: only dump commands for debug
- enabled channels
+Subject: [Qemu-devel] [PULL 03/35] sam460ex: Fix sam460ex device tree when
+ booting the Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +21,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Guenter Roeck <linux@roeck-us.net>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Guenter Roeck <linux@roeck-us.net>
 
-This enables us to apply the same filter in DEBUG_DBDMA_CHANMASK to the
-DBDMA command execution debug output.
+sam460ex (or at least this emulation) does not support the "ibm,cpm" power
+management. As a result, Linux crashes when trying to access it. Remove
+its device tree node. Also, if/when we boot the Linux kernel directly,
+serial port clock frequencies in the device tree file will be unset, and
+serial port initialization will fail. Add valid frequency values to
+the serial ports to be able to use it. Also set valid values for the other
+clock nodes otherwise set by u-boot.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/mac_dbdma.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ hw/ppc/sam460ex.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
-index 1b2a69b3ef..87ae246d37 100644
---- a/hw/misc/macio/mac_dbdma.c
-+++ b/hw/misc/macio/mac_dbdma.c
-@@ -71,18 +71,19 @@ static DBDMAState *dbdma_from_ch(DBDMA_channel *ch)
- }
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index bdc53d2603..33ea51816c 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -37,6 +37,8 @@
+ #include "hw/i2c/smbus.h"
+ #include "hw/usb/hcd-ehci.h"
  
- #if DEBUG_DBDMA
--static void dump_dbdma_cmd(dbdma_cmd *cmd)
-+static void dump_dbdma_cmd(DBDMA_channel *ch, dbdma_cmd *cmd)
- {
--    printf("dbdma_cmd %p\n", cmd);
--    printf("    req_count 0x%04x\n", le16_to_cpu(cmd->req_count));
--    printf("    command 0x%04x\n", le16_to_cpu(cmd->command));
--    printf("    phy_addr 0x%08x\n", le32_to_cpu(cmd->phy_addr));
--    printf("    cmd_dep 0x%08x\n", le32_to_cpu(cmd->cmd_dep));
--    printf("    res_count 0x%04x\n", le16_to_cpu(cmd->res_count));
--    printf("    xfer_status 0x%04x\n", le16_to_cpu(cmd->xfer_status));
-+    DBDMA_DPRINTFCH(ch, "dbdma_cmd %p\n", cmd);
-+    DBDMA_DPRINTFCH(ch, "    req_count 0x%04x\n", le16_to_cpu(cmd->req_count));
-+    DBDMA_DPRINTFCH(ch, "    command 0x%04x\n", le16_to_cpu(cmd->command));
-+    DBDMA_DPRINTFCH(ch, "    phy_addr 0x%08x\n", le32_to_cpu(cmd->phy_addr));
-+    DBDMA_DPRINTFCH(ch, "    cmd_dep 0x%08x\n", le32_to_cpu(cmd->cmd_dep));
-+    DBDMA_DPRINTFCH(ch, "    res_count 0x%04x\n", le16_to_cpu(cmd->res_count));
-+    DBDMA_DPRINTFCH(ch, "    xfer_status 0x%04x\n",
-+                    le16_to_cpu(cmd->xfer_status));
- }
- #else
--static void dump_dbdma_cmd(dbdma_cmd *cmd)
-+static void dump_dbdma_cmd(DBDMA_channel *ch, dbdma_cmd *cmd)
- {
- }
- #endif
-@@ -448,7 +449,7 @@ static void channel_run(DBDMA_channel *ch)
-     uint32_t phy_addr;
++#include <libfdt.h>
++
+ #define BINARY_DEVICE_TREE_FILE "canyonlands.dtb"
+ #define UBOOT_FILENAME "u-boot-sam460-20100605.bin"
+ /* to extract the official U-Boot bin from the updater: */
+@@ -67,6 +69,10 @@
+ */
  
-     DBDMA_DPRINTFCH(ch, "channel_run\n");
--    dump_dbdma_cmd(current);
-+    dump_dbdma_cmd(ch, current);
+ #define CPU_FREQ 1150000000
++#define PLB_FREQ 230000000
++#define OPB_FREQ 115000000
++#define EBC_FREQ 115000000
++#define UART_FREQ 11059200
+ #define SDRAM_NR_BANKS 4
  
-     /* clear WAKE flag at command fetch */
+ /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
+@@ -255,6 +261,7 @@ static int sam460ex_load_device_tree(hwaddr addr,
+     void *fdt;
+     uint32_t tb_freq = CPU_FREQ;
+     uint32_t clock_freq = CPU_FREQ;
++    int offset;
  
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
+     if (!filename) {
+@@ -308,6 +315,27 @@ static int sam460ex_load_device_tree(hwaddr addr,
+     qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "timebase-frequency",
+                               tb_freq);
+ 
++    /* Remove cpm node if it exists (it is not emulated) */
++    offset = fdt_path_offset(fdt, "/cpm");
++    if (offset >= 0) {
++        fdt_nop_node(fdt, offset);
++    }
++
++    /* set serial port clocks */
++    offset = fdt_node_offset_by_compatible(fdt, -1, "ns16550");
++    while (offset >= 0) {
++        fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FREQ);
++        offset = fdt_node_offset_by_compatible(fdt, offset, "ns16550");
++    }
++
++    /* some more clocks */
++    qemu_fdt_setprop_cell(fdt, "/plb", "clock-frequency",
++                              PLB_FREQ);
++    qemu_fdt_setprop_cell(fdt, "/plb/opb", "clock-frequency",
++                              OPB_FREQ);
++    qemu_fdt_setprop_cell(fdt, "/plb/opb/ebc", "clock-frequency",
++                              EBC_FREQ);
++
+     rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
+     g_free(fdt);
+     ret = fdt_size;
 -- 
 2.17.1
