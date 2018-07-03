@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faJNz-0006pz-Hn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:22:20 -0400
+	(envelope-from <berrange@redhat.com>) id 1faJOG-0006zN-W3
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:22:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faJNy-0004G7-OC
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:22:19 -0400
-Date: Tue, 3 Jul 2018 13:22:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180703112211.GC3812@localhost.localdomain>
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-	<20180629151524.138542-3-vsementsov@virtuozzo.com>
-	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
-	<0f766c07-dfe5-1886-5635-f76780220757@virtuozzo.com>
+	(envelope-from <berrange@redhat.com>) id 1faJOF-0004Ta-SF
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:22:37 -0400
+Date: Tue, 3 Jul 2018 12:22:23 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180703111949.GB24516@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
+	<20180622125502.GF4366@localhost.localdomain>
+	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
+	<20180622142513.GH4366@localhost.localdomain>
+	<20180622143146.GQ23296@redhat.com>
+	<20180625095322.GC18580@redhat.com>
+	<20180625114106.GJ5024@localhost.localdomain>
+	<20180625114528.GL16514@angien.pipo.sk>
+	<20180702080411.GA4299@localhost.localdomain>
+	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0f766c07-dfe5-1886-5635-f76780220757@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
- driver for fleecing
+In-Reply-To: <60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-Am 02.07.2018 um 13:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 29.06.2018 20:30, John Snow wrote:
-> > 
-> > On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > > We need to synchronize backup job with reading from fleecing image
-> > > like it was done in block/replication.c.
-> > > 
-> > > Otherwise, the following situation is theoretically possible:
-> > > 
-> > > 1. client start reading
-> > > 2. client understand, that there is no corresponding cluster in
-> > >     fleecing image
-> > I don't think the client refocuses the read, but QEMU does. (the client
-> > has no idea if it is reading from the fleecing node or the backing file.)
-> > 
-> > ... but understood:
-> > 
-> > > 3. client is going to read from backing file (i.e. active image)
-> > > 4. guest writes to active image
-> > My question here is if QEMU will allow reads and writes to interleave in
-> > general. If the client is reading from the backing file, the active
-> > image, will QEMU allow a write to modify that data before we're done
-> > getting that data?
-> 
-> If I understand correctly: yes. Physical drives allows intersecting
-> operations too and there no guarantee on result. We have serializing
-> requests, but in general only unaligned requests are marked serializing.
+On Tue, Jul 03, 2018 at 12:53:44PM +0200, Christian Borntraeger wrote:
+>=20
+>=20
+> On 07/02/2018 10:04 AM, Kevin Wolf wrote:
+> > Am 25.06.2018 um 13:45 hat Peter Krempa geschrieben:
+> >> On Mon, Jun 25, 2018 at 13:41:06 +0200, Kevin Wolf wrote:
+> >>> Am 25.06.2018 um 11:53 hat Daniel P. Berrang=C3=A9 geschrieben:
+> >>>> On Fri, Jun 22, 2018 at 03:31:46PM +0100, Daniel P. Berrang=C3=A9 =
+wrote:
+> >>>>> On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
+> >>>>>> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
+> >>
+> >> [...]
+> >>
+> >>>
+> >>> Thanks!
+> >>>
+> >>> I'll look into werror/rerror support for usb-storage. It shouldn't =
+be
+> >>> too hard, though it's strictly speaking a separate problem related =
+to
+> >>> using -blockdev rather than option deprecation.
+> >>>
+> >>> If Peter wants to wait for QEMU support before converting werror/re=
+rror
+> >>
+> >> Definitely. I don't want to keep around yet another hack that will
+> >> satisfy one specific case and then add another capability for it. We
+> >> should then gate the moving of the feature based on the presence of
+> >> werror for usb-storage.
+> >>
+> >>> to -device, maybe it would make sense to split your patch for v2 so=
+ that
+> >>> geometry and serial can get fixed right away?
+> >>
+> >> Yes this can be done right away.
+> >=20
+> > Has serial/gemoetry been fixed meanwhile and will it make it into the
+> > next release?
+>=20
+> I cannot find an archive that has it, but it is on the libvirt mailing
+> list as "[libvirt] [PATCH v3] qemu: format serial and geometry on front=
+end disk device".
+> Review seems done, but it has missed libvirt 4.5 which was released tod=
+ay.
 
-Copy on read (in the context of image streaming) is the feature which
-actually introduced it. It has some similarities with the backup job, so
-the idea of using it for backup, too, isn't exactly revolutionary.
+Just posted latest version here:
 
-Kevin
+  https://www.redhat.com/archives/libvir-list/2018-July/msg00130.html
+
+It will be in the next release on ~ Aug 1st
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
