@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxv-00085O-GN
+	(envelope-from <armbru@redhat.com>) id 1faSxv-00084R-0Y
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxr-00069i-MI
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45976 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faSxr-00069O-KG
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34290 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxr-00068f-Ea
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxr-00068V-B1
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:59 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F31F0400589B
+	by mx1.redhat.com (Postfix) with ESMTPS id D7D92406C7A9
 	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B1A542166BA9
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 986031C5B8
 	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 23:35:33 +0200
-Message-Id: <20180703213556.20619-10-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:29 +0200
+Message-Id: <20180703213556.20619-6-armbru@redhat.com>
 In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
 References: <20180703213556.20619-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 09/32] qmp qemu-ga: Revert change that
- accidentally made qemu-ga accept "id"
+Subject: [Qemu-devel] [PULL v2 05/32] qmp: Get rid of x-oob-test command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,110 +35,251 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Commit cf869d53172 "qmp: support out-of-band (oob) execution" changed
-how we check "id":
+tests/qmp-test tests an out-of-band command overtaking a slow in-band
+command.  To do that, it needs:
 
-    Note that in the patch I exported qmp_dispatch_check_obj() to be
-    used to check the request earlier, and at the same time allowed
-    "id" field to be there since actually we always allow that.
+1. An in-band command that *reliably* takes long enough to be
+   overtaken.
 
-The part after "and" is ill-advised: it makes qemu-ga accept and
-ignore "id".  Revert.
+2. An out-of-band command to do the overtaking.
+
+3. To avoid delays, a way to make the in-band command complete quickly
+   after it was overtaken.
+
+To satisfy these needs, commit 469638f9cb3 provides the rather
+peculiar oob-capable QMP command x-oob-test:
+
+* With "lock": true, it waits for a global semaphore.
+
+* With "lock": false, it signals the global semaphore.
+
+To satisfy 1., the test runs x-oob-test in-band with "lock": true.
+To satisfy 2. and 3., it runs x-oob-test out-of-band with "lock": false.
+
+Note that waiting for a semaphore violates the rules for oob-capable
+commands.  Running x-oob-test with "lock": true hangs the monitor
+until you run x-oob-test with "lock": false on another monitor (which
+you might not have set up).
+
+Having an externally visible QMP command that may hang the monitor is
+not nice.  Let's apply a little more ingenuity to the problem.  Idea:
+have an existing command block on reading a FIFO special file, unblock
+it by opening the FIFO for writing.
+
+For 1., use
+
+    {"execute": "blockdev-add",  "id": ID1,
+     "arguments": {
+        "driver": "blkdebug", "node-name": ID1, "config": FIFO,
+        "image": { "driver": "null-co"}}}
+
+where ID1 is an arbitrary string, and FIFO is the name of the FIFO.
+
+For 2., use
+
+    {"execute": "migrate-pause", "id": ID2, "control": {"run-oob": true}}
+
+where ID2 is a different arbitrary string.  Since there's no migration
+to pause, the command will fail, but that's fine; instant failure is
+still a test of out-of-band responses overtaking in-band commands.
+
+For 3., open FIFO for writing.
+
+Drop QMP command x-oob-test.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-10-armbru@redhat.com>
+Message-Id: <20180703085358.13941-6-armbru@redhat.com>
+[Error checking tweaked]
 ---
- monitor.c           | 14 ++++++++------
- qapi/qmp-dispatch.c |  2 --
- tests/test-qga.c    | 13 +++++--------
- 3 files changed, 13 insertions(+), 16 deletions(-)
+ qapi/misc.json   | 18 ---------
+ qmp.c            | 16 --------
+ tests/qmp-test.c | 95 +++++++++++++++++++++++++++++++++---------------
+ 3 files changed, 65 insertions(+), 64 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 0dd6e22463..7245ee37ce 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4264,7 +4264,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
- static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
- {
-     QObject *req, *id = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     MonitorQMP *mon_qmp = container_of(parser, MonitorQMP, parser);
-     Monitor *mon = container_of(mon_qmp, Monitor, qmp);
-     Error *err = NULL;
-@@ -4279,6 +4279,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         goto err;
-     }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 74cd97f237..f1860418e8 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3472,24 +3472,6 @@
+ { 'event': 'COMMAND_DROPPED' ,
+   'data': { 'id': 'any', 'reason': 'CommandDropReason' } }
  
-+    qdict = qobject_to(QDict, req);
-+    if (qdict) {
-+        id = qobject_ref(qdict_get(qdict, "id"));
-+        qdict_del(qdict, "id");
-+    } /* else will fail qmp_dispatch() */
-+
-     /* Check against the request in general layout */
-     qdict = qmp_dispatch_check_obj(req, &err);
-     if (!qdict) {
-@@ -4290,16 +4296,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         goto err;
-     }
- 
--    id = qdict_get(qdict, "id");
+-##
+-# @x-oob-test:
+-#
+-# Test OOB functionality.  When sending this command with lock=true,
+-# it'll try to hang the dispatcher.  When sending it with lock=false,
+-# it'll try to notify the locked thread to continue.  Note: it should
+-# only be used by QMP test program rather than anything else.
+-#
+-# Since: 2.12
+-#
+-# Example:
+-#
+-# { "execute": "x-oob-test",
+-#   "arguments": { "lock": true } }
+-##
+-{ 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
+-  'allow-oob': true }
 -
-     req_obj = g_new0(QMPRequest, 1);
-     req_obj->mon = mon;
--    req_obj->id = qobject_ref(id);
-+    req_obj->id = id;
-     req_obj->req = req;
-     req_obj->need_resume = false;
+ ##
+ # @set-numa-node:
+ #
+diff --git a/qmp.c b/qmp.c
+index 73e46d795f..62325ac6aa 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -775,19 +775,3 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
  
--    qdict_del(qdict, "id");
--
-     if (qmp_is_oob(qdict)) {
-         /* Out-of-band (OOB) requests are executed directly in parser. */
-         trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj->id)
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 935f9e159c..3d5d5e110f 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -52,8 +52,6 @@ QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
-                            "QMP input member 'arguments' must be an object");
-                 return NULL;
-             }
--        } else if (!strcmp(arg_name, "id")) {
--            continue;
-         } else if (!strcmp(arg_name, "control")) {
-             if (qobject_type(arg_obj) != QTYPE_QDICT) {
-                 error_setg(errp,
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 6b632e3da4..564a4594b5 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -229,19 +229,16 @@ static void test_qga_ping(gconstpointer fix)
- 
- static void test_qga_invalid_id(gconstpointer fix)
- {
--    /*
--     * FIXME "id" is ignored; it should either be repeated in the
--     * reply, or rejected on input
--     */
-     const TestFixture *fixture = fix;
--    QDict *ret, *val;
-+    QDict *ret, *error;
-+    const char *class;
- 
-     ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping', 'id': 1}");
-     g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
- 
--    val = qdict_get_qdict(ret, "return");
--    g_assert(!qdict_haskey(val, "id"));
-+    error = qdict_get_qdict(ret, "error");
-+    class = qdict_get_try_str(error, "class");
-+    g_assert_cmpstr(class, ==, "GenericError");
- 
-     qobject_unref(ret);
+     return mem_info;
  }
+-
+-static QemuSemaphore x_oob_test_sem;
+-
+-static void __attribute__((constructor)) x_oob_test_init(void)
+-{
+-    qemu_sem_init(&x_oob_test_sem, 0);
+-}
+-
+-void qmp_x_oob_test(bool lock, Error **errp)
+-{
+-    if (lock) {
+-        qemu_sem_wait(&x_oob_test_sem);
+-    } else {
+-        qemu_sem_post(&x_oob_test_sem);
+-    }
+-}
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 5206b14ca6..467b694aa2 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -135,16 +135,66 @@ static void test_qmp_protocol(void)
+     qtest_quit(qts);
+ }
+ 
+-/* Tests for out-of-band support. */
++/* Out-of-band tests */
++
++char tmpdir[] = "/tmp/qmp-test-XXXXXX";
++char *fifo_name;
++
++static void setup_blocking_cmd(void)
++{
++    if (!mkdtemp(tmpdir)) {
++        g_error("mkdtemp: %s", strerror(errno));
++    }
++    fifo_name = g_strdup_printf("%s/fifo", tmpdir);
++    if (mkfifo(fifo_name, 0666)) {
++        g_error("mkfifo: %s", strerror(errno));
++    }
++}
++
++static void cleanup_blocking_cmd(void)
++{
++    unlink(fifo_name);
++    rmdir(tmpdir);
++}
++
++static void send_cmd_that_blocks(QTestState *s, const char *id)
++{
++    qtest_async_qmp(s, "{ 'execute': 'blockdev-add',  'id': %s,"
++                    " 'arguments': {"
++                    " 'driver': 'blkdebug', 'node-name': %s,"
++                    " 'config': %s,"
++                    " 'image': { 'driver': 'null-co' } } }",
++                    id, id, fifo_name);
++}
++
++static void unblock_blocked_cmd(void)
++{
++    int fd = open(fifo_name, O_WRONLY);
++    g_assert(fd >= 0);
++    close(fd);
++}
++
++static void send_oob_cmd_that_fails(QTestState *s, const char *id)
++{
++    qtest_async_qmp(s, "{ 'execute': 'migrate-pause', 'id': %s,"
++                    "  'control': { 'run-oob': true } }", id);
++}
++
++static void recv_cmd_id(QTestState *s, const char *id)
++{
++    QDict *resp = qtest_qmp_receive(s);
++
++    g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, id);
++    qobject_unref(resp);
++}
++
+ static void test_qmp_oob(void)
+ {
+     QTestState *qts;
+     QDict *resp, *q;
+-    int acks = 0;
+     const QListEntry *entry;
+     QList *capabilities;
+     QString *qstr;
+-    const char *cmd_id;
+ 
+     qts = qtest_init_without_qmp_handshake(true, common_args);
+ 
+@@ -185,37 +235,20 @@ static void test_qmp_oob(void)
+     g_assert(qdict_haskey(resp, "error"));
+     qobject_unref(resp);
+ 
+-    /*
+-     * First send the "x-oob-test" command with lock=true and
+-     * oob=false, it should hang the dispatcher and main thread;
+-     * later, we send another lock=false with oob=true to continue
+-     * that thread processing.  Finally we should receive replies from
+-     * both commands.
+-     */
+-    qtest_async_qmp(qts,
+-                    "{ 'execute': 'x-oob-test',"
+-                    "  'arguments': { 'lock': true }, "
+-                    "  'id': 'lock-cmd'}");
+-    qtest_async_qmp(qts,
+-                    "{ 'execute': 'x-oob-test', "
+-                    "  'arguments': { 'lock': false }, "
+-                    "  'control': { 'run-oob': true }, "
+-                    "  'id': 'unlock-cmd' }");
+-
+-    /* Ignore all events.  Wait for 2 acks */
+-    while (acks < 2) {
+-        resp = qtest_qmp_receive(qts);
+-        cmd_id = qdict_get_str(resp, "id");
+-        if (!g_strcmp0(cmd_id, "lock-cmd") ||
+-            !g_strcmp0(cmd_id, "unlock-cmd")) {
+-            acks++;
+-        }
+-        qobject_unref(resp);
+-    }
++    /* OOB command overtakes slow in-band command */
++    setup_blocking_cmd();
++    send_cmd_that_blocks(qts, "ib-blocks-1");
++    send_oob_cmd_that_fails(qts, "oob-1");
++    recv_cmd_id(qts, "oob-1");
++    unblock_blocked_cmd();
++    recv_cmd_id(qts, "ib-blocks-1");
++    cleanup_blocking_cmd();
+ 
+     qtest_quit(qts);
+ }
+ 
++/* Query smoke tests */
++
+ static int query_error_class(const char *cmd)
+ {
+     static struct {
+@@ -392,6 +425,8 @@ static void add_query_tests(QmpSchema *schema)
+     }
+ }
+ 
++/* Preconfig tests */
++
+ static void test_qmp_preconfig(void)
+ {
+     QDict *rsp, *ret;
 -- 
 2.17.1
