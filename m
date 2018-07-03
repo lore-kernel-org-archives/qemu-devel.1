@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faARz-0003XO-7t
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:49:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1faAZP-0005Bb-DT
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:57:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faARw-000547-3K
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:49:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37536 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1faAZK-0001sw-PF
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:57:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37738 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1faARv-00053j-VJ
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:49:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1faAZK-0001sK-Je
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:57:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DEE087A87
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 01:49:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0BE8E87A7D
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 01:57:26 +0000 (UTC)
 References: <20180702162218.13678-1-armbru@redhat.com>
-	<20180702162218.13678-12-armbru@redhat.com>
+	<20180702162218.13678-13-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <8cfd539c-240b-da9b-24f0-10e2990fef32@redhat.com>
-Date: Mon, 2 Jul 2018 20:49:43 -0500
+Message-ID: <760da7f7-7600-5299-f006-5649b3c368c4@redhat.com>
+Date: Mon, 2 Jul 2018 20:57:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180702162218.13678-12-armbru@redhat.com>
+In-Reply-To: <20180702162218.13678-13-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/32] qmp qemu-ga: Fix qemu-ga not to
- accept "control"
+Subject: Re: [Qemu-devel] [PATCH 12/32] qmp: Redo how the client requests
+ out-of-band execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,25 +39,50 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: peterx@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
 
 On 07/02/2018 11:21 AM, Markus Armbruster wrote:
-> Commit cf869d53172 "qmp: support out-of-band (oob) execution"
-> accidentally made qemu-ga accept and ignore "control".  Fix that.
+> Commit cf869d53172 "qmp: support out-of-band (oob) execution" added a
+> general mechanism for command-independent arguments just for an
+> out-of-band flag:
 > 
-> Out-of-band execution in a monitor that doesn't support it now fails
-> with
+>      The "control" key is introduced to store this extra flag.  "control"
+>      field is used to store arguments that are shared by all the commands,
+>      rather than command specific arguments.  Let "run-oob" be the first.
 > 
->      {"error": {"class": "GenericError", "desc": "QMP input member 'control' is unexpected"}}
+> However, it failed to reject unknown members of "control".  For
+> instance, in QMP command
 > 
-> instead of
+>      {"execute": "query-name", "id": 42, "control": {"crap": true}}
 > 
->      {"error": {"class": "GenericError", "desc": "Please enable out-of-band first for the session during capabilities negotiation"}}
+> "crap" gets silently ignored.
 > 
-> The old description is suboptimal when out-of-band cannot not be
-> enabled, or the command doesn't support out-of-band execution.
+> Instead of fixing this, revert the general "control" mechanism
+> (because YAGNI), and do it the way I initially proposed, with key
+> "exec-oob".  Simpler code, simper interface.
 > 
-> The new description is a bit unspecific, but it'll do.
+> An out-of-band command
+> 
+>      {"execute": "migrate-pause", "id": 42, "control": {"run-oob": true}}
+> 
+> becomes
+> 
+>      {"exec-oob": "migrate-pause", "id": 42}
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
+
+Yay!
+
+> @@ -106,9 +110,6 @@ The format for command execution is:
+>     command execution, it is optional and will be part of the response
+>     if provided.  The "id" member can be any json-value.  A json-number
+>     incremented for each successive command works fine.
+> -- The optional "control" member further specifies how the command is
+> -  to be executed.  Currently, its only member is optional "run-oob".
+> -  See section "2.3.1 Out-of-band execution" for details.
+
+Still could use a mention that 'id' is a VERY good idea when using 
+'exec-oob' - but as 7/32 made it optional, you could tweak that part of 
+the doc in a later patch when making 'id' required for 'exec-oob'.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
