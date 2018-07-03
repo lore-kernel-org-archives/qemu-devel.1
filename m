@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faSUw-0000oo-Ra
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1faSVC-0000yT-Dw
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faSUs-0000Dc-QC
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:06 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:46388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faSUs-0000DC-G8
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:02 -0400
-Received: by mail-qk0-x244.google.com with SMTP id o2-v6so1792504qkc.13
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 14:06:02 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180702175030.18621-1-f4bug@amsat.org>
-	<20180702175030.18621-2-f4bug@amsat.org>
-	<2e367d67-77f4-8d58-53de-409c0b0bf558@vivier.eu>
-	<e0ac6484-0f62-66e0-c7b8-fab9775fbc0f@amsat.org>
-	<5b37d5a8-b622-a95f-4f43-0b30fd6e7d68@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1c70482e-7fad-4621-fcf2-209cba3b09c6@amsat.org>
-Date: Tue, 3 Jul 2018 18:05:58 -0300
+	(envelope-from <armbru@redhat.com>) id 1faSV8-0000PS-2V
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33650 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSV7-0000On-Tc
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E52740782D5
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:06:17 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:06:10 +0200
+Message-Id: <20180703210613.25619-12-armbru@redhat.com>
+In-Reply-To: <20180703210613.25619-1-armbru@redhat.com>
+References: <20180703210613.25619-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5b37d5a8-b622-a95f-4f43-0b30fd6e7d68@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/13] linux-user/syscall: Verify
- recvfrom(addr) is user-writable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 11/14] qapi-types: add #if conditions to types &
+ visitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,51 +33,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 07/03/2018 01:38 PM, Laurent Vivier wrote:
-> Le 03/07/2018 à 17:39, Philippe Mathieu-Daudé a écrit :
->> On 07/03/2018 11:55 AM, Laurent Vivier wrote:
->>> Le 02/07/2018 à 19:50, Philippe Mathieu-Daudé a écrit :
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> Tested-By: Guido Günther <agx@sigxcpu.org>
->>>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->>>> ---
->>>>  linux-user/syscall.c | 5 +++++
->>>>  1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->>>> index 2117fb13b4..ad40682cee 100644
->>>> --- a/linux-user/syscall.c
->>>> +++ b/linux-user/syscall.c
->>>> @@ -4154,6 +4154,11 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
->>>>              ret = -TARGET_EINVAL;
->>>>              goto fail;
->>>>          }
->>>> +        if (!access_ok(VERIFY_WRITE, target_addr, addrlen)) {
->>>> +            ret = -TARGET_EFAULT;
->>>> +            goto fail;
->>>> +        }
->>>> +
->>>>          addr = alloca(addrlen);
->>>>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
->>>>                                        addr, &addrlen));
->>>>
->>>
->>> This patch breaks the test recvfrom01 of the Linux Test Project.
->>
->> OK :(
->>
->> I just sent v4, can you simply drop this patch?
->> I'll now look at it after 3.0.
-> 
-> Not enough time to add more patches to my pull request, sorry.
-> 
-> I'll queue them in my branch for the next release.
+Types & visitors are coupled and must be handled together to avoid
+temporary build regression.
 
-Fair enough :)
+Wrap generated types/visitor code with #if/#endif using the context
+helpers. Derived from a patch by Marc-Andr=C3=A9.
 
-Thanks!
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20180703155648.11933-12-marcandre.lureau@redhat.com>
+---
+ scripts/qapi/types.py | 48 ++++++++++++++++++++++++++-----------------
+ scripts/qapi/visit.py | 33 ++++++++++++++++-------------
+ 2 files changed, 48 insertions(+), 33 deletions(-)
 
-Phil.
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 659075f884..fd7808103c 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -55,7 +55,7 @@ def gen_struct_members(members):
+     return ret
+=20
+=20
+-def gen_object(name, base, members, variants):
++def gen_object(name, ifcond, base, members, variants):
+     if name in objects_seen:
+         return ''
+     objects_seen.add(name)
+@@ -64,11 +64,14 @@ def gen_object(name, base, members, variants):
+     if variants:
+         for v in variants.variants:
+             if isinstance(v.type, QAPISchemaObjectType):
+-                ret +=3D gen_object(v.type.name, v.type.base,
++                ret +=3D gen_object(v.type.name, v.type.ifcond, v.type.b=
+ase,
+                                   v.type.local_members, v.type.variants)
+=20
+     ret +=3D mcgen('''
+=20
++''')
++    ret +=3D gen_if(ifcond)
++    ret +=3D mcgen('''
+ struct %(c_name)s {
+ ''',
+                  c_name=3Dc_name(name))
+@@ -101,6 +104,7 @@ struct %(c_name)s {
+     ret +=3D mcgen('''
+ };
+ ''')
++    ret +=3D gen_endif(ifcond)
+=20
+     return ret
+=20
+@@ -209,33 +213,39 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVi=
+sitor):
+         self._genc.add(gen_type_cleanup(name))
+=20
+     def visit_enum_type(self, name, info, ifcond, values, prefix):
+-        self._genh.preamble_add(gen_enum(name, values, prefix))
+-        self._genc.add(gen_enum_lookup(name, values, prefix))
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._genh.preamble_add(gen_enum(name, values, prefix))
++            self._genc.add(gen_enum_lookup(name, values, prefix))
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+-        self._genh.preamble_add(gen_fwd_object_or_array(name))
+-        self._genh.add(gen_array(name, element_type))
+-        self._gen_type_cleanup(name)
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._genh.preamble_add(gen_fwd_object_or_array(name))
++            self._genh.add(gen_array(name, element_type))
++            self._gen_type_cleanup(name)
+=20
+     def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+-        self._genh.preamble_add(gen_fwd_object_or_array(name))
+-        self._genh.add(gen_object(name, base, members, variants))
+-        if base and not base.is_implicit():
+-            self._genh.add(gen_upcast(name, base))
+-        # TODO Worth changing the visitor signature, so we could
+-        # directly use rather than repeat type.is_implicit()?
+-        if not name.startswith('q_'):
+-            # implicit types won't be directly allocated/freed
+-            self._gen_type_cleanup(name)
++        with ifcontext(ifcond, self._genh):
++            self._genh.preamble_add(gen_fwd_object_or_array(name))
++        self._genh.add(gen_object(name, ifcond, base, members, variants)=
+)
++        with ifcontext(ifcond, self._genh, self._genc):
++            if base and not base.is_implicit():
++                self._genh.add(gen_upcast(name, base))
++            # TODO Worth changing the visitor signature, so we could
++            # directly use rather than repeat type.is_implicit()?
++            if not name.startswith('q_'):
++                # implicit types won't be directly allocated/freed
++                self._gen_type_cleanup(name)
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+-        self._genh.preamble_add(gen_fwd_object_or_array(name))
+-        self._genh.add(gen_object(name, None,
++        with ifcontext(ifcond, self._genh):
++            self._genh.preamble_add(gen_fwd_object_or_array(name))
++        self._genh.add(gen_object(name, ifcond, None,
+                                   [variants.tag_member], variants))
+-        self._gen_type_cleanup(name)
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._gen_type_cleanup(name)
+=20
+=20
+ def gen_types(schema, output_dir, prefix, opt_builtins):
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 34fe1ef5eb..dd5034a66a 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -311,29 +311,34 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCV=
+isitor):
+                                       types=3Dtypes))
+=20
+     def visit_enum_type(self, name, info, ifcond, values, prefix):
+-        self._genh.add(gen_visit_decl(name, scalar=3DTrue))
+-        self._genc.add(gen_visit_enum(name))
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._genh.add(gen_visit_decl(name, scalar=3DTrue))
++            self._genc.add(gen_visit_enum(name))
+=20
+     def visit_array_type(self, name, info, ifcond, element_type):
+-        self._genh.add(gen_visit_decl(name))
+-        self._genc.add(gen_visit_list(name, element_type))
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._genh.add(gen_visit_decl(name))
++            self._genc.add(gen_visit_list(name, element_type))
+=20
+     def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+-        self._genh.add(gen_visit_members_decl(name))
+-        self._genc.add(gen_visit_object_members(name, base, members, var=
+iants))
+-        # TODO Worth changing the visitor signature, so we could
+-        # directly use rather than repeat type.is_implicit()?
+-        if not name.startswith('q_'):
+-            # only explicit types need an allocating visit
+-            self._genh.add(gen_visit_decl(name))
+-            self._genc.add(gen_visit_object(name, base, members, variant=
+s))
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._genh.add(gen_visit_members_decl(name))
++            self._genc.add(gen_visit_object_members(name, base,
++                                                    members, variants))
++            # TODO Worth changing the visitor signature, so we could
++            # directly use rather than repeat type.is_implicit()?
++            if not name.startswith('q_'):
++                # only explicit types need an allocating visit
++                self._genh.add(gen_visit_decl(name))
++                self._genc.add(gen_visit_object(name, base, members, var=
+iants))
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+-        self._genh.add(gen_visit_decl(name))
+-        self._genc.add(gen_visit_alternate(name, variants))
++        with ifcontext(ifcond, self._genh, self._genc):
++            self._genh.add(gen_visit_decl(name))
++            self._genc.add(gen_visit_alternate(name, variants))
+=20
+=20
+ def gen_visit(schema, output_dir, prefix, opt_builtins):
+--=20
+2.17.1
