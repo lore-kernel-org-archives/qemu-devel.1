@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4X-0001Rc-9Q
+	(envelope-from <armbru@redhat.com>) id 1faH4X-0001Rf-I3
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4V-0007Dd-82
+	(envelope-from <armbru@redhat.com>) id 1faH4V-0007E1-I0
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51386 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38134 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4V-0007D1-1o
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4V-0007DO-CY
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:03 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 10:53:37 +0200
-Message-Id: <20180703085358.13941-12-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 10:53:43 +0200
+Message-Id: <20180703085358.13941-18-armbru@redhat.com>
 In-Reply-To: <20180703085358.13941-1-armbru@redhat.com>
 References: <20180703085358.13941-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/32] qmp qemu-ga: Fix qemu-ga not to
- accept "control"
+Subject: [Qemu-devel] [PATCH v2 17/32] qmp: Don't let malformed in-band
+ commands jump the queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,228 +27,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
 
-Commit cf869d53172 "qmp: support out-of-band (oob) execution"
-accidentally made qemu-ga accept and ignore "control".  Fix that.
+handle_qmp_command() reports certain errors right away.  This is wrong
+when OOB is enabled, because the errors can "jump the queue" then, as
+the previous commit demonstrates.
 
-Out-of-band execution in a monitor that doesn't support it now fails
-with
+To fix, we need to delay errors until dispatch.  Do that for semantic
+errors, mostly by reverting ill-advised parts of commit cf869d53172
+"qmp: support out-of-band (oob) execution".  Bonus: doesn't run
+qmp_dispatch_check_obj() twice, once in handle_qmp_command(), and
+again in do_qmp_dispatch().  That's also due to commit cf869d53172.
 
-    {"error": {"class": "GenericError", "desc": "QMP input member 'control' is unexpected"}}
-
-instead of
-
-    {"error": {"class": "GenericError", "desc": "Please enable out-of-band first for the session during capabilities negotiation"}}
-
-The old description is suboptimal when out-of-band cannot not be
-enabled, or the command doesn't support out-of-band execution.
-
-The new description is a bit unspecific, but it'll do.
+The next commit will fix queue jumping for syntax errors.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/dispatch.h |  6 ++++--
- monitor.c                   |  9 ++-------
- qapi/qmp-dispatch.c         | 14 ++++++++------
- qga/main.c                  |  2 +-
- tests/test-qga.c            |  9 +++++----
- tests/test-qmp-cmds.c       |  8 ++++----
- 6 files changed, 24 insertions(+), 24 deletions(-)
+ include/qapi/qmp/dispatch.h |  2 -
+ monitor.c                   | 79 +++++++++----------------------------
+ qapi/qmp-dispatch.c         | 12 +++++-
+ tests/qmp-test.c            |  4 +-
+ 4 files changed, 30 insertions(+), 67 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index b366bb48bd..303a15ba84 100644
+index 303a15ba84..514bfc45b0 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -41,7 +41,6 @@ void qmp_register_command(QmpCommandList *cmds, const char *name,
-                           QmpCommandFunc *fn, QmpCommandOptions options);
- void qmp_unregister_command(QmpCommandList *cmds, const char *name);
- QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
--QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request);
- void qmp_disable_command(QmpCommandList *cmds, const char *name);
- void qmp_enable_command(QmpCommandList *cmds, const char *name);
- 
-@@ -49,7 +48,10 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+@@ -48,8 +48,6 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
  const char *qmp_command_name(const QmpCommand *cmd);
  bool qmp_has_success_response(const QmpCommand *cmd);
  QObject *qmp_build_error_object(Error *err);
--QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp);
-+QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
-+                              Error **errp);
-+QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
-+                      bool allow_oob);
+-QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
+-                              Error **errp);
+ QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+                       bool allow_oob);
  bool qmp_is_oob(QDict *dict);
- 
- typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
 diff --git a/monitor.c b/monitor.c
-index 4659399b55..2c28b05ecb 100644
+index 28fa9b8d44..7a80e58bf2 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1318,11 +1318,6 @@ static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
+@@ -1289,48 +1289,6 @@ static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
      }
+ }
  
-     if (qmp_is_oob(req)) {
--        if (!qmp_oob_enabled(mon)) {
--            error_setg(errp, "Please enable out-of-band first "
--                       "for the session during capabilities negotiation");
+-/*
+- * Return true if check successful, or false otherwise.  When false is
+- * returned, detailed error will be in errp if provided.
+- */
+-static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
+-{
+-    const char *command;
+-    QmpCommand *cmd;
+-
+-    command = qdict_get_try_str(req, "execute");
+-    if (!command) {
+-        command = qdict_get_try_str(req, "exec-oob");
+-    }
+-    if (!command) {
+-        error_setg(errp, "Command field 'execute' missing");
+-        return false;
+-    }
+-
+-    cmd = qmp_find_command(mon->qmp.commands, command);
+-    if (!cmd) {
+-        if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
+-            error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+-                      "Expecting capabilities negotiation "
+-                      "with 'qmp_capabilities'");
+-        } else {
+-            error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+-                      "The command %s has not been found", command);
+-        }
+-        return false;
+-    }
+-
+-    if (qmp_is_oob(req)) {
+-        if (!(cmd->options & QCO_ALLOW_OOB)) {
+-            error_setg(errp, "The command %s does not support OOB",
+-                       command);
 -            return false;
 -        }
-         if (!(cmd->options & QCO_ALLOW_OOB)) {
-             error_setg(errp, "The command %s does not support OOB",
-                        command);
-@@ -4194,7 +4189,7 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+-    }
+-
+-    return true;
+-}
+-
+ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+                           Error **errp)
+ {
+@@ -4170,6 +4128,7 @@ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
+ {
+     Monitor *old_mon;
+     QObject *rsp;
++    QDict *error;
+ 
      old_mon = cur_mon;
      cur_mon = mon;
- 
--    rsp = qmp_dispatch(mon->qmp.commands, req);
-+    rsp = qmp_dispatch(mon->qmp.commands, req, qmp_oob_enabled(mon));
+@@ -4178,6 +4137,19 @@ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
  
      cur_mon = old_mon;
  
-@@ -4285,7 +4280,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-     } /* else will fail qmp_dispatch() */
++    if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
++        error = qdict_get_qdict(qobject_to(QDict, rsp), "error");
++        if (error
++            && !g_strcmp0(qdict_get_try_str(error, "class"),
++                    QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOUND))) {
++            /* Provide a more useful error message */
++            qdict_del(error, "desc");
++            qdict_put_str(error, "desc", "Expecting capabilities negotiation"
++                          " with 'qmp_capabilities'");
++        }
++    }
++
++    /* Respond if necessary */
+     monitor_qmp_respond(mon, rsp, NULL, qobject_ref(id));
+ }
  
-     /* Check against the request in general layout */
--    qdict = qmp_dispatch_check_obj(req, &err);
-+    qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
-     if (!qdict) {
-         goto err;
+@@ -4255,7 +4227,9 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         error_setg(&err, QERR_JSON_PARSING);
      }
+     if (err) {
+-        goto err;
++        assert(!req);
++        monitor_qmp_respond(mon, NULL, err, NULL);
++        return;
+     }
+ 
+     qdict = qobject_to(QDict, req);
+@@ -4270,18 +4244,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         qobject_unref(req_json);
+     }
+ 
+-    /* Check against the request in general layout */
+-    qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
+-    if (!qdict) {
+-        goto err;
+-    }
+-
+-    /* Check against OOB specific */
+-    if (!qmp_cmd_oob_check(mon, qdict, &err)) {
+-        goto err;
+-    }
+-
+-    if (qmp_is_oob(qdict)) {
++    if (qdict && qmp_is_oob(qdict)) {
+         /* Out-of-band (OOB) requests are executed directly in parser. */
+         trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
+                                           ?: "");
+@@ -4335,12 +4298,6 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+ 
+     /* Kick the dispatcher routine */
+     qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+-    return;
+-
+-err:
+-    /* FIXME overtakes queued in-band commands, wrong when !qmp_is_oob() */
+-    monitor_qmp_respond(mon, NULL, err, NULL);
+-    qobject_unref(req);
+ }
+ 
+ static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 3d5d5e110f..0ad0fab8ed 100644
+index 12be120fe7..6d78f3e9f6 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -20,7 +20,8 @@
+@@ -20,8 +20,8 @@
  #include "qapi/qmp/qbool.h"
  #include "sysemu/sysemu.h"
  
--QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
-+QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
-+                              Error **errp)
+-QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
+-                              Error **errp)
++static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
++                                     Error **errp)
  {
+     const char *exec_key = NULL;
      const QDictEntry *ent;
-     const char *arg_name;
-@@ -52,7 +53,7 @@ QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
-                            "QMP input member 'arguments' must be an object");
-                 return NULL;
-             }
--        } else if (!strcmp(arg_name, "control")) {
-+        } else if (!strcmp(arg_name, "control") && allow_oob) {
-             if (qobject_type(arg_obj) != QTYPE_QDICT) {
-                 error_setg(errp,
-                            "QMP input member 'control' must be a dict");
-@@ -74,7 +75,7 @@ QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
- }
- 
- static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
--                                Error **errp)
-+                                bool allow_oob, Error **errp)
+@@ -78,6 +78,7 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+                                 bool allow_oob, Error **errp)
  {
      Error *local_err = NULL;
++    bool oob;
      const char *command;
-@@ -82,7 +83,7 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+     QDict *args, *dict;
      QmpCommand *cmd;
-     QObject *ret = NULL;
+@@ -89,9 +90,11 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+     }
  
--    dict = qmp_dispatch_check_obj(request, errp);
-+    dict = qmp_dispatch_check_obj(request, allow_oob, errp);
-     if (!dict) {
+     command = qdict_get_try_str(dict, "execute");
++    oob = false;
+     if (!command) {
+         assert(allow_oob);
+         command = qdict_get_str(dict, "exec-oob");
++        oob = true;
+     }
+     cmd = qmp_find_command(cmds, command);
+     if (cmd == NULL) {
+@@ -104,6 +107,11 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+                    command);
          return NULL;
      }
-@@ -157,13 +158,14 @@ bool qmp_is_oob(QDict *dict)
-     return qbool_get_bool(bool_obj);
- }
++    if (oob && !(cmd->options & QCO_ALLOW_OOB)) {
++        error_setg(errp, "The command %s does not support OOB",
++                   command);
++        return false;
++    }
  
--QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request)
-+QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
-+                      bool allow_oob)
- {
-     Error *err = NULL;
-     QObject *ret;
-     QDict *rsp;
+     if (runstate_check(RUN_STATE_PRECONFIG) &&
+         !(cmd->options & QCO_ALLOW_PRECONFIG)) {
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 6581d1d755..57c1296573 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -243,12 +243,12 @@ static void test_qmp_oob(void)
+     recv_cmd_id(qts, "ib-blocks-1");
+     recv_cmd_id(qts, "ib-quick-1");
  
--    ret = do_qmp_dispatch(cmds, request, &err);
-+    ret = do_qmp_dispatch(cmds, request, allow_oob, &err);
+-    /* FIXME certain in-band errors overtake slow in-band command */
++    /* Even malformed in-band command fails in-band */
+     send_cmd_that_blocks(qts, "blocks-2");
+     qtest_async_qmp(qts, "{ 'id': 'err-2' }");
+-    recv_cmd_id(qts, NULL);
+     unblock_blocked_cmd();
+     recv_cmd_id(qts, "blocks-2");
++    recv_cmd_id(qts, "err-2");
+     cleanup_blocking_cmd();
  
-     rsp = qdict_new();
-     if (err) {
-diff --git a/qga/main.c b/qga/main.c
-index ea7540edcc..d332bacce5 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -586,7 +586,7 @@ static void process_command(GAState *s, QDict *req)
- 
-     g_assert(req);
-     g_debug("processing command");
--    rsp = qmp_dispatch(&ga_commands, QOBJECT(req));
-+    rsp = qmp_dispatch(&ga_commands, QOBJECT(req), false);
-     if (rsp) {
-         ret = send_response(s, rsp);
-         if (ret < 0) {
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 2e9e0f73bb..febabc7ad5 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -245,16 +245,17 @@ static void test_qga_invalid_id(gconstpointer fix)
- 
- static void test_qga_invalid_oob(gconstpointer fix)
- {
--    /* FIXME "control" is ignored; it should be rejected */
-     const TestFixture *fixture = fix;
--    QDict *ret;
-+    QDict *ret, *error;
-+    const char *class;
- 
-     ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping',"
-                  " 'control': {'run-oob': true}}");
-     g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
- 
--    qdict_get_qdict(ret, "return");
-+    error = qdict_get_qdict(ret, "error");
-+    class = qdict_get_try_str(error, "class");
-+    g_assert_cmpstr(class, ==, "GenericError");
- 
-     qobject_unref(ret);
- }
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 491b0c4a44..10c7ba40c1 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -102,7 +102,7 @@ static void test_dispatch_cmd(void)
- 
-     qdict_put_str(req, "execute", "user_def_cmd");
- 
--    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
-+    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-     assert(resp != NULL);
-     assert(!qdict_haskey(qobject_to(QDict, resp), "error"));
- 
-@@ -119,7 +119,7 @@ static void test_dispatch_cmd_failure(void)
- 
-     qdict_put_str(req, "execute", "user_def_cmd2");
- 
--    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
-+    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-     assert(resp != NULL);
-     assert(qdict_haskey(qobject_to(QDict, resp), "error"));
- 
-@@ -133,7 +133,7 @@ static void test_dispatch_cmd_failure(void)
- 
-     qdict_put_str(req, "execute", "user_def_cmd");
- 
--    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
-+    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-     assert(resp != NULL);
-     assert(qdict_haskey(qobject_to(QDict, resp), "error"));
- 
-@@ -147,7 +147,7 @@ static QObject *test_qmp_dispatch(QDict *req)
-     QDict *resp;
-     QObject *ret;
- 
--    resp_obj = qmp_dispatch(&qmp_commands, QOBJECT(req));
-+    resp_obj = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
-     assert(resp_obj);
-     resp = qobject_to(QDict, resp_obj);
-     assert(resp && !qdict_haskey(resp, "error"));
+     qtest_quit(qts);
 -- 
 2.17.1
