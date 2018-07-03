@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faNJq-0008SS-D8
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:34:20 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1faNKI-0000KP-Nx
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faNJp-0001gF-HZ
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:34:18 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:42561)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faNJp-0001fM-Cm
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:34:17 -0400
-Received: by mail-qt0-x243.google.com with SMTP id y31-v6so1917848qty.9
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:34:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  3 Jul 2018 12:33:44 -0300
-Message-Id: <20180703153346.9050-11-f4bug@amsat.org>
-In-Reply-To: <20180703153346.9050-1-f4bug@amsat.org>
-References: <20180703153346.9050-1-f4bug@amsat.org>
+	(envelope-from <rkagan@virtuozzo.com>) id 1faNKC-0002If-A3
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:34:46 -0400
+Received: from mail-vi1eur04hn0221.outbound.protection.outlook.com
+	([104.47.14.221]:56143
+	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1faNKB-0002Eq-BT
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:34:40 -0400
+Date: Tue, 3 Jul 2018 18:34:22 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180703153422.GD30904@rkaganb.sw.ru>
+References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	<20180702161404.GA2339@rkaganb.sw.ru>
+	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
+	<20180703095825.GC30904@rkaganb.sw.ru>
+	<20180703142817.GA3088@vbusired-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 10/12] linux-user/strace: Let
- print_sockaddr() have a 'last' argument
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180703142817.GA3088@vbusired-vm>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Use of unique identifier for
+ pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+To: Venu Busireddy <venu.busireddy@oracle.com>
+Cc: si-wei liu <si-wei.liu@oracle.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-If the format is not the syscall last argument, a comma is append.
+On Tue, Jul 03, 2018 at 09:28:17AM -0500, Venu Busireddy wrote:
+> On 2018-07-03 12:58:25 +0300, Roman Kagan wrote:
+> > My point with these two questions is that since this patchset is
+> > defining external interfaces -- with guest OS, with management layer --
+> 
+> This patch set is not defining any external interfaces. All this is doing
+> is provide the means and locations to store the "group identifier". How
+> that info will be used, I thought, should be another patch set.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/strace.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Device properties are a part of the interface to the management layer.
+PCI vendor capabilities are a part of the interface to the guest OS.
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 54060eed93..19222d2192 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -67,7 +67,7 @@ UNUSED static void print_timeval(abi_ulong, int);
- UNUSED static void print_timezone(abi_ulong, int);
- UNUSED static void print_number(abi_long, int);
- UNUSED static void print_signal(abi_ulong, int);
--UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
-+UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen, int);
- UNUSED static void print_socket_domain(int domain);
- UNUSED static void print_socket_type(int type);
- UNUSED static void print_socket_protocol(int domain, int type, int protocol);
-@@ -336,7 +336,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
- }
- 
- static void
--print_sockaddr(abi_ulong addr, abi_long addrlen)
-+print_sockaddr(abi_ulong addr, abi_long addrlen, int last)
- {
-     struct target_sockaddr *sa;
-     int i;
-@@ -418,7 +418,7 @@ print_sockaddr(abi_ulong addr, abi_long addrlen)
-     } else {
-         print_raw_param("0x"TARGET_ABI_FMT_lx, addr, 0);
-     }
--    gemu_log(", "TARGET_ABI_FMT_ld, addrlen);
-+    gemu_log(", "TARGET_ABI_FMT_ld"%s", addrlen, get_comma(last));
- }
- 
- static void
-@@ -1666,7 +1666,7 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
- 
-     gemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
--    print_sockaddr(addr, addrlen);
-+    print_sockaddr(addr, addrlen, 0);
-     gemu_log(")");
- }
- 
-@@ -1736,7 +1736,7 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
-     print_buf(msg, len, 0);
-     print_raw_param(TARGET_ABI_FMT_ld, len, 0);
-     print_flags(msg_flags, flags, 0);
--    print_sockaddr(addr, addrlen);
-+    print_sockaddr(addr, addrlen, 0);
-     gemu_log(")");
- }
- 
--- 
-2.18.0
+So yes, I think it makes sense to have at least a rough plan on how it's
+going to be used.
+
+Thanks,
+Roman.
