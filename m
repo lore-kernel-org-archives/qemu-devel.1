@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1faQIW-0002lV-Qn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:45:09 -0400
+	(envelope-from <linux@roeck-us.net>) id 1faQMx-00040r-Ee
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1faQIV-0002On-TZ
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:45:08 -0400
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-	<1530602398-16127-8-git-send-email-eric.auger@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <cc538632-e853-adbc-ec34-a2f524415406@redhat.com>
-Date: Tue, 3 Jul 2018 20:44:58 +0200
+	(envelope-from <linux@roeck-us.net>) id 1faQMw-0004ij-G1
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:49:43 -0400
+Date: Tue, 3 Jul 2018 11:49:22 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180703184922.GA14422@roeck-us.net>
+References: <20180626200008.GA680@roeck-us.net>
+	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
+	<20180702162733.GB32333@roeck-us.net>
+	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
+	<20180702170522.GA9885@roeck-us.net>
+	<CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
+	<20180702175740.GA14904@roeck-us.net>
+	<CAFEAcA8noUOGt_9LpfRTRX52n4Z66XzudYFfW=180c92vzPH-g@mail.gmail.com>
+	<20180702183717.GA22482@roeck-us.net>
+	<CAFEAcA_p8vOs_1_4sAf1SvvPb44z885doU0821eh=-e0K5B3_A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1530602398-16127-8-git-send-email-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 07/15] hw/arm/virt: Add memory hotplug
- framework
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_p8vOs_1_4sAf1SvvPb44z885doU0821eh=-e0K5B3_A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
+ identify and set one-shot mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
-Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 03.07.2018 09:19, Eric Auger wrote:
-> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+On Tue, Jul 03, 2018 at 06:06:24PM +0100, Peter Maydell wrote:
+> On 2 July 2018 at 19:37, Guenter Roeck <linux@roeck-us.net> wrote:
+> > Please try http://server.roeck-us.net/qemu/an385/
+> >
+> > vmlinux is plain v4.18-rc3 compiled with the provided defconfig and
+> > the provided toolchain (position independent, created with buildroot).
+> > defconfig is mps2_defconfig+CONFIG_BLK_DEV_INITRD=y. Older kernels work
+> > as well (I tested as far back as 4.9.y), with the same configuration.
+> >
+> > qemu is from the master-local branch in my repository, built with
+> > https://github.com/groeck/linux-build-test/blob/master/qemu/buildall.sh.
+> >
+> > The boot wrapper was generated from
+> > https://github.com/groeck/linux-build-test/tree/master/rootfs/arm/arm-m3-bootwrapper/.
+> >
+> > run.sh should boot the system into a shell (at least it does for me).
 > 
-> This patch adds the the memory hot-plug/hot-unplug infrastructure
-> in machvirt.
+> Thanks. Unfortunately I tried running that a bunch of times with a
+> version of your QEMU with the 'set one-shot mode' patch reverted,
+> and it still booted every time.
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
-> - s/pc_dimm_memory_plug/pc_dimm_plug
-> - reworded title and commit message
-> - added pre_plug cb
-> - don't handle get_memory_region failure anymore
-> ---
->  default-configs/arm-softmmu.mak |  2 ++
->  hw/arm/virt.c                   | 68 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 69 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 834d45c..28fe8f3 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -152,3 +152,5 @@ CONFIG_PCI_DESIGNWARE=y
->  CONFIG_STRONGARM=y
->  CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
-> +CONFIG_MEM_HOTPLUG=y
-> +
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 6fefb78..7190962 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -60,6 +60,8 @@
->  #include "standard-headers/linux/input.h"
->  #include "hw/arm/smmuv3.h"
->  #include "hw/acpi/acpi.h"
-> +#include "hw/mem/pc-dimm.h"
-> +#include "hw/mem/nvdimm.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1785,6 +1787,53 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->      return ms->possible_cpus;
->  }
->  
-> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                 Error **errp)
-> +{
-> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-> +
-> +    if (is_nvdimm) {
-> +        error_setg(errp, "nvdimm is not yet supported");
-> +        return;
-> +    }
 
-You mention that actual hotplug is not supported, only coldplug.
-Wouldn't this be the right place to check for that? (only skimmed over
-your patches, how do you handle that?)
+Oddly enough, I now seem to be unable to reproduce the problem either.
+Weird, when I wrote the patch it was absolutely necessary.
 
+The only other change I can think of would be the code to set the
+serial baud rate in the boot loader, which I did not have initially.
+Is it possible that the hangup could have been caused by that ? 
 
--- 
+Is it worth tracking it down, or are we ok ?
+
+> However, I think I agree with you that it's better for the timer
+> device to avoid doing things that result in the ptimer code emitting
+> warnings rather than just dropping the ptimer warning, so I'm going
+> to take this patch upstream.
+> 
+> I also sorted through some of the other corner case issues
+> (eg restarting a stopped one-shot timer by writing to VALUE,
+> and whether an interrupt should be generated if VALUE is
+> written as zero). I'm going to send a patchset in a moment that
+> includes this patch and those fixes. I've tested that set by
+> applying it to your master-local/ branch and using your testcase
+> here, as well as by using my buildroot/uclinux image on an
+> upstream QEMU (and a few other RTOS images I had to hand).
+> 
+
+The series WFM as well. I'll send out a Tested-by: in a minute.
 
 Thanks,
-
-David / dhildenb
+Guenter
