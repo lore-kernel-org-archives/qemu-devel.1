@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4Z-0001T7-Rn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1faH4a-0001Uc-MW
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4W-0007Er-AN
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52200 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faH4X-0007Go-Cl
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38144 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4W-0007EK-5O
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:04 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4X-0007Fo-0X
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:05 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 10:53:45 +0200
-Message-Id: <20180703085358.13941-20-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 10:53:56 +0200
+Message-Id: <20180703085358.13941-31-armbru@redhat.com>
 In-Reply-To: <20180703085358.13941-1-armbru@redhat.com>
 References: <20180703085358.13941-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 19/32] monitor: Rename use_io_thr to
- use_io_thread
+Subject: [Qemu-devel] [PATCH v2 30/32] qmp: Clean up capability negotiation
+ after commit 02130314d8c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +27,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
 
+qmp_greeting() offers capabilities to the client, and
+qmp_qmp_capabilities() accepts or denies capabilities requested by the
+client.  The two compute the set of available capabilities
+independently.  Not nice.
+
+Clean this up as follows.  Compute available capabilities just once in
+monitor_qmp_caps_reset(), and store them in Monitor member
+qmp.capab_offered[].  Have qmp_greeting() and qmp_qmp_capabilities()
+use that.  Both are now oblivious of capability details.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- monitor.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ monitor.c | 93 ++++++++++++++++++++++++-------------------------------
+ 1 file changed, 40 insertions(+), 53 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index fd83a57dda..10b6634d3e 100644
+index 876a3a23a7..590e5b5b04 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -206,11 +206,11 @@ struct Monitor {
-     int flags;
-     int suspend_cnt;            /* Needs to be accessed atomically */
-     bool skip_flush;
--    bool use_io_thr;
-+    bool use_io_thread;
- 
-     /*
-      * State used only in the thread "owning" the monitor.
--     * If @use_io_thr, this is mon_global.mon_iothread.
-+     * If @use_io_thread, this is mon_global.mon_iothread.
-      * Else, it's the main thread.
-      * These members can be safely accessed without locks.
+@@ -172,7 +172,8 @@ typedef struct {
+      * mode.
       */
-@@ -520,7 +520,7 @@ static void monitor_json_emitter_raw(Monitor *mon,
- 
- static void monitor_json_emitter(Monitor *mon, QObject *data)
- {
--    if (mon->use_io_thr) {
-+    if (mon->use_io_thread) {
-         /*
-          * If using I/O thread, we need to queue the item so that I/O
-          * thread will do the rest for us.  Take refcount so that
-@@ -766,7 +766,7 @@ static void monitor_qapi_event_init(void)
- static void handle_hmp_command(Monitor *mon, const char *cmdline);
- 
- static void monitor_data_init(Monitor *mon, bool skip_flush,
--                              bool use_io_thr)
-+                              bool use_io_thread)
- {
-     memset(mon, 0, sizeof(Monitor));
-     qemu_mutex_init(&mon->mon_lock);
-@@ -775,7 +775,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
-     /* Use *mon_cmds by default. */
-     mon->cmd_table = mon_cmds;
-     mon->skip_flush = skip_flush;
--    mon->use_io_thr = use_io_thr;
-+    mon->use_io_thread = use_io_thread;
-     mon->qmp.qmp_requests = g_queue_new();
-     mon->qmp.qmp_responses = g_queue_new();
+     QmpCommandList *commands;
+-    bool qmp_caps[QMP_CAPABILITY__MAX];
++    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
++    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
+     /*
+      * Protects qmp request/response queue.  Please take monitor_lock
+      * first when used together.
+@@ -1252,52 +1253,56 @@ static void monitor_init_qmp_commands(void)
+                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
  }
-@@ -1270,7 +1270,7 @@ static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
-         assert(list->value < QMP_CAPABILITY__MAX);
-         switch (list->value) {
-         case QMP_CAPABILITY_OOB:
--            if (!mon->use_io_thr) {
-+            if (!mon->use_io_thread) {
-                 /*
-                  * Out-of-band only works with monitors that are
-                  * running on dedicated I/O thread.
-@@ -4376,7 +4376,7 @@ void monitor_resume(Monitor *mon)
-              * For QMP monitors that are running in I/O thread, let's
-              * kick the thread in case it's sleeping.
-              */
--            if (mon->use_io_thr) {
-+            if (mon->use_io_thread) {
-                 aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
+ 
+-static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
+-{
+-    return mon->qmp.qmp_caps[cap];
+-}
+-
+ static bool qmp_oob_enabled(Monitor *mon)
+ {
+-    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
++    return mon->qmp.capab[QMP_CAPABILITY_OOB];
+ }
+ 
+-static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
+-                           Error **errp)
++static void monitor_qmp_caps_reset(Monitor *mon)
+ {
++    memset(mon->qmp.capab_offered, 0, sizeof(mon->qmp.capab_offered));
++    memset(mon->qmp.capab, 0, sizeof(mon->qmp.capab));
++    mon->qmp.capab_offered[QMP_CAPABILITY_OOB] = mon->use_io_thread;
++}
++
++/*
++ * Accept QMP capabilities in @list for @mon.
++ * On success, set mon->qmp.capab[], and return true.
++ * On error, set @errp, and return false.
++ */
++static bool qmp_caps_accept(Monitor *mon, QMPCapabilityList *list,
++                            Error **errp)
++{
++    GString *unavailable = NULL;
++    bool capab[QMP_CAPABILITY__MAX];
++
++    memset(capab, 0, sizeof(capab));
++
+     for (; list; list = list->next) {
+-        assert(list->value < QMP_CAPABILITY__MAX);
+-        switch (list->value) {
+-        case QMP_CAPABILITY_OOB:
+-            if (!mon->use_io_thread) {
+-                /*
+-                 * Out-of-band only works with monitors that are
+-                 * running on dedicated I/O thread.
+-                 */
+-                error_setg(errp, "This monitor does not support "
+-                           "out-of-band (OOB)");
+-                return;
++        if (!mon->qmp.capab_offered[list->value]) {
++            if (!unavailable) {
++                unavailable = g_string_new(QMPCapability_str(list->value));
++            } else {
++                g_string_append_printf(unavailable, ", %s",
++                                      QMPCapability_str(list->value));
              }
-         } else {
-@@ -4396,7 +4396,7 @@ static QObject *get_qmp_greeting(Monitor *mon)
+-            break;
+-        default:
+-            break;
+         }
++        capab[list->value] = true;
+     }
+-}
+ 
+-/* This function should only be called after capabilities are checked. */
+-static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
+-{
+-    for (; list; list = list->next) {
+-        mon->qmp.qmp_caps[list->value] = true;
++    if (unavailable) {
++        error_setg(errp, "Capability %s not available", unavailable->str);
++        g_string_free(unavailable, true);
++        return false;
+     }
++
++    memcpy(mon->qmp.capab, capab, sizeof(capab));
++    return true;
+ }
+ 
+ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+                           Error **errp)
+ {
+-    Error *local_err = NULL;
+-
+     if (cur_mon->qmp.commands == &qmp_commands) {
+         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+                   "Capabilities negotiation is already complete, command "
+@@ -1305,19 +1310,8 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+         return;
+     }
+ 
+-    /* Enable QMP capabilities provided by the client if applicable. */
+-    if (has_enable) {
+-        qmp_caps_check(cur_mon, enable, &local_err);
+-        if (local_err) {
+-            /*
+-             * Failed check on any of the capabilities will fail the
+-             * entire command (and thus not apply any of the other
+-             * capabilities that were also requested).
+-             */
+-            error_propagate(errp, local_err);
+-            return;
+-        }
+-        qmp_caps_apply(cur_mon, enable);
++    if (!qmp_caps_accept(cur_mon, enable, errp)) {
++        return;
+     }
+ 
+     cur_mon->qmp.commands = &qmp_commands;
+@@ -4384,11 +4378,9 @@ static QDict *qmp_greeting(Monitor *mon)
      qmp_marshal_query_version(NULL, &ver, NULL);
  
      for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
--        if (!mon->use_io_thr && cap == QMP_CAPABILITY_OOB) {
-+        if (!mon->use_io_thread && cap == QMP_CAPABILITY_OOB) {
-             /* Monitors that are not using I/O thread won't support OOB */
-             continue;
+-        if (!mon->use_io_thread && cap == QMP_CAPABILITY_OOB) {
+-            /* Monitors that are not using I/O thread won't support OOB */
+-            continue;
++        if (mon->qmp.capab_offered[cap]) {
++            qlist_append_str(cap_list, QMPCapability_str(cap));
          }
-@@ -4609,9 +4609,9 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
-     Monitor *mon = opaque;
-     GMainContext *context;
+-        qlist_append_str(cap_list, QMPCapability_str(cap));
+     }
  
--    if (mon->use_io_thr) {
-+    if (mon->use_io_thread) {
-         /*
--         * When use_io_thr is set, we use the global shared dedicated
-+         * When @use_io_thread is set, we use the global shared dedicated
-          * I/O thread for this monitor to handle input/output.
-          */
-         context = monitor_get_io_context();
-@@ -4660,7 +4660,7 @@ void monitor_init(Chardev *chr, int flags)
-     if (monitor_is_qmp(mon)) {
-         qemu_chr_fe_set_echo(&mon->chr, true);
-         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
--        if (mon->use_io_thr) {
-+        if (mon->use_io_thread) {
-             /*
-              * Make sure the old iowatch is gone.  It's possible when
-              * e.g. the chardev is in client mode, with wait=on.
+     return qdict_from_jsonf_nofail(
+@@ -4396,11 +4388,6 @@ static QDict *qmp_greeting(Monitor *mon)
+         ver, cap_list);
+ }
+ 
+-static void monitor_qmp_caps_reset(Monitor *mon)
+-{
+-    memset(mon->qmp.qmp_caps, 0, sizeof(mon->qmp.qmp_caps));
+-}
+-
+ static void monitor_qmp_event(void *opaque, int event)
+ {
+     QDict *data;
 -- 
 2.17.1
