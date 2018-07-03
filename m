@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1faOpN-0003T7-7l
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 13:10:58 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1faOpO-0003UP-I7
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 13:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1faOpM-0005Ea-BS
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 13:10:57 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1faOpN-0005Ff-KR
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 13:10:58 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  3 Jul 2018 18:10:40 +0100
-Message-Id: <20180703171044.9503-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-3.0 0/4] cmsdk-apb-timer: various bugfixes
+Date: Tue,  3 Jul 2018 18:10:44 +0100
+Message-Id: <20180703171044.9503-5-peter.maydell@linaro.org>
+In-Reply-To: <20180703171044.9503-1-peter.maydell@linaro.org>
+References: <20180703171044.9503-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH for-3.0 4/4] hw/timer/cmsdk-apb-timer: run or
+ stop timer on writes to RELOAD and VALUE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,43 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Guenter Roeck <linux@roeck-us.net>
 
-This patchseries includes Guenter's recent patch to suppress
-warning messages from the ptimer layer that otherwise occur
-from the way the Linux driver for this timer device operates.
+If the CMSDK APB timer is set up with a zero RELOAD value
+then it will count down to zero, fire once and then stay
+at zero. From the point of view of the ptimer system, the
+timer is disabled; but the enable bit in the CTRL register
+is still set and if the guest subsequently writes to the
+RELOAD or VALUE registers this should cause the timer to
+start counting down again.
 
-The other patches here fix more obscure things:
- * the timer interrupt is only supposed to trigger when the
-   counter counts down from 1 to 0, not if it is at 0 for
-   some other reason like a direct write of 0 to the VALUE register.
-   Handling this requires adding a new policy option to the ptimer
-   code, which is what patch 1 does.
- * we were incorrectly setting the NO_IMMEDIATE_TRIGGER
-   ptimer policy, which meant we would trigger the interrupt
-   one timer clock too late (when we did the timer reload,
-   rather than on the 1-to-0 counter transition)
- * if the ptimer had already disabled itself because it was
-   in one-shot mode and had expired, writing to RELOAD or
-   VALUE needs to cause it to start counting again
+Add code to the write paths for RELOAD and VALUE so that
+we correctly restart the timer in this situation.
 
-Tested with a uCLinux/mps2 kernel and buildroot initfs.
+Conversely, if the new RELOAD and VALUE are both zero,
+we should stop the ptimer.
 
-thanks
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/timer/cmsdk-apb-timer.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Guenter Roeck (1):
-  hw/timer/cmsdk-apb-timer: Correctly identify and set one-shot mode
-
-Peter Maydell (3):
-  ptimer: Add TRIGGER_ONLY_ON_DECREMENT policy option
-  hw/timer/cmsdk-apb-timer: Correct ptimer policy settings
-  hw/timer/cmsdk-apb-timer: run or stop timer on writes to RELOAD and
-    VALUE
-
- include/hw/ptimer.h        |  9 +++++++++
- hw/core/ptimer.c           | 22 +++++++++++++++++++++-
- hw/timer/cmsdk-apb-timer.c | 20 ++++++++++++++++++--
- tests/ptimer-test.c        | 25 +++++++++++++++++++------
- 4 files changed, 67 insertions(+), 9 deletions(-)
-
+diff --git a/hw/timer/cmsdk-apb-timer.c b/hw/timer/cmsdk-apb-timer.c
+index 3ebdc7be408..801d1dba741 100644
+--- a/hw/timer/cmsdk-apb-timer.c
++++ b/hw/timer/cmsdk-apb-timer.c
+@@ -126,10 +126,26 @@ static void cmsdk_apb_timer_write(void *opaque, hwaddr offset, uint64_t value,
+         break;
+     case A_RELOAD:
+         /* Writing to reload also sets the current timer value */
++        if (!value) {
++            ptimer_stop(s->timer);
++        }
+         ptimer_set_limit(s->timer, value, 1);
++        if (value && (s->ctrl & R_CTRL_EN_MASK)) {
++            /*
++             * Make sure timer is running (it might have stopped if this
++             * was an expired one-shot timer)
++             */
++            ptimer_run(s->timer, 0);
++        }
+         break;
+     case A_VALUE:
++        if (!value && !ptimer_get_limit(s->timer)) {
++            ptimer_stop(s->timer);
++        }
+         ptimer_set_count(s->timer, value);
++        if (value && (s->ctrl & R_CTRL_EN_MASK)) {
++            ptimer_run(s->timer, ptimer_get_limit(s->timer) == 0);
++        }
+         break;
+     case A_INTSTATUS:
+         /* Just one bit, which is W1C. */
 -- 
 2.17.1
