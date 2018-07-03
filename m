@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1faOGY-0007rF-DY
+	(envelope-from <laurent@vivier.eu>) id 1faOGY-0007r8-9u
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1faOGU-0005aV-GI
+	(envelope-from <laurent@vivier.eu>) id 1faOGU-0005aH-BY
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:34:58 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:51501)
+Received: from mout.kundenserver.de ([212.227.126.130]:48403)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1faOGU-0005Zs-6I
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1faOGU-0005Zn-0X
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:34:54 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  3 Jul 2018 18:34:45 +0200
-Message-Id: <20180703163451.16936-2-laurent@vivier.eu>
+Date: Tue,  3 Jul 2018 18:34:47 +0200
+Message-Id: <20180703163451.16936-4-laurent@vivier.eu>
 In-Reply-To: <20180703163451.16936-1-laurent@vivier.eu>
 References: <20180703163451.16936-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 1/7] qemu-binfmt-conf.sh: cleanup --credential
+Subject: [Qemu-devel] [PULL 3/7] qemu-binfmt-conf.sh: allow to provide a
+ suffix to the interpreter name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +27,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-move credential value to its own variable to be able to manage
-more flags
+some distros provide a qemu-CPU-static binary beside the qemu-CPU one.
+This change allows to use it by providing "--qemu-suffix -static" to the
+script.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180627205317.10343-2-laurent@vivier.eu>
+Message-Id: <20180627205317.10343-4-laurent@vivier.eu>
 ---
- scripts/qemu-binfmt-conf.sh | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ scripts/qemu-binfmt-conf.sh | 41 ++++++++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 17 deletions(-)
 
 diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index d7eefda0b8..9900554608 100755
+index 00c9c3aa16..23df00ae30 100755
 --- a/scripts/qemu-binfmt-conf.sh
 +++ b/scripts/qemu-binfmt-conf.sh
-@@ -241,7 +241,12 @@ qemu_check_systemd() {
- }
+@@ -161,25 +161,26 @@ usage() {
+     cat <<EOF
+ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+                            [--help][--credential yes|no][--exportdir PATH]
+-                           [--persistent yes|no]
++                           [--persistent yes|no][--qemu-suffix SUFFIX]
  
- qemu_generate_register() {
--    echo ":qemu-$cpu:M::$magic:$mask:$qemu:$FLAGS"
-+    flags=""
-+    if [ "$CREDENTIAL" = "yes" ] ; then
-+        flags="OC"
-+    fi
-+
-+    echo ":qemu-$cpu:M::$magic:$mask:$qemu:$flags"
- }
+        Configure binfmt_misc to use qemu interpreter
  
- qemu_register_interpreter() {
-@@ -260,10 +265,8 @@ package qemu-$cpu
- interpreter $qemu
- magic $magic
- mask $mask
-+credential $CREDENTIAL
- EOF
--    if [ "$FLAGS" = "OC" ] ; then
--        echo "credentials yes" >> "$EXPORTDIR/qemu-$cpu"
--    fi
- }
+-       --help:       display this usage
+-       --qemu-path:  set path to qemu interpreter ($QEMU_PATH)
+-       --debian:     don't write into /proc,
+-                     instead generate update-binfmts templates
+-       --systemd:    don't write into /proc,
+-                     instead generate file for systemd-binfmt.service
+-                     for the given CPU. If CPU is "ALL", generate a
+-                     file for all known cpus
+-       --exportdir:  define where to write configuration files
+-                     (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential: if yes, credential and security tokens are
+-                     calculated according to the binary to interpret
+-       --persistent: if yes, the interpreter is loaded when binfmt is
+-                     configured and remains in memory. All future uses
+-                     are cloned from the open file.
++       --help:        display this usage
++       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
++       --qemu-suffix: add a suffix to the default interpreter name
++       --debian:      don't write into /proc,
++                      instead generate update-binfmts templates
++       --systemd:     don't write into /proc,
++                      instead generate file for systemd-binfmt.service
++                      for the given CPU. If CPU is "ALL", generate a
++                      file for all known cpus
++       --exportdir:   define where to write configuration files
++                      (default: $SYSTEMDDIR or $DEBIANDIR)
++       --credential:  if yes, credential and security tokens are
++                      calculated according to the binary to interpret
++       --persistent:  if yes, the interpreter is loaded when binfmt is
++                      configured and remains in memory. All future uses
++                      are cloned from the open file.
  
- qemu_set_binfmts() {
-@@ -300,7 +303,7 @@ SYSTEMDDIR="/etc/binfmt.d"
- DEBIANDIR="/usr/share/binfmts"
+     To import templates with update-binfmts, use :
  
+@@ -297,6 +298,7 @@ qemu_set_binfmts() {
+             qemu="$QEMU_PATH/qemu-i386"
+         fi
+ 
++        qemu="$qemu$QEMU_SUFFIX"
+         if [ "$host_family" != "$family" ] ; then
+             $BINFMT_SET
+         fi
+@@ -312,8 +314,9 @@ DEBIANDIR="/usr/share/binfmts"
  QEMU_PATH=/usr/local/bin
--FLAGS=""
-+CREDENTIAL=no
+ CREDENTIAL=no
+ PERSISTENT=no
++QEMU_SUFFIX=""
  
- options=$(getopt -o ds:Q:e:hc: -l debian,systemd:,qemu-path:,exportdir:,help,credential: -- "$@")
+-options=$(getopt -o ds:Q:e:hc:p: -l debian,systemd:,qemu-path:,exportdir:,help,credential:,persistent: -- "$@")
++options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
  eval set -- "$options"
-@@ -348,11 +351,7 @@ while true ; do
-         ;;
-     -c|--credential)
+ 
+ while true ; do
+@@ -349,6 +352,10 @@ while true ; do
          shift
--        if [ "$1" = "yes" ] ; then
--            FLAGS="OC"
--        else
--            FLAGS=""
--        fi
-+        CREDENTIAL="$1"
+         QEMU_PATH="$1"
          ;;
-     *)
-         break
++    -F|--qemu-suffix)
++        shift
++        QEMU_SUFFIX="$1"
++        ;;
+     -e|--exportdir)
+         shift
+         EXPORTDIR="$1"
 -- 
 2.17.1
