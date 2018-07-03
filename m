@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSy0-0008CT-Ei
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1faSxw-00086O-BA
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxt-0006Cr-4n
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32924 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faSxr-00069h-Lw
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34292 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxs-0006Aw-TD
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxr-00068g-Fh
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A1CF81A4EAF
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:36:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0408E407564B
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:59 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id ED5CE111C4A0
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B6D0B2156889
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 23:35:55 +0200
-Message-Id: <20180703213556.20619-32-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:35 +0200
+Message-Id: <20180703213556.20619-12-armbru@redhat.com>
 In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
 References: <20180703213556.20619-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 31/32] monitor: Improve some comments
+Subject: [Qemu-devel] [PULL v2 11/32] qmp qemu-ga: Fix qemu-ga not to accept
+ "control"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,293 +36,229 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Commit cf869d53172 "qmp: support out-of-band (oob) execution"
+accidentally made qemu-ga accept and ignore "control".  Fix that.
+
+Out-of-band execution in a monitor that doesn't support it now fails
+with
+
+    {"error": {"class": "GenericError", "desc": "QMP input member 'control' is unexpected"}}
+
+instead of
+
+    {"error": {"class": "GenericError", "desc": "Please enable out-of-band first for the session during capabilities negotiation"}}
+
+The old description is suboptimal when out-of-band cannot not be
+enabled, or the command doesn't support out-of-band execution.
+
+The new description is a bit unspecific, but it'll do.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-32-armbru@redhat.com>
+Message-Id: <20180703085358.13941-12-armbru@redhat.com>
 ---
- monitor.c | 100 ++++++++++++++++++++++++------------------------------
- 1 file changed, 45 insertions(+), 55 deletions(-)
+ include/qapi/qmp/dispatch.h |  6 ++++--
+ monitor.c                   |  9 ++-------
+ qapi/qmp-dispatch.c         | 14 ++++++++------
+ qga/main.c                  |  2 +-
+ tests/test-qga.c            |  9 +++++----
+ tests/test-qmp-cmds.c       |  8 ++++----
+ 6 files changed, 24 insertions(+), 24 deletions(-)
 
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index b366bb48bd..303a15ba84 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -41,7 +41,6 @@ void qmp_register_command(QmpCommandList *cmds, const char *name,
+                           QmpCommandFunc *fn, QmpCommandOptions options);
+ void qmp_unregister_command(QmpCommandList *cmds, const char *name);
+ QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
+-QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request);
+ void qmp_disable_command(QmpCommandList *cmds, const char *name);
+ void qmp_enable_command(QmpCommandList *cmds, const char *name);
+ 
+@@ -49,7 +48,10 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QObject *qmp_build_error_object(Error *err);
+-QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp);
++QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
++                              Error **errp);
++QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++                      bool allow_oob);
+ bool qmp_is_oob(QDict *dict);
+ 
+ typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
 diff --git a/monitor.c b/monitor.c
-index f8b88ba105..511795365b 100644
+index 7245ee37ce..2e443bba13 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -169,15 +169,16 @@ typedef struct {
-     JSONMessageParser parser;
-     /*
-      * When a client connects, we're in capabilities negotiation mode.
--     * When command qmp_capabilities succeeds, we go into command
--     * mode.
-+     * @commands is &qmp_cap_negotiation_commands then.  When command
-+     * qmp_capabilities succeeds, we go into command mode, and
-+     * @command becomes &qmp_commands.
-      */
-     QmpCommandList *commands;
-     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-     /*
--     * Protects qmp request/response queue.  Please take monitor_lock
--     * first when used together.
-+     * Protects qmp request/response queue.
-+     * Take monitor_lock first when you need both.
-      */
-     QemuMutex qmp_queue_lock;
-     /* Input queue that holds all the parsed QMP requests */
-@@ -232,7 +233,7 @@ struct Monitor {
-     QemuMutex mon_lock;
- 
-     /*
--     * Fields that are protected by the per-monitor lock.
-+     * Members that are protected by the per-monitor lock
-      */
-     QLIST_HEAD(, mon_fd_t) fds;
-     QString *outbuf;
-@@ -241,6 +242,7 @@ struct Monitor {
-     int mux_out;
- };
- 
-+/* Shared monitor I/O thread */
- IOThread *mon_iothread;
- 
- /* Bottom half to dispatch the requests received from I/O thread */
-@@ -302,9 +304,9 @@ static inline bool monitor_is_qmp(const Monitor *mon)
- }
- 
- /**
-- * Whether @mon is using readline?  Note: not all HMP monitors use
-- * readline, e.g., gdbserver has a non-interactive HMP monitor, so
-- * readline is not used there.
-+ * Is @mon is using readline?
-+ * Note: not all HMP monitors use readline, e.g., gdbserver has a
-+ * non-interactive HMP monitor, so readline is not used there.
-  */
- static inline bool monitor_uses_readline(const Monitor *mon)
- {
-@@ -318,14 +320,12 @@ static inline bool monitor_is_hmp_non_interactive(const Monitor *mon)
- 
- /*
-  * Return the clock to use for recording an event's time.
-+ * It's QEMU_CLOCK_REALTIME, except for qtests it's
-+ * QEMU_CLOCK_VIRTUAL, to support testing rate limits.
-  * Beware: result is invalid before configure_accelerator().
-  */
- static inline QEMUClockType monitor_get_event_clock(void)
- {
--    /*
--     * This allows us to perform tests on the monitor queues to verify
--     * that the rate limits are enforced.
--     */
-     return qtest_enabled() ? QEMU_CLOCK_VIRTUAL : QEMU_CLOCK_REALTIME;
- }
- 
-@@ -368,7 +368,7 @@ static void qmp_request_free(QMPRequest *req)
-     g_free(req);
- }
- 
--/* Must with the mon->qmp.qmp_queue_lock held */
-+/* Caller must hold mon->qmp.qmp_queue_lock */
- static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
- {
-     while (!g_queue_is_empty(mon->qmp.qmp_requests)) {
-@@ -376,7 +376,7 @@ static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
-     }
- }
- 
--/* Must with the mon->qmp.qmp_queue_lock held */
-+/* Caller must hold the mon->qmp.qmp_queue_lock */
- static void monitor_qmp_cleanup_resp_queue_locked(Monitor *mon)
- {
-     while (!g_queue_is_empty(mon->qmp.qmp_responses)) {
-@@ -407,7 +407,7 @@ static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
-     return FALSE;
- }
- 
--/* Called with mon->mon_lock held.  */
-+/* Caller must hold mon->mon_lock */
- static void monitor_flush_locked(Monitor *mon)
- {
-     int rc;
-@@ -523,10 +523,8 @@ static void qmp_queue_response(Monitor *mon, QDict *rsp)
- {
-     if (mon->use_io_thread) {
-         /*
--         * If using I/O thread, we need to queue the item so that I/O
--         * thread will do the rest for us.  Take refcount so that
--         * caller won't free the data (which will be finally freed in
--         * responder thread).
-+         * Push a reference to the response queue.  The I/O thread
-+         * drains that queue and emits.
-          */
-         qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-         g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(rsp));
-@@ -534,8 +532,8 @@ static void qmp_queue_response(Monitor *mon, QDict *rsp)
-         qemu_bh_schedule(qmp_respond_bh);
-     } else {
-         /*
--         * If not using monitor I/O thread, then we are in main thread.
--         * Do the emission right away.
-+         * Not using monitor I/O thread, i.e. we are in the main thread.
-+         * Emit right away.
-          */
-         qmp_send_response(mon, rsp);
-     }
-@@ -611,8 +609,9 @@ static MonitorQAPIEventConf monitor_qapi_event_conf[QAPI_EVENT__MAX] = {
- };
- 
- /*
-- * Emits the event to every monitor instance, @event is only used for trace
-- * Called with monitor_lock held.
-+ * Broadcast an event to all monitors.
-+ * @qdict is the event object.  Its member "event" must match @event.
-+ * Caller must hold monitor_lock.
-  */
- static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
- {
-@@ -981,8 +980,7 @@ static int parse_cmdline(const char *cmdline,
- }
- 
- /*
-- * Returns true if the command can be executed in preconfig mode
-- * i.e. it has the 'p' flag.
-+ * Can command @cmd be executed in preconfig state?
-  */
- static bool cmd_can_preconfig(const mon_cmd_t *cmd)
- {
-@@ -2221,7 +2219,7 @@ void qmp_getfd(const char *fdname, Error **errp)
-         tmp_fd = monfd->fd;
-         monfd->fd = fd;
-         qemu_mutex_unlock(&cur_mon->mon_lock);
--        /* Make sure close() is out of critical section */
-+        /* Make sure close() is outside critical section */
-         close(tmp_fd);
-         return;
-     }
-@@ -2250,7 +2248,7 @@ void qmp_closefd(const char *fdname, Error **errp)
-         g_free(monfd->name);
-         g_free(monfd);
-         qemu_mutex_unlock(&cur_mon->mon_lock);
--        /* Make sure close() is out of critical section */
-+        /* Make sure close() is outside critical section */
-         close(tmp_fd);
-         return;
-     }
-@@ -4139,7 +4137,8 @@ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
- }
- 
- /*
-- * Pop one QMP request from monitor queues, return NULL if not found.
-+ * Pop a QMP request from a monitor request queue.
-+ * Return the request, or NULL all request queues are empty.
-  * We are using round-robin fashion to pop the request, to avoid
-  * processing commands only on a very busy monitor.  To achieve that,
-  * when we process one request on a specific monitor, we put that
-@@ -4234,7 +4233,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+@@ -1319,11 +1319,6 @@ static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
      }
  
-     if (qdict && qmp_is_oob(qdict)) {
--        /* Out-of-band (OOB) requests are executed directly in parser. */
-+        /* OOB commands are executed immediately */
-         trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
-                                           ?: "");
-         monitor_qmp_dispatch(mon, req, id);
-@@ -4356,8 +4355,8 @@ void monitor_resume(Monitor *mon)
-     if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
-         if (monitor_is_qmp(mon)) {
-             /*
--             * For QMP monitors that are running in I/O thread, let's
--             * kick the thread in case it's sleeping.
-+             * For QMP monitors that are running in the I/O thread,
-+             * let's kick the thread in case it's sleeping.
-              */
-             if (mon->use_io_thread) {
-                 aio_notify(iothread_get_aio_context(mon_iothread));
-@@ -4505,18 +4504,18 @@ static void monitor_iothread_init(void)
-     mon_iothread = iothread_create("mon_iothread", &error_abort);
+     if (qmp_is_oob(req)) {
+-        if (!qmp_oob_enabled(mon)) {
+-            error_setg(errp, "Please enable out-of-band first "
+-                       "for the session during capabilities negotiation");
+-            return false;
+-        }
+         if (!(cmd->options & QCO_ALLOW_OOB)) {
+             error_setg(errp, "The command %s does not support OOB",
+                        command);
+@@ -4195,7 +4190,7 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+     old_mon = cur_mon;
+     cur_mon = mon;
  
-     /*
--     * This MUST be on main loop thread since we have commands that
--     * have assumption to be run on main loop thread.  It would be
--     * nice that one day we can remove this assumption in the future.
-+     * The dispatcher BH must run in the main loop thread, since we
-+     * have commands assuming that context.  It would be nice to get
-+     * rid of those assumptions.
-      */
-     qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
-                                    monitor_qmp_bh_dispatcher,
-                                    NULL);
+-    rsp = qmp_dispatch(mon->qmp.commands, req);
++    rsp = qmp_dispatch(mon->qmp.commands, req, qmp_oob_enabled(mon));
  
-     /*
--     * Unlike the dispatcher BH, this must be run on the monitor I/O
--     * thread, so that monitors that are using I/O thread will make
--     * sure read/write operations are all done on the I/O thread.
-+     * The responder BH must be run in the monitor I/O thread, so that
-+     * monitors that are using the I/O thread have their output
-+     * written by the I/O thread.
-      */
-     qmp_respond_bh = aio_bh_new(monitor_get_aio_context(),
-                                 monitor_qmp_bh_responder,
-@@ -4586,15 +4585,11 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
-     GMainContext *context;
+     cur_mon = old_mon;
  
-     if (mon->use_io_thread) {
--        /*
--         * When @use_io_thread is set, we use the global shared dedicated
--         * I/O thread for this monitor to handle input/output.
--         */
-+        /* Use @mon_iothread context */
-         context = monitor_get_io_context();
--        /* We should have inited globals before reaching here. */
-         assert(context);
-     } else {
--        /* The default main loop, which is the main thread */
-+        /* Use default main loop context */
-         context = NULL;
+@@ -4286,7 +4281,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+     } /* else will fail qmp_dispatch() */
+ 
+     /* Check against the request in general layout */
+-    qdict = qmp_dispatch_check_obj(req, &err);
++    qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
+     if (!qdict) {
+         goto err;
      }
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 3d5d5e110f..0ad0fab8ed 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -20,7 +20,8 @@
+ #include "qapi/qmp/qbool.h"
+ #include "sysemu/sysemu.h"
  
-@@ -4644,15 +4639,12 @@ void monitor_init(Chardev *chr, int flags)
-             remove_fd_in_watch(chr);
-             /*
-              * We can't call qemu_chr_fe_set_handlers() directly here
--             * since during the procedure the chardev will be active
--             * and running in monitor I/O thread, while we'll still do
--             * something before returning from it, which is a possible
--             * race too.  To avoid that, we just create a BH to setup
--             * the handlers.
-+             * since chardev might be running in the monitor I/O
-+             * thread.  Schedule a bottom half.
-              */
-             aio_bh_schedule_oneshot(monitor_get_aio_context(),
-                                     monitor_qmp_setup_handlers_bh, mon);
--            /* We'll add this to mon_list in the BH when setup done */
-+            /* The bottom half will add @mon to @mon_list */
-             return;
-         } else {
-             qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
-@@ -4673,21 +4665,19 @@ void monitor_cleanup(void)
+-QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
++QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
++                              Error **errp)
+ {
+     const QDictEntry *ent;
+     const char *arg_name;
+@@ -52,7 +53,7 @@ QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+                            "QMP input member 'arguments' must be an object");
+                 return NULL;
+             }
+-        } else if (!strcmp(arg_name, "control")) {
++        } else if (!strcmp(arg_name, "control") && allow_oob) {
+             if (qobject_type(arg_obj) != QTYPE_QDICT) {
+                 error_setg(errp,
+                            "QMP input member 'control' must be a dict");
+@@ -74,7 +75,7 @@ QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ }
  
-     /*
-      * We need to explicitly stop the I/O thread (but not destroy it),
--     * cleanup the monitor resources, then destroy the I/O thread since
-+     * clean up the monitor resources, then destroy the I/O thread since
-      * we need to unregister from chardev below in
-      * monitor_data_destroy(), and chardev is not thread-safe yet
-      */
-     iothread_stop(mon_iothread);
+ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+-                                Error **errp)
++                                bool allow_oob, Error **errp)
+ {
+     Error *local_err = NULL;
+     const char *command;
+@@ -82,7 +83,7 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+     QmpCommand *cmd;
+     QObject *ret = NULL;
  
-     /*
--     * After we have I/O thread to send responses, it's possible that
--     * when we stop the I/O thread there are still replies queued in the
--     * responder queue.  Flush all of them.  Note that even after this
--     * flush it's still possible that out buffer is not flushed.
--     * It'll be done in below monitor_flush() as the last resort.
-+     * Flush all response queues.  Note that even after this flush,
-+     * data may remain in output buffers.
-      */
-     monitor_qmp_bh_responder(NULL);
+-    dict = qmp_dispatch_check_obj(request, errp);
++    dict = qmp_dispatch_check_obj(request, allow_oob, errp);
+     if (!dict) {
+         return NULL;
+     }
+@@ -157,13 +158,14 @@ bool qmp_is_oob(QDict *dict)
+     return qbool_get_bool(bool_obj);
+ }
  
-+    /* Flush output buffers and destroy monitors */
-     qemu_mutex_lock(&monitor_lock);
-     QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-         QTAILQ_REMOVE(&mon_list, mon, entry);
+-QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request)
++QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++                      bool allow_oob)
+ {
+     Error *err = NULL;
+     QObject *ret;
+     QDict *rsp;
+ 
+-    ret = do_qmp_dispatch(cmds, request, &err);
++    ret = do_qmp_dispatch(cmds, request, allow_oob, &err);
+ 
+     rsp = qdict_new();
+     if (err) {
+diff --git a/qga/main.c b/qga/main.c
+index ea7540edcc..d332bacce5 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -586,7 +586,7 @@ static void process_command(GAState *s, QDict *req)
+ 
+     g_assert(req);
+     g_debug("processing command");
+-    rsp = qmp_dispatch(&ga_commands, QOBJECT(req));
++    rsp = qmp_dispatch(&ga_commands, QOBJECT(req), false);
+     if (rsp) {
+         ret = send_response(s, rsp);
+         if (ret < 0) {
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 2e9e0f73bb..febabc7ad5 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -245,16 +245,17 @@ static void test_qga_invalid_id(gconstpointer fix)
+ 
+ static void test_qga_invalid_oob(gconstpointer fix)
+ {
+-    /* FIXME "control" is ignored; it should be rejected */
+     const TestFixture *fixture = fix;
+-    QDict *ret;
++    QDict *ret, *error;
++    const char *class;
+ 
+     ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping',"
+                  " 'control': {'run-oob': true}}");
+     g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+ 
+-    qdict_get_qdict(ret, "return");
++    error = qdict_get_qdict(ret, "error");
++    class = qdict_get_try_str(error, "class");
++    g_assert_cmpstr(class, ==, "GenericError");
+ 
+     qobject_unref(ret);
+ }
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 491b0c4a44..10c7ba40c1 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -102,7 +102,7 @@ static void test_dispatch_cmd(void)
+ 
+     qdict_put_str(req, "execute", "user_def_cmd");
+ 
+-    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp != NULL);
+     assert(!qdict_haskey(qobject_to(QDict, resp), "error"));
+ 
+@@ -119,7 +119,7 @@ static void test_dispatch_cmd_failure(void)
+ 
+     qdict_put_str(req, "execute", "user_def_cmd2");
+ 
+-    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp != NULL);
+     assert(qdict_haskey(qobject_to(QDict, resp), "error"));
+ 
+@@ -133,7 +133,7 @@ static void test_dispatch_cmd_failure(void)
+ 
+     qdict_put_str(req, "execute", "user_def_cmd");
+ 
+-    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp != NULL);
+     assert(qdict_haskey(qobject_to(QDict, resp), "error"));
+ 
+@@ -147,7 +147,7 @@ static QObject *test_qmp_dispatch(QDict *req)
+     QDict *resp;
+     QObject *ret;
+ 
+-    resp_obj = qmp_dispatch(&qmp_commands, QOBJECT(req));
++    resp_obj = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp_obj);
+     resp = qobject_to(QDict, resp_obj);
+     assert(resp && !qdict_haskey(resp, "error"));
 -- 
 2.17.1
