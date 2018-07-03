@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <claunia@claunia.com>) id 1faSxE-0007e5-SM
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1faSxt-00083J-Pj
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <claunia@claunia.com>) id 1faSxB-0005ba-GJ
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:20 -0400
-Received: from [107.174.70.112] (port=42944 helo=mail2.claunia.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <claunia@claunia.com>) id 1faSxB-0005ap-8q
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:17 -0400
-References: <20180630083357.23489-1-huth@tuxfamily.org>
-	<bb109e75-6c00-45b2-bb17-7d09ff3a8112@ilande.co.uk>
-	<20180630151444.2f0b30cb@thl530.multi.box>
-	<CAFEAcA_wo8t2CTRj4oizRPUbG7fa0MgdACpAnLvR53Pp+piLjQ@mail.gmail.com>
-	<20180630153422.03f0146f@thl530.multi.box>
-	<CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
-From: Natalia Portillo <claunia@claunia.com>
-Message-ID: <038e1df0-7e13-ac6f-4e5e-5a8e41c0f54d@claunia.com>
-Date: Tue, 3 Jul 2018 21:58:33 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r"
-Subject: Re: [Qemu-devel] [PATCH v1 0/4] m68k: Add basic support for the
- NeXTcube machine
+	(envelope-from <armbru@redhat.com>) id 1faSxq-00067R-Jd
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52326 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxq-00066J-Bx
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB492C326
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
+	[10.36.116.126])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 970D22166BA9
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:57 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:28 +0200
+Message-Id: <20180703213556.20619-5-armbru@redhat.com>
+In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
+References: <20180703213556.20619-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v2 04/32] qmp: Document COMMAND_DROPPED design
+ flaw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bryce Lanham <blanham@gmail.com>, Thomas Huth <huth@tuxfamily.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r
-From: Natalia Portillo <claunia@claunia.com>
-To: Bryce Lanham <blanham@gmail.com>, Thomas Huth <huth@tuxfamily.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
-Message-ID: <038e1df0-7e13-ac6f-4e5e-5a8e41c0f54d@claunia.com>
-Subject: Re: [Qemu-devel] [PATCH v1 0/4] m68k: Add basic support for the
- NeXTcube machine
-References: <20180630083357.23489-1-huth@tuxfamily.org>
- <bb109e75-6c00-45b2-bb17-7d09ff3a8112@ilande.co.uk>
- <20180630151444.2f0b30cb@thl530.multi.box>
- <CAFEAcA_wo8t2CTRj4oizRPUbG7fa0MgdACpAnLvR53Pp+piLjQ@mail.gmail.com>
- <20180630153422.03f0146f@thl530.multi.box>
- <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
-In-Reply-To: <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Events are broadcast to all monitors.  If another monitor's client has
+a command with the same ID in flight, the event will incorrectly claim
+that command was dropped.  This must be fixed before out-of-band
+execution can graduate from "experimental".
 
-Now you've made me subscribe again to qemu-devel ;)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180703085358.13941-5-armbru@redhat.com>
+---
+ monitor.c      | 6 ++++++
+ qapi/misc.json | 3 +++
+ 2 files changed, 9 insertions(+)
 
-On 30/06/18 18:07, Bryce Lanham wrote:
-> Oh hi!=C2=A0
->=20
-> Luckily gmail brought this to the top since I don=E2=80=99t pay attenti=
-on to the
-> list. I=E2=80=99m away from my computer at the moment, but I had more t=
-han this
-> working, including interrupts, Ethernet, and SCSI for sure.
-> (https://i.imgur.com/Py0FO.png)=C2=A0I=E2=80=99d love to dive back into=
- this now that
-> 68040 support is complete and merged.
->=20
->=20
-> On Sat, Jun 30, 2018 at 8:34 AM, Thomas Huth <huth@tuxfamily.org
-> <mailto:huth@tuxfamily.org>> wrote:
->=20
->     Am Sat, 30 Jun 2018 14:17:32 +0100
->     schrieb Peter Maydell <peter.maydell@linaro.org
->     <mailto:peter.maydell@linaro.org>>:
->=20
->     > On 30 June 2018 at 14:14, Thomas Huth <huth@tuxfamily.org <mailto=
-:huth@tuxfamily.org>> wrote:
->     > > Weird... the mail was ca. 1200 lines ... that not small, but no=
-t so
->     > > big that I'd expect that it would get blocked somewhere. Let's =
-wait
->     > > some more more hours, maybe the spam filter is just very slow
->     > > today. If it is then still not available on the list, I'll try =
-to
->     > > send it out again.=C2=A0=20
->     >=20
->     > The mailing list does just occasionally randomly eat patches,
->     > as far as I can tell. It's not purely a size thing.
->=20
->     Ok, good to know. I've just sent out patch 3/4 again, let's see how=
- it
->     goes.
->=20
->     =C2=A0Thomas
->=20
->=20
-
-
---QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEI28eIbVA/A1A960XUdIEiMckyp8FAls744IACgkQUdIEiMck
-yp9TzQgAwTJJByqJQrk2N2shtlxeRXhibQYjczaYY2UFJZCniJhnz/+Di77a3mQ+
-/ePn3h7cxbOMc1HudBG/UWr5Jar+qZfS5tG9TBQkp8PE135Rb1hUvOJYFL5ZzSY0
-3WlpskCu7/3Xzv1CYdM7N0N0HST8nkJv9fYEDyOQFOnFR1hZSEgWfujXooHjcBOp
-279hEiK1Vd179L6UwgDMR8HX3F1ICd6o3ztI3o3CvsmEyegLBSItvu8hzRBWtkGv
-KLhKagn6doGPxzhh3WMmVAxgq+4YouGsPrBuDnIVLA9az0eJeVJUHZxcVYIZNa6/
-6js0WzVouNf0ms51JwM6F9cYlTdV+A==
-=VJC3
------END PGP SIGNATURE-----
-
---QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r--
+diff --git a/monitor.c b/monitor.c
+index 4f4f309d45..3ad89fe1ba 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4331,6 +4331,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         /* Drop the request if queue is full. */
+         if (mon->qmp.qmp_requests->length >= QMP_REQ_QUEUE_LEN_MAX) {
+             qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
++            /*
++             * FIXME @id's scope is just @mon, and broadcasting it is
++             * wrong.  If another monitor's client has a command with
++             * the same ID in flight, the event will incorrectly claim
++             * that command was dropped.
++             */
+             qapi_event_send_command_dropped(id,
+                                             COMMAND_DROP_REASON_QUEUE_FULL,
+                                             &error_abort);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 0446c3e48e..74cd97f237 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3454,6 +3454,9 @@
+ # only be dropped when the oob capability is enabled.
+ #
+ # @id: The dropped command's "id" field.
++# FIXME Broken by design.  Events are broadcast to all monitors.  If
++# another monitor's client has a command with the same ID in flight,
++# the event will incorrectly claim that command was dropped.
+ #
+ # @reason: The reason why the command is dropped.
+ #
+-- 
+2.17.1
