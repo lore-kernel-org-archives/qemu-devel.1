@@ -1,48 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1faIwk-0003jW-Gs
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:11 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1faIwp-0003nb-Cz
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1faIwh-00058I-DF
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59342)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1faIwh-00052h-46
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:07 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w63AnV4k115110
-	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 06:53:52 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k06sqtjty-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 06:53:52 -0400
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 3 Jul 2018 11:53:49 +0100
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622143146.GQ23296@redhat.com> <20180625095322.GC18580@redhat.com>
-	<20180625114106.GJ5024@localhost.localdomain>
-	<20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 3 Jul 2018 12:53:44 +0200
+	(envelope-from <tgolembi@redhat.com>) id 1faIwm-0005E0-8d
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:15 -0400
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:54092)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1faIwm-0005Cu-1g
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:12 -0400
+Received: by mail-wm0-f65.google.com with SMTP id b188-v6so1833331wme.3
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:54:11 -0700 (PDT)
+Date: Tue, 3 Jul 2018 12:54:08 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20180703125408.623d77fc@fiorina>
+In-Reply-To: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
+References: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180702080411.GA4299@localhost.localdomain>
-Content-Language: en-US
-Message-Id: <60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Subject: Re: [Qemu-devel] [PATCH] qga: report disk size and free space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,50 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+
+On Tue,  3 Jul 2018 10:31:20 +0200
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 70ee5379f6..6d6ca05281 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -706,6 +706,22 @@ static GuestFilesystemInfo *build_guest_fsinfo(char =
+*guid, Error **errp)
+>      }
+>      fs->type =3D g_strdup(fs_name);
+>      fs->disk =3D build_guest_disk_info(guid, errp);
+> +
+> +    if (len > 0) {
+> +        if (GetDiskFreeSpaceEx(mnt_point, 0, (PULARGE_INTEGER)&fs->size,
+> +                (PULARGE_INTEGER)&fs->free) !=3D 0) {
+
+Btw, it seems to me that checkpatch.pl returns some false positives
+here. See:
+
+    ERROR: spaces required around that '&' (ctx:VxV)                       =
+                                                                           =
+                         =20
+    #72: FILE: qga/commands-win32.c:711:
+    +        if (GetDiskFreeSpaceEx(mnt_point, 0, (PULARGE_INTEGER)&fs->siz=
+e,
+                                                                ^
+
+    ERROR: spaces required around that '&' (ctx:VxV)
+    #73: FILE: qga/commands-win32.c:712:
+    +                (PULARGE_INTEGER)&fs->free) !=3D 0) {
+                                    ^
+
+Seems that & is mistakenly interpreted as bitwise-AND operator.=20
+Or am I expected to format that as
+
+  ..., (PULARGE_INTEGER) & fs->size, ...
+
+because that looks... weird.
 
 
+Also, checkpatch.pl itself suggest to look into MAINTAINERS to find out
+whom to report false positives, but there is no maintainer there. :)
 
-On 07/02/2018 10:04 AM, Kevin Wolf wrote:
-> Am 25.06.2018 um 13:45 hat Peter Krempa geschrieben:
->> On Mon, Jun 25, 2018 at 13:41:06 +0200, Kevin Wolf wrote:
->>> Am 25.06.2018 um 11:53 hat Daniel P. Berrang=E9 geschrieben:
->>>> On Fri, Jun 22, 2018 at 03:31:46PM +0100, Daniel P. Berrang=E9 wrote=
-:
->>>>> On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
->>>>>> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
->>
->> [...]
->>
->>>
->>> Thanks!
->>>
->>> I'll look into werror/rerror support for usb-storage. It shouldn't be
->>> too hard, though it's strictly speaking a separate problem related to
->>> using -blockdev rather than option deprecation.
->>>
->>> If Peter wants to wait for QEMU support before converting werror/rerr=
-or
->>
->> Definitely. I don't want to keep around yet another hack that will
->> satisfy one specific case and then add another capability for it. We
->> should then gate the moving of the feature based on the presence of
->> werror for usb-storage.
->>
->>> to -device, maybe it would make sense to split your patch for v2 so t=
-hat
->>> geometry and serial can get fixed right away?
->>
->> Yes this can be done right away.
->=20
-> Has serial/gemoetry been fixed meanwhile and will it make it into the
-> next release?
+    Tomas
 
-I cannot find an archive that has it, but it is on the libvirt mailing
-list as "[libvirt] [PATCH v3] qemu: format serial and geometry on fronten=
-d disk device".
-Review seems done, but it has missed libvirt 4.5 which was released today=
-.=20
 
-Christian
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
