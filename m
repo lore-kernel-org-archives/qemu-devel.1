@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faR4T-0000rp-8A
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:34:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1faRFu-0004In-9H
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:46:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faR4S-0003yf-D7
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:34:41 -0400
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-	<1530602398-16127-8-git-send-email-eric.auger@redhat.com>
-	<cc538632-e853-adbc-ec34-a2f524415406@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <4dfad441-b94f-916f-025e-fc69b6375465@redhat.com>
-Date: Tue, 3 Jul 2018 21:34:29 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1faRFr-0000R6-6F
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:46:30 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:42621)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1faRFq-0000PF-Un
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:46:27 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id p1-v6so3092346wrs.9
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 12:46:26 -0700 (PDT)
+References: <20180703101444.23778-1-alex.bennee@linaro.org>
+	<20180703101444.23778-12-alex.bennee@linaro.org>
+	<8976a555-af38-2998-5b95-5ab294b66520@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <8976a555-af38-2998-5b95-5ab294b66520@redhat.com>
+Date: Tue, 03 Jul 2018 20:45:23 +0100
+Message-ID: <87601w9k8c.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <cc538632-e853-adbc-ec34-a2f524415406@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 07/15] hw/arm/virt: Add memory hotplug
- framework
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 11/20] docker: filter out linux-user builds
+ for mingw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
-Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 
-Hi David,
 
-On 07/03/2018 08:44 PM, David Hildenbrand wrote:
-> On 03.07.2018 09:19, Eric Auger wrote:
->> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->>
->> This patch adds the the memory hot-plug/hot-unplug infrastructure
->> in machvirt.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>
->> ---
->>
->> v1 -> v2:
->> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
->> - s/pc_dimm_memory_plug/pc_dimm_plug
->> - reworded title and commit message
->> - added pre_plug cb
->> - don't handle get_memory_region failure anymore
->> ---
->>  default-configs/arm-softmmu.mak |  2 ++
->>  hw/arm/virt.c                   | 68 ++++++++++++++++++++++++++++++++++++++++-
->>  2 files changed, 69 insertions(+), 1 deletion(-)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index 834d45c..28fe8f3 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -152,3 +152,5 @@ CONFIG_PCI_DESIGNWARE=y
->>  CONFIG_STRONGARM=y
->>  CONFIG_HIGHBANK=y
->>  CONFIG_MUSICPAL=y
->> +CONFIG_MEM_HOTPLUG=y
->> +
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 6fefb78..7190962 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -60,6 +60,8 @@
->>  #include "standard-headers/linux/input.h"
->>  #include "hw/arm/smmuv3.h"
->>  #include "hw/acpi/acpi.h"
->> +#include "hw/mem/pc-dimm.h"
->> +#include "hw/mem/nvdimm.h"
->>  
->>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
->> @@ -1785,6 +1787,53 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->>      return ms->possible_cpus;
->>  }
->>  
->> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->> +                                 Error **errp)
->> +{
->> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->> +
->> +    if (is_nvdimm) {
->> +        error_setg(errp, "nvdimm is not yet supported");
->> +        return;
->> +    }
-> 
-> You mention that actual hotplug is not supported, only coldplug.
-> Wouldn't this be the right place to check for that? (only skimmed over
-> your patches, how do you handle that?)
-At the moment I don't check it. I did not look yet at ways to
-discriminate both cases.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Thanks
+> On 03/07/2018 12:14, Alex Benn=C3=A9e wrote:
+>> The recent change from TARGET_DIRS to TARGET_LIST (208ecb3e1) had the
+>> effect of defaulting all docker builds to the current configured set
+>> of targets. This is actually reasonable behaviour but does run into
+>> problems if you have linux-user builds configured and you want to test
+>> the windows cross builds. This commit fixes that by adding a
+>> DOCKER_FILTER_TARGETS variable which is special-cased for mingw builds
+>> so we don't pass the whole set down.
+>
+>> +# Special cases
+>> +#  mingw/windows builds cannot build linux-user
+>> +docker-%-win32-cross: DOCKER_FILTER_TARGETS =3D %-linux-user
+>> +docker-%-win64-cross: DOCKER_FILTER_TARGETS =3D %-linux-user
+>> +docker-test-mingw@%: DOCKER_FILTER_TARGETS =3D %-linux-user
+>
+> Some questions:
+>
+> 1) Any reason to keep all three?
 
-Eric
-> 
-> 
+We could prune but it doesn't hurt.
+
+>
+> 2) Can we do it in the test script instead?
+>
+> 3) DEF_TARGET_LIST in the test script becomes meaningless.
+
+Good point.
+
+>
+> 4) You now have to override TARGET_LIST with "make
+> TARGET_LIST=3Dfoo-softmmu docker-test-mingw@fedora".  Does this interact
+> badly with other uses of TARGET_LIST in the Makefile?
+
+Yeah I originally thought this made sense from the "docker builds the
+same as my configured setup" sense but your right that's overkill.
+
+>
+> Thanks,
+>
+> Paolo
+
+
+--
+Alex Benn=C3=A9e
