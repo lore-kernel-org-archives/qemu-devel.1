@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54071)
+Received: from eggs.gnu.org ([208.118.235.92]:52797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFk7-0005EW-SL
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:13 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFku-0004Kc-1u
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFh0-0001mT-2A
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:28:55 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFh1-0001oN-Gu
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:29:40 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  3 Jul 2018 09:19:47 +0200
-Message-Id: <1530602398-16127-5-git-send-email-eric.auger@redhat.com>
+Date: Tue,  3 Jul 2018 09:19:52 +0200
+Message-Id: <1530602398-16127-10-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
 References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 04/15] hw/arm/virt: support kvm_type property
+Subject: [Qemu-devel] [RFC v3 09/15] hw/arm/boot: Expose the PC-DIMM nodes
+ in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,113 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-The kvm-type property currently is used to pass
-a user parameter to KVM_CREATE_VM. This matches
-the way KVM/ARM expects to pass the max_vm_phys_shift
-parameter.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-This patch adds the support or the kvm-type property in
-machvirt and also implements the machine class kvm_type()
-callback so that it either returns the kvm-type value
-provided by the user or returns the max_vm_phys_shift
-exposed by KVM.
+This patch add memory nodes corresponding to PC-DIMM regions.
 
-for instance, the usespace can use the following option to
-instantiate a 42b IPA guest: -machine kvm-type=42
+NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
+don't need to care about NV-DIMM at this stage.
 
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt.c         | 44 ++++++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 45 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 281ddcd..04a32de 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1649,6 +1649,21 @@ static void virt_set_iommu(Object *obj, const char *value, Error **errp)
-     }
+---
+
+v1 -> v2:
+- added qapi_free_MemoryDeviceInfoList and simplify the loop
+---
+ hw/arm/boot.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 5243a25..2c7d558 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -19,6 +19,7 @@
+ #include "sysemu/numa.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
++#include "hw/mem/memory-device.h"
+ #include "elf.h"
+ #include "sysemu/device_tree.h"
+ #include "qemu/config-file.h"
+@@ -516,6 +517,35 @@ static void fdt_add_psci_node(void *fdt)
+     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
  }
  
-+static char *virt_get_kvm_type(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++static int fdt_add_hotpluggable_memory_nodes(void *fdt,
++                                             uint64_t base, uint64_t len,
++                                             uint32_t acells, uint32_t scells) {
++    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
++    MemoryDeviceInfo *mi;
++    PCDIMMDeviceInfo *di;
++    bool is_nvdimm;
++    int ret = 0;
 +
-+    return g_strdup(vms->kvm_type);
-+}
++    for (info = info_list; info != NULL; info = info->next) {
++        mi = info->value;
++        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
++        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
 +
-+static void virt_set_kvm_type(Object *obj, const char *value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    g_free(vms->kvm_type);
-+    vms->kvm_type = g_strdup(value);
-+}
-+
- static CpuInstanceProperties
- virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- {
-@@ -1710,6 +1725,31 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
-+static int virt_kvm_type(MachineState *ms, const char *type_str)
-+{
-+    int max_vm_phys_shift, ret = 0;
-+    uint64_t type;
-+
-+    if (!type_str) {
-+        max_vm_phys_shift = kvm_arm_get_max_vm_phys_shift(ms);
-+        if (max_vm_phys_shift < 0) {
-+            goto out;
++        if (is_nvdimm) {
++            ret = -ENOENT; /* NV-DIMM not yet supported */
++        } else {
++            ret = fdt_add_memory_node(fdt, acells, di->addr,
++                                      scells, di->size, di->node);
 +        }
-+    } else {
-+        type = g_ascii_strtoll(type_str, NULL, 0);
-+        type &= 0xFF;
-+        max_vm_phys_shift = (int)type;
-+        if (max_vm_phys_shift < 40 || max_vm_phys_shift > 52) {
-+            warn_report("valid kvm-type type values are within [40, 52]:"
-+                        " option is ignored and VM is created with 40b IPA");
++        if (ret < 0) {
 +            goto out;
 +        }
 +    }
-+    ret = max_vm_phys_shift;
 +out:
++    qapi_free_MemoryDeviceInfoList(info_list);
 +    return ret;
 +}
 +
- static void virt_machine_class_init(ObjectClass *oc, void *data)
+ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+                  hwaddr addr_limit, AddressSpace *as)
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1733,6 +1773,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-+    mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-     hc->plug = virt_machine_device_plug_cb;
-@@ -1826,6 +1867,9 @@ static void virt_3_0_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
+@@ -611,6 +641,14 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+         }
+     }
  
-+    object_property_add_str(obj, "kvm-type",
-+                            virt_get_kvm_type, virt_set_kvm_type, NULL);
++    rc = fdt_add_hotpluggable_memory_nodes(fdt, binfo->device_memory_start,
++                                           binfo->device_memory_size,
++                                           acells, scells);
++    if (rc < 0) {
++            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
++            goto fail;
++    }
 +
-     vms->memmap = a15memmap;
-     vms->irqmap = a15irqmap;
- }
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 9a870cc..1a90ffc 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -124,6 +124,7 @@ typedef struct {
-     uint32_t msi_phandle;
-     uint32_t iommu_phandle;
-     int psci_conduit;
-+    char *kvm_type;
- } VirtMachineState;
- 
- #define VIRT_ECAM_ID(high) (high ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM)
+     rc = fdt_path_offset(fdt, "/chosen");
+     if (rc < 0) {
+         qemu_fdt_add_subnode(fdt, "/chosen");
 -- 
 2.5.5
