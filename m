@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faHj1-0007VA-0l
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:35:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1faHnx-0000KC-PV
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faHiy-0007n2-Bx
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:35:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52914 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1faHiy-0007ms-5Z
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:35:52 -0400
-References: <1529053904-12607-1-git-send-email-dimastep@yandex-team.ru>
-	<20180702085207.GA6032@dimastep-nix>
-	<5149995f-2bb2-cbe8-1a2c-e16ed0ee3cd6@redhat.com>
-	<20180703092711.GA823@dimastep-nix>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <85ff3641-4d5f-2021-5364-b6d1d5823ec1@redhat.com>
-Date: Tue, 3 Jul 2018 11:35:49 +0200
+	(envelope-from <bounces@canonical.com>) id 1faHnu-0002HN-Mg
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:41:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1faHnu-0002GM-Ey
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:40:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1faHnt-0004ak-0Y
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 09:40:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CFB5F2E819B
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 09:40:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180703092711.GA823@dimastep-nix>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] qemu-pr-helper: garbage response
- structure can be used to write data
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 03 Jul 2018 09:34:05 -0000
+From: He Yi <1779634@bugs.launchpad.net>
+Reply-To: Bug 1779634 <1779634@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153052346519.30029.15773821079672320069.malonedeb@wampee.canonical.com>
+Message-Id: <153061044579.12612.12436670370929639726.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779634] Re: qemu-x86_64 on aarch64 reports
+ "Synchronous External Abort"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dima Stepanov <dimastep@yandex-team.ru>
-Cc: qemu-devel@nongnu.org, wrfsh@yandex-team.ru
+To: qemu-devel@nongnu.org
 
-On 03/07/2018 11:27, Dima Stepanov wrote:
-> On Mon, Jul 02, 2018 at 02:21:41PM +0200, Paolo Bonzini wrote:
->> On 02/07/2018 10:52, Dima Stepanov wrote:
->>> Ping.
->>>
->>> On Fri, Jun 15, 2018 at 12:11:44PM +0300, Dima Stepanov wrote:
->>>> The prh_co_entry() routine handles requests. The first part is to read a
->>>> request by calling the prh_read_request() routine, if:
->>>>   1. scsi_cdb_xfer(req->cdb) call returns 0, and
->>>>   2. req->cdb[0] == PERSISTENT_RESERVE_IN, then
->>>> The resp->result field will be uninitialized. As a result the resp.sz
->>>> field will be also uninitialized in the prh_co_entry() function.
->>>> The second part is to send the response by calling the
->>>> prh_write_response() routine:
->>>>   1. For the PERSISTENT_RESERVE_IN command, and
->>>>   2. resp->result == GOOD (previous successful reply or just luck), then
->>>> There is a probability that the following assert will not be trigered:
->>>>   assert(resp->sz <= req->sz && resp->sz <= sizeof(client->data));
->>>> As a result some uninitialized response will be sent.
->>>>
->>>> The fix is to initialize the response structure to CHECK_CONDITION and 0
->>>> values before calling the prh_read_request() routine.
->>
->> The actual bug is that the "if (sz > 0)" should apply only to 
->> PERSISTENT_RESERVE_OUT, and in fact it can be done in do_pr_out.  
->> PERSISTENT_RESERVE_IN with sz == 0 is weird but okay.
->>
->> This simplifies the code a bit too, because we can handle closing the 
->> file descriptor in prh_co_entry.
->>
->> Does something like this work for you?
-> 
-> Thanks for the feedback. Yes, this will work for me. Should i update the
-> patch and resend it or you will just pick the version you suggested?
+thanks Peter, yes I tried to run an x86 strace under QEMU.
 
-I will pick it, thanks!
+I'll stop this experiment since you are right this won't work for
+utilities with device-level I/O and memory operations, I will raise this
+requirement to Intel support website firstly.
 
-Paolo
+Best Regards, Yi
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779634
+
+Title:
+  qemu-x86_64 on aarch64 reports "Synchronous External Abort"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network =
+adapters' firmware upgrade tools)
+  System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-=
+45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarc=
+h64 aarch64 GNU/Linux
+
+  Reproduce:
+  1) build linux-user qemu-x86_64 static from source (tried both version 2.=
+12.0 & 2.11.2)
+  =C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable=
+-system --static --enable-linux-user
+
+  2) install the interpreter into binfmt_misc filesystem
+  =C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003=
+e00
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffff=
+ff
+
+  3) packaging Intel/Dell upgrade utilities into docker images, I've publis=
+hed two on docker hub:
+  =C2=A0=C2=A0=C2=A0REPOSITORY          TAG
+  =C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
+  =C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
+
+  4) run the docker container on aarch64 server platform:
+  =C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /us=
+r/local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
+
+  5) finally, within docker container run the upgrade tool:
+  =C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
+
+  Errors: in dmesg it reports excessive 'Synchronous External Abort':
+
+  kernel: [242850.159893] Synchronous External Abort: synchronous external =
+abort (0x92000610) at 0x0000000000429958
+  kernel: [242850.169199] Unhandled fault: synchronous external abort (0x92=
+000610) at 0x0000000000429958
+
+  thanks and best regards, Yi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779634/+subscriptions
