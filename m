@@ -1,16 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1faPiZ-0004XK-4d
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:08:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1faPvW-00028N-F1
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1faPiV-0006TZ-5k
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:07:59 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  3 Jul 2018 21:07:50 +0300
-Message-Id: <20180703180751.243496-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20180703180751.243496-1-vsementsov@virtuozzo.com>
-References: <20180703180751.243496-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 1/2] block: add BDRV_REQ_SERIALISING flag
+	(envelope-from <richard.henderson@linaro.org>) id 1faPvT-0005IZ-7y
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:21:22 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:35526)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1faPvT-0005H4-0s
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:21:19 -0400
+Received: by mail-pl0-x243.google.com with SMTP id k1-v6so1424371plt.2
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 11:21:18 -0700 (PDT)
+References: <20180703171044.9503-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <823c2db8-22f1-a7be-1684-a2c012286b25@linaro.org>
+Date: Tue, 3 Jul 2018 11:20:56 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180703171044.9503-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/4] cmsdk-apb-timer: various
+ bugfixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,49 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Guenter Roeck <linux@roeck-us.net>, patches@linaro.org
 
-Serialized writes should be used in copy-on-write of backup(sync=none)
-for image fleecing scheme.
+On 07/03/2018 10:10 AM, Peter Maydell wrote:
+> Guenter Roeck (1):
+>   hw/timer/cmsdk-apb-timer: Correctly identify and set one-shot mode
+> 
+> Peter Maydell (3):
+>   ptimer: Add TRIGGER_ONLY_ON_DECREMENT policy option
+>   hw/timer/cmsdk-apb-timer: Correct ptimer policy settings
+>   hw/timer/cmsdk-apb-timer: run or stop timer on writes to RELOAD and
+>     VALUE
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/block.h | 5 ++++-
- block/io.c            | 4 ++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/include/block/block.h b/include/block/block.h
-index e5c7759a0c..107113aad5 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -58,8 +58,11 @@ typedef enum {
-      * content. */
-     BDRV_REQ_WRITE_UNCHANGED    = 0x40,
- 
-+    /* Force request serializing. Only for writes. */
-+    BDRV_REQ_SERIALISING        = 0x80,
-+
-     /* Mask of valid flags */
--    BDRV_REQ_MASK               = 0x7f,
-+    BDRV_REQ_MASK               = 0xff,
- } BdrvRequestFlags;
- 
- typedef struct BlockSizes {
-diff --git a/block/io.c b/block/io.c
-index 1a2272fad3..d5ba078514 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1572,6 +1572,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
-                                    align);
- 
-+    if (flags & BDRV_REQ_SERIALISING) {
-+        mark_request_serialising(req, bdrv_get_cluster_size(bs));
-+    }
-+
-     waited = wait_serialising_requests(req);
-     assert(!waited || !req->serialising);
-     assert(req->overlap_offset <= offset);
--- 
-2.11.1
+
+r~
