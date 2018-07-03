@@ -1,32 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1faNSi-0007ZY-2V
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:43:29 -0400
+	(envelope-from <paulmck@linux.vnet.ibm.com>) id 1faNcd-0007h9-VB
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:53:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1faNSg-000370-Bp
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:43:28 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1faNSf-00036b-W6
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:43:26 -0400
-Received: by mail-wr0-x244.google.com with SMTP id s11-v6so2451661wra.13
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:43:25 -0700 (PDT)
+	(envelope-from <paulmck@linux.vnet.ibm.com>) id 1faNcY-0000SL-Ua
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:53:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56040
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <paulmck@linux.vnet.ibm.com>)
+	id 1faNcY-0000S0-NN
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:53:38 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w63FmdrS115713
+	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 11:53:36 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2k0aajdwtu-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 11:53:35 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <paulmck@linux.vnet.ibm.com>;
+	Tue, 3 Jul 2018 11:53:34 -0400
+Date: Tue, 3 Jul 2018 08:55:42 -0700
+From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+Reply-To: paulmck@linux.vnet.ibm.com
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-10-xiaoguangrong@tencent.com>
+	<20180620045203.GE18985@xz-mi>
+	<6f871708-d38b-2acf-350a-985c8a23a013@gmail.com>
+	<5B34CCB9.5040406@intel.com>
+	<e7e37560-3c52-39d2-64be-67d79d210496@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <878t6s72qf.fsf@dusky.pond.sub.org>
-References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
-	<20180627163551.31610-8-marcandre.lureau@redhat.com>
-	<87sh50bkno.fsf@dusky.pond.sub.org>
-	<CAJ+F1CL1HMNoJQUBcUWPM0kZni4GtPdHQmVmtbdbk+KhyfkPrg@mail.gmail.com>
-	<87r2kka19v.fsf@dusky.pond.sub.org>
-	<CAJ+F1CL8BHh6K5Ds_AdnGAwuCHH-HoAAi+GLQMGGuNLMHfq1Nw@mail.gmail.com>
-	<878t6s72qf.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 3 Jul 2018 17:43:24 +0200
-Message-ID: <CAJ+F1CJ2gOC=7oukGb_GKvqd=NgtZRcBihMWjAt6byFTF4Ckbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 07/15] qapi: add #if/#endif helpers
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e7e37560-3c52-39d2-64be-67d79d210496@gmail.com>
+Message-Id: <20180703155541.GB3593@linux.vnet.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH 09/12] ring: introduce lockless ring buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,352 +48,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, Peter Xu <peterx@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, Xiao Guangrong <xiaoguangrong@tencent.com>, peterz@infradead.org, stefani@seibold.net, Lai Jiangshan <jiangshanlai@gmail.com>
 
-Hi
-
-On Tue, Jul 3, 2018 at 5:34 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->
->> Hi
->>
->> On Tue, Jul 3, 2018 at 3:37 PM, Markus Armbruster <armbru@redhat.com> wr=
-ote:
->>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->>>
->>>> Hi
->>>>
->>>> On Tue, Jul 3, 2018 at 1:53 PM, Markus Armbruster <armbru@redhat.com> =
-wrote:
->>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>>>>
->>>>>> Add helpers to wrap generated code with #if/#endif lines.
->>>>>>
->>>>>> Add QAPIGenCSnippet class to write C snippet code, make QAPIGenC
->>>>>> inherit from it, for full C files with copyright headers etc.
->>>>>
->>>>> It's called QAPIGenCCode now.  Can touch up when I apply, along with
->>>>> another instance below.
->>>>>
->>>>> Leaves the reader wondering *why* you need to splice QAPIGenCCode
->>>>> between QAPIGen and QAPIGenC.  Becomes clear only in PATCH 10.
->>>>> Providing the class now reduces code churn, but you should explain wh=
-y.
->>>>> Perhaps:
->>>>>
->>>>>   A later patch wants to use QAPIGen for generating C snippets rather
->>>>>   than full C files with copyright headers etc.  Splice in class
->>>>>   QAPIGenCCode between QAPIGen and QAPIGenC.
->>>>
->>>> sure, thanks
->>>>
->>>>>
->>>>>> Add a 'with' statement context manager that will be used to wrap
->>>>>> generator visitor methods.  The manager will check if code was
->>>>>> generated before adding #if/#endif lines on QAPIGenCSnippet
->>>>>> objects. Used in the following patches.
->>>>>>
->>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>>>>> ---
->>>>>>  scripts/qapi/common.py | 101 ++++++++++++++++++++++++++++++++++++++=
-+--
->>>>>>  1 file changed, 97 insertions(+), 4 deletions(-)
->>>>>>
->>>>>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->>>>>> index 1b56065a80..44eaf25850 100644
->>>>>> --- a/scripts/qapi/common.py
->>>>>> +++ b/scripts/qapi/common.py
->>>>>> @@ -12,6 +12,7 @@
->>>>>>  # See the COPYING file in the top-level directory.
->>>>>>
->>>>>>  from __future__ import print_function
->>>>>> +from contextlib import contextmanager
->>>>>>  import errno
->>>>>>  import os
->>>>>>  import re
->>>>>> @@ -1974,6 +1975,40 @@ def guardend(name):
->>>>>>                   name=3Dguardname(name))
->>>>>>
->>>>>>
->>>>>> +def gen_if(ifcond):
->>>>>> +    ret =3D ''
->>>>>> +    for ifc in ifcond:
->>>>>> +        ret +=3D mcgen('''
->>>>>> +#if %(cond)s
->>>>>> +''', cond=3Difc)
->>>>>> +    return ret
->>>>>> +
->>>>>> +
->>>>>> +def gen_endif(ifcond):
->>>>>> +    ret =3D ''
->>>>>> +    for ifc in reversed(ifcond):
->>>>>> +        ret +=3D mcgen('''
->>>>>> +#endif /* %(cond)s */
->>>>>> +''', cond=3Difc)
->>>>>> +    return ret
->>>>>> +
->>>>>> +
->>>>>> +def wrap_ifcond(ifcond, before, after):
->>>>>
->>>>> Looks like a helper method.  Name it _wrap_ifcond?
->>>>
->>>> Not fond of functions with _. Iirc, it was suggested by a linter to
->>>> make it a top-level function. I don't mind if you change it on commit.
->>>
->>> It's just how Python defines a module's public names.  I don't like the
->>> proliferation of leading underscores either, but I feel it's best to go
->>> with the flow here.
->>
->> ok
->>
->>>
->>>>>> +    if ifcond is None or before =3D=3D after:
->>>>>> +        return after
->>>>>
->>>>> The before =3D=3D after part suppresses empty conditionals.  Suggest
->>>>>
->>>>>            return after            # suppress empty #if ... #endif
->>>>>
->>>>> The ifcond is None part is suppresses "non-conditionals".  How can th=
-is
->>>>> happen?  If it can't, let's drop this part.
->>>>
->>>> because the function can be called without additional checks on ifcond
->>>> is None. I don't see what would be the benefit in moving this to the
->>>> caller responsibility.
->>>
->>> Why stop at None?  Why not empty string?  Empty containers other than
->>> []?  False?  Numeric zero?
->>>
->>> To answer my own question: because a precise function signatures reduce
->>> complexity.  "The first argument is a list of strings, no ifs, no buts"
->>> is simpler than "the first argument may be None, or a list of I don't
->>> remember what exactly, but if you screw it up, the function hopefully
->>> throws up before it does real damage" ;)
->>
->> So you prefer if not ifcond or before =3D=3D after ? ok
->
-> I'd recommend
->
->       +    if before =3D=3D after:
->       +        return after
->
-> If we pass crap, we die in gen_if()'s for ifc in ifcond.  The difference
-> is now crap includes None.
->
-
-makes sense, I didn't realize it no longers pass None.
-
->>>>> Another non-conditional is [].  See below.
->>>>>
->>>>>> +
->>>>>> +    assert after.startswith(before)
->>>>>> +    out =3D before
->>>>>> +    added =3D after[len(before):]
->>>>>> +    if added[0] =3D=3D '\n':
->>>>>> +        out +=3D '\n'
->>>>>> +        added =3D added[1:]
->>>>>
->>>>> The conditional adjusts vertical space around #if.  This might need
->>>>> tweaking, but let's not worry about that now.
->>>>>
->>>>>> +    out +=3D gen_if(ifcond)
->>>>>> +    out +=3D added
->>>>>> +    out +=3D gen_endif(ifcond)
->>>>>
->>>>> There's no similar adjustment for #endif.  Again, let's not worry abo=
-ut
->>>>> that now.
->>>>>
->>>>>> +    return out
->>>>>> +
->>>>>> +
->>>>>
->>>>> Since gen_if([]) and gen_endif([]) return '', wrap_ifcond([], before,
->>>>> after) returns after.  Okay.
->>>>>
->>>>>>  def gen_enum_lookup(name, values, prefix=3DNone):
->>>>>>      ret =3D mcgen('''
->>>>>>
->>>>>> @@ -2064,6 +2099,7 @@ class QAPIGen(object):
->>>>>>      def __init__(self):
->>>>>>          self._preamble =3D ''
->>>>>>          self._body =3D ''
->>>>>> +        self._start_if =3D None
->>>>>>
->>>>>>      def preamble_add(self, text):
->>>>>>          self._preamble +=3D text
->>>>>> @@ -2071,6 +2107,25 @@ class QAPIGen(object):
->>>>>>      def add(self, text):
->>>>>>          self._body +=3D text
->>>>>>
->>>>>> +    def start_if(self, ifcond):
->>>>>> +        assert self._start_if is None
->>>>>> +
->>>>>
->>>>> Let's drop this blank line.
->>>>
->>>> I prefer to have preconditions separated from the code, but ok
->>>
->>> I sympathize, but not if both are one-liners.
->>
->> ok
->>
->>>
->>>>>
->>>>>> +        self._start_if =3D (ifcond, self._body, self._preamble)
->>>>>
->>>>> It's now obvious that you can't nest .start_if() ... .endif().  Good.
->>>>>
->>>>>> +
->>>>>> +    def _wrap_ifcond(self):
->>>>>> +        pass
->>>>>> +
->>>>>> +    def end_if(self):
->>>>>> +        assert self._start_if
->>>>>> +
->>>>>
->>>>> Let's drop this blank line.
->>>>>
->>>>>> +        self._wrap_ifcond()
->>>>>> +        self._start_if =3D None
->>>>>> +
->>>>>> +    def get_content(self, fname=3DNone):
->>>>>> +        assert self._start_if is None
->>>>>> +        return (self._top(fname) + self._preamble + self._body
->>>>>> +                + self._bottom(fname))
->>>>>> +
->>>>>>      def _top(self, fname):
->>>>>>          return ''
->>>>>>
->>>>>
->>>>> Note for later: all this code has no effect unless ._wrap_ifcond() is
->>>>> overridden.
->>>>>
->>>>>> @@ -2091,8 +2146,7 @@ class QAPIGen(object):
->>>>>>              f =3D open(fd, 'r+', encoding=3D'utf-8')
->>>>>>          else:
->>>>>>              f =3D os.fdopen(fd, 'r+')
->>>>>> -        text =3D (self._top(fname) + self._preamble + self._body
->>>>>> -                + self._bottom(fname))
->>>>>> +        text =3D self.get_content(fname)
->>>>>>          oldtext =3D f.read(len(text) + 1)
->>>>>>          if text !=3D oldtext:
->>>>>>              f.seek(0)
->>>>>> @@ -2101,10 +2155,49 @@ class QAPIGen(object):
->>>>>>          f.close()
->>>>>>
->>>>>>
->>>>>> -class QAPIGenC(QAPIGen):
->>>>>> +@contextmanager
->>>>>> +def ifcontext(ifcond, *args):
->>>>>> +    """A 'with' statement context manager to wrap with start_if()/e=
-nd_if()
->>>>>>
->>>>>> -    def __init__(self, blurb, pydoc):
->>>>>> +    *args: variable length argument list of QAPIGen
->>>>>
->>>>> Perhaps: any number of QAPIGen objects
->>>>>
->>>>
->>>> sure
->>>>
->>>>>> +
->>>>>> +    Example::
->>>>>> +
->>>>>> +        with ifcontext(ifcond, self._genh, self._genc):
->>>>>> +            modify self._genh and self._genc ...
->>>>>> +
->>>>>> +    Is equivalent to calling::
->>>>>> +
->>>>>> +        self._genh.start_if(ifcond)
->>>>>> +        self._genc.start_if(ifcond)
->>>>>> +        modify self._genh and self._genc ...
->>>>>> +        self._genh.end_if()
->>>>>> +        self._genc.end_if()
->>>>>> +
->>>>>
->>>>> Can we drop this blank line?
->>>>>
->>>>
->>>> I guess we can, I haven't tested the rst formatting this rigorously.
->>>> Hopefully the linter does it.
->>>>
->>>>>> +    """
->>>>>> +    for arg in args:
->>>>>> +        arg.start_if(ifcond)
->>>>>> +    yield
->>>>>> +    for arg in args:
->>>>>> +        arg.end_if()
->>>>>> +
->>>>>> +
->>>>>> +class QAPIGenCCode(QAPIGen):
->>>>>> +
->>>>>> +    def __init__(self):
->>>>>>          QAPIGen.__init__(self)
->>>>>> +
->>>>>> +    def _wrap_ifcond(self):
->>>>>> +        self._body =3D wrap_ifcond(self._start_if[0],
->>>>>> +                                 self._start_if[1], self._body)
->>>>>> +        self._preamble =3D wrap_ifcond(self._start_if[0],
->>>>>> +                                     self._start_if[2], self._pream=
-ble)
->>>>>
->>>>> Can you explain why you put the machinery for conditionals in QAPIGen
->>>>> and not QAPIGenCCode?
->>>>
->>>> Iirc, this has to do with the fact that QAPIGenDoc is used for
->>>> visiting, and thus QAPIGen start_if()/end_if() could be handled there,
->>>
->>> Can you point me to calls of .start_if(), .end_if(), .get_content() for
->>> anything but QAPIGenCCode and its subtypes?
->>>
->>>> while we only want to generate #ifdef wrapping in QAPIGenCCode. I
->>>> guess I could move more of start_if()/end_if() data to QAPIGenCCode
->>>> (make them virtual / 'pass' in QAPIGen) Is that what you would like to
->>>> see?
->>>
->>> If there are no such calls, we should simply move the whole shebang to
->>> QAPIGenCCode.
->>
->> done
->
-> Does that mean I should expect v7 from you?
-
-yes
-
->
->>> If there are such calls, the common supertype QAPIGen has to provide th=
-e
->>> methods.
->>>
->>> If we expect subtypes other than QAPIGenCCode to implement conditional
->>> code generation the same way, except for a different ._wrap_ifcond(),
->>> then the patch is okay as is.
->>>
->>> If we don't, the transformation you described looks like an improvement
->>> to me, because it keeps the actual code closer together.
->>>
->>> What's your take on it?
->>>
->>> I think I could make the transformation when I apply.
->>>
->>>>>
->>>>>> +
->>>>>> +
->>>>>> +class QAPIGenC(QAPIGenCCode):
->>>>>> +
->>>>>> +    def __init__(self, blurb, pydoc):
->>>>>> +        QAPIGenCCode.__init__(self)
->>>>>>          self._blurb =3D blurb
->>>>>>          self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*=
-', pydoc,
->>>>>>                                                    re.MULTILINE))
->>>>>
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+T24gRnJpLCBKdW4gMjksIDIwMTggYXQgMTE6NTU6MDhBTSArMDgwMCwgWGlhbyBHdWFuZ3Jv
+bmcgd3JvdGU6DQo+IA0KPiANCj4gT24gMDYvMjgvMjAxOCAwNzo1NSBQTSwgV2VpIFdhbmcg
+d3JvdGU6DQo+ID5PbiAwNi8yOC8yMDE4IDA2OjAyIFBNLCBYaWFvIEd1YW5ncm9uZyB3cm90
+ZToNCj4gPj4NCj4gPj5DQzogUGF1bCwgUGV0ZXIgWmlqbHN0cmEsIFN0ZWZhbmksIExhaSB3
+aG8gYXJlIGFsbCBnb29kIGF0IG1lbW9yeSBiYXJyaWVyLg0KPiA+Pg0KPiA+Pg0KPiA+Pk9u
+IDA2LzIwLzIwMTggMTI6NTIgUE0sIFBldGVyIFh1IHdyb3RlOg0KPiA+Pj5PbiBNb24sIEp1
+biAwNCwgMjAxOCBhdCAwNTo1NToxN1BNICswODAwLCBndWFuZ3JvbmcueGlhb0BnbWFpbC5j
+b20gd3JvdGU6DQo+ID4+Pj5Gcm9tOiBYaWFvIEd1YW5ncm9uZyA8eGlhb2d1YW5ncm9uZ0B0
+ZW5jZW50LmNvbT4NCj4gPj4+Pg0KPiA+Pj4+SXQncyB0aGUgc2ltcGxlIGxvY2tsZXNzIHJp
+bmcgYnVmZmVyIGltcGxlbWVudCB3aGljaCBzdXBwb3J0cyBib3RoDQo+ID4+Pj5zaW5nbGUg
+cHJvZHVjZXIgdnMuIHNpbmdsZSBjb25zdW1lciBhbmQgbXVsdGlwbGUgcHJvZHVjZXJzIHZz
+Lg0KPiA+Pj4+c2luZ2xlIGNvbnN1bWVyLg0KPiA+Pj4+DQo+ID4+Pj5NYW55IGxlc3NvbnMg
+d2VyZSBsZWFybmVkIGZyb20gTGludXggS2VybmVsJ3Mga2ZpZm8gKDEpIGFuZCBEUERLJ3MN
+Cj4gPj4+PnJ0ZV9yaW5nICgyKSBiZWZvcmUgaSB3cm90ZSB0aGlzIGltcGxlbWVudC4gSXQg
+Y29ycmVjdHMgc29tZSBidWdzIG9mDQo+ID4+Pj5tZW1vcnkgYmFycmllcnMgaW4ga2ZpZm8g
+YW5kIGl0IGlzIHRoZSBzaW1wbGVyIGxvY2tsZXNzIHZlcnNpb24gb2YNCj4gPj4+PnJ0ZV9y
+aW5nIGFzIGN1cnJlbnRseSBtdWx0aXBsZSBhY2Nlc3MgaXMgb25seSBhbGxvd2VkIGZvciBw
+cm9kdWNlci4NCj4gPj4+DQo+ID4+PkNvdWxkIHlvdSBwcm92aWRlIHNvbWUgbW9yZSBpbmZv
+cm1hdGlvbiBhYm91dCB0aGUga2ZpZm8gYnVnPyBBbnkNCj4gPj4+cG9pbnRlciB3b3VsZCBi
+ZSBhcHByZWNpYXRlZC4NCj4gPj4+DQo+ID4+DQo+ID4+U3VyZSwgaSByZXBvcnRlZCBvbmUg
+b2YgdGhlIG1lbW9yeSBiYXJyaWVyIGlzc3VlIHRvIGxpbnV4IGtlcm5lbDoNCj4gPj7CoMKg
+IGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE4LzUvMTEvNTgNCj4gPj4NCj4gPj5BY3R1YWxs
+eSwgYmVzaWRlIHRoYXQsIHRoZXJlIGlzIGFub3RoZXIgbWVtb3J5IGJhcnJpZXIgaXNzdWUg
+aW4ga2ZpZm8sDQo+ID4+cGxlYXNlIGNvbnNpZGVyIHRoaXMgY2FzZToNCj4gPj4NCj4gPj7C
+oMKgIGF0IHRoZSBiZWdpbm5pbmcNCj4gPj7CoMKgIHJpbmctPnNpemUgPSA0DQo+ID4+wqDC
+oCByaW5nLT5vdXQgPSAwDQo+ID4+wqDCoCByaW5nLT5pbiA9IDQNCj4gPj4NCj4gPj7CoMKg
+wqDCoCBDb25zdW1lcsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBQcm9kdWNlcg0KPiA+PsKgLS0tLS0tLS0tLS0tLS0twqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtLS0tLS0tLS0tLS0tLQ0KPiA+PsKg
+wqAgaW5kZXggPSByaW5nLT5vdXQ7IC8qIGluZGV4ID09IDAgKi8NCj4gPj7CoMKgIHJpbmct
+Pm91dCsrOyAvKiByaW5nLT5vdXQgPT0gMSAqLw0KPiA+PsKgwqAgPCBSZS1PcmRlciA+DQo+
+ID4+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBvdXQgPSByaW5nLT5vdXQ7DQo+ID4+wqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBpZiAocmluZy0+aW4gLSBvdXQgPj0gcmluZy0+bWFzaykNCj4gPj7CoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FRlVMTDsNCj4gPj7CoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8q
+IHNlZSB0aGUgcmluZyBpcyBub3QgZnVsbCAqLw0KPiA+PsKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW5k
+ZXggPSByaW5nLT5pbiAmIHJpbmctPm1hc2s7IC8qIGluZGV4ID09IDAgKi8NCj4gPj7CoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIHJpbmctPmRhdGFbaW5kZXhdID0gbmV3X2RhdGE7DQo+ID4+44CA44CA
+44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA44CA
+44CAcmluZy0+aW4rKzsNCj4gPj4NCj4gPj7CoMKgIGRhdGEgPSByaW5nLT5kYXRhW2luZGV4
+XTsNCj4gPj7CoMKgICEhISEhISB0aGUgb2xkIGRhdGEgaXMgbG9zdCAhISEhISENCj4gPj4N
+Cj4gPj5TbyB3ZSBuZWVkIHRvIG1ha2Ugc3VyZToNCj4gPj4xKSBmb3IgdGhlIGNvbnN1bWVy
+LCB3ZSBzaG91bGQgcmVhZCB0aGUgcmluZy0+ZGF0YVtdIG91dCBiZWZvcmUgdXBkYXRpbmcg
+cmluZy0+b3V0DQo+ID4+MikgZm9yIHRoZSBwcm9kdWNlciwgd2Ugc2hvdWxkIHJlYWQgcmlu
+Zy0+b3V0IGJlZm9yZSB1cGRhdGluZyByaW5nLT5kYXRhW10NCj4gPj4NCj4gPj5hcyBmb2xs
+b3dpbmdzOg0KPiA+PsKgwqDCoMKgwqAgUHJvZHVjZXLCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IENvbnN1bWVyDQo+ID4+wqAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+PsKgwqDCoMKgwqAgUmVhZGluZyByaW5n
+LT5vdXTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgUmVhZGluZyByaW5nLT5kYXRhW2luZGV4XQ0KPiA+PsKgwqDCoMKgwqAgc21wX21i
+KCnCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgc21wX21iKCkNCj4gPj7CoMKgwqDCoMKgIFNldHRpbmcg
+cmluZy0+ZGF0YVtpbmRleF0gPSBkYXRhIHJpbmctPm91dCsrDQo+ID4+DQo+ID4+WyBpIHVz
+ZWQgYXRvbWljX3N0b3JlX3JlbGVhc2UoKSBhbmQgYXRvbWljX2xvYWRfYWNxdWlyZSgpIGlu
+c3RlYWQgb2Ygc21wX21iKCkgaW4gdGhlDQo+ID4+wqAgcGF0Y2guIF0NCj4gPj4NCj4gPj5C
+dXQgaSBhbSBub3Qgc3VyZSBpZiB3ZSBjYW4gdXNlIHNtcF9hY3F1aXJlX19hZnRlcl9jdHJs
+X2RlcCgpIGluIHRoZSBwcm9kdWNlcj8NCj4gPg0KPiA+DQo+ID5JIHdvbmRlciBpZiB0aGlz
+IGNvdWxkIGJlIHNvbHZlZCBieSBzaW1wbHkgdHdlYWtpbmcgdGhlIGFib3ZlIGNvbnN1bWVy
+IGltcGxlbWVudGF0aW9uOg0KPiA+DQo+ID5bMV0gaW5kZXggPSByaW5nLT5vdXQ7DQo+ID5b
+Ml0gZGF0YSA9IHJpbmctPmRhdGFbaW5kZXhdOw0KPiA+WzNdIGluZGV4Kys7DQo+ID5bNF0g
+cmluZy0+b3V0ID0gaW5kZXg7DQo+ID4NCj4gPk5vdyBbMl0gYW5kIFszXSBmb3JtcyBhIFdB
+UiBkZXBlbmRlbmN5LCB3aGljaCBhdm9pZHMgdGhlIHJlb3JkZXJpbmcuDQo+IA0KPiBJdCBj
+YW4gbm90LiBbMl0gYW5kIFs0XSBzdGlsbCBkbyBub3QgYW55IGRlcGVuZGVuY3ksIENQVSBh
+bmQgY29tcGxhaW5lciBjYW4gb21pdA0KPiB0aGUgJ2luZGV4Jy4NCg0KT25lIHRoaW5nIHRv
+IHRyeSB3b3VsZCBiZSB0aGUgTGludXgta2VybmVsIG1lbW9yeSBtb2RlbCB0b29scyBpbg0K
+dG9vbHMvbWVtb3J5LW1vZGVsIGluIGN1cnJlbnQgbWFpbmxpbmUuICBUaGVyZSBpcyBhIFJF
+QURNRSBmaWxlIGRlc2NyaWJpbmcNCmhvdyB0byBpbnN0YWxsIGFuZCBzZXQgaXQgdXAsIHdp
+dGggYSBudW1iZXIgb2YgZmlsZXMgaW4gRG9jdW1lbnRhdGlvbg0KYW5kIGxpdG11cy10ZXN0
+cyB0aGF0IGNhbiBoZWxwIGd1aWRlIHlvdS4NCg0KCQkJCQkJCVRoYW54LCBQYXVsDQoNCg==
