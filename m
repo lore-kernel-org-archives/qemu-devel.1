@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1faJg2-0004a6-F5
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:40:59 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1faJrQ-00075q-3b
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1faJfx-00078y-M5
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:40:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1faJfx-00078Y-Ex
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:40:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1faJfv-0006bd-IQ
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 11:40:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F35932E81A4
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 11:40:50 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1faJrO-0006xK-Op
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:52:44 -0400
+References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
+	<20180629151524.138542-3-vsementsov@virtuozzo.com>
+	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
+	<920ef7dd-67c3-fd93-b1b3-ea3bd31577f2@redhat.com>
+	<e97fb1f7-a864-a413-0ea4-f3e1dc29bc9f@virtuozzo.com>
+	<20180703111538.GB3812@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <22fb134f-a45a-919e-c742-f76fb711f190@virtuozzo.com>
+Date: Tue, 3 Jul 2018 14:52:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180703111538.GB3812@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Jul 2018 11:27:23 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
-Message-Id: <153061724388.29497.13322512850218566436.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
- 6 when running lv2 plugin cross-compilation
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
+ driver for fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,79 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
 
-You want to execute a single program in the chroot (whatever the binary
-that is failing is):
+03.07.2018 14:15, Kevin Wolf wrote:
+> Am 02.07.2018 um 14:09 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 29.06.2018 20:40, Eric Blake wrote:
+>>> On 06/29/2018 12:30 PM, John Snow wrote:
+>>>>
+>>>> On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> We need to synchronize backup job with reading from fleecing image
+>>>>> like it was done in block/replication.c.
+>>>>>
+>>>>> Otherwise, the following situation is theoretically possible:
+>>>>>
+>>>>> 1. client start reading
+>>>>> 2. client understand, that there is no corresponding cluster in
+>>>>>  =C2=A0=C2=A0=C2=A0 fleecing image
+>>>> I don't think the client refocuses the read, but QEMU does. (the clien=
+t
+>>>> has no idea if it is reading from the fleecing node or the backing
+>>>> file.)
+>>>>
+>>>> ... but understood:
+>>>>
+>>>>> 3. client is going to read from backing file (i.e. active image)
+>>>>> 4. guest writes to active image
+>>>> My question here is if QEMU will allow reads and writes to interleave =
+in
+>>>> general. If the client is reading from the backing file, the active
+>>>> image, will QEMU allow a write to modify that data before we're done
+>>>> getting that data?
+>>>>
+>>>>> 5. this write is stopped by backup(sync=3Dnone) and cluster is copied=
+ to
+>>>>>  =C2=A0=C2=A0=C2=A0 fleecing image
+>>>>> 6. guest write continues...
+>>>>> 7. and client reads _new_ (or partly new) date from active image
+>>>>>
+>>>> I can't answer this for myself one way or the other right now, but I
+>>>> imagine you observed a failure in practice in your test setups, which
+>>>> motivated this patch?
+>>>>
+>>>> A test or some proof would help justification for this patch. It would
+>>>> also help prove that it solves what it claims to!
+>>> In fact, do we really need a new filter, or do we just need to make the
+>>> "sync":"none" blockdev-backup job take the appropriate synchronization
+>>> locks?
+>>>
+>> How? We'll need additional mechanism like serializing requests.. Or a wa=
+y to
+>> reuse serializing requests. Using backup internal synchronization looks
+>> simpler, and it is already used in block replication.
+> But it also just an ugly hack
 
-sudo chroot . usr/bin/qemu-arm-static -g program/to/run arguments
+agree.
 
--- =
+>   that fixes one special case and leaves
+> everything else broken. replication is usually not a good example for
+> anything. It always gives me bad surprises when I have to look at it.
+>
+> We'll have to figure out where to fix this problem (or what it really
+> is, once you look more than just at fleecing), but I think requiring the
+> user to add a filter driver to work around missing serialisation in
+> other code, and corrupting their image if they forget to, is not a
+> reasonable solution.
+>
+> I see at least two things wrong in this context:
+>
+> * The permissions don't seem to match reality. The NBD server
+>    unconditionally shares PERM_WRITE, which is wrong in this case. The
+>    client wants to see a point-in-time snapshot that never changes. This
+>    should become an option so that it can be properly reflected in the
+>    permissions used.
+>
+> * Once we have proper permissions, the fleecing setup breaks down
+>    because the guest needs PERM_WRITE on the backing file, but the
+>    fleecing overlay allows that only if the NBD client allows it (which
+>    it doesn't for fleecing).
+>
+>    Now we can implement an exception right into backup that installs a
+>    backup filter driver between source and target if the source is the
+>    backing file of the target. The filter driver would be similar to the
+>    commit filter driver in that it simply promises !PERM_WRITE to its
+>    parents, but allows PERM_WRITE on the source because it has installed
+>    the before_write_notifier that guarantees this condition.
+>
+>    All writes to the target that are made by the backup job in this setup
+>    (including before_write_notifier writes) need to be marked as
+>    serialising so that any concurrent reads are completed first.
+>
+> And if we decide to add a target filter to backup, we should probably at
+> the same time use a filter driver for intercepting source writes instead
+> of using before_write_notifier.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776478
+and this is the point, where we can drop backup job at all from fleecing=20
+scheme, as actually backup(sync=3Dnone) =3D=3D such special filter driver
 
-Title:
-  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
-  compilation
+>
+> Max, I think you intended to make both source and target children of the
+> same block job node (or at least for mirror). But wouldn't that create
+> loops in a setup like this? I think we may need two filters that are
+> only connected through the block job, but not with block graph edges.
+>
+> Kevin
 
-Status in QEMU:
-  New
-
-Bug description:
-  Hey,
-  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
-e lv2 audio plugins.
-
-  When running a compilation of DISTRHO-Ports we get:
-
-  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
-on `mutex->__data.__owner =3D=3D 0' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
-$FILE
-  Makefile:62: recipe for target 'gen_lv2' failed
-  make[1]: *** [gen_lv2] Error 134
-  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
-  Makefile:104: recipe for target 'lv2' failed
-  make: *** [lv2] Error 2
-
-  =
-
-  lv2_ttl_generator source is here:
-  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
-or
-
-  The command that is ruining is
-  lv2_ttl_generator ./TAL-Filter-2.so =
-
-
-  And ./TAL-Filter-2.so source is here:
-  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
-ource
-
-
-  Is there a way to debug what is going on?
-  This runs fine on a Raspberrypi which is armv7
-
-  A workaround would also help.
-
-  =
-
-  Bug in Zynthian:
-  https://github.com/zynthian/zynthian-sys/issues/59
-  Bug in DISTRHO-Ports:
-  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
-
-  Using qemu-arm-static version from master from two days ago:
-  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
-9ca52c327c6603d60db90ae4feeae719f7
-
-  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
-
-  Thanks,
-  Guy
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
+--=20
+Best regards,
+Vladimir
