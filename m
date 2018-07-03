@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg2-0002HM-7z
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:16 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg3-0002IU-8A
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg0-0003c5-DE
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36438 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg2-0003d9-2J
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53152 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1faNg0-0003bi-7t
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:12 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1faNg1-0003co-S9
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFF32401D795
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 596C140780F8
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:13 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jul 2018 17:56:47 +0200
-Message-Id: <20180703155648.11933-14-marcandre.lureau@redhat.com>
+Date: Tue,  3 Jul 2018 17:56:48 +0200
+Message-Id: <20180703155648.11933-15-marcandre.lureau@redhat.com>
 In-Reply-To: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 13/14] qapi: add conditions to VNC
+Subject: [Qemu-devel] [PATCH v7 14/14] qapi: add conditions to SPICE
  type/commands/events on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,379 +37,227 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add #if defined(CONFIG_VNC) in generated code, and adjust the
+Add #if defined(CONFIG_SPICE) in generated code, and adjust the
 qmp/hmp code accordingly.
 
 query-qmp-schema no longer reports the command/events etc as
-available when disabled at compile.
+available when disabled at compile time.
 
 Commands made conditional:
 
-* query-vnc, query-vnc-servers, change-vnc-password
+* query-spice
 
-  Before the patch, the commands for !CONFIG_VNC are stubs that fail
-  like this:
-
-    {"error": {"class": "GenericError",
-               "desc": "The feature 'vnc' is not enabled"}}
-
-  Afterwards, they fail like this:
-
-    {"error": {"class": "CommandNotFound",
-               "desc": "The command FOO has not been found"}}
-
-  I call that an improvement, because it lets clients distinguish
-  between command unavailable (class CommandNotFound) and command failed
-  (class GenericError).
+  Before the patch, the command for !CONFIG_SPICE is unregistered. It
+  will fail with the same error.
 
 Events made conditional:
 
-* VNC_CONNECTED, VNC_INITIALIZED, VNC_DISCONNECTED
+* SPICE_CONNECTED, SPICE_INITIALIZED, SPICE_DISCONNECTED,
+  SPICE_MIGRATE_COMPLETED
 
-HMP change:
+Add TODO for conditional SPICE chardevs, delayed until the supports
+for conditional members lands.
 
-* info vnc
-
-  Will return "unknown command: 'info vnc'" when VNC is compiled
-  out (same as error for spice when --disable-spice)
-
-Occurrences of VNC (case insensitive) in the schema that aren't
-covered by this change:
-
-* add_client
-
-  Command has other uses, including "socket bases character devices".
-  These are unconditional as far as I can tell.
-
-* set_password, expire_password
-
-  In theory, these commands could be used for managing any service's
-  password.  In practice, they're used for VNC and SPICE services.
-  They're documented for "remote display session" / "remote display
-  server".
-
-  The service is selected by argument @protocol.  The code special-cases
-  protocol-specific argument checking, then calls a protocol-specific
-  function to do the work.  If it fails, the command fails with "Could
-  not set password".  It does when the service isn't compiled in (it's a
-  stub then).
-
-  We could make these commands conditional on the conjunction of all
-  services [currently: defined(CONFIG_VNC) || defined(CONFIG_SPICE)],
-  but I doubt it's worthwhile.
-
-* change
-
-  Command has other uses, namely changing media.
-  This patch inlines a stub; no functional change.
+No HMP change, the code was already conditional.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/ui.json         | 45 +++++++++++++++++++++++++++-----------------
- ui/vnc.h             |  2 ++
- hmp.c                |  9 ++++++++-
- qmp.c                | 30 ++++-------------------------
- hmp-commands-info.hx |  2 ++
- 5 files changed, 44 insertions(+), 44 deletions(-)
+ qapi/char.json |  8 ++++++--
+ qapi/ui.json   | 30 ++++++++++++++++++++----------
+ monitor.c      |  3 ---
+ qmp.c          | 16 ----------------
+ 4 files changed, 26 insertions(+), 31 deletions(-)
 
+diff --git a/qapi/char.json b/qapi/char.json
+index 60f31d83fc..b7b2a05766 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -320,6 +320,7 @@
+ ##
+ { 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
+   'base': 'ChardevCommon' }
++# TODO: 'if': 'defined(CONFIG_SPICE)'
+=20
+ ##
+ # @ChardevSpicePort:
+@@ -332,6 +333,7 @@
+ ##
+ { 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
+   'base': 'ChardevCommon' }
++# TODO: 'if': 'defined(CONFIG_SPICE)'
+=20
+ ##
+ # @ChardevVC:
+@@ -385,8 +387,10 @@
+                                        'testdev': 'ChardevCommon',
+                                        'stdio'  : 'ChardevStdio',
+                                        'console': 'ChardevCommon',
+-                                       'spicevmc' : 'ChardevSpiceChannel=
+',
+-                                       'spiceport' : 'ChardevSpicePort',
++                                       'spicevmc': 'ChardevSpiceChannel'=
+,
++# TODO: { 'type': 'ChardevSpiceChannel', 'if': 'defined(CONFIG_SPICE)' }=
+,
++                                       'spiceport': 'ChardevSpicePort',
++# TODO: { 'type': 'ChardevSpicePort', 'if': 'defined(CONFIG_SPICE)' },
+                                        'vc'     : 'ChardevVC',
+                                        'ringbuf': 'ChardevRingbuf',
+                                        # next one is just for compatibil=
+ity
 diff --git a/qapi/ui.json b/qapi/ui.json
-index f48d2a0afb..ee90c1880b 100644
+index ee90c1880b..4ca91bb45a 100644
 --- a/qapi/ui.json
 +++ b/qapi/ui.json
-@@ -377,7 +377,8 @@
+@@ -118,7 +118,8 @@
+ { 'struct': 'SpiceBasicInfo',
    'data': { 'host': 'str',
-             'service': 'str',
-             'family': 'NetworkAddressFamily',
--            'websocket': 'bool' } }
-+            'websocket': 'bool' },
-+  'if': 'defined(CONFIG_VNC)' }
+             'port': 'str',
+-            'family': 'NetworkAddressFamily' } }
++            'family': 'NetworkAddressFamily' },
++  'if': 'defined(CONFIG_SPICE)' }
 =20
  ##
- # @VncServerInfo:
-@@ -391,7 +392,8 @@
+ # @SpiceServerInfo:
+@@ -131,7 +132,8 @@
  ##
- { 'struct': 'VncServerInfo',
-   'base': 'VncBasicInfo',
+ { 'struct': 'SpiceServerInfo',
+   'base': 'SpiceBasicInfo',
 -  'data': { '*auth': 'str' } }
 +  'data': { '*auth': 'str' },
-+  'if': 'defined(CONFIG_VNC)' }
++  'if': 'defined(CONFIG_SPICE)' }
 =20
  ##
- # @VncClientInfo:
-@@ -408,7 +410,8 @@
- ##
- { 'struct': 'VncClientInfo',
-   'base': 'VncBasicInfo',
--  'data': { '*x509_dname': 'str', '*sasl_username': 'str' } }
-+  'data': { '*x509_dname': 'str', '*sasl_username': 'str' },
-+  'if': 'defined(CONFIG_VNC)' }
+ # @SpiceChannel:
+@@ -156,7 +158,8 @@
+ { 'struct': 'SpiceChannel',
+   'base': 'SpiceBasicInfo',
+   'data': {'connection-id': 'int', 'channel-type': 'int', 'channel-id': =
+'int',
+-           'tls': 'bool'} }
++           'tls': 'bool'},
++  'if': 'defined(CONFIG_SPICE)' }
 =20
  ##
- # @VncInfo:
-@@ -449,7 +452,8 @@
- { 'struct': 'VncInfo',
-   'data': {'enabled': 'bool', '*host': 'str',
-            '*family': 'NetworkAddressFamily',
--           '*service': 'str', '*auth': 'str', '*clients': ['VncClientInf=
-o']} }
-+           '*service': 'str', '*auth': 'str', '*clients': ['VncClientInf=
-o']},
-+  'if': 'defined(CONFIG_VNC)' }
+ # @SpiceQueryMouseMode:
+@@ -175,7 +178,8 @@
+ # Since: 1.1
+ ##
+ { 'enum': 'SpiceQueryMouseMode',
+-  'data': [ 'client', 'server', 'unknown' ] }
++  'data': [ 'client', 'server', 'unknown' ],
++  'if': 'defined(CONFIG_SPICE)' }
 =20
  ##
- # @VncPrimaryAuth:
-@@ -460,7 +464,8 @@
- ##
- { 'enum': 'VncPrimaryAuth',
-   'data': [ 'none', 'vnc', 'ra2', 'ra2ne', 'tight', 'ultra',
--            'tls', 'vencrypt', 'sasl' ] }
-+            'tls', 'vencrypt', 'sasl' ],
-+  'if': 'defined(CONFIG_VNC)' }
+ # @SpiceInfo:
+@@ -212,7 +216,8 @@
+ { 'struct': 'SpiceInfo',
+   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str', '*port=
+': 'int',
+            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str=
+',
+-           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChan=
+nel']} }
++           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChan=
+nel']},
++  'if': 'defined(CONFIG_SPICE)' }
 =20
  ##
- # @VncVencryptSubAuth:
-@@ -474,8 +479,8 @@
-             'tls-none',  'x509-none',
-             'tls-vnc',   'x509-vnc',
-             'tls-plain', 'x509-plain',
--            'tls-sasl',  'x509-sasl' ] }
--
-+            'tls-sasl',  'x509-sasl' ],
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # @VncServerInfo2:
-@@ -492,8 +497,8 @@
- { 'struct': 'VncServerInfo2',
-   'base': 'VncBasicInfo',
-   'data': { 'auth'      : 'VncPrimaryAuth',
--            '*vencrypt' : 'VncVencryptSubAuth' } }
--
-+            '*vencrypt' : 'VncVencryptSubAuth' },
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # @VncInfo2:
-@@ -525,7 +530,8 @@
-             'clients'   : ['VncClientInfo'],
-             'auth'      : 'VncPrimaryAuth',
-             '*vencrypt' : 'VncVencryptSubAuth',
--            '*display'  : 'str' } }
-+            '*display'  : 'str' },
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # @query-vnc:
-@@ -556,8 +562,8 @@
+ # @query-spice:
+@@ -257,7 +262,8 @@
  #    }
  #
  ##
--{ 'command': 'query-vnc', 'returns': 'VncInfo' }
--
-+{ 'command': 'query-vnc', 'returns': 'VncInfo',
-+  'if': 'defined(CONFIG_VNC)' }
+-{ 'command': 'query-spice', 'returns': 'SpiceInfo' }
++{ 'command': 'query-spice', 'returns': 'SpiceInfo',
++  'if': 'defined(CONFIG_SPICE)' }
+=20
  ##
- # @query-vnc-servers:
+ # @SPICE_CONNECTED:
+@@ -282,7 +288,8 @@
+ ##
+ { 'event': 'SPICE_CONNECTED',
+   'data': { 'server': 'SpiceBasicInfo',
+-            'client': 'SpiceBasicInfo' } }
++            'client': 'SpiceBasicInfo' },
++  'if': 'defined(CONFIG_SPICE)' }
+=20
+ ##
+ # @SPICE_INITIALIZED:
+@@ -310,7 +317,8 @@
+ ##
+ { 'event': 'SPICE_INITIALIZED',
+   'data': { 'server': 'SpiceServerInfo',
+-            'client': 'SpiceChannel' } }
++            'client': 'SpiceChannel' },
++  'if': 'defined(CONFIG_SPICE)' }
+=20
+ ##
+ # @SPICE_DISCONNECTED:
+@@ -335,7 +343,8 @@
+ ##
+ { 'event': 'SPICE_DISCONNECTED',
+   'data': { 'server': 'SpiceBasicInfo',
+-            'client': 'SpiceBasicInfo' } }
++            'client': 'SpiceBasicInfo' },
++  'if': 'defined(CONFIG_SPICE)' }
+=20
+ ##
+ # @SPICE_MIGRATE_COMPLETED:
+@@ -350,7 +359,8 @@
+ #      "event": "SPICE_MIGRATE_COMPLETED" }
  #
-@@ -567,7 +573,8 @@
- #
- # Since: 2.3
  ##
--{ 'command': 'query-vnc-servers', 'returns': ['VncInfo2'] }
-+{ 'command': 'query-vnc-servers', 'returns': ['VncInfo2'],
-+  'if': 'defined(CONFIG_VNC)' }
+-{ 'event': 'SPICE_MIGRATE_COMPLETED' }
++{ 'event': 'SPICE_MIGRATE_COMPLETED',
++  'if': 'defined(CONFIG_SPICE)' }
 =20
  ##
- # @change-vnc-password:
-@@ -581,7 +588,8 @@
- # Notes:  An empty password in this command will set the password to the=
- empty
- #         string.  Existing clients are unaffected by executing this com=
-mand.
- ##
--{ 'command': 'change-vnc-password', 'data': {'password': 'str'} }
-+{ 'command': 'change-vnc-password', 'data': {'password': 'str'},
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # @VNC_CONNECTED:
-@@ -610,7 +618,8 @@
- ##
- { 'event': 'VNC_CONNECTED',
-   'data': { 'server': 'VncServerInfo',
--            'client': 'VncBasicInfo' } }
-+            'client': 'VncBasicInfo' },
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # @VNC_INITIALIZED:
-@@ -637,7 +646,8 @@
- ##
- { 'event': 'VNC_INITIALIZED',
-   'data': { 'server': 'VncServerInfo',
--            'client': 'VncClientInfo' } }
-+            'client': 'VncClientInfo' },
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # @VNC_DISCONNECTED:
-@@ -663,7 +673,8 @@
- ##
- { 'event': 'VNC_DISCONNECTED',
-   'data': { 'server': 'VncServerInfo',
--            'client': 'VncClientInfo' } }
-+            'client': 'VncClientInfo' },
-+  'if': 'defined(CONFIG_VNC)' }
-=20
- ##
- # =3D Input
-diff --git a/ui/vnc.h b/ui/vnc.h
-index 762632929b..a86e0610e8 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -297,7 +297,9 @@ struct VncState
-     bool encode_ws;
-     bool websocket;
-=20
-+#ifdef CONFIG_VNC
-     VncClientInfo *info;
-+#endif
-=20
-     /* Job thread bottom half has put data for a forced update
-      * into the output buffer. This offset points to the end of
-diff --git a/hmp.c b/hmp.c
-index fe4477a8fb..4555b503ac 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -616,6 +616,7 @@ void hmp_info_blockstats(Monitor *mon, const QDict *q=
-dict)
-     qapi_free_BlockStatsList(stats_list);
- }
-=20
-+#ifdef CONFIG_VNC
- /* Helper for hmp_info_vnc_clients, _servers */
- static void hmp_info_VncBasicInfo(Monitor *mon, VncBasicInfo *info,
-                                   const char *name)
-@@ -703,6 +704,7 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
-     qapi_free_VncInfo2List(info2l);
-=20
- }
-+#endif
-=20
- #ifdef CONFIG_SPICE
- void hmp_info_spice(Monitor *mon, const QDict *qdict)
-@@ -1772,12 +1774,14 @@ void hmp_eject(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
-=20
-+#ifdef CONFIG_VNC
- static void hmp_change_read_arg(void *opaque, const char *password,
-                                 void *readline_opaque)
+ # =3D=3D VNC
+diff --git a/monitor.c b/monitor.c
+index 3a0ea0c602..8e1aea7826 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1191,9 +1191,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
+ect **ret_data,
+  */
+ static void qmp_unregister_commands_hack(void)
  {
-     qmp_change_vnc_password(password, NULL);
-     monitor_read_command(opaque, 1);
- }
-+#endif
-=20
- void hmp_change(Monitor *mon, const QDict *qdict)
- {
-@@ -1788,6 +1792,7 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-     BlockdevChangeReadOnlyMode read_only_mode =3D 0;
-     Error *err =3D NULL;
-=20
-+#ifdef CONFIG_VNC
-     if (strcmp(device, "vnc") =3D=3D 0) {
-         if (read_only) {
-             monitor_printf(mon,
-@@ -1802,7 +1807,9 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-             }
-         }
-         qmp_change("vnc", target, !!arg, arg, &err);
--    } else {
-+    } else
-+#endif
-+    {
-         if (read_only) {
-             read_only_mode =3D
-                 qapi_enum_parse(&BlockdevChangeReadOnlyMode_lookup,
+-#ifndef CONFIG_SPICE
+-    qmp_unregister_command(&qmp_commands, "query-spice");
+-#endif
+ #ifndef CONFIG_REPLICATION
+     qmp_unregister_command(&qmp_commands, "xen-set-replication");
+     qmp_unregister_command(&qmp_commands, "query-xen-replication-status"=
+);
 diff --git a/qmp.c b/qmp.c
-index 73e46d795f..bc5537b221 100644
+index bc5537b221..162bc2e30d 100644
 --- a/qmp.c
 +++ b/qmp.c
 @@ -129,22 +129,6 @@ void qmp_cpu_add(int64_t id, Error **errp)
      }
  }
 =20
--#ifndef CONFIG_VNC
--/* If VNC support is enabled, the "true" query-vnc command is
--   defined in the VNC subsystem */
--VncInfo *qmp_query_vnc(Error **errp)
+-#ifndef CONFIG_SPICE
+-/*
+- * qmp_unregister_commands_hack() ensures that QMP command query-spice
+- * exists only #ifdef CONFIG_SPICE.  Necessary for an accurate
+- * query-commands result.  However, the QAPI schema is blissfully
+- * unaware of that, and the QAPI code generator happily generates a
+- * dead qmp_marshal_query_spice() that calls qmp_query_spice().
+- * Provide it one, or else linking fails.  FIXME Educate the QAPI
+- * schema on CONFIG_SPICE.
+- */
+-SpiceInfo *qmp_query_spice(Error **errp)
 -{
--    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
--    return NULL;
--};
--
--VncInfo2List *qmp_query_vnc_servers(Error **errp)
--{
--    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
--    return NULL;
+-    abort();
 -};
 -#endif
 -
- #ifndef CONFIG_SPICE
- /*
-  * qmp_unregister_commands_hack() ensures that QMP command query-spice
-@@ -412,23 +396,17 @@ static void qmp_change_vnc(const char *target, bool=
- has_arg, const char *arg,
-         qmp_change_vnc_listen(target, errp);
-     }
- }
--#else
--void qmp_change_vnc_password(const char *password, Error **errp)
--{
--    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
--}
--static void qmp_change_vnc(const char *target, bool has_arg, const char =
-*arg,
--                           Error **errp)
--{
--    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
--}
- #endif /* !CONFIG_VNC */
-=20
- void qmp_change(const char *device, const char *target,
-                 bool has_arg, const char *arg, Error **errp)
+ void qmp_exit_preconfig(Error **errp)
  {
-     if (strcmp(device, "vnc") =3D=3D 0) {
-+#ifdef CONFIG_VNC
-         qmp_change_vnc(target, has_arg, arg, errp);
-+#else
-+        error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
-+#endif
-     } else {
-         qmp_blockdev_change_medium(true, device, false, NULL, target,
-                                    has_arg, arg, false, 0, errp);
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a482b6e56b..70639f656a 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -426,6 +426,7 @@ STEXI
- Show which guest mouse is receiving events.
- ETEXI
-=20
-+#if defined(CONFIG_VNC)
-     {
-         .name       =3D "vnc",
-         .args_type  =3D "",
-@@ -433,6 +434,7 @@ ETEXI
-         .help       =3D "show the vnc server status",
-         .cmd        =3D hmp_info_vnc,
-     },
-+#endif
-=20
- STEXI
- @item info vnc
+     if (!runstate_check(RUN_STATE_PRECONFIG)) {
 --=20
 2.18.0.rc1
