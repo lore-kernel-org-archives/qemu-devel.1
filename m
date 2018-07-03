@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1faI5C-0000a7-Hs
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:58:51 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1faI8H-0001ma-Td
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1faI57-0000c3-Nr
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:58:50 -0400
-Received: from mail-db3eur04hn0213.outbound.protection.outlook.com
-	([104.47.12.213]:36640
-	helo=EUR04-DB3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1faI57-0000bT-8e
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:58:45 -0400
-Date: Tue, 3 Jul 2018 12:58:25 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180703095825.GC30904@rkaganb.sw.ru>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-	<20180702161404.GA2339@rkaganb.sw.ru>
-	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1faI8D-0002fg-S6
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:01 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:42953)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1faI8D-0002es-I2
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:01:57 -0400
+Received: by mail-wr0-x243.google.com with SMTP id p1-v6so1318224wrs.9
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:01:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Use of unique identifier for
- pairing virtio and passthrough devices...
+In-Reply-To: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
+References: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 3 Jul 2018 12:01:55 +0200
+Message-ID: <CAJ+F1CJeui7YXrH35ObNBbasoduRKeJW8W=O+nW3P2rEHLAdPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qga: report disk size and free space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,118 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: si-wei liu <si-wei.liu@oracle.com>
-Cc: Venu Busireddy <venu.busireddy@oracle.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Mon, Jul 02, 2018 at 02:14:52PM -0700, si-wei liu wrote:
-> On 7/2/2018 9:14 AM, Roman Kagan wrote:
-> > On Fri, Jun 29, 2018 at 05:19:03PM -0500, Venu Busireddy wrote:
-> > > The patch set "Enable virtio_net to act as a standby for a passthru
-> > > device" [1] deals with live migration of guests that use passthrough
-> > > devices. However, that scheme uses the MAC address for pairing
-> > > the virtio device and the passthrough device. The thread "netvsc:
-> > > refactor notifier/event handling code to use the failover framework"
-> > > [2] discusses an alternate mechanism, such as using an UUID, for pairing
-> > > the devices. Based on that discussion, proposals "Add "Group Identifier"
-> > > to virtio PCI capabilities." [3] and "RFC: Use of bridge devices to
-> > > store pairing information..." [4] were made.
-> > > 
-> > > The current patch set includes all the feedback received for proposals [3]
-> > > and [4]. For the sake of completeness, patch for the virtio specification
-> > > is also included here. Following is the updated proposal.
-> > > 
-> > > 1. Extend the virtio specification to include a new virtio PCI capability
-> > >     "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-> > > 
-> > > 2. Enhance the QEMU CLI to include a "failover-group-id" option to the
-> > >     virtio device. The "failover-group-id" is a 64 bit value.
-> > > 
-> > > 3. Enhance the QEMU CLI to include a "failover-group-id" option to the
-> > >     Red Hat PCI bridge device (support for the i440FX model).
-> > > 
-> > > 4. Add a new "pcie-downstream" device, with the option
-> > >     "failover-group-id" (support for the Q35 model).
-> > > 
-> > > 5. The operator creates a 64 bit unique identifier, failover-group-id.
-> > > 
-> > > 6. When the virtio device is created, the operator uses the
-> > >     "failover-group-id" option (for example, '-device
-> > >     virtio-net-pci,failover-group-id=<identifier>') and specifies the
-> > >     failover-group-id created in step 4.
-> > > 
-> > >     QEMU stores the failover-group-id in the virtio device's configuration
-> > >     space in the capability "VIRTIO_PCI_CAP_GROUP_ID_CFG".
-> > > 
-> > > 7. When assigning a PCI device to the guest in passthrough mode, the
-> > >     operator first creates a bridge using the "failover-group-id" option
-> > >     (for example, '-device pcie-downstream,failover-group-id=<identifier>')
-> > >     to specify the failover-group-id created in step 4, and then attaches
-> > >     the passthrough device to the bridge.
-> > > 
-> > >     QEMU stores the failover-group-id in the configuration space of the
-> > >     bridge as Vendor-Specific capability (0x09). The "Vendor" here is
-> > >     not to be confused with a specific organization. Instead, the vendor
-> > >     of the bridge is QEMU.
-> > > 
-> > > 8. Patch 4 in patch series "Enable virtio_net to act as a standby for
-> > >     a passthru device" [1] needs to be modified to use the UUID values
-> > >     present in the bridge's configuration space and the virtio device's
-> > >     configuration space instead of the MAC address for pairing the devices.
-> > I'm still missing a few bits in the overall scheme.
-> > 
-> > Is the guest supposed to acknowledge the support for PT-PV failover?
-> 
-> Yes. We are leveraging virtio's feature negotiation mechanism for that.
-> Guest which does not acknowledge the support will not have PT plugged in.
-> 
-> > Should the PT device be visibile to the guest before it acknowledges the
-> > support for failover?
-> No. QEMU will only expose PT device after guest acknowledges the support
-> through virtio's feature negotiation.
-> 
-> >    How is this supposed to work with legacy guests that don't support it?
-> Only PV device will be exposed on legacy guest.
+Hi
 
-So how is this coordination going to work?  One possibility is that the
-PV device emits a QMP event upon the guest driver confirming the support
-for failover, the management layer intercepts the event and performs
-device_add of the PT device.  Another is that the PT device is added
-from the very beginning (e.g. on the QEMU command line) but its parent
-PCI bridge subscribes a callback with the PV device to "activate" the PT
-device upon negotiating the failover feature.
+On Tue, Jul 3, 2018 at 10:31 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolemb=
+i@redhat.com> wrote:
+> Report total file system size and free space in output of command
+> "guest-get-fsinfo". Values are optional and it is not an error if they ca=
+nnot
+> be retrieved for some reason.
+>
 
-I think this needs to be decided within the scope of this patchset.
+I am afraid this will miss 3.0, since it's a new feature
 
-> > Is the guest supposed to signal the datapath switch to the host?
-> No, guest doesn't need to be initiating datapath switch at all.
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
+>  qga/commands-posix.c | 18 ++++++++++++++++++
+>  qga/commands-win32.c | 16 ++++++++++++++++
+>  qga/qapi-schema.json |  5 ++++-
+>  3 files changed, 38 insertions(+), 1 deletion(-)
+>
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index eae817191b..1f2fb25b91 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -13,6 +13,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include <sys/ioctl.h>
+> +#include <sys/statvfs.h>
+>  #include <sys/utsname.h>
+>  #include <sys/wait.h>
+>  #include <dirent.h>
+> @@ -1074,11 +1075,28 @@ static GuestFilesystemInfo *build_guest_fsinfo(st=
+ruct FsMount *mount,
+>      GuestFilesystemInfo *fs =3D g_malloc0(sizeof(*fs));
+>      char *devpath =3D g_strdup_printf("/sys/dev/block/%u:%u",
+>                                      mount->devmajor, mount->devminor);
+> +    struct statvfs vfs_stats;
+>
+>      fs->mountpoint =3D g_strdup(mount->dirname);
+>      fs->type =3D g_strdup(mount->devtype);
+>      build_guest_fsinfo_for_device(devpath, fs, errp);
+>
+> +    g_debug(" get filesystem statistics for '%s'", mount->dirname);
+> +    if (statvfs(mount->dirname, &vfs_stats) !=3D 0) {
+> +        /* This is not fatal, just log this incident */
+> +        Error *local_err =3D NULL;
+> +        error_setg_errno(&local_err, errno, "statfs(\"%s\")",
 
-What happens if the guest supports failover in its PV driver, but lacks
-the driver for the PT device?
+statvfs()
 
-> However, QMP
-> events may be generated when exposing or hiding the PT device through hot
-> plug/unplug to facilitate host to switch datapath.
+> +            mount->dirname);
+> +        slog("failed to stat filesystem: %s",
+> +            error_get_pretty(local_err));
+> +        error_free(local_err);
 
-The PT device hot plug/unplug are initiated by the host, aren't they?  Why
-would it also need QMP events for them?
+The usage of Error is a bit overkill, perhaps you may juste use slog()
+/ strerror() directly.
 
-> > Is the scheme going to be applied/extended to other transports (vmbus,
-> > virtio-ccw, etc.)?
-> Well, it depends on the use case, and how feasible it can be extended to
-> other transport due to constraints and transport specifics.
-> 
-> > Is the failover group concept going to be used beyond PT-PV network
-> > device failover?
-> Although the concept of failover group is generic, the implementation itself
-> may vary.
+> +    } else {
+> +        fs->size =3D vfs_stats.f_frsize * vfs_stats.f_blocks;
+> +        fs->has_size =3D true;
+> +        fs->free =3D vfs_stats.f_frsize * vfs_stats.f_bfree;
+> +        fs->has_free =3D true;
+> +    }
+> +
+>      g_free(devpath);
+>      return fs;
+>  }
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 70ee5379f6..6d6ca05281 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -706,6 +706,22 @@ static GuestFilesystemInfo *build_guest_fsinfo(char =
+*guid, Error **errp)
+>      }
+>      fs->type =3D g_strdup(fs_name);
+>      fs->disk =3D build_guest_disk_info(guid, errp);
+> +
+> +    if (len > 0) {
+> +        if (GetDiskFreeSpaceEx(mnt_point, 0, (PULARGE_INTEGER)&fs->size,
+> +                (PULARGE_INTEGER)&fs->free) !=3D 0) {
 
-My point with these two questions is that since this patchset is
-defining external interfaces -- with guest OS, with management layer --
-which are not easy to change later, it might make sense to try and see
-if the interfaces map to other usecases.  E.g. I think we can get enough
-information on how Hyper-V handles PT-PV network device failover from
-the current Linux implementation; it may be a good idea to share some
-concepts and workflows with virtio-pci.
+I would rather use some local ULARGE_INTEGER and access the QuadPart
+to avoid the cast, but it should work.
 
-Thanks,
-Roman.
+> +            /* This is not fatal, just log this incident */
+> +            Error *local_err =3D NULL;
+> +            error_setg_win32(&local_err, GetLastError(),
+> +                "failed to get free space on volume \"%s\"", mnt_point);
+> +            slog("%s", error_get_pretty(local_err));
+> +            error_free(local_err);
+> +        } else {
+> +            fs->has_size =3D true;
+> +            fs->has_free =3D true;
+> +        }
+> +    }
+> +
+>  free:
+>      g_free(mnt_point);
+>      return fs;
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index 17884c7c70..28a32444d3 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -848,12 +848,15 @@
+>  # @type: file system type string
+>  # @disk: an array of disk hardware information that the volume lies on,
+>  #        which may be empty if the disk type is not supported
+> +# @size: total number of bytes on the file system (Since 2.13)
+> +# @free: number of bytes available on the file system (Since 2.13)
+
+"Since 3.1", most probably
+
+>  #
+>  # Since: 2.2
+>  ##
+>  { 'struct': 'GuestFilesystemInfo',
+>    'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
+> -           'disk': ['GuestDiskAddress']} }
+> +           'disk': ['GuestDiskAddress'], '*size': 'uint64',
+> +           '*free': 'uint64'} }
+>
+>  ##
+>  # @guest-get-fsinfo:
+> --
+> 2.17.1
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
