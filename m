@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1faJ8Z-0001Xo-ND
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:06:24 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1faJA5-0002D9-Hj
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1faJ8W-000387-Gf
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:06:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46974)
+	(envelope-from <robert.hu@linux.intel.com>) id 1faJA2-00040f-C8
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:07:57 -0400
+Received: from mga04.intel.com ([192.55.52.120]:2249)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1faJ8W-00036U-A8
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:06:20 -0400
-Date: Tue, 3 Jul 2018 08:06:17 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180703110617.GM7451@localhost.localdomain>
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1faJA2-000406-2R
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:07:54 -0400
+Message-ID: <1530616071.22880.52.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Tue, 03 Jul 2018 19:07:51 +0800
+In-Reply-To: <b7c410af-ebc0-537c-84c4-588842fec111@redhat.com>
 References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
 	<1530098844-236851-2-git-send-email-robert.hu@linux.intel.com>
 	<20180627170304.GD914@localhost.localdomain>
@@ -19,10 +21,9 @@ References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
 	<ce3282a7-310c-6c53-05b8-f00afb787279@redhat.com>
 	<1530607697.22880.46.camel@linux.intel.com>
 	<b7c410af-ebc0-537c-84c4-588842fec111@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7c410af-ebc0-537c-84c4-588842fec111@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2 1/5] i386: Add support for IA32_PRED_CMD
  and IA32_ARCH_CAPABILITIES MSRs
 List-Id: <qemu-devel.nongnu.org>
@@ -34,9 +35,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com
 
-On Tue, Jul 03, 2018 at 11:06:00AM +0200, Paolo Bonzini wrote:
+On Tue, 2018-07-03 at 11:06 +0200, Paolo Bonzini wrote:
 > On 03/07/2018 10:48, Robert Hoo wrote:
 > >>
 > >> However, I suggest adding it to the FeatureWord enum, since everything
@@ -65,16 +66,18 @@ On Tue, Jul 03, 2018 at 11:06:00AM +0200, Paolo Bonzini wrote:
 > Then the existing loops that use FeatureWordInfo can go up to
 > FEATURE_WORDS_NUM_CPUID.
 
-I assume we want to make some (or most) of the loops go up to
-FEATURE_WORDS (e.g. make x86_cpu_get_supported_feature_word()
-support MSRs too), otherwise it would be pointless to reuse the
-same array.
-
-I would be OK with both approaches, though.  If the first version
-doesn't use the `features[]` array and implements this with a
-separate `msr_features[]` or `msr_arch_capabilities` field, it
-would work for me (especially if this means we can get this
-implemented in time for QEMU 3.0).
-
--- 
-Eduardo
+Emm... Understand your point now. It is a little risky, all references
+to FEATURE_WORDS need to be updated carefully.
+OK, let me try to think in this way.
+Perhaps, I'll need to define a new 'struct FeautureWordMsrInfo' to
+describe feature words from MSR, in parallel to current FeatureWordInfo
+(or better rename it to FeatureWordCpuidInfo).
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> > And, if I implemented ARCH_CAPABILITIES-bits features in FeatureWord,
+> > then no necessity of having it in kvm_msr_entries, right?
+> 
+And would you help confirm with my this point?
