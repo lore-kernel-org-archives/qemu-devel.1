@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4X-0001Rb-8n
+	(envelope-from <armbru@redhat.com>) id 1faH4X-0001RV-7Z
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4U-0007CX-A7
+	(envelope-from <armbru@redhat.com>) id 1faH4V-0007DJ-28
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51076 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51380 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4U-0007C5-6j
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4U-0007Cx-U6
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:02 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 10:53:36 +0200
-Message-Id: <20180703085358.13941-11-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 10:53:39 +0200
+Message-Id: <20180703085358.13941-14-armbru@redhat.com>
 In-Reply-To: <20180703085358.13941-1-armbru@redhat.com>
 References: <20180703085358.13941-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/32] tests/test-qga: Demonstrate the
- guest-agent ignores "control"
+Subject: [Qemu-devel] [PATCH v2 13/32] qmp: Revert change to
+ handle_qmp_command tracepoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +27,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
 
+Commit 71da4667db6 "monitor: separate QMP parser and dispatcher" moved
+the handle_qmp_command tracepoint from handle_qmp_command() to
+monitor_qmp_dispatch_one().  This delays tracing from enqueue time to
+dequeue time.  Revert that.  Dequeue remains adequately visible via
+tracepoint monitor_qmp_cmd_in_band.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/test-qga.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ monitor.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 564a4594b5..2e9e0f73bb 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -243,6 +243,22 @@ static void test_qga_invalid_id(gconstpointer fix)
-     qobject_unref(ret);
- }
+diff --git a/monitor.c b/monitor.c
+index 8b0c29ce06..10991757f6 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4183,12 +4183,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
  
-+static void test_qga_invalid_oob(gconstpointer fix)
-+{
-+    /* FIXME "control" is ignored; it should be rejected */
-+    const TestFixture *fixture = fix;
-+    QDict *ret;
+     g_free(req_obj);
+ 
+-    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
+-        QString *req_json = qobject_to_json(req);
+-        trace_handle_qmp_command(mon, qstring_get_str(req_json));
+-        qobject_unref(req_json);
+-    }
+-
+     old_mon = cur_mon;
+     cur_mon = mon;
+ 
+@@ -4282,6 +4276,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         qdict_del(qdict, "id");
+     } /* else will fail qmp_dispatch() */
+ 
++    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
++        QString *req_json = qobject_to_json(req);
++        trace_handle_qmp_command(mon, qstring_get_str(req_json));
++        qobject_unref(req_json);
++    }
 +
-+    ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping',"
-+                 " 'control': {'run-oob': true}}");
-+    g_assert_nonnull(ret);
-+    qmp_assert_no_error(ret);
-+
-+    qdict_get_qdict(ret, "return");
-+
-+    qobject_unref(ret);
-+}
-+
- static void test_qga_invalid_args(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -951,6 +967,7 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/file-write-read", &fix, test_qga_file_write_read);
-     g_test_add_data_func("/qga/get-time", &fix, test_qga_get_time);
-     g_test_add_data_func("/qga/invalid-id", &fix, test_qga_invalid_id);
-+    g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob);
-     g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd);
-     g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_args);
-     g_test_add_data_func("/qga/fsfreeze-status", &fix,
+     /* Check against the request in general layout */
+     qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
+     if (!qdict) {
 -- 
 2.17.1
