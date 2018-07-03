@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1faQvQ-00041v-F4
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:25:23 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faQxq-0005Az-Nk
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1faQvK-0005In-Qr
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:25:20 -0400
-Resent-Message-Id: <E1faQvK-0005In-Qr@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1faQvK-0005Ht-Df
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:25:14 -0400
-In-Reply-To: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153061795273.804.10710293653797006210@946cad8fd14e>
+	(envelope-from <eric.auger@redhat.com>) id 1faQxp-0000MP-2z
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 15:27:50 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
+	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
+Date: Tue, 3 Jul 2018 21:27:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 3 Jul 2018 04:39:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] qga: report disk size and free space
+In-Reply-To: <a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +24,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tgolembi@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: David Hildenbrand <david@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDBiMmMxNDJkYTVkNDRhNGI2NDVkZWU0N2I3YzUwZGFlODdhOTBhMDUuMTUzMDYw
-NjY3Mi5naXQudGdvbGVtYmlAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
-XSBxZ2E6IHJlcG9ydCBkaXNrIHNpemUgYW5kIGZyZWUgc3BhY2UKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzlkMzljODI3NCBxZ2E6
-IHJlcG9ydCBkaXNrIHNpemUgYW5kIGZyZWUgc3BhY2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvMTogcWdhOiByZXBvcnQgZGlzayBzaXplIGFuZCBmcmVlIHNwYWNlLi4u
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyYnIChjdHg6VnhWKQojNjc6IEZJ
-TEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjcxMToKKyAgICAgICAgaWYgKEdldERpc2tGcmVlU3Bh
-Y2VFeChtbnRfcG9pbnQsIDAsIChQVUxBUkdFX0lOVEVHRVIpJmZzLT5zaXplLAogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcmJyAoY3R4OlZ4VikKIzY4OiBGSUxF
-OiBxZ2EvY29tbWFuZHMtd2luMzIuYzo3MTI6CisgICAgICAgICAgICAgICAgKFBVTEFSR0VfSU5U
-RUdFUikmZnMtPmZyZWUpICE9IDApIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNzMgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi David,
+On 07/03/2018 08:25 PM, David Hildenbrand wrote:
+> On 03.07.2018 09:19, Eric Auger wrote:
+>> We define a new hotpluggable RAM region (aka. device memory).
+>> Its base is 2TB GPA. This obviously requires 42b IPA support
+>> in KVM/ARM, FW and guest kernel. At the moment the device
+>> memory region is max 2TB.
+> 
+> Maybe a stupid question, but why exactly does it have to start at 2TB
+> (and not e.g. at 1TB)?
+not a stupid question. See tentative answer below.
+> 
+>>
+>> This is largely inspired of device memory initialization in
+>> pc machine code.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>> ---
+>>  hw/arm/virt.c         | 104 ++++++++++++++++++++++++++++++++++++--------------
+>>  include/hw/arm/arm.h  |   2 +
+>>  include/hw/arm/virt.h |   1 +
+>>  3 files changed, 79 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 5a4d0bf..6fefb78 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -59,6 +59,7 @@
+>>  #include "qapi/visitor.h"
+>>  #include "standard-headers/linux/input.h"
+>>  #include "hw/arm/smmuv3.h"
+>> +#include "hw/acpi/acpi.h"
+>>  
+>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>> @@ -94,34 +95,25 @@
+>>  
+>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>  
+>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>> - * address space unallocated and free for future use between 256G and 512G.
+>> - * If we need to provide more RAM to VMs in the future then we need to:
+>> - *  * allocate a second bank of RAM starting at 2TB and working up
+I acknowledge this comment was the main justification. Now if you look at
+
+Principles of ARM Memory Maps
+http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_principles_of_arm_memory_maps.pdf
+chapter 2.3 you will find that when adding PA bits, you always leave
+space for reserved space and mapped IO.
+
+On the other hand, if you look at chapter 5, "Proposed 44-bit and 48bit
+Address Maps", we should logically put the additional RAM at 8TB if we
+want to comply with that doc.
+
+Peter, was there any other justification why we should put the RAM at 2TB?
+
+Thanks
+
+Eric
+
+
+>> - *  * fix the DT and ACPI table generation code in QEMU to correctly
+>> - *    report two split lumps of RAM to the guest
+>> - *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
+>> - * (We don't want to fill all the way up to 512GB with RAM because
+>> - * we might want it for non-RAM purposes later. Conversely it seems
+>> - * reasonable to assume that anybody configuring a VM with a quarter
+>> - * of a terabyte of RAM will be doing it on a host with more than a
+>> - * terabyte of physical address space.)
+>> - */
+>> -#define RAMLIMIT_GB 255
+>> -#define RAMLIMIT_BYTES (RAMLIMIT_GB * 1024ULL * 1024 * 1024)
+>> +#define SZ_64K 0x10000
+>> +#define SZ_1G (1024ULL * 1024 * 1024)
+>>  
+>>  /* Addresses and sizes of our components.
+>> - * 0..128MB is space for a flash device so we can run bootrom code such as UEFI.
+>> - * 128MB..256MB is used for miscellaneous device I/O.
+>> - * 256MB..1GB is reserved for possible future PCI support (ie where the
+>> - * PCI memory window will go if we add a PCI host controller).
+>> - * 1GB and up is RAM (which may happily spill over into the
+>> - * high memory region beyond 4GB).
+>> - * This represents a compromise between how much RAM can be given to
+>> - * a 32 bit VM and leaving space for expansion and in particular for PCI.
+>> - * Note that devices should generally be placed at multiples of 0x10000,
+>> + * 0..128MB is space for a flash device so we can run bootrom code such as UEFI,
+>> + * 128MB..256MB is used for miscellaneous device I/O,
+>> + * 256MB..1GB is used for PCI host controller,
+>> + * 1GB..256GB is RAM (not hotpluggable),
+>> + * 256GB..512GB: is left for device I/O (non RAM purpose),
+>> + * 512GB..1TB: high mem PCI MMIO region,
+>> + * 2TB..4TB is used for hot-pluggable DIMM (assumes 42b GPA is supported).
+>> + *
+>> + * Note that IO devices should generally be placed at multiples of 0x10000,
+>>   * to accommodate guests using 64K pages.
+>> + *
+>> + * Conversely it seems reasonable to assume that anybody configuring a VM
+>> + * with a quarter of a terabyte of RAM will be doing it on a host with more
+>> + * than a terabyte of physical address space.)
+>> + *
+>>   */
+>>  static const MemMapEntry a15memmap[] = {
+>>      /* Space up to 0x8000000 is reserved for a boot ROM */
+>> @@ -148,12 +140,13 @@ static const MemMapEntry a15memmap[] = {
+>>      [VIRT_PCIE_MMIO] =          { 0x10000000, 0x2eff0000 },
+>>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>> -    [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+>> +    [VIRT_MEM] =                { SZ_1G , 255 * SZ_1G },
+>>      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+>>      [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000 },
+>>      [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
+>>      /* Second PCIe window, 512GB wide at the 512GB boundary */
+>> -    [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
+>> +    [VIRT_PCIE_MMIO_HIGH] =     { 512 * SZ_1G, 512 * SZ_1G },
+>> +    [VIRT_HOTPLUG_MEM] =        { 2048 * SZ_1G, 2048 * SZ_1G },
+>>  };
+>>  
+>>  static const int a15irqmap[] = {
+>> @@ -1223,6 +1216,58 @@ static void create_secure_ram(VirtMachineState *vms,
+>>      g_free(nodename);
+>>  }
+>>  
+>> +static void create_device_memory(VirtMachineState *vms, MemoryRegion *sysmem)
+>> +{
+>> +    MachineState *ms = MACHINE(vms);
+>> +    uint64_t device_memory_size;
+>> +    uint64_t align = SZ_64K;
+>> +
+>> +    /* always allocate the device memory information */
+>> +    ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>> +
+>> +    if (vms->max_vm_phys_shift < 42) {
+>> +        /* device memory starts at 2TB whereas this VM supports less than
+>> +         * 2TB GPA */
+>> +        if (ms->maxram_size > ms->ram_size || ms->ram_slots) {
+>> +            MachineClass *mc = MACHINE_GET_CLASS(ms);
+>> +
+>> +            error_report("\"-memory 'slots|maxmem'\" is not supported by %s "
+>> +                         "since KVM does not support more than 41b IPA",
+>> +                         mc->name);
+>> +            exit(EXIT_FAILURE);
+>> +        }
+>> +        return;
+>> +    }
+>> +
+>> +    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
+>> +        error_report("unsupported number of memory slots: %"PRIu64,
+>> +                     ms->ram_slots);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (QEMU_ALIGN_UP(ms->maxram_size, align) != ms->maxram_size) {
+>> +        error_report("maximum memory size must be aligned to multiple of 0x%"
+>> +                     PRIx64, align);
+>> +            exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    ms->device_memory->base = vms->memmap[VIRT_HOTPLUG_MEM].base;
+>> +    device_memory_size = ms->maxram_size - ms->ram_size;
+>> +
+>> +    if (device_memory_size > vms->memmap[VIRT_HOTPLUG_MEM].size) {
+>> +        error_report("unsupported amount of maximum memory: " RAM_ADDR_FMT,
+>> +                         ms->maxram_size);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
+>> +                       "device-memory", device_memory_size);
+>> +    memory_region_add_subregion(sysmem, ms->device_memory->base,
+>> +                                &ms->device_memory->mr);
+>> +    vms->bootinfo.device_memory_start = ms->device_memory->base;
+>> +    vms->bootinfo.device_memory_size = device_memory_size;
+>> +}
+>> +
+>>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+>>  {
+>>      const VirtMachineState *board = container_of(binfo, VirtMachineState,
+>> @@ -1430,7 +1475,8 @@ static void machvirt_init(MachineState *machine)
+>>      vms->smp_cpus = smp_cpus;
+>>  
+>>      if (machine->ram_size > vms->memmap[VIRT_MEM].size) {
+>> -        error_report("mach-virt: cannot model more than %dGB RAM", RAMLIMIT_GB);
+>> +        error_report("mach-virt: cannot model more than %dGB RAM",
+>> +                     (int)(vms->memmap[VIRT_MEM].size / SZ_1G));
+>>          exit(1);
+>>      }
+>>  
+>> @@ -1525,6 +1571,8 @@ static void machvirt_init(MachineState *machine)
+>>                                           machine->ram_size);
+>>      memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+>>  
+>> +    create_device_memory(vms, sysmem);
+>> +
+>>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>>  
+>>      create_gic(vms, pic);
+>> diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+>> index ffed392..76269e6 100644
+>> --- a/include/hw/arm/arm.h
+>> +++ b/include/hw/arm/arm.h
+>> @@ -116,6 +116,8 @@ struct arm_boot_info {
+>>      bool secure_board_setup;
+>>  
+>>      arm_endianness endianness;
+>> +    hwaddr device_memory_start;
+>> +    hwaddr device_memory_size;
+>>  };
+>>  
+>>  /**
+>> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+>> index 91f6de2..173938d 100644
+>> --- a/include/hw/arm/virt.h
+>> +++ b/include/hw/arm/virt.h
+>> @@ -78,6 +78,7 @@ enum {
+>>      VIRT_GPIO,
+>>      VIRT_SECURE_UART,
+>>      VIRT_SECURE_MEM,
+>> +    VIRT_HOTPLUG_MEM,
+>>  };
+>>  
+>>  typedef enum VirtIOMMUType {
+>>
+> 
+> 
