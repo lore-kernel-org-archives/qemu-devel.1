@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4b-0001VU-MO
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1faH4d-0001XT-5W
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4V-0007DW-7L
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51084 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faH4X-0007Hd-Nb
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38148 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4V-0007Cz-1V
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:03 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4X-0007GB-ES
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:05 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 10:53:38 +0200
-Message-Id: <20180703085358.13941-13-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 10:53:57 +0200
+Message-Id: <20180703085358.13941-32-armbru@redhat.com>
 In-Reply-To: <20180703085358.13941-1-armbru@redhat.com>
 References: <20180703085358.13941-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 12/32] qmp: Redo how the client requests
- out-of-band execution
+Subject: [Qemu-devel] [PATCH v2 31/32] monitor: Improve some comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,276 +26,292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
 
-Commit cf869d53172 "qmp: support out-of-band (oob) execution" added a
-general mechanism for command-independent arguments just for an
-out-of-band flag:
-
-    The "control" key is introduced to store this extra flag.  "control"
-    field is used to store arguments that are shared by all the commands,
-    rather than command specific arguments.  Let "run-oob" be the first.
-
-However, it failed to reject unknown members of "control".  For
-instance, in QMP command
-
-    {"execute": "query-name", "id": 42, "control": {"crap": true}}
-
-"crap" gets silently ignored.
-
-Instead of fixing this, revert the general "control" mechanism
-(because YAGNI), and do it the way I initially proposed, with key
-"exec-oob".  Simpler code, simper interface.
-
-An out-of-band command
-
-    {"execute": "migrate-pause", "id": 42, "control": {"run-oob": true}}
-
-becomes
-
-    {"exec-oob": "migrate-pause", "id": 42}
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt | 10 +++----
- docs/interop/qmp-spec.txt    | 18 ++++++-------
- monitor.c                    |  3 +++
- qapi/qmp-dispatch.c          | 51 +++++++++++++++---------------------
- tests/qmp-test.c             |  7 ++---
- tests/test-qga.c             |  3 +--
- 6 files changed, 39 insertions(+), 53 deletions(-)
+ monitor.c | 100 ++++++++++++++++++++++++------------------------------
+ 1 file changed, 45 insertions(+), 55 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 9625798d16..f020f6bab2 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -649,13 +649,11 @@ example:
-  { 'command': 'migrate_recover',
-    'data': { 'uri': 'str' }, 'allow-oob': true }
- 
--To execute a command with out-of-band priority, the client specifies
--the "control" field in the request, with "run-oob" set to
--true. Example:
-+To execute a command with out-of-band priority, the client uses key
-+"exec-oob" instead of "execute".  Example:
- 
-- => { "execute": "command-support-oob",
--      "arguments": { ... },
--      "control": { "run-oob": true } }
-+ => { "exec-oob": "migrate-recover",
-+      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
-  <= { "return": { } }
- 
- Without it, even the commands that support out-of-band execution will
-diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-index a1d6f9ee06..1566b8ae5e 100644
---- a/docs/interop/qmp-spec.txt
-+++ b/docs/interop/qmp-spec.txt
-@@ -92,12 +92,16 @@ Currently supported capabilities are:
- 
- The format for command execution is:
- 
--{ "execute": json-string, "arguments": json-object, "id": json-value,
--  "control": json-object }
-+{ "execute": json-string, "arguments": json-object, "id": json-value }
-+
-+or
-+
-+{ "exec-oob": json-string, "arguments": json-object, "id": json-value }
- 
-  Where,
- 
--- The "execute" member identifies the command to be executed by the Server
-+- The "execute" or "exec-oob" member identifies the command to be
-+  executed by the server.  The latter requests out-of-band execution.
- - The "arguments" member is used to pass any arguments required for the
-   execution of the command, it is optional when no arguments are
-   required. Each command documents what contents will be considered
-@@ -106,9 +110,6 @@ The format for command execution is:
-   command execution, it is optional and will be part of the response
-   if provided.  The "id" member can be any json-value.  A json-number
-   incremented for each successive command works fine.
--- The optional "control" member further specifies how the command is
--  to be executed.  Currently, its only member is optional "run-oob".
--  See section "2.3.1 Out-of-band execution" for details.
- 
- 2.3.1 Out-of-band execution
- ---------------------------
-@@ -129,9 +130,6 @@ To be able to match responses back to their commands, the client needs
- to pass "id" with out-of-band commands.  Passing it with all commands
- is recommended for clients that accept capability "oob".
- 
--To execute a command out-of-band, the client puts "run-oob": true into
--execute's member "control".
--
- If the client sends in-band commands faster than the server can
- execute them, the server will eventually drop commands to limit the
- queue length.  The sever sends event COMMAND_DROPPED then.
-@@ -274,7 +272,7 @@ S: { "timestamp": { "seconds": 1258551470, "microseconds": 802384 },
- 3.7 Out-of-band execution
- -------------------------
- 
--C: { "execute": "migrate-pause", "id": 42, "control": { "run-oob": true } }
-+C: { "exec-oob": "migrate-pause", "id": 42 }
- S: { "id": 42,
-      "error": { "class": "GenericError",
-       "desc": "migrate-pause is currently only supported during postcopy-active state" } }
 diff --git a/monitor.c b/monitor.c
-index 2c28b05ecb..8b0c29ce06 100644
+index 590e5b5b04..14af7b7ea6 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1299,6 +1299,9 @@ static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
-     QmpCommand *cmd;
+@@ -168,15 +168,16 @@ typedef struct {
+     JSONMessageParser parser;
+     /*
+      * When a client connects, we're in capabilities negotiation mode.
+-     * When command qmp_capabilities succeeds, we go into command
+-     * mode.
++     * @commands is &qmp_cap_negotiation_commands then.  When command
++     * qmp_capabilities succeeds, we go into command mode, and
++     * @command becomes &qmp_commands.
+      */
+     QmpCommandList *commands;
+     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
+     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
+     /*
+-     * Protects qmp request/response queue.  Please take monitor_lock
+-     * first when used together.
++     * Protects qmp request/response queue.
++     * Take monitor_lock first when you need both.
+      */
+     QemuMutex qmp_queue_lock;
+     /* Input queue that holds all the parsed QMP requests */
+@@ -231,7 +232,7 @@ struct Monitor {
+     QemuMutex mon_lock;
  
-     command = qdict_get_try_str(req, "execute");
-+    if (!command) {
-+        command = qdict_get_try_str(req, "exec-oob");
-+    }
-     if (!command) {
-         error_setg(errp, "Command field 'execute' missing");
-         return false;
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 0ad0fab8ed..12be120fe7 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -23,11 +23,11 @@
- QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
-                               Error **errp)
+     /*
+-     * Fields that are protected by the per-monitor lock.
++     * Members that are protected by the per-monitor lock
+      */
+     QLIST_HEAD(, mon_fd_t) fds;
+     QString *outbuf;
+@@ -240,6 +241,7 @@ struct Monitor {
+     int mux_out;
+ };
+ 
++/* Shared monitor I/O thread */
+ IOThread *mon_iothread;
+ 
+ /* Bottom half to dispatch the requests received from I/O thread */
+@@ -301,9 +303,9 @@ static inline bool monitor_is_qmp(const Monitor *mon)
+ }
+ 
+ /**
+- * Whether @mon is using readline?  Note: not all HMP monitors use
+- * readline, e.g., gdbserver has a non-interactive HMP monitor, so
+- * readline is not used there.
++ * Is @mon is using readline?
++ * Note: not all HMP monitors use readline, e.g., gdbserver has a
++ * non-interactive HMP monitor, so readline is not used there.
+  */
+ static inline bool monitor_uses_readline(const Monitor *mon)
  {
-+    const char *exec_key = NULL;
-     const QDictEntry *ent;
-     const char *arg_name;
-     const QObject *arg_obj;
--    bool has_exec_key = false;
--    QDict *dict = NULL;
-+    QDict *dict;
+@@ -317,14 +319,12 @@ static inline bool monitor_is_hmp_non_interactive(const Monitor *mon)
  
-     dict = qobject_to(QDict, request);
-     if (!dict) {
-@@ -40,25 +40,25 @@ QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
-         arg_name = qdict_entry_key(ent);
-         arg_obj = qdict_entry_value(ent);
+ /*
+  * Return the clock to use for recording an event's time.
++ * It's QEMU_CLOCK_REALTIME, except for qtests it's
++ * QEMU_CLOCK_VIRTUAL, to support testing rate limits.
+  * Beware: result is invalid before configure_accelerator().
+  */
+ static inline QEMUClockType monitor_get_event_clock(void)
+ {
+-    /*
+-     * This allows us to perform tests on the monitor queues to verify
+-     * that the rate limits are enforced.
+-     */
+     return qtest_enabled() ? QEMU_CLOCK_VIRTUAL : QEMU_CLOCK_REALTIME;
+ }
  
--        if (!strcmp(arg_name, "execute")) {
-+        if (!strcmp(arg_name, "execute")
-+            || (!strcmp(arg_name, "exec-oob") && allow_oob)) {
-             if (qobject_type(arg_obj) != QTYPE_QSTRING) {
--                error_setg(errp,
--                           "QMP input member 'execute' must be a string");
-+                error_setg(errp, "QMP input member '%s' must be a string",
-+                           arg_name);
-                 return NULL;
-             }
--            has_exec_key = true;
-+            if (exec_key) {
-+                error_setg(errp, "QMP input member '%s' clashes with '%s'",
-+                           arg_name, exec_key);
-+                return NULL;
-+            }
-+            exec_key = arg_name;
-         } else if (!strcmp(arg_name, "arguments")) {
-             if (qobject_type(arg_obj) != QTYPE_QDICT) {
-                 error_setg(errp,
-                            "QMP input member 'arguments' must be an object");
-                 return NULL;
-             }
--        } else if (!strcmp(arg_name, "control") && allow_oob) {
--            if (qobject_type(arg_obj) != QTYPE_QDICT) {
--                error_setg(errp,
--                           "QMP input member 'control' must be a dict");
--                return NULL;
--            }
-         } else {
-             error_setg(errp, "QMP input member '%s' is unexpected",
-                        arg_name);
-@@ -66,7 +66,7 @@ QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
-         }
+@@ -367,7 +367,7 @@ static void qmp_request_free(QMPRequest *req)
+     g_free(req);
+ }
+ 
+-/* Must with the mon->qmp.qmp_queue_lock held */
++/* Caller must hold mon->qmp.qmp_queue_lock */
+ static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
+ {
+     while (!g_queue_is_empty(mon->qmp.qmp_requests)) {
+@@ -375,7 +375,7 @@ static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
      }
+ }
  
--    if (!has_exec_key) {
-+    if (!exec_key) {
-         error_setg(errp, "QMP input lacks member 'execute'");
-         return NULL;
-     }
-@@ -88,7 +88,11 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
-         return NULL;
-     }
+-/* Must with the mon->qmp.qmp_queue_lock held */
++/* Caller must hold the mon->qmp.qmp_queue_lock */
+ static void monitor_qmp_cleanup_resp_queue_locked(Monitor *mon)
+ {
+     while (!g_queue_is_empty(mon->qmp.qmp_responses)) {
+@@ -406,7 +406,7 @@ static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
+     return FALSE;
+ }
  
--    command = qdict_get_str(dict, "execute");
-+    command = qdict_get_try_str(dict, "execute");
-+    if (!command) {
-+        assert(allow_oob);
-+        command = qdict_get_str(dict, "exec-oob");
-+    }
-     cmd = qmp_find_command(cmds, command);
-     if (cmd == NULL) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-@@ -137,25 +141,12 @@ QObject *qmp_build_error_object(Error *err)
+-/* Called with mon->mon_lock held.  */
++/* Caller must hold mon->mon_lock */
+ static void monitor_flush_locked(Monitor *mon)
+ {
+     int rc;
+@@ -522,10 +522,8 @@ static void qmp_queue_response(Monitor *mon, QDict *rsp)
+ {
+     if (mon->use_io_thread) {
+         /*
+-         * If using I/O thread, we need to queue the item so that I/O
+-         * thread will do the rest for us.  Take refcount so that
+-         * caller won't free the data (which will be finally freed in
+-         * responder thread).
++         * Push a reference to the response queue.  The I/O thread
++         * drains that queue and emits.
+          */
+         qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+         g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(rsp));
+@@ -533,8 +531,8 @@ static void qmp_queue_response(Monitor *mon, QDict *rsp)
+         qemu_bh_schedule(qmp_respond_bh);
+     } else {
+         /*
+-         * If not using monitor I/O thread, then we are in main thread.
+-         * Do the emission right away.
++         * Not using monitor I/O thread, i.e. we are in the main thread.
++         * Emit right away.
+          */
+         qmp_send_response(mon, rsp);
+     }
+@@ -610,8 +608,9 @@ static MonitorQAPIEventConf monitor_qapi_event_conf[QAPI_EVENT__MAX] = {
+ };
+ 
+ /*
+- * Emits the event to every monitor instance, @event is only used for trace
+- * Called with monitor_lock held.
++ * Broadcast an event to all monitors.
++ * @qdict is the event object.  Its member "event" must match @event.
++ * Caller must hold monitor_lock.
+  */
+ static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
+ {
+@@ -980,8 +979,7 @@ static int parse_cmdline(const char *cmdline,
  }
  
  /*
-- * Detect whether a request should be run out-of-band, by quickly
-- * peeking at whether we have: { "control": { "run-oob": true } }. By
-- * default commands are run in-band.
-+ * Does @qdict look like a command to be run out-of-band?
+- * Returns true if the command can be executed in preconfig mode
+- * i.e. it has the 'p' flag.
++ * Can command @cmd be executed in preconfig state?
   */
- bool qmp_is_oob(QDict *dict)
+ static bool cmd_can_preconfig(const mon_cmd_t *cmd)
  {
--    QBool *bool_obj;
--
--    dict = qdict_get_qdict(dict, "control");
--    if (!dict) {
--        return false;
--    }
--
--    bool_obj = qobject_to(QBool, qdict_get(dict, "run-oob"));
--    if (!bool_obj) {
--        return false;
--    }
--
--    return qbool_get_bool(bool_obj);
-+    return qdict_haskey(dict, "exec-oob")
-+        && !qdict_haskey(dict, "execute");
+@@ -2220,7 +2218,7 @@ void qmp_getfd(const char *fdname, Error **errp)
+         tmp_fd = monfd->fd;
+         monfd->fd = fd;
+         qemu_mutex_unlock(&cur_mon->mon_lock);
+-        /* Make sure close() is out of critical section */
++        /* Make sure close() is outside critical section */
+         close(tmp_fd);
+         return;
+     }
+@@ -2249,7 +2247,7 @@ void qmp_closefd(const char *fdname, Error **errp)
+         g_free(monfd->name);
+         g_free(monfd);
+         qemu_mutex_unlock(&cur_mon->mon_lock);
+-        /* Make sure close() is out of critical section */
++        /* Make sure close() is outside critical section */
+         close(tmp_fd);
+         return;
+     }
+@@ -4138,7 +4136,8 @@ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
  }
  
- QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index d73730945a..3f4e43bd2b 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -177,8 +177,7 @@ static void unblock_blocked_cmd(void)
+ /*
+- * Pop one QMP request from monitor queues, return NULL if not found.
++ * Pop a QMP request from a monitor request queue.
++ * Return the request, or NULL all request queues are empty.
+  * We are using round-robin fashion to pop the request, to avoid
+  * processing commands only on a very busy monitor.  To achieve that,
+  * when we process one request on a specific monitor, we put that
+@@ -4233,7 +4232,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+     }
  
- static void send_oob_cmd_that_fails(QTestState *s, const char *id)
- {
--    qtest_async_qmp(s, "{ 'execute': 'migrate-pause', 'id': %s,"
--                    "  'control': { 'run-oob': true } }", id);
-+    qtest_async_qmp(s, "{ 'exec-oob': 'migrate-pause', 'id': %s }", id);
- }
+     if (qdict && qmp_is_oob(qdict)) {
+-        /* Out-of-band (OOB) requests are executed directly in parser. */
++        /* OOB commands are executed immediately */
+         trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
+                                           ?: "");
+         monitor_qmp_dispatch(mon, req, id);
+@@ -4355,8 +4354,8 @@ void monitor_resume(Monitor *mon)
+     if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
+         if (monitor_is_qmp(mon)) {
+             /*
+-             * For QMP monitors that are running in I/O thread, let's
+-             * kick the thread in case it's sleeping.
++             * For QMP monitors that are running in the I/O thread,
++             * let's kick the thread in case it's sleeping.
+              */
+             if (mon->use_io_thread) {
+                 aio_notify(iothread_get_aio_context(mon_iothread));
+@@ -4504,18 +4503,18 @@ static void monitor_iothread_init(void)
+     mon_iothread = iothread_create("mon_iothread", &error_abort);
  
- static void recv_cmd_id(QTestState *s, const char *id)
-@@ -230,9 +229,7 @@ static void test_qmp_oob(void)
-      * Try any command that does not support OOB but with OOB flag. We
-      * should get failure.
+     /*
+-     * This MUST be on main loop thread since we have commands that
+-     * have assumption to be run on main loop thread.  It would be
+-     * nice that one day we can remove this assumption in the future.
++     * The dispatcher BH must run in the main loop thread, since we
++     * have commands assuming that context.  It would be nice to get
++     * rid of those assumptions.
       */
--    resp = qtest_qmp(qts,
--                     "{ 'execute': 'query-cpus',"
--                     "  'control': { 'run-oob': true } }");
-+    resp = qtest_qmp(qts, "{ 'exec-oob': 'query-cpus' }");
-     g_assert(qdict_haskey(resp, "error"));
-     qobject_unref(resp);
+     qmp_dispatcher_bh = aio_bh_new(iohandler_get_aio_context(),
+                                    monitor_qmp_bh_dispatcher,
+                                    NULL);
  
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index febabc7ad5..daadf22ea3 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -249,8 +249,7 @@ static void test_qga_invalid_oob(gconstpointer fix)
-     QDict *ret, *error;
-     const char *class;
+     /*
+-     * Unlike the dispatcher BH, this must be run on the monitor I/O
+-     * thread, so that monitors that are using I/O thread will make
+-     * sure read/write operations are all done on the I/O thread.
++     * The responder BH must be run in the monitor I/O thread, so that
++     * monitors that are using the I/O thread have their output
++     * written by the I/O thread.
+      */
+     qmp_respond_bh = aio_bh_new(monitor_get_aio_context(),
+                                 monitor_qmp_bh_responder,
+@@ -4585,15 +4584,11 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+     GMainContext *context;
  
--    ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping',"
--                 " 'control': {'run-oob': true}}");
-+    ret = qmp_fd(fixture->fd, "{'exec-oob': 'guest-ping'}");
-     g_assert_nonnull(ret);
+     if (mon->use_io_thread) {
+-        /*
+-         * When @use_io_thread is set, we use the global shared dedicated
+-         * I/O thread for this monitor to handle input/output.
+-         */
++        /* Use @mon_iothread context */
+         context = monitor_get_io_context();
+-        /* We should have inited globals before reaching here. */
+         assert(context);
+     } else {
+-        /* The default main loop, which is the main thread */
++        /* Use default main loop context */
+         context = NULL;
+     }
  
-     error = qdict_get_qdict(ret, "error");
+@@ -4643,15 +4638,12 @@ void monitor_init(Chardev *chr, int flags)
+             remove_fd_in_watch(chr);
+             /*
+              * We can't call qemu_chr_fe_set_handlers() directly here
+-             * since during the procedure the chardev will be active
+-             * and running in monitor I/O thread, while we'll still do
+-             * something before returning from it, which is a possible
+-             * race too.  To avoid that, we just create a BH to setup
+-             * the handlers.
++             * since chardev might be running in the monitor I/O
++             * thread.  Schedule a bottom half.
+              */
+             aio_bh_schedule_oneshot(monitor_get_aio_context(),
+                                     monitor_qmp_setup_handlers_bh, mon);
+-            /* We'll add this to mon_list in the BH when setup done */
++            /* The bottom half will add @mon to @mon_list */
+             return;
+         } else {
+             qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
+@@ -4672,21 +4664,19 @@ void monitor_cleanup(void)
+ 
+     /*
+      * We need to explicitly stop the I/O thread (but not destroy it),
+-     * cleanup the monitor resources, then destroy the I/O thread since
++     * clean up the monitor resources, then destroy the I/O thread since
+      * we need to unregister from chardev below in
+      * monitor_data_destroy(), and chardev is not thread-safe yet
+      */
+     iothread_stop(mon_iothread);
+ 
+     /*
+-     * After we have I/O thread to send responses, it's possible that
+-     * when we stop the I/O thread there are still replies queued in the
+-     * responder queue.  Flush all of them.  Note that even after this
+-     * flush it's still possible that out buffer is not flushed.
+-     * It'll be done in below monitor_flush() as the last resort.
++     * Flush all response queues.  Note that even after this flush,
++     * data may remain in output buffers.
+      */
+     monitor_qmp_bh_responder(NULL);
+ 
++    /* Flush output buffers and destroy monitors */
+     qemu_mutex_lock(&monitor_lock);
+     QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+         QTAILQ_REMOVE(&mon_list, mon, entry);
 -- 
 2.17.1
