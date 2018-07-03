@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1faLk8-0001aA-3x
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:53:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faLx3-0006NM-Tb
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1faLk4-0002jh-P2
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:53:20 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39762)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faLwz-0008IC-L3
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:06:41 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:39231)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1faLk4-0002jR-IU
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:53:16 -0400
-Received: by mail-pf0-x242.google.com with SMTP id s21-v6so1065225pfm.6
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 06:53:16 -0700 (PDT)
-Date: Tue, 3 Jul 2018 22:53:13 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20180703135313.GT24595@lianli.shorne-pla.net>
-References: <20180702151023.24532-1-shorne@gmail.com>
-	<CAFEAcA8EPj=-ExxZeitao_gN-7XPUGQ=eOj+Q0mBU-x0QTepPQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faLwz-0008I1-Fu
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:06:37 -0400
+Received: by mail-qt0-x243.google.com with SMTP id q12-v6so1635960qtp.6
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 07:06:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180703121924.11411-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a53564fb-c2d8-967f-1264-f9e2a895366b@amsat.org>
+Date: Tue, 3 Jul 2018 11:06:32 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8EPj=-ExxZeitao_gN-7XPUGQ=eOj+Q0mBU-x0QTepPQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v2 00/25] OpenRISC updates for 3.0
+In-Reply-To: <20180703121924.11411-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pulseaudio: process audio data in smaller
+ chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Martin Schrodt <martin@schrodt.org>, Max Ehrlich <maxehr@umiacs.umd.edu>
 
-On Mon, Jul 02, 2018 at 04:36:10PM +0100, Peter Maydell wrote:
-> On 2 July 2018 at 16:09, Stafford Horne <shorne@gmail.com> wrote:
-> > Hi Peter,
-> >
-> > Changes since v1:
-> >  - Un"fixed" an incorrect checkpatch warning pointed out by Richard.
-> >
-> > Please consider for pull.
-> >
-> > The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
-> >
-> >   tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git@github.com:stffrdhrn/qemu.git tags/pull-or-20180702
-> >
-> > for you to fetch changes up to 33e1acf437ce4f0b67c262fc93b436e2e306f278:
-> >
-> >   target/openrisc: Fix writes to interrupt mask register (2018-07-03 00:05:28 +0900)
-> >
-> > ----------------------------------------------------------------
-> > OpenRISC cleanups and Fixes for QEMU 3.0
-> >
-> > Mostly patches from Richard Henderson fixing multiple things:
-> >  * Fix singlestepping in GDB.
-> >  * Use more TB linking.
-> >  * Fixes to exit TB after updating SPRs to enable registering of state
-> >    changes.
-> >  * Significant optimizations and refactors to the TLB
-> >  * Split out disassembly from translation.
-> >  * Add qemu-or1k to qemu-binfmt-conf.sh.
-> >  * Implement signal handling for linux-user.
-> >
-> > Then there are a few fixups from me:
-> >  * Fix delay slot detections to match hardware, this was masking a bug
-> >    in the linus kernel.
-> >  * Fix stores to the PIC mask register
-> >
-> > ----------------------------------------------------------------
+On 07/03/2018 09:19 AM, Gerd Hoffmann wrote:
+> The rate of pulseaudio absorbing the audio stream is used to control the
+> the rate of the guests audio stream.  When the emulated hardware uses
+> small chunks (like intel-hda does) we need small chunks on the audio
+> backend side too, otherwise that feedback loop doesn't work very well.
 > 
-> Compile failure, for the windows crossbuilds:
+> Cc: Max Ehrlich <maxehr@umiacs.umd.edu>
+> Cc: Martin Schrodt <martin@schrodt.org>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  audio/paaudio.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-[...]
-> /home/petmay01/qemu-for-merges/target/openrisc/mmu.c:171:23: error:
-> 'PROT_READ' undeclared (first use in this function)
->                      : PROT_READ);
->                        ^
-> /home/petmay01/qemu-for-merges/rules.mak:69: recipe for target
-> 'target/openrisc/mmu.o' failed
+> diff --git a/audio/paaudio.c b/audio/paaudio.c
+> index 949769774d..4c100bc318 100644
+> --- a/audio/paaudio.c
+> +++ b/audio/paaudio.c
+> @@ -227,7 +227,7 @@ static void *qpa_thread_out (void *arg)
+>              }
+>          }
+>  
+> -        decr = to_mix = audio_MIN (pa->live, pa->g->conf.samples >> 2);
+> +        decr = to_mix = audio_MIN(pa->live, pa->g->conf.samples >> 5);
+>          rpos = pa->rpos;
+>  
+>          if (audio_pt_unlock(&pa->pt, __func__)) {
+> @@ -319,7 +319,7 @@ static void *qpa_thread_in (void *arg)
+>              }
+>          }
+>  
+> -        incr = to_grab = audio_MIN (pa->dead, pa->g->conf.samples >> 2);
+> +        incr = to_grab = audio_MIN(pa->dead, pa->g->conf.samples >> 5);
+
+Same pattern/value: can we have a #define?
+
+I looked at the PA intel-hda code and couldn't find the chunk size,
+anyway this change looks sane.
+
+>          wpos = pa->wpos;
+>  
+>          if (audio_pt_unlock(&pa->pt, __func__)) {
 > 
-> PROT_READ/WRITE/EXEC are the Posix flags for mmap().
-> The flags for the 'prot' argument to tlb_set_page()
-> and similar places are PAGE_READ/WRITE/EXEC.
-
-Understood, this should be fixed now, after changing I see no differences.
-
-> PS: for trivial respins of a pullreq you don't need to resend
-> the whole thing, you can just resend the cover letter (and
-> any individual patches which got major changes).
-
-Thats good to know, I thought it might be annoying to resend the entire series
-when all that is needed is the pr cover letter.
-
-I have resent, I hope all is well.
-
--Stafford
