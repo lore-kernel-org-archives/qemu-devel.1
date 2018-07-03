@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1faHah-0003SB-1p
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:27:20 -0400
+	(envelope-from <stefanha@gmail.com>) id 1faHeZ-0006I5-TA
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1faHaf-0005zJ-O0
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:27:19 -0400
-Received: from forwardcorp1o.cmail.yandex.net ([2a02:6b8:0:1a72::290]:54381)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dimastep@yandex-team.ru>)
-	id 1faHaf-0005s0-6E
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:27:17 -0400
-Date: Tue, 3 Jul 2018 12:27:11 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-Message-ID: <20180703092711.GA823@dimastep-nix>
-References: <1529053904-12607-1-git-send-email-dimastep@yandex-team.ru>
-	<20180702085207.GA6032@dimastep-nix>
-	<5149995f-2bb2-cbe8-1a2c-e16ed0ee3cd6@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1faHeX-0003ds-6r
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:31:19 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1faHeW-0003dA-SR
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:31:17 -0400
+Received: by mail-wr0-x244.google.com with SMTP id a12-v6so1226304wro.1
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 02:31:16 -0700 (PDT)
+Date: Tue, 3 Jul 2018 10:31:13 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180703093113.GF16791@stefanha-x1.localdomain>
+References: <20180626093204.27612-1-contrib@steffen-goertz.de>
+	<20180627094456.GB4325@stefanha-x1.localdomain>
+	<CAFEAcA-j8z4TLN=Qo82JicSQ_=YnJnGjAoLiMOnyfmd1QtQo7w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Wb5NtZlyOqqy58h0"
 Content-Disposition: inline
-In-Reply-To: <5149995f-2bb2-cbe8-1a2c-e16ed0ee3cd6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] qemu-pr-helper: garbage response
- structure can be used to write data
+In-Reply-To: <CAFEAcA-j8z4TLN=Qo82JicSQ_=YnJnGjAoLiMOnyfmd1QtQo7w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2] arm: Add NRF51 SOC non-volatile memory
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,139 +32,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, wrfsh@yandex-team.ru
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>
 
-On Mon, Jul 02, 2018 at 02:21:41PM +0200, Paolo Bonzini wrote:
-> On 02/07/2018 10:52, Dima Stepanov wrote:
-> > Ping.
-> > 
-> > On Fri, Jun 15, 2018 at 12:11:44PM +0300, Dima Stepanov wrote:
-> >> The prh_co_entry() routine handles requests. The first part is to read a
-> >> request by calling the prh_read_request() routine, if:
-> >>   1. scsi_cdb_xfer(req->cdb) call returns 0, and
-> >>   2. req->cdb[0] == PERSISTENT_RESERVE_IN, then
-> >> The resp->result field will be uninitialized. As a result the resp.sz
-> >> field will be also uninitialized in the prh_co_entry() function.
-> >> The second part is to send the response by calling the
-> >> prh_write_response() routine:
-> >>   1. For the PERSISTENT_RESERVE_IN command, and
-> >>   2. resp->result == GOOD (previous successful reply or just luck), then
-> >> There is a probability that the following assert will not be trigered:
-> >>   assert(resp->sz <= req->sz && resp->sz <= sizeof(client->data));
-> >> As a result some uninitialized response will be sent.
-> >>
-> >> The fix is to initialize the response structure to CHECK_CONDITION and 0
-> >> values before calling the prh_read_request() routine.
-> 
-> The actual bug is that the "if (sz > 0)" should apply only to 
-> PERSISTENT_RESERVE_OUT, and in fact it can be done in do_pr_out.  
-> PERSISTENT_RESERVE_IN with sz == 0 is weird but okay.
-> 
-> This simplifies the code a bit too, because we can handle closing the 
-> file descriptor in prh_co_entry.
-> 
-> Does something like this work for you?
 
-Thanks for the feedback. Yes, this will work for me. Should i update the
-patch and resend it or you will just pick the version you suggested?
+--Wb5NtZlyOqqy58h0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards, Dima.
+On Mon, Jul 02, 2018 at 01:18:35PM +0100, Peter Maydell wrote:
+> On 27 June 2018 at 10:44, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > On Tue, Jun 26, 2018 at 11:32:04AM +0200, Steffen G=F6rtz wrote:
+> >> Changes since V1:
+> >> - Code style changes
+> >
+> > Please put the changelog below '---'.
+> >
+> >> diff --git a/hw/nvram/nrf51_nvmc.c b/hw/nvram/nrf51_nvmc.c
+> >> new file mode 100644
+> >> index 0000000000..5dde3088a8
+> >> --- /dev/null
+> >> +++ b/hw/nvram/nrf51_nvmc.c
+> >> @@ -0,0 +1,168 @@
+> >> +/*
+> >> + * nrf51_nvmc.c
+> >> + *
+> >> + * Copyright 2018 Steffen G=F6rtz <contrib@steffen-goertz.de>
+> >> + *
+> >> + * This code is licensed under the GPL version 2 or later.  See
+> >> + * the COPYING file in the top-level directory.
+> >> + */
+> >
+> > Please mention the full name of the peripheral so its purpose is clear
+> > and include a link to the datasheet.
+> >
+> > It's convenient to have this information in the .c file, since that's
+> > where the majority of code changes happen.
+> >
+> >> diff --git a/include/hw/nvram/nrf51_nvmc.h b/include/hw/nvram/nrf51_nv=
+mc.h
+> >> new file mode 100644
+> >> index 0000000000..3a63b7e5ad
+> >> --- /dev/null
+> >> +++ b/include/hw/nvram/nrf51_nvmc.h
+> >> @@ -0,0 +1,51 @@
+> >> +/*
+> >> + * nrf51_nvmc.h
+> >> + *
+> >> + * Copyright 2018 Steffen G=F6rtz <contrib@steffen-goertz.de>
+> >> + *
+> >> + * This code is licensed under the GPL version 2 or later.  See
+> >> + * the COPYING file in the top-level directory.
+> >> + *
+> >> + * See Nrf51 reference manual 6 Non-Volatile Memory Controller (NVMC)
+> >> + * See Nrf51 product sheet 8.22 NVMC specifications
+> >> + *
+> >> + * QEMU interface:
+> >> + * + sysbus MMIO regions 0: Memory Region with registers
+> >> + *   to be mapped to the peripherals instance address by the SOC.
+> >> + * + page_size property to set the page size in bytes.
+> >> + * + code_size property to set the code size in number of pages.
+> >> + *
+> >> + * Accuracy of the peripheral model:
+> >> + * + The NVMC is always ready, all requested erase operations succeed
+> >> + *   immediately.
+> >> + * + CONFIG.WEN and CONFIG.EEN flags can be written and read back
+> >> + *   but are not evaluated to check whether a requested write/erase o=
+peration
+> >> + *   is legal.
+> >
+> > Checking CONFIG.EEN would be easy, please do it.
+> >
+> > Peter: CONFIG.WEN determines whether stores to the flash memory region
+> > are allowed.  What is the best way to implement this protection?
+>=20
+> What accesses do they gate? If this is just accesses that go
+> via the io_read() and io_write() functions then this is easy:
+> just put a check in those functions in the appropriate place.
+> The harder case is if they affect accesses to a region that
+> is implemented as an MMIO ram region which can be executed from;
+> that can be done, but gets annoyingly complicated:
+>  * unmap the RAM and map an MMIO region which handles the errors
+>    (only possible if the config bit gates the reads as well)
+>  * use a ROM device memory region (only possible if reads are
+>    always ok but writes might not be
+>  * use the IOMMU APIs (maximum flexibility, maximum pain)
+>=20
+> A quick scan of the code suggests you're in the easy case
+> where you can just have io_read() and io_write() handle
+> the config switch checks, though.
 
-> 
-> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-> index 0218d65bbf..c89a446a45 100644
-> --- a/scsi/qemu-pr-helper.c
-> +++ b/scsi/qemu-pr-helper.c
-> @@ -455,6 +455,14 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
->      char transportids[PR_HELPER_DATA_SIZE];
->      int r;
->  
-> +    if (sz < PR_OUT_FIXED_PARAM_SIZE) {
-> +        /* Illegal request, Parameter list length error.  This isn't fatal;
-> +         * we have read the data, send an error without closing the socket.
-> +         */
-> +        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM_LEN));
-> +        return CHECK_CONDITION;
-> +    }
-> +
->      switch (rq_servact) {
->      case MPATH_PROUT_REG_SA:
->      case MPATH_PROUT_RES_SA:
-> @@ -574,6 +582,12 @@ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
->                       const uint8_t *param, int sz)
->  {
->      int resp_sz;
-> +
-> +    if ((fcntl(fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
-> +        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
-> +        return CHECK_CONDITION;
-> +    }
-> +
->  #ifdef CONFIG_MPATH
->      if (is_mpath(fd)) {
->          return multipath_pr_out(fd, cdb, sense, param, sz);
-> @@ -690,21 +704,6 @@ static int coroutine_fn prh_read_request(PRHelperClient *client,
->                                   errp) < 0) {
->              goto out_close;
->          }
-> -        if ((fcntl(client->fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
-> -            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_OPCODE));
-> -            sz = 0;
-> -        } else if (sz < PR_OUT_FIXED_PARAM_SIZE) {
-> -            /* Illegal request, Parameter list length error.  This isn't fatal;
-> -             * we have read the data, send an error without closing the socket.
-> -             */
-> -            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_PARAM_LEN));
-> -            sz = 0;
-> -        }
-> -        if (sz == 0) {
-> -            resp->result = CHECK_CONDITION;
-> -            close(client->fd);
-> -            client->fd = -1;
-> -        }
->      }
->  
->      req->fd = client->fd;
-> @@ -785,25 +784,23 @@ static void coroutine_fn prh_co_entry(void *opaque)
->              break;
->          }
->  
-> -        if (sz > 0) {
-> -            num_active_sockets++;
-> -            if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
-> -                r = do_pr_out(req.fd, req.cdb, resp.sense,
-> -                              client->data, sz);
-> -                resp.sz = 0;
-> -            } else {
-> -                resp.sz = sizeof(client->data);
-> -                r = do_pr_in(req.fd, req.cdb, resp.sense,
-> -                             client->data, &resp.sz);
-> -                resp.sz = MIN(resp.sz, sz);
-> -            }
-> -            num_active_sockets--;
-> -            close(req.fd);
-> -            if (r == -1) {
-> -                break;
-> -            }
-> -            resp.result = r;
-> +        num_active_sockets++;
-> +        if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
-> +            r = do_pr_out(req.fd, req.cdb, resp.sense,
-> +                          client->data, sz);
-> +            resp.sz = 0;
-> +        } else {
-> +            resp.sz = sizeof(client->data);
-> +            r = do_pr_in(req.fd, req.cdb, resp.sense,
-> +                         client->data, &resp.sz);
-> +            resp.sz = MIN(resp.sz, sz);
-> +        }
-> +        num_active_sockets--;
-> +        close(req.fd);
-> +        if (r == -1) {
-> +            break;
->          }
-> +        resp.result = r;
->  
->          if (prh_write_response(client, &req, &resp, &local_err) < 0) {
->              break;
+Thanks!
+
+> >> +    MemoryRegion *mr;
+> >> +    AddressSpace as;
+> >
+> > I remember you said you tried
+> > address_space_read/write(get_system_memory(), ...) but it didn't work.
+> > Did you figure out why?
+>=20
+> Devices directly talking to get_system_memory() isn't a great
+> design anyway.
+>=20
+> It's not clear to me what this device is doing with its
+> AddressSpace, though; comments that went into more detail
+> about what the device is and what the "memory" property is
+> for might help.
+
+I understand this issue now.  It's the same as qtest.
+
+This device is only visible from cpu->as, it's not visible from
+address_space_memory (system_memory).
+
+The NVMC needs access to the SoC's flash memory region, and that's what
+mr/as achieve here.  I agree that comments explaining the purpose of
+mr/as would be useful.
+
+--Wb5NtZlyOqqy58h0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbO0JhAAoJEJykq7OBq3PIQ6YH/2198w28gajjriWwSuUP62+Y
+M6tmcDuX1extU+zBYshOW3nPkG32iqsn7pOsMRO2Oq8jsiU6dBYNbbf9vdYDpbIT
+JIlGb6fXAXUNJVCxyDymdQ7BBNXyJDPnXAkcmXkqUiofplFnZUk4Raj2l6ERi/eM
+oPoyXMjKhcj8xj/tw0Hi+d7CiE1/V53YfR2cGax/CGk7Nzie2cgCBzes8kGny4jj
++kR+a6UBW+B52N4a83jHAWsuZ/C2RS9qCNiwHxm9Nq3d+gzlm0/puhGrypH7BqP5
+USKwnsU7AIOFY1eOOYWDXlTgNOsgQ6AAY29wkTu6rv8kmBqB2DbSdW/BwOG10eQ=
+=BJAF
+-----END PGP SIGNATURE-----
+
+--Wb5NtZlyOqqy58h0--
