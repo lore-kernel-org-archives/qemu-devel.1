@@ -1,50 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1faKa2-0005xc-Hh
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 08:38:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1faKfr-0007Rc-1u
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 08:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1faKZz-0001C4-MD
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 08:38:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41674
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1faKZz-0001Bh-HF
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 08:38:47 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w63CTQ20051490
-	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 08:38:47 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k08vvhba6-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:38:46 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 3 Jul 2018 13:38:42 +0100
-References: <20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622143146.GQ23296@redhat.com> <20180625095322.GC18580@redhat.com>
-	<20180625114106.GJ5024@localhost.localdomain>
-	<20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-	<20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
-	<CAFEAcA8uo72D79rRjP7sTz-C1-vxahFKMk3gxWs_cJqVBYXpAQ@mail.gmail.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 3 Jul 2018 14:38:39 +0200
-In-Reply-To: <CAFEAcA8uo72D79rRjP7sTz-C1-vxahFKMk3gxWs_cJqVBYXpAQ@mail.gmail.com>
-Content-Language: en-US
-Message-Id: <d8b2efe4-0317-93e9-8c7d-41a0be2c1ff2@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: Quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1faKfn-0004Ai-39
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 08:44:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58394 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1faKfm-0004AJ-TD
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 08:44:47 -0400
+References: <20180629195544.34263-1-eblake@redhat.com>
+	<20180629195544.34263-3-eblake@redhat.com>
+	<87r2kl8oey.fsf@dusky.pond.sub.org>
+	<12e2f857-8052-3542-0475-b84f8f02c716@redhat.com>
+	<87o9fo7tp4.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7a280a92-06d8-cf3b-3755-97f6c5b9b355@redhat.com>
+Date: Tue, 3 Jul 2018 07:44:44 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+In-Reply-To: <87o9fo7tp4.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: Drop qapi-gen --unmask option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,30 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-
-
-On 07/03/2018 01:35 PM, Peter Maydell wrote:
-> On 3 July 2018 at 12:32, Kevin Wolf <kwolf@redhat.com> wrote:
->> Am 03.07.2018 um 13:22 hat Daniel P. Berrang=C3=A9 geschrieben:
->>> Just posted latest version here:
+On 07/03/2018 12:51 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+>> On 07/02/2018 01:48 PM, Markus Armbruster wrote:
+>>> Eric Blake <eblake@redhat.com> writes:
 >>>
->>>   https://www.redhat.com/archives/libvir-list/2018-July/msg00130.html
->>>
->>> It will be in the next release on ~ Aug 1st
->>
->> It would have been a lot nicer to have it the July release because this
->> means that we'll have the released libvirt broken during almost the
->> whole rc phase of QEMU 3.0, but the release is planned for Aug 8th the
->> earliest, so I guess we're still okay. People using QEMU from git will
->> just need libvirt from git as well.
->=20
-> I'm still not clear what we gain from having a QEMU that's dropped
-> a feature that is still used by everything except leading-edge
-> not-yet-released versions of libvirt. Is there a strong reason we
-> can't just revert the deletion of the deprecated feature for a QEMU
-> release or two?
+>>>> Now that we have useful access to the type name as a comment
+>>>> in the generated qapi-introspect.c, we don't need to regenerate
+>>>> code with a temporary -u option just to get at type names.
+>>>>
 
-+1
+>      # three lines: greeting, output of qmp_capabilities, query-qmp-schema
+>      return json.loads(out.split('\n')[2])['return']
+> 
+> This returns an abstract syntax tree, represented in Python the obvious
+> way.  I can then explore it in Python, say search for object types with
+> certain properties.  For example, commit 2860b2b2cb8:
+> 
+>      Thus, the flaw puts an artificial restriction on the QAPI schema: we
+>      can't have potentially empty objects and arrays within
+>      BlockdevOptions, except when they're optional and "empty" has the same
+>      meaning as "absent".
+> 
+> --> Our QAPI schema satisfies this restriction (I checked), but it's a
+>      trap for the unwary, and a temptation to employ awkward workarounds
+>      for the wary.  Let's get rid of it.
+> 
+> I checked with a Python script that read the schema as shown above.
+> Without -u, I'd have to revert the identifier hiding.  I could certainly
+> write some more Python to read the mapping from the generated C, but
+> that feels like busy work.
+
+Good argument. Okay, I'm dropping this patch, and tweaking the other 
+patch commit message to explain that -u is still useful, even with the 
+addition of comment aids.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
