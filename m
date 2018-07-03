@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faNjG-0005K0-Q4
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:00:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1faNst-0005W1-Tw
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faNjD-00063j-KL
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:00:34 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38016)
+	(envelope-from <peter.maydell@linaro.org>) id 1faNss-0005HG-LE
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:10:31 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:36788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1faNjD-00061H-3m
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:00:31 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id 69-v6so2844285wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 09:00:30 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  3 Jul 2018 17:00:22 +0100
-Message-Id: <20180703160022.10705-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1faNss-0005Gt-9p
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:10:30 -0400
+Received: by mail-oi0-x241.google.com with SMTP id r16-v6so4917473oie.3
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 09:10:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] scripts/qemu-binfmt-conf.sh: allow clearing of
- entries
+In-Reply-To: <20180703135003.7485-1-shorne@gmail.com>
+References: <20180703135003.7485-1-shorne@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Jul 2018 17:10:09 +0100
+Message-ID: <CAFEAcA8-Ajhy8a8n0YU5Ta_N-8LZC2PN3TOvbj=cp4QhnB3xsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/25] OpenRISC updates for 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Stafford Horne <shorne@gmail.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>
 
-Currently running the script twice will fail with "sh: echo: I/O
-error" as the registration is already complete. Add a new option
---clear to reset the entries to save the user doing it by hand.
+On 3 July 2018 at 14:50, Stafford Horne <shorne@gmail.com> wrote:
+> Hello Peter,
+>
+> Trying again to send this series, just one difference here so just sending the
+> single patch.
+>
+> Changes since v2:
+>  - Use PAGE_ instead of PROT_ flags in MMU patches to fix windows build.
+>
+>
+> Please consider for pull:
+>
+> The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
+>
+>   tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:stffrdhrn/qemu.git tags/pull-or-20180703
+>
+> for you to fetch changes up to dfc84745bbaa0fea2abc8575dd349f6e4bb7edc7:
+>
+>   target/openrisc: Fix writes to interrupt mask register (2018-07-03 22:40:33 +0900)
+>
+> ----------------------------------------------------------------
+> OpenRISC cleanups and Fixes for QEMU 3.0
+>
+> Mostly patches from Richard Henderson fixing multiple things:
+>  * Fix singlestepping in GDB.
+>  * Use more TB linking.
+>  * Fixes to exit TB after updating SPRs to enable registering of state
+>    changes.
+>  * Significant optimizations and refactors to the TLB
+>  * Split out disassembly from translation.
+>  * Add qemu-or1k to qemu-binfmt-conf.sh.
+>  * Implement signal handling for linux-user.
+>
+> Then there are a few fixups from me:
+>  * Fix delay slot detections to match hardware, this was masking a bug
+>    in the linus kernel.
+>  * Fix stores to the PIC mask register
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- scripts/qemu-binfmt-conf.sh | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+Applied, thanks.
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index d7eefda0b8..13ef4713e6 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -160,7 +160,7 @@ qemu_get_family() {
- usage() {
-     cat <<EOF
- Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
--                           [--help][--credential yes|no][--exportdir PATH]
-+                           [--help][--clear][--credential yes|no][--exportdir PATH]
- 
-        Configure binfmt_misc to use qemu interpreter
- 
-@@ -176,6 +176,7 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                      (default: $SYSTEMDDIR or $DEBIANDIR)
-        --credential: if yes, credential and security tokens are
-                      calculated according to the binary to interpret
-+       --clear:      clear existing qemu binfmt registrations
- 
-     To import templates with update-binfmts, use :
- 
-@@ -249,6 +250,13 @@ qemu_register_interpreter() {
-     qemu_generate_register > /proc/sys/fs/binfmt_misc/register
- }
- 
-+qemu_clear_interpreter() {
-+    if [ -e /proc/sys/fs/binfmt_misc/qemu-$cpu ]; then
-+        echo "Removing qemu-$cpu as binfmt interpreter for $cpu"
-+        echo -1 > /proc/sys/fs/binfmt_misc/qemu-$cpu
-+    fi
-+}
-+
- qemu_generate_systemd() {
-     echo "Setting $qemu as binfmt interpreter for $cpu for systemd-binfmt.service"
-     qemu_generate_register > "$EXPORTDIR/qemu-$cpu.conf"
-@@ -302,7 +310,7 @@ DEBIANDIR="/usr/share/binfmts"
- QEMU_PATH=/usr/local/bin
- FLAGS=""
- 
--options=$(getopt -o ds:Q:e:hc: -l debian,systemd:,qemu-path:,exportdir:,help,credential: -- "$@")
-+options=$(getopt -o ds:Q:e:hc: -l debian,systemd:,qemu-path:,exportdir:,help,clear,credential: -- "$@")
- eval set -- "$options"
- 
- while true ; do
-@@ -354,6 +362,10 @@ while true ; do
-             FLAGS=""
-         fi
-         ;;
-+    --clear)
-+        shift
-+        BINFMT_SET=qemu_clear_interpreter
-+        ;;
-     *)
-         break
-         ;;
--- 
-2.17.1
+-- PMM
