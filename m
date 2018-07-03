@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faAFI-0004Di-J2
+	(envelope-from <dgibson@ozlabs.org>) id 1faAFI-0004Dh-D5
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:36:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faAFH-0004Mp-BE
+	(envelope-from <dgibson@ozlabs.org>) id 1faAFH-0004Mj-B4
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:36:44 -0400
-Date: Tue, 3 Jul 2018 11:33:05 +1000
+Date: Tue, 3 Jul 2018 11:13:22 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180703013305.GI3422@umbus.fritz.box>
-References: <20180702191345.19120-1-mail@sebastianbauer.info>
+Message-ID: <20180703011322.GH3422@umbus.fritz.box>
+References: <cover.1530225513.git.balaton@eik.bme.hu>
+	<bf4086546f08124e57b9676e6c0b81386ee59b67.1530225513.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Fh0SynPkUvrWGMR0"
+	protocol="application/pgp-signature"; boundary="saTAHnV464s+57Yq"
 Content-Disposition: inline
-In-Reply-To: <20180702191345.19120-1-mail@sebastianbauer.info>
-Subject: Re: [Qemu-devel] [PATCH v2] ppc: Include vga cirrus card into the
- compiling process
+In-Reply-To: <bf4086546f08124e57b9676e6c0b81386ee59b67.1530225513.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v6 5/5] target/ppc: Relax
+ reserved bitmask of indexed store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sebastian Bauer <mail@sebastianbauer.info>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, balaton@eik.bme.hu, qemu-ppc@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---Fh0SynPkUvrWGMR0
+--saTAHnV464s+57Yq
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 02, 2018 at 09:13:45PM +0200, Sebastian Bauer wrote:
-> Drivers for this card exists on PPC-based AmigaOS guests so it is useful =
-to
-> allow users to emulate the graphics card for PPC machines.
+On Fri, Jun 29, 2018 at 12:38:33AM +0200, BALATON Zoltan wrote:
+> The PPC440 User Manual says that if bit 31 is set, the contents of
+> CR[CR0] are undefined for indexed store instructions but this form is
+> not invalid. Other PPC variants confirming to recent ISA where this
+> bit may be reserved should ignore reserved bits and not raise invalid
+> instruction exception. In particular, MorphOS has an stwx instruction
+> with bit 31 set and fails to boot currently because of this. With this
+> patch it gets further.
 >=20
-> As cirrus vga is currently preferred over std(vga) in absence of any user
-> choice, this change also sets the default display of spapr machines to
-> std as otherwise qemu refuses to start these machines. Not specifying an
-> explicit graphics mode is for instance done by 'make check'.
+> ---
+> On sam460ex MorhpOS still has problems accessing PCI devices so cannot
+> yet boot but does not hit the invalid instruction exception and gets
+> further and fails due to not finding boot volume or display controller.
+> On mac99 it actually boots but needs an OpenBIOS patch to get USB
+> working (needed for mouse and keyboard). I'll prepare some docs on how
+> to run different guests but for the impatient here's a little hint:
+> -M mac99 -m 512 -vga none -device sm501 \
+> -prom-env 'boot-device=3Dcd:,\mac_ppc32\boot.img'
 >=20
-> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
 Applied to ppc-for-3.0, thanks.
 
->=20
 > ---
+>  target/ppc/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> v2
-> Adds std as default display for spapr machines
->=20
-> Notes
-> This change will make all other ppc machines to use cirrusgd as default
-> display because QEMU internally prefers that card. If this is considered
-> as being too risky, setting the default mode for the other machines as it
-> has been done for spapr would bring them back to the previous level.
-> However, this is rarely used in the exiting code base.
->=20
-> Alternatively, using the cirrusgd is possibly considered more an exception
-> than the rule these days, so altering the code to prefer stdvga over
-> cirrusgd may be the better solution (this should also render the changes
-> of v2 obsolete).
->=20
-> Feedback on how to proceed is welcome.
->=20
-> The patch applies to current ppc-for-3.0 minus v1 of the patch.
-> ---
->  default-configs/ppc-softmmu.mak | 1 +
->  hw/ppc/spapr.c                  | 1 +
->  2 files changed, 2 insertions(+)
->=20
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-> index 7e1a3d8135..6f12bf84f0 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -29,6 +29,7 @@ CONFIG_IDE_SII3112=3Dy
->  CONFIG_I2C=3Dy
->  CONFIG_BITBANG_I2C=3Dy
->  CONFIG_M41T80=3Dy
-> +CONFIG_VGA_CIRRUS=3Dy
-> =20
->  # For Macs
->  CONFIG_MAC=3Dy
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b2baec026f..0c12c404d4 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3962,6 +3962,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      mc->no_parallel =3D 1;
->      mc->default_boot_order =3D "";
->      mc->default_ram_size =3D 512 * M_BYTE;
-> +    mc->default_display =3D "std";
->      mc->kvm_type =3D spapr_kvm_type;
->      machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SPAPR_PCI_HOST_BRIDG=
-E);
->      mc->pci_allow_0_address =3D true;
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 3a215a1..525d55e 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -6886,7 +6886,7 @@ GEN_HANDLER(stop##u, opc, 0xFF, 0xFF, 0x00000000, t=
+ype),
+>  #define GEN_STUX(name, stop, opc2, opc3, type)                          =
+      \
+>  GEN_HANDLER(name##ux, 0x1F, opc2, opc3, 0x00000001, type),
+>  #define GEN_STX_E(name, stop, opc2, opc3, type, type2, chk)             =
+      \
+> -GEN_HANDLER_E(name##x, 0x1F, opc2, opc3, 0x00000001, type, type2),
+> +GEN_HANDLER_E(name##x, 0x1F, opc2, opc3, 0x00000000, type, type2),
+>  #define GEN_STS(name, stop, op, type)                                   =
+      \
+>  GEN_ST(name, stop, op | 0x20, type)                                     =
+      \
+>  GEN_STU(name, stop, op | 0x21, type)                                    =
+      \
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -107,24 +87,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Fh0SynPkUvrWGMR0
+--saTAHnV464s+57Yq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls60kwACgkQbDjKyiDZ
-s5JL5Q/5AbXnFtmkzmNHNdQe8wVdHTlPlt4TR+RBdr140VnWRpuEj1jC8TzsYVbv
-dKP0hPQmSX6vi8o4KAGIb01lDl+ocd7M5rPP/sotBB9c9kersOacHBxJDTPpfpLn
-dBTc8XpKhBAhNv670qMn+Eo2bTag9AJkrYRScJYYZ7mXBICbqqARexgaM6y/4V7O
-L22OkBreDiHxLFdIIzunTLREN/hF8oxEp8nEvhL/HMRFlDOeeJl21kiK0fGXJQUf
-fHlUqcC8iQdaNSj3p22tdYMzeXHLfIodeAlefbfjPxty7s0lV5Gw0Tyt/v8XSotC
-i9LGhROCwMbk54rdSfutJP4nOIgzJkiCFgI68XUDNaelZPwySffUeFku59ze2Jxl
-fPPOmBrQSzn2R66+MCkBGF0wDIKmhLePgBrpmorPz40adKPl82Dh3X88A03aOPL7
-C1dxLdAN7e9cmOrNGN3USH0I2W4HAoxhTKS8UmE1+/oKmXJfSy50/EThWfeIAiFh
-iLKFADc3xouWeJ7Zx1NkMrgp54NwgS7F4bpj5Q1rn9AknNnR9Byzl15dKsifH3vE
-1Q/ivX7SxkrSTEFGNApXsqMuK92ktuZEzLkuCFEAruq3F1W8QznFm3BSTt7uVJbP
-iRBQiSkNJksX7PSYh5lOFkwVI6oh0bofUUTL+GYLoHyUcgcjrF4=
-=NURl
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls6zbEACgkQbDjKyiDZ
+s5LUFBAA5baa1uFefCfHY3vcoLDXZO5f1GXcYx+P/sqOOVvgO6EojywSKpHG3AIb
+9V8DECu84rUaDQnYYlG0o/CZQE0heVz7W3w/5tEWit3x5Y6FRDT2vGxRa1o2h3NS
+QamSk3MVbfHhjwtG/TI1iGcrUqiM/58RkUsrvryTpYswd6dZVW7dnYbxCbV6Nnpx
+AV+W3UWotezoz15HQ1lhA2jHMxJ7uCDOOYrPF8AS0Rb4KKI5qlGKiOuUTdh5v+eY
+E8ucEoaKmWx7L1qxkvdt2EOTUU4hfDeEHy/ttss8tluTttgYh7XsXhKH+cvU5TIe
+ukhpdzGPS3iCcddUSdrgn0jNmL2UqXlKR9gEB9FdgLHcYf60NMNIyY4Mr9Blxv6D
+hQGxj0ctPBB1PhPvUE6kXU4C2P1FgxE0EAGGSSX3IiT5AMdkgela9vdMq5mo+/zX
+lWDrP+23d2s6Li/cO55tVCZecWgSV+B5HMXjxCZFYlkzg/6RBxwE34s08B/RD7Mx
+c6lEWzl3FG7rYBH0Q0+eaEB1uuappzCNJcYhlAGnfZpvSWb49/7GRd6Qyh7pwFAO
+DcUHal9tjaDVOBsCZ5cgLQ+gy4e2LqQK3JCyIgyD6xc/JuyI4bBO6nNijtTWS5la
+0vYKmM0zVevTqXDRX1NTGloZRqHzCyjdVHLqp6+Op44fKSTZpoM=
+=Bfuz
 -----END PGP SIGNATURE-----
 
---Fh0SynPkUvrWGMR0--
+--saTAHnV464s+57Yq--
