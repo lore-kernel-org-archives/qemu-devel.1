@@ -1,10 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faGYB-0006ak-6A
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:20:40 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faGZu-0007Qj-2U
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faGY7-00046D-36
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:20:39 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faGZp-0005kd-Vt
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:22:26 -0400
 References: <20180702093755.7384-1-david@redhat.com>
 	<20180702093755.7384-5-david@redhat.com>
 	<20180702123141.4a499198@redhat.com>
@@ -12,8 +12,8 @@ References: <20180702093755.7384-1-david@redhat.com>
 	<20180702144422.18f451c9@redhat.com>
 	<823aa15f-c73b-4e15-4562-3f0bf7007dc4@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <baecb3ee-ade1-6b37-6d72-906ffaf3016e@redhat.com>
-Date: Tue, 3 Jul 2018 10:20:28 +0200
+Message-ID: <fb292647-8035-ff9e-e108-4e5f0c8c51fc@redhat.com>
+Date: Tue, 3 Jul 2018 10:22:14 +0200
 MIME-Version: 1.0
 In-Reply-To: <823aa15f-c73b-4e15-4562-3f0bf7007dc4@redhat.com>
 Content-Type: text/plain; charset=utf-8
@@ -32,6 +32,7 @@ To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
 
 Hi David,
+
 On 07/02/2018 02:47 PM, David Hildenbrand wrote:
 > On 02.07.2018 14:44, Igor Mammedov wrote:
 >> On Mon, 2 Jul 2018 12:39:43 +0200
@@ -88,6 +89,7 @@ On 07/02/2018 02:47 PM, David Hildenbrand wrote:
 >>
 > Yes, already contained.
 > 
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
