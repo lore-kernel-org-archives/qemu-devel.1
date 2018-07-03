@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faGO7-0003Mz-9V
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:10:20 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faGOs-0003r1-0R
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faGO3-0007vo-6s
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:10:15 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faGOr-0008QY-45
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:11:01 -0400
 References: <20180702093755.7384-1-david@redhat.com>
-	<20180702093755.7384-3-david@redhat.com>
+	<20180702093755.7384-4-david@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <079e5efc-35bc-29e7-4f8d-5f5d127e1f92@redhat.com>
-Date: Tue, 3 Jul 2018 10:10:06 +0200
+Message-ID: <edd967e7-28f9-4d7f-564c-5343f69a663d@redhat.com>
+Date: Tue, 3 Jul 2018 10:10:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180702093755.7384-3-david@redhat.com>
+In-Reply-To: <20180702093755.7384-4-david@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] util/oslib-win32: indicate
- alignment for qemu_anon_ram_alloc()
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] pc: drop memory region alignment
+ check for 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +30,40 @@ Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com
 Hi David,
 
 On 07/02/2018 11:37 AM, David Hildenbrand wrote:
-> Let's set the alignment just like for the posix variant. This will
-> implicitly set the alignment of the underlying memory region and
-> therefore make memory_region_get_alignment(mr) return something > 0 for
-> all memory backends applicable to PCDIMM/NVDIMM.
+> All applicable memory regions always have an alignment > 0. All memory
+> backends result in file_ram_alloc() or qemu_anon_ram_alloc() getting
+> called, setting the alignment to > 0.
 > 
-> The allocation granularity is ususally 64k, while the page size is 4k.
-> The documentation of VirtualAlloc is not really comprehensible in case
-> only MEM_COMMIT is specified without an address. We'll detect the actual
-> values and then go for the bigger one. The expection is, that it will
-> always be 64k aligned. (The assumption is that MEM_COMMIT does an
-> implicit MEM_RESERVE, so the address will always be aligned to the
-> allocation granularity. And the allocation granularity is always bigger
-> than the page size).
+> So a PCDIMM memory region always has an alignment > 0. NVDIMM copy the
+> alignment of the original memory memory region into the handcrafted memory
+> region that will be used at this place.
 > 
-> This will allow us to drop special handling in pc.c for
-> memory_region_get_alignment(mr) == 0, as we can then assume that it is
-> always set (and AFAICS >= getpagesize()).
+> So the check for 0 can be dropped and we can reduce the special
+> handling.
 > 
-> For pc in pc_memory_plug(), under Windows TARGET_PAGE_SIZE == getpagesize(),
-> therefore alignment of DIMMs will not change, and therefore also not the
-> guest physical memory layout.
-> 
-> For spapr in spapr_memory_plug(), an alignment of 0 would have been used
-> until now. As QEMU_ALIGN_UP will crash with the alignment being 0, this
-> never worked, so we don't have to care about compatibility handling.
+> Dropping this check makes factoring out of alignment handling easier as
+> compat handling only has to look at pcmc->enforce_aligned_dimm and not
+> care about the alignment of the memory region.
 > 
 > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  util/oslib-win32.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
+>  hw/i386/pc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index bb5ad28bd3..25dd1595ad 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -67,15 +67,24 @@ void *qemu_memalign(size_t alignment, size_t size)
->      return qemu_oom_check(qemu_try_memalign(alignment, size));
->  }
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index bf986baf91..934b7155b1 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1712,7 +1712,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>      uint64_t align = TARGET_PAGE_SIZE;
+>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
 >  
-> +static int get_allocation_granularity(void)
-> +{
-> +    SYSTEM_INFO system_info;
-> +
-> +    GetSystemInfo(&system_info);
-> +    return system_info.dwAllocationGranularity;
-> +}
-> +
->  void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared)
->  {
->      void *ptr;
->  
-> -    /* FIXME: this is not exactly optimal solution since VirtualAlloc
-> -       has 64Kb granularity, but at least it guarantees us that the
-> -       memory is page aligned. */
->      ptr = VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
->      trace_qemu_anon_ram_alloc(size, ptr);
-> +
-> +    if (ptr && align) {
-> +        *align = MAX(get_allocation_granularity(), getpagesize());
-> +    }
->      return ptr;
->  }
+> -    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+> +    if (pcmc->enforce_aligned_dimm) {
+>          align = memory_region_get_alignment(mr);
+>      }
 >  
 > 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
