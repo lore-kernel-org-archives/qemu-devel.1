@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKU-0002pt-3c
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKU-0002r3-Ru
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKS-0006xV-B2
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKR-0006wh-Lt
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:22 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:45 +1000
-Message-Id: <20180703055804.13449-17-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:41 +1000
+Message-Id: <20180703055804.13449-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 16/35] target/ppc: Tidy gen_conditional_store
+Subject: [Qemu-devel] [PULL 12/35] target/ppc: Use atomic load for LQ and
+ LQARX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +25,221 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, ag
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Leave only the minimal amount of code within the STCX macro,
-moving the rest of the code into gen_conditional_store.
-Remove the explicit call to gen_check_align; the matching LDAX will
-have already checked alignment, and we verify the same address.
+Section 1.4 of the Power ISA v3.0B states that both of these
+instructions are single-copy atomic.  As we cannot (yet) issue
+128-bit loads within TCG, use the generic helpers provided.
+
+Since TCG cannot (yet) return a 128-bit value, add a slot within
+CPUPPCState for returning the high half of a 128-bit return value.
+This solution is preferred to the helper assigning to architectural
+registers directly, as it avoids clobbering all TCG live values.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 28 +++++++++++-----------------
- 1 file changed, 11 insertions(+), 17 deletions(-)
+ target/ppc/cpu.h        |  3 ++
+ target/ppc/helper.h     |  5 +++
+ target/ppc/mem_helper.c | 20 ++++++++-
+ target/ppc/translate.c  | 91 ++++++++++++++++++++++++++++++-----------
+ 4 files changed, 94 insertions(+), 25 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c7f3fb6b73..973cf44cda 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1015,6 +1015,9 @@ struct CPUPPCState {
+     /* Next instruction pointer */
+     target_ulong nip;
+ 
++    /* High part of 128-bit helper return.  */
++    uint64_t retxh;
++
+     int access_type; /* when a memory exception occurs, the access
+                         type is stored here */
+ 
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index d751f0e219..3f451a5d7e 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -799,3 +799,8 @@ DEF_HELPER_4(dscliq, void, env, fprp, fprp, i32)
+ 
+ DEF_HELPER_1(tbegin, void, env)
+ DEF_HELPER_FLAGS_1(fixup_thrm, TCG_CALL_NO_RWG, void, env)
++
++#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
++DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
++DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
++#endif
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index a34e604db3..44a8f3445a 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -21,9 +21,9 @@
+ #include "exec/exec-all.h"
+ #include "qemu/host-utils.h"
+ #include "exec/helper-proto.h"
+-
+ #include "helper_regs.h"
+ #include "exec/cpu_ldst.h"
++#include "tcg.h"
+ #include "internal.h"
+ 
+ //#define DEBUG_OP
+@@ -215,6 +215,24 @@ target_ulong helper_lscbx(CPUPPCState *env, target_ulong addr, uint32_t reg,
+     return i;
+ }
+ 
++#if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
++uint64_t helper_lq_le_parallel(CPUPPCState *env, target_ulong addr,
++                               uint32_t opidx)
++{
++    Int128 ret = helper_atomic_ldo_le_mmu(env, addr, opidx, GETPC());
++    env->retxh = int128_gethi(ret);
++    return int128_getlo(ret);
++}
++
++uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
++                               uint32_t opidx)
++{
++    Int128 ret = helper_atomic_ldo_be_mmu(env, addr, opidx, GETPC());
++    env->retxh = int128_gethi(ret);
++    return int128_getlo(ret);
++}
++#endif
++
+ /*****************************************************************************/
+ /* Altivec extension helpers */
+ #if defined(HOST_WORDS_BIGENDIAN)
 diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 03e8c5df03..e751072404 100644
+index 3a215a1dc6..0923cc24e3 100644
 --- a/target/ppc/translate.c
 +++ b/target/ppc/translate.c
-@@ -3201,14 +3201,17 @@ ST_ATOMIC(stwat, DEF_MEMOP(MO_UL), i32, trunc_tl_i32)
- ST_ATOMIC(stdat, DEF_MEMOP(MO_Q), i64, mov_i64)
- #endif
- 
--static void gen_conditional_store(DisasContext *ctx, TCGv EA,
--                                  int reg, int memop)
-+static void gen_conditional_store(DisasContext *ctx, TCGMemOp memop)
+@@ -2607,7 +2607,7 @@ static void gen_ld(DisasContext *ctx)
+ static void gen_lq(DisasContext *ctx)
  {
-     TCGLabel *l1 = gen_new_label();
-     TCGLabel *l2 = gen_new_label();
--    TCGv t0;
-+    TCGv t0 = tcg_temp_new();
-+    int reg = rS(ctx->opcode);
+     int ra, rd;
+-    TCGv EA;
++    TCGv EA, hi, lo;
  
--    tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
-+    gen_set_access_type(ctx, ACCESS_RES);
-+    gen_addr_reg_index(ctx, t0);
-+    tcg_gen_brcond_tl(TCG_COND_NE, t0, cpu_reserve, l1);
-+    tcg_temp_free(t0);
+     /* lq is a legal user mode instruction starting in ISA 2.07 */
+     bool legal_in_user_mode = (ctx->insns_flags2 & PPC2_LSQ_ISA207) != 0;
+@@ -2633,16 +2633,35 @@ static void gen_lq(DisasContext *ctx)
+     EA = tcg_temp_new();
+     gen_addr_imm_index(ctx, EA, 0x0F);
  
-     t0 = tcg_temp_new();
-     tcg_gen_atomic_cmpxchg_tl(t0, cpu_reserve, cpu_reserve_val,
-@@ -3232,19 +3235,10 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
-     tcg_gen_movi_tl(cpu_reserve, -1);
+-    /* We only need to swap high and low halves. gen_qemu_ld64_i64 does
+-       necessary 64-bit byteswap already. */
+-    if (unlikely(ctx->le_mode)) {
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd + 1], EA);
++    /* Note that the low part is always in RD+1, even in LE mode.  */
++    lo = cpu_gpr[rd + 1];
++    hi = cpu_gpr[rd];
++
++    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++#ifdef CONFIG_ATOMIC128
++        TCGv_i32 oi = tcg_temp_new_i32();
++        if (ctx->le_mode) {
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
++            gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
++        } else {
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
++            gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
++        }
++        tcg_temp_free_i32(oi);
++        tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
++#else
++        /* Restart with exclusive lock.  */
++        gen_helper_exit_atomic(cpu_env);
++        ctx->base.is_jmp = DISAS_NORETURN;
++#endif
++    } else if (ctx->le_mode) {
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ);
+         gen_addr_add(ctx, EA, EA, 8);
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd], EA);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_LEQ);
+     } else {
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd], EA);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_BEQ);
+         gen_addr_add(ctx, EA, EA, 8);
+-        gen_qemu_ld64_i64(ctx, cpu_gpr[rd + 1], EA);
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_BEQ);
+     }
+     tcg_temp_free(EA);
+ }
+@@ -3236,9 +3255,8 @@ STCX(stdcx_, DEF_MEMOP(MO_Q))
+ /* lqarx */
+ static void gen_lqarx(DisasContext *ctx)
+ {
+-    TCGv EA;
+     int rd = rD(ctx->opcode);
+-    TCGv gpr1, gpr2;
++    TCGv EA, hi, lo;
+ 
+     if (unlikely((rd & 1) || (rd == rA(ctx->opcode)) ||
+                  (rd == rB(ctx->opcode)))) {
+@@ -3247,24 +3265,49 @@ static void gen_lqarx(DisasContext *ctx)
+     }
+ 
+     gen_set_access_type(ctx, ACCESS_RES);
+-    EA = tcg_temp_local_new();
++    EA = tcg_temp_new();
+     gen_addr_reg_index(ctx, EA);
+-    gen_check_align(ctx, EA, 15);
+-    if (unlikely(ctx->le_mode)) {
+-        gpr1 = cpu_gpr[rd+1];
+-        gpr2 = cpu_gpr[rd];
++
++    /* Note that the low part is always in RD+1, even in LE mode.  */
++    lo = cpu_gpr[rd + 1];
++    hi = cpu_gpr[rd];
++
++    if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++#ifdef CONFIG_ATOMIC128
++        TCGv_i32 oi = tcg_temp_new_i32();
++        if (ctx->le_mode) {
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ | MO_ALIGN_16,
++                                                ctx->mem_idx));
++            gen_helper_lq_le_parallel(lo, cpu_env, EA, oi);
++        } else {
++            tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ | MO_ALIGN_16,
++                                                ctx->mem_idx));
++            gen_helper_lq_be_parallel(lo, cpu_env, EA, oi);
++        }
++        tcg_temp_free_i32(oi);
++        tcg_gen_ld_i64(hi, cpu_env, offsetof(CPUPPCState, retxh));
++#else
++        /* Restart with exclusive lock.  */
++        gen_helper_exit_atomic(cpu_env);
++        ctx->base.is_jmp = DISAS_NORETURN;
++        tcg_temp_free(EA);
++        return;
++#endif
++    } else if (ctx->le_mode) {
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_LEQ | MO_ALIGN_16);
++        tcg_gen_mov_tl(cpu_reserve, EA);
++        gen_addr_add(ctx, EA, EA, 8);
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_LEQ);
+     } else {
+-        gpr1 = cpu_gpr[rd];
+-        gpr2 = cpu_gpr[rd+1];
++        tcg_gen_qemu_ld_i64(hi, EA, ctx->mem_idx, MO_BEQ | MO_ALIGN_16);
++        tcg_gen_mov_tl(cpu_reserve, EA);
++        gen_addr_add(ctx, EA, EA, 8);
++        tcg_gen_qemu_ld_i64(lo, EA, ctx->mem_idx, MO_BEQ);
+     }
+-    tcg_gen_qemu_ld_i64(gpr1, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
+-    tcg_gen_mov_tl(cpu_reserve, EA);
+-    gen_addr_add(ctx, EA, EA, 8);
+-    tcg_gen_qemu_ld_i64(gpr2, EA, ctx->mem_idx, DEF_MEMOP(MO_Q));
+-
+-    tcg_gen_st_tl(gpr1, cpu_env, offsetof(CPUPPCState, reserve_val));
+-    tcg_gen_st_tl(gpr2, cpu_env, offsetof(CPUPPCState, reserve_val2));
+     tcg_temp_free(EA);
++
++    tcg_gen_st_tl(hi, cpu_env, offsetof(CPUPPCState, reserve_val));
++    tcg_gen_st_tl(lo, cpu_env, offsetof(CPUPPCState, reserve_val2));
  }
  
--#define STCX(name, memop)                                   \
--static void gen_##name(DisasContext *ctx)                   \
--{                                                           \
--    TCGv t0;                                                \
--    int len = MEMOP_GET_SIZE(memop);                        \
--    gen_set_access_type(ctx, ACCESS_RES);                   \
--    t0 = tcg_temp_local_new();                              \
--    gen_addr_reg_index(ctx, t0);                            \
--    if (len > 1) {                                          \
--        gen_check_align(ctx, t0, (len) - 1);                \
--    }                                                       \
--    gen_conditional_store(ctx, t0, rS(ctx->opcode), memop); \
--    tcg_temp_free(t0);                                      \
-+#define STCX(name, memop)                  \
-+static void gen_##name(DisasContext *ctx)  \
-+{                                          \
-+    gen_conditional_store(ctx, memop);     \
- }
- 
- STCX(stbcx_, DEF_MEMOP(MO_UB))
+ /* stqcx. */
 -- 
 2.17.1
