@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1faLhJ-0008Lg-9h
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:26 -0400
+	(envelope-from <shorne@gmail.com>) id 1faLhM-0008Pd-DL
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1faLhF-0000nh-Qd
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:25 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:33739)
+	(envelope-from <shorne@gmail.com>) id 1faLhH-0000ov-Sr
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:28 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:45246)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1faLhF-0000m7-IS
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:21 -0400
-Received: by mail-pl0-x244.google.com with SMTP id 6-v6so1088287plb.0
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 06:50:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1faLhH-0000oZ-Fg
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 09:50:23 -0400
+Received: by mail-pl0-x241.google.com with SMTP id bi1-v6so1073388plb.12
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 06:50:23 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Tue,  3 Jul 2018 22:50:02 +0900
-Message-Id: <20180703135003.7485-1-shorne@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 00/25] OpenRISC updates for 3.0
+Date: Tue,  3 Jul 2018 22:50:03 +0900
+Message-Id: <20180703135003.7485-2-shorne@gmail.com>
+In-Reply-To: <20180703135003.7485-1-shorne@gmail.com>
+References: <20180703135003.7485-1-shorne@gmail.com>
+Subject: [Qemu-devel] [PULL v3 20/25] target/openrisc: Reorg tlb lookup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +26,358 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>
 
-Hello Peter,
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Trying again to send this series, just one difference here so just sending the
-single patch.
+While openrisc has a split i/d tlb, qemu does not.  Perform a
+lookup on both i & d tlbs in parallel and put the composite
+rights into qemu's tlb.  This avoids ping-ponging the qemu tlb
+between EXEC and READ.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
 Changes since v2:
- - Use PAGE_ instead of PROT_ flags in MMU patches to fix windows build.
+ - Updated flags to PAGE_ from PROT_ to fix windows build.
 
+ target/openrisc/cpu.h |   8 --
+ target/openrisc/mmu.c | 250 +++++++++++++++---------------------------
+ 2 files changed, 88 insertions(+), 170 deletions(-)
 
-Please consider for pull:
-
-The following changes since commit 646f34fa5482e495483de230b4cf0f2ae4fd2781:
-
-  tcg: Fix --disable-tcg build breakage (2018-07-02 13:42:05 +0100)
-
-are available in the Git repository at:
-
-  git@github.com:stffrdhrn/qemu.git tags/pull-or-20180703
-
-for you to fetch changes up to dfc84745bbaa0fea2abc8575dd349f6e4bb7edc7:
-
-  target/openrisc: Fix writes to interrupt mask register (2018-07-03 22:40:33 +0900)
-
-----------------------------------------------------------------
-OpenRISC cleanups and Fixes for QEMU 3.0
-
-Mostly patches from Richard Henderson fixing multiple things:
- * Fix singlestepping in GDB.
- * Use more TB linking.
- * Fixes to exit TB after updating SPRs to enable registering of state
-   changes.
- * Significant optimizations and refactors to the TLB
- * Split out disassembly from translation.
- * Add qemu-or1k to qemu-binfmt-conf.sh.
- * Implement signal handling for linux-user.
-
-Then there are a few fixups from me:
- * Fix delay slot detections to match hardware, this was masking a bug
-   in the linus kernel.
- * Fix stores to the PIC mask register
-
-----------------------------------------------------------------
-
-Richard Henderson (23):
-  target/openrisc: Fix mtspr shadow gprs
-  target/openrisc: Add print_insn_or1k
-  target/openrisc: Log interrupts
-  target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP
-  target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB
-  target/openrisc: Fix singlestep_enabled
-  target/openrisc: Link more translation blocks
-  target/openrisc: Split out is_user
-  target/openrisc: Exit the TB after l.mtspr
-  target/openrisc: Form the spr index from tcg
-  target/openrisc: Merge tlb allocation into CPUOpenRISCState
-  target/openrisc: Remove indirect function calls for mmu
-  target/openrisc: Merge mmu_helper.c into mmu.c
-  target/openrisc: Reduce tlb to a single dimension
-  target/openrisc: Fix tlb flushing in mtspr
-  target/openrisc: Fix cpu_mmu_index
-  target/openrisc: Use identical sizes for ITLB and DTLB
-  target/openrisc: Stub out handle_mmu_fault for softmmu
-  target/openrisc: Increase the TLB size
-  target/openrisc: Reorg tlb lookup
-  target/openrisc: Add support in scripts/qemu-binfmt-conf.sh
-  linux-user: Implement signals for openrisc
-  linux-user: Fix struct sigaltstack for openrisc
-
-Stafford Horne (2):
-  target/openrisc: Fix delay slot exception flag to match spec
-  target/openrisc: Fix writes to interrupt mask register
-
- linux-user/openrisc/signal.c         | 217 ++++++++-----------
- linux-user/openrisc/target_signal.h  |   2 +-
- linux-user/openrisc/target_syscall.h |  28 +--
- linux-user/signal.c                  |   2 +-
- scripts/qemu-binfmt-conf.sh          |  10 +-
- target/openrisc/Makefile.objs        |   5 +-
- target/openrisc/cpu.c                |  17 +-
- target/openrisc/cpu.h                |  61 +++---
- target/openrisc/disas.c              | 170 +++++++++++++++
- target/openrisc/helper.h             |   4 +-
- target/openrisc/interrupt.c          |  55 +++--
- target/openrisc/interrupt_helper.c   |  35 +---
- target/openrisc/machine.c            |  44 +---
- target/openrisc/mmu.c                | 279 +++++++++---------------
- target/openrisc/mmu_helper.c         |  40 ----
- target/openrisc/sys_helper.c         |  84 ++++----
- target/openrisc/translate.c          | 303 ++++++++++-----------------
- 17 files changed, 603 insertions(+), 753 deletions(-)
- create mode 100644 target/openrisc/disas.c
- delete mode 100644 target/openrisc/mmu_helper.c
-
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index b180e30e9e..f1b31bc24a 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -237,14 +237,6 @@ enum {
+     UXE = (1 << 7),
+ };
+ 
+-/* check if tlb available */
+-enum {
+-    TLBRET_INVALID = -3,
+-    TLBRET_NOMATCH = -2,
+-    TLBRET_BADADDR = -1,
+-    TLBRET_MATCH = 0
+-};
+-
+ typedef struct OpenRISCTLBEntry {
+     uint32_t mr;
+     uint32_t tr;
+diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
+index f4c0a3e217..e7d5219e11 100644
+--- a/target/openrisc/mmu.c
++++ b/target/openrisc/mmu.c
+@@ -29,148 +29,78 @@
+ #endif
+ 
+ #ifndef CONFIG_USER_ONLY
+-static inline int get_phys_nommu(hwaddr *physical, int *prot,
+-                                 target_ulong address)
++static inline void get_phys_nommu(hwaddr *phys_addr, int *prot,
++                                  target_ulong address)
+ {
+-    *physical = address;
++    *phys_addr = address;
+     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+-    return TLBRET_MATCH;
+ }
+ 
+-static int get_phys_code(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
+-                         target_ulong address, int rw, bool supervisor)
++static int get_phys_mmu(OpenRISCCPU *cpu, hwaddr *phys_addr, int *prot,
++                        target_ulong addr, int need, bool super)
+ {
+-    int vpn = address >> TARGET_PAGE_BITS;
+-    int idx = vpn & TLB_MASK;
+-    int right = 0;
+-    uint32_t mr = cpu->env.tlb.itlb[idx].mr;
+-    uint32_t tr = cpu->env.tlb.itlb[idx].tr;
+-
+-    if ((mr >> TARGET_PAGE_BITS) != vpn) {
+-        return TLBRET_NOMATCH;
+-    }
+-    if (!(mr & 1)) {
+-        return TLBRET_INVALID;
+-    }
+-    if (supervisor) {
+-        if (tr & SXE) {
+-            right |= PAGE_EXEC;
+-        }
+-    } else {
+-        if (tr & UXE) {
+-            right |= PAGE_EXEC;
++    int idx = (addr >> TARGET_PAGE_BITS) & TLB_MASK;
++    uint32_t imr = cpu->env.tlb.itlb[idx].mr;
++    uint32_t itr = cpu->env.tlb.itlb[idx].tr;
++    uint32_t dmr = cpu->env.tlb.dtlb[idx].mr;
++    uint32_t dtr = cpu->env.tlb.dtlb[idx].tr;
++    int right, match, valid;
++
++    /* If the ITLB and DTLB indexes map to the same page, we want to
++       load all permissions all at once.  If the destination pages do
++       not match, zap the one we don't need.  */
++    if (unlikely((itr ^ dtr) & TARGET_PAGE_MASK)) {
++        if (need & PAGE_EXEC) {
++            dmr = dtr = 0;
++        } else {
++            imr = itr = 0;
+         }
+     }
+-    if ((rw & 2) && ((right & PAGE_EXEC) == 0)) {
+-        return TLBRET_BADADDR;
+-    }
+ 
+-    *physical = (tr & TARGET_PAGE_MASK) | (address & ~TARGET_PAGE_MASK);
+-    *prot = right;
+-    return TLBRET_MATCH;
+-}
++    /* Check if either of the entries matches the source address.  */
++    match  = (imr ^ addr) & TARGET_PAGE_MASK ? 0 : PAGE_EXEC;
++    match |= (dmr ^ addr) & TARGET_PAGE_MASK ? 0 : PAGE_READ | PAGE_WRITE;
+ 
+-static int get_phys_data(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
+-                         target_ulong address, int rw, bool supervisor)
+-{
+-    int vpn = address >> TARGET_PAGE_BITS;
+-    int idx = vpn & TLB_MASK;
+-    int right = 0;
+-    uint32_t mr = cpu->env.tlb.dtlb[idx].mr;
+-    uint32_t tr = cpu->env.tlb.dtlb[idx].tr;
++    /* Check if either of the entries is valid.  */
++    valid  = imr & 1 ? PAGE_EXEC : 0;
++    valid |= dmr & 1 ? PAGE_READ | PAGE_WRITE : 0;
++    valid &= match;
+ 
+-    if ((mr >> TARGET_PAGE_BITS) != vpn) {
+-        return TLBRET_NOMATCH;
+-    }
+-    if (!(mr & 1)) {
+-        return TLBRET_INVALID;
+-    }
+-    if (supervisor) {
+-        if (tr & SRE) {
+-            right |= PAGE_READ;
+-        }
+-        if (tr & SWE) {
+-            right |= PAGE_WRITE;
+-        }
+-    } else {
+-        if (tr & URE) {
+-            right |= PAGE_READ;
+-        }
+-        if (tr & UWE) {
+-            right |= PAGE_WRITE;
+-        }
+-    }
+-
+-    if (!(rw & 1) && ((right & PAGE_READ) == 0)) {
+-        return TLBRET_BADADDR;
+-    }
+-    if ((rw & 1) && ((right & PAGE_WRITE) == 0)) {
+-        return TLBRET_BADADDR;
+-    }
++    /* Collect the permissions from the entries.  */
++    right  = itr & (super ? SXE : UXE) ? PAGE_EXEC : 0;
++    right |= dtr & (super ? SRE : URE) ? PAGE_READ : 0;
++    right |= dtr & (super ? SWE : UWE) ? PAGE_WRITE : 0;
++    right &= valid;
+ 
+-    *physical = (tr & TARGET_PAGE_MASK) | (address & ~TARGET_PAGE_MASK);
++    /* Note that above we validated that itr and dtr match on page.
++       So oring them together changes nothing without having to
++       check which one we needed.  We also want to store to these
++       variables even on failure, as it avoids compiler warnings.  */
++    *phys_addr = ((itr | dtr) & TARGET_PAGE_MASK) | (addr & ~TARGET_PAGE_MASK);
+     *prot = right;
+-    return TLBRET_MATCH;
+-}
+ 
+-static int get_phys_addr(OpenRISCCPU *cpu, hwaddr *physical,
+-                         int *prot, target_ulong address, int rw)
+-{
+-    bool supervisor = (cpu->env.sr & SR_SM) != 0;
+-    int ret;
++    qemu_log_mask(CPU_LOG_MMU,
++                  "MMU lookup: need %d match %d valid %d right %d -> %s\n",
++                  need, match, valid, right, (need & right) ? "OK" : "FAIL");
+ 
+-    /* Assume nommu results for a moment.  */
+-    ret = get_phys_nommu(physical, prot, address);
++    /* Check the collective permissions are present.  */
++    if (likely(need & right)) {
++        return 0;  /* success! */
++    }
+ 
+-    /* Overwrite with TLB lookup if enabled.  */
+-    if (rw == MMU_INST_FETCH) {
+-        if (cpu->env.sr & SR_IME) {
+-            ret = get_phys_code(cpu, physical, prot, address, rw, supervisor);
+-        }
++    /* Determine what kind of failure we have.  */
++    if (need & valid) {
++        return need & PAGE_EXEC ? EXCP_IPF : EXCP_DPF;
+     } else {
+-        if (cpu->env.sr & SR_DME) {
+-            ret = get_phys_data(cpu, physical, prot, address, rw, supervisor);
+-        }
++        return need & PAGE_EXEC ? EXCP_ITLBMISS : EXCP_DTLBMISS;
+     }
+-
+-    return ret;
+ }
+ #endif
+ 
+-static void cpu_openrisc_raise_mmu_exception(OpenRISCCPU *cpu,
+-                                             target_ulong address,
+-                                             int rw, int tlb_error)
++static void raise_mmu_exception(OpenRISCCPU *cpu, target_ulong address,
++                                int exception)
+ {
+     CPUState *cs = CPU(cpu);
+-    int exception = 0;
+-
+-    switch (tlb_error) {
+-    default:
+-        if (rw == 2) {
+-            exception = EXCP_IPF;
+-        } else {
+-            exception = EXCP_DPF;
+-        }
+-        break;
+-#ifndef CONFIG_USER_ONLY
+-    case TLBRET_BADADDR:
+-        if (rw == 2) {
+-            exception = EXCP_IPF;
+-        } else {
+-            exception = EXCP_DPF;
+-        }
+-        break;
+-    case TLBRET_INVALID:
+-    case TLBRET_NOMATCH:
+-        /* No TLB match for a mapped address */
+-        if (rw == 2) {
+-            exception = EXCP_ITLBMISS;
+-        } else {
+-            exception = EXCP_DTLBMISS;
+-        }
+-        break;
+-#endif
+-    }
+ 
+     cs->exception_index = exception;
+     cpu->env.eear = address;
+@@ -182,7 +112,7 @@ int openrisc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+ {
+ #ifdef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+-    cpu_openrisc_raise_mmu_exception(cpu, address, rw, 0);
++    raise_mmu_exception(cpu, address, EXCP_DPF);
+     return 1;
+ #else
+     g_assert_not_reached();
+@@ -193,27 +123,32 @@ int openrisc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ {
+     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
++    int prot, excp, sr = cpu->env.sr;
+     hwaddr phys_addr;
+-    int prot;
+-    int miss;
+ 
+-    /* Check memory for any kind of address, since during debug the
+-       gdb can ask for anything, check data tlb for address */
+-    miss = get_phys_addr(cpu, &phys_addr, &prot, addr, 0);
++    switch (sr & (SR_DME | SR_IME)) {
++    case SR_DME | SR_IME:
++        /* The mmu is definitely enabled.  */
++        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr,
++                            PAGE_EXEC | PAGE_READ | PAGE_WRITE,
++                            (sr & SR_SM) != 0);
++        return excp ? -1 : phys_addr;
+ 
+-    /* Check instruction tlb */
+-    if (miss) {
+-        miss = get_phys_addr(cpu, &phys_addr, &prot, addr, MMU_INST_FETCH);
+-    }
+-
+-    /* Last, fall back to a plain address */
+-    if (miss) {
+-        miss = get_phys_nommu(&phys_addr, &prot, addr);
+-    }
++    default:
++        /* The mmu is partially enabled, and we don't really have
++           a "real" access type.  Begin by trying the mmu, but if
++           that fails try again without.  */
++        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr,
++                            PAGE_EXEC | PAGE_READ | PAGE_WRITE,
++                            (sr & SR_SM) != 0);
++        if (!excp) {
++            return phys_addr;
++        }
++        /* fallthru */
+ 
+-    if (miss) {
+-        return -1;
+-    } else {
++    case 0:
++        /* The mmu is definitely disabled; lookups never fail.  */
++        get_phys_nommu(&phys_addr, &prot, addr);
+         return phys_addr;
+     }
+ }
+@@ -222,37 +157,28 @@ void tlb_fill(CPUState *cs, target_ulong addr, int size,
+               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+ {
+     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+-    int ret, prot = 0;
+-    hwaddr physical = 0;
++    int prot, excp;
++    hwaddr phys_addr;
+ 
+     if (mmu_idx == MMU_NOMMU_IDX) {
+-        ret = get_phys_nommu(&physical, &prot, addr);
++        /* The mmu is disabled; lookups never fail.  */
++        get_phys_nommu(&phys_addr, &prot, addr);
++        excp = 0;
+     } else {
+         bool super = mmu_idx == MMU_SUPERVISOR_IDX;
+-        if (access_type == MMU_INST_FETCH) {
+-            ret = get_phys_code(cpu, &physical, &prot, addr, 2, super);
+-        } else {
+-            ret = get_phys_data(cpu, &physical, &prot, addr,
+-                                access_type == MMU_DATA_STORE, super);
+-        }
++        int need = (access_type == MMU_INST_FETCH ? PAGE_EXEC
++                    : access_type == MMU_DATA_STORE ? PAGE_WRITE
++                    : PAGE_READ);
++        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr, need, super);
+     }
+ 
+-    if (ret == TLBRET_MATCH) {
+-        tlb_set_page(cs, addr & TARGET_PAGE_MASK,
+-                     physical & TARGET_PAGE_MASK, prot,
+-                     mmu_idx, TARGET_PAGE_SIZE);
+-    } else if (ret < 0) {
+-        int rw;
+-        if (access_type == MMU_INST_FETCH) {
+-            rw = 2;
+-        } else if (access_type == MMU_DATA_STORE) {
+-            rw = 1;
+-        } else {
+-            rw = 0;
+-        }
+-        cpu_openrisc_raise_mmu_exception(cpu, addr, rw, ret);
+-        /* Raise Exception.  */
++    if (unlikely(excp)) {
++        raise_mmu_exception(cpu, addr, excp);
+         cpu_loop_exit_restore(cs, retaddr);
+     }
++
++    tlb_set_page(cs, addr & TARGET_PAGE_MASK,
++                 phys_addr & TARGET_PAGE_MASK, prot,
++                 mmu_idx, TARGET_PAGE_SIZE);
+ }
+ #endif
 -- 
 2.17.0
