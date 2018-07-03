@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faGnx-00041i-0H
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:36:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1faGx6-0005vZ-0S
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faGnt-0005IR-QO
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:36:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37480 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faGnt-0005Hy-MT
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:36:53 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180702162218.13678-1-armbru@redhat.com>
-	<CAJ+F1CK2AXagKO5-Qsb3nc4xBfc_Scr+pOyM+Vn8EynZYFsqAg@mail.gmail.com>
-Date: Tue, 03 Jul 2018 10:36:48 +0200
-In-Reply-To: <CAJ+F1CK2AXagKO5-Qsb3nc4xBfc_Scr+pOyM+Vn8EynZYFsqAg@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 3 Jul 2018
-	09:05:46 +0200")
-Message-ID: <877emc4swv.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1faGx5-0001dR-8Y
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:46:24 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:40849)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1faGx5-0001cZ-25
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:46:23 -0400
+Received: by mail-oi0-x244.google.com with SMTP id w126-v6so2226903oie.7
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 01:46:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/32] qmp: Fixes and cleanups around OOB
- commands
+In-Reply-To: <20180703100044.5d265acb@bahia.lan>
+References: <20180702163125.28729-1-pbonzini@redhat.com>
+	<20180703100044.5d265acb@bahia.lan>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Jul 2018 09:46:01 +0100
+Message-ID: <CAFEAcA9qdYYnCNTNSotEfMzvOPCBj_baxANmixGmQKBbHejnww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fsdev: fix compilation with VIRTIO but not
+ VIRTIO_9P
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
-
-> Hi
+On 3 July 2018 at 09:00, Greg Kurz <groug@kaod.org> wrote:
+> On Mon,  2 Jul 2018 18:31:25 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On Mon, Jul 2, 2018 at 6:21 PM, Markus Armbruster <armbru@redhat.com> wro=
-te:
->> We're trying to get the out-of-band execution feature ready.  This
->> series fixes a number of issues, and marks a design flaw FIXME.  More
->> work is needed.
+>> hw/9pfs/Makefile.objs uses CONFIG_VIRTIO_9P to guard the definition for
+>> FileOperations structs, while fsdev/Makefile.objs uses CONFIG_VIRTIO
+>> to guard the use.  Mismatch causes linking to fail when CONFIG_VIRTIO
+>> is set but CONFIG_VIRTIO_9P is not.
+>>
+>> Fix it and use if/else to clarify that the two lines are for opposite
+>> conditions.
+>>
+>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>> Fixes: b5dfdb082fc350f3e68dfa61dc988d97cad28cfe
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
 >
-> They are several related worthy cleanups in the qapi-async series.
+> Acked-by: Greg Kurz <groug@kaod.org>
+> Tested-by: Greg Kurz <groug@kaod.org>
 >
-> They will now conflict with your changes though.
+> Peter,
+>
+> I see this patch is needed for the latest RISC-V pull req.
 
-Puh!
+It isn't, because that pullreq only fails because of what
+looks to me like a rebase mismerge that made it change how
+the riscv default-configs enable virtio. The riscv pullreq
+should be fixed. This is just a cleanup, really.
 
-I haven't looked closely at the qapi-async series; the qapi-if series
-took priority.
-
-> Please take a look roughly from 4/38 to 17/38, and let me know if you
-> want me to rebase it for 3.0.
-
-Extracting its preliminary cleanups into a separate series that could be
-merged more quickly makes could make sense.  I'll try to have a look.
+thanks
+-- PMM
