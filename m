@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1faMtt-0006R4-7j
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:07:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1faMuS-0006qd-Mh
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1faMto-0002db-QE
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:07:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35190 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1faMto-0002dK-KZ
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:07:24 -0400
-Date: Tue, 3 Jul 2018 17:07:20 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180703170720.72a210b2@redhat.com>
-In-Reply-To: <20180703011026.18650-1-ehabkost@redhat.com>
-References: <20180703011026.18650-1-ehabkost@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1faMuR-0002rD-EJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:08:04 -0400
+Date: Tue, 3 Jul 2018 17:07:58 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180703150758.GB28229@localhost.localdomain>
+References: <20180703145915.32607-1-kwolf@redhat.com>
+	<20180703145915.32607-6-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc: Fix typo on PC_COMPAT_2_12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180703145915.32607-6-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 5/5] block: Add blklogwrites
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +23,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Babu Moger <babu.moger@amd.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Mon,  2 Jul 2018 22:10:26 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> I forgot a hyphen when amending the compat code on commit
-> e0051647 ("i386: Enable TOPOEXT feature on AMD EPYC CPU").
+Am 03.07.2018 um 16:59 hat Kevin Wolf geschrieben:
+> From: Aapo Vienamo <aapo@tuxera.com>
 > 
-> Fixes: e00516475c270dcb6705753da96063f95699abf2
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Bug detected by compat_checker:
-> https://github.com/ehabkost/gdb-qemu
-> ---
->  include/hw/i386/pc.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Implements a block device write logging system, similar to Linux kernel
+> device mapper dm-log-writes. The write operations that are performed
+> on a block device are logged to a file or another block device. The
+> write log format is identical to the dm-log-writes format. Currently,
+> log markers are not supported.
 > 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 4d99d69681..654003f44c 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -309,7 +309,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->          .property = "xlevel",\
->          .value    = stringify(0x8000000a),\
->      },{\
-> -        .driver   = "EPYC-IBPB" TYPE_X86_CPU,\
-> +        .driver   = "EPYC-IBPB-" TYPE_X86_CPU,\
->          .property = "xlevel",\
->          .value    = stringify(0x8000000a),\
->      },
+> This functionality can be used for crash consistency and fs consistency
+> testing. By implementing it in qemu, tests utilizing write logs can be
+> be used to test non-Linux drivers and older kernels.
+> 
+> The driver accepts an optional parameter to set the sector size used
+> for logging. This makes the driver require all requests to be aligned
+> to this sector size and also makes offsets and sizes of writes in the
+> log metadata to be expressed in terms of this value (the log format has
+> a granularity of one sector for offsets and sizes). This allows
+> accurate logging of writes to guest block devices that have unusual
+> sector sizes.
+> 
+> The implementation is based on the blkverify and blkdebug block
+> drivers.
+> 
+> Signed-off-by: Aapo Vienamo <aapo@tuxera.com>
+> Signed-off-by: Ari Sundholm <ari@tuxera.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Note that I saw Ari's v7 right after sending the pull request. It
+contains only a few simple bugfixes compared to the version I had
+queued, so I quickly squashed the following in and updated the tag.
+
+Kevin
+
+
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index 0748b56d72..47093fadd6 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -53,6 +53,19 @@ typedef struct {
+     uint64_t nr_entries;
+ } BDRVBlkLogWritesState;
+ 
++static QemuOptsList runtime_opts = {
++    .name = "blklogwrites",
++    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
++    .desc = {
++        {
++            .name = "log-sector-size",
++            .type = QEMU_OPT_SIZE,
++            .help = "Log sector size",
++        },
++        { /* end of list */ }
++    },
++};
++
+ static inline uint32_t blk_log_writes_log2(uint32_t value)
+ {
+     assert(value > 0);
+@@ -63,9 +76,18 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+                                Error **errp)
+ {
+     BDRVBlkLogWritesState *s = bs->opaque;
++    QemuOpts *opts;
+     Error *local_err = NULL;
+     int ret;
+-    int64_t log_sector_size = BDRV_SECTOR_SIZE;
++    int64_t log_sector_size;
++
++    opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
++    qemu_opts_absorb_qdict(opts, options, &local_err);
++    if (local_err) {
++        ret = -EINVAL;
++        error_propagate(errp, local_err);
++        goto fail;
++    }
+ 
+     /* Open the file */
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
+@@ -76,12 +98,10 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
+-    if (qdict_haskey(options, "log-sector-size")) {
+-        log_sector_size = qdict_get_int(options, "log-sector-size");
+-        qdict_del(options, "log-sector-size");
+-    }
++    log_sector_size = qemu_opt_get_size(opts, "log-sector-size",
++                                        BDRV_SECTOR_SIZE);
+ 
+-    if (log_sector_size < 0 || log_sector_size >= (1ull << 32) ||
++    if (log_sector_size < 0 || log_sector_size > (1ull << 23) ||
+         !is_power_of_2(log_sector_size))
+     {
+         ret = -EINVAL;
+@@ -109,6 +129,7 @@ fail:
+         bdrv_unref_child(bs, bs->file);
+         bs->file = NULL;
+     }
++    qemu_opts_del(opts);
+     return ret;
+ }
+ 
+@@ -144,6 +165,7 @@ static void blk_log_writes_refresh_filename(BlockDriverState *bs,
+         qobject_ref(s->log_file->bs->full_open_options);
+         qdict_put_obj(opts, "log",
+                       QOBJECT(s->log_file->bs->full_open_options));
++        qdict_put_int(opts, "log-sector-size", s->sectorsize);
+ 
+         bs->full_open_options = opts;
+     }
