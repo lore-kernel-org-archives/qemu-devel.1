@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxw-000879-N4
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1faSxv-00085K-Ff
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxt-0006Ca-2r
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48968 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faSxs-0006BU-T5
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34294 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxs-0006Al-Nw
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxs-0006AP-Fe
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 157A7701EA
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:36:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0A63406C7A9
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:59 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CAF0F20290AB
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CD1C91C5BA
 	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:59 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 23:35:48 +0200
-Message-Id: <20180703213556.20619-25-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:49 +0200
+Message-Id: <20180703213556.20619-26-armbru@redhat.com>
 In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
 References: <20180703213556.20619-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 24/32] qmp: Replace monitor_json_emitter{,
- raw}() by qmp_{queue, send}_response()
+Subject: [Qemu-devel] [PULL v2 25/32] qmp: Replace get_qmp_greeting() by
+ qmp_greeting()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,110 +36,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-monitor_json_emitter() and monitor_json_emitter_raw() are
-unnecessarily general: they can send arbitrary JSON values, even
-though we only ever use them for QMP, which may send only JSON
-objects.
+get_qmp_greeting() returns a QDict * as QObject *.  It's caller
+converts it right back.
 
-Specialize the argument from QObject * to QDict *, and rename to
-qmp_queue_response(), qmp_send_response().
-
-All callers but one lose an upcast.  The lone exception gains a
-downcast; the next commit will get rid of it.
+Return QDict * instead.  While there, rename to qmp_greeting().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-25-armbru@redhat.com>
+Message-Id: <20180703085358.13941-26-armbru@redhat.com>
 ---
- monitor.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ monitor.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 8237b1c916..50dc57c82e 100644
+index 50dc57c82e..e5e9f496c2 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -503,9 +503,9 @@ int monitor_fprintf(FILE *stream, const char *fmt, ...)
-     return 0;
+@@ -4382,7 +4382,7 @@ void monitor_resume(Monitor *mon)
+     trace_monitor_suspend(mon, -1);
  }
  
--static void monitor_json_emitter_raw(Monitor *mon,
--                                     QObject *data)
-+static void qmp_send_response(Monitor *mon, QDict *rsp)
+-static QObject *get_qmp_greeting(Monitor *mon)
++static QDict *qmp_greeting(Monitor *mon)
  {
-+    QObject *data = QOBJECT(rsp);
-     QString *json;
+     QList *cap_list = qlist_new();
+     QObject *ver = NULL;
+@@ -4398,8 +4398,9 @@ static QObject *get_qmp_greeting(Monitor *mon)
+         qlist_append_str(cap_list, QMPCapability_str(cap));
+     }
  
-     json = mon->flags & MONITOR_USE_PRETTY ? qobject_to_json_pretty(data) :
-@@ -518,7 +518,7 @@ static void monitor_json_emitter_raw(Monitor *mon,
-     qobject_unref(json);
+-    return qobject_from_jsonf("{'QMP': {'version': %p, 'capabilities': %p}}",
+-                              ver, cap_list);
++    return qdict_from_jsonf_nofail(
++        "{'QMP': {'version': %p, 'capabilities': %p}}",
++        ver, cap_list);
  }
  
--static void monitor_json_emitter(Monitor *mon, QObject *data)
-+static void qmp_queue_response(Monitor *mon, QDict *rsp)
+ static void monitor_qmp_caps_reset(Monitor *mon)
+@@ -4409,15 +4410,15 @@ static void monitor_qmp_caps_reset(Monitor *mon)
+ 
+ static void monitor_qmp_event(void *opaque, int event)
  {
-     if (mon->use_io_thread) {
-         /*
-@@ -528,8 +528,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
-          * responder thread).
-          */
-         qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
--        g_queue_push_tail(mon->qmp.qmp_responses,
--                          qobject_ref(qobject_to(QDict, data)));
-+        g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(rsp));
-         qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-         qemu_bh_schedule(qmp_respond_bh);
-     } else {
-@@ -537,7 +536,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
-          * If not using monitor I/O thread, then we are in main thread.
-          * Do the emission right away.
-          */
--        monitor_json_emitter_raw(mon, data);
-+        qmp_send_response(mon, rsp);
-     }
- }
+-    QObject *data;
++    QDict *data;
+     Monitor *mon = opaque;
  
-@@ -563,7 +562,7 @@ static void monitor_qmp_response_flush(Monitor *mon)
-     QDict *data;
- 
-     while ((data = monitor_qmp_response_pop_one(mon))) {
--        monitor_json_emitter_raw(mon, QOBJECT(data));
-+        qmp_send_response(mon, data);
-         qobject_unref(data);
-     }
- }
-@@ -595,7 +594,7 @@ static void monitor_qmp_bh_responder(void *opaque)
-     QMPResponse response;
- 
-     while (monitor_qmp_response_pop_any(&response)) {
--        monitor_json_emitter_raw(response.mon, QOBJECT(response.data));
-+        qmp_send_response(response.mon, response.data);
-         qobject_unref(response.data);
-     }
- }
-@@ -622,7 +621,7 @@ static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
-     QTAILQ_FOREACH(mon, &mon_list, entry) {
-         if (monitor_is_qmp(mon)
-             && mon->qmp.commands != &qmp_cap_negotiation_commands) {
--            monitor_json_emitter(mon, QOBJECT(qdict));
-+            qmp_queue_response(mon, qdict);
-         }
-     }
- }
-@@ -4118,7 +4117,7 @@ static void monitor_qmp_respond(Monitor *mon, QDict *rsp,
-             qdict_put_obj(rsp, "id", qobject_ref(id));
-         }
- 
--        monitor_json_emitter(mon, QOBJECT(rsp));
-+        qmp_queue_response(mon, rsp);
-     }
- 
-     qobject_unref(id);
-@@ -4418,7 +4417,7 @@ static void monitor_qmp_event(void *opaque, int event)
+     switch (event) {
+     case CHR_EVENT_OPENED:
          mon->qmp.commands = &qmp_cap_negotiation_commands;
          monitor_qmp_caps_reset(mon);
-         data = get_qmp_greeting(mon);
--        monitor_json_emitter(mon, data);
-+        qmp_queue_response(mon, qobject_to(QDict, data));
+-        data = get_qmp_greeting(mon);
+-        qmp_queue_response(mon, qobject_to(QDict, data));
++        data = qmp_greeting(mon);
++        qmp_queue_response(mon, data);
          qobject_unref(data);
          mon_refcount++;
          break;
