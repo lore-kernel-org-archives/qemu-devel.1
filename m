@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1faSwW-0007FJ-P0
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:34:37 -0400
+	(envelope-from <claunia@claunia.com>) id 1faSxE-0007e5-SM
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1faSwT-0005C3-M8
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:34:36 -0400
-Resent-Message-Id: <E1faSwT-0005C3-M8@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21106)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1faSwT-0005Ba-DK
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:34:33 -0400
-In-Reply-To: <20180703163451.16936-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153065362134.867.11724882851758988112@946cad8fd14e>
+	(envelope-from <claunia@claunia.com>) id 1faSxB-0005ba-GJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:20 -0400
+Received: from [107.174.70.112] (port=42944 helo=mail2.claunia.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <claunia@claunia.com>) id 1faSxB-0005ap-8q
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:17 -0400
+References: <20180630083357.23489-1-huth@tuxfamily.org>
+	<bb109e75-6c00-45b2-bb17-7d09ff3a8112@ilande.co.uk>
+	<20180630151444.2f0b30cb@thl530.multi.box>
+	<CAFEAcA_wo8t2CTRj4oizRPUbG7fa0MgdACpAnLvR53Pp+piLjQ@mail.gmail.com>
+	<20180630153422.03f0146f@thl530.multi.box>
+	<CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
+From: Natalia Portillo <claunia@claunia.com>
+Message-ID: <038e1df0-7e13-ac6f-4e5e-5a8e41c0f54d@claunia.com>
+Date: Tue, 3 Jul 2018 21:58:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 3 Jul 2018 14:33:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/7] Linux user for 3.0 patches
+In-Reply-To: <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r"
+Subject: Re: [Qemu-devel] [PATCH v1 0/4] m68k: Add basic support for the
+ NeXTcube machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
+To: Bryce Lanham <blanham@gmail.com>, Thomas Huth <huth@tuxfamily.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzAzMTYzNDUxLjE2OTM2LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvN10gTGludXggdXNlciBmb3IgMy4wIHBhdGNoZXMKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-YjVjMWU5NDRiOSBsaW51eC11c2VyL3N0cmFjZTogSW1wcm92ZSByZWN2bXNnKCkgb3V0cHV0CmI5
-YzUwNTAyZmQgbGludXgtdXNlci9zdHJhY2U6IEltcHJvdmUgY2FwZ2V0KCkvY2Fwc2V0KCkgb3V0
-cHV0CjE3YzRmZDg2MjAgbGludXgtdXNlcjogdXBkYXRlIGRvX3NldHNvY2tvcHQoKQpmOTBjZjkz
-ZTI2IGxpbnV4LXVzZXI6IGFkZCBuZXRsaW5rIENBUlJJRVJfVVBfQ09VTlQvQ0FSUklFUl9ET1dO
-X0NPVU5UCjA2ZjQ3Zjk3MjMgcWVtdS1iaW5mbXQtY29uZi5zaDogYWxsb3cgdG8gcHJvdmlkZSBh
-IHN1ZmZpeCB0byB0aGUgaW50ZXJwcmV0ZXIgbmFtZQo1NWRhY2Y5YmI2IHFlbXUtYmluZm10LWNv
-bmYuc2g6IGFkZCBwZXJzaXN0ZW50IChGKSBmbGFncwoxZTU5Y2Q3YWQzIHFlbXUtYmluZm10LWNv
-bmYuc2g6IGNsZWFudXAgLS1jcmVkZW50aWFsCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzc6IHFlbXUtYmluZm10LWNvbmYuc2g6IGNsZWFudXAgLS1jcmVkZW50aWFsLi4u
-CkNoZWNraW5nIFBBVENIIDIvNzogcWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIHBlcnNpc3RlbnQg
-KEYpIGZsYWdzLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTY6IEZJTEU6IHNj
-cmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMjA6CitvcHRpb25zPSQoZ2V0b3B0IC1vIGRzOlE6
-ZTpoYzpwOiAtbCBkZWJpYW4sc3lzdGVtZDoscWVtdS1wYXRoOixleHBvcnRkaXI6LGhlbHAsY3Jl
-ZGVudGlhbDoscGVyc2lzdGVudDogLS0gIiRAIikKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgNDUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggMy83OiBxZW11LWJpbmZtdC1jb25mLnNoOiBhbGxvdyB0byBwcm92
-aWRlIGEgc3VmZml4IHRvIHRoZSBpbnRlcnByZXRlciBuYW1lLi4uCkVSUk9SOiBsaW5lIG92ZXIg
-OTAgY2hhcmFjdGVycwojNzc6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMjM6
-CitvcHRpb25zPSQoZ2V0b3B0IC1vIGRzOlE6UzplOmhjOnA6IC1sIGRlYmlhbixzeXN0ZW1kOixx
-ZW11LXBhdGg6LHFlbXUtc3VmZml4OixleHBvcnRkaXI6LGhlbHAsY3JlZGVudGlhbDoscGVyc2lz
-dGVudDogLS0gIiRAIikKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjkgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
-Q0ggNC83OiBsaW51eC11c2VyOiBhZGQgbmV0bGluayBDQVJSSUVSX1VQX0NPVU5UL0NBUlJJRVJf
-RE9XTl9DT1VOVC4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGxpbnV4LXVzZXI6IHVwZGF0ZSBkb19z
-ZXRzb2Nrb3B0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBsaW51eC11c2VyL3N0cmFjZTogSW1w
-cm92ZSBjYXBnZXQoKS9jYXBzZXQoKSBvdXRwdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBsaW51
-eC11c2VyL3N0cmFjZTogSW1wcm92ZSByZWN2bXNnKCkgb3V0cHV0Li4uCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r
+From: Natalia Portillo <claunia@claunia.com>
+To: Bryce Lanham <blanham@gmail.com>, Thomas Huth <huth@tuxfamily.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Message-ID: <038e1df0-7e13-ac6f-4e5e-5a8e41c0f54d@claunia.com>
+Subject: Re: [Qemu-devel] [PATCH v1 0/4] m68k: Add basic support for the
+ NeXTcube machine
+References: <20180630083357.23489-1-huth@tuxfamily.org>
+ <bb109e75-6c00-45b2-bb17-7d09ff3a8112@ilande.co.uk>
+ <20180630151444.2f0b30cb@thl530.multi.box>
+ <CAFEAcA_wo8t2CTRj4oizRPUbG7fa0MgdACpAnLvR53Pp+piLjQ@mail.gmail.com>
+ <20180630153422.03f0146f@thl530.multi.box>
+ <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
+In-Reply-To: <CAKbio+kqcmD9vba-67wbyPX2Er7=cUP-vH1+FYrFK4ToZf9hCw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Now you've made me subscribe again to qemu-devel ;)
+
+On 30/06/18 18:07, Bryce Lanham wrote:
+> Oh hi!=C2=A0
+>=20
+> Luckily gmail brought this to the top since I don=E2=80=99t pay attenti=
+on to the
+> list. I=E2=80=99m away from my computer at the moment, but I had more t=
+han this
+> working, including interrupts, Ethernet, and SCSI for sure.
+> (https://i.imgur.com/Py0FO.png)=C2=A0I=E2=80=99d love to dive back into=
+ this now that
+> 68040 support is complete and merged.
+>=20
+>=20
+> On Sat, Jun 30, 2018 at 8:34 AM, Thomas Huth <huth@tuxfamily.org
+> <mailto:huth@tuxfamily.org>> wrote:
+>=20
+>     Am Sat, 30 Jun 2018 14:17:32 +0100
+>     schrieb Peter Maydell <peter.maydell@linaro.org
+>     <mailto:peter.maydell@linaro.org>>:
+>=20
+>     > On 30 June 2018 at 14:14, Thomas Huth <huth@tuxfamily.org <mailto=
+:huth@tuxfamily.org>> wrote:
+>     > > Weird... the mail was ca. 1200 lines ... that not small, but no=
+t so
+>     > > big that I'd expect that it would get blocked somewhere. Let's =
+wait
+>     > > some more more hours, maybe the spam filter is just very slow
+>     > > today. If it is then still not available on the list, I'll try =
+to
+>     > > send it out again.=C2=A0=20
+>     >=20
+>     > The mailing list does just occasionally randomly eat patches,
+>     > as far as I can tell. It's not purely a size thing.
+>=20
+>     Ok, good to know. I've just sent out patch 3/4 again, let's see how=
+ it
+>     goes.
+>=20
+>     =C2=A0Thomas
+>=20
+>=20
+
+
+--QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEI28eIbVA/A1A960XUdIEiMckyp8FAls744IACgkQUdIEiMck
+yp9TzQgAwTJJByqJQrk2N2shtlxeRXhibQYjczaYY2UFJZCniJhnz/+Di77a3mQ+
+/ePn3h7cxbOMc1HudBG/UWr5Jar+qZfS5tG9TBQkp8PE135Rb1hUvOJYFL5ZzSY0
+3WlpskCu7/3Xzv1CYdM7N0N0HST8nkJv9fYEDyOQFOnFR1hZSEgWfujXooHjcBOp
+279hEiK1Vd179L6UwgDMR8HX3F1ICd6o3ztI3o3CvsmEyegLBSItvu8hzRBWtkGv
+KLhKagn6doGPxzhh3WMmVAxgq+4YouGsPrBuDnIVLA9az0eJeVJUHZxcVYIZNa6/
+6js0WzVouNf0ms51JwM6F9cYlTdV+A==
+=VJC3
+-----END PGP SIGNATURE-----
+
+--QGh1FdRHTaAWtHc309FiRsxaEEc6BiR6r--
