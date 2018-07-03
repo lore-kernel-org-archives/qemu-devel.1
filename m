@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=715e8d879=Alistair.Francis@wdc.com>)
-	id 1faOGq-0008At-4Q
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:17 -0400
+	(envelope-from <armbru@redhat.com>) id 1faOHT-0000GQ-VK
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=715e8d879=Alistair.Francis@wdc.com>)
-	id 1faOGm-0005sG-70
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:16 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:62998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=715e8d879=Alistair.Francis@wdc.com>)
-	id 1faOGl-0005ir-PI
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:12 -0400
-From: Alistair Francis <alistair.francis@wdc.com>
-Date: Tue,  3 Jul 2018 09:34:46 -0700
-Message-Id: <20180703163446.9943-8-alistair.francis@wdc.com>
-In-Reply-To: <20180703163446.9943-1-alistair.francis@wdc.com>
-References: <20180703163446.9943-1-alistair.francis@wdc.com>
+	(envelope-from <armbru@redhat.com>) id 1faOHQ-0006TN-26
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38062 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faOHP-0006TA-U1
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:35:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6746B4078B89
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 16:35:51 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
+	<20180703155648.11933-7-marcandre.lureau@redhat.com>
+Date: Tue, 03 Jul 2018 18:35:47 +0200
+In-Reply-To: <20180703155648.11933-7-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 3 Jul 2018 17:56:40 +0200")
+Message-ID: <87wouccm58.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL v3 7/7] hw/riscv/sifive_u: Connect the Cadence
- GEM Ethernet device
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 06/14] qapi: add #if/#endif helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,169 +35,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mjc@sifive.com
-Cc: f4bug@amsat.org, alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Connect the Cadence GEM ethernet device. This also requires us to
-expose the plic interrupt lines.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Michael Clark <mjc@sifive.com>
----
- default-configs/riscv32-softmmu.mak |  2 ++
- default-configs/riscv64-softmmu.mak |  2 ++
- hw/riscv/sifive_u.c                 | 50 +++++++++++++++++++++++++++++
- include/hw/riscv/sifive_u.h         |  9 ++++--
- 4 files changed, 61 insertions(+), 2 deletions(-)
+> Add helpers to wrap generated code with #if/#endif lines.
+>
+> A later patch wants to use QAPIGen for generating C snippets rather
+> than full C files with copyright headers etc.  Splice in class
+> QAPIGenCCode between QAPIGen and QAPIGenC.
+>
+> Add a 'with' statement context manager that will be used to wrap
+> generator visitor methods.  The manager will check if code was
+> generated before adding #if/#endif lines on QAPIGenCSnippet
+> objects. Used in the following patches.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index 20e670d99c..7937c69e22 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -3,3 +3,5 @@
- CONFIG_SERIAL=y
- CONFIG_VIRTIO_MMIO=y
- include virtio.mak
-+
-+CONFIG_CADENCE=y
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index 20e670d99c..7937c69e22 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -3,3 +3,5 @@
- CONFIG_SERIAL=y
- CONFIG_VIRTIO_MMIO=y
- include virtio.mak
-+
-+CONFIG_CADENCE=y
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 46459cd368..1a06384367 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -60,8 +60,11 @@ static const struct MemmapEntry {
-     [SIFIVE_U_UART0] =    { 0x10013000,     0x1000 },
-     [SIFIVE_U_UART1] =    { 0x10023000,     0x1000 },
-     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
-+    [SIFIVE_U_GEM] =      { 0x100900FC,     0x2000 },
- };
- 
-+#define GEM_REVISION        0x10070109
-+
- static uint64_t load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-@@ -194,6 +197,27 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     g_free(cells);
-     g_free(nodename);
- 
-+    nodename = g_strdup_printf("/soc/ethernet@%lx",
-+        (long)memmap[SIFIVE_U_GEM].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "cdns,macb");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[SIFIVE_U_GEM].base,
-+        0x0, memmap[SIFIVE_U_GEM].size);
-+    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-+    qemu_fdt_setprop_string(fdt, nodename, "phy-mode", "gmii");
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_GEM_IRQ);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 1);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0);
-+    g_free(nodename);
-+
-+    nodename = g_strdup_printf("/soc/ethernet@%lx/ethernet-phy@0",
-+        (long)memmap[SIFIVE_U_GEM].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x0);
-+    g_free(nodename);
-+
-     nodename = g_strdup_printf("/soc/uart@%lx",
-         (long)memmap[SIFIVE_U_UART0].base);
-     qemu_fdt_add_subnode(fdt, nodename);
-@@ -296,6 +320,9 @@ static void riscv_sifive_u_soc_init(Object *obj)
-                            memmap[SIFIVE_U_MROM].size, &error_fatal);
-     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
-                                 mask_rom);
-+
-+    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
-+    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
- }
- 
- static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-@@ -303,6 +330,10 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     SiFiveUSoCState *s = RISCV_U_SOC(dev);
-     const struct MemmapEntry *memmap = sifive_u_memmap;
-     MemoryRegion *system_memory = get_system_memory();
-+    qemu_irq plic_gpios[SIFIVE_U_PLIC_NUM_SOURCES];
-+    int i;
-+    Error *err = NULL;
-+    NICInfo *nd = &nd_table[0];
- 
-     object_property_set_bool(OBJECT(&s->cpus), true, "realized",
-                              &error_abort);
-@@ -327,6 +358,25 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-         memmap[SIFIVE_U_CLINT].size, smp_cpus,
-         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+
-+    for (i = 0; i < SIFIVE_U_PLIC_NUM_SOURCES; i++) {
-+        plic_gpios[i] = qdev_get_gpio_in(DEVICE(s->plic), i);
-+    }
-+
-+    if (nd->used) {
-+        qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
-+        qdev_set_nic_properties(DEVICE(&s->gem), nd);
-+    }
-+    object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
-+                            &error_abort);
-+    object_property_set_bool(OBJECT(&s->gem), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
-+                       plic_gpios[SIFIVE_U_GEM_IRQ]);
- }
- 
- static void riscv_sifive_u_machine_init(MachineClass *mc)
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index 49f1946539..e8b4d9ffa3 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -19,6 +19,8 @@
- #ifndef HW_SIFIVE_U_H
- #define HW_SIFIVE_U_H
- 
-+#include "hw/net/cadence_gem.h"
-+
- #define TYPE_RISCV_U_SOC "riscv.sifive.u.soc"
- #define RISCV_U_SOC(obj) \
-     OBJECT_CHECK(SiFiveUSoCState, (obj), TYPE_RISCV_U_SOC)
-@@ -30,6 +32,7 @@ typedef struct SiFiveUSoCState {
-     /*< public >*/
-     RISCVHartArrayState cpus;
-     DeviceState *plic;
-+    CadenceGEMState gem;
- } SiFiveUSoCState;
- 
- typedef struct SiFiveUState {
-@@ -49,12 +52,14 @@ enum {
-     SIFIVE_U_PLIC,
-     SIFIVE_U_UART0,
-     SIFIVE_U_UART1,
--    SIFIVE_U_DRAM
-+    SIFIVE_U_DRAM,
-+    SIFIVE_U_GEM
- };
- 
- enum {
-     SIFIVE_U_UART0_IRQ = 3,
--    SIFIVE_U_UART1_IRQ = 4
-+    SIFIVE_U_UART1_IRQ = 4,
-+    SIFIVE_U_GEM_IRQ = 0x35
- };
- 
- enum {
--- 
-2.17.1
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
