@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1faN9q-0002ml-2m
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:23:59 -0400
+	(envelope-from <clg@kaod.org>) id 1faNAC-00033x-31
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1faN9p-0004Dz-6V
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:23:58 -0400
-References: <20180702194630.9360-1-jsnow@redhat.com>
-	<20180702194630.9360-3-jsnow@redhat.com>
-	<4cd80feb-2717-94ff-9a68-f423e2f31fa8@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <0ca0fc21-a7f9-d739-8331-889a7c242e44@redhat.com>
-Date: Tue, 3 Jul 2018 11:23:51 -0400
+	(envelope-from <clg@kaod.org>) id 1faNA8-0004NU-4E
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:24:20 -0400
+Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:60245)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1faNA7-0004Mr-Sw
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:24:16 -0400
+Received: from player787.ha.ovh.net (unknown [10.109.105.46])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 53875D5BA6
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 17:24:14 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Tue,  3 Jul 2018 17:23:59 +0200
+Message-Id: <20180703152359.16618-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <4cd80feb-2717-94ff-9a68-f423e2f31fa8@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] iotests: add 222 to test basic
- fleecing
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-3.0] spapr/vio: quiet down the "irq"
+ property accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,17 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+commit efe2add7cb7f ("spapr/vio: deprecate the "irq" property")
+introduced get/set accessors for the "irq" property to warn of its
+usage, but the warning in the get pollutes the monitor 'info qtree'.
 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/spapr_vio.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-On 07/03/2018 05:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 02.07.2018 22:46, John Snow wrote:
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
-> 
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-
-Thanks, and sorry for the 3.0 freeze rush.
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index daf85130b5ef..be9af71437cc 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -43,7 +43,16 @@
+=20
+ #include <libfdt.h>
+=20
+-static void spapr_vio_getset_irq(Object *obj, Visitor *v, const char *na=
+me,
++static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *name,
++                              void *opaque, Error **errp)
++{
++    Property *prop =3D opaque;
++    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
++
++    visit_type_uint32(v, name, ptr, errp);
++}
++
++static void spapr_vio_set_irq(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
+     Property *prop =3D opaque;
+@@ -57,8 +66,8 @@ static void spapr_vio_getset_irq(Object *obj, Visitor *=
+v, const char *name,
+=20
+ static const PropertyInfo spapr_vio_irq_propinfo =3D {
+     .name =3D "irq",
+-    .get =3D spapr_vio_getset_irq,
+-    .set =3D spapr_vio_getset_irq,
++    .get =3D spapr_vio_get_irq,
++    .set =3D spapr_vio_set_irq,
+ };
+=20
+ static Property spapr_vio_props[] =3D {
+--=20
+2.13.6
