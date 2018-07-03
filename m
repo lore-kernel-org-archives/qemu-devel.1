@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxu-000844-KC
+	(envelope-from <armbru@redhat.com>) id 1faSxt-00083L-RH
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxr-00069b-LG
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32920 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faSxq-00067o-Ld
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45972 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxr-00068b-FO
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxq-00066M-Br
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E289381A4EAD
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D193E4007389
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:57 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B3D2320290AA
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 922202156889
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:57 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 23:35:34 +0200
-Message-Id: <20180703213556.20619-11-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:27 +0200
+Message-Id: <20180703213556.20619-4-armbru@redhat.com>
 In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
 References: <20180703213556.20619-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 10/32] tests/test-qga: Demonstrate the
- guest-agent ignores "control"
+Subject: [Qemu-devel] [PULL v2 03/32] docs/interop/qmp: Improve OOB
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +36,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+OOB documentation is spread over qmp-spec.txt sections 2.2.1
+Capabilities and 2.3 Issuing Commands.  The amount of detail is a bit
+distracting there.  Move the meat of the matter to new section 2.3.1
+Out of band execution.
+
+Throw in a few other improvements while there:
+
+* 2.2 Server Greeting: Drop advice to search entire capabilities
+  array; should be obvious.
+
+* 3. QMP Examples
+
+  - 3.1 Server Greeting: Update greeting to the one we expect for the
+    release.  Now shows capability "oob".  Update qmp-intro.txt
+    likewise.
+
+  - 3.2 Capabilities negotiation: Show client accepting capability
+    "oob".
+
+  - 3.7 Out-of-band execution: New.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-11-armbru@redhat.com>
+Message-Id: <20180703085358.13941-4-armbru@redhat.com>
+[Whitespace tidied up]
 ---
- tests/test-qga.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ docs/interop/qmp-intro.txt | 13 +++----
+ docs/interop/qmp-spec.txt  | 74 +++++++++++++++++++++++++-------------
+ 2 files changed, 56 insertions(+), 31 deletions(-)
 
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 564a4594b5..2e9e0f73bb 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -243,6 +243,22 @@ static void test_qga_invalid_id(gconstpointer fix)
-     qobject_unref(ret);
+diff --git a/docs/interop/qmp-intro.txt b/docs/interop/qmp-intro.txt
+index 900d69d612..9d54a718b8 100644
+--- a/docs/interop/qmp-intro.txt
++++ b/docs/interop/qmp-intro.txt
+@@ -52,13 +52,14 @@ Escape character is '^]'.
+     "QMP": {
+         "version": {
+             "qemu": {
+-                "micro": 50, 
+-                "minor": 6, 
+-                "major": 1
+-            }, 
+-            "package": ""
+-        }, 
++                "micro": 0,
++                "minor": 0,
++                "major": 3
++            },
++            "package": "v3.0.0"
++        },
+         "capabilities": [
++            "oob"
+         ]
+     }
  }
+diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+index 2bb492d1ea..6b72b69cb1 100644
+--- a/docs/interop/qmp-spec.txt
++++ b/docs/interop/qmp-spec.txt
+@@ -77,8 +77,7 @@ The greeting message format is:
+   is the same of the query-version command)
+ - The "capabilities" member specify the availability of features beyond the
+   baseline specification; the order of elements in this array has no
+-  particular significance, so a client must search the entire array
+-  when looking for a particular capability
++  particular significance.
  
-+static void test_qga_invalid_oob(gconstpointer fix)
-+{
-+    /* FIXME "control" is ignored; it should be rejected */
-+    const TestFixture *fixture = fix;
-+    QDict *ret;
+ 2.2.1 Capabilities
+ ------------------
+@@ -86,16 +85,7 @@ The greeting message format is:
+ Currently supported capabilities are:
+ 
+ - "oob": the QMP server supports "out-of-band" (OOB) command
+-  execution.  For more details, please see the "run-oob" parameter in
+-  the "Issuing Commands" section below.  Not all commands allow this
+-  "oob" execution.  The "query-qmp-schema" command can be used to
+-  inspect which commands support "oob" execution.
+-
+-QMP clients can get a list of supported QMP capabilities of the QMP
+-server in the greeting message mentioned above.  By default, all the
+-capabilities are off.  To enable any QMP capabilities, the QMP client
+-needs to send the "qmp_capabilities" command with an extra parameter
+-for the requested capabilities.
++  execution, as described in section "2.3.1 Out-of-band execution".
+ 
+ 2.3 Issuing Commands
+ --------------------
+@@ -115,14 +105,38 @@ The format for command execution is:
+ - The "id" member is a transaction identification associated with the
+   command execution.  It is required for all commands if the OOB -
+   capability was enabled at startup, and optional otherwise.  The same
+-  "id" field will be part of the response if provided. The "id" member
+-  can be any json-value, although most clients merely use a
+-  json-number incremented for each successive command
+-- The "control" member is optional, and currently only used for
+-  out-of-band execution. The handling or response of an "oob" command
+-  can overtake prior in-band commands.  To enable "oob" handling of a
+-  particular command, just provide a control field with: { "control":
+-  { "run-oob": true } }
++  "id" field will be part of the response if provided.  The "id"
++  member can be any json-value.  A json-number incremented for each
++  successive command works fine.
++- The optional "control" member further specifies how the command is
++  to be executed.  Currently, its only member is optional "run-oob".
++  See section "2.3.1 Out-of-band execution" for details.
 +
-+    ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping',"
-+                 " 'control': {'run-oob': true}}");
-+    g_assert_nonnull(ret);
-+    qmp_assert_no_error(ret);
 +
-+    qdict_get_qdict(ret, "return");
++2.3.1 Out-of-band execution
++---------------------------
 +
-+    qobject_unref(ret);
-+}
++The server normally reads, executes and responds to one command after
++the other.  The client therefore receives command responses in issue
++order.
 +
- static void test_qga_invalid_args(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -951,6 +967,7 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/file-write-read", &fix, test_qga_file_write_read);
-     g_test_add_data_func("/qga/get-time", &fix, test_qga_get_time);
-     g_test_add_data_func("/qga/invalid-id", &fix, test_qga_invalid_id);
-+    g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob);
-     g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd);
-     g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_args);
-     g_test_add_data_func("/qga/fsfreeze-status", &fix,
++With out-of-band execution enabled via capability negotiation (section
++4.), the server reads and queues commands as they arrive.  It executes
++commands from the queue one after the other.  Commands executed
++out-of-band jump the queue: the command get executed right away,
++possibly overtaking prior in-band commands.  The client may therefore
++receive such a command's response before responses from prior in-band
++commands.
++
++To execute a command out-of-band, the client puts "run-oob": true into
++execute's member "control".
++
++If the client sends in-band commands faster than the server can
++execute them, the server will eventually drop commands to limit the
++queue length.  The sever sends event COMMAND_DROPPED then.
++
++Only a few commands support out-of-band execution.  The ones that do
++have "allow-oob": true in output of query-qmp-schema.
+ 
+ 2.4 Commands Responses
+ ----------------------
+@@ -223,12 +237,13 @@ This section provides some examples of real QMP usage, in all of them
+ 3.1 Server greeting
+ -------------------
+ 
+-S: { "QMP": { "version": { "qemu": { "micro": 50, "minor": 6, "major": 1 },
+-     "package": ""}, "capabilities": []}}
++S: { "QMP": {"version": {"qemu": {"micro": 0, "minor": 0, "major": 3},
++     "package": "v3.0.0"}, "capabilities": ["oob"] } }
+ 
+-3.2 Client QMP negotiation
+---------------------------
+-C: { "execute": "qmp_capabilities" }
++3.2 Capabilities negotiation
++----------------------------
++
++C: { "execute": "qmp_capabilities", "arguments": { "enable": ["oob"] } }
+ S: { "return": {}}
+ 
+ 3.3 Simple 'stop' execution
+@@ -255,6 +270,15 @@ S: { "error": { "class": "GenericError", "desc": "Invalid JSON syntax" } }
+ S: { "timestamp": { "seconds": 1258551470, "microseconds": 802384 },
+     "event": "POWERDOWN" }
+ 
++3.7 Out-of-band execution
++-------------------------
++
++C: { "execute": "migrate-pause", "id": 42, "control": { "run-oob": true } }
++S: { "id": 42,
++     "error": { "class": "GenericError",
++      "desc": "migrate-pause is currently only supported during postcopy-active state" } }
++
++
+ 4. Capabilities Negotiation
+ ===========================
+ 
 -- 
 2.17.1
