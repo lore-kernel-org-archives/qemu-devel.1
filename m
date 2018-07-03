@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53318)
+Received: from eggs.gnu.org ([208.118.235.92]:55085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFlx-0004hH-G0
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:58 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFm8-0006e7-Rz
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:32:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFjO-00046d-L5
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:30:48 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFjI-000402-9r
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:00 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  3 Jul 2018 09:19:53 +0200
-Message-Id: <1530602398-16127-11-git-send-email-eric.auger@redhat.com>
+Date: Tue,  3 Jul 2018 09:19:44 +0200
+Message-Id: <1530602398-16127-2-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
 References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 10/15] acpi: move
- build_srat_hotpluggable_memory to generic ACPI source
+Subject: [Qemu-devel] [RFC v3 01/15] linux-headers: header update for
+ KVM/ARM KVM_ARM_GET_MAX_VM_PHYS_SHIFT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,153 +23,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-We plan to reuse build_srat_hotpluggable_memory() for ARM so
-let's move the function to aml-build.
+This is a header update against
+
+git://linux-arm.org/linux-skp.git ipa52/v3
+
+to get the KVM_ARM_GET_MAX_VM_PHYS_SHIFT ioctl. This allows to retrieve
+the IPA address range KVM supports.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/acpi/aml-build.c         | 51 +++++++++++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c        | 49 -------------------------------------------
- include/hw/acpi/aml-build.h |  3 +++
- 3 files changed, 54 insertions(+), 49 deletions(-)
+ include/standard-headers/linux/virtio_config.h | 16 ++++++++++++----
+ linux-headers/asm-mips/unistd.h                | 18 ++++++++++++------
+ linux-headers/asm-powerpc/kvm.h                |  1 +
+ linux-headers/linux/kvm.h                      | 16 ++++++++++++++++
+ 4 files changed, 41 insertions(+), 10 deletions(-)
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 1e43cd7..167fb6b 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -22,6 +22,7 @@
- #include "qemu/osdep.h"
- #include <glib/gprintf.h>
- #include "hw/acpi/aml-build.h"
-+#include "hw/mem/memory-device.h"
- #include "qemu/bswap.h"
- #include "qemu/bitops.h"
- #include "sysemu/numa.h"
-@@ -1802,3 +1803,53 @@ build_hdr:
-     build_header(linker, tbl, (void *)(tbl->data + fadt_start),
-                  "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
- }
-+
-+void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-+                                    uint64_t len, int default_node)
-+{
-+    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-+    MemoryDeviceInfoList *info;
-+    MemoryDeviceInfo *mi;
-+    PCDIMMDeviceInfo *di;
-+    uint64_t end = base + len, cur, size;
-+    bool is_nvdimm;
-+    AcpiSratMemoryAffinity *numamem;
-+    MemoryAffinityFlags flags;
-+
-+    for (cur = base, info = info_list;
-+         cur < end;
-+         cur += size, info = info->next) {
-+        numamem = acpi_data_push(table_data, sizeof *numamem);
-+
-+        if (!info) {
-+            build_srat_memory(numamem, cur, end - cur, default_node,
-+                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-+            break;
-+        }
-+
-+        mi = info->value;
-+        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-+        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-+
-+        if (cur < di->addr) {
-+            build_srat_memory(numamem, cur, di->addr - cur, default_node,
-+                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-+            numamem = acpi_data_push(table_data, sizeof *numamem);
-+        }
-+
-+        size = di->size;
-+
-+        flags = MEM_AFFINITY_ENABLED;
-+        if (di->hotpluggable) {
-+            flags |= MEM_AFFINITY_HOTPLUGGABLE;
-+        }
-+        if (is_nvdimm) {
-+            flags |= MEM_AFFINITY_NON_VOLATILE;
-+        }
-+
-+        build_srat_memory(numamem, di->addr, size, di->node, flags);
-+    }
-+
-+    qapi_free_MemoryDeviceInfoList(info_list);
-+}
-+
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9bc6d97..fcebd02 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2251,55 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- #define HOLE_640K_START  (640 * 1024)
- #define HOLE_640K_END   (1024 * 1024)
+diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
+index b777069..0b19436 100644
+--- a/include/standard-headers/linux/virtio_config.h
++++ b/include/standard-headers/linux/virtio_config.h
+@@ -45,11 +45,14 @@
+ /* We've given up on this device. */
+ #define VIRTIO_CONFIG_S_FAILED		0x80
  
--static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
--                                           uint64_t len, int default_node)
--{
--    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
--    MemoryDeviceInfoList *info;
--    MemoryDeviceInfo *mi;
--    PCDIMMDeviceInfo *di;
--    uint64_t end = base + len, cur, size;
--    bool is_nvdimm;
--    AcpiSratMemoryAffinity *numamem;
--    MemoryAffinityFlags flags;
--
--    for (cur = base, info = info_list;
--         cur < end;
--         cur += size, info = info->next) {
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--
--        if (!info) {
--            build_srat_memory(numamem, cur, end - cur, default_node,
--                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
--            break;
--        }
--
--        mi = info->value;
--        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
--        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
--
--        if (cur < di->addr) {
--            build_srat_memory(numamem, cur, di->addr - cur, default_node,
--                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
--            numamem = acpi_data_push(table_data, sizeof *numamem);
--        }
--
--        size = di->size;
--
--        flags = MEM_AFFINITY_ENABLED;
--        if (di->hotpluggable) {
--            flags |= MEM_AFFINITY_HOTPLUGGABLE;
--        }
--        if (is_nvdimm) {
--            flags |= MEM_AFFINITY_NON_VOLATILE;
--        }
--
--        build_srat_memory(numamem, di->addr, size, di->node, flags);
--    }
--
--    qapi_free_MemoryDeviceInfoList(info_list);
--}
--
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- {
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 6c36903..4c2ca13 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -416,4 +416,7 @@ void build_slit(GArray *table_data, BIOSLinker *linker);
+-/* Some virtio feature bits (currently bits 28 through 32) are reserved for the
+- * transport being used (eg. virtio_ring), the rest are per-device feature
+- * bits. */
++/*
++ * Virtio feature bits VIRTIO_TRANSPORT_F_START through
++ * VIRTIO_TRANSPORT_F_END are reserved for the transport
++ * being used (e.g. virtio_ring, virtio_pci etc.), the
++ * rest are per-device feature bits.
++ */
+ #define VIRTIO_TRANSPORT_F_START	28
+-#define VIRTIO_TRANSPORT_F_END		34
++#define VIRTIO_TRANSPORT_F_END		38
  
- void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
-                 const char *oem_id, const char *oem_table_id);
+ #ifndef VIRTIO_CONFIG_NO_LEGACY
+ /* Do we get callbacks when the ring is completely used, even if we've
+@@ -71,4 +74,9 @@
+  * this is for compatibility with legacy systems.
+  */
+ #define VIRTIO_F_IOMMU_PLATFORM		33
 +
-+void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-+                                    uint64_t len, int default_node);
- #endif
++/*
++ * Does the device support Single Root I/O Virtualization?
++ */
++#define VIRTIO_F_SR_IOV			37
+ #endif /* _LINUX_VIRTIO_CONFIG_H */
+diff --git a/linux-headers/asm-mips/unistd.h b/linux-headers/asm-mips/unistd.h
+index 9bfef7f..d4a85ef 100644
+--- a/linux-headers/asm-mips/unistd.h
++++ b/linux-headers/asm-mips/unistd.h
+@@ -388,17 +388,19 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 364)
+ #define __NR_pkey_free			(__NR_Linux + 365)
+ #define __NR_statx			(__NR_Linux + 366)
++#define __NR_rseq			(__NR_Linux + 367)
++#define __NR_io_pgetevents		(__NR_Linux + 368)
+ 
+ 
+ /*
+  * Offset of the last Linux o32 flavoured syscall
+  */
+-#define __NR_Linux_syscalls		366
++#define __NR_Linux_syscalls		368
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_ABI32 */
+ 
+ #define __NR_O32_Linux			4000
+-#define __NR_O32_Linux_syscalls		366
++#define __NR_O32_Linux_syscalls		368
+ 
+ #if _MIPS_SIM == _MIPS_SIM_ABI64
+ 
+@@ -733,16 +735,18 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 324)
+ #define __NR_pkey_free			(__NR_Linux + 325)
+ #define __NR_statx			(__NR_Linux + 326)
++#define __NR_rseq			(__NR_Linux + 327)
++#define __NR_io_pgetevents		(__NR_Linux + 328)
+ 
+ /*
+  * Offset of the last Linux 64-bit flavoured syscall
+  */
+-#define __NR_Linux_syscalls		326
++#define __NR_Linux_syscalls		328
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_ABI64 */
+ 
+ #define __NR_64_Linux			5000
+-#define __NR_64_Linux_syscalls		326
++#define __NR_64_Linux_syscalls		328
+ 
+ #if _MIPS_SIM == _MIPS_SIM_NABI32
+ 
+@@ -1081,15 +1085,17 @@
+ #define __NR_pkey_alloc			(__NR_Linux + 328)
+ #define __NR_pkey_free			(__NR_Linux + 329)
+ #define __NR_statx			(__NR_Linux + 330)
++#define __NR_rseq			(__NR_Linux + 331)
++#define __NR_io_pgetevents		(__NR_Linux + 332)
+ 
+ /*
+  * Offset of the last N32 flavoured syscall
+  */
+-#define __NR_Linux_syscalls		330
++#define __NR_Linux_syscalls		332
+ 
+ #endif /* _MIPS_SIM == _MIPS_SIM_NABI32 */
+ 
+ #define __NR_N32_Linux			6000
+-#define __NR_N32_Linux_syscalls		330
++#define __NR_N32_Linux_syscalls		332
+ 
+ #endif /* _ASM_UNISTD_H */
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 833ed9a..1b32b56 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -633,6 +633,7 @@ struct kvm_ppc_cpu_char {
+ #define KVM_REG_PPC_PSSCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbd)
+ 
+ #define KVM_REG_PPC_DEC_EXPIRY	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbe)
++#define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
+ 
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 98f389a..0a90115 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -751,6 +751,16 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_S390_SIE_PAGE_OFFSET 1
+ 
+ /*
++ * On arm/arm64, machine type can be used to request the physical
++ * address size for the VM. Bits [7-0] have been reserved for the
++ * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
++ * value 0 implies the default IPA size, which is 40bits.
++ */
++#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK	0xff
++#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)		\
++	((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
++
++/*
+  * ioctls for /dev/kvm fds:
+  */
+ #define KVM_GET_API_VERSION       _IO(KVMIO,   0x00)
+@@ -775,6 +785,12 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_GET_MSR_FEATURE_INDEX_LIST    _IOWR(KVMIO, 0x0a, struct kvm_msr_list)
+ 
+ /*
++ * Get the maximum physical address size supported by the host.
++ * Returns log2(Max-Physical-Address-Size)
++ */
++#define KVM_ARM_GET_MAX_VM_PHYS_SHIFT	_IO(KVMIO, 0x0b)
++
++/*
+  * Extension capability list.
+  */
+ #define KVM_CAP_IRQCHIP	  0
 -- 
 2.5.5
