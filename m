@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg3-0002IU-8A
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:18 -0400
+	(envelope-from <alistair23@gmail.com>) id 1faNgX-0002gS-I6
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg2-0003d9-2J
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53152 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1faNg1-0003co-S9
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 596C140780F8
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:13 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jul 2018 17:56:48 +0200
-Message-Id: <20180703155648.11933-15-marcandre.lureau@redhat.com>
-In-Reply-To: <20180703155648.11933-1-marcandre.lureau@redhat.com>
-References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1faNgW-0003t7-Dr
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:45 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:37979)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1faNgW-0003sQ-5a
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:44 -0400
+Received: by mail-lf0-x243.google.com with SMTP id a4-v6so2034658lff.5
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:57:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 14/14] qapi: add conditions to SPICE
- type/commands/events on the schema
+In-Reply-To: <CAFEAcA8ceyqpyBg6RNoMQsuyvCbjiew2OJDyBVP80bO8L4Y_iQ@mail.gmail.com>
+References: <20180629172215.29475-1-alistair.francis@wdc.com>
+	<CAFEAcA8ceyqpyBg6RNoMQsuyvCbjiew2OJDyBVP80bO8L4Y_iQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 3 Jul 2018 08:57:11 -0700
+Message-ID: <CAKmqyKPMCbXvWixgJr1tQ_3zcby2nsZLVd-Z+5+R6exb0R+XtA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,230 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-Add #if defined(CONFIG_SPICE) in generated code, and adjust the
-qmp/hmp code accordingly.
+On Sat, Jun 30, 2018 at 5:53 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 29 June 2018 at 18:22, Alistair Francis <alistair.francis@wdc.com> wrote:
+>> The following changes since commit 75507f1aba6feb73ae43329922d51571550b9128:
+>>
+>>   Merge remote-tracking branch 'remotes/berrange/tags/min-glib-pull-request' into staging (2018-06-29 15:04:20 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180629
+>>
+>> for you to fetch changes up to e4847c96685e210649e6ec90fecd732a744dad75:
+>>
+>>   hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device (2018-06-29 09:51:05 -0700)
+>>
+>> ----------------------------------------------------------------
+>> RISC-V: SoCify SiFive boards and connect GEM
+>>
+>> This series has three tasks:
+>>  1. To convert the SiFive U and E machines into SoCs and boards
+>>  2. To connect the Cadence GEM device to the SiFive U board
+>>  3. Fix some device tree problems with the SiFive U board
+>>
+>> After this series the SiFive E and U boards have their SoCs split into
+>> seperate QEMU objects, which can be used on future boards if desired.
+>>
+>> The RISC-V Virt and Spike boards have not been converted. They haven't
+>> been converted as they aren't physical boards, so it doesn't make a
+>> whole lot of sense to split them into an SoC and board. The only
+>> disadvantage with this is that they now differ to the SiFive boards.
+>>
+>> This series also connect the Cadence GEM device to the SiFive U board.
+>> There are some interrupt line changes requried before this is possible.
+>
+> Hi; this fails to build I'm afraid:
+>
+>   LINK    riscv32-softmmu/qemu-system-riscv32
+> ../fsdev/qemu-fsdev.o:(.data.rel.ro+0x8): undefined reference to `local_ops'
+> ../fsdev/qemu-fsdev.o:(.data.rel.ro+0x18): undefined reference to `handle_ops'
+> ../fsdev/qemu-fsdev.o:(.data.rel.ro+0x28): undefined reference to `synth_ops'
+> ../fsdev/qemu-fsdev.o:(.data.rel.ro+0x38): undefined reference to `proxy_ops'
+>
+> I'm not sure exactly what's going on here but I suspect
+> commit e4847c96685, which made the riscv default-config
+> files stop including virtio.mak.
+>
+> I think the bit of code that defines these _ops structs and the
+> bit of code that's using them aren't guarded by exactly the same
+> set of CONFIG_* defines. That inconsistency is arguably a bug,
+> but nobody notices it because you just use virtio.mak to get all
+> the virtio defines.
+>
+> The definitions are guarded by "CONFIG_VIRTIO_9P || CONFIG_XEN"
+> but the use by "CONFIG_VIRTFS && (CONFIG_VIRTIO || CONFIG_XEN)",
+> so if you define CONFIG_VIRTIO without CONFIG_VIRTIO_9P you're
+> going to run into this.
+>
+> The guard on the definitions was only added in commit b5dfdb082fc350f3,
+> so you've had an unfortunate race with that pullreq I think.
+>
+> All that said, it looks to me like e4847c98 should not have been
+> changing how the virtio configs are set -- the commit message
+> doesn't say anything about it -- so the simplest thing is just to
+> fix that up.
 
-query-qmp-schema no longer reports the command/events etc as
-available when disabled at compile time.
+Ok, I'm sending an updated PR now. I can't reproduce the failure for
+some reason so hopefully I have fixed the problem by not modifying the
+virtio include.
 
-Commands made conditional:
+Alistair
 
-* query-spice
-
-  Before the patch, the command for !CONFIG_SPICE is unregistered. It
-  will fail with the same error.
-
-Events made conditional:
-
-* SPICE_CONNECTED, SPICE_INITIALIZED, SPICE_DISCONNECTED,
-  SPICE_MIGRATE_COMPLETED
-
-Add TODO for conditional SPICE chardevs, delayed until the supports
-for conditional members lands.
-
-No HMP change, the code was already conditional.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/char.json |  8 ++++++--
- qapi/ui.json   | 30 ++++++++++++++++++++----------
- monitor.c      |  3 ---
- qmp.c          | 16 ----------------
- 4 files changed, 26 insertions(+), 31 deletions(-)
-
-diff --git a/qapi/char.json b/qapi/char.json
-index 60f31d83fc..b7b2a05766 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -320,6 +320,7 @@
- ##
- { 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
-   'base': 'ChardevCommon' }
-+# TODO: 'if': 'defined(CONFIG_SPICE)'
-=20
- ##
- # @ChardevSpicePort:
-@@ -332,6 +333,7 @@
- ##
- { 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
-   'base': 'ChardevCommon' }
-+# TODO: 'if': 'defined(CONFIG_SPICE)'
-=20
- ##
- # @ChardevVC:
-@@ -385,8 +387,10 @@
-                                        'testdev': 'ChardevCommon',
-                                        'stdio'  : 'ChardevStdio',
-                                        'console': 'ChardevCommon',
--                                       'spicevmc' : 'ChardevSpiceChannel=
-',
--                                       'spiceport' : 'ChardevSpicePort',
-+                                       'spicevmc': 'ChardevSpiceChannel'=
-,
-+# TODO: { 'type': 'ChardevSpiceChannel', 'if': 'defined(CONFIG_SPICE)' }=
-,
-+                                       'spiceport': 'ChardevSpicePort',
-+# TODO: { 'type': 'ChardevSpicePort', 'if': 'defined(CONFIG_SPICE)' },
-                                        'vc'     : 'ChardevVC',
-                                        'ringbuf': 'ChardevRingbuf',
-                                        # next one is just for compatibil=
-ity
-diff --git a/qapi/ui.json b/qapi/ui.json
-index ee90c1880b..4ca91bb45a 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -118,7 +118,8 @@
- { 'struct': 'SpiceBasicInfo',
-   'data': { 'host': 'str',
-             'port': 'str',
--            'family': 'NetworkAddressFamily' } }
-+            'family': 'NetworkAddressFamily' },
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceServerInfo:
-@@ -131,7 +132,8 @@
- ##
- { 'struct': 'SpiceServerInfo',
-   'base': 'SpiceBasicInfo',
--  'data': { '*auth': 'str' } }
-+  'data': { '*auth': 'str' },
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceChannel:
-@@ -156,7 +158,8 @@
- { 'struct': 'SpiceChannel',
-   'base': 'SpiceBasicInfo',
-   'data': {'connection-id': 'int', 'channel-type': 'int', 'channel-id': =
-'int',
--           'tls': 'bool'} }
-+           'tls': 'bool'},
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceQueryMouseMode:
-@@ -175,7 +178,8 @@
- # Since: 1.1
- ##
- { 'enum': 'SpiceQueryMouseMode',
--  'data': [ 'client', 'server', 'unknown' ] }
-+  'data': [ 'client', 'server', 'unknown' ],
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SpiceInfo:
-@@ -212,7 +216,8 @@
- { 'struct': 'SpiceInfo',
-   'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str', '*port=
-': 'int',
-            '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str=
-',
--           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChan=
-nel']} }
-+           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChan=
-nel']},
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @query-spice:
-@@ -257,7 +262,8 @@
- #    }
- #
- ##
--{ 'command': 'query-spice', 'returns': 'SpiceInfo' }
-+{ 'command': 'query-spice', 'returns': 'SpiceInfo',
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SPICE_CONNECTED:
-@@ -282,7 +288,8 @@
- ##
- { 'event': 'SPICE_CONNECTED',
-   'data': { 'server': 'SpiceBasicInfo',
--            'client': 'SpiceBasicInfo' } }
-+            'client': 'SpiceBasicInfo' },
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SPICE_INITIALIZED:
-@@ -310,7 +317,8 @@
- ##
- { 'event': 'SPICE_INITIALIZED',
-   'data': { 'server': 'SpiceServerInfo',
--            'client': 'SpiceChannel' } }
-+            'client': 'SpiceChannel' },
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SPICE_DISCONNECTED:
-@@ -335,7 +343,8 @@
- ##
- { 'event': 'SPICE_DISCONNECTED',
-   'data': { 'server': 'SpiceBasicInfo',
--            'client': 'SpiceBasicInfo' } }
-+            'client': 'SpiceBasicInfo' },
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # @SPICE_MIGRATE_COMPLETED:
-@@ -350,7 +359,8 @@
- #      "event": "SPICE_MIGRATE_COMPLETED" }
- #
- ##
--{ 'event': 'SPICE_MIGRATE_COMPLETED' }
-+{ 'event': 'SPICE_MIGRATE_COMPLETED',
-+  'if': 'defined(CONFIG_SPICE)' }
-=20
- ##
- # =3D=3D VNC
-diff --git a/monitor.c b/monitor.c
-index 3a0ea0c602..8e1aea7826 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1191,9 +1191,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObj=
-ect **ret_data,
-  */
- static void qmp_unregister_commands_hack(void)
- {
--#ifndef CONFIG_SPICE
--    qmp_unregister_command(&qmp_commands, "query-spice");
--#endif
- #ifndef CONFIG_REPLICATION
-     qmp_unregister_command(&qmp_commands, "xen-set-replication");
-     qmp_unregister_command(&qmp_commands, "query-xen-replication-status"=
-);
-diff --git a/qmp.c b/qmp.c
-index bc5537b221..162bc2e30d 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -129,22 +129,6 @@ void qmp_cpu_add(int64_t id, Error **errp)
-     }
- }
-=20
--#ifndef CONFIG_SPICE
--/*
-- * qmp_unregister_commands_hack() ensures that QMP command query-spice
-- * exists only #ifdef CONFIG_SPICE.  Necessary for an accurate
-- * query-commands result.  However, the QAPI schema is blissfully
-- * unaware of that, and the QAPI code generator happily generates a
-- * dead qmp_marshal_query_spice() that calls qmp_query_spice().
-- * Provide it one, or else linking fails.  FIXME Educate the QAPI
-- * schema on CONFIG_SPICE.
-- */
--SpiceInfo *qmp_query_spice(Error **errp)
--{
--    abort();
--};
--#endif
--
- void qmp_exit_preconfig(Error **errp)
- {
-     if (!runstate_check(RUN_STATE_PRECONFIG)) {
---=20
-2.18.0.rc1
+>
+> thanks
+> -- PMM
