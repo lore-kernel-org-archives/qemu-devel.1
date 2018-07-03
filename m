@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faNNT-0002sb-VC
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:38:04 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faNP5-0004Ji-9U
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faNNQ-0005dk-OY
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:38:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36050 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1faNNQ-0005dV-JY
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:38:00 -0400
-References: <20180703085358.13941-1-armbru@redhat.com>
-	<20180703085358.13941-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b014980a-14a2-3d5b-9238-1c9e2302eb35@redhat.com>
-Date: Tue, 3 Jul 2018 10:37:59 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faNP1-00089K-0L
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:39:43 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:44070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faNP0-000896-RO
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:39:38 -0400
+Received: by mail-qk0-x242.google.com with SMTP id i188-v6so1214980qkc.11
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:39:38 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180702175030.18621-1-f4bug@amsat.org>
+	<20180702175030.18621-2-f4bug@amsat.org>
+	<2e367d67-77f4-8d58-53de-409c0b0bf558@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e0ac6484-0f62-66e0-c7b8-fab9775fbc0f@amsat.org>
+Date: Tue, 3 Jul 2018 12:39:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180703085358.13941-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <2e367d67-77f4-8d58-53de-409c0b0bf558@vivier.eu>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/32] qmp: Get rid of x-oob-test command
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/13] linux-user/syscall: Verify
+ recvfrom(addr) is user-writable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: peterx@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
 
-On 07/03/2018 03:53 AM, Markus Armbruster wrote:
-> tests/qmp-test tests an out-of-band command overtaking a slow in-band
-> command.  To do that, it needs:
+On 07/03/2018 11:55 AM, Laurent Vivier wrote:
+> Le 02/07/2018 à 19:50, Philippe Mathieu-Daudé a écrit :
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Tested-By: Guido Günther <agx@sigxcpu.org>
+>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>  linux-user/syscall.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 2117fb13b4..ad40682cee 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -4154,6 +4154,11 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>>              ret = -TARGET_EINVAL;
+>>              goto fail;
+>>          }
+>> +        if (!access_ok(VERIFY_WRITE, target_addr, addrlen)) {
+>> +            ret = -TARGET_EFAULT;
+>> +            goto fail;
+>> +        }
+>> +
+>>          addr = alloca(addrlen);
+>>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
+>>                                        addr, &addrlen));
+>>
 > 
+> This patch breaks the test recvfrom01 of the Linux Test Project.
 
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+OK :(
 
-R-b stands, although:
+I just sent v4, can you simply drop this patch?
+I'll now look at it after 3.0.
 
-> ---
+Thanks,
 
-> +static void setup_blocking_cmd(void)
-> +{
-> +    int rc;
-> +
-> +    if (!mkdtemp(tmpdir)) {
-> +        g_error("mkdtemp: %s", strerror(errno));
-> +    }
-> +    fifo_name = g_strdup_printf("%s/fifo", tmpdir);
-> +    rc = mkfifo(fifo_name, 0666);
-> +    g_assert(!rc);
-
-It's weird seeing two error handling styles in close proximity; we could 
-have done:
-
-if (!mkdtemp(tmpdir)) {
-     g_error(...)
-}
-fifo_name = ...
-if (mkfifo(fifo_name, 0666)) {
-     g_error(...)
-}
-
-
-> +
-> +static void send_oob_cmd_that_fails(QTestState *s, const char *id)
-
-Nice change of name compared to v1.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Phil.
