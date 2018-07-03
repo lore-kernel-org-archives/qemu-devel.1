@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg0-0002F5-0Y
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg2-0002HM-7z
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfy-0003ay-Ri
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39836 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg0-0003c5-DE
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36438 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1faNfy-0003aV-Mi
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	id 1faNg0-0003bi-7t
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C7ACEBFEA
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFF32401D795
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:11 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jul 2018 17:56:46 +0200
-Message-Id: <20180703155648.11933-13-marcandre.lureau@redhat.com>
+Date: Tue,  3 Jul 2018 17:56:47 +0200
+Message-Id: <20180703155648.11933-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 12/14] qapi: add 'If:' section to generated
- documentation
+Subject: [Qemu-devel] [PATCH v7 13/14] qapi: add conditions to VNC
+ type/commands/events on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,159 +37,379 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The documentation is generated only once, and doesn't know C
-pre-conditions. Add 'If:' sections for top-level entities.
+Add #if defined(CONFIG_VNC) in generated code, and adjust the
+qmp/hmp code accordingly.
+
+query-qmp-schema no longer reports the command/events etc as
+available when disabled at compile.
+
+Commands made conditional:
+
+* query-vnc, query-vnc-servers, change-vnc-password
+
+  Before the patch, the commands for !CONFIG_VNC are stubs that fail
+  like this:
+
+    {"error": {"class": "GenericError",
+               "desc": "The feature 'vnc' is not enabled"}}
+
+  Afterwards, they fail like this:
+
+    {"error": {"class": "CommandNotFound",
+               "desc": "The command FOO has not been found"}}
+
+  I call that an improvement, because it lets clients distinguish
+  between command unavailable (class CommandNotFound) and command failed
+  (class GenericError).
+
+Events made conditional:
+
+* VNC_CONNECTED, VNC_INITIALIZED, VNC_DISCONNECTED
+
+HMP change:
+
+* info vnc
+
+  Will return "unknown command: 'info vnc'" when VNC is compiled
+  out (same as error for spice when --disable-spice)
+
+Occurrences of VNC (case insensitive) in the schema that aren't
+covered by this change:
+
+* add_client
+
+  Command has other uses, including "socket bases character devices".
+  These are unconditional as far as I can tell.
+
+* set_password, expire_password
+
+  In theory, these commands could be used for managing any service's
+  password.  In practice, they're used for VNC and SPICE services.
+  They're documented for "remote display session" / "remote display
+  server".
+
+  The service is selected by argument @protocol.  The code special-cases
+  protocol-specific argument checking, then calls a protocol-specific
+  function to do the work.  If it fails, the command fails with "Could
+  not set password".  It does when the service isn't compiled in (it's a
+  stub then).
+
+  We could make these commands conditional on the conjunction of all
+  services [currently: defined(CONFIG_VNC) || defined(CONFIG_SPICE)],
+  but I doubt it's worthwhile.
+
+* change
+
+  Command has other uses, namely changing media.
+  This patch inlines a stub; no functional change.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/doc.py             | 22 ++++++++++++----------
- tests/qapi-schema/doc-good.json |  2 +-
- tests/qapi-schema/doc-good.out  |  1 +
- tests/qapi-schema/doc-good.texi |  2 ++
- 4 files changed, 16 insertions(+), 11 deletions(-)
+ qapi/ui.json         | 45 +++++++++++++++++++++++++++-----------------
+ ui/vnc.h             |  2 ++
+ hmp.c                |  9 ++++++++-
+ qmp.c                | 30 ++++-------------------------
+ hmp-commands-info.hx |  2 ++
+ 5 files changed, 44 insertions(+), 44 deletions(-)
 
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 4db6674dc3..987fd3c943 100755
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -174,7 +174,7 @@ def texi_members(doc, what, base, variants, member_fu=
-nc):
-     return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
+diff --git a/qapi/ui.json b/qapi/ui.json
+index f48d2a0afb..ee90c1880b 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -377,7 +377,8 @@
+   'data': { 'host': 'str',
+             'service': 'str',
+             'family': 'NetworkAddressFamily',
+-            'websocket': 'bool' } }
++            'websocket': 'bool' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
+ ##
+ # @VncServerInfo:
+@@ -391,7 +392,8 @@
+ ##
+ { 'struct': 'VncServerInfo',
+   'base': 'VncBasicInfo',
+-  'data': { '*auth': 'str' } }
++  'data': { '*auth': 'str' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
--def texi_sections(doc):
-+def texi_sections(doc, ifcond):
-     """Format additional sections following arguments"""
-     body =3D ''
-     for section in doc.sections:
-@@ -185,14 +185,16 @@ def texi_sections(doc):
-             body +=3D texi_example(section.text)
-         else:
-             body +=3D texi_format(section.text)
-+    if ifcond:
-+        body +=3D '\n\n@b{If:} @code{%s}' % ", ".join(ifcond)
-     return body
+ ##
+ # @VncClientInfo:
+@@ -408,7 +410,8 @@
+ ##
+ { 'struct': 'VncClientInfo',
+   'base': 'VncBasicInfo',
+-  'data': { '*x509_dname': 'str', '*sasl_username': 'str' } }
++  'data': { '*x509_dname': 'str', '*sasl_username': 'str' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
+ ##
+ # @VncInfo:
+@@ -449,7 +452,8 @@
+ { 'struct': 'VncInfo',
+   'data': {'enabled': 'bool', '*host': 'str',
+            '*family': 'NetworkAddressFamily',
+-           '*service': 'str', '*auth': 'str', '*clients': ['VncClientInf=
+o']} }
++           '*service': 'str', '*auth': 'str', '*clients': ['VncClientInf=
+o']},
++  'if': 'defined(CONFIG_VNC)' }
 =20
--def texi_entity(doc, what, base=3DNone, variants=3DNone,
-+def texi_entity(doc, what, ifcond, base=3DNone, variants=3DNone,
-                 member_func=3Dtexi_member):
-     return (texi_body(doc)
-             + texi_members(doc, what, base, variants, member_func)
--            + texi_sections(doc))
-+            + texi_sections(doc, ifcond))
+ ##
+ # @VncPrimaryAuth:
+@@ -460,7 +464,8 @@
+ ##
+ { 'enum': 'VncPrimaryAuth',
+   'data': [ 'none', 'vnc', 'ra2', 'ra2ne', 'tight', 'ultra',
+-            'tls', 'vencrypt', 'sasl' ] }
++            'tls', 'vencrypt', 'sasl' ],
++  'if': 'defined(CONFIG_VNC)' }
 =20
+ ##
+ # @VncVencryptSubAuth:
+@@ -474,8 +479,8 @@
+             'tls-none',  'x509-none',
+             'tls-vnc',   'x509-vnc',
+             'tls-plain', 'x509-plain',
+-            'tls-sasl',  'x509-sasl' ] }
+-
++            'tls-sasl',  'x509-sasl' ],
++  'if': 'defined(CONFIG_VNC)' }
 =20
- class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
-@@ -208,7 +210,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-         doc =3D self.cur_doc
-         self._gen.add(TYPE_FMT(type=3D'Enum',
-                                name=3Ddoc.symbol,
--                               body=3Dtexi_entity(doc, 'Values',
-+                               body=3Dtexi_entity(doc, 'Values', ifcond,
-                                                 member_func=3Dtexi_enum_=
-value)))
+ ##
+ # @VncServerInfo2:
+@@ -492,8 +497,8 @@
+ { 'struct': 'VncServerInfo2',
+   'base': 'VncBasicInfo',
+   'data': { 'auth'      : 'VncPrimaryAuth',
+-            '*vencrypt' : 'VncVencryptSubAuth' } }
+-
++            '*vencrypt' : 'VncVencryptSubAuth' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
-     def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
-@@ -217,14 +219,14 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
-aVisitor):
-             base =3D None
-         self._gen.add(TYPE_FMT(type=3D'Object',
-                                name=3Ddoc.symbol,
--                               body=3Dtexi_entity(doc, 'Members',
-+                               body=3Dtexi_entity(doc, 'Members', ifcond=
-,
-                                                 base, variants)))
+ ##
+ # @VncInfo2:
+@@ -525,7 +530,8 @@
+             'clients'   : ['VncClientInfo'],
+             'auth'      : 'VncPrimaryAuth',
+             '*vencrypt' : 'VncVencryptSubAuth',
+-            '*display'  : 'str' } }
++            '*display'  : 'str' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-         doc =3D self.cur_doc
-         self._gen.add(TYPE_FMT(type=3D'Alternate',
-                                name=3Ddoc.symbol,
--                               body=3Dtexi_entity(doc, 'Members')))
-+                               body=3Dtexi_entity(doc, 'Members', ifcond=
-)))
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfi=
-g):
-@@ -233,9 +235,9 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-             body =3D texi_body(doc)
-             body +=3D ('\n@b{Arguments:} the members of @code{%s}\n'
-                      % arg_type.name)
--            body +=3D texi_sections(doc)
-+            body +=3D texi_sections(doc, ifcond)
-         else:
--            body =3D texi_entity(doc, 'Arguments')
-+            body =3D texi_entity(doc, 'Arguments', ifcond)
-         self._gen.add(MSG_FMT(type=3D'Command',
-                               name=3Ddoc.symbol,
-                               body=3Dbody))
-@@ -244,7 +246,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-         doc =3D self.cur_doc
-         self._gen.add(MSG_FMT(type=3D'Event',
-                               name=3Ddoc.symbol,
--                              body=3Dtexi_entity(doc, 'Arguments')))
-+                              body=3Dtexi_entity(doc, 'Arguments', ifcon=
-d)))
-=20
-     def symbol(self, doc, entity):
-         if self._gen._body:
-@@ -257,7 +259,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-         assert not doc.args
-         if self._gen._body:
-             self._gen.add('\n')
--        self._gen.add(texi_body(doc) + texi_sections(doc))
-+        self._gen.add(texi_body(doc) + texi_sections(doc, None))
-=20
-=20
- def gen_doc(schema, output_dir, prefix):
-diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
-.json
-index 97ab4625ff..984cd8ed06 100644
---- a/tests/qapi-schema/doc-good.json
-+++ b/tests/qapi-schema/doc-good.json
-@@ -55,7 +55,7 @@
+ ##
+ # @query-vnc:
+@@ -556,8 +562,8 @@
+ #    }
  #
- # @two is undocumented
  ##
--{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
-+{ 'enum': 'Enum', 'data': [ 'one', 'two' ], 'if': 'defined(IFCOND)' }
+-{ 'command': 'query-vnc', 'returns': 'VncInfo' }
+-
++{ 'command': 'query-vnc', 'returns': 'VncInfo',
++  'if': 'defined(CONFIG_VNC)' }
+ ##
+ # @query-vnc-servers:
+ #
+@@ -567,7 +573,8 @@
+ #
+ # Since: 2.3
+ ##
+-{ 'command': 'query-vnc-servers', 'returns': ['VncInfo2'] }
++{ 'command': 'query-vnc-servers', 'returns': ['VncInfo2'],
++  'if': 'defined(CONFIG_VNC)' }
 =20
  ##
- # @Base:
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-index 9c8a4838e1..35f3f1164c 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -3,6 +3,7 @@ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', =
-'qlist', 'qbool']
-     prefix QTYPE
- module doc-good.json
- enum Enum ['one', 'two']
-+    if ['defined(IFCOND)']
- object Base
-     member base1: Enum optional=3DFalse
- object Variant1
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
-.texi
-index 0aed2300a5..e42eace474 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -89,6 +89,8 @@ Not documented
- @end table
- @code{two} is undocumented
+ # @change-vnc-password:
+@@ -581,7 +588,8 @@
+ # Notes:  An empty password in this command will set the password to the=
+ empty
+ #         string.  Existing clients are unaffected by executing this com=
+mand.
+ ##
+-{ 'command': 'change-vnc-password', 'data': {'password': 'str'} }
++{ 'command': 'change-vnc-password', 'data': {'password': 'str'},
++  'if': 'defined(CONFIG_VNC)' }
 =20
-+
-+@b{If:} @code{defined(IFCOND)}
- @end deftp
+ ##
+ # @VNC_CONNECTED:
+@@ -610,7 +618,8 @@
+ ##
+ { 'event': 'VNC_CONNECTED',
+   'data': { 'server': 'VncServerInfo',
+-            'client': 'VncBasicInfo' } }
++            'client': 'VncBasicInfo' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
+ ##
+ # @VNC_INITIALIZED:
+@@ -637,7 +646,8 @@
+ ##
+ { 'event': 'VNC_INITIALIZED',
+   'data': { 'server': 'VncServerInfo',
+-            'client': 'VncClientInfo' } }
++            'client': 'VncClientInfo' },
++  'if': 'defined(CONFIG_VNC)' }
 =20
+ ##
+ # @VNC_DISCONNECTED:
+@@ -663,7 +673,8 @@
+ ##
+ { 'event': 'VNC_DISCONNECTED',
+   'data': { 'server': 'VncServerInfo',
+-            'client': 'VncClientInfo' } }
++            'client': 'VncClientInfo' },
++  'if': 'defined(CONFIG_VNC)' }
+=20
+ ##
+ # =3D Input
+diff --git a/ui/vnc.h b/ui/vnc.h
+index 762632929b..a86e0610e8 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -297,7 +297,9 @@ struct VncState
+     bool encode_ws;
+     bool websocket;
+=20
++#ifdef CONFIG_VNC
+     VncClientInfo *info;
++#endif
+=20
+     /* Job thread bottom half has put data for a forced update
+      * into the output buffer. This offset points to the end of
+diff --git a/hmp.c b/hmp.c
+index fe4477a8fb..4555b503ac 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -616,6 +616,7 @@ void hmp_info_blockstats(Monitor *mon, const QDict *q=
+dict)
+     qapi_free_BlockStatsList(stats_list);
+ }
+=20
++#ifdef CONFIG_VNC
+ /* Helper for hmp_info_vnc_clients, _servers */
+ static void hmp_info_VncBasicInfo(Monitor *mon, VncBasicInfo *info,
+                                   const char *name)
+@@ -703,6 +704,7 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+     qapi_free_VncInfo2List(info2l);
+=20
+ }
++#endif
+=20
+ #ifdef CONFIG_SPICE
+ void hmp_info_spice(Monitor *mon, const QDict *qdict)
+@@ -1772,12 +1774,14 @@ void hmp_eject(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
+ }
+=20
++#ifdef CONFIG_VNC
+ static void hmp_change_read_arg(void *opaque, const char *password,
+                                 void *readline_opaque)
+ {
+     qmp_change_vnc_password(password, NULL);
+     monitor_read_command(opaque, 1);
+ }
++#endif
+=20
+ void hmp_change(Monitor *mon, const QDict *qdict)
+ {
+@@ -1788,6 +1792,7 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+     BlockdevChangeReadOnlyMode read_only_mode =3D 0;
+     Error *err =3D NULL;
+=20
++#ifdef CONFIG_VNC
+     if (strcmp(device, "vnc") =3D=3D 0) {
+         if (read_only) {
+             monitor_printf(mon,
+@@ -1802,7 +1807,9 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+             }
+         }
+         qmp_change("vnc", target, !!arg, arg, &err);
+-    } else {
++    } else
++#endif
++    {
+         if (read_only) {
+             read_only_mode =3D
+                 qapi_enum_parse(&BlockdevChangeReadOnlyMode_lookup,
+diff --git a/qmp.c b/qmp.c
+index 73e46d795f..bc5537b221 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -129,22 +129,6 @@ void qmp_cpu_add(int64_t id, Error **errp)
+     }
+ }
+=20
+-#ifndef CONFIG_VNC
+-/* If VNC support is enabled, the "true" query-vnc command is
+-   defined in the VNC subsystem */
+-VncInfo *qmp_query_vnc(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
+-    return NULL;
+-};
+-
+-VncInfo2List *qmp_query_vnc_servers(Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
+-    return NULL;
+-};
+-#endif
+-
+ #ifndef CONFIG_SPICE
+ /*
+  * qmp_unregister_commands_hack() ensures that QMP command query-spice
+@@ -412,23 +396,17 @@ static void qmp_change_vnc(const char *target, bool=
+ has_arg, const char *arg,
+         qmp_change_vnc_listen(target, errp);
+     }
+ }
+-#else
+-void qmp_change_vnc_password(const char *password, Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
+-}
+-static void qmp_change_vnc(const char *target, bool has_arg, const char =
+*arg,
+-                           Error **errp)
+-{
+-    error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
+-}
+ #endif /* !CONFIG_VNC */
+=20
+ void qmp_change(const char *device, const char *target,
+                 bool has_arg, const char *arg, Error **errp)
+ {
+     if (strcmp(device, "vnc") =3D=3D 0) {
++#ifdef CONFIG_VNC
+         qmp_change_vnc(target, has_arg, arg, errp);
++#else
++        error_setg(errp, QERR_FEATURE_DISABLED, "vnc");
++#endif
+     } else {
+         qmp_blockdev_change_medium(true, device, false, NULL, target,
+                                    has_arg, arg, false, 0, errp);
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index a482b6e56b..70639f656a 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -426,6 +426,7 @@ STEXI
+ Show which guest mouse is receiving events.
+ ETEXI
+=20
++#if defined(CONFIG_VNC)
+     {
+         .name       =3D "vnc",
+         .args_type  =3D "",
+@@ -433,6 +434,7 @@ ETEXI
+         .help       =3D "show the vnc server status",
+         .cmd        =3D hmp_info_vnc,
+     },
++#endif
+=20
+ STEXI
+ @item info vnc
 --=20
 2.18.0.rc1
