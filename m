@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4f-0001aq-Qn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1faH4Z-0001T7-Rn
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4X-0007Hj-Nx
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51420 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faH4W-0007Er-AN
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52200 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4X-0007GL-Eh
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:05 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4W-0007EK-5O
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:04 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 10:53:58 +0200
-Message-Id: <20180703085358.13941-33-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 10:53:45 +0200
+Message-Id: <20180703085358.13941-20-armbru@redhat.com>
 In-Reply-To: <20180703085358.13941-1-armbru@redhat.com>
 References: <20180703085358.13941-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 32/32] qapi: Polish command flags
- documentation in qapi-code-gen.txt
+Subject: [Qemu-devel] [PATCH v2 19/32] monitor: Rename use_io_thr to
+ use_io_thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +30,101 @@ Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.c
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt | 61 +++++++++++++++---------------------
- 1 file changed, 25 insertions(+), 36 deletions(-)
+ monitor.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index f020f6bab2..8decd6f17d 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -624,60 +624,48 @@ its return value.
- In rare cases, QAPI cannot express a type-safe representation of a
- corresponding Client JSON Protocol command.  You then have to suppress
- generation of a marshalling function by including a key 'gen' with
--boolean value false, and instead write your own function.  Please try
--to avoid adding new commands that rely on this, and instead use
--type-safe unions.  For an example of this usage:
-+boolean value false, and instead write your own function.  For
-+example:
+diff --git a/monitor.c b/monitor.c
+index fd83a57dda..10b6634d3e 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -206,11 +206,11 @@ struct Monitor {
+     int flags;
+     int suspend_cnt;            /* Needs to be accessed atomically */
+     bool skip_flush;
+-    bool use_io_thr;
++    bool use_io_thread;
  
-  { 'command': 'netdev_add',
-    'data': {'type': 'str', 'id': 'str'},
-    'gen': false }
+     /*
+      * State used only in the thread "owning" the monitor.
+-     * If @use_io_thr, this is mon_global.mon_iothread.
++     * If @use_io_thread, this is mon_global.mon_iothread.
+      * Else, it's the main thread.
+      * These members can be safely accessed without locks.
+      */
+@@ -520,7 +520,7 @@ static void monitor_json_emitter_raw(Monitor *mon,
  
-+Please try to avoid adding new commands that rely on this, and instead
-+use type-safe unions.
-+
- Normally, the QAPI schema is used to describe synchronous exchanges,
- where a response is expected.  But in some cases, the action of a
- command is expected to change state in a way that a successful
- response is not possible (although the command will still return a
- normal dictionary error on failure).  When a successful reply is not
--possible, the command expression should include the optional key
-+possible, the command expression includes the optional key
- 'success-response' with boolean value false.  So far, only QGA makes
- use of this member.
+ static void monitor_json_emitter(Monitor *mon, QObject *data)
+ {
+-    if (mon->use_io_thr) {
++    if (mon->use_io_thread) {
+         /*
+          * If using I/O thread, we need to queue the item so that I/O
+          * thread will do the rest for us.  Take refcount so that
+@@ -766,7 +766,7 @@ static void monitor_qapi_event_init(void)
+ static void handle_hmp_command(Monitor *mon, const char *cmdline);
  
--A command can be declared to support out-of-band (OOB) execution.  By
--default, commands do not support OOB.  To declare a command that
--supports it, the schema includes an extra 'allow-oob' field.  For
--example:
-+Key 'allow-oob' declares whether the command supports out-of-band
-+(OOB) execution.  It defaults to false.  For example:
+ static void monitor_data_init(Monitor *mon, bool skip_flush,
+-                              bool use_io_thr)
++                              bool use_io_thread)
+ {
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->mon_lock);
+@@ -775,7 +775,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
+     /* Use *mon_cmds by default. */
+     mon->cmd_table = mon_cmds;
+     mon->skip_flush = skip_flush;
+-    mon->use_io_thr = use_io_thr;
++    mon->use_io_thread = use_io_thread;
+     mon->qmp.qmp_requests = g_queue_new();
+     mon->qmp.qmp_responses = g_queue_new();
+ }
+@@ -1270,7 +1270,7 @@ static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
+         assert(list->value < QMP_CAPABILITY__MAX);
+         switch (list->value) {
+         case QMP_CAPABILITY_OOB:
+-            if (!mon->use_io_thr) {
++            if (!mon->use_io_thread) {
+                 /*
+                  * Out-of-band only works with monitors that are
+                  * running on dedicated I/O thread.
+@@ -4376,7 +4376,7 @@ void monitor_resume(Monitor *mon)
+              * For QMP monitors that are running in I/O thread, let's
+              * kick the thread in case it's sleeping.
+              */
+-            if (mon->use_io_thr) {
++            if (mon->use_io_thread) {
+                 aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
+             }
+         } else {
+@@ -4396,7 +4396,7 @@ static QObject *get_qmp_greeting(Monitor *mon)
+     qmp_marshal_query_version(NULL, &ver, NULL);
  
-  { 'command': 'migrate_recover',
-    'data': { 'uri': 'str' }, 'allow-oob': true }
+     for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
+-        if (!mon->use_io_thr && cap == QMP_CAPABILITY_OOB) {
++        if (!mon->use_io_thread && cap == QMP_CAPABILITY_OOB) {
+             /* Monitors that are not using I/O thread won't support OOB */
+             continue;
+         }
+@@ -4609,9 +4609,9 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+     Monitor *mon = opaque;
+     GMainContext *context;
  
--To execute a command with out-of-band priority, the client uses key
--"exec-oob" instead of "execute".  Example:
-+See qmp-spec.txt for out-of-band execution syntax and semantics.
- 
-- => { "exec-oob": "migrate-recover",
--      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
-- <= { "return": { } }
-+Commands supporting out-of-band execution can still be executed
-+in-band.
- 
--Without it, even the commands that support out-of-band execution will
--still be run in-band.
-+When a command is executed in-band, its handler runs in the main
-+thread with the BQL held.
- 
--Under normal QMP command execution, the following apply to each
--command:
-+When a command is executed out-of-band, its handler runs in a
-+dedicated monitor I/O thread with the BQL *not* held.
- 
--- They are executed in order,
--- They run only in main thread of QEMU,
--- They run with the BQL held.
-+An OOB-capable command handler must satisfy the following conditions:
- 
--When a command is executed with OOB, the following changes occur:
--
--- They can be completed before a pending in-band command,
--- They run in a dedicated monitor thread,
--- They run with the BQL not held.
--
--OOB command handlers must satisfy the following conditions:
--
--- It terminates quickly,
--- It does not invoke system calls that may block,
-+- It terminates quickly.
-+- It does not invoke system calls that may block.
- - It does not access guest RAM that may block when userfaultfd is
--  enabled for postcopy live migration,
-+  enabled for postcopy live migration.
- - It takes only "fast" locks, i.e. all critical sections protected by
-   any lock it takes also satisfy the conditions for OOB command
-   handler code.
-@@ -686,17 +674,18 @@ The restrictions on locking limit access to shared state.  Such access
- requires synchronization, but OOB commands can't take the BQL or any
- other "slow" lock.
- 
--If in doubt, do not implement OOB execution support.
-+When in doubt, do not implement OOB execution support.
- 
--A command may use the optional 'allow-preconfig' key to permit its execution
--at early runtime configuration stage (preconfig runstate).
--If not specified then a command defaults to 'allow-preconfig': false.
-+Key 'allow-preconfig' declares whether the command is available before
-+the machine is built.  It defaults to false.  For example:
- 
--An example of declaring a command that is enabled during preconfig:
-  { 'command': 'qmp_capabilities',
-    'data': { '*enable': [ 'QMPCapability' ] },
-    'allow-preconfig': true }
- 
-+QMP is available before the machine is built only when QEMU was
-+started with --preconfig.
-+
- === Events ===
- 
- Usage: { 'event': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+-    if (mon->use_io_thr) {
++    if (mon->use_io_thread) {
+         /*
+-         * When use_io_thr is set, we use the global shared dedicated
++         * When @use_io_thread is set, we use the global shared dedicated
+          * I/O thread for this monitor to handle input/output.
+          */
+         context = monitor_get_io_context();
+@@ -4660,7 +4660,7 @@ void monitor_init(Chardev *chr, int flags)
+     if (monitor_is_qmp(mon)) {
+         qemu_chr_fe_set_echo(&mon->chr, true);
+         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+-        if (mon->use_io_thr) {
++        if (mon->use_io_thread) {
+             /*
+              * Make sure the old iowatch is gone.  It's possible when
+              * e.g. the chardev is in client mode, with wait=on.
 -- 
 2.17.1
