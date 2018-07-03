@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIz-0008QO-VX
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:47 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIz-0008QM-P6
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIx-0000zz-HR
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIu-0000xu-OC
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46126
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58590)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1faSIx-0000zd-Bp
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:43 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1faSIu-0000wt-FT
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:40 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w63KnB5D041206
-	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 16:53:42 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k0dp9pc0v-1
+	w63KnBfc013220
+	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 16:53:38 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k0dpd6jkg-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 16:53:42 -0400
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 16:53:37 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 3 Jul 2018 14:53:42 -0600
+	Tue, 3 Jul 2018 14:53:37 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  3 Jul 2018 15:52:11 -0500
+Date: Tue,  3 Jul 2018 15:52:16 -0500
 In-Reply-To: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
 References: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20180703205221.24788-5-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 04/14] qga-win: add driver path usage to
- GuestFilesystemInfo
+Message-Id: <20180703205221.24788-10-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL 09/14] qga: refactoring qmp_guest_suspend_*
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,54 +39,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Chen Hanxiao <chenhanxiao@gmail.com>
+Cc: peter.maydell@linaro.org, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-This patch adds support for getting the usage of
-windows driver path.
-The usage of fs stored as used_bytes and total_bytes.
+To be able to add new suspend mechanisms we need to detach
+the existing QMP functions from the current implementation
+specifics.
 
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+At this moment we have functions such as qmp_guest_suspend_ram
+calling bios_suspend_mode and guest_suspend passing the
+pmutils command and arguments as parameters. This patch
+removes this logic from the QMP functions, moving them to
+the respective functions that will have to deal with which
+binary to use.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands-win32.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ qga/commands-posix.c | 87 +++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 55 insertions(+), 32 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 73f31fa8c2..318d760a74 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -670,6 +670,7 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-     char fs_name[32];
-     char vol_info[MAX_PATH+1];
-     size_t len;
-+    uint64_t i64FreeBytesToCaller, i64TotalBytes, i64FreeBytes;
-     GuestFilesystemInfo *fs = NULL;
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 7b7c78d85a..bd2c3514d8 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1474,15 +1474,38 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
+ #define LINUX_SYS_STATE_FILE "/sys/power/state"
+ #define SUSPEND_SUPPORTED 0
+ #define SUSPEND_NOT_SUPPORTED 1
++#define SUSPEND_MODE_DISK 1
++#define SUSPEND_MODE_RAM 2
++#define SUSPEND_MODE_HYBRID 3
  
-     GetVolumePathNamesForVolumeName(guid, (LPCH)&mnt, 0, &info_size);
-@@ -699,10 +700,21 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-     fs_name[sizeof(fs_name) - 1] = 0;
-     fs = g_malloc(sizeof(*fs));
-     fs->name = g_strdup(guid);
-+    fs->has_total_bytes = false;
-+    fs->has_used_bytes = false;
-     if (len == 0) {
-         fs->mountpoint = g_strdup("System Reserved");
-     } else {
-         fs->mountpoint = g_strndup(mnt_point, len);
-+        if (GetDiskFreeSpaceEx(fs->mountpoint,
-+                               (PULARGE_INTEGER) & i64FreeBytesToCaller,
-+                               (PULARGE_INTEGER) & i64TotalBytes,
-+                               (PULARGE_INTEGER) & i64FreeBytes)) {
-+            fs->used_bytes = i64TotalBytes - i64FreeBytes;
-+            fs->total_bytes = i64TotalBytes;
-+            fs->has_total_bytes = true;
-+            fs->has_used_bytes = true;
-+        }
-     }
-     fs->type = g_strdup(fs_name);
-     fs->disk = build_guest_disk_info(guid, errp);
+-static void bios_supports_mode(const char *pmutils_bin, const char *pmutils_arg,
+-                               const char *sysfile_str, Error **errp)
++static void bios_supports_mode(int suspend_mode, Error **errp)
+ {
+     Error *local_err = NULL;
++    const char *pmutils_arg, *sysfile_str;
++    const char *pmutils_bin = "pm-is-supported";
+     char *pmutils_path;
+     pid_t pid;
+     int status;
+ 
++    switch (suspend_mode) {
++
++    case SUSPEND_MODE_DISK:
++        pmutils_arg = "--hibernate";
++        sysfile_str = "disk";
++        break;
++    case SUSPEND_MODE_RAM:
++        pmutils_arg = "--suspend";
++        sysfile_str = "mem";
++        break;
++    case SUSPEND_MODE_HYBRID:
++        pmutils_arg = "--suspend-hybrid";
++        sysfile_str = NULL;
++        break;
++    default:
++        error_setg(errp, "guest suspend mode not supported");
++        return;
++    }
++
+     pmutils_path = g_find_program_in_path(pmutils_bin);
+ 
+     pid = fork();
+@@ -1559,14 +1582,39 @@ out:
+     g_free(pmutils_path);
+ }
+ 
+-static void guest_suspend(const char *pmutils_bin, const char *sysfile_str,
+-                          Error **errp)
++static void guest_suspend(int suspend_mode, Error **errp)
+ {
+     Error *local_err = NULL;
++    const char *pmutils_bin, *sysfile_str;
+     char *pmutils_path;
+     pid_t pid;
+     int status;
+ 
++    bios_supports_mode(suspend_mode, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    switch (suspend_mode) {
++
++    case SUSPEND_MODE_DISK:
++        pmutils_bin = "pm-hibernate";
++        sysfile_str = "disk";
++        break;
++    case SUSPEND_MODE_RAM:
++        pmutils_bin = "pm-suspend";
++        sysfile_str = "mem";
++        break;
++    case SUSPEND_MODE_HYBRID:
++        pmutils_bin = "pm-suspend-hybrid";
++        sysfile_str = NULL;
++        break;
++    default:
++        error_setg(errp, "unknown guest suspend mode");
++        return;
++    }
++
+     pmutils_path = g_find_program_in_path(pmutils_bin);
+ 
+     pid = fork();
+@@ -1629,42 +1677,17 @@ out:
+ 
+ void qmp_guest_suspend_disk(Error **errp)
+ {
+-    Error *local_err = NULL;
+-
+-    bios_supports_mode("pm-is-supported", "--hibernate", "disk", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    guest_suspend("pm-hibernate", "disk", errp);
++    guest_suspend(SUSPEND_MODE_DISK, errp);
+ }
+ 
+ void qmp_guest_suspend_ram(Error **errp)
+ {
+-    Error *local_err = NULL;
+-
+-    bios_supports_mode("pm-is-supported", "--suspend", "mem", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    guest_suspend("pm-suspend", "mem", errp);
++    guest_suspend(SUSPEND_MODE_RAM, errp);
+ }
+ 
+ void qmp_guest_suspend_hybrid(Error **errp)
+ {
+-    Error *local_err = NULL;
+-
+-    bios_supports_mode("pm-is-supported", "--suspend-hybrid", NULL,
+-                       &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    guest_suspend("pm-suspend-hybrid", NULL, errp);
++    guest_suspend(SUSPEND_MODE_HYBRID, errp);
+ }
+ 
+ static GuestNetworkInterfaceList *
 -- 
 2.11.0
