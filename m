@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1faMB3-00019d-G2
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:21:11 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faMFO-00038J-Fi
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1faMB1-0000Fz-Ki
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:21:09 -0400
-References: <1530305259-19184-1-git-send-email-ari@tuxera.com>
-	<1530305259-19184-3-git-send-email-ari@tuxera.com>
-	<20180703130604.GE3812@localhost.localdomain>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <0ae8ea61-be00-cb8a-d01e-27865cf116e0@tuxera.com>
-Date: Tue, 3 Jul 2018 17:20:52 +0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faMFL-0003Eo-41
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:25:38 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faMFK-0003Dx-Uo
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:25:35 -0400
+Received: by mail-qt0-x244.google.com with SMTP id m13-v6so1706987qth.1
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 07:25:34 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180217192215.28581-1-paul.burton@mips.com>
+	<20180217192215.28581-2-paul.burton@mips.com>
+	<a67d6a92-7a00-e1e2-541e-843e676c9c19@amsat.org>
+	<BN7PR08MB4868110F66E113B4E1C8AE7CC6420@BN7PR08MB4868.namprd08.prod.outlook.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <24289cad-a4bc-6c79-5aed-e15782592f05@amsat.org>
+Date: Tue, 3 Jul 2018 11:25:27 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180703130604.GE3812@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <BN7PR08MB4868110F66E113B4E1C8AE7CC6420@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] block: Add blklogwrites
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/net: Add support for Intel pch_gbe
+ ethernet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,338 +38,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Aapo Vienamo <aapo@tuxera.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On 07/03/2018 04:06 PM, Kevin Wolf wrote:
-> Am 29.06.2018 um 22:47 hat Ari Sundholm geschrieben:
->> From: Aapo Vienamo <aapo@tuxera.com>
+Hi Aleksandar,
+
+On 07/03/2018 06:46 AM, Aleksandar Markovic wrote:
+> On 03.07.2018. 01:37, Philippe Mathieu-Daudé wrote:
+>> Cc'ing Jason, the "Network devices" maintainer.
 >>
->> Implements a block device write logging system, similar to Linux kernel
->> device mapper dm-log-writes. The write operations that are performed
->> on a block device are logged to a file or another block device. The
->> write log format is identical to the dm-log-writes format. Currently,
->> log markers are not supported.
->>
->> This functionality can be used for crash consistency and fs consistency
->> testing. By implementing it in qemu, tests utilizing write logs can be
->> be used to test non-Linux drivers and older kernels.
->>
->> The driver accepts an optional parameter to set the sector size used
->> for logging. This makes the driver require all requests to be aligned
->> to this sector size and also makes offsets and sizes of writes in the
->> log metadata to be expressed in terms of this value (the log format has
->> a granularity of one sector for offsets and sizes). This allows
->> accurate logging of writes to guest block devices that have unusual
->> sector sizes.
->>
->> The implementation is based on the blkverify and blkdebug block
->> drivers.
->>
->> Signed-off-by: Aapo Vienamo <aapo@tuxera.com>
->> Signed-off-by: Ari Sundholm <ari@tuxera.com>
->> ---
->>   MAINTAINERS          |   6 +
->>   block/Makefile.objs  |   1 +
->>   block/blklogwrites.c | 392 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>   qapi/block-core.json |  33 ++++-
->>   4 files changed, 426 insertions(+), 6 deletions(-)
->>   create mode 100644 block/blklogwrites.c
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 42a1892..5af89e7 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -2051,6 +2051,12 @@ S: Supported
->>   F: block/quorum.c
->>   L: qemu-block@nongnu.org
->>   
->> +blklogwrites
->> +M: Ari Sundholm <ari@tuxera.com>
->> +L: qemu-block@nongnu.org
->> +S: Supported
->> +F: block/blklogwrites.c
->> +
->>   blkverify
->>   M: Stefan Hajnoczi <stefanha@redhat.com>
->>   L: qemu-block@nongnu.org
->> diff --git a/block/Makefile.objs b/block/Makefile.objs
->> index 899bfb5..c8337bf 100644
->> --- a/block/Makefile.objs
->> +++ b/block/Makefile.objs
->> @@ -5,6 +5,7 @@ block-obj-y += qed-check.o
->>   block-obj-y += vhdx.o vhdx-endian.o vhdx-log.o
->>   block-obj-y += quorum.o
->>   block-obj-y += parallels.o blkdebug.o blkverify.o blkreplay.o
->> +block-obj-y += blklogwrites.o
->>   block-obj-y += block-backend.o snapshot.o qapi.o
->>   block-obj-$(CONFIG_WIN32) += file-win32.o win32-aio.o
->>   block-obj-$(CONFIG_POSIX) += file-posix.o
->> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
->> new file mode 100644
->> index 0000000..0748b56
->> --- /dev/null
->> +++ b/block/blklogwrites.c
->> @@ -0,0 +1,392 @@
->> +/*
->> + * Write logging blk driver based on blkverify and blkdebug.
->> + *
->> + * Copyright (c) 2017 Tuomas Tynkkynen <tuomas@tuxera.com>
->> + * Copyright (c) 2018 Aapo Vienamo <aapo@tuxera.com>
->> + * Copyright (c) 2018 Ari Sundholm <ari@tuxera.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qemu/sockets.h" /* for EINPROGRESS on Windows */
->> +#include "block/block_int.h"
->> +#include "qapi/qmp/qdict.h"
->> +#include "qapi/qmp/qstring.h"
->> +#include "qemu/cutils.h"
->> +#include "qemu/option.h"
->> +
->> +/* Disk format stuff - taken from Linux drivers/md/dm-log-writes.c */
->> +
->> +#define LOG_FLUSH_FLAG   (1 << 0)
->> +#define LOG_FUA_FLAG     (1 << 1)
->> +#define LOG_DISCARD_FLAG (1 << 2)
->> +#define LOG_MARK_FLAG    (1 << 3)
->> +
->> +#define WRITE_LOG_VERSION 1ULL
->> +#define WRITE_LOG_MAGIC 0x6a736677736872ULL
->> +
->> +/* All fields are little-endian. */
->> +struct log_write_super {
->> +    uint64_t magic;
->> +    uint64_t version;
->> +    uint64_t nr_entries;
->> +    uint32_t sectorsize;
->> +} QEMU_PACKED;
->> +
->> +struct log_write_entry {
->> +    uint64_t sector;
->> +    uint64_t nr_sectors;
->> +    uint64_t flags;
->> +    uint64_t data_len;
->> +} QEMU_PACKED;
->> +
->> +/* End of disk format structures. */
->> +
->> +typedef struct {
->> +    BdrvChild *log_file;
->> +    uint32_t sectorsize;
->> +    uint32_t sectorbits;
->> +    uint64_t cur_log_sector;
->> +    uint64_t nr_entries;
->> +} BDRVBlkLogWritesState;
->> +
->> +static inline uint32_t blk_log_writes_log2(uint32_t value)
->> +{
->> +    assert(value > 0);
->> +    return 31 - clz32(value);
->> +}
->> +
->> +static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
->> +                               Error **errp)
->> +{
->> +    BDRVBlkLogWritesState *s = bs->opaque;
->> +    Error *local_err = NULL;
->> +    int ret;
->> +    int64_t log_sector_size = BDRV_SECTOR_SIZE;
->> +
->> +    /* Open the file */
->> +    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
->> +                               &local_err);
->> +    if (local_err) {
->> +        ret = -EINVAL;
->> +        error_propagate(errp, local_err);
->> +        goto fail;
->> +    }
->> +
->> +    if (qdict_haskey(options, "log-sector-size")) {
->> +        log_sector_size = qdict_get_int(options, "log-sector-size");
+>> On 02/17/2018 04:22 PM, Paul Burton wrote:
+>>> This patch introduces support for emulating the ethernet controller
+>>> found in the Intel EG20T Platform Controller Hub, referred to as pch_gbe
+>>> for consistency with both Linux & U-Boot.
+>>>
+>>> Documentation for the hardware can be found here:
+>>>
+>>>   https://www.intel.com/content/www/us/en/intelligent-systems/queens-bay/platform-controller-hub-eg20t-datasheet.html
+>>>
+>>> The device is used on MIPS Boston development boards as well as the
+>>> Intel Crown Bay platform including devices such as the Minnowboard V1.
+>>>
+>>> Enough functionality is implemented for Linux to make use of the device,
+>>> and has been tested using Linux v4.16-rc1.
 > 
-> This works with -blockdev and QMP blockdev-add, but not with -drive. The
-> problem is that the options QDict may contain the option in the proper
-> data type as specified in the QAPI schema, but it may also contain it as
-> a string in other code paths.
+> Acked-by: Aleksandar Markovic <AMarkovic@wavecomp.com>
 > 
-> Other block drivers solve this by using QemuOpts for the driver options,
-> which can accept both types.
-> 
-> As an example for the failure, this command line segfaults for me:
-> 
-> $ x86_64-softmmu/qemu-system-x86_64 -drive driver=blklogwrites,file.filename=/home/kwolf/images/hd.img,log.filename=/tmp/test.log,log-sector-size=512
-> 
+> We need this device to complete QEMU's MIPS Boston board support. May I
 
-Thanks, will fix.
+I tried to test this device using the 'eng' branch of
+git://git.linux-mips.org/pub/scm/linux-mti.git and using the
+'64r2el_defconfig' config but I get:
 
->> +        qdict_del(options, "log-sector-size");
->> +    }
->> +
->> +    if (log_sector_size < 0 || log_sector_size >= (1ull << 32) ||
+qemu-system-mips64el: Unable to copy device tree in memory
+unable to load FIT image
+
+I noticed the PPC machines use the _FDT() macro (see "hw/ppc/fdt.h") to
+eventually give more useful error message.
+
+> ask Jason to take a closer look at the proposed code for this network
+> device?
 > 
-> Maybe we should set a lower, more reasonable limit even if the log file
-> format would allow more.
+> Regards,
+> Aleksandar
 > 
-> If you allow a 2 GB sector size, QEMU will have to allocate a 2 GB
-> bounce buffer for every write request, which is just insane and might
-> easily DoS the VM because a memory allocation failure could bring QEMU
-> down.
-> 
-
-I'll set the limit at a more conservative 8 MB. That's still quite a big 
-number, but may be useful.
-
->> +        !is_power_of_2(log_sector_size))
->> +    {
->> +        ret = -EINVAL;
->> +        error_setg(errp, "Invalid log sector size %"PRId64, log_sector_size);
->> +        goto fail;
->> +    }
->> +
->> +    s->sectorsize = log_sector_size;
->> +    s->sectorbits = blk_log_writes_log2(log_sector_size);
->> +    s->cur_log_sector = 1;
->> +    s->nr_entries = 0;
->> +
->> +    /* Open the log file */
->> +    s->log_file = bdrv_open_child(NULL, options, "log", bs, &child_file, false,
->> +                                  &local_err);
->> +    if (local_err) {
->> +        ret = -EINVAL;
->> +        error_propagate(errp, local_err);
->> +        goto fail;
->> +    }
->> +
->> +    ret = 0;
->> +fail:
->> +    if (ret < 0) {
->> +        bdrv_unref_child(bs, bs->file);
->> +        bs->file = NULL;
->> +    }
->> +    return ret;
->> +}
->> +
->> +static void blk_log_writes_close(BlockDriverState *bs)
->> +{
->> +    BDRVBlkLogWritesState *s = bs->opaque;
->> +
->> +    bdrv_unref_child(bs, s->log_file);
->> +    s->log_file = NULL;
->> +}
->> +
->> +static int64_t blk_log_writes_getlength(BlockDriverState *bs)
->> +{
->> +    return bdrv_getlength(bs->file->bs);
->> +}
->> +
->> +static void blk_log_writes_refresh_filename(BlockDriverState *bs,
->> +                                            QDict *options)
->> +{
->> +    BDRVBlkLogWritesState *s = bs->opaque;
->> +
->> +    /* bs->file->bs has already been refreshed */
->> +    bdrv_refresh_filename(s->log_file->bs);
->> +
->> +    if (bs->file->bs->full_open_options
->> +        && s->log_file->bs->full_open_options)
->> +    {
->> +        QDict *opts = qdict_new();
->> +        qdict_put_str(opts, "driver", "blklogwrites");
->> +
->> +        qobject_ref(bs->file->bs->full_open_options);
->> +        qdict_put_obj(opts, "file", QOBJECT(bs->file->bs->full_open_options));
->> +        qobject_ref(s->log_file->bs->full_open_options);
->> +        qdict_put_obj(opts, "log",
->> +                      QOBJECT(s->log_file->bs->full_open_options));
-> 
-> log_sector_size is missing here.
-> 
-
-Oops, will fix.
-
->> +        bs->full_open_options = opts;
->> +    }
->> +}
->> +
->> +static void blk_log_writes_child_perm(BlockDriverState *bs, BdrvChild *c,
->> +                                      const BdrvChildRole *role,
->> +                                      BlockReopenQueue *ro_q,
->> +                                      uint64_t perm, uint64_t shrd,
->> +                                      uint64_t *nperm, uint64_t *nshrd)
->> +{
->> +    if (!c) {
->> +        *nperm = perm & DEFAULT_PERM_PASSTHROUGH;
->> +        *nshrd = (shrd & DEFAULT_PERM_PASSTHROUGH) | DEFAULT_PERM_UNCHANGED;
->> +        return;
->> +    }
->> +
->> +    if (!strcmp(c->name, "log")) {
->> +        bdrv_format_default_perms(bs, c, role, ro_q, perm, shrd, nperm, nshrd);
->> +    } else {
->> +        bdrv_filter_default_perms(bs, c, role, ro_q, perm, shrd, nperm, nshrd);
->> +    }
->> +}
->> +
->> +static void blk_log_writes_refresh_limits(BlockDriverState *bs, Error **errp)
->> +{
->> +    BDRVBlkLogWritesState *s = bs->opaque;
->> +    bs->bl.request_alignment = s->sectorsize;
->> +}
->> +
->> +static int coroutine_fn
->> +blk_log_writes_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
->> +                         QEMUIOVector *qiov, int flags)
->> +{
->> +    return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
->> +}
->> +
->> +typedef struct BlkLogWritesFileReq {
->> +    BlockDriverState *bs;
->> +    uint64_t offset;
->> +    uint64_t bytes;
->> +    int file_flags;
->> +    QEMUIOVector *qiov;
->> +    int (*func)(struct BlkLogWritesFileReq *r);
->> +    int file_ret;
->> +} BlkLogWritesFileReq;
->> +
->> +typedef struct {
->> +    BlockDriverState *bs;
->> +    QEMUIOVector *qiov;
->> +    struct log_write_entry entry;
->> +    uint64_t zero_size;
->> +    int log_ret;
->> +} BlkLogWritesLogReq;
->> +
->> +static void coroutine_fn blk_log_writes_co_do_log(BlkLogWritesLogReq *lr)
->> +{
->> +    BDRVBlkLogWritesState *s = lr->bs->opaque;
->> +    uint64_t cur_log_offset = s->cur_log_sector << s->sectorbits;
->> +
->> +    s->nr_entries++;
->> +    s->cur_log_sector +=
->> +            ROUND_UP(lr->qiov->size, s->sectorsize) >> s->sectorbits;
-> 
-> Calculations like this could be simplified with DIV_ROUND_UP().
-> 
-
-We explicitly wanted to use shifts here, as division and multiplication 
-can be slow on certain platforms and in this case can be replaced by shifts.
-
-> The rest looks good to me. If you can send a new version quickly, I can
-> still include it in my last pull request before the freeze in an hour or
-> two. Otherwise, I think I can merge it and we'll fix the problems during
-> the RC phase.
-> 
-
-I'll send a new version within the hour, if everything goes well with 
-the changes I'm making based on your review.
-
-Thank you for the review,
-Ari Sundholm
-ari@tuxera.com
