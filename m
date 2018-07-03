@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faE1Q-0006u1-2S
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:38:41 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1faE1e-0006zo-W2
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faE1M-0002OF-WC
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:38:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34694 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faE1M-0002O3-Qj
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:38:36 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180629195544.34263-1-eblake@redhat.com>
-	<20180629195544.34263-2-eblake@redhat.com>
-	<ed5d831b-2035-74b5-b12a-01f443c8a896@redhat.com>
-	<87va9x8omh.fsf@dusky.pond.sub.org>
-	<d0f625bb-54f3-364a-4f47-9ff38fc97935@redhat.com>
-Date: Tue, 03 Jul 2018 07:38:35 +0200
-In-Reply-To: <d0f625bb-54f3-364a-4f47-9ff38fc97935@redhat.com> (Eric Blake's
-	message of "Mon, 2 Jul 2018 14:59:38 -0500")
-Message-ID: <87sh507uas.fsf@dusky.pond.sub.org>
+	(envelope-from <dovgaluk@ispras.ru>) id 1faE1b-0002X8-Sx
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:38:55 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:50358)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1faE1b-0002WH-Kp
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:38:51 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180614193147.29680-15-richard.henderson@linaro.org>
+	<000601d40f7a$4be320b0$e3a96210$@ru>
+	<20180629184832.GB14726@flamenco>
+	<000901d411c8$d3bfc9c0$7b3f5d40$@ru>
+	<20180702195234.GB20840@flamenco>
+In-Reply-To: <20180702195234.GB20840@flamenco>
+Date: Tue, 3 Jul 2018 08:38:52 +0300
+Message-ID: <000601d41290$205c56a0$611503e0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: Add comments to aid debugging
- generated introspection
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL,
+ 14/18] translate-all: discard TB when tb_link_page returns an
+ existing matching TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "'Emilio G. Cota'" <cota@braap.org>
+Cc: 'Richard Henderson' <richard.henderson@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Eric Blake <eblake@redhat.com> writes:
+> From: Emilio G. Cota [mailto:cota@braap.org]
+> On Mon, Jul 02, 2018 at 08:52:14 +0300, Pavel Dovgalyuk wrote:
+> > The same failure can be reproduced with linux-0.2.img, which was
+> > downloaded from QEMU site.
+> > I can't find it now, but I can upload this file if needed.
+> 
+> Please upload it somewhere and share the full QEMU invocation
+> needed to replicate.
 
-> On 07/02/2018 01:43 PM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> On 06/29/2018 02:55 PM, Eric Blake wrote:
->>>> We consciously chose in commit 1a9a507b to hide QAPI type names
->>>> from the generated introspection output, but added a command line
->>>> option -u to unmask the type name when doing a debug build.  At
->>>> that time, we generated a monolithic C string, so there was no
->>>> better way to do things (we could not really inject comments).
->>>>
->>>> Later, in commit 7d0f982b, we switched the generation to output
->>>> a QLit object, in part to make it easier for future addition of
->>>> conditional compilation.  But this switch has also made it easier
->>>> to interject strategic comments.  That commit also forgot to
->>>> delete some now-stale comments about long generated line lengths.
->>>>
->>>> For now, type name debug aid comments are only output once per
->>>> meta-type, rather than at all uses of the number used to encode
->>>> the type to the introspection data.  But this is still a lot
->>>> more convenient than having to regenerate the file with the
->>>> unmask operation temporarily turned on.
->>> ...
->
->> to_qlit() converts from a natural representation of JSON in Python to
->> JSON text.
->>
->> Your patch breaks it for JSON objects that have a member named
->> 'comment'.
->
-> Hmm.  None do, presently.  And I don't see where it would be permitted
-> in the QAPI schema for query-qmp-schema.
+https://github.com/Dovgalyuk/qemu-images/blob/master/linux-0.2.img
 
-So far, to_qlit() is completely oblivious of the schema; it just
-crunches JSON.  I'd like to keep it that way, if practical.
+qemu-system-i386 -drive file=images/linux-0.2.img,if=none,snapshot,id=img -drive
+driver=blkreplay,if=none,id=rr,image=img -device ide-hd,drive=rr -net none -icount
+shift=5,rr=record,rrfile=linux02.rr
 
->> Related work: Marc-Andr=C3=A9's "[PATCH v6 09/15] qapi-introspect: add
->> preprocessor conditions to generated QLit" uses tuples to augment JSON.
->> He uses them for conditionals, but the technique could be generalized,
->> say from his (jobj, ifcond) to (jobj, { 'if': ifcond, '#': comment }.
->
-> Yeah, I can probably rebase on top of that (and at this point, it's
-> late enough to probably have missed 3.0 anyways, so I'm not
-> time-crunched for getting it done right now).
-
-It's a lovely improvement for developers, but it'll be just as lovely in
-3.1 :)
+Pavel Dovgalyuk
