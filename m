@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfz-0002F2-UH
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNg0-0002F5-0Y
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNft-0003Wb-VK
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfy-0003ay-Ri
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36428 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39836 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1faNft-0003WH-Qe
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	id 1faNfy-0003aV-Mi
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 36170401D79C
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C7ACEBFEA
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:10 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jul 2018 17:56:40 +0200
-Message-Id: <20180703155648.11933-7-marcandre.lureau@redhat.com>
+Date: Tue,  3 Jul 2018 17:56:46 +0200
+Message-Id: <20180703155648.11933-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 06/14] qapi: add #if/#endif helpers
+Subject: [Qemu-devel] [PATCH v7 12/14] qapi: add 'If:' section to generated
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,162 +37,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add helpers to wrap generated code with #if/#endif lines.
-
-A later patch wants to use QAPIGen for generating C snippets rather
-than full C files with copyright headers etc.  Splice in class
-QAPIGenCCode between QAPIGen and QAPIGenC.
-
-Add a 'with' statement context manager that will be used to wrap
-generator visitor methods.  The manager will check if code was
-generated before adding #if/#endif lines on QAPIGenCSnippet
-objects. Used in the following patches.
+The documentation is generated only once, and doesn't know C
+pre-conditions. Add 'If:' sections for top-level entities.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py | 98 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 94 insertions(+), 4 deletions(-)
+ scripts/qapi/doc.py             | 22 ++++++++++++----------
+ tests/qapi-schema/doc-good.json |  2 +-
+ tests/qapi-schema/doc-good.out  |  1 +
+ tests/qapi-schema/doc-good.texi |  2 ++
+ 4 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 1b56065a80..9230a2a3e8 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -12,6 +12,7 @@
- # See the COPYING file in the top-level directory.
-=20
- from __future__ import print_function
-+from contextlib import contextmanager
- import errno
- import os
- import re
-@@ -1974,6 +1975,40 @@ def guardend(name):
-                  name=3Dguardname(name))
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 4db6674dc3..987fd3c943 100755
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -174,7 +174,7 @@ def texi_members(doc, what, base, variants, member_fu=
+nc):
+     return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
 =20
 =20
-+def gen_if(ifcond):
-+    ret =3D ''
-+    for ifc in ifcond:
-+        ret +=3D mcgen('''
-+#if %(cond)s
-+''', cond=3Difc)
-+    return ret
-+
-+
-+def gen_endif(ifcond):
-+    ret =3D ''
-+    for ifc in reversed(ifcond):
-+        ret +=3D mcgen('''
-+#endif /* %(cond)s */
-+''', cond=3Difc)
-+    return ret
-+
-+
-+def _wrap_ifcond(ifcond, before, after):
-+    if before =3D=3D after:
-+        return after   # suppress empty #if ... #endif
-+
-+    assert after.startswith(before)
-+    out =3D before
-+    added =3D after[len(before):]
-+    if added[0] =3D=3D '\n':
-+        out +=3D '\n'
-+        added =3D added[1:]
-+    out +=3D gen_if(ifcond)
-+    out +=3D added
-+    out +=3D gen_endif(ifcond)
-+    return out
-+
-+
- def gen_enum_lookup(name, values, prefix=3DNone):
-     ret =3D mcgen('''
-=20
-@@ -2071,6 +2106,10 @@ class QAPIGen(object):
-     def add(self, text):
-         self._body +=3D text
-=20
-+    def get_content(self, fname=3DNone):
-+        return (self._top(fname) + self._preamble + self._body
-+                + self._bottom(fname))
-+
-     def _top(self, fname):
-         return ''
-=20
-@@ -2091,8 +2130,7 @@ class QAPIGen(object):
-             f =3D open(fd, 'r+', encoding=3D'utf-8')
+-def texi_sections(doc):
++def texi_sections(doc, ifcond):
+     """Format additional sections following arguments"""
+     body =3D ''
+     for section in doc.sections:
+@@ -185,14 +185,16 @@ def texi_sections(doc):
+             body +=3D texi_example(section.text)
          else:
-             f =3D os.fdopen(fd, 'r+')
--        text =3D (self._top(fname) + self._preamble + self._body
--                + self._bottom(fname))
-+        text =3D self.get_content(fname)
-         oldtext =3D f.read(len(text) + 1)
-         if text !=3D oldtext:
-             f.seek(0)
-@@ -2101,10 +2139,62 @@ class QAPIGen(object):
-         f.close()
+             body +=3D texi_format(section.text)
++    if ifcond:
++        body +=3D '\n\n@b{If:} @code{%s}' % ", ".join(ifcond)
+     return body
 =20
 =20
--class QAPIGenC(QAPIGen):
-+@contextmanager
-+def ifcontext(ifcond, *args):
-+    """A 'with' statement context manager to wrap with start_if()/end_if=
-()
+-def texi_entity(doc, what, base=3DNone, variants=3DNone,
++def texi_entity(doc, what, ifcond, base=3DNone, variants=3DNone,
+                 member_func=3Dtexi_member):
+     return (texi_body(doc)
+             + texi_members(doc, what, base, variants, member_func)
+-            + texi_sections(doc))
++            + texi_sections(doc, ifcond))
 =20
--    def __init__(self, blurb, pydoc):
-+    *args: any number of QAPIGenCCode
+=20
+ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
+@@ -208,7 +210,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+         doc =3D self.cur_doc
+         self._gen.add(TYPE_FMT(type=3D'Enum',
+                                name=3Ddoc.symbol,
+-                               body=3Dtexi_entity(doc, 'Values',
++                               body=3Dtexi_entity(doc, 'Values', ifcond,
+                                                 member_func=3Dtexi_enum_=
+value)))
+=20
+     def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+@@ -217,14 +219,14 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
+aVisitor):
+             base =3D None
+         self._gen.add(TYPE_FMT(type=3D'Object',
+                                name=3Ddoc.symbol,
+-                               body=3Dtexi_entity(doc, 'Members',
++                               body=3Dtexi_entity(doc, 'Members', ifcond=
+,
+                                                 base, variants)))
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         doc =3D self.cur_doc
+         self._gen.add(TYPE_FMT(type=3D'Alternate',
+                                name=3Ddoc.symbol,
+-                               body=3Dtexi_entity(doc, 'Members')))
++                               body=3Dtexi_entity(doc, 'Members', ifcond=
+)))
+=20
+     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+                       success_response, boxed, allow_oob, allow_preconfi=
+g):
+@@ -233,9 +235,9 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+             body =3D texi_body(doc)
+             body +=3D ('\n@b{Arguments:} the members of @code{%s}\n'
+                      % arg_type.name)
+-            body +=3D texi_sections(doc)
++            body +=3D texi_sections(doc, ifcond)
+         else:
+-            body =3D texi_entity(doc, 'Arguments')
++            body =3D texi_entity(doc, 'Arguments', ifcond)
+         self._gen.add(MSG_FMT(type=3D'Command',
+                               name=3Ddoc.symbol,
+                               body=3Dbody))
+@@ -244,7 +246,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+         doc =3D self.cur_doc
+         self._gen.add(MSG_FMT(type=3D'Event',
+                               name=3Ddoc.symbol,
+-                              body=3Dtexi_entity(doc, 'Arguments')))
++                              body=3Dtexi_entity(doc, 'Arguments', ifcon=
+d)))
+=20
+     def symbol(self, doc, entity):
+         if self._gen._body:
+@@ -257,7 +259,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+         assert not doc.args
+         if self._gen._body:
+             self._gen.add('\n')
+-        self._gen.add(texi_body(doc) + texi_sections(doc))
++        self._gen.add(texi_body(doc) + texi_sections(doc, None))
+=20
+=20
+ def gen_doc(schema, output_dir, prefix):
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
+.json
+index 97ab4625ff..984cd8ed06 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -55,7 +55,7 @@
+ #
+ # @two is undocumented
+ ##
+-{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
++{ 'enum': 'Enum', 'data': [ 'one', 'two' ], 'if': 'defined(IFCOND)' }
+=20
+ ##
+ # @Base:
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+index 9c8a4838e1..35f3f1164c 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -3,6 +3,7 @@ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', =
+'qlist', 'qbool']
+     prefix QTYPE
+ module doc-good.json
+ enum Enum ['one', 'two']
++    if ['defined(IFCOND)']
+ object Base
+     member base1: Enum optional=3DFalse
+ object Variant1
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
+.texi
+index 0aed2300a5..e42eace474 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -89,6 +89,8 @@ Not documented
+ @end table
+ @code{two} is undocumented
+=20
 +
-+    Example::
-+
-+        with ifcontext(ifcond, self._genh, self._genc):
-+            modify self._genh and self._genc ...
-+
-+    Is equivalent to calling::
-+
-+        self._genh.start_if(ifcond)
-+        self._genc.start_if(ifcond)
-+        modify self._genh and self._genc ...
-+        self._genh.end_if()
-+        self._genc.end_if()
-+    """
-+    for arg in args:
-+        arg.start_if(ifcond)
-+    yield
-+    for arg in args:
-+        arg.end_if()
-+
-+
-+class QAPIGenCCode(QAPIGen):
-+
-+    def __init__(self):
-         QAPIGen.__init__(self)
-+        self._start_if =3D None
-+
-+    def start_if(self, ifcond):
-+        assert self._start_if is None
-+        self._start_if =3D (ifcond, self._body, self._preamble)
-+
-+    def end_if(self):
-+        assert self._start_if
-+        self._wrap_ifcond()
-+        self._start_if =3D None
-+
-+    def _wrap_ifcond(self):
-+        self._body =3D _wrap_ifcond(self._start_if[0],
-+                                  self._start_if[1], self._body)
-+        self._preamble =3D _wrap_ifcond(self._start_if[0],
-+                                      self._start_if[2], self._preamble)
-+
-+    def get_content(self, fname=3DNone):
-+        assert self._start_if is None
-+        return QAPIGen.get_content(self, fname)
-+
-+
-+class QAPIGenC(QAPIGenCCode):
-+
-+    def __init__(self, blurb, pydoc):
-+        QAPIGenCCode.__init__(self)
-         self._blurb =3D blurb
-         self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*', py=
-doc,
-                                                   re.MULTILINE))
++@b{If:} @code{defined(IFCOND)}
+ @end deftp
+=20
+=20
 --=20
 2.18.0.rc1
