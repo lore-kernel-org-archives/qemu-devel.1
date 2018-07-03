@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1faOYD-0000dQ-84
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:53:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1faOd2-0004Gz-SH
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1faOYB-0001Zj-Nq
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:53:13 -0400
-References: <20180703034655.792039-1-jcody@redhat.com>
-	<20180703034655.792039-4-jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b2981aa2-c45a-b816-dfb0-fa25b2888be1@redhat.com>
-Date: Tue, 3 Jul 2018 12:53:04 -0400
+	(envelope-from <laurent@vivier.eu>) id 1faOcy-0004Ge-IN
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:58:12 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:45683)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1faOcy-0004Fz-8d
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:58:08 -0400
+References: <20180703160022.10705-1-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <bd71ddfb-1f94-605a-ac94-bd372d34bddd@vivier.eu>
+Date: Tue, 3 Jul 2018 18:57:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180703034655.792039-4-jcody@redhat.com>
+In-Reply-To: <20180703160022.10705-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PULL 3/3] backup: Use copy offloading
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] scripts/qemu-binfmt-conf.sh: allow
+ clearing of entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,254 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-
-
-On 07/02/2018 11:46 PM, Jeff Cody wrote:
-> From: Fam Zheng <famz@redhat.com>
+Le 03/07/2018 à 18:00, Alex Bennée a écrit :
+> Currently running the script twice will fail with "sh: echo: I/O
+> error" as the registration is already complete. Add a new option
+> --clear to reset the entries to save the user doing it by hand.
 > 
-> The implementation is similar to the 'qemu-img convert'. In the
-> beginning of the job, offloaded copy is attempted. If it fails, further
-> I/O will go through the existing bounce buffer code path.
-> 
-> Then, as Kevin pointed out, both this and qemu-img convert can benefit
-> from a local check if one request fails because of, for example, the
-> offset is beyond EOF, but another may well be accepted by the protocol
-> layer. This will be implemented separately.
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> Message-id: 20180703023758.14422-4-famz@redhat.com
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  block/backup.c     | 150 ++++++++++++++++++++++++++++++++-------------
->  block/trace-events |   1 +
->  2 files changed, 110 insertions(+), 41 deletions(-)
+>  scripts/qemu-binfmt-conf.sh | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
 > 
-> diff --git a/block/backup.c b/block/backup.c
-> index d18be40caf..81895ddbe2 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -45,6 +45,8 @@ typedef struct BackupBlockJob {
->      QLIST_HEAD(, CowRequest) inflight_reqs;
+> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+> index d7eefda0b8..13ef4713e6 100755
+> --- a/scripts/qemu-binfmt-conf.sh
+> +++ b/scripts/qemu-binfmt-conf.sh
+> @@ -160,7 +160,7 @@ qemu_get_family() {
+>  usage() {
+>      cat <<EOF
+>  Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+> -                           [--help][--credential yes|no][--exportdir PATH]
+> +                           [--help][--clear][--credential yes|no][--exportdir PATH]
 >  
->      HBitmap *copy_bitmap;
-> +    bool use_copy_range;
-> +    int64_t copy_range_size;
->  } BackupBlockJob;
+>         Configure binfmt_misc to use qemu interpreter
 >  
->  static const BlockJobDriver backup_job_driver;
-> @@ -86,19 +88,101 @@ static void cow_request_end(CowRequest *req)
->      qemu_co_queue_restart_all(&req->wait_queue);
+> @@ -176,6 +176,7 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+>                       (default: $SYSTEMDDIR or $DEBIANDIR)
+>         --credential: if yes, credential and security tokens are
+>                       calculated according to the binary to interpret
+> +       --clear:      clear existing qemu binfmt registrations
+>  
+>      To import templates with update-binfmts, use :
+>  
+> @@ -249,6 +250,13 @@ qemu_register_interpreter() {
+>      qemu_generate_register > /proc/sys/fs/binfmt_misc/register
 >  }
 >  
-> +/* Copy range to target with a bounce buffer and return the bytes copied. If
-> + * error occured, return a negative error number */
-> +static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-> +                                                      int64_t start,
-> +                                                      int64_t end,
-> +                                                      bool is_write_notifier,
-> +                                                      bool *error_is_read,
-> +                                                      void **bounce_buffer)
-> +{
-> +    int ret;
-> +    struct iovec iov;
-> +    QEMUIOVector qiov;
-> +    BlockBackend *blk = job->common.blk;
-> +    int nbytes;
-> +
-> +    hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-> +    nbytes = MIN(job->cluster_size, job->len - start);
-> +    if (!*bounce_buffer) {
-> +        *bounce_buffer = blk_blockalign(blk, job->cluster_size);
-> +    }
-> +    iov.iov_base = *bounce_buffer;
-> +    iov.iov_len = nbytes;
-> +    qemu_iovec_init_external(&qiov, &iov, 1);
-> +
-> +    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
-> +                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-> +    if (ret < 0) {
-> +        trace_backup_do_cow_read_fail(job, start, ret);
-> +        if (error_is_read) {
-> +            *error_is_read = true;
-> +        }
-> +        goto fail;
-> +    }
-> +
-> +    if (qemu_iovec_is_zero(&qiov)) {
-> +        ret = blk_co_pwrite_zeroes(job->target, start,
-> +                                   qiov.size, BDRV_REQ_MAY_UNMAP);
-> +    } else {
-> +        ret = blk_co_pwritev(job->target, start,
-> +                             qiov.size, &qiov,
-> +                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-> +    }
-> +    if (ret < 0) {
-> +        trace_backup_do_cow_write_fail(job, start, ret);
-> +        if (error_is_read) {
-> +            *error_is_read = false;
-> +        }
-> +        goto fail;
-> +    }
-> +
-> +    return nbytes;
-> +fail:
-> +    hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-> +    return ret;
-> +
+> +qemu_clear_interpreter() {
+> +    if [ -e /proc/sys/fs/binfmt_misc/qemu-$cpu ]; then
+
+You should use qemu_check_access()
+
+> +        echo "Removing qemu-$cpu as binfmt interpreter for $cpu"
+> +        echo -1 > /proc/sys/fs/binfmt_misc/qemu-$cpu
+> +    fi
 > +}
 > +
-> +/* Copy range to target and return the bytes copied. If error occured, return a
-> + * negative error number. */
-> +static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-> +                                                int64_t start,
-> +                                                int64_t end,
-> +                                                bool is_write_notifier)
-> +{
-> +    int ret;
-> +    int nr_clusters;
-> +    BlockBackend *blk = job->common.blk;
-> +    int nbytes;
-> +
-> +    assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-> +    nbytes = MIN(job->copy_range_size, end - start);
-> +    nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
-> +    hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
-> +                  nr_clusters);
-> +    ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-> +                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-> +    if (ret < 0) {
-> +        trace_backup_do_cow_copy_range_fail(job, start, ret);
-> +        hbitmap_set(job->copy_bitmap, start / job->cluster_size,
-> +                    nr_clusters);
-> +        return ret;
-> +    }
-> +
-> +    return nbytes;
-> +}
-> +
->  static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->                                        int64_t offset, uint64_t bytes,
->                                        bool *error_is_read,
->                                        bool is_write_notifier)
->  {
-> -    BlockBackend *blk = job->common.blk;
->      CowRequest cow_request;
-> -    struct iovec iov;
-> -    QEMUIOVector bounce_qiov;
-> -    void *bounce_buffer = NULL;
->      int ret = 0;
->      int64_t start, end; /* bytes */
-> -    int n; /* bytes */
-> +    void *bounce_buffer = NULL;
+>  qemu_generate_systemd() {
+>      echo "Setting $qemu as binfmt interpreter for $cpu for systemd-binfmt.service"
+>      qemu_generate_register > "$EXPORTDIR/qemu-$cpu.conf"
+> @@ -302,7 +310,7 @@ DEBIANDIR="/usr/share/binfmts"
+>  QEMU_PATH=/usr/local/bin
+>  FLAGS=""
 >  
->      qemu_co_rwlock_rdlock(&job->flush_rwlock);
+> -options=$(getopt -o ds:Q:e:hc: -l debian,systemd:,qemu-path:,exportdir:,help,credential: -- "$@")
+> +options=$(getopt -o ds:Q:e:hc: -l debian,systemd:,qemu-path:,exportdir:,help,clear,credential: -- "$@")
+>  eval set -- "$options"
 >  
-> @@ -110,60 +194,38 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
->      wait_for_overlapping_requests(job, start, end);
->      cow_request_begin(&cow_request, job, start, end);
->  
-> -    for (; start < end; start += job->cluster_size) {
-> +    while (start < end) {
->          if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
->              trace_backup_do_cow_skip(job, start);
-> +            start += job->cluster_size;
->              continue; /* already copied */
->          }
-> -        hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
->  
->          trace_backup_do_cow_process(job, start);
->  
-> -        n = MIN(job->cluster_size, job->len - start);
-> -
-> -        if (!bounce_buffer) {
-> -            bounce_buffer = blk_blockalign(blk, job->cluster_size);
-> -        }
-> -        iov.iov_base = bounce_buffer;
-> -        iov.iov_len = n;
-> -        qemu_iovec_init_external(&bounce_qiov, &iov, 1);
-> -
-> -        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
-> -                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-> -        if (ret < 0) {
-> -            trace_backup_do_cow_read_fail(job, start, ret);
-> -            if (error_is_read) {
-> -                *error_is_read = true;
-> +        if (job->use_copy_range) {
-> +            ret = backup_cow_with_offload(job, start, end, is_write_notifier);
-> +            if (ret < 0) {
-> +                job->use_copy_range = false;
->              }
-> -            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-> -            goto out;
->          }
-> -
-> -        if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
-> -            ret = blk_co_pwrite_zeroes(job->target, start,
-> -                                       bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
-> -        } else {
-> -            ret = blk_co_pwritev(job->target, start,
-> -                                 bounce_qiov.size, &bounce_qiov,
-> -                                 job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-> +        if (!job->use_copy_range) {
-> +            ret = backup_cow_with_bounce_buffer(job, start, end, is_write_notifier,
-> +                                                error_is_read, &bounce_buffer);
->          }
->          if (ret < 0) {
-> -            trace_backup_do_cow_write_fail(job, start, ret);
-> -            if (error_is_read) {
-> -                *error_is_read = false;
-> -            }
-> -            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-> -            goto out;
-> +            break;
->          }
->  
->          /* Publish progress, guest I/O counts as progress too.  Note that the
->           * offset field is an opaque progress value, it is not a disk offset.
->           */
-> -        job->bytes_read += n;
-> -        job_progress_update(&job->common.job, n);
-> +        start += ret;
-> +        job->bytes_read += ret;
-> +        job_progress_update(&job->common.job, ret);
-> +        ret = 0;
->      }
->  
-> -out:
->      if (bounce_buffer) {
->          qemu_vfree(bounce_buffer);
->      }
-> @@ -665,6 +727,12 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->      } else {
->          job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
->      }
-> +    job->use_copy_range = true;
-> +    job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-> +                                        blk_get_max_transfer(job->target));
-> +    job->copy_range_size = MAX(job->cluster_size,
-> +                               QEMU_ALIGN_UP(job->copy_range_size,
-> +                                             job->cluster_size));
->  
->      /* Required permissions are already taken with target's blk_new() */
->      block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-> diff --git a/block/trace-events b/block/trace-events
-> index 2d59b53fd3..c35287b48a 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -42,6 +42,7 @@ backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
->  backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
->  backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
->  backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
-> +backup_do_cow_copy_range_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
->  
->  # blockdev.c
->  qmp_block_job_cancel(void *job) "job %p"
+>  while true ; do
+> @@ -354,6 +362,10 @@ while true ; do
+>              FLAGS=""
+>          fi
+>          ;;
+> +    --clear)
+> +        shift
+> +        BINFMT_SET=qemu_clear_interpreter
+> +        ;;
+>      *)
+>          break
+>          ;;
 > 
 
-As a head's up, this breaks fleecing test 222. Not sure why just yet.
+if you use --debian or --systemd, you don't have the problem because
+update-binfmts and systemd-binfmt.service update /proc from the
+generated files for you.
 
---js
+But you're right there is no command to undo what we have done.
+You manage only the /proc case, I think it would be also useful to
+remove the files from $EXPORTDIR.
+
+So could you also manage something like "--debian --clear" and
+"--systemd CPU --clear"?
+
+Thanks,
+Laurent
