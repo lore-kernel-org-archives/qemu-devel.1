@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1faHIN-0005Qa-Fn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:08:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1faHNN-0001WX-3T
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1faHIH-0000Nj-EA
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:08:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52040 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1faHIH-0000NK-8P
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:08:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60EC9402346D
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 09:08:16 +0000 (UTC)
-Date: Tue, 3 Jul 2018 10:08:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180703090808.GA11434@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180702162218.13678-1-armbru@redhat.com>
-	<20180702162218.13678-8-armbru@redhat.com>
-	<20180703033625.GP2455@xz-mi> <874lhg7sms.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1faHNM-0002hJ-0K
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:13:33 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:42079)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1faHNL-0002h4-QA
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:13:31 -0400
+Received: by mail-oi0-x241.google.com with SMTP id n84-v6so2347568oib.9
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 02:13:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <874lhg7sms.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/32] qmp: Make "id" optional again even
- in "oob" monitors
+In-Reply-To: <20180703002815.GF3422@umbus.fritz.box>
+References: <cover.1530047900.git.balaton@eik.bme.hu>
+	<alpine.BSF.2.21.1806302231400.45338@zero.eik.bme.hu>
+	<CAFEAcA_ymngY5i5BWQ6-xAveCWjs0QKrORSAy9nH1A8m9672Fg@mail.gmail.com>
+	<20180703002815.GF3422@umbus.fritz.box>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Jul 2018 10:13:10 +0100
+Message-ID: <CAFEAcA9qTxmHPffpjvZ=bgyaAYZivJd--3wEWFxk+UdABkyt3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] Misc sm501 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, dgilbert@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, QEMU Developers <qemu-devel@nongnu.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, Philippe Mathieu-Daude <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Tue, Jul 03, 2018 at 08:14:35AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
->=20
-> > On Mon, Jul 02, 2018 at 06:21:53PM +0200, Markus Armbruster wrote:
-> >> Commit cf869d53172 "qmp: support out-of-band (oob) execution" made
-> >> "id" mandatory for all commands when the client accepted capability
-> >> "oob".  This is rather onerous when you play with QMP by hand, and
-> >> unnecessarily so: only out-of-band commands need an ID for reliable
-> >> matching of response to command.
-> >>=20
-> >> Revert that part of commit cf869d53172 for now.  We may still make
-> >> "id" mandatory for out-of-band commands.
-> >
-> > This change should be okay with current implementation when
-> > out-of-band commands are still in order themselves, though I'm still
-> > not that confident on whether we really want this change if only for
-> > the sake of easier usage for human beings.
-> >
-> > If we see Libvirt, the real player for QMP - it has the "id" field
-> > even for in-band commands always.  I'd say the "id" field is really
-> > helpful for machines, though not that friendly to us.
-> >
-> > Basically I'll read it as: machines like "id"s, humans hate "id"s.
-> > And QMP is Qemu Machine Protocol after all... so not sure whether
-> > it'll be good we change that for us humans.
->=20
-> "id" being optional doesn't hurt libvirt in any way.  Thus, I see no
-> need to inconvenience humans.
->=20
-> Daniel has argued[*] for making "id" mandatory with OOB commands.  I'm
-> not rejecting that argument.  But I needed to get this out in a hurry,
-> and simply reverting something is quicker than debating and implementin=
-g
-> an improvement.  There's still time to tweak this before the release.
+On 3 July 2018 at 01:28, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Mon, Jul 02, 2018 at 10:42:07AM +0100, Peter Maydell wrote:
+>> I can have a look, but really I think these should go via the
+>> ppc tree -- the device is used in a ppc machine and an sh4 one,
+>> and the ppc tree is much more active than sh4.
+>
+> Hm, well, if you like.  Although the gradual creep of my
+> maintainership scope into things I know less and less about makes me
+> rather nervous.  I tried to convince Balaton Zoltan to become sm501
+> maintainer, but he didn't bite.
 
-I'm fine with this - I agree that it is more important to avoid creating
-a regression, than to enforce "id" for OOB. We've still documented that
-OOB will require "id", so it would not be a surprise once we enforce it
-later.=20
+It's not like I know anything more about the sm501 than you do :-)
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+The arm parts of the tree have a lot of board and device code
+I'm not familiar with either. Generally the approach I use is:
+ * eyeball the code to see if it's doing anything that looks
+   "obviously wrong", failing to use correct QEMU APIs, etc
+ * anything that touches 'core' code or code common to multiple
+   machines gets closer scrutiny
+ * I might check the data sheet if I'm feeling enthusastic or
+   if the code looks like it's doing weird things, but often
+   not, especially if the code has had review from somebody else
+ * if I have a test image to hand I'll do a smoke test, but often
+   I don't have a test image
 
+Basically I think the important thing is to make sure the
+codebase stays maintainable and generally the quality bar
+in terms of using the right APIs and design approaches
+tends to ratchet up rather than down. If our implementation
+of an obscure device isn't actually right, that doesn't
+really affect very many users, so I worry less about that
+side of things.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+thanks
+-- PMM
