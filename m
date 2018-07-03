@@ -1,16 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faAGJ-0004nX-M8
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:49 -0400
+	(envelope-from <famz@redhat.com>) id 1faAPZ-0002MB-Jd
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:47:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faAGH-0005Bw-94
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:47 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon,  2 Jul 2018 20:37:28 -0500
-Message-Id: <20180703013730.55375-5-eblake@redhat.com>
-In-Reply-To: <20180703013730.55375-1-eblake@redhat.com>
-References: <20180703013730.55375-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 4/6] iotests: add 222 to test basic fleecing
+	(envelope-from <famz@redhat.com>) id 1faAPW-00035x-Ej
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:47:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37498 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1faAPW-000353-1O
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:47:18 -0400
+Date: Tue, 3 Jul 2018 09:47:14 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180703014714.GC485@lemon.usersys.redhat.com>
+References: <20180628153535.1411-1-f4bug@amsat.org>
+	<20180628153535.1411-2-f4bug@amsat.org>
+	<20180702071205.GI26002@lemon.usersys.redhat.com>
+	<beca5523-ea92-6c2b-c931-6b3523f18460@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <beca5523-ea92-6c2b-c931-6b3523f18460@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] tests/vm: Support proxy / corporate
+ firewall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,265 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-From: John Snow <jsnow@redhat.com>
+On Mon, 07/02 12:11, Philippe Mathieu-Daud=E9 wrote:
+> Hi Fam,
+>=20
+> On 07/02/2018 04:12 AM, Fam Zheng wrote:
+> > On Thu, 06/28 12:35, Philippe Mathieu-Daud=E9 wrote:
+> >> If ftp_proxy/http_proxy/https_proxy standard environment variables
+> >> are available, pass them to the vm images.
+> >>
+> >> As per 06cc3551714:
+> >> This is required when building behind corporate proxy/firewall, but
+> >> also help when using local cache server (ie: apt/yum).
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >> ---
+> >>  tests/vm/ubuntu.i386 | 4 ++++
+> >>  1 file changed, 4 insertions(+)
+> >>
+> >> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+> >> index fc319e0e6e..be16ceed50 100755
+> >> --- a/tests/vm/ubuntu.i386
+> >> +++ b/tests/vm/ubuntu.i386
+> >> @@ -68,6 +68,10 @@ class UbuntuX86VM(basevm.BaseVM):
+> >>          self.boot(img_tmp, extra_args =3D ["-cdrom", self._gen_clou=
+d_init_iso()])
+> >>          self.wait_ssh()
+> >>          self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+> >> +        for k, v in os.environ.iteritems():
+> >> +            kl =3D k.lower()
+> >> +            if kl in ['ftp_proxy', 'http_proxy', 'https_proxy']:
+> >> +                self.ssh_root_check("echo 'Acquire::{}::Proxy \"{}\=
+";' >> /etc/apt/apt.conf.d/01proxy".format(kl[:-6].upper(), v))
+> >=20
+> > Reasonable, but do we want it for other apps and images? How about se=
+tting these
+> > env vars to ssh commands?
+>=20
+> I see 2 different network usages:
+>=20
+> 1/ how the guest connect to the outer world, this goes via the firewall=
+.
+> Here the change only affects apt* based commands (via the apt.conf file=
+).
+> Do we have other commands requiring network connectivity? If we have,
+> then yes, we should add the same env vars in the guest.
+> One case I think of is "git submodule init" calling "git clone".
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Message-Id: <20180702194630.9360-3-jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/222     | 155 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/222.out |  67 ++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 223 insertions(+)
- create mode 100644 tests/qemu-iotests/222
- create mode 100644 tests/qemu-iotests/222.out
+Yes, I think this case is what we are looking at here. But this patch is =
+very
+specific: it only affects one command in one VM, albeit we don't have man=
+y.
+Doing this means we'll need to specially open code tests/vm/fedora,
+tests/vm/debian, or any other images we introduce later, to be consistent=
+ with
+ubuntu.i386. It is a poor way to do this, IMO.
 
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-new file mode 100644
-index 00000000000..ff3bfc14701
---- /dev/null
-+++ b/tests/qemu-iotests/222
-@@ -0,0 +1,155 @@
-+#!/usr/bin/env python
-+#
-+# This test covers the basic fleecing workflow, which provides a
-+# point-in-time snapshot of a node that can be queried over NBD.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+# John helped, too.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: John Snow <jsnow@redhat.com>
-+
-+import iotests
-+from iotests import log, qemu_img, qemu_io, qemu_io_silent
-+
-+iotests.verify_platform(['linux'])
-+
-+patterns = [("0x5d", "0",         "64k"),
-+            ("0xd5", "1M",        "64k"),
-+            ("0xdc", "32M",       "64k"),
-+            ("0xcd", "0x3ff0000", "64k")]  # 64M - 64K
-+
-+overwrite = [("0xab", "0",         "64k"), # Full overwrite
-+             ("0xad", "0x00f8000", "64k"), # Partial-left (1M-32K)
-+             ("0x1d", "0x2008000", "64k"), # Partial-right (32M+32K)
-+             ("0xea", "0x3fe0000", "64k")] # Adjacent-left (64M - 128K)
-+
-+zeroes = [("0", "0x00f8000", "32k"), # Left-end of partial-left (1M-32K)
-+          ("0", "0x2010000", "32k"), # Right-end of partial-right (32M+64K)
-+          ("0", "0x3fe0000", "64k")] # overwrite[3]
-+
-+remainder = [("0xd5", "0x108000",  "32k"), # Right-end of partial-left [1]
-+             ("0xdc", "32M",       "32k"), # Left-end of partial-right [2]
-+             ("0xcd", "0x3ff0000", "64k")] # patterns[3]
-+
-+with iotests.FilePath('base.img') as base_img_path, \
-+     iotests.FilePath('fleece.img') as fleece_img_path, \
-+     iotests.FilePath('nbd.sock') as nbd_sock_path, \
-+     iotests.VM() as vm:
-+
-+    log('--- Setting up images ---')
-+    log('')
-+
-+    assert qemu_img('create', '-f', iotests.imgfmt, base_img_path, '64M') == 0
-+    assert qemu_img('create', '-f', "qcow2", fleece_img_path, '64M') == 0
-+
-+    for p in patterns:
-+        qemu_io('-f', iotests.imgfmt,
-+                '-c', 'write -P%s %s %s' % p, base_img_path)
-+
-+    log('Done')
-+
-+    log('')
-+    log('--- Launching VM ---')
-+    log('')
-+
-+    vm.add_drive(base_img_path)
-+    vm.launch()
-+    log('Done')
-+
-+    log('')
-+    log('--- Setting up Fleecing Graph ---')
-+    log('')
-+
-+    src_node = "drive0"
-+    tgt_node = "fleeceNode"
-+
-+    # create tgt_node backed by src_node
-+    log(vm.qmp("blockdev-add", **{
-+        "driver": "qcow2",
-+        "node-name": tgt_node,
-+        "file": {
-+            "driver": "file",
-+            "filename": fleece_img_path,
-+        },
-+        "backing": src_node,
-+    }))
-+
-+    # Establish COW from source to fleecing node
-+    log(vm.qmp("blockdev-backup",
-+               device=src_node,
-+               target=tgt_node,
-+               sync="none"))
-+
-+    log('')
-+    log('--- Setting up NBD Export ---')
-+    log('')
-+
-+    nbd_uri = 'nbd+unix:///%s?socket=%s' % (tgt_node, nbd_sock_path)
-+    log(vm.qmp("nbd-server-start",
-+               **{"addr": { "type": "unix",
-+                            "data": { "path": nbd_sock_path } } }))
-+
-+    log(vm.qmp("nbd-server-add", device=tgt_node))
-+
-+    log('')
-+    log('--- Sanity Check ---')
-+    log('')
-+
-+    for p in (patterns + zeroes):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-+
-+    log('')
-+    log('--- Testing COW ---')
-+    log('')
-+
-+    for p in overwrite:
-+        cmd = "write -P%s %s %s" % p
-+        log(cmd)
-+        log(vm.hmp_qemu_io(src_node, cmd))
-+
-+    log('')
-+    log('--- Verifying Data ---')
-+    log('')
-+
-+    for p in (patterns + zeroes):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
-+
-+    log('')
-+    log('--- Cleanup ---')
-+    log('')
-+
-+    log(vm.qmp('block-job-cancel', device=src_node))
-+    log(vm.event_wait('BLOCK_JOB_CANCELLED'),
-+        filters=[iotests.filter_qmp_event])
-+    log(vm.qmp('nbd-server-stop'))
-+    log(vm.qmp('blockdev-del', node_name=tgt_node))
-+    vm.shutdown()
-+
-+    log('')
-+    log('--- Confirming writes ---')
-+    log('')
-+
-+    for p in (overwrite + remainder):
-+        cmd = "read -P%s %s %s" % p
-+        log(cmd)
-+        assert qemu_io_silent(base_img_path, '-c', cmd) == 0
-+
-+    log('')
-+    log('Done')
-diff --git a/tests/qemu-iotests/222.out b/tests/qemu-iotests/222.out
-new file mode 100644
-index 00000000000..48f336a02b5
---- /dev/null
-+++ b/tests/qemu-iotests/222.out
-@@ -0,0 +1,67 @@
-+--- Setting up images ---
-+
-+Done
-+
-+--- Launching VM ---
-+
-+Done
-+
-+--- Setting up Fleecing Graph ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Setting up NBD Export ---
-+
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Sanity Check ---
-+
-+read -P0x5d 0 64k
-+read -P0xd5 1M 64k
-+read -P0xdc 32M 64k
-+read -P0xcd 0x3ff0000 64k
-+read -P0 0x00f8000 32k
-+read -P0 0x2010000 32k
-+read -P0 0x3fe0000 64k
-+
-+--- Testing COW ---
-+
-+write -P0xab 0 64k
-+{u'return': u''}
-+write -P0xad 0x00f8000 64k
-+{u'return': u''}
-+write -P0x1d 0x2008000 64k
-+{u'return': u''}
-+write -P0xea 0x3fe0000 64k
-+{u'return': u''}
-+
-+--- Verifying Data ---
-+
-+read -P0x5d 0 64k
-+read -P0xd5 1M 64k
-+read -P0xdc 32M 64k
-+read -P0xcd 0x3ff0000 64k
-+read -P0 0x00f8000 32k
-+read -P0 0x2010000 32k
-+read -P0 0x3fe0000 64k
-+
-+--- Cleanup ---
-+
-+{u'return': {}}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'backup', u'speed': 0, u'len': 67108864, u'offset': 393216}, u'event': u'BLOCK_JOB_CANCELLED'}
-+{u'return': {}}
-+{u'return': {}}
-+
-+--- Confirming writes ---
-+
-+read -P0xab 0 64k
-+read -P0xad 0x00f8000 64k
-+read -P0x1d 0x2008000 64k
-+read -P0xea 0x3fe0000 64k
-+read -P0xd5 0x108000 32k
-+read -P0xdc 32M 32k
-+read -P0xcd 0x3ff0000 64k
-+
-+Done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index eea75819d2a..8019a9f721f 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -220,3 +220,4 @@
- 218 rw auto quick
- 219 rw auto
- 221 rw auto quick
-+222 rw auto quick
--- 
-2.14.4
+What I mean is, can we do it more generically? Like setting the env var i=
+n guest
+/etc/profile or change BaseVM._ssh_do() to inject env vars:
+
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 3643117816..94501e7dc7 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -106,7 +106,9 @@ class BaseVM(object):
+         if interactive:
+             ssh_cmd +=3D ['-t']
+         assert not isinstance(cmd, str)
+-        ssh_cmd +=3D ["%s@127.0.0.1" % user] + list(cmd)
++        env =3D ["%s=3D%s" % (k, v) for k, v in os.environ.items() if k =
+in \
++                ["ftp_proxy", "http_proxy", "https_proxy"]]
++        ssh_cmd +=3D ["%s@127.0.0.1" % user] + env + list(cmd)
+         logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+         r =3D subprocess.call(ssh_cmd)
+         if check and r !=3D 0:
