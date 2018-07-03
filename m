@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4Z-0001Rn-6r
+	(envelope-from <armbru@redhat.com>) id 1faH4Z-0001Ro-CO
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faH4X-0007GF-3B
+	(envelope-from <armbru@redhat.com>) id 1faH4W-0007FB-D6
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52206 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51404 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4W-0007Fh-UZ
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:05 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faH4W-0007ES-87
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:54:04 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 10:53:44 +0200
-Message-Id: <20180703085358.13941-19-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 10:53:48 +0200
+Message-Id: <20180703085358.13941-23-armbru@redhat.com>
 In-Reply-To: <20180703085358.13941-1-armbru@redhat.com>
 References: <20180703085358.13941-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 18/32] qmp: Don't let JSON errors jump the
- queue
+Subject: [Qemu-devel] [PATCH v2 22/32] qmp: De-duplicate error response
+ building
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +27,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peterx@redhat.com, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
 
-handle_qmp_command() reports JSON syntax errors right away.  This is
-wrong when OOB is enabled, because the errors can "jump the queue"
-then.
-
-The previous commit fixed the same bug for semantic errors, by
-delaying the checking until dispatch.  We can't delay the checking, so
-delay the reporting.
+All callers of qmp_build_error_object() duplicate the code to wrap it
+in a response object.  Replace it by qmp_error_response() that
+captures the duplicated code, including error_free().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- monitor.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ include/qapi/qmp/dispatch.h |  2 +-
+ monitor.c                   |  7 +------
+ qapi/qmp-dispatch.c         | 20 +++++++++++---------
+ qga/main.c                  |  8 ++------
+ 4 files changed, 15 insertions(+), 22 deletions(-)
 
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 514bfc45b0..a53e11c9b1 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -47,7 +47,7 @@ void qmp_enable_command(QmpCommandList *cmds, const char *name);
+ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+-QObject *qmp_build_error_object(Error *err);
++QDict *qmp_error_response(Error *err);
+ QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+                       bool allow_oob);
+ bool qmp_is_oob(QDict *dict);
 diff --git a/monitor.c b/monitor.c
-index 7a80e58bf2..fd83a57dda 100644
+index ef19562f65..db85cd0a57 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -253,8 +253,12 @@ struct QMPRequest {
-     Monitor *mon;
-     /* "id" field of the request */
-     QObject *id;
--    /* Request object to be handled */
-+    /*
-+     * Request object to be handled or Error to be reported
-+     * (exactly one of them is non-null)
-+     */
-     QObject *req;
-+    Error *err;
-     /*
-      * Whether we need to resume the monitor afterward.  This flag is
-      * used to emulate the old QMP server behavior that the current
-@@ -359,6 +363,7 @@ static void qmp_request_free(QMPRequest *req)
+@@ -4106,14 +4106,9 @@ static int monitor_can_read(void *opaque)
+ static void monitor_qmp_respond(Monitor *mon, QObject *rsp,
+                                 Error *err, QObject *id)
  {
-     qobject_unref(req->id);
-     qobject_unref(req->req);
-+    error_free(req->err);
-     g_free(req);
+-    QDict *qdict = NULL;
+-
+     if (err) {
+         assert(!rsp);
+-        qdict = qdict_new();
+-        qdict_put_obj(qdict, "error", qmp_build_error_object(err));
+-        error_free(err);
+-        rsp = QOBJECT(qdict);
++        rsp = QOBJECT(qmp_error_response(err));
+     }
+ 
+     if (rsp) {
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 6d78f3e9f6..c85748a33f 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -141,11 +141,15 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+     return ret;
  }
  
-@@ -4198,8 +4203,14 @@ static void monitor_qmp_bh_dispatcher(void *data)
-         return;
-     }
- 
--    trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
--    monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
-+    if (req_obj->req) {
-+        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
-+        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
-+    } else {
-+        assert(req_obj->err);
-+        monitor_qmp_respond(req_obj->mon, NULL, req_obj->err, NULL);
-+    }
+-QObject *qmp_build_error_object(Error *err)
++QDict *qmp_error_response(Error *err)
+ {
+-    return qobject_from_jsonf("{ 'class': %s, 'desc': %s }",
+-                              QapiErrorClass_str(error_get_class(err)),
+-                              error_get_pretty(err));
++    QDict *rsp;
 +
-     if (req_obj->need_resume) {
-         /* Pairs with the monitor_suspend() in handle_qmp_command() */
-         monitor_resume(req_obj->mon);
-@@ -4226,11 +4237,6 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         /* json_parser_parse_err() sucks: can fail without setting @err */
-         error_setg(&err, QERR_JSON_PARSING);
++    rsp = qdict_from_jsonf_nofail("{ 'error': { 'class': %s, 'desc': %s } }",
++                                  QapiErrorClass_str(error_get_class(err)),
++                                  error_get_pretty(err));
++    error_free(err);
++    return rsp;
+ }
+ 
+ /*
+@@ -166,15 +170,13 @@ QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+ 
+     ret = do_qmp_dispatch(cmds, request, allow_oob, &err);
+ 
+-    rsp = qdict_new();
+     if (err) {
+-        qdict_put_obj(rsp, "error", qmp_build_error_object(err));
+-        error_free(err);
++        rsp = qmp_error_response(err);
+     } else if (ret) {
++        rsp = qdict_new();
+         qdict_put_obj(rsp, "return", ret);
+     } else {
+-        qobject_unref(rsp);
+-        return NULL;
++        rsp = NULL;
      }
--    if (err) {
--        assert(!req);
--        monitor_qmp_respond(mon, NULL, err, NULL);
--        return;
--    }
  
-     qdict = qobject_to(QDict, req);
-     if (qdict) {
-@@ -4256,6 +4262,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-     req_obj->mon = mon;
-     req_obj->id = id;
-     req_obj->req = req;
-+    req_obj->err = err;
-     req_obj->need_resume = false;
+     return QOBJECT(rsp);
+diff --git a/qga/main.c b/qga/main.c
+index d332bacce5..0e30e30248 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -610,15 +610,13 @@ static void process_event(JSONMessageParser *parser, GQueue *tokens)
+     qdict = qobject_to(QDict, json_parser_parse_err(tokens, NULL, &err));
+     if (err || !qdict) {
+         qobject_unref(qdict);
+-        qdict = qdict_new();
+         if (!err) {
+             g_warning("failed to parse event: unknown error");
+             error_setg(&err, QERR_JSON_PARSING);
+         } else {
+             g_warning("failed to parse event: %s", error_get_pretty(err));
+         }
+-        qdict_put_obj(qdict, "error", qmp_build_error_object(err));
+-        error_free(err);
++        qdict = qmp_error_response(err);
+     }
  
-     /* Protect qmp_requests and fetching its length. */
+     /* handle host->guest commands */
+@@ -627,11 +625,9 @@ static void process_event(JSONMessageParser *parser, GQueue *tokens)
+     } else {
+         if (!qdict_haskey(qdict, "error")) {
+             qobject_unref(qdict);
+-            qdict = qdict_new();
+             g_warning("unrecognized payload format");
+             error_setg(&err, QERR_UNSUPPORTED);
+-            qdict_put_obj(qdict, "error", qmp_build_error_object(err));
+-            error_free(err);
++            qdict = qmp_error_response(err);
+         }
+         ret = send_response(s, QOBJECT(qdict));
+         if (ret < 0) {
 -- 
 2.17.1
