@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1faIwp-0003nb-Cz
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1faIyC-00053k-L3
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1faIwm-0005E0-8d
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:15 -0400
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:54092)
+	(envelope-from <bounces@canonical.com>) id 1faIy9-0005uS-Gu
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:55:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1faIwm-0005Cu-1g
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:54:12 -0400
-Received: by mail-wm0-f65.google.com with SMTP id b188-v6so1833331wme.3
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:54:11 -0700 (PDT)
-Date: Tue, 3 Jul 2018 12:54:08 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20180703125408.623d77fc@fiorina>
-In-Reply-To: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
-References: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1faIy9-0005tr-2G
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:55:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1faIy7-0000DG-K7
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 10:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 95AEE2E8197
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 10:55:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qga: report disk size and free space
+Date: Tue, 03 Jul 2018 10:47:12 -0000
+From: guysoft <guysoft@gmail.com>
+Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
+Message-Id: <153061483207.13595.4951189204262701.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
+ 6 when running lv2 plugin cross-compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +38,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Tue,  3 Jul 2018 10:31:20 +0200
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+Hey,
+So how do I enable -g option?
+The command that activates qemu is:
 
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 70ee5379f6..6d6ca05281 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -706,6 +706,22 @@ static GuestFilesystemInfo *build_guest_fsinfo(char =
-*guid, Error **errp)
->      }
->      fs->type =3D g_strdup(fs_name);
->      fs->disk =3D build_guest_disk_info(guid, errp);
-> +
-> +    if (len > 0) {
-> +        if (GetDiskFreeSpaceEx(mnt_point, 0, (PULARGE_INTEGER)&fs->size,
-> +                (PULARGE_INTEGER)&fs->free) !=3D 0) {
+sudo chroot .
 
-Btw, it seems to me that checkpatch.pl returns some false positives
-here. See:
+How do I set -g?
 
-    ERROR: spaces required around that '&' (ctx:VxV)                       =
-                                                                           =
-                         =20
-    #72: FILE: qga/commands-win32.c:711:
-    +        if (GetDiskFreeSpaceEx(mnt_point, 0, (PULARGE_INTEGER)&fs->siz=
-e,
-                                                                ^
+Also minor update - the new rasbian image (aka updated g++ libs) makes
+lv2_ttl_generator hang on:
 
-    ERROR: spaces required around that '&' (ctx:VxV)
-    #73: FILE: qga/commands-win32.c:712:
-    +                (PULARGE_INTEGER)&fs->free) !=3D 0) {
-                                    ^
+Writing drowaudio-flanger.ttl... done!
+Generate ttl data for './drowaudio-tremolo.so', basename: 'drowaudio-tremol=
+o'
 
-Seems that & is mistakenly interpreted as bitwise-AND operator.=20
-Or am I expected to format that as
+So definitely something is strange with how lv2_ttl_generator runs the
+.so files provided to it.
 
-  ..., (PULARGE_INTEGER) & fs->size, ...
+-- =
 
-because that looks... weird.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776478
+
+Title:
+  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
+  compilation
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hey,
+  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
+e lv2 audio plugins.
+
+  When running a compilation of DISTRHO-Ports we get:
+
+  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
+on `mutex->__data.__owner =3D=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
+$FILE
+  Makefile:62: recipe for target 'gen_lv2' failed
+  make[1]: *** [gen_lv2] Error 134
+  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
+  Makefile:104: recipe for target 'lv2' failed
+  make: *** [lv2] Error 2
+
+  =
+
+  lv2_ttl_generator source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
+or
+
+  The command that is ruining is
+  lv2_ttl_generator ./TAL-Filter-2.so =
 
 
-Also, checkpatch.pl itself suggest to look into MAINTAINERS to find out
-whom to report false positives, but there is no maintainer there. :)
+  And ./TAL-Filter-2.so source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
+ource
 
-    Tomas
 
+  Is there a way to debug what is going on?
+  This runs fine on a Raspberrypi which is armv7
 
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+  A workaround would also help.
+
+  =
+
+  Bug in Zynthian:
+  https://github.com/zynthian/zynthian-sys/issues/59
+  Bug in DISTRHO-Ports:
+  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+
+  Using qemu-arm-static version from master from two days ago:
+  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
+9ca52c327c6603d60db90ae4feeae719f7
+
+  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+
+  Thanks,
+  Guy
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
