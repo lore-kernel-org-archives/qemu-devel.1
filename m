@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faNLA-00012l-Ad
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:35:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1faNMz-0002Ml-7T
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faNL7-0002zA-8j
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:35:40 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37247)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faNL7-0002ym-3e
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:35:37 -0400
-Received: by mail-qt0-x241.google.com with SMTP id a18-v6so1932408qtj.4
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:35:37 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  3 Jul 2018 12:35:30 -0300
-Message-Id: <20180703153530.9330-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] docker: Update debootstrap script after Debian
- migration from Alioth to Salsa
+	(envelope-from <armbru@redhat.com>) id 1faNMx-0005Ib-1a
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52096 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMw-0005HK-TN
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7BD054075842
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:30 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
+	[10.36.116.126])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5785D2156880
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  3 Jul 2018 17:37:02 +0200
+Message-Id: <20180703153728.2175-7-armbru@redhat.com>
+In-Reply-To: <20180703153728.2175-1-armbru@redhat.com>
+References: <20180703153728.2175-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 06/32] tests/qmp-test: Test in-band command
+ doesn't overtake
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This silents the following warning:
-
-  Cloning into './debootstrap.git'...
-  warning: redirecting to https://salsa.debian.org/installer-team/debootstrap.git/
-
-See https://lists.debian.org/debian-devel-announce/2018/01/msg00004.html
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180703085358.13941-7-armbru@redhat.com>
 ---
- tests/docker/dockerfiles/debian-bootstrap.pre | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qmp-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
-index 7c76dce663..44b18db7a2 100755
---- a/tests/docker/dockerfiles/debian-bootstrap.pre
-+++ b/tests/docker/dockerfiles/debian-bootstrap.pre
-@@ -53,7 +53,7 @@ if [ -z $DEBOOTSTRAP_DIR ]; then
-         NEED_DEBOOTSTRAP=true
-     fi
-     if $NEED_DEBOOTSTRAP; then
--        DEBOOTSTRAP_SOURCE=https://anonscm.debian.org/git/d-i/debootstrap.git
-+        DEBOOTSTRAP_SOURCE=https://salsa.debian.org/installer-team/debootstrap.git
-         git clone ${DEBOOTSTRAP_SOURCE} ./debootstrap.git
-         export DEBOOTSTRAP_DIR=./debootstrap.git
-         DEBOOTSTRAP=./debootstrap.git/debootstrap
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 6dd331fcdd..d73730945a 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -239,10 +239,12 @@ static void test_qmp_oob(void)
+     /* OOB command overtakes slow in-band command */
+     setup_blocking_cmd();
+     send_cmd_that_blocks(qts, "ib-blocks-1");
++    qtest_async_qmp(qts, "{ 'execute': 'query-name', 'id': 'ib-quick-1' }");
+     send_oob_cmd_that_fails(qts, "oob-1");
+     recv_cmd_id(qts, "oob-1");
+     unblock_blocked_cmd();
+     recv_cmd_id(qts, "ib-blocks-1");
++    recv_cmd_id(qts, "ib-quick-1");
+     cleanup_blocking_cmd();
+ 
+     qtest_quit(qts);
 -- 
-2.18.0
+2.17.1
