@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxt-00083H-PT
+	(envelope-from <armbru@redhat.com>) id 1faSxu-000844-KC
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxq-00067d-Ji
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45970 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faSxr-00069b-LG
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32920 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxq-00066L-C2
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:58 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxr-00068b-FO
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:59 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CA7C0400589B
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E289381A4EAD
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BA5A20290AA
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:57 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B3D2320290AA
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 23:35:26 +0200
-Message-Id: <20180703213556.20619-3-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:34 +0200
+Message-Id: <20180703213556.20619-11-armbru@redhat.com>
 In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
 References: <20180703213556.20619-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/32] monitor: Spell "I/O thread"
- consistently in comments
+Subject: [Qemu-devel] [PULL v2 10/32] tests/test-qga: Demonstrate the
+ guest-agent ignores "control"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,138 +38,45 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-3-armbru@redhat.com>
+Message-Id: <20180703085358.13941-11-armbru@redhat.com>
 ---
- monitor.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ tests/test-qga.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/monitor.c b/monitor.c
-index 208d7c7cfd..4f4f309d45 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -243,7 +243,7 @@ struct Monitor {
- /* Let's add monitor global variables to this struct. */
- static struct {
-     IOThread *mon_iothread;
--    /* Bottom half to dispatch the requests received from IO thread */
-+    /* Bottom half to dispatch the requests received from I/O thread */
-     QEMUBH *qmp_dispatcher_bh;
-     /* Bottom half to deliver the responses back to clients */
-     QEMUBH *qmp_respond_bh;
-@@ -518,7 +518,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 564a4594b5..2e9e0f73bb 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -243,6 +243,22 @@ static void test_qga_invalid_id(gconstpointer fix)
+     qobject_unref(ret);
+ }
+ 
++static void test_qga_invalid_oob(gconstpointer fix)
++{
++    /* FIXME "control" is ignored; it should be rejected */
++    const TestFixture *fixture = fix;
++    QDict *ret;
++
++    ret = qmp_fd(fixture->fd, "{'execute': 'guest-ping',"
++                 " 'control': {'run-oob': true}}");
++    g_assert_nonnull(ret);
++    qmp_assert_no_error(ret);
++
++    qdict_get_qdict(ret, "return");
++
++    qobject_unref(ret);
++}
++
+ static void test_qga_invalid_args(gconstpointer fix)
  {
-     if (mon->use_io_thr) {
-         /*
--         * If using IO thread, we need to queue the item so that IO
-+         * If using I/O thread, we need to queue the item so that I/O
-          * thread will do the rest for us.  Take refcount so that
-          * caller won't free the data (which will be finally freed in
-          * responder thread).
-@@ -529,7 +529,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
-         qemu_bh_schedule(mon_global.qmp_respond_bh);
-     } else {
-         /*
--         * If not using monitor IO thread, then we are in main thread.
-+         * If not using monitor I/O thread, then we are in main thread.
-          * Do the emission right away.
-          */
-         monitor_json_emitter_raw(mon, data);
-@@ -1269,7 +1269,7 @@ static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
-             if (!mon->use_io_thr) {
-                 /*
-                  * Out-of-band only works with monitors that are
--                 * running on dedicated IOThread.
-+                 * running on dedicated I/O thread.
-                  */
-                 error_setg(errp, "This monitor does not support "
-                            "out-of-band (OOB)");
-@@ -4403,7 +4403,7 @@ int monitor_suspend(Monitor *mon)
- 
-     if (monitor_is_qmp(mon)) {
-         /*
--         * Kick iothread to make sure this takes effect.  It'll be
-+         * Kick I/O thread to make sure this takes effect.  It'll be
-          * evaluated again in prepare() of the watch object.
-          */
-         aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
-@@ -4422,7 +4422,7 @@ void monitor_resume(Monitor *mon)
-     if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
-         if (monitor_is_qmp(mon)) {
-             /*
--             * For QMP monitors that are running in IOThread, let's
-+             * For QMP monitors that are running in I/O thread, let's
-              * kick the thread in case it's sleeping.
-              */
-             if (mon->use_io_thr) {
-@@ -4446,7 +4446,7 @@ static QObject *get_qmp_greeting(Monitor *mon)
- 
-     for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
-         if (!mon->use_io_thr && cap == QMP_CAPABILITY_OOB) {
--            /* Monitors that are not using IOThread won't support OOB */
-+            /* Monitors that are not using I/O thread won't support OOB */
-             continue;
-         }
-         qlist_append_str(cap_list, QMPCapability_str(cap));
-@@ -4587,9 +4587,9 @@ static void monitor_iothread_init(void)
-                                               NULL);
- 
-     /*
--     * Unlike the dispatcher BH, this must be run on the monitor IO
--     * thread, so that monitors that are using IO thread will make
--     * sure read/write operations are all done on the IO thread.
-+     * Unlike the dispatcher BH, this must be run on the monitor I/O
-+     * thread, so that monitors that are using I/O thread will make
-+     * sure read/write operations are all done on the I/O thread.
-      */
-     mon_global.qmp_respond_bh = aio_bh_new(monitor_get_aio_context(),
-                                            monitor_qmp_bh_responder,
-@@ -4661,7 +4661,7 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
-     if (mon->use_io_thr) {
-         /*
-          * When use_io_thr is set, we use the global shared dedicated
--         * IO thread for this monitor to handle input/output.
-+         * I/O thread for this monitor to handle input/output.
-          */
-         context = monitor_get_io_context();
-         /* We should have inited globals before reaching here. */
-@@ -4718,7 +4718,7 @@ void monitor_init(Chardev *chr, int flags)
-             /*
-              * We can't call qemu_chr_fe_set_handlers() directly here
-              * since during the procedure the chardev will be active
--             * and running in monitor iothread, while we'll still do
-+             * and running in monitor I/O thread, while we'll still do
-              * something before returning from it, which is a possible
-              * race too.  To avoid that, we just create a BH to setup
-              * the handlers.
-@@ -4745,16 +4745,16 @@ void monitor_cleanup(void)
-     Monitor *mon, *next;
- 
-     /*
--     * We need to explicitly stop the iothread (but not destroy it),
--     * cleanup the monitor resources, then destroy the iothread since
-+     * We need to explicitly stop the I/O thread (but not destroy it),
-+     * cleanup the monitor resources, then destroy the I/O thread since
-      * we need to unregister from chardev below in
-      * monitor_data_destroy(), and chardev is not thread-safe yet
-      */
-     iothread_stop(mon_global.mon_iothread);
- 
-     /*
--     * After we have IOThread to send responses, it's possible that
--     * when we stop the IOThread there are still replies queued in the
-+     * After we have I/O thread to send responses, it's possible that
-+     * when we stop the I/O thread there are still replies queued in the
-      * responder queue.  Flush all of them.  Note that even after this
-      * flush it's still possible that out buffer is not flushed.
-      * It'll be done in below monitor_flush() as the last resort.
-@@ -4770,7 +4770,7 @@ void monitor_cleanup(void)
-     }
-     qemu_mutex_unlock(&monitor_lock);
- 
--    /* QEMUBHs needs to be deleted before destroying the IOThread. */
-+    /* QEMUBHs needs to be deleted before destroying the I/O thread */
-     qemu_bh_delete(mon_global.qmp_dispatcher_bh);
-     mon_global.qmp_dispatcher_bh = NULL;
-     qemu_bh_delete(mon_global.qmp_respond_bh);
+     const TestFixture *fixture = fix;
+@@ -951,6 +967,7 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/qga/file-write-read", &fix, test_qga_file_write_read);
+     g_test_add_data_func("/qga/get-time", &fix, test_qga_get_time);
+     g_test_add_data_func("/qga/invalid-id", &fix, test_qga_invalid_id);
++    g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob);
+     g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd);
+     g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_args);
+     g_test_add_data_func("/qga/fsfreeze-status", &fix,
 -- 
 2.17.1
