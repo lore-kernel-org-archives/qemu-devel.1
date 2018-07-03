@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faMm8-0008Vt-Qq
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:59:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1faMmG-0000Gm-Fh
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faMm7-00054A-Ha
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:59:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1faMmB-000564-LF
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:59:36 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  3 Jul 2018 16:59:13 +0200
-Message-Id: <20180703145915.32607-4-kwolf@redhat.com>
-In-Reply-To: <20180703145915.32607-1-kwolf@redhat.com>
-References: <20180703145915.32607-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 3/5] qcow2: add compress threads
+Date: Tue,  3 Jul 2018 16:59:10 +0200
+Message-Id: <20180703145915.32607-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 0/5] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,126 +20,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The following changes since commit a395717cbd26e7593d3c3fe81faca121ec6d13e8:
 
-Do data compression in separate threads. This significantly improve
-performance for qemu-img convert with -W (allow async writes) and -c
-(compressed) options.
+  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-07-03 11:49:51 +0100)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qcow2.h |  3 +++
- block/qcow2.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 64 insertions(+), 1 deletion(-)
+are available in the git repository at:
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1c9c0d3631..d6aca687d6 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -326,6 +326,9 @@ typedef struct BDRVQcow2State {
-      * override) */
-     char *image_backing_file;
-     char *image_backing_format;
-+
-+    CoQueue compress_wait_queue;
-+    int nb_compress_threads;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 67f4fb7c71..327685a2f9 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -44,6 +44,7 @@
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "crypto.h"
-+#include "block/thread-pool.h"
- 
- /*
-   Differences with QCOW:
-@@ -1544,6 +1545,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         qcow2_check_refcounts(bs, &result, 0);
-     }
- #endif
-+
-+    qemu_co_queue_init(&s->compress_wait_queue);
-+
-     return ret;
- 
-  fail:
-@@ -3693,6 +3697,62 @@ static ssize_t qcow2_compress(void *dest, const void *src, size_t size)
-     return ret;
- }
- 
-+#define MAX_COMPRESS_THREADS 4
-+
-+typedef struct Qcow2CompressData {
-+    void *dest;
-+    const void *src;
-+    size_t size;
-+    ssize_t ret;
-+} Qcow2CompressData;
-+
-+static int qcow2_compress_pool_func(void *opaque)
-+{
-+    Qcow2CompressData *data = opaque;
-+
-+    data->ret = qcow2_compress(data->dest, data->src, data->size);
-+
-+    return 0;
-+}
-+
-+static void qcow2_compress_complete(void *opaque, int ret)
-+{
-+    qemu_coroutine_enter(opaque);
-+}
-+
-+/* See qcow2_compress definition for parameters description */
-+static ssize_t qcow2_co_compress(BlockDriverState *bs,
-+                                 void *dest, const void *src, size_t size)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    BlockAIOCB *acb;
-+    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
-+    Qcow2CompressData arg = {
-+        .dest = dest,
-+        .src = src,
-+        .size = size,
-+    };
-+
-+    while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
-+        qemu_co_queue_wait(&s->compress_wait_queue, NULL);
-+    }
-+
-+    s->nb_compress_threads++;
-+    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
-+                                 qcow2_compress_complete,
-+                                 qemu_coroutine_self());
-+
-+    if (!acb) {
-+        s->nb_compress_threads--;
-+        return -EINVAL;
-+    }
-+    qemu_coroutine_yield();
-+    s->nb_compress_threads--;
-+    qemu_co_queue_next(&s->compress_wait_queue);
-+
-+    return arg.ret;
-+}
-+
- /* XXX: put compressed sectors first, then all the cluster aligned
-    tables to avoid losing bytes in alignment */
- static coroutine_fn int
-@@ -3737,7 +3797,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
- 
-     out_buf = g_malloc(s->cluster_size);
- 
--    out_len = qcow2_compress(out_buf, buf, s->cluster_size);
-+    out_len = qcow2_co_compress(bs, out_buf, buf, s->cluster_size);
-     if (out_len == -2) {
-         ret = -EINVAL;
-         goto fail;
--- 
-2.13.6
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to 59738025a1674bb7e07713c3c93ff4fb9c5079f5:
+
+  block: Add blklogwrites (2018-07-03 16:09:48 +0200)
+
+----------------------------------------------------------------
+Block layer patches:
+
+- qcow2: Use worker threads for compression to improve performance of
+  'qemu-img convert -W' and compressed backup jobs
+- blklogwrites: New filter driver to log write requests to an image in
+  the dm-log-writes format
+
+----------------------------------------------------------------
+Aapo Vienamo (1):
+      block: Add blklogwrites
+
+Ari Sundholm (1):
+      block: Move two block permission constants to the relevant enum
+
+Vladimir Sementsov-Ogievskiy (3):
+      qemu-img: allow compressed not-in-order writes
+      qcow2: refactor data compression
+      qcow2: add compress threads
+
+ qapi/block-core.json  |  33 ++++-
+ block/qcow2.h         |   3 +
+ include/block/block.h |   7 +
+ block.c               |   6 -
+ block/blklogwrites.c  | 392 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c         | 136 ++++++++++++++----
+ qemu-img.c            |   5 -
+ MAINTAINERS           |   6 +
+ block/Makefile.objs   |   1 +
+ 9 files changed, 545 insertions(+), 44 deletions(-)
+ create mode 100644 block/blklogwrites.c
