@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfx-0002D7-18
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:10 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfz-0002F2-UH
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1faNfu-0003Wp-BE
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53150 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faNft-0003Wb-VK
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36428 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1faNfu-0003WS-5D
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:06 -0400
+	id 1faNft-0003WH-Qe
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:57:05 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AA97840780F8
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 36170401D79C
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:57:01 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jul 2018 17:56:43 +0200
-Message-Id: <20180703155648.11933-10-marcandre.lureau@redhat.com>
+Date: Tue,  3 Jul 2018 17:56:40 +0200
+Message-Id: <20180703155648.11933-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 References: <20180703155648.11933-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 09/14] qapi/commands: add #if conditions to
- commands
+Subject: [Qemu-devel] [PATCH v7 06/14] qapi: add #if/#endif helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +36,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Wrap generated code with #if/#endif using an 'ifcontext' on
-QAPIGenCSnippet objects.
+Add helpers to wrap generated code with #if/#endif lines.
+
+A later patch wants to use QAPIGen for generating C snippets rather
+than full C files with copyright headers etc.  Splice in class
+QAPIGenCCode between QAPIGen and QAPIGenC.
+
+Add a 'with' statement context manager that will be used to wrap
+generator visitor methods.  The manager will check if code was
+generated before adding #if/#endif lines on QAPIGenCSnippet
+objects. Used in the following patches.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/commands.py | 26 +++++++++++++++++---------
- tests/test-qmp-cmds.c    |  4 ++--
- 2 files changed, 19 insertions(+), 11 deletions(-)
+ scripts/qapi/common.py | 98 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 94 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index dcc03c7859..0c9e321179 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -239,7 +239,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
-isitor):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-commands',
-             ' * Schema-defined QAPI/QMP commands', __doc__)
--        self._regy =3D ''
-+        self._regy =3D QAPIGenCCode()
-         self._visited_ret_types =3D {}
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 1b56065a80..9230a2a3e8 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -12,6 +12,7 @@
+ # See the COPYING file in the top-level directory.
 =20
-     def _begin_module(self, name):
-@@ -275,20 +275,28 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModular=
-CVisitor):
- void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
- ''',
-                        c_prefix=3Dc_name(self._prefix, protect=3DFalse))=
-)
--        genc.add(gen_registry(self._regy, self._prefix))
-+        genc.add(gen_registry(self._regy.get_content(), self._prefix))
-=20
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-                       success_response, boxed, allow_oob, allow_preconfi=
-g):
-         if not gen:
-             return
--        self._genh.add(gen_command_decl(name, arg_type, boxed, ret_type)=
-)
--        if ret_type and ret_type not in self._visited_ret_types[self._ge=
-nc]:
-+        # FIXME: If T is a user-defined type, the user is responsible
-+        # for making this work, i.e. to make T's condition the
-+        # conjunction of the T-returning commands' conditions.  If T
-+        # is a built-in type, this isn't possible: the
-+        # qmp_marshal_output_T() will be generated unconditionally.
-+        if (ret_type and
-+            ret_type not in self._visited_ret_types[self._genc]):
-             self._visited_ret_types[self._genc].add(ret_type)
--            self._genc.add(gen_marshal_output(ret_type))
--        self._genh.add(gen_marshal_decl(name))
--        self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
--        self._regy +=3D gen_register_command(name, success_response, all=
-ow_oob,
--                                           allow_preconfig)
-+            with ifcontext(ret_type.ifcond, self._genh, self._genc, self=
-._regy):
-+                self._genc.add(gen_marshal_output(ret_type))
-+        with ifcontext(ifcond, self._genh, self._genc, self._regy):
-+            self._genh.add(gen_command_decl(name, arg_type, boxed, ret_t=
-ype))
-+            self._genh.add(gen_marshal_decl(name))
-+            self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
-+            self._regy.add(gen_register_command(name, success_response,
-+                                                allow_oob, allow_preconf=
-ig))
+ from __future__ import print_function
++from contextlib import contextmanager
+ import errno
+ import os
+ import re
+@@ -1974,6 +1975,40 @@ def guardend(name):
+                  name=3Dguardname(name))
 =20
 =20
- def gen_commands(schema, output_dir, prefix):
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 840530b84c..ce277c9c3b 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -12,12 +12,12 @@
++def gen_if(ifcond):
++    ret =3D ''
++    for ifc in ifcond:
++        ret +=3D mcgen('''
++#if %(cond)s
++''', cond=3Difc)
++    return ret
++
++
++def gen_endif(ifcond):
++    ret =3D ''
++    for ifc in reversed(ifcond):
++        ret +=3D mcgen('''
++#endif /* %(cond)s */
++''', cond=3Difc)
++    return ret
++
++
++def _wrap_ifcond(ifcond, before, after):
++    if before =3D=3D after:
++        return after   # suppress empty #if ... #endif
++
++    assert after.startswith(before)
++    out =3D before
++    added =3D after[len(before):]
++    if added[0] =3D=3D '\n':
++        out +=3D '\n'
++        added =3D added[1:]
++    out +=3D gen_if(ifcond)
++    out +=3D added
++    out +=3D gen_endif(ifcond)
++    return out
++
++
+ def gen_enum_lookup(name, values, prefix=3DNone):
+     ret =3D mcgen('''
 =20
- static QmpCommandList qmp_commands;
+@@ -2071,6 +2106,10 @@ class QAPIGen(object):
+     def add(self, text):
+         self._body +=3D text
 =20
--/* #if defined(TEST_IF_STRUCT) && defined(TEST_IF_CMD) */
-+#if defined(TEST_IF_STRUCT) && defined(TEST_IF_CMD)
- UserDefThree *qmp_TestIfCmd(TestIfStruct *foo, Error **errp)
- {
-     return NULL;
- }
--/* #endif */
-+#endif
++    def get_content(self, fname=3DNone):
++        return (self._top(fname) + self._preamble + self._body
++                + self._bottom(fname))
++
+     def _top(self, fname):
+         return ''
 =20
- UserDefThree *qmp_TestCmdReturnDefThree(Error **errp)
- {
+@@ -2091,8 +2130,7 @@ class QAPIGen(object):
+             f =3D open(fd, 'r+', encoding=3D'utf-8')
+         else:
+             f =3D os.fdopen(fd, 'r+')
+-        text =3D (self._top(fname) + self._preamble + self._body
+-                + self._bottom(fname))
++        text =3D self.get_content(fname)
+         oldtext =3D f.read(len(text) + 1)
+         if text !=3D oldtext:
+             f.seek(0)
+@@ -2101,10 +2139,62 @@ class QAPIGen(object):
+         f.close()
+=20
+=20
+-class QAPIGenC(QAPIGen):
++@contextmanager
++def ifcontext(ifcond, *args):
++    """A 'with' statement context manager to wrap with start_if()/end_if=
+()
+=20
+-    def __init__(self, blurb, pydoc):
++    *args: any number of QAPIGenCCode
++
++    Example::
++
++        with ifcontext(ifcond, self._genh, self._genc):
++            modify self._genh and self._genc ...
++
++    Is equivalent to calling::
++
++        self._genh.start_if(ifcond)
++        self._genc.start_if(ifcond)
++        modify self._genh and self._genc ...
++        self._genh.end_if()
++        self._genc.end_if()
++    """
++    for arg in args:
++        arg.start_if(ifcond)
++    yield
++    for arg in args:
++        arg.end_if()
++
++
++class QAPIGenCCode(QAPIGen):
++
++    def __init__(self):
+         QAPIGen.__init__(self)
++        self._start_if =3D None
++
++    def start_if(self, ifcond):
++        assert self._start_if is None
++        self._start_if =3D (ifcond, self._body, self._preamble)
++
++    def end_if(self):
++        assert self._start_if
++        self._wrap_ifcond()
++        self._start_if =3D None
++
++    def _wrap_ifcond(self):
++        self._body =3D _wrap_ifcond(self._start_if[0],
++                                  self._start_if[1], self._body)
++        self._preamble =3D _wrap_ifcond(self._start_if[0],
++                                      self._start_if[2], self._preamble)
++
++    def get_content(self, fname=3DNone):
++        assert self._start_if is None
++        return QAPIGen.get_content(self, fname)
++
++
++class QAPIGenC(QAPIGenCCode):
++
++    def __init__(self, blurb, pydoc):
++        QAPIGenCCode.__init__(self)
+         self._blurb =3D blurb
+         self._copyright =3D '\n * '.join(re.findall(r'^Copyright .*', py=
+doc,
+                                                   re.MULTILINE))
 --=20
 2.18.0.rc1
