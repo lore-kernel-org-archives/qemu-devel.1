@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faEE1-00012T-Kt
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:51:42 -0400
+	(envelope-from <peterx@redhat.com>) id 1faEHD-0001uk-JJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faEDy-000187-Hk
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:51:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34940 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1faEH8-0004LT-Mz
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:54:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33372 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faEDy-00017f-C7
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:51:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180629195544.34263-1-eblake@redhat.com>
-	<20180629195544.34263-3-eblake@redhat.com>
-	<87r2kl8oey.fsf@dusky.pond.sub.org>
-	<12e2f857-8052-3542-0475-b84f8f02c716@redhat.com>
-Date: Tue, 03 Jul 2018 07:51:35 +0200
-In-Reply-To: <12e2f857-8052-3542-0475-b84f8f02c716@redhat.com> (Eric Blake's
-	message of "Mon, 2 Jul 2018 14:55:37 -0500")
-Message-ID: <87o9fo7tp4.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1faEH8-0004LL-Go
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:54:54 -0400
+Date: Tue, 3 Jul 2018 13:54:47 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180703055447.GQ2455@xz-mi>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180702112308.GO2455@xz-mi>
+	<e935a3ea-6714-8f92-fe67-9f820646efc3@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: Drop qapi-gen --unmask option
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e935a3ea-6714-8f92-fe67-9f820646efc3@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +28,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+On Mon, Jul 02, 2018 at 03:40:31PM +0300, Denis Plotnikov wrote:
+> 
+> 
+> On 02.07.2018 14:23, Peter Xu wrote:
+> > On Fri, Jun 29, 2018 at 11:03:13AM +0300, Denis Plotnikov wrote:
+> > > The patch set adds the ability to make external snapshots while VM is running.
+> > 
+> > Hi, Denis,
+> > 
+> > This work is interesting, though I have a few questions to ask in
+> > general below.
+> > 
+> > > 
+> > > The workflow to make a snapshot is the following:
+> > > 1. Pause the vm
+> > > 2. Make a snapshot of block devices using the scheme of your choice
+> > 
+> > Here you explicitly took the snapshot for the block device, then...
+> > 
+> > > 3. Turn on background-snapshot migration capability
+> > > 4. Start the migration using the destination (migration stream) of your choice.
+> > 
+> > ... here you started the VM snapshot.  How did you make sure that the
+> > VM snapshot (e.g., the RAM data) and the block snapshot will be
+> > aligned?
+> As the VM has been paused before making an image(disk) snapshot, there
+> should be no requests to the original image done ever since. All the later
+> request's goes to the disk snapshot.
+> 
+> At the point we have a disk image and its snapshot.
+> In the image we have kind of checkpoint-ed state which won't (shouldn't) be
+> changed because all the writing requests should go to the image snapshot.
+> 
+> Then we start the background snapshot which marks all the memory as
+> read-only and writing the part of VM state to the VM snapshot file.
+> By making the memory read-only we kind of freeze the state of the RAM.
+> 
+> At that point we have an original image and the VM memory content which
+> corresponds to each other because the VM isn't running.
+> 
+> Then, the background snapshot thread continues VM execution with the
+> read-only-marked memory which is being written to the external VM snapshot
+> file. All the write accesses to the memory are intercepted and the memory
+> pages being accessed are written to the VM snapshot (VM state) file in
+> priority. Having marked as read-write right after the writing, the memory
+> pages aren't tracked for later accesses.
+> 
+> This is how we guarantee that the VM snapshot (state) file has the memory
+> content corresponding to the moment when the disk snapshot is created.
+> 
+> When the writing ends, we have the VM snapshot (VM state) file which has the
+> memory content saved by the moment of the image snapshot creating.
+> 
+> So, to restore the VM from "the snapshot" we need to use the original image
+> disk (not the disk snapshot) and the VM snapshot (VM state with saved
+> memory) file.
 
-> On 07/02/2018 01:48 PM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> Now that we have useful access to the type name as a comment
->>> in the generated qapi-introspect.c, we don't need to regenerate
->>> code with a temporary -u option just to get at type names.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> I occasionally feed output of query-qmp-schema to ad hoc Python scripts.
->> My last one searched for object types containing non-string members
->> (directly or indirectly).  -u remains useful there, and having to
->> recompile is not a problem.  I'd prefer to keep it.
->
-> Would it be any easier to argue for the removal of -u if the generated
-> output resembled:
->
-> { "ret-type", QLIT_QSTR("1") /* Foo */ },
->
-> that is, sticking in the comment everywhere the type name is mangled
-> to an integer, rather than just once per type?
+My bad to have not noticed about the implication of vm_stop() as the
+first step.  Your explanation is clear.  Thank you!
 
-Doesn't help with my use case.  Let me elaborate on it.
+> 
+> > 
+> > For example, in current save_snapshot() we'll quiesce disk IOs before
+> > migrating the last pieces of RAM data to make sure they are aligned.
+> > I didn't figure out myself on how that's done in this work.
+> > 
+> > >     The migration will resume the vm execution by itself
+> > >     when it has the devices' states saved  and is ready to start ram writing
+> > >     to the migration stream.
+> > > 5. Listen to the migration finish event
+> > > 
+> > > The feature relies on KVM unapplied ability to report the faulting address.
+> > > Please find the KVM patch snippet to make the patchset work below:
+> > > 
+> > > +++ b/arch/x86/kvm/vmx.c
+> > > @@ -XXXX,X +XXXX,XX @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+> > >          vcpu->arch.exit_qualification = exit_qualification;
+> > > -       return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> > > +       r = kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> > > +        if (r == -EFAULT) {
+> > > +               unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gpa >> PAGE_SHIFT);
+> > > +
+> > > +               vcpu->run->exit_reason = KVM_EXIT_FAIL_MEM_ACCESS;
+> > > +               vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_VIOLATION;
+> > > +               vcpu->run->fail_mem_access.hva = hva | (gpa & (PAGE_SIZE-1));
+> > > +               r = 0;
+> > > +
+> > > +       }
+> > > +       return r;
+> > 
+> > Just to make sure I fully understand here: so this is some extra KVM
+> > work just to make sure the mprotect() trick will work even for KVM
+> > vcpu threads, am I right?
+> 
+> That's correct!
+> > 
+> > Meanwhile, I see that you only modified EPT violation code, then how
+> > about the legacy hardwares and softmmu case?
+> 
+> Didn't check thoroughly but the scheme works in TCG mode.
 
-My ad hoc Python script gets the output of query-qmp-schema like this:
+Yeah I guess TCG will work since the SIGSEGV handler will work with
+that.  I meant the shadow MMU implementation in KVM when
+kvm_intel.ept=0 is set on the host.  But of course that's not a big
+deal for now since that can be discussed in the kvm counterpart of the
+work.  Meanwhile, considering that this series seems to provide a
+general framework for live snapshot, this work is meaningful no matter
+what backend magic is used (either mprotect, or userfaultfd in the
+future).
 
-    pipe = subprocess.Popen('socat %s STDIO' % qmp_socket,
-                            shell=True,
-                            stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    (out, err) = pipe.communicate('{ "execute": "qmp_capabilities" }\n'
-                                  '{ "execute": "query-qmp-schema" }\n')
-    # three lines: greeting, output of qmp_capabilities, query-qmp-schema
-    return json.loads(out.split('\n')[2])['return']
+Thanks,
 
-This returns an abstract syntax tree, represented in Python the obvious
-way.  I can then explore it in Python, say search for object types with
-certain properties.  For example, commit 2860b2b2cb8:
-
-    Thus, the flaw puts an artificial restriction on the QAPI schema: we
-    can't have potentially empty objects and arrays within
-    BlockdevOptions, except when they're optional and "empty" has the same
-    meaning as "absent".
-
---> Our QAPI schema satisfies this restriction (I checked), but it's a
-    trap for the unwary, and a temptation to employ awkward workarounds
-    for the wary.  Let's get rid of it.
-
-I checked with a Python script that read the schema as shown above.
-Without -u, I'd have to revert the identifier hiding.  I could certainly
-write some more Python to read the mapping from the generated C, but
-that feels like busy work.
+-- 
+Peter Xu
