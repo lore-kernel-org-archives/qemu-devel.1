@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKP-0002lf-V6
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKQ-0002mP-Go
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKM-0006oZ-AA
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKO-0006tk-Tj
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:18 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:35 +1000
-Message-Id: <20180703055804.13449-7-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:36 +1000
+Message-Id: <20180703055804.13449-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/35] ppc/xics: move the instance_init handler
- under the ics-base class
+Subject: [Qemu-devel] [PULL 07/35] ppx/xics: introduce a parent_reset in
+ ICSStateClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +28,179 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, ag
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
+Just like for the realize handlers, this makes possible to move the
+common ICSState code of the reset handlers in the ics-base class.
+
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ hw/intc/xics.c        | 45 ++++++++++++++++++++++++++++---------------
+ hw/intc/xics_kvm.c    | 26 ++++++++++---------------
+ include/hw/ppc/xics.h |  1 +
+ 3 files changed, 41 insertions(+), 31 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index d6066d561f..83340770f7 100644
+index 83340770f7..8cfe223153 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -611,13 +611,6 @@ static const VMStateDescription vmstate_ics_simple =3D=
- {
-     },
- };
-=20
--static void ics_simple_initfn(Object *obj)
--{
--    ICSState *ics =3D ICS_SIMPLE(obj);
--
--    ics->offset =3D XICS_IRQ_BASE;
--}
--
- static void ics_simple_realize(DeviceState *dev, Error **errp)
- {
-     ICSState *ics =3D ICS_SIMPLE(dev);
-@@ -655,7 +648,6 @@ static const TypeInfo ics_simple_info =3D {
-     .instance_size =3D sizeof(ICSState),
-     .class_init =3D ics_simple_class_init,
-     .class_size =3D sizeof(ICSStateClass),
--    .instance_init =3D ics_simple_initfn,
- };
-=20
- static void ics_base_realize(DeviceState *dev, Error **errp)
-@@ -679,6 +671,13 @@ static void ics_base_realize(DeviceState *dev, Error=
- **errp)
-     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+@@ -537,23 +537,16 @@ static void ics_simple_eoi(ICSState *ics, uint32_t =
+nr)
+     }
  }
 =20
-+static void ics_base_instance_init(Object *obj)
-+{
-+    ICSState *ics =3D ICS_BASE(obj);
-+
-+    ics->offset =3D XICS_IRQ_BASE;
+-static void ics_simple_reset(void *dev)
++static void ics_simple_reset(DeviceState *dev)
+ {
+-    ICSState *ics =3D ICS_SIMPLE(dev);
+-    int i;
+-    uint8_t flags[ics->nr_irqs];
++    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
+=20
+-    for (i =3D 0; i < ics->nr_irqs; i++) {
+-        flags[i] =3D ics->irqs[i].flags;
+-    }
+-
+-    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
++    icsc->parent_reset(dev);
 +}
-+
- static Property ics_base_properties[] =3D {
-     DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
-     DEFINE_PROP_END_OF_LIST(),
-@@ -697,6 +696,7 @@ static const TypeInfo ics_base_info =3D {
-     .parent =3D TYPE_DEVICE,
-     .abstract =3D true,
-     .instance_size =3D sizeof(ICSState),
-+    .instance_init =3D ics_base_instance_init,
-     .class_init =3D ics_base_class_init,
+=20
+-    for (i =3D 0; i < ics->nr_irqs; i++) {
+-        ics->irqs[i].priority =3D 0xff;
+-        ics->irqs[i].saved_priority =3D 0xff;
+-        ics->irqs[i].flags =3D flags[i];
+-    }
++static void ics_simple_reset_handler(void *dev)
++{
++    ics_simple_reset(dev);
+ }
+=20
+ static int ics_simple_dispatch_pre_save(void *opaque)
+@@ -625,7 +618,7 @@ static void ics_simple_realize(DeviceState *dev, Erro=
+r **errp)
+=20
+     ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
+rqs);
+=20
+-    qemu_register_reset(ics_simple_reset, ics);
++    qemu_register_reset(ics_simple_reset_handler, ics);
+ }
+=20
+ static void ics_simple_class_init(ObjectClass *klass, void *data)
+@@ -635,6 +628,8 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+=20
+     device_class_set_parent_realize(dc, ics_simple_realize,
+                                     &isc->parent_realize);
++    device_class_set_parent_reset(dc, ics_simple_reset,
++                                  &isc->parent_reset);
+=20
+     dc->vmsd =3D &vmstate_ics_simple;
+     isc->reject =3D ics_simple_reject;
+@@ -650,6 +645,25 @@ static const TypeInfo ics_simple_info =3D {
      .class_size =3D sizeof(ICSStateClass),
  };
+=20
++static void ics_base_reset(DeviceState *dev)
++{
++    ICSState *ics =3D ICS_BASE(dev);
++    int i;
++    uint8_t flags[ics->nr_irqs];
++
++    for (i =3D 0; i < ics->nr_irqs; i++) {
++        flags[i] =3D ics->irqs[i].flags;
++    }
++
++    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
++
++    for (i =3D 0; i < ics->nr_irqs; i++) {
++        ics->irqs[i].priority =3D 0xff;
++        ics->irqs[i].saved_priority =3D 0xff;
++        ics->irqs[i].flags =3D flags[i];
++    }
++}
++
+ static void ics_base_realize(DeviceState *dev, Error **errp)
+ {
+     ICSState *ics =3D ICS_BASE(dev);
+@@ -689,6 +703,7 @@ static void ics_base_class_init(ObjectClass *klass, v=
+oid *data)
+=20
+     dc->realize =3D ics_base_realize;
+     dc->props =3D ics_base_properties;
++    dc->reset =3D ics_base_reset;
+ }
+=20
+ static const TypeInfo ics_base_info =3D {
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 1f27eb4979..b314eb7d16 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -324,25 +324,18 @@ static void ics_kvm_set_irq(void *opaque, int srcno=
+, int val)
+     }
+ }
+=20
+-static void ics_kvm_reset(void *dev)
++static void ics_kvm_reset(DeviceState *dev)
+ {
+-    ICSState *ics =3D ICS_SIMPLE(dev);
+-    int i;
+-    uint8_t flags[ics->nr_irqs];
+-
+-    for (i =3D 0; i < ics->nr_irqs; i++) {
+-        flags[i] =3D ics->irqs[i].flags;
+-    }
++    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
+=20
+-    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
++    icsc->parent_reset(dev);
+=20
+-    for (i =3D 0; i < ics->nr_irqs; i++) {
+-        ics->irqs[i].priority =3D 0xff;
+-        ics->irqs[i].saved_priority =3D 0xff;
+-        ics->irqs[i].flags =3D flags[i];
+-    }
++    ics_set_kvm_state(ICS_KVM(dev), 1);
++}
+=20
+-    ics_set_kvm_state(ics, 1);
++static void ics_kvm_reset_handler(void *dev)
++{
++    ics_kvm_reset(dev);
+ }
+=20
+ static void ics_kvm_realize(DeviceState *dev, Error **errp)
+@@ -358,7 +351,7 @@ static void ics_kvm_realize(DeviceState *dev, Error *=
+*errp)
+     }
+     ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_irqs=
+);
+=20
+-    qemu_register_reset(ics_kvm_reset, ics);
++    qemu_register_reset(ics_kvm_reset_handler, ics);
+ }
+=20
+ static void ics_kvm_class_init(ObjectClass *klass, void *data)
+@@ -371,6 +364,7 @@ static void ics_kvm_class_init(ObjectClass *klass, vo=
+id *data)
+      * directly from ics-base and not from ics-simple anymore.
+      */
+     dc->realize =3D ics_kvm_realize;
++    dc->reset =3D ics_kvm_reset;
+=20
+     icsc->pre_save =3D ics_get_kvm_state;
+     icsc->post_load =3D ics_set_kvm_state;
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 44e96e6400..6ac8a9392d 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -116,6 +116,7 @@ struct ICSStateClass {
+     DeviceClass parent_class;
+=20
+     DeviceRealize parent_realize;
++    DeviceReset parent_reset;
+=20
+     void (*pre_save)(ICSState *s);
+     int (*post_load)(ICSState *s, int version_id);
 --=20
 2.17.1
