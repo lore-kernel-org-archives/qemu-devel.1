@@ -1,13 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faJXz-0000uO-64
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:32:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1faJap-0002T7-NC
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faJXy-00039Z-24
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:32:39 -0400
-Date: Tue, 3 Jul 2018 13:32:29 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180703113229.GD3812@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1faJao-00052E-Pk
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:35:35 -0400
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:46288)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1faJao-00051o-Da
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:35:34 -0400
+Received: by mail-oi0-x22c.google.com with SMTP id y207-v6so3051024oie.13
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 04:35:34 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180703113229.GD3812@localhost.localdomain>
 References: <20180622125502.GF4366@localhost.localdomain>
 	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
 	<20180622142513.GH4366@localhost.localdomain>
@@ -18,10 +24,11 @@ References: <20180622125502.GF4366@localhost.localdomain>
 	<20180702080411.GA4299@localhost.localdomain>
 	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
 	<20180703111949.GB24516@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180703111949.GB24516@redhat.com>
+	<20180703113229.GD3812@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Jul 2018 12:35:13 +0100
+Message-ID: <CAFEAcA8uo72D79rRjP7sTz-C1-vxahFKMk3gxWs_cJqVBYXpAQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
  -drive option serial
@@ -33,70 +40,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 03.07.2018 um 13:22 hat Daniel P. Berrang=E9 geschrieben:
-> On Tue, Jul 03, 2018 at 12:53:44PM +0200, Christian Borntraeger wrote:
-> >=20
-> >=20
-> > On 07/02/2018 10:04 AM, Kevin Wolf wrote:
-> > > Am 25.06.2018 um 13:45 hat Peter Krempa geschrieben:
-> > >> On Mon, Jun 25, 2018 at 13:41:06 +0200, Kevin Wolf wrote:
-> > >>> Am 25.06.2018 um 11:53 hat Daniel P. Berrang=E9 geschrieben:
-> > >>>> On Fri, Jun 22, 2018 at 03:31:46PM +0100, Daniel P. Berrang=E9 w=
-rote:
-> > >>>>> On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
-> > >>>>>> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
-> > >>
-> > >> [...]
-> > >>
-> > >>>
-> > >>> Thanks!
-> > >>>
-> > >>> I'll look into werror/rerror support for usb-storage. It shouldn'=
-t be
-> > >>> too hard, though it's strictly speaking a separate problem relate=
-d to
-> > >>> using -blockdev rather than option deprecation.
-> > >>>
-> > >>> If Peter wants to wait for QEMU support before converting werror/=
-rerror
-> > >>
-> > >> Definitely. I don't want to keep around yet another hack that will
-> > >> satisfy one specific case and then add another capability for it. =
-We
-> > >> should then gate the moving of the feature based on the presence o=
-f
-> > >> werror for usb-storage.
-> > >>
-> > >>> to -device, maybe it would make sense to split your patch for v2 =
-so that
-> > >>> geometry and serial can get fixed right away?
-> > >>
-> > >> Yes this can be done right away.
-> > >=20
-> > > Has serial/gemoetry been fixed meanwhile and will it make it into t=
-he
-> > > next release?
-> >=20
-> > I cannot find an archive that has it, but it is on the libvirt mailin=
-g
-> > list as "[libvirt] [PATCH v3] qemu: format serial and geometry on fro=
-ntend disk device".
-> > Review seems done, but it has missed libvirt 4.5 which was released t=
-oday.
->=20
-> Just posted latest version here:
->=20
->   https://www.redhat.com/archives/libvir-list/2018-July/msg00130.html
->=20
-> It will be in the next release on ~ Aug 1st
+On 3 July 2018 at 12:32, Kevin Wolf <kwolf@redhat.com> wrote:
+> Am 03.07.2018 um 13:22 hat Daniel P. Berrang=C3=A9 geschrieben:
+>> Just posted latest version here:
+>>
+>>   https://www.redhat.com/archives/libvir-list/2018-July/msg00130.html
+>>
+>> It will be in the next release on ~ Aug 1st
+>
+> It would have been a lot nicer to have it the July release because this
+> means that we'll have the released libvirt broken during almost the
+> whole rc phase of QEMU 3.0, but the release is planned for Aug 8th the
+> earliest, so I guess we're still okay. People using QEMU from git will
+> just need libvirt from git as well.
 
-It would have been a lot nicer to have it the July release because this
-means that we'll have the released libvirt broken during almost the
-whole rc phase of QEMU 3.0, but the release is planned for Aug 8th the
-earliest, so I guess we're still okay. People using QEMU from git will
-just need libvirt from git as well.
+I'm still not clear what we gain from having a QEMU that's dropped
+a feature that is still used by everything except leading-edge
+not-yet-released versions of libvirt. Is there a strong reason we
+can't just revert the deletion of the deprecated feature for a QEMU
+release or two?
 
-Kevin
+thanks
+-- PMM
