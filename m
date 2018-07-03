@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faTsC-0003CS-BP
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 18:34:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1faTyf-00057f-HL
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 18:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faTs9-0007xr-7S
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 18:34:12 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:37976)
+	(envelope-from <bounces@canonical.com>) id 1faTyc-0002DY-DJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 18:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46598)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faTs9-0007xe-1p
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 18:34:09 -0400
-Received: by mail-qk0-x241.google.com with SMTP id y4-v6so1921608qka.5
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 15:34:08 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180702151023.24532-1-shorne@gmail.com>
-	<20180702151023.24532-23-shorne@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <feef2195-8fd8-f9e1-da85-f3286a9e2b1d@amsat.org>
-Date: Tue, 3 Jul 2018 19:34:02 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1faTyc-0002D5-6Z
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 18:40:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1faTya-0000nj-44
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 22:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 157402E8198
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 22:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180702151023.24532-23-shorne@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 22/25] linux-user: Implement signals for
- openrisc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 03 Jul 2018 22:32:02 -0000
+From: Ke Liu <1779955@bugs.launchpad.net>
+Reply-To: Bug 1779955 <1779955@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153065712229.13372.17157400567540509420.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779955] [NEW] qemu-arm-static read() doesn't
+ accept mmap address as destination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +36,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, QEMU Development <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
 
-Hi Stafford,
+Public bug reported:
 
-On 07/02/2018 12:10 PM, Stafford Horne wrote:
-> From: Richard Henderson <richard.henderson@linaro.org>
-> 
-> All of the existing code was boilerplate from elsewhere,
-> and would crash the guest upon the first signal.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Stafford Horne <shorne@gmail.com>
-> 
-> ---
-> v2:
->   Add a comment to the new definition of target_pt_regs.
->   Install the signal mask into the ucontext.
-> v3:
->   Incorporate feedback from Laurent.
+When read() function takes an mmap'ed address as output buffer, it
+returns EFAULT. The expected behavior is it should just work.
 
-Oops this is not supposed to enter git history, something is wrong with
-your pull request script.
+The following code works for qemu-system-arm, but not for qemu-arm-
+static.
 
-> ---
->  linux-user/openrisc/signal.c         | 217 +++++++++++----------------
->  linux-user/openrisc/target_syscall.h |  28 +---
->  linux-user/signal.c                  |   2 +-
->  target/openrisc/cpu.c                |   1 +
->  4 files changed, 94 insertions(+), 154 deletions(-)
+QEMU version affected: latest release 2.12.0.
 
-<snip>
+Steps to reproduce (please substitute /path/to/qemu-arm-static with the
+path of the binary, and /tmp/a.cpp with the example source code
+attached):
+
+# First register binfmt_misc
+[hidden]$ docker run --rm --privileged multiarch/qemu-user-static:register =
+--reset
+
+# Compile the code and run
+[hidden]$ docker run --rm -it -v /tmp/a.cpp:/tmp/a.cpp -v /path/to/qemu-arm=
+-static:/usr/bin/qemu-arm-static arm32v7/ubuntu:18.04 bash -c '{ apt update=
+ -y && apt install -y g++; } >& /dev/null && g++ -std=3Dc++14 /tmp/a.cpp -o=
+ /tmp/a.out && echo hehe > /tmp/haha.txt && /tmp/a.out'
+ofd=3D3
+ftruncate=3D0
+mmap=3D0xff3f5000
+fd=3D4
+0xff3f5023 -1 14
+
+The expected result in qemu-system-arm as well as natively on x86_64 host:
+hidden$ ./a.out
+ofd=3D3
+ftruncate=3D0
+mmap=3D0xb6fb7000
+fd=3D4
+0xb6fb7023 5 0
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "a.cpp"
+   https://bugs.launchpad.net/bugs/1779955/+attachment/5159341/+files/a.cpp
+
+** Description changed:
+
+  When read() function takes an mmap'ed address as output buffer, it
+  returns EFAULT. The expected behavior is it should just work.
+  =
+
+  The following code works for qemu-system-arm, but not for qemu-arm-
+  static.
+  =
+
++ QEMU version affected: latest release 2.12.0.
+  =
+
+  Steps to reproduce (please substitute /path/to/qemu-arm-static with the
+  path of the binary, and /tmp/a.cpp with the example source code
+  attached):
+  =
+
+  # First register binfmt_misc
+  [hidden]$ docker run --rm --privileged multiarch/qemu-user-static:registe=
+r --reset
+  =
+
+  # Compile the code and run
+  [hidden]$ docker run --rm -it -v /tmp/a.cpp:/tmp/a.cpp -v /path/to/qemu-a=
+rm-static:/usr/bin/qemu-arm-static arm32v7/ubuntu:18.04 bash -c '{ apt upda=
+te -y && apt install -y g++; } >& /dev/null && g++ -std=3Dc++14 /tmp/a.cpp =
+-o /tmp/a.out && echo hehe > /tmp/haha.txt && /tmp/a.out'
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xff3f5000
+  fd=3D4
+  0xff3f5023 -1 14
+  =
+
+- =
+
+  The expected result in qemu-system-arm as well as natively on x86_64 host:
+- hidden$ ./a.out                                                          =
+                                                                           =
+                =
+
+- ofd=3D3                                                                  =
+                                              =
+
+- ftruncate=3D0                                                            =
+                                              =
+
+- mmap=3D0xb6fb7000                                                        =
+                                                  =
+
+- fd=3D4                                                                   =
+                                                                 =
+
++ hidden$ ./a.out
++ ofd=3D3
++ ftruncate=3D0
++ mmap=3D0xb6fb7000
++ fd=3D4
+  0xb6fb7023 5 0
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779955
+
+Title:
+  qemu-arm-static read() doesn't accept mmap address as destination
+
+Status in QEMU:
+  New
+
+Bug description:
+  When read() function takes an mmap'ed address as output buffer, it
+  returns EFAULT. The expected behavior is it should just work.
+
+  The following code works for qemu-system-arm, but not for qemu-arm-
+  static.
+
+  QEMU version affected: latest release 2.12.0.
+
+  Steps to reproduce (please substitute /path/to/qemu-arm-static with
+  the path of the binary, and /tmp/a.cpp with the example source code
+  attached):
+
+  # First register binfmt_misc
+  [hidden]$ docker run --rm --privileged multiarch/qemu-user-static:registe=
+r --reset
+
+  # Compile the code and run
+  [hidden]$ docker run --rm -it -v /tmp/a.cpp:/tmp/a.cpp -v /path/to/qemu-a=
+rm-static:/usr/bin/qemu-arm-static arm32v7/ubuntu:18.04 bash -c '{ apt upda=
+te -y && apt install -y g++; } >& /dev/null && g++ -std=3Dc++14 /tmp/a.cpp =
+-o /tmp/a.out && echo hehe > /tmp/haha.txt && /tmp/a.out'
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xff3f5000
+  fd=3D4
+  0xff3f5023 -1 14
+
+  The expected result in qemu-system-arm as well as natively on x86_64 host:
+  hidden$ ./a.out
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xb6fb7000
+  fd=3D4
+  0xb6fb7023 5 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779955/+subscriptions
