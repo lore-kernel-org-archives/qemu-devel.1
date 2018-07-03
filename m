@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1faHs8-0001kB-Az
+	(envelope-from <kraxel@redhat.com>) id 1faHs8-0001k8-9U
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1faHs6-00050m-C8
+	(envelope-from <kraxel@redhat.com>) id 1faHs6-00050g-9B
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43802)
+Received: from mx1.redhat.com ([209.132.183.28]:43800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1faHs6-0004z1-6a
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1faHs5-0004yn-Vr
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.phx2.redhat.com
+	[10.5.11.25])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60418308404B
+	by mx1.redhat.com (Postfix) with ESMTPS id 38E453084048
 	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 09:45:17 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  3 Jul 2018 11:45:07 +0200
-Message-Id: <20180703094508.25987-4-kraxel@redhat.com>
+Date: Tue,  3 Jul 2018 11:45:06 +0200
+Message-Id: <20180703094508.25987-3-kraxel@redhat.com>
 In-Reply-To: <20180703094508.25987-1-kraxel@redhat.com>
 References: <20180703094508.25987-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/4] virtio-gpu: disable scanout when backing
- resource is destroyed
+Subject: [Qemu-devel] [PULL 2/4] virtio-gpu: update old resource too.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +35,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
+When switching scanout from one resource to another we must update the
+scanout_bitmask field for both new (set bit) and old (clear bit)
+resource.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180702162443.16796-4-kraxel@redhat.com
+Message-id: 20180702162443.16796-3-kraxel@redhat.com
 ---
- hw/display/virtio-gpu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/display/virtio-gpu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 336dc59007..08cd567218 100644
+index 054ec73c0a..336dc59007 100644
 --- a/hw/display/virtio-gpu.c
 +++ b/hw/display/virtio-gpu.c
-@@ -430,6 +430,16 @@ static void virtio_gpu_disable_scanout(VirtIOGPU *g,=
- int scanout_id)
- static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                         struct virtio_gpu_simple_resourc=
-e *res)
+@@ -590,7 +590,7 @@ static void virtio_unref_resource(pixman_image_t *ima=
+ge, void *data)
+ static void virtio_gpu_set_scanout(VirtIOGPU *g,
+                                    struct virtio_gpu_ctrl_command *cmd)
  {
-+    int i;
-+
-+    if (res->scanout_bitmask) {
-+        for (i =3D 0; i < g->conf.max_outputs; i++) {
-+            if (res->scanout_bitmask & (1 << i)) {
-+                virtio_gpu_disable_scanout(g, i);
-+            }
-+        }
+-    struct virtio_gpu_simple_resource *res;
++    struct virtio_gpu_simple_resource *res, *ores;
+     struct virtio_gpu_scanout *scanout;
+     pixman_format_code_t format;
+     uint32_t offset;
+@@ -664,6 +664,11 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
+         dpy_gfx_replace_surface(g->scanout[ss.scanout_id].con, scanout->=
+ds);
+     }
+=20
++    ores =3D virtio_gpu_find_resource(g, scanout->resource_id);
++    if (ores) {
++        ores->scanout_bitmask &=3D ~(1 << ss.scanout_id);
 +    }
 +
-     pixman_image_unref(res->image);
-     virtio_gpu_cleanup_mapping(res);
-     QTAILQ_REMOVE(&g->reslist, res, next);
+     res->scanout_bitmask |=3D (1 << ss.scanout_id);
+     scanout->resource_id =3D ss.resource_id;
+     scanout->x =3D ss.r.x;
 --=20
 2.9.3
