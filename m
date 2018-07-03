@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFuW-0005J0-Pn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:39:41 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1faG2L-0002aM-NJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:47:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFuT-0004gg-Ko
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:39:40 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  3 Jul 2018 09:19:57 +0200
-Message-Id: <1530602398-16127-15-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 14/15] hw/arm/boot: Expose the pmem nodes in
- the DT
+	(envelope-from <rkagan@virtuozzo.com>) id 1faG2I-0003Ds-Hn
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:47:45 -0400
+Received: from mail-he1eur04hn030b.outbound.protection.outlook.com
+	([2a01:111:f400:fe0d::30b]:19714
+	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1faG2H-0003DJ-P3
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:47:42 -0400
+Date: Tue, 3 Jul 2018 10:47:18 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180703074717.GB30904@rkaganb.sw.ru>
+References: <20180702165842.11423-1-rkagan@virtuozzo.com>
+	<42e1ca43-c31a-43a7-950e-57695c5ddd7f@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42e1ca43-c31a-43a7-950e-57695c5ddd7f@redhat.com>
+Subject: [Qemu-devel] patchew header docs [was: Re: [PATCH 0/6] hyperv:
+ refactor HvSintRoute management]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,66 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
-Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>, Richard Henderson <rth@twiddle.net>
 
-In case of NV-DIMM slots, let's add /pmem DT nodes.
+On Mon, Jul 02, 2018 at 03:55:33PM -0500, Eric Blake wrote:
+> On 07/02/2018 11:58 AM, Roman Kagan wrote:
+> > This series modifies the management of HvSintRoute, which is an
+> > important building block in Hyper-V emulation infrastructure, to make it
+> > easier to maintain and enhance, and paves the way to the more complete
+> > Synthetic Interrupt Controller (SynIC) emulation.
+> > 
+> > This series applies on top of "[PATCH 0/2] hyperv: ensure VP index equal
+> > to QEMU cpu_index" series (message-id:
+> > <20180702134156.13404-1-rkagan@virtuozzo.com>).
+> 
+> Rewriting that in a form that patchew can parse:
+> 
+> Based-on: 20180702134156.13404-1-rkagan@virtuozzo.com
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/boot.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+Thanks!
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 2c7d558..3381c66 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -444,6 +444,36 @@ out:
-     return ret;
- }
- 
-+static int fdt_add_pmem_node(void *fdt, uint32_t acells, hwaddr mem_base,
-+                             uint32_t scells, hwaddr mem_len,
-+                             int numa_node_id)
-+{
-+    char *nodename = NULL;
-+    int ret;
-+
-+    nodename = g_strdup_printf("/pmem@%" PRIx64, mem_base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "pmem-region");
-+    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
-+                                       scells, mem_len);
-+    if (ret < 0) {
-+        fprintf(stderr, "couldn't set %s/reg\n", nodename);
-+        goto out;
-+    }
-+    if (numa_node_id < 0) {
-+        goto out;
-+    }
-+
-+    ret = qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_node_id);
-+    if (ret < 0) {
-+        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
-+    }
-+
-+out:
-+    g_free(nodename);
-+    return ret;
-+}
-+
- static void fdt_add_psci_node(void *fdt)
- {
-     uint32_t cpu_suspend_fn;
-@@ -532,7 +562,8 @@ static int fdt_add_hotpluggable_memory_nodes(void *fdt,
-         di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
- 
-         if (is_nvdimm) {
--            ret = -ENOENT; /* NV-DIMM not yet supported */
-+            ret = fdt_add_pmem_node(fdt, acells, di->addr,
-+                                    scells, di->size, di->node);
-         } else {
-             ret = fdt_add_memory_node(fdt, acells, di->addr,
-                                       scells, di->size, di->node);
--- 
-2.5.5
+Are patchew-recognized headers documented anywhere?
+
+Roman.
