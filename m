@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faMaq-0001zh-HN
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:47:49 -0400
+	(envelope-from <ari@tuxera.com>) id 1faMbz-0002av-UP
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faMan-00061g-FR
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:47:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34286 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faMan-00061E-AP
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:47:45 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
-	<20180627163551.31610-12-marcandre.lureau@redhat.com>
-Date: Tue, 03 Jul 2018 16:47:43 +0200
-In-Reply-To: <20180627163551.31610-12-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 27 Jun 2018
-	18:35:47 +0200")
-Message-ID: <87lgas8jg0.fsf@dusky.pond.sub.org>
+	(envelope-from <ari@tuxera.com>) id 1faMbz-0006cR-4Z
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 10:48:59 -0400
+From: Ari Sundholm <ari@tuxera.com>
+Date: Tue, 3 Jul 2018 17:48:47 +0300
+Message-ID: <1530629328-10193-2-git-send-email-ari@tuxera.com>
+In-Reply-To: <1530629328-10193-1-git-send-email-ari@tuxera.com>
+References: <1530629328-10193-1-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 11/15] qapi/events: add #if conditions
- to events
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 1/2] block: Move two block permission
+ constants to the relevant enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+This allows using the two constants outside of block.c, which will
+happen in a subsequent patch.
 
-> Wrap generated code with #if/#endif using an 'ifcontext' on
-> QAPIGenCSnippet objects.
->
-> This makes a conditional event's qapi_event_send_FOO() compile-time
-> conditional, but its enum QAPIEvent member remains unconditional for
-> now. A follow up patch "qapi-event: add 'if' condition to implicit
-> event enum" will improve this.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Ari Sundholm <ari@tuxera.com>
+---
+ block.c               | 6 ------
+ include/block/block.h | 7 +++++++
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/block.c b/block.c
+index 70a46fd..961ec97 100644
+--- a/block.c
++++ b/block.c
+@@ -1948,12 +1948,6 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+     return 0;
+ }
+ 
+-#define DEFAULT_PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
+-                                 | BLK_PERM_WRITE \
+-                                 | BLK_PERM_WRITE_UNCHANGED \
+-                                 | BLK_PERM_RESIZE)
+-#define DEFAULT_PERM_UNCHANGED (BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH)
+-
+ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                const BdrvChildRole *role,
+                                BlockReopenQueue *reopen_queue,
+diff --git a/include/block/block.h b/include/block/block.h
+index e5c7759..bc76b1e 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -225,6 +225,13 @@ enum {
+     BLK_PERM_GRAPH_MOD          = 0x10,
+ 
+     BLK_PERM_ALL                = 0x1f,
++
++    DEFAULT_PERM_PASSTHROUGH    = BLK_PERM_CONSISTENT_READ
++                                 | BLK_PERM_WRITE
++                                 | BLK_PERM_WRITE_UNCHANGED
++                                 | BLK_PERM_RESIZE,
++
++    DEFAULT_PERM_UNCHANGED      = BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH,
+ };
+ 
+ char *bdrv_perm_names(uint64_t perm);
+-- 
+2.7.4
