@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faNN2-0002Pu-CW
+	(envelope-from <armbru@redhat.com>) id 1faNN3-0002Qe-55
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faNMy-0005NJ-L8
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36022 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faNMz-0005Nr-0q
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36024 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMy-0005LX-CE
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMy-0005ME-NB
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E27FEDFE0
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4307FDFDF
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:32 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A3AFA1C661
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:31 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 01B392026D76
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:32 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 17:37:26 +0200
-Message-Id: <20180703153728.2175-31-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 17:37:19 +0200
+Message-Id: <20180703153728.2175-24-armbru@redhat.com>
 In-Reply-To: <20180703153728.2175-1-armbru@redhat.com>
 References: <20180703153728.2175-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 30/32] qmp: Clean up capability negotiation
- after commit 02130314d8c
+Subject: [Qemu-devel] [PULL 23/32] qmp: Use QDict * instead of QObject * for
+ response objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,171 +36,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-qmp_greeting() offers capabilities to the client, and
-qmp_qmp_capabilities() accepts or denies capabilities requested by the
-client.  The two compute the set of available capabilities
-independently.  Not nice.
-
-Clean this up as follows.  Compute available capabilities just once in
-monitor_qmp_caps_reset(), and store them in Monitor member
-qmp.capab_offered[].  Have qmp_greeting() and qmp_qmp_capabilities()
-use that.  Both are now oblivious of capability details.
+By using the more specific type, we get fewer downcasts.  The
+downcasts are safe, but not obviously so, at least not locally.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-31-armbru@redhat.com>
+Message-Id: <20180703085358.13941-24-armbru@redhat.com>
 ---
- monitor.c | 93 ++++++++++++++++++++++++-------------------------------
- 1 file changed, 40 insertions(+), 53 deletions(-)
+ include/qapi/qmp/dispatch.h |  4 ++--
+ monitor.c                   | 31 ++++++++++++++++---------------
+ qapi/qmp-dispatch.c         |  6 +++---
+ qga/main.c                  |  8 ++++----
+ tests/test-qmp-cmds.c       | 17 +++++++----------
+ 5 files changed, 32 insertions(+), 34 deletions(-)
 
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index a53e11c9b1..4e2e749faf 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -48,8 +48,8 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QDict *qmp_error_response(Error *err);
+-QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+-                      bool allow_oob);
++QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++                    bool allow_oob);
+ bool qmp_is_oob(QDict *dict);
+ 
+ typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
 diff --git a/monitor.c b/monitor.c
-index 1da7b8bebf..f8b88ba105 100644
+index 6284efe33e..8237b1c916 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -173,7 +173,8 @@ typedef struct {
-      * mode.
-      */
-     QmpCommandList *commands;
--    bool qmp_caps[QMP_CAPABILITY__MAX];
-+    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-+    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-     /*
-      * Protects qmp request/response queue.  Please take monitor_lock
-      * first when used together.
-@@ -1253,52 +1254,56 @@ static void monitor_init_qmp_commands(void)
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
+@@ -379,7 +379,7 @@ static void monitor_qmp_cleanup_req_queue_locked(Monitor *mon)
+ static void monitor_qmp_cleanup_resp_queue_locked(Monitor *mon)
+ {
+     while (!g_queue_is_empty(mon->qmp.qmp_responses)) {
+-        qobject_unref((QObject *)g_queue_pop_head(mon->qmp.qmp_responses));
++        qobject_unref((QDict *)g_queue_pop_head(mon->qmp.qmp_responses));
+     }
  }
  
--static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
--{
--    return mon->qmp.qmp_caps[cap];
--}
--
- static bool qmp_oob_enabled(Monitor *mon)
- {
--    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
-+    return mon->qmp.capab[QMP_CAPABILITY_OOB];
- }
+@@ -528,7 +528,8 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
+          * responder thread).
+          */
+         qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+-        g_queue_push_tail(mon->qmp.qmp_responses, qobject_ref(data));
++        g_queue_push_tail(mon->qmp.qmp_responses,
++                          qobject_ref(qobject_to(QDict, data)));
+         qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+         qemu_bh_schedule(qmp_respond_bh);
+     } else {
+@@ -542,13 +543,13 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
  
--static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
--                           Error **errp)
-+static void monitor_qmp_caps_reset(Monitor *mon)
+ struct QMPResponse {
+     Monitor *mon;
+-    QObject *data;
++    QDict *data;
+ };
+ typedef struct QMPResponse QMPResponse;
+ 
+-static QObject *monitor_qmp_response_pop_one(Monitor *mon)
++static QDict *monitor_qmp_response_pop_one(Monitor *mon)
  {
-+    memset(mon->qmp.capab_offered, 0, sizeof(mon->qmp.capab_offered));
-+    memset(mon->qmp.capab, 0, sizeof(mon->qmp.capab));
-+    mon->qmp.capab_offered[QMP_CAPABILITY_OOB] = mon->use_io_thread;
-+}
-+
-+/*
-+ * Accept QMP capabilities in @list for @mon.
-+ * On success, set mon->qmp.capab[], and return true.
-+ * On error, set @errp, and return false.
-+ */
-+static bool qmp_caps_accept(Monitor *mon, QMPCapabilityList *list,
-+                            Error **errp)
-+{
-+    GString *unavailable = NULL;
-+    bool capab[QMP_CAPABILITY__MAX];
-+
-+    memset(capab, 0, sizeof(capab));
-+
-     for (; list; list = list->next) {
--        assert(list->value < QMP_CAPABILITY__MAX);
--        switch (list->value) {
--        case QMP_CAPABILITY_OOB:
--            if (!mon->use_io_thread) {
--                /*
--                 * Out-of-band only works with monitors that are
--                 * running on dedicated I/O thread.
--                 */
--                error_setg(errp, "This monitor does not support "
--                           "out-of-band (OOB)");
--                return;
-+        if (!mon->qmp.capab_offered[list->value]) {
-+            if (!unavailable) {
-+                unavailable = g_string_new(QMPCapability_str(list->value));
-+            } else {
-+                g_string_append_printf(unavailable, ", %s",
-+                                      QMPCapability_str(list->value));
-             }
--            break;
--        default:
--            break;
+-    QObject *data;
++    QDict *data;
+ 
+     qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+     data = g_queue_pop_head(mon->qmp.qmp_responses);
+@@ -559,10 +560,10 @@ static QObject *monitor_qmp_response_pop_one(Monitor *mon)
+ 
+ static void monitor_qmp_response_flush(Monitor *mon)
+ {
+-    QObject *data;
++    QDict *data;
+ 
+     while ((data = monitor_qmp_response_pop_one(mon))) {
+-        monitor_json_emitter_raw(mon, data);
++        monitor_json_emitter_raw(mon, QOBJECT(data));
+         qobject_unref(data);
+     }
+ }
+@@ -574,7 +575,7 @@ static void monitor_qmp_response_flush(Monitor *mon)
+ static bool monitor_qmp_response_pop_any(QMPResponse *response)
+ {
+     Monitor *mon;
+-    QObject *data = NULL;
++    QDict *data = NULL;
+ 
+     qemu_mutex_lock(&monitor_lock);
+     QTAILQ_FOREACH(mon, &mon_list, entry) {
+@@ -594,7 +595,7 @@ static void monitor_qmp_bh_responder(void *opaque)
+     QMPResponse response;
+ 
+     while (monitor_qmp_response_pop_any(&response)) {
+-        monitor_json_emitter_raw(response.mon, response.data);
++        monitor_json_emitter_raw(response.mon, QOBJECT(response.data));
+         qobject_unref(response.data);
+     }
+ }
+@@ -4104,20 +4105,20 @@ static int monitor_can_read(void *opaque)
+  * 2. rsp, err, and id may be NULL.
+  * 3. If err != NULL then rsp must be NULL.
+  */
+-static void monitor_qmp_respond(Monitor *mon, QObject *rsp,
++static void monitor_qmp_respond(Monitor *mon, QDict *rsp,
+                                 Error *err, QObject *id)
+ {
+     if (err) {
+         assert(!rsp);
+-        rsp = QOBJECT(qmp_error_response(err));
++        rsp = qmp_error_response(err);
+     }
+ 
+     if (rsp) {
+         if (id) {
+-            qdict_put_obj(qobject_to(QDict, rsp), "id", qobject_ref(id));
++            qdict_put_obj(rsp, "id", qobject_ref(id));
          }
-+        capab[list->value] = true;
-     }
--}
  
--/* This function should only be called after capabilities are checked. */
--static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
--{
--    for (; list; list = list->next) {
--        mon->qmp.qmp_caps[list->value] = true;
-+    if (unavailable) {
-+        error_setg(errp, "Capability %s not available", unavailable->str);
-+        g_string_free(unavailable, true);
-+        return false;
+-        monitor_json_emitter(mon, rsp);
++        monitor_json_emitter(mon, QOBJECT(rsp));
      }
-+
-+    memcpy(mon->qmp.capab, capab, sizeof(capab));
-+    return true;
+ 
+     qobject_unref(id);
+@@ -4127,7 +4128,7 @@ static void monitor_qmp_respond(Monitor *mon, QObject *rsp,
+ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
+ {
+     Monitor *old_mon;
+-    QObject *rsp;
++    QDict *rsp;
+     QDict *error;
+ 
+     old_mon = cur_mon;
+@@ -4138,7 +4139,7 @@ static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
+     cur_mon = old_mon;
+ 
+     if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
+-        error = qdict_get_qdict(qobject_to(QDict, rsp), "error");
++        error = qdict_get_qdict(rsp, "error");
+         if (error
+             && !g_strcmp0(qdict_get_try_str(error, "class"),
+                     QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOUND))) {
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index c85748a33f..761812e924 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -161,8 +161,8 @@ bool qmp_is_oob(QDict *dict)
+         && !qdict_haskey(dict, "execute");
  }
  
- void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-                           Error **errp)
+-QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+-                      bool allow_oob)
++QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++                    bool allow_oob)
  {
--    Error *local_err = NULL;
--
-     if (cur_mon->qmp.commands == &qmp_commands) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "Capabilities negotiation is already complete, command "
-@@ -1306,19 +1311,8 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-         return;
+     Error *err = NULL;
+     QObject *ret;
+@@ -179,5 +179,5 @@ QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+         rsp = NULL;
      }
  
--    /* Enable QMP capabilities provided by the client if applicable. */
--    if (has_enable) {
--        qmp_caps_check(cur_mon, enable, &local_err);
--        if (local_err) {
--            /*
--             * Failed check on any of the capabilities will fail the
--             * entire command (and thus not apply any of the other
--             * capabilities that were also requested).
--             */
--            error_propagate(errp, local_err);
--            return;
--        }
--        qmp_caps_apply(cur_mon, enable);
-+    if (!qmp_caps_accept(cur_mon, enable, errp)) {
-+        return;
+-    return QOBJECT(rsp);
++    return rsp;
+ }
+diff --git a/qga/main.c b/qga/main.c
+index 0e30e30248..537cc0e162 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -545,7 +545,7 @@ fail:
+ #endif
+ }
+ 
+-static int send_response(GAState *s, QObject *payload)
++static int send_response(GAState *s, QDict *payload)
+ {
+     const char *buf;
+     QString *payload_qstr, *response_qstr;
+@@ -553,7 +553,7 @@ static int send_response(GAState *s, QObject *payload)
+ 
+     g_assert(payload && s->channel);
+ 
+-    payload_qstr = qobject_to_json(payload);
++    payload_qstr = qobject_to_json(QOBJECT(payload));
+     if (!payload_qstr) {
+         return -EINVAL;
      }
+@@ -581,7 +581,7 @@ static int send_response(GAState *s, QObject *payload)
  
-     cur_mon->qmp.commands = &qmp_commands;
-@@ -4385,11 +4379,9 @@ static QDict *qmp_greeting(Monitor *mon)
-     qmp_marshal_query_version(NULL, &ver, NULL);
+ static void process_command(GAState *s, QDict *req)
+ {
+-    QObject *rsp = NULL;
++    QDict *rsp;
+     int ret;
  
-     for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
--        if (!mon->use_io_thread && cap == QMP_CAPABILITY_OOB) {
--            /* Monitors that are not using I/O thread won't support OOB */
--            continue;
-+        if (mon->qmp.capab_offered[cap]) {
-+            qlist_append_str(cap_list, QMPCapability_str(cap));
+     g_assert(req);
+@@ -629,7 +629,7 @@ static void process_event(JSONMessageParser *parser, GQueue *tokens)
+             error_setg(&err, QERR_UNSUPPORTED);
+             qdict = qmp_error_response(err);
          }
--        qlist_append_str(cap_list, QMPCapability_str(cap));
-     }
+-        ret = send_response(s, QOBJECT(qdict));
++        ret = send_response(s, qdict);
+         if (ret < 0) {
+             g_warning("error sending error response: %s", strerror(-ret));
+         }
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 10c7ba40c1..afb338a61e 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -98,13 +98,13 @@ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org_qemu_x_EnumList *a,
+ static void test_dispatch_cmd(void)
+ {
+     QDict *req = qdict_new();
+-    QObject *resp;
++    QDict *resp;
  
-     return qdict_from_jsonf_nofail(
-@@ -4397,11 +4389,6 @@ static QDict *qmp_greeting(Monitor *mon)
-         ver, cap_list);
+     qdict_put_str(req, "execute", "user_def_cmd");
+ 
+     resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp != NULL);
+-    assert(!qdict_haskey(qobject_to(QDict, resp), "error"));
++    assert(!qdict_haskey(resp, "error"));
+ 
+     qobject_unref(resp);
+     qobject_unref(req);
+@@ -115,13 +115,13 @@ static void test_dispatch_cmd_failure(void)
+ {
+     QDict *req = qdict_new();
+     QDict *args = qdict_new();
+-    QObject *resp;
++    QDict *resp;
+ 
+     qdict_put_str(req, "execute", "user_def_cmd2");
+ 
+     resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp != NULL);
+-    assert(qdict_haskey(qobject_to(QDict, resp), "error"));
++    assert(qdict_haskey(resp, "error"));
+ 
+     qobject_unref(resp);
+     qobject_unref(req);
+@@ -135,7 +135,7 @@ static void test_dispatch_cmd_failure(void)
+ 
+     resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp != NULL);
+-    assert(qdict_haskey(qobject_to(QDict, resp), "error"));
++    assert(qdict_haskey(resp, "error"));
+ 
+     qobject_unref(resp);
+     qobject_unref(req);
+@@ -143,18 +143,15 @@ static void test_dispatch_cmd_failure(void)
+ 
+ static QObject *test_qmp_dispatch(QDict *req)
+ {
+-    QObject *resp_obj;
+     QDict *resp;
+     QObject *ret;
+ 
+-    resp_obj = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+-    assert(resp_obj);
+-    resp = qobject_to(QDict, resp_obj);
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req), false);
+     assert(resp && !qdict_haskey(resp, "error"));
+     ret = qdict_get(resp, "return");
+     assert(ret);
+     qobject_ref(ret);
+-    qobject_unref(resp_obj);
++    qobject_unref(resp);
+     return ret;
  }
  
--static void monitor_qmp_caps_reset(Monitor *mon)
--{
--    memset(mon->qmp.qmp_caps, 0, sizeof(mon->qmp.qmp_caps));
--}
--
- static void monitor_qmp_event(void *opaque, int event)
- {
-     QDict *data;
 -- 
 2.17.1
