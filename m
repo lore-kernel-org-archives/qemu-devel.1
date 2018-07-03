@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faO9U-0002bD-OX
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:27:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1faODW-0005jj-NI
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:31:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faO9Q-0001sk-QY
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:27:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54052 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1faO9Q-0001sJ-Ka
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:27:36 -0400
-References: <86b43998-fc9e-75bf-564c-a64d72163793@huawei.com>
-	<20180702131518.GF2155@stefanha-x1.localdomain>
-	<c3e76f29-9259-f56d-6829-8abd6dd7da88@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <65ada9e4-0495-ce50-1404-3ee6b74d0607@redhat.com>
-Date: Tue, 3 Jul 2018 18:27:31 +0200
+	(envelope-from <eblake@redhat.com>) id 1faODV-0003zu-TH
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 12:31:50 -0400
+References: <20180609153217.19683-1-vsementsov@virtuozzo.com>
+	<e56d4b22-dfe3-f127-679f-a5609f78d8db@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <98dd2ba5-8e7e-0584-ef0f-1bd9be409a5d@redhat.com>
+Date: Tue, 3 Jul 2018 11:31:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <c3e76f29-9259-f56d-6829-8abd6dd7da88@huawei.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <e56d4b22-dfe3-f127-679f-a5609f78d8db@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] question: disk missing in the guest contingently
- when hotplug several virtio scsi disks consecutively.
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] NBD reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: l00284672 <lizhengui@huawei.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: famz@redhat.com, kwolf@redhat.com, "Fangyi (C)" <eric.fangyi@huawei.com>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 03/07/2018 09:20, l00284672 wrote:
+On 07/03/2018 08:46 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all.
 >=20
-> }
+> before v4 realization, I'd like to discuss some questions.
 >=20
-> The scsi inqury request from guest is cancelled by qemu. The qemu bt is
-> below:
+> Our proposal for v4 is the following:
 >=20
-> (gdb) bt
-> #0=A0 scsi_req_cancel_async (req=3D0x7f86d00055c0, notifier=3D0x0) at
-> hw/scsi/scsi-bus.c:1825
-> #1=A0 0x000055b50ac254c7 in scsi_device_purge_requests
-> (sdev=3Dsdev@entry=3D0x55b50f9a8990, sense=3D...) at hw/scsi/scsi-bus.c=
-:1925
-> #2=A0 0x000055b50ac1d337 in scsi_disk_reset (dev=3D0x55b50f9a8990) at
-> hw/scsi/scsi-disk.c:2186
-> #3=A0 0x000055b50ab95d91 in device_set_realized (obj=3D<optimized out>,
-> value=3D<optimized out>, errp=3D0x7ffedda81898) at hw/core/qdev.c:949
-> #4=A0 0x000055b50acd167e in property_set_bool (obj=3D0x55b50f9a8990,
-> v=3D<optimized out>, name=3D<optimized out>, opaque=3D0x55b50f9c1b50,
-> errp=3D0x7ffedda81898) at qom/object.c:1854
-> #5=A0 0x000055b50acd5091 in object_property_set_qobject
-> (obj=3Dobj@entry=3D0x55b50f9a8990, value=3Dvalue@entry=3D0x55b50f997350=
-,
-> name=3Dname@entry=3D0x55b50ae0260b "realized",
-> =A0=A0=A0 errp=3Derrp@entry=3D0x7ffedda81898) at qom/qom-qobject.c:27
-> #6=A0 0x000055b50acd3210 in object_property_set_bool (obj=3D0x55b50f9a8=
-990,
-> value=3D<optimized out>, name=3D0x55b50ae0260b "realized",
-> errp=3D0x7ffedda81898) at qom/object.c:1157
-> #7=A0 0x000055b50ab1e0b5 in qdev_device_add
-> (opts=3Dopts@entry=3D0x55b50ceb9880, errp=3Derrp@entry=3D0x7ffedda81978=
-) at
-> qdev-monitor.c:627
+> 1. don't reconnect on nbd_open. So, on open we do only one connect=20
+> attempt, and if it fails, open fails.
+> 2. don't configure timeout between attempts. instead do the following:
+>  =C2=A0=C2=A0=C2=A0 1s timeout, then 2s, then 4, 8, 16, and then always=
+ 16 until success
+> 3. configure only time, after disconnect, during which requests are=20
+> paused (and after this time, if not connected, they will return EIO). O=
+r=20
+> not configure it for now, make a default of 5 minutes.
+>=20
+> Any ideas?
 
-It looks like the hotplug event is sent too early to the guest?
+I apologize that I haven't had time to review this series closely.  At=20
+this point, I think it's missed 3.0, and will have to be 3.1 material.=20
+Your proposal for exponential backoff on reconnect attempts makes sense;=20
+beyond that, I haven't reviewed closely enough to know if I have other=20
+suggestions on how many knobs to expose to the user, vs. how much to=20
+make automatic.
 
-Paolo
+>=20
+>=20
+> 09.06.2018 18:32, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all.
+>>
+>> Here is NBD reconnect.
+>> The feature realized inside nbd-client driver and works as follows:
+>>
+>> There are two parameters: reconnect-attempts and reconnect-timeout.
+>> So, we will try to reconnect in case of initial connection failed or
+>> in case of connection lost. All current and new io operations will wai=
+t
+>> until we make reconnect-attempts tries to reconnect. After this, all
+>> requests will fail with EIO, but we will continue trying to reconnect.
+>>
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
