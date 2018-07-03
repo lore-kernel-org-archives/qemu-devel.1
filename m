@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1faHs8-0001kZ-RS
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:22 -0400
+	(envelope-from <groug@kaod.org>) id 1faHsU-000288-S6
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1faHs7-000536-No
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44576)
+	(envelope-from <groug@kaod.org>) id 1faHsR-0005I4-QZ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:42 -0400
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:50507)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1faHs7-00051U-EX
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:19 -0400
-Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
-	[10.5.11.27])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A7DF73082149
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 09:45:18 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  3 Jul 2018 11:45:05 +0200
-Message-Id: <20180703094508.25987-2-kraxel@redhat.com>
-In-Reply-To: <20180703094508.25987-1-kraxel@redhat.com>
-References: <20180703094508.25987-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1faHsR-0005Ch-IX
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 05:45:39 -0400
+Received: from player730.ha.ovh.net (unknown [10.109.122.124])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 13657C753C
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 11:45:30 +0200 (CEST)
+Date: Tue, 3 Jul 2018 11:45:15 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180703114515.4c2f0da3@bahia.lan>
+In-Reply-To: <CAFEAcA9qdYYnCNTNSotEfMzvOPCBj_baxANmixGmQKBbHejnww@mail.gmail.com>
+References: <20180702163125.28729-1-pbonzini@redhat.com>
+	<20180703100044.5d265acb@bahia.lan>
+	<CAFEAcA9qdYYnCNTNSotEfMzvOPCBj_baxANmixGmQKBbHejnww@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/4] virtio-gpu: tweak scanout disable.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fsdev: fix compilation with VIRTIO but not
+ VIRTIO_9P
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-- Factor out the code to virtio_gpu_disable_scanout().
-- Allow disable scanout 0, show a message then.
-- Clear scanout->resource_id.
+On Tue, 3 Jul 2018 09:46:01 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180702162443.16796-2-kraxel@redhat.com
----
- hw/display/virtio-gpu.c | 47 +++++++++++++++++++++++++++++--------------=
-----
- 1 file changed, 29 insertions(+), 18 deletions(-)
+> On 3 July 2018 at 09:00, Greg Kurz <groug@kaod.org> wrote:
+> > On Mon,  2 Jul 2018 18:31:25 +0200
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >  
+> >> hw/9pfs/Makefile.objs uses CONFIG_VIRTIO_9P to guard the definition for
+> >> FileOperations structs, while fsdev/Makefile.objs uses CONFIG_VIRTIO
+> >> to guard the use.  Mismatch causes linking to fail when CONFIG_VIRTIO
+> >> is set but CONFIG_VIRTIO_9P is not.
+> >>
+> >> Fix it and use if/else to clarify that the two lines are for opposite
+> >> conditions.
+> >>
+> >> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> >> Fixes: b5dfdb082fc350f3e68dfa61dc988d97cad28cfe
+> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >> ---  
+> >
+> > Acked-by: Greg Kurz <groug@kaod.org>
+> > Tested-by: Greg Kurz <groug@kaod.org>
+> >
+> > Peter,
+> >
+> > I see this patch is needed for the latest RISC-V pull req.  
+> 
+> It isn't, because that pullreq only fails because of what
+> looks to me like a rebase mismerge that made it change how
+> the riscv default-configs enable virtio. The riscv pullreq
+> should be fixed. This is just a cleanup, really.
+> 
 
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 2dd3c3481a..054ec73c0a 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -399,6 +399,34 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU =
-*g,
-     g->hostmem +=3D res->hostmem;
- }
-=20
-+static void virtio_gpu_disable_scanout(VirtIOGPU *g, int scanout_id)
-+{
-+    struct virtio_gpu_scanout *scanout =3D &g->scanout[scanout_id];
-+    struct virtio_gpu_simple_resource *res;
-+    DisplaySurface *ds =3D NULL;
-+
-+    if (scanout->resource_id =3D=3D 0) {
-+        return;
-+    }
-+
-+    res =3D virtio_gpu_find_resource(g, scanout->resource_id);
-+    if (res) {
-+        res->scanout_bitmask &=3D ~(1 << scanout_id);
-+    }
-+
-+    if (scanout_id =3D=3D 0) {
-+        /* primary head */
-+        ds =3D qemu_create_message_surface(scanout->width  ?: 640,
-+                                         scanout->height ?: 480,
-+                                         "Guest disabled display.");
-+    }
-+    dpy_gfx_replace_surface(scanout->con, ds);
-+    scanout->resource_id =3D 0;
-+    scanout->ds =3D NULL;
-+    scanout->width =3D 0;
-+    scanout->height =3D 0;
-+}
-+
- static void virtio_gpu_resource_destroy(VirtIOGPU *g,
-                                         struct virtio_gpu_simple_resourc=
-e *res)
- {
-@@ -583,24 +611,7 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
-=20
-     g->enable =3D 1;
-     if (ss.resource_id =3D=3D 0) {
--        scanout =3D &g->scanout[ss.scanout_id];
--        if (scanout->resource_id) {
--            res =3D virtio_gpu_find_resource(g, scanout->resource_id);
--            if (res) {
--                res->scanout_bitmask &=3D ~(1 << ss.scanout_id);
--            }
--        }
--        if (ss.scanout_id =3D=3D 0) {
--            qemu_log_mask(LOG_GUEST_ERROR,
--                          "%s: illegal scanout id specified %d",
--                          __func__, ss.scanout_id);
--            cmd->error =3D VIRTIO_GPU_RESP_ERR_INVALID_SCANOUT_ID;
--            return;
--        }
--        dpy_gfx_replace_surface(g->scanout[ss.scanout_id].con, NULL);
--        scanout->ds =3D NULL;
--        scanout->width =3D 0;
--        scanout->height =3D 0;
-+        virtio_gpu_disable_scanout(g, ss.scanout_id);
-         return;
-     }
-=20
---=20
-2.9.3
+Ok, thanks for the clarification.
+
+I've applied this to 9p-next.
+
+> thanks
+> -- PMM
