@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1faBuC-0006EV-GL
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:23:05 -0400
+	(envelope-from <jcody@redhat.com>) id 1faBuX-0006Ox-F3
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:23:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1faBu7-0004Ub-Ji
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:23:04 -0400
-Date: Mon, 2 Jul 2018 23:22:57 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180703032257.GA29222@flamenco>
-References: <1530568927-4738-1-git-send-email-cota@braap.org>
-	<20180703010348.GG3422@umbus.fritz.box>
+	(envelope-from <jcody@redhat.com>) id 1faBuW-0005Lr-Gt
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:23:25 -0400
+Date: Mon, 2 Jul 2018 23:23:12 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180703032312.GA4184563@localhost.localdomain>
+References: <20180703023758.14422-1-famz@redhat.com>
+	<20180703023758.14422-2-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180703010348.GG3422@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: set is_jmp on
- ppc_tr_breakpoint_check
+In-Reply-To: <20180703023758.14422-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] block: Fix parameter checking in
+ bdrv_co_copy_range_internal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Jul 03, 2018 at 11:03:48 +1000, David Gibson wrote:
-> On Mon, Jul 02, 2018 at 06:02:07PM -0400, Emilio G. Cota wrote:
-> > The use of GDB breakpoints was broken by b0c2d52 ("target/ppc: convert
-> > to TranslatorOps", 2018-02-16).
-> > 
-> > Fix it by setting is_jmp, so that we break from the translation loop
-> > as originally intended.
-> > 
-> > Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> > ---
-> > (I'll send this to qemu-stable (for 2.12) once it's on master.)
+On Tue, Jul 03, 2018 at 10:37:56AM +0800, Fam Zheng wrote:
+> src may be NULL if BDRV_REQ_ZERO_WRITE flag is set, in this case only
+> check dst and dst->bs. This bug was introduced when moving in the
+> request tracking code from bdrv_co_copy_range, in 37aec7d75eb.
 > 
-> Applied to ppc-for-3.0.  It's kind of lucky I happened to pick this up
-> on qemu-ppc - I'm not able to read that all the time.  Things will get
-> merged much faster if you CC me directly on things to go through the
-> ppc tree.
+> This especially fixes the possible segfault when initializing src_bs
+> with a NULL src.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-Sorry I forgot to Cc you -- will do better next time.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Thanks,
-
-		Emilio
+> ---
+>  block/io.c | 29 +++++++++++++++--------------
+>  1 file changed, 15 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 7035b78a20..b8845708d7 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2897,18 +2897,11 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
+>                                                      bool recurse_src)
+>  {
+>      BdrvTrackedRequest src_req, dst_req;
+> -    BlockDriverState *src_bs = src->bs;
+> -    BlockDriverState *dst_bs = dst->bs;
+>      int ret;
+>  
+> -    if (!src || !dst || !src->bs || !dst->bs) {
+> +    if (!dst || !dst->bs) {
+>          return -ENOMEDIUM;
+>      }
+> -    ret = bdrv_check_byte_request(src->bs, src_offset, bytes);
+> -    if (ret) {
+> -        return ret;
+> -    }
+> -
+>      ret = bdrv_check_byte_request(dst->bs, dst_offset, bytes);
+>      if (ret) {
+>          return ret;
+> @@ -2917,16 +2910,24 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
+>          return bdrv_co_pwrite_zeroes(dst, dst_offset, bytes, flags);
+>      }
+>  
+> +    if (!src || !src->bs) {
+> +        return -ENOMEDIUM;
+> +    }
+> +    ret = bdrv_check_byte_request(src->bs, src_offset, bytes);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+>      if (!src->bs->drv->bdrv_co_copy_range_from
+>          || !dst->bs->drv->bdrv_co_copy_range_to
+>          || src->bs->encrypted || dst->bs->encrypted) {
+>          return -ENOTSUP;
+>      }
+> -    bdrv_inc_in_flight(src_bs);
+> -    bdrv_inc_in_flight(dst_bs);
+> -    tracked_request_begin(&src_req, src_bs, src_offset,
+> +    bdrv_inc_in_flight(src->bs);
+> +    bdrv_inc_in_flight(dst->bs);
+> +    tracked_request_begin(&src_req, src->bs, src_offset,
+>                            bytes, BDRV_TRACKED_READ);
+> -    tracked_request_begin(&dst_req, dst_bs, dst_offset,
+> +    tracked_request_begin(&dst_req, dst->bs, dst_offset,
+>                            bytes, BDRV_TRACKED_WRITE);
+>  
+>      wait_serialising_requests(&src_req);
+> @@ -2944,8 +2945,8 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
+>      }
+>      tracked_request_end(&src_req);
+>      tracked_request_end(&dst_req);
+> -    bdrv_dec_in_flight(src_bs);
+> -    bdrv_dec_in_flight(dst_bs);
+> +    bdrv_dec_in_flight(src->bs);
+> +    bdrv_dec_in_flight(dst->bs);
+>      return ret;
+>  }
+>  
+> -- 
+> 2.17.1
+> 
