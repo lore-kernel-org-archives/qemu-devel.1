@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1faMrI-0004Ac-7V
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1faMs6-0004w9-Sv
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1faMrH-0000mh-9W
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:48 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1faMrH-0000m9-4H
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:04:47 -0400
-Received: by mail-oi0-x241.google.com with SMTP id v8-v6so4441273oie.5
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 08:04:47 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1faMs1-0001LJ-L6
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:05:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35114 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faMs1-0001Ko-Ex
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:05:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180627163551.31610-1-marcandre.lureau@redhat.com>
+	<20180627163551.31610-16-marcandre.lureau@redhat.com>
+Date: Tue, 03 Jul 2018 17:05:31 +0200
+In-Reply-To: <20180627163551.31610-16-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 27 Jun 2018
+	18:35:51 +0200")
+Message-ID: <874lhg8imc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Jul 2018 16:04:25 +0100
-Message-ID: <CAFEAcA87Fog9mMsUFNSjpyAv3naEO-RSCXu-75HMLynaWim6Ew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/35] ppc-for-3.0 queue 20180703
+Subject: Re: [Qemu-devel] [PATCH v6 15/15] qapi: add conditions to SPICE
+ type/commands/events on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 3 July 2018 at 06:57, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit ab08440a4ee09032d1a9cb22fdcab23bc7e1c6=
-56:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180702' into =
-staging (2018-07-02 17:57:46 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180703
->
-> for you to fetch changes up to 29f9cef39eb1ae55e82c6763eb22d7a1bdff7276:
->
->   ppc: Include vga cirrus card into the compiling process (2018-07-03 11:=
-23:09 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-07-03
->
-> Here's a last minue pull request before today's soft freeze.  Ideally
-> I would have sent this earlier, but I was waiting for a couple of
-> extra fixes I knew were close.  And the freeze crept up on me, like
-> always.
->
-> Most of the changes here are bugfixes in any case.  There are some
-> cleanups as well, which have been in my staging tree for a little
-> while.  There are a couple of truly new features (some extensions to
-> the sam460ex platform), but these are low risk, since they only affect
-> a new and not really stabilized machine type anyway.
->
-> Higlights are:
->   * Mac platform improvements from Mark Cave-Ayland
->   * Sam460ex improvements from BALATON Zoltan et al.
->   * XICS interrupt handler cleanups from C=C3=A9dric Le Goater
->   * TCG improvements for atomic loads and stores from Richard
->     Henderson
->   * Assorted other bugfixes
->
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Applied, thanks.
+> Add #if defined(CONFIG_SPICE) in generated code, and adjust the
+> qmp/hmp code accordingly.
+>
+> query-qmp-schema no longer reports the command/events etc as
+> available when disabled at compile time.
+>
+> Commands made conditional:
+>
+> * query-spice
+>
+>   Before the patch, the command for !CONFIG_SPICE is unregistered. It
+>   will fail with the same error.
+>
+> Events made conditional:
+>
+> * SPICE_CONNECTED, SPICE_INITIALIZED, SPICE_DISCONNECTED,
+>   SPICE_MIGRATE_COMPLETED
+>
+> Add TODO for conditional SPICE chardevs, delayed until the supports
+> for conditional members lands.
+>
+> No HMP change, the code was already conditional.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
--- PMM
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
