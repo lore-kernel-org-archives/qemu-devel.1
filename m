@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faAGH-0004l5-JG
+	(envelope-from <eblake@redhat.com>) id 1faAGH-0004kz-GV
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1faAGG-0005B9-EI
+	(envelope-from <eblake@redhat.com>) id 1faAGG-0005BJ-Gd
 	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:45 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  2 Jul 2018 20:37:26 -0500
-Message-Id: <20180703013730.55375-3-eblake@redhat.com>
+Date: Mon,  2 Jul 2018 20:37:27 -0500
+Message-Id: <20180703013730.55375-4-eblake@redhat.com>
 In-Reply-To: <20180703013730.55375-1-eblake@redhat.com>
 References: <20180703013730.55375-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/6] iscsi: Avoid potential for get_status
- overflow
+Subject: [Qemu-devel] [PULL 3/6] blockdev: enable non-root nodes for backup
+ source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +21,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:iSCSI" <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Detected by Coverity: Multiplying two 32-bit int and assigning
-the result to a 64-bit number is a risk of overflow.  Prior to
-the conversion to byte-based interfaces, the block layer took
-care of ensuring that a status request never exceeded 2G in
-the driver; but after that conversion, the block layer expects
-drivers to deal with any size request (the driver can always
-truncate the request size back down, as long as it makes
-progress).  So, in the off-chance that someone makes a large
-request, we are at the mercy of whether iscsi_get_lba_status_task()
-will cap things to at most INT_MAX / iscsilun->block_size when
-it populates lbasd->num_blocks; since I could not easily audit
-that, it's better to be safe than sorry by just forcing a 64-bit
-multiply.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Fixes: 92809c36
-CC: qemu-stable@nongnu.org
+This is needed to implement the image-fleecing workflow where we
+create a temporary node backed by an active node, then start
+backupdev-backup sync=none from the active node to the temp node.
+
+In this case, the active node is now a root node AND a backing node,
+so it no longer qualifies as a root node, so we loosen the restriction
+on which nodes can be considered as the source for a backup.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-Id: <20180702194630.9360-2-jsnow@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180508212718.1482663-1-eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- block/iscsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ blockdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 9beb06d4986..ead2bd5aa7f 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -734,7 +734,7 @@ retry:
-         goto out_unlock;
+diff --git a/blockdev.c b/blockdev.c
+index 58d75709327..72f5347df5f 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1859,7 +1859,7 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
+     assert(common->action->type == TRANSACTION_ACTION_KIND_BLOCKDEV_BACKUP);
+     backup = common->action->u.blockdev_backup.data;
+
+-    bs = qmp_get_root_bs(backup->device, errp);
++    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
+         return;
+     }
+@@ -3517,7 +3517,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+         backup->compress = false;
      }
 
--    *pnum =3D lbasd->num_blocks * iscsilun->block_size;
-+    *pnum =3D (int64_t) lbasd->num_blocks * iscsilun->block_size;
-
-     if (lbasd->provisioning =3D=3D SCSI_PROVISIONING_TYPE_DEALLOCATED ||
-         lbasd->provisioning =3D=3D SCSI_PROVISIONING_TYPE_ANCHORED) {
---=20
+-    bs = qmp_get_root_bs(backup->device, errp);
++    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
+         return NULL;
+     }
+-- 
 2.14.4
