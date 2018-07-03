@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faC7G-0001FN-L5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:36:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faCAE-00026h-Qc
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faC7D-0004go-HW
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:36:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44336 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1faC7D-0004ga-CN
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:36:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8443C4072CE6
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 03:36:30 +0000 (UTC)
-Date: Tue, 3 Jul 2018 11:36:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180703033625.GP2455@xz-mi>
-References: <20180702162218.13678-1-armbru@redhat.com>
-	<20180702162218.13678-8-armbru@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1faCAD-0006My-Rv
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 23:39:38 -0400
+Date: Tue, 3 Jul 2018 13:31:56 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180703033156.GK3422@umbus.fritz.box>
+References: <1530568927-4738-1-git-send-email-cota@braap.org>
+	<20180703010348.GG3422@umbus.fritz.box>
+	<20180703032257.GA29222@flamenco>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="GwwLvQJ0l3HSwfoE"
 Content-Disposition: inline
-In-Reply-To: <20180702162218.13678-8-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/32] qmp: Make "id" optional again even
- in "oob" monitors
+In-Reply-To: <20180703032257.GA29222@flamenco>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: set is_jmp on
+ ppc_tr_breakpoint_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, stefanha@redhat.com, dgilbert@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-On Mon, Jul 02, 2018 at 06:21:53PM +0200, Markus Armbruster wrote:
-> Commit cf869d53172 "qmp: support out-of-band (oob) execution" made
-> "id" mandatory for all commands when the client accepted capability
-> "oob".  This is rather onerous when you play with QMP by hand, and
-> unnecessarily so: only out-of-band commands need an ID for reliable
-> matching of response to command.
-> 
-> Revert that part of commit cf869d53172 for now.  We may still make
-> "id" mandatory for out-of-band commands.
 
-This change should be okay with current implementation when
-out-of-band commands are still in order themselves, though I'm still
-not that confident on whether we really want this change if only for
-the sake of easier usage for human beings.
+--GwwLvQJ0l3HSwfoE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If we see Libvirt, the real player for QMP - it has the "id" field
-even for in-band commands always.  I'd say the "id" field is really
-helpful for machines, though not that friendly to us.
+On Mon, Jul 02, 2018 at 11:22:57PM -0400, Emilio G. Cota wrote:
+> On Tue, Jul 03, 2018 at 11:03:48 +1000, David Gibson wrote:
+> > On Mon, Jul 02, 2018 at 06:02:07PM -0400, Emilio G. Cota wrote:
+> > > The use of GDB breakpoints was broken by b0c2d52 ("target/ppc: convert
+> > > to TranslatorOps", 2018-02-16).
+> > >=20
+> > > Fix it by setting is_jmp, so that we break from the translation loop
+> > > as originally intended.
+> > >=20
+> > > Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> > > ---
+> > > (I'll send this to qemu-stable (for 2.12) once it's on master.)
+> >=20
+> > Applied to ppc-for-3.0.  It's kind of lucky I happened to pick this up
+> > on qemu-ppc - I'm not able to read that all the time.  Things will get
+> > merged much faster if you CC me directly on things to go through the
+> > ppc tree.
+>=20
+> Sorry I forgot to Cc you -- will do better next time.
 
-Basically I'll read it as: machines like "id"s, humans hate "id"s.
-And QMP is Qemu Machine Protocol after all... so not sure whether
-it'll be good we change that for us humans.
+Great, thanks.
 
-Regards,
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
--- 
-Peter Xu
+--GwwLvQJ0l3HSwfoE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls67ioACgkQbDjKyiDZ
+s5Lp3BAAtgm+kdkbWZ2EMz5ETMvNdy8wZR9oIdzbbs81kirVDAaSK+y1GoteL9PK
+8RBEqraYkKfkTDhnYP6DC6mja+uxWBkBLVC6jJvEr0Hu6dp/HDuf6TToKnkWa2Hi
+sU0LDcZEsjomgiLxuWt3+yQ/gcuthcD3lesXvtotNToYkowNMXtjtvu60+wK8tRc
+RsxfdFzEuQkBlKOwmK6tGr4al1UdKVbZ0dUny9BZomxqAfBn0GGVPh8XQUbgO1mw
+NnAJygq/RI8xdJy+UPVJTUh1xMUbu1Cnwl9NzehDQJF8fFL2ufERVd13BrqgI48n
+Glta4v9Tq7JhOEDCNspi3uRl5MvnFqAhE2zKhG5aIul1SodFg8ZvM3LW+xHyD5+S
+qVHiOAm1evuw9IwaSjP7E4edyFNHcBvhAJ1S/deE7l1y1McyBoP+FlBiZeS17Cmo
+jHu5CEfnhamGqTWd10aqe4crRffgl35s8pSpjZTcs/CpvNEMwDTgJGv7OXKuHL5n
+dnvnfR8ssflH/Ox0iHArRno4FyT3MdQUxbZn9XWH+elzCEnLzIgOQ6Bi397gLM9l
+ej5naMsaxWAQHsRdW0ib3/ihp945RuT97f1+S28XfsjaGmqWWV5vh26WSko8JJ0v
+Lnys5xD5o1W+e5MmFBOFXAGd+kC5lMixxukzGuvVkkr0KVBGs84=
+=oDt7
+-----END PGP SIGNATURE-----
+
+--GwwLvQJ0l3HSwfoE--
