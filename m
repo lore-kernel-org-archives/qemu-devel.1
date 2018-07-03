@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faI8a-0001v9-Mn
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1faI8k-00021y-NT
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1faI8V-0002qb-QE
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:20 -0400
-References: <c791ba035f26ea957e8f3602e3009b621769b1ba.1530611283.git.mprivozn@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1faI8g-0002wH-0J
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54424 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1faI8f-0002w3-Pl
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:02:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 50BF14071181
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 10:02:25 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-239.ams2.redhat.com
+	[10.36.117.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CBF8B1C5AA
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 10:02:24 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fc0d0005-d2bc-e466-5b99-072ddadd7110@redhat.com>
-Date: Tue, 3 Jul 2018 12:01:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <c791ba035f26ea957e8f3602e3009b621769b1ba.1530611283.git.mprivozn@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pr-helper: Rework socket path handling
+Date: Tue,  3 Jul 2018 12:02:24 +0200
+Message-Id: <20180703100224.6203-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] pr-helper: avoid error on PR IN command with
+ zero request size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,131 +32,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 03/07/2018 11:51, Michal Privoznik wrote:
-> When reviewing Paolo's pr-helper patches I've noticed couple of
-> problems:
-> 
-> 1) socket_path needs to be calculated at two different places
-> (one for printing out help, the other if socket activation is NOT
-> used),
-> 
-> 2) even though the default socket_path is allocated in
-> compute_default_paths() it is the only default path the function
-> handles. For instance, pidfile is allocated outside of this
-> function. And yet again, at different places than 1)
-> 
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+After reading a PR IN command with zero request size in prh_read_request,
+the resp->result field will be uninitialized and the resp.sz field will
+be also uninitialized when returning to prh_co_entry.
 
-Queued, thanks.
+If resp->result == GOOD (from a previous successful reply or just luck),
+then the assert in prh_write_response might not be triggered and
+uninitialized response will be sent.
 
-Paolo
+The fix is to remove the whole handling of sz == 0 in prh_co_entry.
+Those errors apply only to PR OUT commands and it's perfectly okay to
+catch them later in do_pr_out and multipath_pr_out; the check for
+too-short parameters in fact doesn't apply in the easy SG_IO case, as
+it can be left to the target firmware even.
 
-> ---
->  scsi/qemu-pr-helper.c | 36 ++++++++++--------------------------
->  1 file changed, 10 insertions(+), 26 deletions(-)
-> 
-> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-> index 0218d65bbf..59df3fd608 100644
-> --- a/scsi/qemu-pr-helper.c
-> +++ b/scsi/qemu-pr-helper.c
-> @@ -76,14 +76,12 @@ static int gid = -1;
->  
->  static void compute_default_paths(void)
->  {
-> -    if (!socket_path) {
-> -        socket_path = qemu_get_local_state_pathname("run/qemu-pr-helper.sock");
-> -    }
-> +    socket_path = qemu_get_local_state_pathname("run/qemu-pr-helper.sock");
-> +    pidfile = qemu_get_local_state_pathname("run/qemu-pr-helper.pid");
->  }
->  
->  static void usage(const char *name)
->  {
-> -    compute_default_paths();
->      (printf) (
->  "Usage: %s [OPTIONS] FILE\n"
->  "Persistent Reservation helper program for QEMU\n"
-> @@ -844,19 +842,6 @@ static gboolean accept_client(QIOChannel *ioc, GIOCondition cond, gpointer opaqu
->      return TRUE;
->  }
->  
-> -
-> -/*
-> - * Check socket parameters compatibility when socket activation is used.
-> - */
-> -static const char *socket_activation_validate_opts(void)
-> -{
-> -    if (socket_path != NULL) {
-> -        return "Unix socket can't be set when using socket activation";
-> -    }
-> -
-> -    return NULL;
-> -}
-> -
->  static void termsig_handler(int signum)
->  {
->      atomic_cmpxchg(&state, RUNNING, TERMINATE);
-> @@ -930,6 +915,7 @@ int main(int argc, char **argv)
->      char *trace_file = NULL;
->      bool daemonize = false;
->      bool pidfile_specified = false;
-> +    bool socket_path_specified = false;
->      unsigned socket_activation;
->  
->      struct sigaction sa_sigterm;
-> @@ -946,12 +932,14 @@ int main(int argc, char **argv)
->      qemu_add_opts(&qemu_trace_opts);
->      qemu_init_exec_dir(argv[0]);
->  
-> -    pidfile = qemu_get_local_state_pathname("run/qemu-pr-helper.pid");
-> +    compute_default_paths();
->  
->      while ((ch = getopt_long(argc, argv, sopt, lopt, &opt_ind)) != -1) {
->          switch (ch) {
->          case 'k':
-> -            socket_path = optarg;
-> +            g_free(socket_path);
-> +            socket_path = g_strdup(optarg);
-> +            socket_path_specified = true;
->              if (socket_path[0] != '/') {
->                  error_report("socket path must be absolute");
->                  exit(EXIT_FAILURE);
-> @@ -1042,10 +1030,9 @@ int main(int argc, char **argv)
->      socket_activation = check_socket_activation();
->      if (socket_activation == 0) {
->          SocketAddress saddr;
-> -        compute_default_paths();
->          saddr = (SocketAddress){
->              .type = SOCKET_ADDRESS_TYPE_UNIX,
-> -            .u.q_unix.path = g_strdup(socket_path)
-> +            .u.q_unix.path = socket_path,
->          };
->          server_ioc = qio_channel_socket_new();
->          if (qio_channel_socket_listen_sync(server_ioc, &saddr, &local_err) < 0) {
-> @@ -1053,12 +1040,10 @@ int main(int argc, char **argv)
->              error_report_err(local_err);
->              return 1;
->          }
-> -        g_free(saddr.u.q_unix.path);
->      } else {
->          /* Using socket activation - check user didn't use -p etc. */
-> -        const char *err_msg = socket_activation_validate_opts();
-> -        if (err_msg != NULL) {
-> -            error_report("%s", err_msg);
-> +        if (socket_path_specified) {
-> +            error_report("Unix socket can't be set when using socket activation");
->              exit(EXIT_FAILURE);
->          }
->  
-> @@ -1075,7 +1060,6 @@ int main(int argc, char **argv)
->                           error_get_pretty(local_err));
->              exit(EXIT_FAILURE);
->          }
-> -        socket_path = NULL;
->      }
->  
->      if (qemu_init_main_loop(&local_err)) {
-> 
+The result is that prh_read_request does not fail requests anymore and
+prh_co_entry becomes simpler.
+
+Reported-by: Dima Stepanov <dimastep@yandex-team.ru>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scsi/qemu-pr-helper.c | 63 +++++++++++++++++++++----------------------
+ 1 file changed, 30 insertions(+), 33 deletions(-)
+
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 0218d65bbf..c89a446a45 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -455,6 +455,14 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+     char transportids[PR_HELPER_DATA_SIZE];
+     int r;
+ 
++    if (sz < PR_OUT_FIXED_PARAM_SIZE) {
++        /* Illegal request, Parameter list length error.  This isn't fatal;
++         * we have read the data, send an error without closing the socket.
++         */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM_LEN));
++        return CHECK_CONDITION;
++    }
++
+     switch (rq_servact) {
+     case MPATH_PROUT_REG_SA:
+     case MPATH_PROUT_RES_SA:
+@@ -574,6 +582,12 @@ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                      const uint8_t *param, int sz)
+ {
+     int resp_sz;
++
++    if ((fcntl(fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
++        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++        return CHECK_CONDITION;
++    }
++
+ #ifdef CONFIG_MPATH
+     if (is_mpath(fd)) {
+         return multipath_pr_out(fd, cdb, sense, param, sz);
+@@ -690,21 +704,6 @@ static int coroutine_fn prh_read_request(PRHelperClient *client,
+                                  errp) < 0) {
+             goto out_close;
+         }
+-        if ((fcntl(client->fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
+-            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_OPCODE));
+-            sz = 0;
+-        } else if (sz < PR_OUT_FIXED_PARAM_SIZE) {
+-            /* Illegal request, Parameter list length error.  This isn't fatal;
+-             * we have read the data, send an error without closing the socket.
+-             */
+-            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_PARAM_LEN));
+-            sz = 0;
+-        }
+-        if (sz == 0) {
+-            resp->result = CHECK_CONDITION;
+-            close(client->fd);
+-            client->fd = -1;
+-        }
+     }
+ 
+     req->fd = client->fd;
+@@ -785,25 +784,23 @@ static void coroutine_fn prh_co_entry(void *opaque)
+             break;
+         }
+ 
+-        if (sz > 0) {
+-            num_active_sockets++;
+-            if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
+-                r = do_pr_out(req.fd, req.cdb, resp.sense,
+-                              client->data, sz);
+-                resp.sz = 0;
+-            } else {
+-                resp.sz = sizeof(client->data);
+-                r = do_pr_in(req.fd, req.cdb, resp.sense,
+-                             client->data, &resp.sz);
+-                resp.sz = MIN(resp.sz, sz);
+-            }
+-            num_active_sockets--;
+-            close(req.fd);
+-            if (r == -1) {
+-                break;
+-            }
+-            resp.result = r;
++        num_active_sockets++;
++        if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
++            r = do_pr_out(req.fd, req.cdb, resp.sense,
++                          client->data, sz);
++            resp.sz = 0;
++        } else {
++            resp.sz = sizeof(client->data);
++            r = do_pr_in(req.fd, req.cdb, resp.sense,
++                         client->data, &resp.sz);
++            resp.sz = MIN(resp.sz, sz);
++        }
++        num_active_sockets--;
++        close(req.fd);
++        if (r == -1) {
++            break;
+         }
++        resp.result = r;
+ 
+         if (prh_write_response(client, &req, &resp, &local_err) < 0) {
+             break;
+-- 
+2.17.1
