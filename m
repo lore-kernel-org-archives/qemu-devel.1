@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxu-000848-LR
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1faSxx-00089H-UY
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faSxr-00069C-Ic
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48960 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faSxt-0006DA-EL
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45992 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxr-00068Z-BX
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:35:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faSxt-0006BY-82
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:36:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E12CEDFE1
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 966334015177
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:36:00 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BE7CB1C5B9
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:35:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5768A2026D76
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 21:36:00 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 23:35:37 +0200
-Message-Id: <20180703213556.20619-14-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 23:35:56 +0200
+Message-Id: <20180703213556.20619-33-armbru@redhat.com>
 In-Reply-To: <20180703213556.20619-1-armbru@redhat.com>
 References: <20180703213556.20619-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 13/32] qmp: Revert change to
- handle_qmp_command tracepoint
+Subject: [Qemu-devel] [PULL v2 32/32] qapi: Polish command flags
+ documentation in qapi-code-gen.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +36,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Commit 71da4667db6 "monitor: separate QMP parser and dispatcher" moved
-the handle_qmp_command tracepoint from handle_qmp_command() to
-monitor_qmp_dispatch_one().  This delays tracing from enqueue time to
-dequeue time.  Revert that.  Dequeue remains adequately visible via
-tracepoint monitor_qmp_cmd_in_band.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-14-armbru@redhat.com>
+Message-Id: <20180703085358.13941-33-armbru@redhat.com>
 ---
- monitor.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ docs/devel/qapi-code-gen.txt | 61 +++++++++++++++---------------------
+ 1 file changed, 25 insertions(+), 36 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 3bf3e68bdc..3cc4b07788 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4184,12 +4184,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index f020f6bab2..8decd6f17d 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -624,60 +624,48 @@ its return value.
+ In rare cases, QAPI cannot express a type-safe representation of a
+ corresponding Client JSON Protocol command.  You then have to suppress
+ generation of a marshalling function by including a key 'gen' with
+-boolean value false, and instead write your own function.  Please try
+-to avoid adding new commands that rely on this, and instead use
+-type-safe unions.  For an example of this usage:
++boolean value false, and instead write your own function.  For
++example:
  
-     g_free(req_obj);
+  { 'command': 'netdev_add',
+    'data': {'type': 'str', 'id': 'str'},
+    'gen': false }
  
--    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
--        QString *req_json = qobject_to_json(req);
--        trace_handle_qmp_command(mon, qstring_get_str(req_json));
--        qobject_unref(req_json);
--    }
--
-     old_mon = cur_mon;
-     cur_mon = mon;
- 
-@@ -4283,6 +4277,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         qdict_del(qdict, "id");
-     } /* else will fail qmp_dispatch() */
- 
-+    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
-+        QString *req_json = qobject_to_json(req);
-+        trace_handle_qmp_command(mon, qstring_get_str(req_json));
-+        qobject_unref(req_json);
-+    }
++Please try to avoid adding new commands that rely on this, and instead
++use type-safe unions.
 +
-     /* Check against the request in general layout */
-     qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
-     if (!qdict) {
+ Normally, the QAPI schema is used to describe synchronous exchanges,
+ where a response is expected.  But in some cases, the action of a
+ command is expected to change state in a way that a successful
+ response is not possible (although the command will still return a
+ normal dictionary error on failure).  When a successful reply is not
+-possible, the command expression should include the optional key
++possible, the command expression includes the optional key
+ 'success-response' with boolean value false.  So far, only QGA makes
+ use of this member.
+ 
+-A command can be declared to support out-of-band (OOB) execution.  By
+-default, commands do not support OOB.  To declare a command that
+-supports it, the schema includes an extra 'allow-oob' field.  For
+-example:
++Key 'allow-oob' declares whether the command supports out-of-band
++(OOB) execution.  It defaults to false.  For example:
+ 
+  { 'command': 'migrate_recover',
+    'data': { 'uri': 'str' }, 'allow-oob': true }
+ 
+-To execute a command with out-of-band priority, the client uses key
+-"exec-oob" instead of "execute".  Example:
++See qmp-spec.txt for out-of-band execution syntax and semantics.
+ 
+- => { "exec-oob": "migrate-recover",
+-      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
+- <= { "return": { } }
++Commands supporting out-of-band execution can still be executed
++in-band.
+ 
+-Without it, even the commands that support out-of-band execution will
+-still be run in-band.
++When a command is executed in-band, its handler runs in the main
++thread with the BQL held.
+ 
+-Under normal QMP command execution, the following apply to each
+-command:
++When a command is executed out-of-band, its handler runs in a
++dedicated monitor I/O thread with the BQL *not* held.
+ 
+-- They are executed in order,
+-- They run only in main thread of QEMU,
+-- They run with the BQL held.
++An OOB-capable command handler must satisfy the following conditions:
+ 
+-When a command is executed with OOB, the following changes occur:
+-
+-- They can be completed before a pending in-band command,
+-- They run in a dedicated monitor thread,
+-- They run with the BQL not held.
+-
+-OOB command handlers must satisfy the following conditions:
+-
+-- It terminates quickly,
+-- It does not invoke system calls that may block,
++- It terminates quickly.
++- It does not invoke system calls that may block.
+ - It does not access guest RAM that may block when userfaultfd is
+-  enabled for postcopy live migration,
++  enabled for postcopy live migration.
+ - It takes only "fast" locks, i.e. all critical sections protected by
+   any lock it takes also satisfy the conditions for OOB command
+   handler code.
+@@ -686,17 +674,18 @@ The restrictions on locking limit access to shared state.  Such access
+ requires synchronization, but OOB commands can't take the BQL or any
+ other "slow" lock.
+ 
+-If in doubt, do not implement OOB execution support.
++When in doubt, do not implement OOB execution support.
+ 
+-A command may use the optional 'allow-preconfig' key to permit its execution
+-at early runtime configuration stage (preconfig runstate).
+-If not specified then a command defaults to 'allow-preconfig': false.
++Key 'allow-preconfig' declares whether the command is available before
++the machine is built.  It defaults to false.  For example:
+ 
+-An example of declaring a command that is enabled during preconfig:
+  { 'command': 'qmp_capabilities',
+    'data': { '*enable': [ 'QMPCapability' ] },
+    'allow-preconfig': true }
+ 
++QMP is available before the machine is built only when QEMU was
++started with --preconfig.
++
+ === Events ===
+ 
+ Usage: { 'event': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
 -- 
 2.17.1
