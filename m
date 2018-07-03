@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faAFI-0004Dh-D5
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:36:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1faAGE-0004iF-4C
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faAFH-0004Mj-B4
-	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:36:44 -0400
-Date: Tue, 3 Jul 2018 11:13:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180703011322.GH3422@umbus.fritz.box>
-References: <cover.1530225513.git.balaton@eik.bme.hu>
-	<bf4086546f08124e57b9676e6c0b81386ee59b67.1530225513.git.balaton@eik.bme.hu>
+	(envelope-from <eblake@redhat.com>) id 1faAG8-00056E-Ve
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41618 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1faAG8-000564-Qn
+	for qemu-devel@nongnu.org; Mon, 02 Jul 2018 21:37:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F05C74075188
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 01:37:35 +0000 (UTC)
+Received: from red.redhat.com (ovpn-122-121.rdu2.redhat.com [10.10.122.121])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B72972026D76
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 01:37:35 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  2 Jul 2018 20:37:24 -0500
+Message-Id: <20180703013730.55375-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="saTAHnV464s+57Yq"
-Content-Disposition: inline
-In-Reply-To: <bf4086546f08124e57b9676e6c0b81386ee59b67.1530225513.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v6 5/5] target/ppc: Relax
- reserved bitmask of indexed store instructions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] NBD patches for 2018-07-02 (3.0 soft freeze)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
+The following changes since commit ab08440a4ee09032d1a9cb22fdcab23bc7e1c6=
+56:
 
---saTAHnV464s+57Yq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180702' into =
+staging (2018-07-02 17:57:46 +0100)
 
-On Fri, Jun 29, 2018 at 12:38:33AM +0200, BALATON Zoltan wrote:
-> The PPC440 User Manual says that if bit 31 is set, the contents of
-> CR[CR0] are undefined for indexed store instructions but this form is
-> not invalid. Other PPC variants confirming to recent ISA where this
-> bit may be reserved should ignore reserved bits and not raise invalid
-> instruction exception. In particular, MorphOS has an stwx instruction
-> with bit 31 set and fails to boot currently because of this. With this
-> patch it gets further.
->=20
-> ---
-> On sam460ex MorhpOS still has problems accessing PCI devices so cannot
-> yet boot but does not hit the invalid instruction exception and gets
-> further and fails due to not finding boot volume or display controller.
-> On mac99 it actually boots but needs an OpenBIOS patch to get USB
-> working (needed for mouse and keyboard). I'll prepare some docs on how
-> to run different guests but for the impatient here's a little hint:
-> -M mac99 -m 512 -vga none -device sm501 \
-> -prom-env 'boot-device=3Dcd:,\mac_ppc32\boot.img'
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+are available in the Git repository at:
 
-Applied to ppc-for-3.0, thanks.
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-07-02
 
-> ---
->  target/ppc/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 3a215a1..525d55e 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6886,7 +6886,7 @@ GEN_HANDLER(stop##u, opc, 0xFF, 0xFF, 0x00000000, t=
-ype),
->  #define GEN_STUX(name, stop, opc2, opc3, type)                          =
-      \
->  GEN_HANDLER(name##ux, 0x1F, opc2, opc3, 0x00000001, type),
->  #define GEN_STX_E(name, stop, opc2, opc3, type, type2, chk)             =
-      \
-> -GEN_HANDLER_E(name##x, 0x1F, opc2, opc3, 0x00000001, type, type2),
-> +GEN_HANDLER_E(name##x, 0x1F, opc2, opc3, 0x00000000, type, type2),
->  #define GEN_STS(name, stop, op, type)                                   =
-      \
->  GEN_ST(name, stop, op | 0x20, type)                                     =
-      \
->  GEN_STU(name, stop, op | 0x21, type)                                    =
-      \
+for you to fetch changes up to a1532a225a183c9fa60b9c1e8ac8a00c7771f64d:
+
+  iotests: New test 223 for exporting dirty bitmap over NBD (2018-07-02 1=
+9:50:37 -0500)
+
+Discussed but not included here: we need to ensure that during a
+backup sync:none job, writes must NOT be permitted to the fleecing
+node's backing file as long as reads are being served from the same
+area. Hopefully we can fix this via the existing job, instead of
+having to add a new filter node.
+
+----------------------------------------------------------------
+nbd patches for 2018-07-02
+
+Bug fixes and iotest exposure of fleecing via NBD (serving a
+read-only point-in-time view via blockdev-backup sync:none,
+as well as serving dirty bitmaps over NBD), including a new
+x-dirty-bitmap parameter when opening NBD clients as the
+counterpart to x-nbd-server-add-bitmap. Also a random fix
+for iscsi block_status spotted by Coverity that missed other
+miscellaneous trees.
+
+- Eric Blake: nbd/server: Fix dirty bitmap logic regression
+- Eric Blake: iscsi: Avoid potential for get_status overflow
+- John Snow/Vladimir Sementsov-Ogievskiy: 0/2 block: formalize and test f=
+leecing
+- Eric Blake: 0/2 test NBD bitmap export
+
+----------------------------------------------------------------
+Eric Blake (4):
+      nbd/server: Fix dirty bitmap logic regression
+      iscsi: Avoid potential for get_status overflow
+      nbd/client: Add x-dirty-bitmap to query bitmap from server
+      iotests: New test 223 for exporting dirty bitmap over NBD
+
+John Snow (1):
+      iotests: add 222 to test basic fleecing
+
+Vladimir Sementsov-Ogievskiy (1):
+      blockdev: enable non-root nodes for backup source
+
+ qapi/block-core.json       |   7 +-
+ block/nbd-client.h         |   1 +
+ include/block/nbd.h        |   1 +
+ block/iscsi.c              |   2 +-
+ block/nbd-client.c         |   3 +
+ block/nbd.c                |  10 ++-
+ blockdev.c                 |   4 +-
+ nbd/client.c               |   4 +-
+ nbd/server.c               |   2 +-
+ tests/qemu-iotests/222     | 155 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/222.out |  67 ++++++++++++++++++++
+ tests/qemu-iotests/223     | 138 +++++++++++++++++++++++++++++++++++++++=
++
+ tests/qemu-iotests/223.out |  49 ++++++++++++++
+ tests/qemu-iotests/group   |   2 +
+ 14 files changed, 436 insertions(+), 9 deletions(-)
+ create mode 100644 tests/qemu-iotests/222
+ create mode 100644 tests/qemu-iotests/222.out
+ create mode 100755 tests/qemu-iotests/223
+ create mode 100644 tests/qemu-iotests/223.out
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---saTAHnV464s+57Yq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls6zbEACgkQbDjKyiDZ
-s5LUFBAA5baa1uFefCfHY3vcoLDXZO5f1GXcYx+P/sqOOVvgO6EojywSKpHG3AIb
-9V8DECu84rUaDQnYYlG0o/CZQE0heVz7W3w/5tEWit3x5Y6FRDT2vGxRa1o2h3NS
-QamSk3MVbfHhjwtG/TI1iGcrUqiM/58RkUsrvryTpYswd6dZVW7dnYbxCbV6Nnpx
-AV+W3UWotezoz15HQ1lhA2jHMxJ7uCDOOYrPF8AS0Rb4KKI5qlGKiOuUTdh5v+eY
-E8ucEoaKmWx7L1qxkvdt2EOTUU4hfDeEHy/ttss8tluTttgYh7XsXhKH+cvU5TIe
-ukhpdzGPS3iCcddUSdrgn0jNmL2UqXlKR9gEB9FdgLHcYf60NMNIyY4Mr9Blxv6D
-hQGxj0ctPBB1PhPvUE6kXU4C2P1FgxE0EAGGSSX3IiT5AMdkgela9vdMq5mo+/zX
-lWDrP+23d2s6Li/cO55tVCZecWgSV+B5HMXjxCZFYlkzg/6RBxwE34s08B/RD7Mx
-c6lEWzl3FG7rYBH0Q0+eaEB1uuappzCNJcYhlAGnfZpvSWb49/7GRd6Qyh7pwFAO
-DcUHal9tjaDVOBsCZ5cgLQ+gy4e2LqQK3JCyIgyD6xc/JuyI4bBO6nNijtTWS5la
-0vYKmM0zVevTqXDRX1NTGloZRqHzCyjdVHLqp6+Op44fKSTZpoM=
-=Bfuz
------END PGP SIGNATURE-----
-
---saTAHnV464s+57Yq--
+2.14.4
