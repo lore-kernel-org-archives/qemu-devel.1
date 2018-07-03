@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faIKg-0006lI-T3
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1faIKq-0006ry-4J
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faIKd-0008ND-Mk
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:50 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:41213)
+	(envelope-from <alex.bennee@linaro.org>) id 1faIKo-0008Ug-VV
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:15:00 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1faIKd-0008M2-EN
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:47 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id h10-v6so1356566wrq.8
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:14:46 -0700 (PDT)
+	id 1faIKo-0008UC-Q2
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 06:14:58 -0400
+Received: by mail-wm0-x244.google.com with SMTP id w16-v6so1696814wmc.2
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 03:14:58 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  3 Jul 2018 11:14:24 +0100
-Message-Id: <20180703101444.23778-1-alex.bennee@linaro.org>
+Date: Tue,  3 Jul 2018 11:14:41 +0100
+Message-Id: <20180703101444.23778-18-alex.bennee@linaro.org>
+In-Reply-To: <20180703101444.23778-1-alex.bennee@linaro.org>
+References: <20180703101444.23778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/20] Travis,
- Code Coverage and Cross Build updates
+Subject: [Qemu-devel] [PULL 17/20] docker: debian-bootstrap.pre allow
+ customising of variant/url
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +33,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The following changes since commit 46d0885adff9b99622d72f23a8b04c298a8bf91d:
+We default to the buildd variant as most of our images are for
+building. However lets give the user the ability to specify "minbase"
+if they want to create a simple base image for experimentation.
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2018-07-03 09:49:20 +0100)
+Allowing the tweaking of DEB_URL means we can also bootstrap other
+Debian based OS's. For example:
 
-are available in the Git repository at:
+  make docker-binfmt-image-debian-ubuntu-bionic-arm64 \
+       DEB_ARCH=arm64 DEB_TYPE=bionic \
+       DEB_VARIANT=minbase DEB_URL=http://ports.ubuntu.com/ \
+       EXECUTABLE=./aarch64-linux-user/qemu-aarch64
 
-  https://github.com/stsquad/qemu.git tags/pull-code-coverage-and-build-tweaks-030718-1
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-for you to fetch changes up to e84a4f16f0fd67e5e503ceb50a9d069f7b76fcb3:
-
-  docker: add linux-user powered cross builder for QEMU (2018-07-03 11:09:56 +0100)
-
-----------------------------------------------------------------
-Code coverage and other build tweaks
-
-  - some travis speed-ups
-  - modernise code coverage support
-  - docker image cleanups
-  - clean-up binfmt_misc docker infrastructure
-  - add debian-powerpc-user-cross image for ppc32 build
-
-----------------------------------------------------------------
-Alex Bennée (14):
-      build-system: remove per-test GCOV reporting
-      .gitignore: add .gcov files
-      docker: add gcovr to travis image
-      travis: add gcovr summary for GCOV build
-      build-system: add clean-coverage target
-      build-system: add coverage-report target
-      linux-user: introduce preexit_cleanup
-      linux-user: add gcov support to preexit_cleanup
-      docker: filter out linux-user builds for mingw
-      docker: drop QEMU build-dep from bootstrap
-      docker: debian-bootstrap.pre allow customising of variant/url
-      docker: add special handling for FROM:debian-%-user targets
-      docker: add special rule for deboostrapped images
-      docker: add linux-user powered cross builder for QEMU
-
-Philippe Mathieu-Daudé (6):
-      travis: do not waste time cloning unused submodules
-      travis: test out-of-tree builds
-      docker: ubuntu: Update the package list before installing new ones
-      docker: ubuntu: Use SDL2
-      docker: Clean the MXE base image
-      docker: Do not run tests in 'intermediate' images
-
- .gitignore                                         |  1 +
- .travis.yml                                        | 14 +++-
- MAINTAINERS                                        |  1 +
- Makefile                                           | 24 +++++++
- docs/devel/testing.rst                             | 21 ++++--
- linux-user/Makefile.objs                           |  2 +-
- linux-user/exit.c                                  | 35 ++++++++++
- linux-user/qemu.h                                  |  8 +++
- linux-user/syscall.c                               | 10 +--
- scripts/travis/coverage-summary.sh                 | 27 ++++++++
- tests/Makefile.include                             | 10 ---
- tests/docker/Makefile.include                      | 74 ++++++++++++++++++++--
- tests/docker/docker.py                             |  4 ++
- tests/docker/dockerfiles/debian-bootstrap.docker   |  2 -
- tests/docker/dockerfiles/debian-bootstrap.pre      | 11 +++-
- .../dockerfiles/debian-powerpc-user-cross.docker   | 15 +++++
- tests/docker/dockerfiles/debian8-mxe.docker        |  2 +-
- tests/docker/dockerfiles/travis.docker             |  2 +-
- tests/docker/dockerfiles/ubuntu.docker             |  8 +--
- 19 files changed, 228 insertions(+), 43 deletions(-)
- create mode 100644 linux-user/exit.c
- create mode 100755 scripts/travis/coverage-summary.sh
- create mode 100644 tests/docker/dockerfiles/debian-powerpc-user-cross.docker
-
---
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
+index 7c76dce663..56e1aa7a21 100755
+--- a/tests/docker/dockerfiles/debian-bootstrap.pre
++++ b/tests/docker/dockerfiles/debian-bootstrap.pre
+@@ -32,6 +32,15 @@ if [ -z "${DEB_TYPE}" ]; then
+ 
+ fi
+ 
++# The following allow finer grain control over the defaults
++if [ -z "${DEB_VARIANT}" ]; then
++    DEB_VARIANT=buildd
++fi
++
++if [ -z "${DEB_URL}" ]; then
++    DEB_URL="http://httpredir.debian.org/debian"
++fi
++
+ # We check in order for
+ #
+ #  - DEBOOTSTRAP_DIR pointing at a development checkout
+@@ -107,5 +116,5 @@ fi
+ 
+ echo "Building a rootfs using ${FAKEROOT} and ${DEBOOTSTRAP} ${DEB_ARCH}/${DEB_TYPE}"
+ 
+-${FAKEROOT} ${DEBOOTSTRAP} --variant=buildd --foreign --arch=$DEB_ARCH $DEB_TYPE . http://httpredir.debian.org/debian || exit 1
++${FAKEROOT} ${DEBOOTSTRAP} --variant=$DEB_VARIANT --foreign --arch=$DEB_ARCH $DEB_TYPE . $DEB_URL || exit 1
+ exit 0
+-- 
 2.17.1
