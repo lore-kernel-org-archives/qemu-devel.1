@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKT-0002pU-Mb
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKX-0002rN-Er
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKR-0006wZ-L4
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKV-00071h-Ma
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:25 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:42 +1000
-Message-Id: <20180703055804.13449-14-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:54 +1000
+Message-Id: <20180703055804.13449-26-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 13/35] target/ppc: Use atomic store for STQ
+Subject: [Qemu-devel] [PULL 25/35] hw/ppc: Give sam46ex its own config option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,118 +20,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+At present the Sam460ex board is activated by the general CONFIG_PPC4XX
+option.  However that includes the board for both ppc-softmmu and
+(deprecated) ppcemb-softmmu builds.  As Sam460ex is developed, that would
+require adding more things into ppcemb-softmmu, which we don't want to do.
 
-Section 1.4 of the Power ISA v3.0B states that this insn is
-single-copy atomic.  As we cannot (yet) issue 128-bit stores
-within TCG, use the generic helpers provided.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h     |  4 ++++
- target/ppc/mem_helper.c | 14 ++++++++++++++
- target/ppc/translate.c  | 35 +++++++++++++++++++++++++++--------
- 3 files changed, 45 insertions(+), 8 deletions(-)
+ default-configs/ppc-softmmu.mak | 1 +
+ hw/ppc/Makefile.objs            | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 3f451a5d7e..cbc1228570 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -803,4 +803,8 @@ DEF_HELPER_FLAGS_1(fixup_thrm, TCG_CALL_NO_RWG, void, env)
- #if defined(TARGET_PPC64) && defined(CONFIG_ATOMIC128)
- DEF_HELPER_FLAGS_3(lq_le_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
- DEF_HELPER_FLAGS_3(lq_be_parallel, TCG_CALL_NO_WG, i64, env, tl, i32)
-+DEF_HELPER_FLAGS_5(stq_le_parallel, TCG_CALL_NO_WG,
-+                   void, env, tl, i64, i64, i32)
-+DEF_HELPER_FLAGS_5(stq_be_parallel, TCG_CALL_NO_WG,
-+                   void, env, tl, i64, i64, i32)
- #endif
-diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index 44a8f3445a..57e301edc3 100644
---- a/target/ppc/mem_helper.c
-+++ b/target/ppc/mem_helper.c
-@@ -231,6 +231,20 @@ uint64_t helper_lq_be_parallel(CPUPPCState *env, target_ulong addr,
-     env->retxh = int128_gethi(ret);
-     return int128_getlo(ret);
- }
-+
-+void helper_stq_le_parallel(CPUPPCState *env, target_ulong addr,
-+                            uint64_t lo, uint64_t hi, uint32_t opidx)
-+{
-+    Int128 val = int128_make128(lo, hi);
-+    helper_atomic_sto_le_mmu(env, addr, val, opidx, GETPC());
-+}
-+
-+void helper_stq_be_parallel(CPUPPCState *env, target_ulong addr,
-+                            uint64_t lo, uint64_t hi, uint32_t opidx)
-+{
-+    Int128 val = int128_make128(lo, hi);
-+    helper_atomic_sto_be_mmu(env, addr, val, opidx, GETPC());
-+}
- #endif
- 
- /*****************************************************************************/
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 0923cc24e3..3d63a62269 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -2760,6 +2760,7 @@ static void gen_std(DisasContext *ctx)
-     if ((ctx->opcode & 0x3) == 0x2) { /* stq */
-         bool legal_in_user_mode = (ctx->insns_flags2 & PPC2_LSQ_ISA207) != 0;
-         bool le_is_supported = (ctx->insns_flags2 & PPC2_LSQ_ISA207) != 0;
-+        TCGv hi, lo;
- 
-         if (!(ctx->insns_flags & PPC_64BX)) {
-             gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
-@@ -2783,20 +2784,38 @@ static void gen_std(DisasContext *ctx)
-         EA = tcg_temp_new();
-         gen_addr_imm_index(ctx, EA, 0x03);
- 
--        /* We only need to swap high and low halves. gen_qemu_st64_i64 does
--           necessary 64-bit byteswap already. */
--        if (unlikely(ctx->le_mode)) {
--            gen_qemu_st64_i64(ctx, cpu_gpr[rs + 1], EA);
-+        /* Note that the low part is always in RS+1, even in LE mode.  */
-+        lo = cpu_gpr[rs + 1];
-+        hi = cpu_gpr[rs];
-+
-+        if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
-+#ifdef CONFIG_ATOMIC128
-+            TCGv_i32 oi = tcg_temp_new_i32();
-+            if (ctx->le_mode) {
-+                tcg_gen_movi_i32(oi, make_memop_idx(MO_LEQ, ctx->mem_idx));
-+                gen_helper_stq_le_parallel(cpu_env, EA, lo, hi, oi);
-+            } else {
-+                tcg_gen_movi_i32(oi, make_memop_idx(MO_BEQ, ctx->mem_idx));
-+                gen_helper_stq_be_parallel(cpu_env, EA, lo, hi, oi);
-+            }
-+            tcg_temp_free_i32(oi);
-+#else
-+            /* Restart with exclusive lock.  */
-+            gen_helper_exit_atomic(cpu_env);
-+            ctx->base.is_jmp = DISAS_NORETURN;
-+#endif
-+        } else if (ctx->le_mode) {
-+            tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_LEQ);
-             gen_addr_add(ctx, EA, EA, 8);
--            gen_qemu_st64_i64(ctx, cpu_gpr[rs], EA);
-+            tcg_gen_qemu_st_i64(hi, EA, ctx->mem_idx, MO_LEQ);
-         } else {
--            gen_qemu_st64_i64(ctx, cpu_gpr[rs], EA);
-+            tcg_gen_qemu_st_i64(hi, EA, ctx->mem_idx, MO_BEQ);
-             gen_addr_add(ctx, EA, EA, 8);
--            gen_qemu_st64_i64(ctx, cpu_gpr[rs + 1], EA);
-+            tcg_gen_qemu_st_i64(lo, EA, ctx->mem_idx, MO_BEQ);
-         }
-         tcg_temp_free(EA);
-     } else {
--        /* std / stdu*/
-+        /* std / stdu */
-         if (Rc(ctx->opcode)) {
-             if (unlikely(rA(ctx->opcode) == 0)) {
-                 gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 851b4afc21..475120bda2 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -22,6 +22,7 @@ CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ # For Sam460ex
++CONFIG_SAM460EX=y
+ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_SM501=y
+ CONFIG_IDE_SII3112=y
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 86d82a6ec3..bcab6323b7 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -14,7 +14,8 @@ obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+ # PowerPC 4xx boards
+ obj-y += ppc4xx_devs.o ppc405_uc.o
+ obj-$(CONFIG_PPC4XX) += ppc4xx_pci.o ppc405_boards.o
+-obj-$(CONFIG_PPC4XX) += ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o sam460ex.o
++obj-$(CONFIG_PPC4XX) += ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
++obj-$(CONFIG_SAM460EX) += sam460ex.o
+ # PReP
+ obj-$(CONFIG_PREP) += prep.o
+ obj-$(CONFIG_PREP) += prep_systemio.o
 -- 
 2.17.1
