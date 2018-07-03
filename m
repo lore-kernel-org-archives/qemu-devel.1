@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1faGid-0002Iv-Kg
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:31:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1faGnx-00041i-0H
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1faGia-0002cw-BY
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:31:27 -0400
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:37989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1faGia-0002cB-52
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:31:24 -0400
-Received: by mail-wm0-f67.google.com with SMTP id 69-v6so1287508wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 01:31:23 -0700 (PDT)
-From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Tue,  3 Jul 2018 10:31:20 +0200
-Message-Id: <0b2c142da5d44a4b645dee47b7c50dae87a90a05.1530606672.git.tgolembi@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1faGnt-0005IR-QO
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:36:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37480 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faGnt-0005Hy-MT
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:36:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180702162218.13678-1-armbru@redhat.com>
+	<CAJ+F1CK2AXagKO5-Qsb3nc4xBfc_Scr+pOyM+Vn8EynZYFsqAg@mail.gmail.com>
+Date: Tue, 03 Jul 2018 10:36:48 +0200
+In-Reply-To: <CAJ+F1CK2AXagKO5-Qsb3nc4xBfc_Scr+pOyM+Vn8EynZYFsqAg@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 3 Jul 2018
+	09:05:46 +0200")
+Message-ID: <877emc4swv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] qga: report disk size and free space
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/32] qmp: Fixes and cleanups around OOB
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Report total file system size and free space in output of command
-"guest-get-fsinfo". Values are optional and it is not an error if they cannot
-be retrieved for some reason.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
----
- qga/commands-posix.c | 18 ++++++++++++++++++
- qga/commands-win32.c | 16 ++++++++++++++++
- qga/qapi-schema.json |  5 ++++-
- 3 files changed, 38 insertions(+), 1 deletion(-)
+> Hi
+>
+> On Mon, Jul 2, 2018 at 6:21 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> We're trying to get the out-of-band execution feature ready.  This
+>> series fixes a number of issues, and marks a design flaw FIXME.  More
+>> work is needed.
+>
+> They are several related worthy cleanups in the qapi-async series.
+>
+> They will now conflict with your changes though.
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index eae817191b..1f2fb25b91 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -13,6 +13,7 @@
- 
- #include "qemu/osdep.h"
- #include <sys/ioctl.h>
-+#include <sys/statvfs.h>
- #include <sys/utsname.h>
- #include <sys/wait.h>
- #include <dirent.h>
-@@ -1074,11 +1075,28 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
-     GuestFilesystemInfo *fs = g_malloc0(sizeof(*fs));
-     char *devpath = g_strdup_printf("/sys/dev/block/%u:%u",
-                                     mount->devmajor, mount->devminor);
-+    struct statvfs vfs_stats;
- 
-     fs->mountpoint = g_strdup(mount->dirname);
-     fs->type = g_strdup(mount->devtype);
-     build_guest_fsinfo_for_device(devpath, fs, errp);
- 
-+    g_debug(" get filesystem statistics for '%s'", mount->dirname);
-+    if (statvfs(mount->dirname, &vfs_stats) != 0) {
-+        /* This is not fatal, just log this incident */
-+        Error *local_err = NULL;
-+        error_setg_errno(&local_err, errno, "statfs(\"%s\")",
-+            mount->dirname);
-+        slog("failed to stat filesystem: %s",
-+            error_get_pretty(local_err));
-+        error_free(local_err);
-+    } else {
-+        fs->size = vfs_stats.f_frsize * vfs_stats.f_blocks;
-+        fs->has_size = true;
-+        fs->free = vfs_stats.f_frsize * vfs_stats.f_bfree;
-+        fs->has_free = true;
-+    }
-+
-     g_free(devpath);
-     return fs;
- }
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 70ee5379f6..6d6ca05281 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -706,6 +706,22 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-     }
-     fs->type = g_strdup(fs_name);
-     fs->disk = build_guest_disk_info(guid, errp);
-+
-+    if (len > 0) {
-+        if (GetDiskFreeSpaceEx(mnt_point, 0, (PULARGE_INTEGER)&fs->size,
-+                (PULARGE_INTEGER)&fs->free) != 0) {
-+            /* This is not fatal, just log this incident */
-+            Error *local_err = NULL;
-+            error_setg_win32(&local_err, GetLastError(),
-+                "failed to get free space on volume \"%s\"", mnt_point);
-+            slog("%s", error_get_pretty(local_err));
-+            error_free(local_err);
-+        } else {
-+            fs->has_size = true;
-+            fs->has_free = true;
-+        }
-+    }
-+
- free:
-     g_free(mnt_point);
-     return fs;
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 17884c7c70..28a32444d3 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -848,12 +848,15 @@
- # @type: file system type string
- # @disk: an array of disk hardware information that the volume lies on,
- #        which may be empty if the disk type is not supported
-+# @size: total number of bytes on the file system (Since 2.13)
-+# @free: number of bytes available on the file system (Since 2.13)
- #
- # Since: 2.2
- ##
- { 'struct': 'GuestFilesystemInfo',
-   'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
--           'disk': ['GuestDiskAddress']} }
-+           'disk': ['GuestDiskAddress'], '*size': 'uint64',
-+           '*free': 'uint64'} }
- 
- ##
- # @guest-get-fsinfo:
--- 
-2.17.1
+Puh!
+
+I haven't looked closely at the qapi-async series; the qapi-if series
+took priority.
+
+> Please take a look roughly from 4/38 to 17/38, and let me know if you
+> want me to rebase it for 3.0.
+
+Extracting its preliminary cleanups into a separate series that could be
+merged more quickly makes could make sense.  I'll try to have a look.
