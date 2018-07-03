@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1faRbH-0000gM-9z
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:08:36 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIz-0008QJ-KC
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1faRbG-0004HV-GQ
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:08:35 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1faRbG-0004HC-CE
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:08:34 -0400
-Received: by mail-oi0-x242.google.com with SMTP id n84-v6so6302973oib.9
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 13:08:34 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180703184922.GA14422@roeck-us.net>
-References: <20180626200008.GA680@roeck-us.net>
-	<CAFEAcA_non89OR_-W3Fhr6gG0v0kkgg-ffJx-9K_h=U-Hz_wbg@mail.gmail.com>
-	<20180702162733.GB32333@roeck-us.net>
-	<CAFEAcA8+ZxcRLBgonZaqpAfumKFvhk7yDhX=Fe0KjoeTxWsczg@mail.gmail.com>
-	<20180702170522.GA9885@roeck-us.net>
-	<CAFEAcA97xX72WabGwn7GAQJxMcpzYzyV9yDBg1qF0zLuSDZwSA@mail.gmail.com>
-	<20180702175740.GA14904@roeck-us.net>
-	<CAFEAcA8noUOGt_9LpfRTRX52n4Z66XzudYFfW=180c92vzPH-g@mail.gmail.com>
-	<20180702183717.GA22482@roeck-us.net>
-	<CAFEAcA_p8vOs_1_4sAf1SvvPb44z885doU0821eh=-e0K5B3_A@mail.gmail.com>
-	<20180703184922.GA14422@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Jul 2018 21:08:13 +0100
-Message-ID: <CAFEAcA9pa7YTLnHYD0c7GvkkmiwD+Yyk9qr6G_EC2JeWdMB26Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/char/cmsdk-apb-timer: Correctly
- identify and set one-shot mode
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIv-0000yV-Jo
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45494
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1faSIv-0000yL-EJ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:41 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w63KnGAw095182
+	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 16:53:40 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k0dpdpdmg-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 16:53:40 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 3 Jul 2018 14:53:40 -0600
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Tue,  3 Jul 2018 15:52:09 -0500
+In-Reply-To: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
+References: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
+Message-Id: <20180703205221.24788-3-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL 02/14] qga: check bytes count read by
+ guest-file-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,34 +39,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Prasad J Pandit <pjp@fedoraproject.org>, qemu-stable@nongnu.org
 
-On 3 July 2018 at 19:49, Guenter Roeck <linux@roeck-us.net> wrote:
-> Oddly enough, I now seem to be unable to reproduce the problem either.
-> Weird, when I wrote the patch it was absolutely necessary.
->
-> The only other change I can think of would be the code to set the
-> serial baud rate in the boot loader, which I did not have initially.
-> Is it possible that the hangup could have been caused by that ?
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Seems unlikely -- unless you're actually connecting the emulated
-serial port to a real host serial port, we don't do anything with
-the baudrate in the cmsdk uart model except complain if the
-guest hasn't set it to something valid.
+While reading file content via 'guest-file-read' command,
+'qmp_guest_file_read' routine allocates buffer of count+1
+bytes. It could overflow for large values of 'count'.
+Add check to avoid it.
 
-> Is it worth tracking it down, or are we ok ?
+Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ qga/commands-posix.c | 2 +-
+ qga/commands-win32.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-It does worry me a little, but if neither you nor I can repro
-it at the moment there's not a lot we can do about it I think.
-Looking at the ptimer and cmsdk timer code I think it *should*
-now implement what the hardware does...
-
-If you see the problem again in future let me know and we
-can have another go at figuring out what's going on.
-
-> The series WFM as well. I'll send out a Tested-by: in a minute.
-
-Thanks for the testing.
-
--- PMM
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 594d21ef3e..9284e71666 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -458,7 +458,7 @@ struct GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
+ 
+     if (!has_count) {
+         count = QGA_READ_COUNT_DEFAULT;
+-    } else if (count < 0) {
++    } else if (count < 0 || count >= UINT32_MAX) {
+         error_setg(errp, "value '%" PRId64 "' is invalid for argument count",
+                    count);
+         return NULL;
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 70ee5379f6..73f31fa8c2 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -318,7 +318,7 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
+     }
+     if (!has_count) {
+         count = QGA_READ_COUNT_DEFAULT;
+-    } else if (count < 0) {
++    } else if (count < 0 || count >= UINT32_MAX) {
+         error_setg(errp, "value '%" PRId64
+                    "' is invalid for argument count", count);
+         return NULL;
+-- 
+2.11.0
