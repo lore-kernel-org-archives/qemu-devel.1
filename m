@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faPS9-00055w-5y
+	(envelope-from <kwolf@redhat.com>) id 1faPS9-00056H-Jy
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 13:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faPS8-00034L-9z
+	(envelope-from <kwolf@redhat.com>) id 1faPS8-00034u-HL
 	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 13:51:01 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  3 Jul 2018 19:50:49 +0200
-Message-Id: <20180703175049.27669-3-kwolf@redhat.com>
+Date: Tue,  3 Jul 2018 19:50:48 +0200
+Message-Id: <20180703175049.27669-2-kwolf@redhat.com>
 In-Reply-To: <20180703175049.27669-1-kwolf@redhat.com>
 References: <20180703175049.27669-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] test-bdrv-drain: Test bdrv_append() to
- drained node
+Subject: [Qemu-devel] [PATCH 1/2] block: Poll after drain on attaching a node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +22,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
 
+Commit dcf94a23b1 ('block: Don't poll in parent drain callbacks')
+removed polling in bdrv_child_cb_drained_begin() on the grounds that the
+original bdrv_drain() already will poll and BdrvChildRole.drained_begin
+calls must not cause graph changes (and therefore must not call
+aio_poll() or the recursion through the graph will break.
+
+This reasoning is correct for calls through bdrv_do_drained_begin().
+However, BdrvChildRole.drained_begin is also called when a node that is
+already in a drained section (i.e. bdrv_do_drained_begin() has already
+returned and therefore can't poll any more) is attached to a new parent.
+In this case, we must explicitly poll to have all requests completed
+before the drained new child can be attached to the parent.
+
+In bdrv_replace_child_noperm(), we know that we're not inside the
+recursion of bdrv_do_drained_begin() because graph changes are not
+allowed there, and bdrv_replace_child_noperm() is a graph change. The
+call of BdrvChildRole.drained_begin() must therefore be followed by a
+BDRV_POLL_WHILE() that waits for the completion of requests.
+
+Reported-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ include/block/block.h     |  8 ++++++++
+ include/block/block_int.h |  3 +++
+ block.c                   |  2 +-
+ block/io.c                | 26 ++++++++++++++++++++------
+ 4 files changed, 32 insertions(+), 7 deletions(-)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 291a050f86..17bb8508ae 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -1250,6 +1250,47 @@ static void test_detach_by_driver_cb(void)
-     test_detach_indirect(false);
+diff --git a/include/block/block.h b/include/block/block.h
+index bc76b1e59f..706ef009ad 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -569,6 +569,14 @@ void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ignore,
+                                bool ignore_bds_parents);
+ 
+ /**
++ * bdrv_parent_drained_begin_single:
++ *
++ * Begin a quiesced section for the parent of @c. If @poll is true, wait for
++ * any pending activity to cease.
++ */
++void bdrv_parent_drained_begin_single(BdrvChild *c, bool poll);
++
++/**
+  * bdrv_parent_drained_end:
+  *
+  * End a quiesced section of all users of @bs. This is part of
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index af71b414be..81cd3db7a9 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -606,6 +606,9 @@ struct BdrvChildRole {
+      * requests after returning from .drained_begin() until .drained_end() is
+      * called.
+      *
++     * These functions must not change the graph (and therefore also must not
++     * call aio_poll(), which could change the graph indirectly).
++     *
+      * Note that this can be nested. If drained_begin() was called twice, new
+      * I/O is allowed only after drained_end() was called twice, too.
+      */
+diff --git a/block.c b/block.c
+index 961ec97d26..fb1462fbf2 100644
+--- a/block.c
++++ b/block.c
+@@ -2060,7 +2060,7 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
+             }
+             assert(num >= 0);
+             for (i = 0; i < num; i++) {
+-                child->role->drained_begin(child);
++                bdrv_parent_drained_begin_single(child, true);
+             }
+         }
+ 
+diff --git a/block/io.c b/block/io.c
+index 1a2272fad3..038449f81f 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -52,9 +52,7 @@ void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ignore,
+         if (c == ignore || (ignore_bds_parents && c->role->parent_is_bds)) {
+             continue;
+         }
+-        if (c->role->drained_begin) {
+-            c->role->drained_begin(c);
+-        }
++        bdrv_parent_drained_begin_single(c, false);
+     }
  }
  
-+static void test_append_to_drained(void)
+@@ -73,6 +71,14 @@ void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore,
+     }
+ }
+ 
++static bool bdrv_parent_drained_poll_single(BdrvChild *c)
 +{
-+    BlockBackend *blk;
-+    BlockDriverState *base, *overlay;
-+    BDRVTestState *base_s, *overlay_s;
-+
-+    blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    base = bdrv_new_open_driver(&bdrv_test, "base", BDRV_O_RDWR, &error_abort);
-+    base_s = base->opaque;
-+    blk_insert_bs(blk, base, &error_abort);
-+
-+    overlay = bdrv_new_open_driver(&bdrv_test, "overlay", BDRV_O_RDWR,
-+                                   &error_abort);
-+    overlay_s = overlay->opaque;
-+
-+    do_drain_begin(BDRV_DRAIN, base);
-+    g_assert_cmpint(base->quiesce_counter, ==, 1);
-+    g_assert_cmpint(base_s->drain_count, ==, 1);
-+    g_assert_cmpint(base->in_flight, ==, 0);
-+
-+    /* Takes ownership of overlay, so we don't have to unref it later */
-+    bdrv_append(overlay, base, &error_abort);
-+    g_assert_cmpint(base->in_flight, ==, 0);
-+    g_assert_cmpint(overlay->in_flight, ==, 0);
-+
-+    g_assert_cmpint(base->quiesce_counter, ==, 1);
-+    g_assert_cmpint(base_s->drain_count, ==, 1);
-+    g_assert_cmpint(overlay->quiesce_counter, ==, 1);
-+    g_assert_cmpint(overlay_s->drain_count, ==, 1);
-+
-+    do_drain_end(BDRV_DRAIN, base);
-+
-+    g_assert_cmpint(base->quiesce_counter, ==, 0);
-+    g_assert_cmpint(base_s->drain_count, ==, 0);
-+    g_assert_cmpint(overlay->quiesce_counter, ==, 0);
-+    g_assert_cmpint(overlay_s->drain_count, ==, 0);
-+
-+    bdrv_unref(base);
-+    blk_unref(blk);
++    if (c->role->drained_poll) {
++        return c->role->drained_poll(c);
++    }
++    return false;
 +}
 +
- int main(int argc, char **argv)
+ static bool bdrv_parent_drained_poll(BlockDriverState *bs, BdrvChild *ignore,
+                                      bool ignore_bds_parents)
  {
-     int ret;
-@@ -1308,6 +1349,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/bdrv-drain/detach/parent_cb", test_detach_by_parent_cb);
-     g_test_add_func("/bdrv-drain/detach/driver_cb", test_detach_by_driver_cb);
+@@ -83,14 +89,22 @@ static bool bdrv_parent_drained_poll(BlockDriverState *bs, BdrvChild *ignore,
+         if (c == ignore || (ignore_bds_parents && c->role->parent_is_bds)) {
+             continue;
+         }
+-        if (c->role->drained_poll) {
+-            busy |= c->role->drained_poll(c);
+-        }
++        busy |= bdrv_parent_drained_poll_single(c);
+     }
  
-+    g_test_add_func("/bdrv-drain/attach/drain", test_append_to_drained);
+     return busy;
+ }
+ 
++void bdrv_parent_drained_begin_single(BdrvChild *c, bool poll)
++{
++    if (c->role->drained_begin) {
++        c->role->drained_begin(c);
++    }
++    if (poll) {
++        BDRV_POLL_WHILE(c->bs, bdrv_parent_drained_poll_single(c));
++    }
++}
 +
-     ret = g_test_run();
-     qemu_event_destroy(&done_event);
-     return ret;
+ static void bdrv_merge_limits(BlockLimits *dst, const BlockLimits *src)
+ {
+     dst->opt_transfer = MAX(dst->opt_transfer, src->opt_transfer);
 -- 
 2.13.6
