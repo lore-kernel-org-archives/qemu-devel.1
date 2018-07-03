@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1faQFz-0001gd-Ij
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:42:32 -0400
+	(envelope-from <david@redhat.com>) id 1faQIW-0002lV-Qn
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1faQFv-0001Fc-AB
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:42:31 -0400
-Resent-Message-Id: <E1faQFv-0001Fc-AB@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1faQFv-0001F4-4T
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:42:27 -0400
-In-Reply-To: <20180703160022.10705-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153063697548.864.8307818591832543828@946cad8fd14e>
+	(envelope-from <david@redhat.com>) id 1faQIV-0002On-TZ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 14:45:08 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-8-git-send-email-eric.auger@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <cc538632-e853-adbc-ec34-a2f524415406@redhat.com>
+Date: Tue, 3 Jul 2018 20:44:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 3 Jul 2018 09:56:16 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] scripts/qemu-binfmt-conf.sh: allow
- clearing of entries
+In-Reply-To: <1530602398-16127-8-git-send-email-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 07/15] hw/arm/virt: Add memory hotplug
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzAzMTYwMDIyLjEwNzA1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6
-IGFsbG93IGNsZWFyaW5nIG9mIGVudHJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
-b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRl
-XSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA3MDMxMDUzMDUuNDUzOTgtMS12c2VtZW50c292QHZp
-cnR1b3p6by5jb20gLT4gcGF0Y2hldy8yMDE4MDcwMzEwNTMwNS40NTM5OC0xLXZzZW1lbnRzb3ZA
-dmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNzAz
-MTYwMDIyLjEwNzA1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwNzAz
-MTYwMDIyLjEwNzA1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCmIwOWIzNjQ0NDUgc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOiBhbGxv
-dyBjbGVhcmluZyBvZiBlbnRyaWVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzE6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDogYWxsb3cgY2xlYXJpbmcgb2YgZW50
-cmllcy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjU6IEZJTEU6IHNjcmlw
-dHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxNjc6CisgICAgICAgICAgICAgICAgICAgICAgICAgICBb
-LS1oZWxwXVstLWNsZWFyXVstLWNyZWRlbnRpYWwgeWVzfG5vXVstLWV4cG9ydGRpciBQQVRIXQoK
-RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1NjogRklMRTogc2NyaXB0cy9xZW11LWJp
-bmZtdC1jb25mLnNoOjMxNzoKK29wdGlvbnM9JChnZXRvcHQgLW8gZHM6UTplOmhjOiAtbCBkZWJp
-YW4sc3lzdGVtZDoscWVtdS1wYXRoOixleHBvcnRkaXI6LGhlbHAsY2xlYXIsY3JlZGVudGlhbDog
-LS0gIiRAIikKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgNDYgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 03.07.2018 09:19, Eric Auger wrote:
+> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> 
+> This patch adds the the memory hot-plug/hot-unplug infrastructure
+> in machvirt.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
+> - s/pc_dimm_memory_plug/pc_dimm_plug
+> - reworded title and commit message
+> - added pre_plug cb
+> - don't handle get_memory_region failure anymore
+> ---
+>  default-configs/arm-softmmu.mak |  2 ++
+>  hw/arm/virt.c                   | 68 ++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 69 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 834d45c..28fe8f3 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -152,3 +152,5 @@ CONFIG_PCI_DESIGNWARE=y
+>  CONFIG_STRONGARM=y
+>  CONFIG_HIGHBANK=y
+>  CONFIG_MUSICPAL=y
+> +CONFIG_MEM_HOTPLUG=y
+> +
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 6fefb78..7190962 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -60,6 +60,8 @@
+>  #include "standard-headers/linux/input.h"
+>  #include "hw/arm/smmuv3.h"
+>  #include "hw/acpi/acpi.h"
+> +#include "hw/mem/pc-dimm.h"
+> +#include "hw/mem/nvdimm.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1785,6 +1787,53 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>      return ms->possible_cpus;
+>  }
+>  
+> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                                 Error **errp)
+> +{
+> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> +
+> +    if (is_nvdimm) {
+> +        error_setg(errp, "nvdimm is not yet supported");
+> +        return;
+> +    }
+
+You mention that actual hotplug is not supported, only coldplug.
+Wouldn't this be the right place to check for that? (only skimmed over
+your patches, how do you handle that?)
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
