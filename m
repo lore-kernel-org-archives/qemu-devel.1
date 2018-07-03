@@ -1,38 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSJ1-0008Qv-SC
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faSUw-0000oo-Ra
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1faSIx-000106-L6
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36010)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1faSIx-0000zS-CB
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 16:53:43 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w63KnBuS069462
-	for <qemu-devel@nongnu.org>; Tue, 3 Jul 2018 16:53:42 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k0dpc66aw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 16:53:42 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 3 Jul 2018 14:53:41 -0600
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  3 Jul 2018 15:52:10 -0500
-In-Reply-To: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
-References: <20180703205221.24788-1-mdroth@linux.vnet.ibm.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faSUs-0000Dc-QC
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:06 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:46388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faSUs-0000DC-G8
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 17:06:02 -0400
+Received: by mail-qk0-x244.google.com with SMTP id o2-v6so1792504qkc.13
+	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 14:06:02 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180702175030.18621-1-f4bug@amsat.org>
+	<20180702175030.18621-2-f4bug@amsat.org>
+	<2e367d67-77f4-8d58-53de-409c0b0bf558@vivier.eu>
+	<e0ac6484-0f62-66e0-c7b8-fab9775fbc0f@amsat.org>
+	<5b37d5a8-b622-a95f-4f43-0b30fd6e7d68@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1c70482e-7fad-4621-fcf2-209cba3b09c6@amsat.org>
+Date: Tue, 3 Jul 2018 18:05:58 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180703205221.24788-4-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/14] qga: add mountpoint usage info to
- GuestFilesystemInfo
+In-Reply-To: <5b37d5a8-b622-a95f-4f43-0b30fd6e7d68@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/13] linux-user/syscall: Verify
+ recvfrom(addr) is user-writable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,89 +39,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Chen Hanxiao <chenhanxiao@gmail.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+On 07/03/2018 01:38 PM, Laurent Vivier wrote:
+> Le 03/07/2018 à 17:39, Philippe Mathieu-Daudé a écrit :
+>> On 07/03/2018 11:55 AM, Laurent Vivier wrote:
+>>> Le 02/07/2018 à 19:50, Philippe Mathieu-Daudé a écrit :
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> Tested-By: Guido Günther <agx@sigxcpu.org>
+>>>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>>>> ---
+>>>>  linux-user/syscall.c | 5 +++++
+>>>>  1 file changed, 5 insertions(+)
+>>>>
+>>>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>>>> index 2117fb13b4..ad40682cee 100644
+>>>> --- a/linux-user/syscall.c
+>>>> +++ b/linux-user/syscall.c
+>>>> @@ -4154,6 +4154,11 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
+>>>>              ret = -TARGET_EINVAL;
+>>>>              goto fail;
+>>>>          }
+>>>> +        if (!access_ok(VERIFY_WRITE, target_addr, addrlen)) {
+>>>> +            ret = -TARGET_EFAULT;
+>>>> +            goto fail;
+>>>> +        }
+>>>> +
+>>>>          addr = alloca(addrlen);
+>>>>          ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
+>>>>                                        addr, &addrlen));
+>>>>
+>>>
+>>> This patch breaks the test recvfrom01 of the Linux Test Project.
+>>
+>> OK :(
+>>
+>> I just sent v4, can you simply drop this patch?
+>> I'll now look at it after 3.0.
+> 
+> Not enough time to add more patches to my pull request, sorry.
+> 
+> I'll queue them in my branch for the next release.
 
-This patch adds support for getting the usage of mounted
-filesystem.
-The usage of fs stored as used_bytes and total_bytes.
-It's very useful when we try to monitor guest's filesystem.
+Fair enough :)
 
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-posix.c | 15 +++++++++++++++
- qga/qapi-schema.json |  3 +++
- 2 files changed, 18 insertions(+)
+Thanks!
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 9284e71666..ae8535e497 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -46,6 +46,7 @@ extern char **environ;
- #include <arpa/inet.h>
- #include <sys/socket.h>
- #include <net/if.h>
-+#include <sys/statvfs.h>
-=20
- #ifdef FIFREEZE
- #define CONFIG_FSFREEZE
-@@ -1072,6 +1073,8 @@ static GuestFilesystemInfo *build_guest_fsinfo(stru=
-ct FsMount *mount,
-                                                Error **errp)
- {
-     GuestFilesystemInfo *fs =3D g_malloc0(sizeof(*fs));
-+    struct statvfs buf;
-+    unsigned long used, nonroot_total, fr_size;
-     char *devpath =3D g_strdup_printf("/sys/dev/block/%u:%u",
-                                     mount->devmajor, mount->devminor);
-=20
-@@ -1079,7 +1082,19 @@ static GuestFilesystemInfo *build_guest_fsinfo(str=
-uct FsMount *mount,
-     fs->type =3D g_strdup(mount->devtype);
-     build_guest_fsinfo_for_device(devpath, fs, errp);
-=20
-+    if (statvfs(fs->mountpoint, &buf) =3D=3D 0) {
-+        fr_size =3D buf.f_frsize;
-+        used =3D buf.f_blocks - buf.f_bfree;
-+        nonroot_total =3D used + buf.f_bavail;
-+        fs->used_bytes =3D used * fr_size;
-+        fs->total_bytes =3D nonroot_total * fr_size;
-+
-+        fs->has_total_bytes =3D true;
-+        fs->has_used_bytes =3D true;
-+    }
-+
-     g_free(devpath);
-+
-     return fs;
- }
-=20
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 1045cef386..2df6356b8c 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -848,6 +848,8 @@
- # @name: disk name
- # @mountpoint: mount point path
- # @type: file system type string
-+# @used-bytes: file system used bytes (since 3.0)
-+# @total-bytes: non-root file system total bytes (since 3.0)
- # @disk: an array of disk hardware information that the volume lies on,
- #        which may be empty if the disk type is not supported
- #
-@@ -855,6 +857,7 @@
- ##
- { 'struct': 'GuestFilesystemInfo',
-   'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
-+           '*used-bytes': 'uint64', '*total-bytes': 'uint64',
-            'disk': ['GuestDiskAddress']} }
-=20
- ##
---=20
-2.11.0
+Phil.
