@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faJHo-0004ag-GV
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:15:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1faJJO-0005O1-LR
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:17:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faJHn-0000tS-7C
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:15:56 -0400
-Date: Tue, 3 Jul 2018 13:15:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180703111538.GB3812@localhost.localdomain>
-References: <20180629151524.138542-1-vsementsov@virtuozzo.com>
-	<20180629151524.138542-3-vsementsov@virtuozzo.com>
-	<32ad25bf-0427-e286-94f1-0566af2ea8ed@redhat.com>
-	<920ef7dd-67c3-fd93-b1b3-ea3bd31577f2@redhat.com>
-	<e97fb1f7-a864-a413-0ea4-f3e1dc29bc9f@virtuozzo.com>
+	(envelope-from <berrange@redhat.com>) id 1faJJN-00025k-DS
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 07:17:34 -0400
+Date: Tue, 3 Jul 2018 12:17:23 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180703111723.GA24516@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180703080303.17355-1-rjones@redhat.com>
+	<20180703080303.17355-2-rjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e97fb1f7-a864-a413-0ea4-f3e1dc29bc9f@virtuozzo.com>
+In-Reply-To: <20180703080303.17355-2-rjones@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/fleecing-filter: new filter
- driver for fleecing
+Subject: Re: [Qemu-devel] [PATCH v6] crypto: Implement TLS Pre-Shared Keys
+ (PSK).
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, qemu-block@nongnu.org
 
-Am 02.07.2018 um 14:09 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 29.06.2018 20:40, Eric Blake wrote:
-> > On 06/29/2018 12:30 PM, John Snow wrote:
-> > >=20
-> > >=20
-> > > On 06/29/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > > > We need to synchronize backup job with reading from fleecing imag=
-e
-> > > > like it was done in block/replication.c.
-> > > >=20
-> > > > Otherwise, the following situation is theoretically possible:
-> > > >=20
-> > > > 1. client start reading
-> > > > 2. client understand, that there is no corresponding cluster in
-> > > > =A0=A0=A0 fleecing image
-> > >=20
-> > > I don't think the client refocuses the read, but QEMU does. (the cl=
-ient
-> > > has no idea if it is reading from the fleecing node or the backing
-> > > file.)
-> > >=20
-> > > ... but understood:
-> > >=20
-> > > > 3. client is going to read from backing file (i.e. active image)
-> > > > 4. guest writes to active image
-> > >=20
-> > > My question here is if QEMU will allow reads and writes to interlea=
-ve in
-> > > general. If the client is reading from the backing file, the active
-> > > image, will QEMU allow a write to modify that data before we're don=
-e
-> > > getting that data?
-> > >=20
-> > > > 5. this write is stopped by backup(sync=3Dnone) and cluster is co=
-pied to
-> > > > =A0=A0=A0 fleecing image
-> > > > 6. guest write continues...
-> > > > 7. and client reads _new_ (or partly new) date from active image
-> > > >=20
-> > >=20
-> > > I can't answer this for myself one way or the other right now, but =
-I
-> > > imagine you observed a failure in practice in your test setups, whi=
-ch
-> > > motivated this patch?
-> > >=20
-> > > A test or some proof would help justification for this patch. It wo=
-uld
-> > > also help prove that it solves what it claims to!
-> >=20
-> > In fact, do we really need a new filter, or do we just need to make t=
-he
-> > "sync":"none" blockdev-backup job take the appropriate synchronizatio=
-n
-> > locks?
-> >=20
+On Tue, Jul 03, 2018 at 09:03:03AM +0100, Richard W.M. Jones wrote:
+> Pre-Shared Keys (PSK) is a simpler mechanism for enabling TLS
+> connections than using certificates.  It requires only a simple secret
+> key:
 >=20
-> How? We'll need additional mechanism like serializing requests.. Or a w=
-ay to
-> reuse serializing requests. Using backup internal synchronization looks
-> simpler, and it is already used in block replication.
+>   $ mkdir -m 0700 /tmp/keys
+>   $ psktool -u rjones -p /tmp/keys/keys.psk
+>   $ cat /tmp/keys/keys.psk
+>   rjones:d543770c15ad93d76443fb56f501a31969235f47e999720ae8d2336f6a13fc=
+bc
+>=20
+> The key can be secretly shared between clients and servers.  Clients
+> must specify the directory containing the "keys.psk" file and a
+> username (defaults to "qemu").  Servers must specify only the
+> directory.
+>=20
+> Example NBD client:
+>=20
+>   $ qemu-img info \
+>     --object tls-creds-psk,id=3Dtls0,dir=3D/tmp/keys,username=3Drjones,=
+endpoint=3Dclient \
+>     --image-opts \
+>     file.driver=3Dnbd,file.host=3Dlocalhost,file.port=3D10809,file.tls-=
+creds=3Dtls0,file.export=3D/
+>=20
+> Example NBD server using qemu-nbd:
+>=20
+>   $ qemu-nbd -t -x / \
+>     --object tls-creds-psk,id=3Dtls0,endpoint=3Dserver,dir=3D/tmp/keys =
+\
+>     --tls-creds tls0 \
+>     image.qcow2
+>=20
+> Example NBD server using nbdkit:
+>=20
+>   $ nbdkit -n -e / -fv \
+>     --tls=3Don --tls-psk=3D/tmp/keys/keys.psk \
+>     file file=3Ddisk.img
+>=20
+> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+> ---
+>  crypto/Makefile.objs           |   1 +
+>  crypto/tlscredspsk.c           | 308 +++++++++++++++++++++++++++++++++
+>  crypto/tlssession.c            |  56 +++++-
+>  crypto/trace-events            |   3 +
+>  include/crypto/tlscredspsk.h   | 106 ++++++++++++
+>  qemu-doc.texi                  |  37 ++++
+>  qemu-options.hx                |  24 +++
+>  tests/Makefile.include         |   4 +-
+>  tests/crypto-tls-psk-helpers.c |  50 ++++++
+>  tests/crypto-tls-psk-helpers.h |  29 ++++
+>  tests/test-crypto-tlssession.c | 185 +++++++++++++++++---
+>  11 files changed, 777 insertions(+), 26 deletions(-)
 
-But it also just an ugly hack that fixes one special case and leaves
-everything else broken. replication is usually not a good example for
-anything. It always gives me bad surprises when I have to look at it.
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-We'll have to figure out where to fix this problem (or what it really
-is, once you look more than just at fleecing), but I think requiring the
-user to add a filter driver to work around missing serialisation in
-other code, and corrupting their image if they forget to, is not a
-reasonable solution.
 
-I see at least two things wrong in this context:
+I'll send a pull request with it shortly
 
-* The permissions don't seem to match reality. The NBD server
-  unconditionally shares PERM_WRITE, which is wrong in this case. The
-  client wants to see a point-in-time snapshot that never changes. This
-  should become an option so that it can be properly reflected in the
-  permissions used.
 
-* Once we have proper permissions, the fleecing setup breaks down
-  because the guest needs PERM_WRITE on the backing file, but the
-  fleecing overlay allows that only if the NBD client allows it (which
-  it doesn't for fleecing).
-
-  Now we can implement an exception right into backup that installs a
-  backup filter driver between source and target if the source is the
-  backing file of the target. The filter driver would be similar to the
-  commit filter driver in that it simply promises !PERM_WRITE to its
-  parents, but allows PERM_WRITE on the source because it has installed
-  the before_write_notifier that guarantees this condition.
-
-  All writes to the target that are made by the backup job in this setup
-  (including before_write_notifier writes) need to be marked as
-  serialising so that any concurrent reads are completed first.
-
-And if we decide to add a target filter to backup, we should probably at
-the same time use a filter driver for intercepting source writes instead
-of using before_write_notifier.
-
-Max, I think you intended to make both source and target children of the
-same block job node (or at least for mirror). But wouldn't that create
-loops in a setup like this? I think we may need two filters that are
-only connected through the block job, but not with block graph edges.
-
-Kevin
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
