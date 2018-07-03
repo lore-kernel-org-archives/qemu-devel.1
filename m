@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faNN0-0002Ng-62
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1faNMz-0002Mn-7I
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1faNMx-0005Ja-9a
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36036 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1faNMw-0005GB-41
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36014 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMx-0005Hk-2q
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1faNMv-0005Ei-UZ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 11:37:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 947BD4021CC1
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 81AAADFDF
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:29 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-126.ams2.redhat.com
 	[10.36.116.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 54B971C640
-	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:30 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 41CF220180EB
+	for <qemu-devel@nongnu.org>; Tue,  3 Jul 2018 15:37:29 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  3 Jul 2018 17:37:01 +0200
-Message-Id: <20180703153728.2175-6-armbru@redhat.com>
+Date: Tue,  3 Jul 2018 17:36:58 +0200
+Message-Id: <20180703153728.2175-3-armbru@redhat.com>
 In-Reply-To: <20180703153728.2175-1-armbru@redhat.com>
 References: <20180703153728.2175-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 05/32] qmp: Get rid of x-oob-test command
+Subject: [Qemu-devel] [PULL 02/32] monitor: Spell "I/O thread" consistently
+ in comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,251 +36,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-tests/qmp-test tests an out-of-band command overtaking a slow in-band
-command.  To do that, it needs:
-
-1. An in-band command that *reliably* takes long enough to be
-   overtaken.
-
-2. An out-of-band command to do the overtaking.
-
-3. To avoid delays, a way to make the in-band command complete quickly
-   after it was overtaken.
-
-To satisfy these needs, commit 469638f9cb3 provides the rather
-peculiar oob-capable QMP command x-oob-test:
-
-* With "lock": true, it waits for a global semaphore.
-
-* With "lock": false, it signals the global semaphore.
-
-To satisfy 1., the test runs x-oob-test in-band with "lock": true.
-To satisfy 2. and 3., it runs x-oob-test out-of-band with "lock": false.
-
-Note that waiting for a semaphore violates the rules for oob-capable
-commands.  Running x-oob-test with "lock": true hangs the monitor
-until you run x-oob-test with "lock": false on another monitor (which
-you might not have set up).
-
-Having an externally visible QMP command that may hang the monitor is
-not nice.  Let's apply a little more ingenuity to the problem.  Idea:
-have an existing command block on reading a FIFO special file, unblock
-it by opening the FIFO for writing.
-
-For 1., use
-
-    {"execute": "blockdev-add",  "id": ID1,
-     "arguments": {
-        "driver": "blkdebug", "node-name": ID1, "config": FIFO,
-        "image": { "driver": "null-co"}}}
-
-where ID1 is an arbitrary string, and FIFO is the name of the FIFO.
-
-For 2., use
-
-    {"execute": "migrate-pause", "id": ID2, "control": {"run-oob": true}}
-
-where ID2 is a different arbitrary string.  Since there's no migration
-to pause, the command will fail, but that's fine; instant failure is
-still a test of out-of-band responses overtaking in-band commands.
-
-For 3., open FIFO for writing.
-
-Drop QMP command x-oob-test.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180703085358.13941-6-armbru@redhat.com>
+Message-Id: <20180703085358.13941-3-armbru@redhat.com>
 ---
- qapi/misc.json   | 18 ---------
- qmp.c            | 16 --------
- tests/qmp-test.c | 96 +++++++++++++++++++++++++++++++++---------------
- 3 files changed, 66 insertions(+), 64 deletions(-)
+ monitor.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 74cd97f237..f1860418e8 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3472,24 +3472,6 @@
- { 'event': 'COMMAND_DROPPED' ,
-   'data': { 'id': 'any', 'reason': 'CommandDropReason' } }
- 
--##
--# @x-oob-test:
--#
--# Test OOB functionality.  When sending this command with lock=true,
--# it'll try to hang the dispatcher.  When sending it with lock=false,
--# it'll try to notify the locked thread to continue.  Note: it should
--# only be used by QMP test program rather than anything else.
--#
--# Since: 2.12
--#
--# Example:
--#
--# { "execute": "x-oob-test",
--#   "arguments": { "lock": true } }
--##
--{ 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
--  'allow-oob': true }
--
- ##
- # @set-numa-node:
- #
-diff --git a/qmp.c b/qmp.c
-index 73e46d795f..62325ac6aa 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -775,19 +775,3 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
- 
-     return mem_info;
- }
--
--static QemuSemaphore x_oob_test_sem;
--
--static void __attribute__((constructor)) x_oob_test_init(void)
--{
--    qemu_sem_init(&x_oob_test_sem, 0);
--}
--
--void qmp_x_oob_test(bool lock, Error **errp)
--{
--    if (lock) {
--        qemu_sem_wait(&x_oob_test_sem);
--    } else {
--        qemu_sem_post(&x_oob_test_sem);
--    }
--}
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 5206b14ca6..6dd331fcdd 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -135,16 +135,67 @@ static void test_qmp_protocol(void)
-     qtest_quit(qts);
- }
- 
--/* Tests for out-of-band support. */
-+/* Out-of-band tests */
-+
-+char tmpdir[] = "/tmp/qmp-test-XXXXXX";
-+char *fifo_name;
-+
-+static void setup_blocking_cmd(void)
-+{
-+    int rc;
-+
-+    if (!mkdtemp(tmpdir)) {
-+        g_error("mkdtemp: %s", strerror(errno));
-+    }
-+    fifo_name = g_strdup_printf("%s/fifo", tmpdir);
-+    rc = mkfifo(fifo_name, 0666);
-+    g_assert(!rc);
-+}
-+
-+static void cleanup_blocking_cmd(void)
-+{
-+    unlink(fifo_name);
-+    rmdir(tmpdir);
-+}
-+
-+static void send_cmd_that_blocks(QTestState *s, const char *id)
-+{
-+    qtest_async_qmp(s, "{ 'execute': 'blockdev-add',  'id': %s,"
-+                    " 'arguments': {"
-+                    " 'driver': 'blkdebug', 'node-name': %s,"
-+                    " 'config': %s,"
-+                    " 'image': { 'driver': 'null-co' } } }",
-+                    id, id, fifo_name);
-+}
-+
-+static void unblock_blocked_cmd(void)
-+{
-+    int fd = open(fifo_name, O_WRONLY);
-+    g_assert(fd >= 0);
-+    close(fd);
-+}
-+
-+static void send_oob_cmd_that_fails(QTestState *s, const char *id)
-+{
-+    qtest_async_qmp(s, "{ 'execute': 'migrate-pause', 'id': %s,"
-+                    "  'control': { 'run-oob': true } }", id);
-+}
-+
-+static void recv_cmd_id(QTestState *s, const char *id)
-+{
-+    QDict *resp = qtest_qmp_receive(s);
-+
-+    g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, id);
-+    qobject_unref(resp);
-+}
-+
- static void test_qmp_oob(void)
+diff --git a/monitor.c b/monitor.c
+index 208d7c7cfd..4f4f309d45 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -243,7 +243,7 @@ struct Monitor {
+ /* Let's add monitor global variables to this struct. */
+ static struct {
+     IOThread *mon_iothread;
+-    /* Bottom half to dispatch the requests received from IO thread */
++    /* Bottom half to dispatch the requests received from I/O thread */
+     QEMUBH *qmp_dispatcher_bh;
+     /* Bottom half to deliver the responses back to clients */
+     QEMUBH *qmp_respond_bh;
+@@ -518,7 +518,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
  {
-     QTestState *qts;
-     QDict *resp, *q;
--    int acks = 0;
-     const QListEntry *entry;
-     QList *capabilities;
-     QString *qstr;
--    const char *cmd_id;
+     if (mon->use_io_thr) {
+         /*
+-         * If using IO thread, we need to queue the item so that IO
++         * If using I/O thread, we need to queue the item so that I/O
+          * thread will do the rest for us.  Take refcount so that
+          * caller won't free the data (which will be finally freed in
+          * responder thread).
+@@ -529,7 +529,7 @@ static void monitor_json_emitter(Monitor *mon, QObject *data)
+         qemu_bh_schedule(mon_global.qmp_respond_bh);
+     } else {
+         /*
+-         * If not using monitor IO thread, then we are in main thread.
++         * If not using monitor I/O thread, then we are in main thread.
+          * Do the emission right away.
+          */
+         monitor_json_emitter_raw(mon, data);
+@@ -1269,7 +1269,7 @@ static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
+             if (!mon->use_io_thr) {
+                 /*
+                  * Out-of-band only works with monitors that are
+-                 * running on dedicated IOThread.
++                 * running on dedicated I/O thread.
+                  */
+                 error_setg(errp, "This monitor does not support "
+                            "out-of-band (OOB)");
+@@ -4403,7 +4403,7 @@ int monitor_suspend(Monitor *mon)
  
-     qts = qtest_init_without_qmp_handshake(true, common_args);
+     if (monitor_is_qmp(mon)) {
+         /*
+-         * Kick iothread to make sure this takes effect.  It'll be
++         * Kick I/O thread to make sure this takes effect.  It'll be
+          * evaluated again in prepare() of the watch object.
+          */
+         aio_notify(iothread_get_aio_context(mon_global.mon_iothread));
+@@ -4422,7 +4422,7 @@ void monitor_resume(Monitor *mon)
+     if (atomic_dec_fetch(&mon->suspend_cnt) == 0) {
+         if (monitor_is_qmp(mon)) {
+             /*
+-             * For QMP monitors that are running in IOThread, let's
++             * For QMP monitors that are running in I/O thread, let's
+              * kick the thread in case it's sleeping.
+              */
+             if (mon->use_io_thr) {
+@@ -4446,7 +4446,7 @@ static QObject *get_qmp_greeting(Monitor *mon)
  
-@@ -185,37 +236,20 @@ static void test_qmp_oob(void)
-     g_assert(qdict_haskey(resp, "error"));
-     qobject_unref(resp);
+     for (cap = 0; cap < QMP_CAPABILITY__MAX; cap++) {
+         if (!mon->use_io_thr && cap == QMP_CAPABILITY_OOB) {
+-            /* Monitors that are not using IOThread won't support OOB */
++            /* Monitors that are not using I/O thread won't support OOB */
+             continue;
+         }
+         qlist_append_str(cap_list, QMPCapability_str(cap));
+@@ -4587,9 +4587,9 @@ static void monitor_iothread_init(void)
+                                               NULL);
  
--    /*
--     * First send the "x-oob-test" command with lock=true and
--     * oob=false, it should hang the dispatcher and main thread;
--     * later, we send another lock=false with oob=true to continue
--     * that thread processing.  Finally we should receive replies from
--     * both commands.
--     */
--    qtest_async_qmp(qts,
--                    "{ 'execute': 'x-oob-test',"
--                    "  'arguments': { 'lock': true }, "
--                    "  'id': 'lock-cmd'}");
--    qtest_async_qmp(qts,
--                    "{ 'execute': 'x-oob-test', "
--                    "  'arguments': { 'lock': false }, "
--                    "  'control': { 'run-oob': true }, "
--                    "  'id': 'unlock-cmd' }");
--
--    /* Ignore all events.  Wait for 2 acks */
--    while (acks < 2) {
--        resp = qtest_qmp_receive(qts);
--        cmd_id = qdict_get_str(resp, "id");
--        if (!g_strcmp0(cmd_id, "lock-cmd") ||
--            !g_strcmp0(cmd_id, "unlock-cmd")) {
--            acks++;
--        }
--        qobject_unref(resp);
--    }
-+    /* OOB command overtakes slow in-band command */
-+    setup_blocking_cmd();
-+    send_cmd_that_blocks(qts, "ib-blocks-1");
-+    send_oob_cmd_that_fails(qts, "oob-1");
-+    recv_cmd_id(qts, "oob-1");
-+    unblock_blocked_cmd();
-+    recv_cmd_id(qts, "ib-blocks-1");
-+    cleanup_blocking_cmd();
+     /*
+-     * Unlike the dispatcher BH, this must be run on the monitor IO
+-     * thread, so that monitors that are using IO thread will make
+-     * sure read/write operations are all done on the IO thread.
++     * Unlike the dispatcher BH, this must be run on the monitor I/O
++     * thread, so that monitors that are using I/O thread will make
++     * sure read/write operations are all done on the I/O thread.
+      */
+     mon_global.qmp_respond_bh = aio_bh_new(monitor_get_aio_context(),
+                                            monitor_qmp_bh_responder,
+@@ -4661,7 +4661,7 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+     if (mon->use_io_thr) {
+         /*
+          * When use_io_thr is set, we use the global shared dedicated
+-         * IO thread for this monitor to handle input/output.
++         * I/O thread for this monitor to handle input/output.
+          */
+         context = monitor_get_io_context();
+         /* We should have inited globals before reaching here. */
+@@ -4718,7 +4718,7 @@ void monitor_init(Chardev *chr, int flags)
+             /*
+              * We can't call qemu_chr_fe_set_handlers() directly here
+              * since during the procedure the chardev will be active
+-             * and running in monitor iothread, while we'll still do
++             * and running in monitor I/O thread, while we'll still do
+              * something before returning from it, which is a possible
+              * race too.  To avoid that, we just create a BH to setup
+              * the handlers.
+@@ -4745,16 +4745,16 @@ void monitor_cleanup(void)
+     Monitor *mon, *next;
  
-     qtest_quit(qts);
- }
+     /*
+-     * We need to explicitly stop the iothread (but not destroy it),
+-     * cleanup the monitor resources, then destroy the iothread since
++     * We need to explicitly stop the I/O thread (but not destroy it),
++     * cleanup the monitor resources, then destroy the I/O thread since
+      * we need to unregister from chardev below in
+      * monitor_data_destroy(), and chardev is not thread-safe yet
+      */
+     iothread_stop(mon_global.mon_iothread);
  
-+/* Query smoke tests */
-+
- static int query_error_class(const char *cmd)
- {
-     static struct {
-@@ -392,6 +426,8 @@ static void add_query_tests(QmpSchema *schema)
+     /*
+-     * After we have IOThread to send responses, it's possible that
+-     * when we stop the IOThread there are still replies queued in the
++     * After we have I/O thread to send responses, it's possible that
++     * when we stop the I/O thread there are still replies queued in the
+      * responder queue.  Flush all of them.  Note that even after this
+      * flush it's still possible that out buffer is not flushed.
+      * It'll be done in below monitor_flush() as the last resort.
+@@ -4770,7 +4770,7 @@ void monitor_cleanup(void)
      }
- }
+     qemu_mutex_unlock(&monitor_lock);
  
-+/* Preconfig tests */
-+
- static void test_qmp_preconfig(void)
- {
-     QDict *rsp, *ret;
+-    /* QEMUBHs needs to be deleted before destroying the IOThread. */
++    /* QEMUBHs needs to be deleted before destroying the I/O thread */
+     qemu_bh_delete(mon_global.qmp_dispatcher_bh);
+     mon_global.qmp_dispatcher_bh = NULL;
+     qemu_bh_delete(mon_global.qmp_respond_bh);
 -- 
 2.17.1
