@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52797)
+Received: from eggs.gnu.org ([208.118.235.92]:53700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFku-0004Kc-1u
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:20 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFkU-0004qG-Af
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:31:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1faFh1-0001oN-Gu
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:29:40 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faFgp-0001d9-U9
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 03:29:09 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  3 Jul 2018 09:19:52 +0200
-Message-Id: <1530602398-16127-10-git-send-email-eric.auger@redhat.com>
+Date: Tue,  3 Jul 2018 09:19:46 +0200
+Message-Id: <1530602398-16127-4-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
 References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 09/15] hw/arm/boot: Expose the PC-DIMM nodes
- in the DT
+Subject: [Qemu-devel] [RFC v3 03/15] kvm: add kvm_arm_get_max_vm_phys_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +22,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Add the kvm_arm_get_max_vm_phys_shift() helper that returns the
+log of the maximum IPA size supported by KVM. This capability
+needs to be known to create the VM with a correct IPA max size
+(kvm_type passed along KVM_CREATE_VM ioctl.
 
-This patch add memory nodes corresponding to PC-DIMM regions.
-
-NV_DIMM and ACPI_NVDIMM configs are not yet set for ARM so we
-don't need to care about NV-DIMM at this stage.
-
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-
 v1 -> v2:
-- added qapi_free_MemoryDeviceInfoList and simplify the loop
+- put this in ARM specific code
 ---
- hw/arm/boot.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ target/arm/kvm.c     |  9 +++++++++
+ target/arm/kvm_arm.h | 16 ++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 5243a25..2c7d558 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -19,6 +19,7 @@
- #include "sysemu/numa.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
-+#include "hw/mem/memory-device.h"
- #include "elf.h"
- #include "sysemu/device_tree.h"
- #include "qemu/config-file.h"
-@@ -516,6 +517,35 @@ static void fdt_add_psci_node(void *fdt)
-     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 65f867d..7d501ca 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -18,6 +18,7 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/kvm_int.h"
+ #include "kvm_arm.h"
+ #include "cpu.h"
+ #include "trace.h"
+@@ -154,6 +155,13 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+     env->features = arm_host_cpu_features.features;
  }
  
-+static int fdt_add_hotpluggable_memory_nodes(void *fdt,
-+                                             uint64_t base, uint64_t len,
-+                                             uint32_t acells, uint32_t scells) {
-+    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
-+    MemoryDeviceInfo *mi;
-+    PCDIMMDeviceInfo *di;
-+    bool is_nvdimm;
-+    int ret = 0;
++int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
++{
++    KVMState *s = KVM_STATE(ms->accelerator);
 +
-+    for (info = info_list; info != NULL; info = info->next) {
-+        mi = info->value;
-+        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-+        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-+
-+        if (is_nvdimm) {
-+            ret = -ENOENT; /* NV-DIMM not yet supported */
-+        } else {
-+            ret = fdt_add_memory_node(fdt, acells, di->addr,
-+                                      scells, di->size, di->node);
-+        }
-+        if (ret < 0) {
-+            goto out;
-+        }
-+    }
-+out:
-+    qapi_free_MemoryDeviceInfoList(info_list);
-+    return ret;
++    return kvm_ioctl(s, KVM_ARM_GET_MAX_VM_PHYS_SHIFT, 0);
 +}
 +
- int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-                  hwaddr addr_limit, AddressSpace *as)
+ int kvm_arch_init(MachineState *ms, KVMState *s)
  {
-@@ -611,6 +641,14 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-         }
-     }
- 
-+    rc = fdt_add_hotpluggable_memory_nodes(fdt, binfo->device_memory_start,
-+                                           binfo->device_memory_size,
-+                                           acells, scells);
-+    if (rc < 0) {
-+            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
-+            goto fail;
-+    }
+     /* For ARM interrupt delivery is always asynchronous,
+@@ -713,3 +721,4 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+ {
+     return (data - 32) & 0xffff;
+ }
 +
-     rc = fdt_path_offset(fdt, "/chosen");
-     if (rc < 0) {
-         qemu_fdt_add_subnode(fdt, "/chosen");
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 863f205..ee973f6 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -183,6 +183,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
+ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+ 
+ /**
++ * kvm_arm_get_max_vm_phys_shift - Returns log2 of the max IPA size
++ * supported by KVM
++ *
++ * @s: Machine state handle
++ *
++ * Return the max number of IPA bits or a negative value if
++ * the host kernel does not expose this value.
++ */
++int kvm_arm_get_max_vm_phys_shift(MachineState *ms);
++
++/**
+  * kvm_arm_sync_mpstate_to_kvm
+  * @cpu: ARMCPU
+  *
+@@ -214,6 +225,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+     cpu->host_cpu_probe_failed = true;
+ }
+ 
++static inline int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
++{
++    return -ENOENT;
++}
++
+ static inline int kvm_arm_vgic_probe(void)
+ {
+     return 0;
 -- 
 2.5.5
