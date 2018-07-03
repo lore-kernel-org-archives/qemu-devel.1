@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKc-0002xx-2t
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKf-00032T-G5
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faEKY-00076x-Jz
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faEKa-0007A8-BQ
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 01:58:33 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Jul 2018 15:57:58 +1000
-Message-Id: <20180703055804.13449-30-david@gibson.dropbear.id.au>
+Date: Tue,  3 Jul 2018 15:57:59 +1000
+Message-Id: <20180703055804.13449-31-david@gibson.dropbear.id.au>
 In-Reply-To: <20180703055804.13449-1-david@gibson.dropbear.id.au>
 References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 29/35] ppc440_uc: Basic emulation of PPC440 DMA
- controller
+Subject: [Qemu-devel] [PULL 30/35] target/ppc/kvm: get rid of
+ kvm_get_fallback_smmu_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,287 +21,187 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Greg Kurz <groug@kaod.org>
 
-PPC440 SoCs such as the AMCC 460EX have a DMA controller which is used
-by AmigaOS on the sam460ex. Implement the parts used by AmigaOS so it
-can get further booting on the sam460ex machine.
+Now that we're checking our MMU configuration is supported by KVM,
+rather than adjusting it to KVM, it doesn't really make sense to
+have a fallback for kvm_get_smmu_info(). If KVM is too old or buggy
+to provide the details, we should rather treat this as an error.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+This patch thus adds error reporting to kvm_get_smmu_info() and get
+rid of the fallback code. QEMU will now terminate if KVM fails to
+provide MMU details. This may break some very old setups, but the
+simplification is worth the sacrifice.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc440.h    |   1 +
- hw/ppc/ppc440_uc.c | 222 +++++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/sam460ex.c  |   3 +
- 3 files changed, 226 insertions(+)
+ target/ppc/kvm.c | 117 ++++++++---------------------------------------
+ 1 file changed, 20 insertions(+), 97 deletions(-)
 
-diff --git a/hw/ppc/ppc440.h b/hw/ppc/ppc440.h
-index ad27db12e4..7cef936125 100644
---- a/hw/ppc/ppc440.h
-+++ b/hw/ppc/ppc440.h
-@@ -21,6 +21,7 @@ void ppc440_sdram_init(CPUPPCState *env, int nbanks,
-                        hwaddr *ram_bases, hwaddr *ram_sizes,
-                        int do_init);
- void ppc4xx_ahb_init(CPUPPCState *env);
-+void ppc4xx_dma_init(CPUPPCState *env, int dcr_base);
- void ppc460ex_pcie_init(CPUPPCState *env);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 4df4ff6cbf..b6000f12b9 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -248,107 +248,25 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
  
- #endif /* PPC440_H */
-diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-index 123f4ac09d..32802d741b 100644
---- a/hw/ppc/ppc440_uc.c
-+++ b/hw/ppc/ppc440_uc.c
-@@ -13,6 +13,7 @@
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-+#include "qemu/log.h"
- #include "cpu.h"
- #include "hw/hw.h"
- #include "exec/address-spaces.h"
-@@ -802,6 +803,227 @@ void ppc4xx_ahb_init(CPUPPCState *env)
-     qemu_register_reset(ppc4xx_ahb_reset, ahb);
+ 
+ #if defined(TARGET_PPC64)
+-static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
+-                                       struct kvm_ppc_smmu_info *info)
++static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info,
++                              Error **errp)
+ {
+-    CPUPPCState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
++    int ret;
+ 
+-    memset(info, 0, sizeof(*info));
+-
+-    /* We don't have the new KVM_PPC_GET_SMMU_INFO ioctl, so
+-     * need to "guess" what the supported page sizes are.
+-     *
+-     * For that to work we make a few assumptions:
+-     *
+-     * - Check whether we are running "PR" KVM which only supports 4K
+-     *   and 16M pages, but supports them regardless of the backing
+-     *   store characteritics. We also don't support 1T segments.
+-     *
+-     *   This is safe as if HV KVM ever supports that capability or PR
+-     *   KVM grows supports for more page/segment sizes, those versions
+-     *   will have implemented KVM_CAP_PPC_GET_SMMU_INFO and thus we
+-     *   will not hit this fallback
+-     *
+-     * - Else we are running HV KVM. This means we only support page
+-     *   sizes that fit in the backing store. Additionally we only
+-     *   advertize 64K pages if the processor is ARCH 2.06 and we assume
+-     *   P7 encodings for the SLB and hash table. Here too, we assume
+-     *   support for any newer processor will mean a kernel that
+-     *   implements KVM_CAP_PPC_GET_SMMU_INFO and thus doesn't hit
+-     *   this fallback.
+-     */
+-    if (kvmppc_is_pr(cs->kvm_state)) {
+-        /* No flags */
+-        info->flags = 0;
+-        info->slb_size = 64;
+-
+-        /* Standard 4k base page size segment */
+-        info->sps[0].page_shift = 12;
+-        info->sps[0].slb_enc = 0;
+-        info->sps[0].enc[0].page_shift = 12;
+-        info->sps[0].enc[0].pte_enc = 0;
+-
+-        /* Standard 16M large page size segment */
+-        info->sps[1].page_shift = 24;
+-        info->sps[1].slb_enc = SLB_VSID_L;
+-        info->sps[1].enc[0].page_shift = 24;
+-        info->sps[1].enc[0].pte_enc = 0;
+-    } else {
+-        int i = 0;
+-
+-        /* HV KVM has backing store size restrictions */
+-        info->flags = KVM_PPC_PAGE_SIZES_REAL;
+-
+-        if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+-            info->flags |= KVM_PPC_1T_SEGMENTS;
+-        }
+-
+-        if (env->mmu_model == POWERPC_MMU_2_06 ||
+-            env->mmu_model == POWERPC_MMU_2_07) {
+-            info->slb_size = 32;
+-        } else {
+-            info->slb_size = 64;
+-        }
+-
+-        /* Standard 4k base page size segment */
+-        info->sps[i].page_shift = 12;
+-        info->sps[i].slb_enc = 0;
+-        info->sps[i].enc[0].page_shift = 12;
+-        info->sps[i].enc[0].pte_enc = 0;
+-        i++;
+-
+-        /* 64K on MMU 2.06 and later */
+-        if (env->mmu_model == POWERPC_MMU_2_06 ||
+-            env->mmu_model == POWERPC_MMU_2_07) {
+-            info->sps[i].page_shift = 16;
+-            info->sps[i].slb_enc = 0x110;
+-            info->sps[i].enc[0].page_shift = 16;
+-            info->sps[i].enc[0].pte_enc = 1;
+-            i++;
+-        }
+-
+-        /* Standard 16M large page size segment */
+-        info->sps[i].page_shift = 24;
+-        info->sps[i].slb_enc = SLB_VSID_L;
+-        info->sps[i].enc[0].page_shift = 24;
+-        info->sps[i].enc[0].pte_enc = 0;
++    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
++        error_setg(errp, "KVM doesn't expose the MMU features it supports");
++        error_append_hint(errp, "Consider switching to a newer KVM\n");
++        return;
+     }
+-}
+-
+-static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+-{
+-    CPUState *cs = CPU(cpu);
+-    int ret;
+ 
+-    if (kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
+-        ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, info);
+-        if (ret == 0) {
+-            return;
+-        }
++    ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_SMMU_INFO, info);
++    if (ret == 0) {
++        return;
+     }
+ 
+-    kvm_get_fallback_smmu_info(cpu, info);
++    error_setg_errno(errp, -ret,
++                     "KVM failed to provide the MMU features it supports");
  }
  
-+/*****************************************************************************/
-+/* DMA controller */
-+
-+#define DMA0_CR_CE  (1 << 31)
-+#define DMA0_CR_PW  (1 << 26 | 1 << 25)
-+#define DMA0_CR_DAI (1 << 24)
-+#define DMA0_CR_SAI (1 << 23)
-+#define DMA0_CR_DEC (1 << 2)
-+
-+enum {
-+    DMA0_CR  = 0x00,
-+    DMA0_CT,
-+    DMA0_SAH,
-+    DMA0_SAL,
-+    DMA0_DAH,
-+    DMA0_DAL,
-+    DMA0_SGH,
-+    DMA0_SGL,
-+
-+    DMA0_SR  = 0x20,
-+    DMA0_SGC = 0x23,
-+    DMA0_SLP = 0x25,
-+    DMA0_POL = 0x26,
-+};
-+
-+typedef struct {
-+    uint32_t cr;
-+    uint32_t ct;
-+    uint64_t sa;
-+    uint64_t da;
-+    uint64_t sg;
-+} PPC4xxDmaChnl;
-+
-+typedef struct {
-+    int base;
-+    PPC4xxDmaChnl ch[4];
-+    uint32_t sr;
-+} PPC4xxDmaState;
-+
-+static uint32_t dcr_read_dma(void *opaque, int dcrn)
-+{
-+    PPC4xxDmaState *dma = opaque;
-+    uint32_t val = 0;
-+    int addr = dcrn - dma->base;
-+    int chnl = addr / 8;
-+
-+    switch (addr) {
-+    case 0x00 ... 0x1f:
-+        switch (addr % 8) {
-+        case DMA0_CR:
-+            val = dma->ch[chnl].cr;
-+            break;
-+        case DMA0_CT:
-+            val = dma->ch[chnl].ct;
-+            break;
-+        case DMA0_SAH:
-+            val = dma->ch[chnl].sa >> 32;
-+            break;
-+        case DMA0_SAL:
-+            val = dma->ch[chnl].sa;
-+            break;
-+        case DMA0_DAH:
-+            val = dma->ch[chnl].da >> 32;
-+            break;
-+        case DMA0_DAL:
-+            val = dma->ch[chnl].da;
-+            break;
-+        case DMA0_SGH:
-+            val = dma->ch[chnl].sg >> 32;
-+            break;
-+        case DMA0_SGL:
-+            val = dma->ch[chnl].sg;
-+            break;
-+        }
-+        break;
-+    case DMA0_SR:
-+        val = dma->sr;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d, %x)\n",
-+                      __func__, dcrn, chnl, addr);
-+    }
-+
-+    return val;
-+}
-+
-+static void dcr_write_dma(void *opaque, int dcrn, uint32_t val)
-+{
-+    PPC4xxDmaState *dma = opaque;
-+    int addr = dcrn - dma->base;
-+    int chnl = addr / 8;
-+
-+    switch (addr) {
-+    case 0x00 ... 0x1f:
-+        switch (addr % 8) {
-+        case DMA0_CR:
-+            dma->ch[chnl].cr = val;
-+            if (val & DMA0_CR_CE) {
-+                int count = dma->ch[chnl].ct & 0xffff;
-+
-+                if (count) {
-+                    int width, i, sidx, didx;
-+                    uint8_t *rptr, *wptr;
-+                    hwaddr rlen, wlen;
-+
-+                    sidx = didx = 0;
-+                    width = 1 << ((val & DMA0_CR_PW) >> 25);
-+                    rptr = cpu_physical_memory_map(dma->ch[chnl].sa, &rlen, 0);
-+                    wptr = cpu_physical_memory_map(dma->ch[chnl].da, &wlen, 1);
-+                    if (rptr && wptr) {
-+                        if (!(val & DMA0_CR_DEC) &&
-+                            val & DMA0_CR_SAI && val & DMA0_CR_DAI) {
-+                            /* optimise common case */
-+                            memmove(wptr, rptr, count * width);
-+                            sidx = didx = count * width;
-+                        } else {
-+                            /* do it the slow way */
-+                            for (sidx = didx = i = 0; i < count; i++) {
-+                                uint64_t v = ldn_le_p(rptr + sidx, width);
-+                                stn_le_p(wptr + didx, width, v);
-+                                if (val & DMA0_CR_SAI) {
-+                                    sidx += width;
-+                                }
-+                                if (val & DMA0_CR_DAI) {
-+                                    didx += width;
-+                                }
-+                            }
-+                        }
-+                    }
-+                    if (wptr) {
-+                        cpu_physical_memory_unmap(wptr, wlen, 1, didx);
-+                    }
-+                    if (wptr) {
-+                        cpu_physical_memory_unmap(rptr, rlen, 0, sidx);
-+                    }
-+                }
-+            }
-+            break;
-+        case DMA0_CT:
-+            dma->ch[chnl].ct = val;
-+            break;
-+        case DMA0_SAH:
-+            dma->ch[chnl].sa &= 0xffffffffULL;
-+            dma->ch[chnl].sa |= (uint64_t)val << 32;
-+            break;
-+        case DMA0_SAL:
-+            dma->ch[chnl].sa &= 0xffffffff00000000ULL;
-+            dma->ch[chnl].sa |= val;
-+            break;
-+        case DMA0_DAH:
-+            dma->ch[chnl].da &= 0xffffffffULL;
-+            dma->ch[chnl].da |= (uint64_t)val << 32;
-+            break;
-+        case DMA0_DAL:
-+            dma->ch[chnl].da &= 0xffffffff00000000ULL;
-+            dma->ch[chnl].da |= val;
-+            break;
-+        case DMA0_SGH:
-+            dma->ch[chnl].sg &= 0xffffffffULL;
-+            dma->ch[chnl].sg |= (uint64_t)val << 32;
-+            break;
-+        case DMA0_SGL:
-+            dma->ch[chnl].sg &= 0xffffffff00000000ULL;
-+            dma->ch[chnl].sg |= val;
-+            break;
-+        }
-+        break;
-+    case DMA0_SR:
-+        dma->sr &= ~val;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register %x (%d, %x)\n",
-+                      __func__, dcrn, chnl, addr);
-+    }
-+}
-+
-+static void ppc4xx_dma_reset(void *opaque)
-+{
-+    PPC4xxDmaState *dma = opaque;
-+    int dma_base = dma->base;
-+
-+    memset(dma, 0, sizeof(*dma));
-+    dma->base = dma_base;
-+}
-+
-+void ppc4xx_dma_init(CPUPPCState *env, int dcr_base)
-+{
-+    PPC4xxDmaState *dma;
-+    int i;
-+
-+    dma = g_malloc0(sizeof(*dma));
-+    dma->base = dcr_base;
-+    qemu_register_reset(&ppc4xx_dma_reset, dma);
-+    for (i = 0; i < 4; i++) {
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CR,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_CT,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAH,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SAL,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAH,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_DAL,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGH,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+        ppc_dcr_register(env, dcr_base + i * 8 + DMA0_SGL,
-+                         dma, &dcr_read_dma, &dcr_write_dma);
-+    }
-+    ppc_dcr_register(env, dcr_base + DMA0_SR,
-+                     dma, &dcr_read_dma, &dcr_write_dma);
-+    ppc_dcr_register(env, dcr_base + DMA0_SGC,
-+                     dma, &dcr_read_dma, &dcr_write_dma);
-+    ppc_dcr_register(env, dcr_base + DMA0_SLP,
-+                     dma, &dcr_read_dma, &dcr_write_dma);
-+    ppc_dcr_register(env, dcr_base + DMA0_POL,
-+                     dma, &dcr_read_dma, &dcr_write_dma);
-+}
-+
- /*****************************************************************************/
- /* PCI Express controller */
- /* FIXME: This is not complete and does not work, only implemented partially
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index a03d12d1dc..80c888c3ef 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -505,6 +505,9 @@ static void sam460ex_init(MachineState *machine)
-     /* MAL */
-     ppc4xx_mal_init(env, 4, 16, &uic[2][3]);
+ struct ppc_radix_page_info *kvm_get_radix_page_info(void)
+@@ -415,7 +333,7 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void)
+         return false;
+     }
  
-+    /* DMA */
-+    ppc4xx_dma_init(env, 0x200);
-+
-     /* 256K of L2 cache as memory */
-     ppc4xx_l2sram_init(env);
-     /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c? */
+-    kvm_get_smmu_info(cpu, &smmu_info);
++    kvm_get_smmu_info(cpu, &smmu_info, &error_fatal);
+     return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
+ }
+ 
+@@ -423,13 +341,18 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
+ {
+     struct kvm_ppc_smmu_info smmu_info;
+     int iq, ik, jq, jk;
++    Error *local_err = NULL;
+ 
+     /* For now, we only have anything to check on hash64 MMUs */
+     if (!cpu->hash64_opts || !kvm_enabled()) {
+         return;
+     }
+ 
+-    kvm_get_smmu_info(cpu, &smmu_info);
++    kvm_get_smmu_info(cpu, &smmu_info, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)
+         && !(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+@@ -2168,7 +2091,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+ 
+     /* Find the largest hardware supported page size that's less than
+      * or equal to the (logical) backing page size of guest RAM */
+-    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
++    kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info, &error_fatal);
+     rampagesize = qemu_getrampagesize();
+     best_page_shift = 0;
+ 
 -- 
 2.17.1
