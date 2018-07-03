@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1faGHr-0007uf-BX
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:03:48 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1faGO7-0003My-9T
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1faGHm-00043z-Us
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:03:47 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:52356
-	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1faGHm-00042p-Nk
-	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:03:42 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
-	<20180629200816-mutt-send-email-mst@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <5124334c-b3c8-4c59-b652-d26ea1101807@arm.com>
-Date: Tue, 3 Jul 2018 09:04:01 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1faGO3-0007vj-6p
+	for qemu-devel@nongnu.org; Tue, 03 Jul 2018 04:10:15 -0400
+References: <20180702093755.7384-1-david@redhat.com>
+	<20180702093755.7384-2-david@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <426f6334-37b9-cb02-e2aa-b94b0029d525@redhat.com>
+Date: Tue, 3 Jul 2018 10:10:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180629200816-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20180702093755.7384-2-david@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/20] virtio: mmio-v1: Validate queue
- PFN
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] pc-dimm: assign and verify the
+ "slot" property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +24,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-Hi Michael,
+Hi David,
 
-On 06/29/2018 06:42 PM, Michael S. Tsirkin wrote:
-> On Fri, Jun 29, 2018 at 12:15:21PM +0100, Suzuki K Poulose wrote:
->> virtio-mmio with virtio-v1 uses a 32bit PFN for the queue.
->> If the queue pfn is too large to fit in 32bits, which
->> we could hit on arm64 systems with 52bit physical addresses
->> (even with 64K page size), we simply miss out a proper link
->> to the other side of the queue.
->>
->> Add a check to validate the PFN, rather than silently breaking
->> the devices.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <cdall@kernel.org>
->> Cc: Peter Maydel <peter.maydell@linaro.org>
->> Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->> Changes since v2:
->>   - Change errno to -E2BIG
->> ---
->>   drivers/virtio/virtio_mmio.c | 18 ++++++++++++++++--
->>   1 file changed, 16 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
->> index 67763d3..82cedc8 100644
->> --- a/drivers/virtio/virtio_mmio.c
->> +++ b/drivers/virtio/virtio_mmio.c
->> @@ -397,9 +397,21 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
->>   	/* Activate the queue */
->>   	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
->>   	if (vm_dev->version == 1) {
->> +		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
->> +
->> +		/*
->> +		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
->> +		 * that doesn't fit in 32bit, fail the setup rather than
->> +		 * pretending to be successful.
->> +		 */
->> +		if (q_pfn >> 32) {
->> +			dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
+On 07/02/2018 11:37 AM, David Hildenbrand wrote:
+> We can assign and verify the slot before realizing and trying to plug.
+> reading/writing the slot property should never fail, so let's reduce
+> error handling a bit by using &error_abort.
 > 
-> How about:
-> 	"hypervisor bug: legacy virtio-mmio must not be used with more than 0x%llx Gigabytes of memory",
-> 	0x1ULL << (32 - 30) << PAGE_SHIFT
+> To do this during pre_plug, add and use (x86, ppc) pc_dimm_pre_plug().
+> 
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/i386/pc.c             |  2 ++
+>  hw/mem/pc-dimm.c         | 35 ++++++++++++++++++-----------------
+>  hw/ppc/spapr.c           |  9 ++++++++-
+>  include/hw/mem/pc-dimm.h |  1 +
+>  4 files changed, 29 insertions(+), 18 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f310040351..bf986baf91 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1695,6 +1695,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>          return;
+>      }
+> +
+> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>  }
+>  
+>  static void pc_memory_plug(HotplugHandler *hotplug_dev,
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 65843bc52a..e56c4daef2 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -29,10 +29,27 @@
+>  
+>  static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+>  
+> +void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    int slot;
+> +
+> +    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
+> +                                   &error_abort);
+> +    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+> +                                 machine->ram_slots, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
+> +    trace_mhp_pc_dimm_assigned_slot(slot);
+> +out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+>                    Error **errp)
+>  {
+> -    int slot;
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+> @@ -59,22 +76,6 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+>      }
+>      trace_mhp_pc_dimm_assigned_address(addr);
+>  
+> -    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -
+> -    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+> -                                 machine->ram_slots, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -    trace_mhp_pc_dimm_assigned_slot(slot);
+> -
+>      memory_device_plug_region(machine, mr, addr);
+>      vmstate_register_ram(vmstate_mr, dev);
+>  
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index b32b971a14..bf012235b6 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3191,6 +3191,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> +    Error *local_err = NULL;
+>      MemoryRegion *mr;
+>      uint64_t size;
+>      Object *memdev;
+> @@ -3216,7 +3217,13 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
+>                                        &error_abort);
+>      pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
+> -    spapr_check_pagesize(spapr, pagesize, errp);
+> +    spapr_check_pagesize(spapr, pagesize, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>  }
+>  
+>  struct sPAPRDIMMState {
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index 26ebb7d5e9..7b120416d1 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -79,6 +79,7 @@ typedef struct PCDIMMDeviceClass {
+>                                                 Error **errp);
+>  } PCDIMMDeviceClass;
+>  
+> +void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
+>  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+>                    Error **errp);
+>  void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+> 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-nit : Do we need change "hypervisor" => "platform" ? Virtio is used by 
-other tools (e.g, emulators) and not just virtual machines.
+Thanks
 
-Suzuki
+Eric
