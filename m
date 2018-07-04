@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fajtA-0007E9-TG
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:40:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fajuS-0008RG-J7
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:41:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fajt7-0003gQ-0A
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:40:16 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:32879)
+	(envelope-from <alex.bennee@linaro.org>) id 1fajuO-0004Vo-NW
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:41:36 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53289)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fajt6-0003gH-Qs
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:40:12 -0400
-Received: by mail-qt0-x236.google.com with SMTP id l10-v6so4853348qtj.0
-	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 08:40:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  4 Jul 2018 12:39:18 -0300
-Message-Id: <20180704153919.12432-8-f4bug@amsat.org>
-In-Reply-To: <20180704153919.12432-1-f4bug@amsat.org>
-References: <20180704153919.12432-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fajuO-0004VZ-Gr
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:41:32 -0400
+Received: by mail-wm0-x241.google.com with SMTP id b188-v6so6560358wme.3
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 08:41:32 -0700 (PDT)
+References: <20180704143014.8670-1-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180704143014.8670-1-f4bug@amsat.org>
+Date: Wed, 04 Jul 2018 16:41:30 +0100
+Message-ID: <87va9v80ut.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 7/8] hw/pci-host: Remove useless parenthesis
- around DIV_ROUND_UP macro
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Do not display host compilers
+ as cross-compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Daniel_P=20?= =?utf-8?Q?=2E_Berrang=C3=A9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-Patch created mechanically by rerunning:
 
-  $  spatch --sp-file scripts/coccinelle/round.cocci \
-            --macro-file scripts/cocci-macro-file.h \
-            --dir . --in-place
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/pci-host/piix.c | 2 +-
- hw/pci-host/q35.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> This silent (since d75402b5ee2):
+>
+>   ./configure
+>   [...]
+>   NOTE: cross-compilers enabled:  'cc'
+>
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/configure b/configure
+> index b99ebdde24..fbb53ab6bb 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7328,7 +7328,7 @@ echo "QEMU_CFLAGS+=3D$cflags" >> $config_target_mak
+>
+>  done # for target in $targets
+>
+> -if test -n "$enabled_cross_compilers"; then
+> +if test -n "$target_compiler" -a -n "$enabled_cross_compilers"; then
+>      echo
+>      echo "NOTE: cross-compilers enabled: $enabled_cross_compilers"
+>  fi
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 0e608347c1..317c0feca6 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -144,7 +144,7 @@ static void i440fx_update_memory_mappings(PCII440FXState *d)
-     memory_region_transaction_begin();
-     for (i = 0; i < 13; i++) {
-         pam_update(&d->pam_regions[i], i,
--                   pd->config[I440FX_PAM + (DIV_ROUND_UP(i, 2))]);
-+                   pd->config[I440FX_PAM + DIV_ROUND_UP(i, 2)]);
-     }
-     memory_region_set_enabled(&d->smram_region,
-                               !(pd->config[I440FX_SMRAM] & SMRAM_D_OPEN));
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 02f9576588..b3a5b3036d 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -352,7 +352,7 @@ static void mch_update_pam(MCHPCIState *mch)
-     memory_region_transaction_begin();
-     for (i = 0; i < 13; i++) {
-         pam_update(&mch->pam_regions[i], i,
--                   pd->config[MCH_HOST_BRIDGE_PAM0 + (DIV_ROUND_UP(i, 2))]);
-+                   pd->config[MCH_HOST_BRIDGE_PAM0 + DIV_ROUND_UP(i, 2)]);
-     }
-     memory_region_transaction_commit();
- }
--- 
-2.18.0
+I had also added:
+
+-    echo "NOTE: cross-compilers enabled: $enabled_cross_compilers"
++    echo "NOTE: compilers enabled for TCG tests: $enabled_cross_compilers"
+
+to make things clearer.
+
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
+--
+Alex Benn=C3=A9e
