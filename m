@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fadkd-0001hK-PK
+	(envelope-from <robert.hu@linux.intel.com>) id 1fadkd-0001hH-OJ
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fadka-0007P7-Im
+	(envelope-from <robert.hu@linux.intel.com>) id 1fadka-0007P1-7S
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:07:03 -0400
-Received: from mga04.intel.com ([192.55.52.120]:53506)
+Received: from mga04.intel.com ([192.55.52.120]:53501)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fadka-0007OO-7j
+	id 1fadkZ-0007Nl-Q2
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:07:00 -0400
 From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Wed,  4 Jul 2018 17:06:38 +0800
-Message-Id: <1530695199-27601-5-git-send-email-robert.hu@linux.intel.com>
+Date: Wed,  4 Jul 2018 17:06:39 +0800
+Message-Id: <1530695199-27601-6-git-send-email-robert.hu@linux.intel.com>
 In-Reply-To: <1530695199-27601-1-git-send-email-robert.hu@linux.intel.com>
 References: <1530695199-27601-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] i386: Add CPUID bit for WBNOINVD
+Subject: [Qemu-devel] [PATCH v3 5/5] i386: Add new CPU model Icelake-{Server, Client}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +27,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 Cc: robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
-WBNOINVD: Write back and do not invalidate cache, enumerated by
-CPUID.(EAX=80000008H, ECX=0):EBX[bit 9].
+New CPU models mostly inherit features from ancestor Skylake, while addin new
+features: UMIP, New Instructions ( PCONIFIG (server only), WBNOINVD,
+AVX512_VBMI2, GFNI, AVX512_VNNI, VPCLMULQDQ, VAES, AVX512_BITALG),
+Intel PT and 5-level paging (Server only). As well as
+IA32_PRED_CMD, SSBD support for speculative execution
+side channel mitigations.
+
+Note:
+For 5-level paging, Guest physical address width can be configured, with
+parameter "phys-bits". Unless explicitly specified, we still use its default
+value, even for Icelake-Server cpu model.
+At present, hold on expose IA32_ARCH_CAPABILITIES to guest, as 1) This MSR
+actually presents more than 1 'feature', maintainers are considering expanding current
+features presentation of only CPUIDs to MSR bits; 2) a reasonable default value
+for MSR_IA32_ARCH_CAPABILITIES needs to settled first. These 2 are actully
+beyond Icelake CPU model itself but fundamental. So split these work apart
+and do it later.
+https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00774.html
+https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00796.html
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 ---
- target/i386/cpu.c | 2 +-
- target/i386/cpu.h | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ target/i386/cpu.c | 115 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 115 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9407071..9ad3f93 100644
+index 9ad3f93..924fafd 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1027,7 +1027,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .feat_names = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
--            NULL, NULL, NULL, NULL,
-+            NULL, "wbnoinvd", NULL, NULL,
-             "ibpb", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 12a7e6c..265f428 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -694,6 +694,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
- #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
- 
-+#define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
-+                                              do not invalidate cache */
- #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
- 
- #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+@@ -2380,6 +2380,121 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .model_id = "Intel Xeon Processor (Skylake, IBRS)",
+     },
+     {
++        .name = "Icelake-Client",
++        .level = 0xd,
++        .vendor = CPUID_VENDOR_INTEL,
++        .family = 6,
++        .model = 126,
++        .stepping = 0,
++        .features[FEAT_1_EDX] =
++            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
++            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
++            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
++            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
++            CPUID_DE | CPUID_FP87,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
++            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
++            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
++            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
++            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
++            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
++            CPUID_EXT2_SYSCALL,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
++        .features[FEAT_8000_0008_EBX] =
++            CPUID_8000_0008_EBX_WBNOINVD,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
++            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
++            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
++            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_INTEL_PT,
++        .features[FEAT_7_0_ECX] =
++            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
++            CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
++            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
++            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
++            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
++        .features[FEAT_7_0_EDX] =
++            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
++        /* Missing: XSAVES (not supported by some Linux versions,
++                * including v4.1 to v4.12).
++                * KVM doesn't yet expose any XSAVES state save component,
++                * and the only one defined in Skylake (processor tracing)
++                * probably will block migration anyway.
++                */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .xlevel = 0x80000008,
++        .model_id = "Intel Core Processor (Icelake)",
++    },
++    {
++        .name = "Icelake-Server",
++        .level = 0xd,
++        .vendor = CPUID_VENDOR_INTEL,
++        .family = 6,
++        .model = 134,
++        .stepping = 0,
++        .features[FEAT_1_EDX] =
++            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
++            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
++            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
++            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
++            CPUID_DE | CPUID_FP87,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
++            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
++            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
++            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
++            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
++            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
++            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
++        .features[FEAT_8000_0008_EBX] =
++            CPUID_8000_0008_EBX_WBNOINVD,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
++            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
++            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
++            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
++            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
++            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
++            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
++            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
++            CPUID_7_0_EBX_INTEL_PT,
++        .features[FEAT_7_0_ECX] =
++            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
++            CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
++            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
++            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
++            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57,
++        .features[FEAT_7_0_EDX] =
++            CPUID_7_0_EDX_PCONFIG | CPUID_7_0_EDX_SPEC_CTRL |
++            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
++        /* Missing: XSAVES (not supported by some Linux versions,
++                * including v4.1 to v4.12).
++                * KVM doesn't yet expose any XSAVES state save component,
++                * and the only one defined in Skylake (processor tracing)
++                * probably will block migration anyway.
++                */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .xlevel = 0x80000008,
++        .model_id = "Intel Xeon Processor (Icelake)",
++    },
++    {
+         .name = "KnightsMill",
+         .level = 0xd,
+         .vendor = CPUID_VENDOR_INTEL,
 -- 
 1.8.3.1
