@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fai0R-0002Fj-Mb
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:39:40 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fai36-0003aO-4f
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fai0Q-0002Yi-MG
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:39:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49872 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fai0Q-0002Xy-GV
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:39:38 -0400
-References: <1530710466-88309-1-git-send-email-jingqi.liu@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <17a63c95-8deb-1112-ca11-f98ee7f5876e@redhat.com>
-Date: Wed, 4 Jul 2018 15:39:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <1530710466-88309-1-git-send-email-jingqi.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: Add support to get/set/migrate MSR
- (33H)
+	(envelope-from <programmingkidx@gmail.com>) id 1fai32-0004TA-4L
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:42:24 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20180704033134.GE14043@umbus.fritz.box>
+Date: Wed, 4 Jul 2018 09:42:16 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5DE66F68-07F2-4494-9CC7-51632A386542@gmail.com>
+References: <20180703151732.29843-1-richard.henderson@linaro.org>
+	<20180704033134.GE14043@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 0/7] target/ppc fp cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jingqi Liu <jingqi.liu@intel.com>
-Cc: rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, wei.w.wang@intel.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 04/07/2018 15:21, Jingqi Liu wrote:
-> The MSR (33H) controls support for #AC exception
-> for split locked accesses. When bit 29 of the MSR (33H)
-> is set, the processor causes an #AC exception to
-> be issued instead of suppressing LOCK on bus
-> (during split lock access).
-> 
-> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-> ---
->  target/i386/cpu.h     |  2 ++
->  target/i386/kvm.c     | 13 +++++++++++++
->  target/i386/machine.c | 20 ++++++++++++++++++++
->  3 files changed, 35 insertions(+)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 8eaefee..9728552 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -348,6 +348,7 @@ typedef enum X86Seg {
->  #define MSR_IA32_APICBASE_ENABLE        (1<<11)
->  #define MSR_IA32_APICBASE_EXTD          (1 << 10)
->  #define MSR_IA32_APICBASE_BASE          (0xfffffU<<12)
-> +#define MSR_SPLIT_LOCK_CTRL             0x00000033
->  #define MSR_IA32_FEATURE_CONTROL        0x0000003a
->  #define MSR_TSC_ADJUST                  0x0000003b
->  #define MSR_IA32_SPEC_CTRL              0x48
-> @@ -1209,6 +1210,7 @@ typedef struct CPUX86State {
->      uint32_t pkru;
->  
->      uint64_t spec_ctrl;
-> +    uint64_t split_lock_ctrl;
 
-Please call everything MSR_TEST_CTL or test_ctl.  Yes, it's a horrible
-name, but if that's what the manual calls it, we should do the same.
+> On Jul 3, 2018, at 11:31 PM, David Gibson =
+<david@gibson.dropbear.id.au> wrote:
+>=20
+> On Tue, Jul 03, 2018 at 08:17:25AM -0700, Richard Henderson wrote:
+>> Beginning with John Arbuckle's fdiv test case, clean up some
+>> of the fp helpers.  As with fdiv, fre and fresqrt are missing
+>> divide-by-zero exceptions.
+>>=20
+>> I've also noticed that load/store were using arithmetic conversions
+>> to/from float32.  These should be using the non-arithmetic algorithms
+>> listed in the manual.
+>>=20
+>> Aside from cleaning up all of the rest of the helpers, I believe that
+>> the implementation of the single-precision operations are incorrect.
+>> They are currently implemented with the double-precision operation
+>> followed by a round-to-single.  This causes incorrect results via
+>> double rounding.  I believe better results could be had by using
+>> these non-arithmetic converters to produce float32 operands, use the
+>> proper float32 softfloat operations, and then convert back.
+>>=20
+>> Anyway, all of this has been broken long enough that it'll need to
+>> wait til next devel cycle before anything further gets done.
+>=20
+> Applied to ppc-for-3.1 (newly created)
 
-Thanks,
-
-Paolo
-
->      uint64_t virt_ssbd;
->  
->      /* End of state preserved by INIT (dummy marker).  */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 032f0ad..043ca9b 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -92,6 +92,7 @@ static bool has_msr_hv_frequencies;
->  static bool has_msr_hv_reenlightenment;
->  static bool has_msr_xss;
->  static bool has_msr_spec_ctrl;
-> +static bool has_msr_split_lock_ctrl;
->  static bool has_msr_virt_ssbd;
->  static bool has_msr_smi_count;
->  
-> @@ -1272,6 +1273,9 @@ static int kvm_get_supported_msrs(KVMState *s)
->                  case MSR_IA32_SPEC_CTRL:
->                      has_msr_spec_ctrl = true;
->                      break;
-> +                case MSR_SPLIT_LOCK_CTRL:
-> +                    has_msr_split_lock_ctrl = true;
-> +                    break;
->                  case MSR_VIRT_SSBD:
->                      has_msr_virt_ssbd = true;
->                      break;
-> @@ -1786,6 +1790,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->      if (has_msr_spec_ctrl) {
->          kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
->      }
-> +    if (has_msr_split_lock_ctrl) {
-> +        kvm_msr_entry_add(cpu, MSR_SPLIT_LOCK_CTRL, env->split_lock_ctrl);
-> +    }
->      if (has_msr_virt_ssbd) {
->          kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
->      }
-> @@ -2169,6 +2176,9 @@ static int kvm_get_msrs(X86CPU *cpu)
->      if (has_msr_spec_ctrl) {
->          kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
->      }
-> +    if (has_msr_split_lock_ctrl) {
-> +        kvm_msr_entry_add(cpu, MSR_SPLIT_LOCK_CTRL, 0);
-> +    }
->      if (has_msr_virt_ssbd) {
->          kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, 0);
->      }
-> @@ -2551,6 +2561,9 @@ static int kvm_get_msrs(X86CPU *cpu)
->          case MSR_IA32_SPEC_CTRL:
->              env->spec_ctrl = msrs[i].data;
->              break;
-> +        case MSR_SPLIT_LOCK_CTRL:
-> +            env->split_lock_ctrl = msrs[i].data;
-> +            break;
->          case MSR_VIRT_SSBD:
->              env->virt_ssbd = msrs[i].data;
->              break;
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 4d98d36..c82dc0d 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -935,6 +935,25 @@ static const VMStateDescription vmstate_msr_virt_ssbd = {
->      }
->  };
->  
-> +static bool split_lock_ctrl_needed(void *opaque)
-> +{
-> +    X86CPU *cpu = opaque;
-> +    CPUX86State *env = &cpu->env;
-> +
-> +    return env->split_lock_ctrl != 0;
-> +}
-> +
-> +static const VMStateDescription vmstate_split_lock_ctrl = {
-> +    .name = "cpu/split_lock_ctrl",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = split_lock_ctrl_needed,
-> +    .fields = (VMStateField[]){
-> +        VMSTATE_UINT64(env.split_lock_ctrl, X86CPU),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  VMStateDescription vmstate_x86_cpu = {
->      .name = "cpu",
->      .version_id = 12,
-> @@ -1059,6 +1078,7 @@ VMStateDescription vmstate_x86_cpu = {
->          &vmstate_mcg_ext_ctl,
->          &vmstate_msr_intel_pt,
->          &vmstate_msr_virt_ssbd,
-> +        &vmstate_split_lock_ctrl,
->          NULL
->      }
->  };
-> 
+Could I have the address for your ppc-for-3.1 repo please? Would you =
+like future floating point patches to be based on this repo?
