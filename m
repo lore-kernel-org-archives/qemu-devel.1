@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fak1G-0005eO-CW
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:48:39 -0400
+	(envelope-from <will.deacon@arm.com>) id 1fak34-0007VM-D7
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fak1D-0008Ai-8f
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:48:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60906 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fak1D-00089y-4m
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:48:35 -0400
-Date: Wed, 4 Jul 2018 16:48:31 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180704154831.GM32267@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180704143014.8670-1-f4bug@amsat.org> <87va9v80ut.fsf@linaro.org>
+	(envelope-from <will.deacon@arm.com>) id 1fak31-0000jp-A8
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:50:30 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47116
+	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <will.deacon@arm.com>) id 1fak30-0000jL-Sw
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:50:27 -0400
+Date: Wed, 4 Jul 2018 16:51:04 +0100
+From: Will Deacon <will.deacon@arm.com>
+Message-ID: <20180704155104.GN4828@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87va9v80ut.fsf@linaro.org>
+In-Reply-To: <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Do not display host compilers
- as cross-compilers
+Subject: Re: [Qemu-devel] [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the
+ physical address size for VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Peter Maydel <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-On Wed, Jul 04, 2018 at 04:41:30PM +0100, Alex Benn=C3=A9e wrote:
->=20
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->=20
-> > This silent (since d75402b5ee2):
-> >
-> >   ./configure
-> >   [...]
-> >   NOTE: cross-compilers enabled:  'cc'
-> >
-> > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  configure | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/configure b/configure
-> > index b99ebdde24..fbb53ab6bb 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -7328,7 +7328,7 @@ echo "QEMU_CFLAGS+=3D$cflags" >> $config_target=
-_mak
-> >
-> >  done # for target in $targets
-> >
-> > -if test -n "$enabled_cross_compilers"; then
-> > +if test -n "$target_compiler" -a -n "$enabled_cross_compilers"; then
-> >      echo
-> >      echo "NOTE: cross-compilers enabled: $enabled_cross_compilers"
-> >  fi
->=20
-> I had also added:
->=20
-> -    echo "NOTE: cross-compilers enabled: $enabled_cross_compilers"
-> +    echo "NOTE: compilers enabled for TCG tests: $enabled_cross_compil=
-ers"[
->=20
-> to make things clearer.
+Hi Suzuki,
 
-I think we should also 's/NOTE: //', because everything printed by
-configure at the end is a note. Also get rid of the extra blank
-line before it.
+On Fri, Jun 29, 2018 at 12:15:35PM +0100, Suzuki K Poulose wrote:
+> Allow specifying the physical address size for a new VM via
+> the kvm_type argument for KVM_CREATE_VM ioctl. This allows
+> us to finalise the stage2 page table format as early as possible
+> and hence perform the right checks on the memory slots without
+> complication. The size is encoded as Log2(PA_Size) in the bits[7:0]
+> of the type field and can encode more information in the future if
+> required. The IPA size is still capped at 40bits.
+>=20
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Cc: Peter Maydel <peter.maydell@linaro.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   |  2 ++
+>  arch/arm64/include/asm/kvm_arm.h | 10 +++-------
+>  arch/arm64/include/asm/kvm_mmu.h |  2 ++
+>  include/uapi/linux/kvm.h         | 10 ++++++++++
+>  virt/kvm/arm/arm.c               | 24 ++++++++++++++++++++++--
+>  5 files changed, 39 insertions(+), 9 deletions(-)
 
->=20
-> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
->=20
-> --
-> Alex Benn=C3=A9e
+[...]
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4df9bb6..fa4cab0 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -751,6 +751,16 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_S390_SIE_PAGE_OFFSET 1
+> =20
+>  /*
+> + * On arm/arm64, machine type can be used to request the physical
+> + * address size for the VM. Bits [7-0] have been reserved for the
+> + * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
+> + * value 0 implies the default IPA size, which is 40bits.
+> + */
+> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK	0xff
+> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)		\
+> +	((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
+
+This seems like you're allocating quite a lot of bits in a non-extensible
+interface to a fairly esoteric parameter. Would it be better to add anoth=
+er
+ioctl, or condense the number of sizes you support instead?
+
+Will
