@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fadxR-0000mn-S4
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:20:21 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fae6D-0002dk-QQ
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fadxO-0005MV-Q1
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:20:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35246 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fadxO-0005M6-LR
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:20:14 -0400
-Date: Wed, 4 Jul 2018 10:20:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180704092007.GA32267@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180704033642.15996-1-caoxinhua@huawei.com>
+	(envelope-from <mail@sebastianbauer.info>) id 1fae6A-00007q-M0
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:29:21 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180704033642.15996-1-caoxinhua@huawei.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-char: check errno together with ret <
- 0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 04 Jul 2018 11:29:09 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <39a5cb1b-7dbc-f683-e4f8-0a655c146891@ilande.co.uk>
+References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+	<20180703055804.13449-36-david@gibson.dropbear.id.au>
+	<4fce9ddd-5079-e833-b6c2-e6935322c73d@ilande.co.uk>
+	<b0f927a5f0eb2bd96798124e6925fa1f@sebastianbauer.info>
+	<9108e419-3120-b887-0da8-3748dbc19a17@ilande.co.uk>
+	<30fe8f08c522688f00af24ccc4f0629e@sebastianbauer.info>
+	<39a5cb1b-7dbc-f683-e4f8-0a655c146891@ilande.co.uk>
+Message-ID: <7181e8dda57df8d270d15b57130d981d@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PULL 35/35] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "xinhua.Cao" <caoxinhua@huawei.com>
-Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, eblake@redhat.com, anton.nefedov@virtuozzo.com, vsementsov@virtuozzo.com, weidong.huang@huawei.com, weifuqiang@huawei.com, qemu-devel@nongnu.org, king.wang@huawei.com, liuyongan@huawei.com, arei.gonglei@huawei.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Jul 04, 2018 at 11:36:42AM +0800, xinhua.Cao wrote:
-> In the tcp_chr_write function, we checked errno,
-> but errno was not reset before a read or write operation.
-> Therefore, this check of errno's actions is often
-> incorrect after EAGAIN has occurred.
-> we need check errno together with ret < 0.
->=20
-> Signed-off-by: xinhua.Cao <caoxinhua@huawei.com>
-> ---
->  chardev/char-socket.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 17519ec..efbad6e 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -134,8 +134,11 @@ static int tcp_chr_write(Chardev *chr, const uint8=
-_t *buf, int len)
->                                          s->write_msgfds,
->                                          s->write_msgfds_num);
-> =20
-> -        /* free the written msgfds in any cases other than errno=3D=3D=
-EAGAIN */
-> -        if (EAGAIN !=3D errno && s->write_msgfds_num) {
-> +        /* free the written msgfds in any cases
-> +         * other than ret < 0 && errno =3D=3D EAGAIN
-> +         */
-> +        if (!(ret < 0 && EAGAIN =3D=3D errno)
-> +            && s->write_msgfds_num) {
->              g_free(s->write_msgfds);
->              s->write_msgfds =3D 0;
->              s->write_msgfds_num =3D 0;
+Hi,
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Am 2018-07-04 07:56, schrieb Mark Cave-Ayland:
+> Right, but as the patch submitter it's your responsibility to ensure
+> that your patch doesn't break other people's machines and/or follow up
+> with the appropriate patches. If you're not willing to do that then we
+> should revert the patch in its current form until a better way forward
+> has been found.
 
+Of course, I will come up with a follow up patch that will hopefully fix 
+the problem (hopefully, as I simply have no clue how to test if some 
+platforms break if it is not covered by 'make check', though I 
+appreciate any hints on doing this as well). That's not the question. My 
+question is what the scope of the patch actually should be. I mentioned 
+two possible ways of proceeding.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>> Last but not least, all of the targets should still work as before if 
+>> you use -vga std option.
+> Except that -vga std has been the default for these machines for a
+> long time, and it's going to be me that will get a large majority of
+> the complaints if this behaviour changes.
+
+I fully agree that -vga std makes the most sense, but why does QEMU 
+prefer the Cirrus one over vga then when there seems to be some 
+agreement that Cirrus is obsolete and many machines don't work with 
+Cirrus?
+
+My patch did not deliberately set a different -vga default, it is 
+actually coded that way in QEMU and a side-effect of the inclusion: For 
+any machine prefer the Cirrus card if it is available as default -vga. 
+Should my patch address this (i.e., to lower the pri of the cirrus)?
+
+Or should my patch add further exceptions to the respective machines?
+
+It is also possible to do the latter now (as release is imminent) and 
+schedule the former the next dev cycle.
+
+Bye
+Sebastian
