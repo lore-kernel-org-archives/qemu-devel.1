@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD8-00072v-2C
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD8-00072z-3u
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:09:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD4-0003dF-DB
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD3-0003c1-0z
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:09:01 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54681 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54539 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1famD4-0003cR-4u
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:08:58 -0400
+	id 1famD2-0003O7-Qo
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:08:56 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed,  4 Jul 2018 20:08:28 +0200
-Message-Id: <1530727708-5416-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed,  4 Jul 2018 20:08:23 +0200
+Message-Id: <1530727708-5416-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530727708-5416-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530727708-5416-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 8/8] target/mips: Check ELPA flag only in some
- cases of MFHC0 and MTHC0
+Subject: [Qemu-devel] [PATCH 3/8] target/mips: Update some CP0 registers bit
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +28,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, aleksandar.markovic@wavecomp.com, petar.jovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
-and placing ELPA flag checks befor switch statement were technically
-correct. However, after adding handling more registers, these checks
-should be moved to act only in cases of handling EntryLo0 and
-EntryLo1.
+Update CP0 registers Config0, Config1, and Config5 bit definitions.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
+Some of these bits will be utilized by upcoming nanoMIPS changes.
+
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/mips/cpu.h | 41 ++++++++++++++++++++++++++++-------------
+ 1 file changed, 28 insertions(+), 13 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index aee39d0..57e24f3 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4884,12 +4884,11 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
- {
-     const char *rn = "invalid";
- 
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
-             rn = "EntryLo0";
-             break;
-@@ -4900,6 +4899,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
-             rn = "EntryLo1";
-             break;
-@@ -4964,12 +4964,11 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     const char *rn = "invalid";
-     uint64_t mask = ctx->PAMask >> 36;
- 
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
-             rn = "EntryLo0";
-@@ -4981,6 +4980,7 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
-             rn = "EntryLo1";
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index cfe1735..edbb66d 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -388,26 +388,27 @@ struct CPUMIPSState {
+     target_ulong CP0_CMGCRBase;
+     int32_t CP0_Config0;
+ #define CP0C0_M    31
+-#define CP0C0_K23  28
+-#define CP0C0_KU   25
++#define CP0C0_K23  28    /* 30..28 */
++#define CP0C0_KU   25    /* 27..25 */
+ #define CP0C0_MDU  20
+ #define CP0C0_MM   18
+ #define CP0C0_BM   16
++#define CP0C0_Impl 16    /* 24..16 */
+ #define CP0C0_BE   15
+-#define CP0C0_AT   13
+-#define CP0C0_AR   10
+-#define CP0C0_MT   7
++#define CP0C0_AT   13    /* 14..13 */
++#define CP0C0_AR   10    /* 12..10 */
++#define CP0C0_MT   7     /*  9..7  */
+ #define CP0C0_VI   3
+-#define CP0C0_K0   0
++#define CP0C0_K0   0     /*  2..0  */
+     int32_t CP0_Config1;
+ #define CP0C1_M    31
+-#define CP0C1_MMU  25
+-#define CP0C1_IS   22
+-#define CP0C1_IL   19
+-#define CP0C1_IA   16
+-#define CP0C1_DS   13
+-#define CP0C1_DL   10
+-#define CP0C1_DA   7
++#define CP0C1_MMU  25    /* 30..25 */
++#define CP0C1_IS   22    /* 24..22 */
++#define CP0C1_IL   19    /* 21..19 */
++#define CP0C1_IA   16    /* 18..16 */
++#define CP0C1_DS   13    /* 15..13 */
++#define CP0C1_DL   10    /* 12..10 */
++#define CP0C1_DA   7     /*  9..7  */
+ #define CP0C1_C2   6
+ #define CP0C1_MD   5
+ #define CP0C1_PC   4
+@@ -468,7 +469,21 @@ struct CPUMIPSState {
+ #define CP0C5_CV         29
+ #define CP0C5_EVA        28
+ #define CP0C5_MSAEn      27
++#define CP0C5_PMJ2       25
++#define CP0C5_PMJ1       24
++#define CP0C5_PMJ0       23
++#define CP0C5_WR2        22
++#define CP0C5_NMS        21
++#define CP0C5_ULS        20
++#define CP0C5_XPA        19
++#define CP0C5_CRCP       18
++#define CP0C5_MI         17
++#define CP0C5_GI1        16
++#define CP0C5_GI0        15
++#define CP0C5_CA2        14
+ #define CP0C5_XNP        13
++#define CP0C5_DEC        11
++#define CP0C5_L2C        10
+ #define CP0C5_UFE        9
+ #define CP0C5_FRE        8
+ #define CP0C5_VP         7
 -- 
 2.7.4
