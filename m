@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fadQ3-0001Vl-BJ
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:45:48 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fadkP-0001ae-R1
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fadQ2-0006Ac-8q
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:45:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fadQ2-00069v-2p
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:45:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A16024078BBB
-	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 08:45:45 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed,  4 Jul 2018 16:45:07 +0800
-Message-Id: <20180704084507.14560-10-peterx@redhat.com>
-In-Reply-To: <20180704084507.14560-1-peterx@redhat.com>
-References: <20180704084507.14560-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 9/9] Revert "tests: Add parameter to
- qtest_init_without_qmp_handshake"
+	(envelope-from <alex.bennee@linaro.org>) id 1fadkL-0007L8-NM
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:06:49 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:54359)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fadkL-0007Ky-G3
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:06:45 -0400
+Received: by mail-wm0-x236.google.com with SMTP id i139-v6so4964329wmf.4
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 02:06:45 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed,  4 Jul 2018 10:06:42 +0100
+Message-Id: <20180704090642.3469-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/20] Travis,
+ Code Coverage and Cross Build updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This reverts commit ddee57e0176f6ab53b13c6c97605b62737a8fd7a.
+The following changes since commit 2a018f6e98782a4931b936a3087404ed81685bac:
 
-Meanwhile, revert one line from fa198ad9bdef to make sure
-qtest_init_without_qmp_handshake() will only pass in one parameter.
+  Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-request' into staging (2018-07-03 23:06:18 +0100)
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/libqtest.h |  4 +---
- tests/libqtest.c | 10 ++++------
- tests/qmp-test.c |  4 ++--
- 3 files changed, 7 insertions(+), 11 deletions(-)
+are available in the Git repository at:
 
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index ac52872cbe..180d2cc6ff 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -56,14 +56,12 @@ QTestState *qtest_init(const char *extra_args);
- 
- /**
-  * qtest_init_without_qmp_handshake:
-- * @use_oob: true to have the server advertise OOB support
-  * @extra_args: other arguments to pass to QEMU.  CAUTION: these
-  * arguments are subject to word splitting and shell evaluation.
-  *
-  * Returns: #QTestState instance.
-  */
--QTestState *qtest_init_without_qmp_handshake(bool use_oob,
--                                             const char *extra_args);
-+QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
- 
- /**
-  * qtest_quit:
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index c5cb3f925c..51af4a289e 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -173,8 +173,7 @@ static const char *qtest_qemu_binary(void)
-     return qemu_bin;
- }
- 
--QTestState *qtest_init_without_qmp_handshake(bool use_oob,
--                                             const char *extra_args)
-+QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
- {
-     QTestState *s;
-     int sock, qmpsock, i;
-@@ -207,13 +206,12 @@ QTestState *qtest_init_without_qmp_handshake(bool use_oob,
-         command = g_strdup_printf("exec %s "
-                                   "-qtest unix:%s,nowait "
-                                   "-qtest-log %s "
--                                  "-chardev socket,path=%s,nowait,id=char0 "
--                                  "-mon chardev=char0,mode=control%s "
-+                                  "-qmp unix:%s,nowait "
-                                   "-machine accel=qtest "
-                                   "-display none "
-                                   "%s", qemu_binary, socket_path,
-                                   getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
--                                  qmp_socket_path, "",
-+                                  qmp_socket_path,
-                                   extra_args ?: "");
-         execlp("/bin/sh", "sh", "-c", command, NULL);
-         exit(1);
-@@ -248,7 +246,7 @@ QTestState *qtest_init_without_qmp_handshake(bool use_oob,
- 
- QTestState *qtest_init(const char *extra_args)
- {
--    QTestState *s = qtest_init_without_qmp_handshake(false, extra_args);
-+    QTestState *s = qtest_init_without_qmp_handshake(extra_args);
- 
-     /* Read the QMP greeting and then do the handshake */
-     qtest_qmp_discard_response(s, "");
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 033d610b0e..bd7118a5a9 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -81,7 +81,7 @@ static void test_qmp_protocol(void)
-     QList *capabilities;
-     QTestState *qts;
- 
--    qts = qtest_init_without_qmp_handshake(false, common_args);
-+    qts = qtest_init_without_qmp_handshake(common_args);
- 
-     /* Test greeting */
-     resp = qtest_qmp_receive(qts);
-@@ -196,7 +196,7 @@ static void test_qmp_oob(void)
-     QList *capabilities;
-     QString *qstr;
- 
--    qts = qtest_init_without_qmp_handshake(true, common_args);
-+    qts = qtest_init_without_qmp_handshake(common_args);
- 
-     /* Check the greeting message. */
-     resp = qtest_qmp_receive(qts);
--- 
+  https://github.com/stsquad/qemu.git tags/pull-code-coverage-and-build-tweaks-040718-2
+
+for you to fetch changes up to a785003b11220afebae929b5c52f3b69bbfc4a40:
+
+  docker: add linux-user powered cross builder for QEMU (2018-07-04 09:30:33 +0100)
+
+----------------------------------------------------------------
+Code coverage and other build tweaks
+
+  - revert 208ecb3e (and drop filter for mingw)
+  - some travis speed-ups
+  - modernise code coverage support
+  - docker image cleanups
+  - clean-up binfmt_misc docker infrastructure
+  - add debian-powerpc-user-cross image for ppc32 build
+
+----------------------------------------------------------------
+Alex Bennée (14):
+      Revert "Makefile: Rename TARGET_DIRS to TARGET_LIST"
+      build-system: remove per-test GCOV reporting
+      .gitignore: add .gcov files
+      docker: add gcovr to travis image
+      travis: add gcovr summary for GCOV build
+      build-system: add clean-coverage target
+      build-system: add coverage-report target
+      linux-user: introduce preexit_cleanup
+      linux-user: add gcov support to preexit_cleanup
+      docker: drop QEMU build-dep from bootstrap
+      docker: debian-bootstrap.pre allow customising of variant/url
+      docker: add special handling for FROM:debian-%-user targets
+      docker: add special rule for deboostrapped images
+      docker: add linux-user powered cross builder for QEMU
+
+Philippe Mathieu-Daudé (6):
+      travis: do not waste time cloning unused submodules
+      travis: test out-of-tree builds
+      docker: ubuntu: Update the package list before installing new ones
+      docker: ubuntu: Use SDL2
+      docker: Clean the MXE base image
+      docker: Do not run tests in 'intermediate' images
+
+ .gitignore                                         |  1 +
+ .travis.yml                                        | 14 +++--
+ MAINTAINERS                                        |  1 +
+ Makefile                                           | 44 ++++++++++++----
+ configure                                          |  2 +-
+ docs/devel/testing.rst                             | 21 +++++---
+ linux-user/Makefile.objs                           |  2 +-
+ linux-user/exit.c                                  | 35 +++++++++++++
+ linux-user/qemu.h                                  |  8 +++
+ linux-user/syscall.c                               | 10 +---
+ scripts/create_config                              |  2 +-
+ scripts/travis/coverage-summary.sh                 | 27 ++++++++++
+ tests/Makefile.include                             | 12 +----
+ tests/docker/Makefile.include                      | 59 ++++++++++++++++++++--
+ tests/docker/docker.py                             |  4 ++
+ tests/docker/dockerfiles/debian-bootstrap.docker   |  2 -
+ tests/docker/dockerfiles/debian-bootstrap.pre      | 11 +++-
+ .../dockerfiles/debian-powerpc-user-cross.docker   | 15 ++++++
+ tests/docker/dockerfiles/debian8-mxe.docker        |  2 +-
+ tests/docker/dockerfiles/travis.docker             |  2 +-
+ tests/docker/dockerfiles/ubuntu.docker             |  8 +--
+ 21 files changed, 228 insertions(+), 54 deletions(-)
+ create mode 100644 linux-user/exit.c
+ create mode 100755 scripts/travis/coverage-summary.sh
+ create mode 100644 tests/docker/dockerfiles/debian-powerpc-user-cross.docker
+
+--
 2.17.1
