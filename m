@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fahDz-0007U6-Nw
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:36 -0400
+	(envelope-from <drjones@redhat.com>) id 1fahE0-0007Vq-P8
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fahDy-0000Uk-K5
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:35 -0400
+	(envelope-from <drjones@redhat.com>) id 1fahDz-0000VO-Op
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:36 -0400
 From: Andrew Jones <drjones@redhat.com>
-Date: Wed,  4 Jul 2018 14:49:20 +0200
-Message-Id: <20180704124923.32483-4-drjones@redhat.com>
+Date: Wed,  4 Jul 2018 14:49:21 +0200
+Message-Id: <20180704124923.32483-5-drjones@redhat.com>
 In-Reply-To: <20180704124923.32483-1-drjones@redhat.com>
 References: <20180704124923.32483-1-drjones@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 3/6] hw/arm/virt: DT: add cpu-map
+Subject: [Qemu-devel] [RFC PATCH 4/6] hw/arm/virt-acpi-build: distinguish
+ possible and present cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,95 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, imammedo@redhat.com, eric.auger@redhat.com, wei@redhat.com
 
-Support devicetree CPU topology descriptions.
+When building ACPI tables regarding CPUs we should always build
+them for the number of possible CPUs, not the number of present
+CPUs. We then ensure only the present CPUs are enabled.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt.c         | 35 +++++++++++++++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 36 insertions(+)
+ hw/arm/virt-acpi-build.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 880441275031..6c5fecdd61df 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -40,6 +40,7 @@
- #include "hw/devices.h"
- #include "net/net.h"
- #include "sysemu/device_tree.h"
-+#include "sysemu/cpus.h"
- #include "sysemu/numa.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
-@@ -302,6 +303,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-     int cpu;
-     int addr_cells = 1;
-     const MachineState *ms = MACHINE(vms);
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 6ea47e258832..1d1fc824da6f 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -49,14 +49,22 @@
+ #define ARM_SPI_BASE 32
+ #define ACPI_POWER_BUTTON_DEVICE "PWRB"
  
-     /*
-      * From Documentation/devicetree/bindings/arm/cpus.txt
-@@ -358,8 +360,38 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-                 ms->possible_cpus->cpus[cs->cpu_index].props.node_id);
-         }
- 
-+        qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle",
-+                              qemu_fdt_alloc_phandle(vms->fdt));
-         g_free(nodename);
-     }
+-static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
++static int possible_cpus(VirtMachineState *vms)
++{
++    return MACHINE_GET_CLASS(vms)->possible_cpu_arch_ids(MACHINE(vms))->len;
++}
 +
-+    if (!vmc->ignore_cpu_topology) {
-+        /* From Documentation/devicetree/bindings/arm/topology.txt
-+         */
-+        qemu_fdt_add_subnode(vms->fdt, "/cpus/cpu-map");
-+
-+        for (cpu = vms->smp_cpus - 1; cpu >= 0; cpu--) {
-+            char *cpu_path = g_strdup_printf("/cpus/cpu@%d", cpu);
-+            char *map_path;
-+
-+            if (smp_threads > 1) {
-+                map_path = g_strdup_printf(
-+                               "/cpus/cpu-map/%s%d/%s%d/%s%d",
-+                               "cluster", cpu / (smp_cores * smp_threads),
-+                               "core", (cpu / smp_threads) % smp_cores,
-+                               "thread", cpu % smp_threads);
-+            } else {
-+                map_path = g_strdup_printf(
-+                               "/cpus/cpu-map/%s%d/%s%d",
-+                               "cluster", cpu / smp_cores,
-+                               "core", cpu % smp_cores);
-+            }
-+            qemu_fdt_add_path(vms->fdt, map_path);
-+            qemu_fdt_setprop_phandle(vms->fdt, map_path, "cpu", cpu_path);
-+            g_free(map_path);
-+            g_free(cpu_path);
-+        }
-+    }
- }
- 
- static void fdt_add_its_gic_node(VirtMachineState *vms)
-@@ -1839,7 +1871,10 @@ static void virt_3_0_instance_init(Object *obj)
- 
- static void virt_machine_3_0_options(MachineClass *mc)
++static void acpi_dsdt_add_cpus(Aml *scope, int possible, int present)
  {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_3_1_options(mc);
-+    vmc->ignore_cpu_topology = true;
- }
- DEFINE_VIRT_MACHINE(3, 0)
+     uint16_t i;
  
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 9a870ccb6a57..deb8bee72cda 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -94,6 +94,7 @@ typedef struct MemMapEntry {
- typedef struct {
-     MachineClass parent;
-     bool disallow_affinity_adjustment;
-+    bool ignore_cpu_topology;
-     bool no_its;
-     bool no_pmu;
-     bool claim_edge_triggered_timers;
+-    for (i = 0; i < smp_cpus; i++) {
++    for (i = 0; i < possible; i++) {
+         Aml *dev = aml_device("C%.03X", i);
+         aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
+         aml_append(dev, aml_name_decl("_UID", aml_int(i)));
++        if (i >= present) {
++            aml_append(dev, aml_name_decl("_STA", aml_int(0)));
++        }
+         aml_append(scope, dev);
+     }
+ }
+@@ -650,7 +658,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
+     gicd->version = vms->gic_version;
+ 
+-    for (i = 0; i < vms->smp_cpus; i++) {
++    for (i = 0; i < possible_cpus(vms); i++) {
+         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
+                                                            sizeof(*gicc));
+         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
+@@ -663,7 +671,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         gicc->cpu_interface_number = cpu_to_le32(i);
+         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
+         gicc->uid = cpu_to_le32(i);
+-        gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
++        if (i < vms->smp_cpus) {
++            gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
++        }
+ 
+         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+@@ -763,7 +773,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+      * the RTC ACPI device at all when using UEFI.
+      */
+     scope = aml_scope("\\_SB");
+-    acpi_dsdt_add_cpus(scope, vms->smp_cpus);
++    acpi_dsdt_add_cpus(scope, possible_cpus(vms), vms->smp_cpus);
+     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
+     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
 -- 
 2.17.1
