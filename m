@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1faiT5-0003NI-Co
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:09:19 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faiYO-0005Hr-E1
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1faiT4-0003Al-Ex
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:09:15 -0400
-References: <20180702025836.20957-1-famz@redhat.com>
-	<02d1f79b-c055-bb2a-edd5-3429ff64af90@redhat.com>
-	<20180703012626.GB485@lemon.usersys.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d9d73f8e-89c8-4ae9-c6b6-a180826768bd@redhat.com>
-Date: Wed, 4 Jul 2018 16:09:04 +0200
+	(envelope-from <marcandre.lureau@redhat.com>) id 1faiYK-0005sG-BX
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:14:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57402 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1faiYK-0005nl-6S
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:14:40 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  4 Jul 2018 16:14:28 +0200
+Message-Id: <20180704141433.498-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180703012626.GB485@lemon.usersys.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CIA6RBFzzO5G7xNj3NjhivydGSToU6TWD"
-Subject: Re: [Qemu-devel] [PATCH 0/4] block: Trivial fixes in offloading code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v7 0/5] Add support for TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CIA6RBFzzO5G7xNj3NjhivydGSToU6TWD
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org
-Message-ID: <d9d73f8e-89c8-4ae9-c6b6-a180826768bd@redhat.com>
-Subject: Re: [PATCH 0/4] block: Trivial fixes in offloading code
-References: <20180702025836.20957-1-famz@redhat.com>
- <02d1f79b-c055-bb2a-edd5-3429ff64af90@redhat.com>
- <20180703012626.GB485@lemon.usersys.redhat.com>
-In-Reply-To: <20180703012626.GB485@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 2018-07-03 03:26, Fam Zheng wrote:
-> On Mon, 07/02 14:35, Max Reitz wrote:
->> On 2018-07-02 04:58, Fam Zheng wrote:
->>> These are the low priority ones spotted by Kevin and Max last week.
->>>
->>> Fam Zheng (4):
->>>   qcow2: Drop unused cluster_data
->>>   file-posix: Fix fd_open check in raw_co_copy_range_to
->>>   qcow2: Drop unreachable break
->>>   raw: Drop superfluous semicolon
->>>
->>>  block/file-posix.c | 2 +-
->>>  block/qcow2.c      | 3 ---
->>>  block/raw-format.c | 2 +-
->>>  3 files changed, 2 insertions(+), 5 deletions(-)
->>
->> Thanks, applied to my block branch:
->>
->> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
->>
->>
->> Do you want to make qcow2_co_copy_range_to() do something special on
->> BDRV_REQ_ZERO_WRITE?  To me, it seems natural, but on the other hand
->> maybe it wouldn't bring anything.  If the protocol layer supports copy=
+The following patches implement the TPM Physical Presence Interface
+that allows a user to set a command via ACPI (sysfs entry in Linux)
+that, upon the next reboot, the firmware looks for and acts upon by
+sending sequences of commands to the TPM.
 
->> offloading, then it'll probably do that zero write efficiently anyway.=
+A dedicated memory region is added to the TPM CRB & TIS devices, at
+address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+holds the location for that PPI region and some version details, to
+allow for future flexibility.
 
->> If it doesn't, qemu-img convert will just fall back to the usual
->> implementation which involves writing zeroes when zeroes are read, so.=
-=2E.
->>  What's your opinion?
->=20
-> In bdrv_co_copy_range_internal() there is
->=20
->     if (flags & BDRV_REQ_ZERO_WRITE) {
->         return bdrv_co_pwrite_zeroes(dst, dst_offset, bytes, flags);
->     }
->=20
-> before calling driver .bdrv_co_copy_range_to() callback. I think this i=
-s enough?
+With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+now runs successfully.
 
-Ah, right...  Yep, that's enough. :-)
+It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+Implement Physical Presence interface for TPM 1.2 and 2")
 
-Max
+The edk2 support is merged upstream.
 
+v7:
+- relace RAM with RAM device ptr
+- a few ACPI code & comments improvements
+- add back proof-of-concept ACPI memory clear interface, handled in
+  qemu (pass again WHLK TCG tests)
 
---CIA6RBFzzO5G7xNj3NjhivydGSToU6TWD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Marc-Andr=C3=A9 Lureau (2):
+  tpm: add a "ppi" boolean property
+  PoC: tpm: add ACPI memory clear interface
 
------BEGIN PGP SIGNATURE-----
+Stefan Berger (3):
+  tpm: implement virtual memory device for TPM PPI
+  acpi: add fw_cfg file for TPM and PPI virtual memory device
+  acpi: build TPM Physical Presence interface
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAls81QAACgkQ9AfbAGHV
-z0AYxQgAnVic2zMkW94JnGzo2lFmgB74zOmSYtY9t+yLIn+smhc8hkhjZBv8Nj1O
-PvOB/VLucMmfapdDQtoDnblFWxlDjN3w5n8Z6usl4cnbvqvC0dHhzqOu8sL2ZOq/
-nyTnlMc/GuNAU0kx38gsXC9qohFh4pkjDKx+/lE0LPZyWo4XK1mu+86gxDPOQkAE
-bBQhIbDwVdXmPC6igUs23aytA1SoAN0F274r2OA/EP/vkv/yIMuethmOZPpDyJ3I
-EkC/7LGxgpR2ECgyROWKRV1LMj9u4U3X3te25h8uWwx+Slx9hQ8oSrgEF8dvJ3lc
-yILF41cknIoKZQl5oird7m3qF/XlNQ==
-=l/qL
------END PGP SIGNATURE-----
+ hw/tpm/tpm_ppi.h      |  26 +++
+ include/hw/acpi/tpm.h |  17 ++
+ include/hw/compat.h   |  10 +
+ hw/i386/acpi-build.c  | 465 +++++++++++++++++++++++++++++++++++++++++-
+ hw/tpm/tpm_crb.c      |  11 +
+ hw/tpm/tpm_ppi.c      |  56 +++++
+ hw/tpm/tpm_tis.c      |  11 +
+ docs/specs/tpm.txt    | 101 +++++++++
+ hw/tpm/Makefile.objs  |   1 +
+ hw/tpm/trace-events   |   3 +
+ 10 files changed, 699 insertions(+), 2 deletions(-)
+ create mode 100644 hw/tpm/tpm_ppi.h
+ create mode 100644 hw/tpm/tpm_ppi.c
 
---CIA6RBFzzO5G7xNj3NjhivydGSToU6TWD--
+--=20
+2.18.0.rc1
