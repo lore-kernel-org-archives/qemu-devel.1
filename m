@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fagiQ-0008QD-S7
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:16:59 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fagr8-0001wp-Mo
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fagiM-0002DP-Jk
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:16:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56334 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fagiM-0002DE-Dy
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:16:54 -0400
-References: <20180701171953.9921-1-clg@kaod.org> <20180702035726.GK2455@xz-mi>
-	<b5f38492-22a4-aa8a-ab42-f7e06c28c753@kaod.org>
-	<20180704022648.GA2568@xz-mi>
-	<f67c2a72-b3ac-fe8d-52c9-b03f58556caa@kaod.org>
-	<95fe81b1-13ee-5c82-22e2-e5ef4abd1168@redhat.com>
-	<20180704095520.GD2568@xz-mi>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9e9c51da-f7aa-c3d1-0beb-4dbfaf31a592@redhat.com>
-Date: Wed, 4 Jul 2018 14:16:42 +0200
+	(envelope-from <zhangckid@gmail.com>) id 1fagr7-0005fN-5t
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:25:58 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:50240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fagr6-0005f0-RI
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:25:57 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id v25-v6so5644184wmc.0
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 05:25:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180704095520.GD2568@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] exec.c: check RAMBlock validity before
- changing its flag
+In-Reply-To: <87po04d18b.fsf@dusky.pond.sub.org>
+References: <20180627204136.4177-1-zhangckid@gmail.com>
+	<20180627204136.4177-13-zhangckid@gmail.com>
+	<87po04d18b.fsf@dusky.pond.sub.org>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Wed, 4 Jul 2018 20:25:54 +0800
+Message-ID: <CAK3tnvJECLWx3H8wBTax+jEiObcq9gX0X8oqx94zXfY0jqbjbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V9 12/20] qapi: Add new command to query
+ colo status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On 04/07/2018 11:55, Peter Xu wrote:
->>     commit b0e56e0b63f350691b52d3e75e89bb64143fbeff
->>     Author: Hu Tao <hutao@cn.fujitsu.com>
->>     Date:   Wed Apr 2 15:13:27 2014 +0800
->>
->>     unset RAMBlock idstr when unregister MemoryRegion
->>
->>     Signed-off-by: Hu Tao <hutao@cn.fujitsu.com>
->>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> whose commit message is a bit lacking, but
->> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html helps
->> more.  It seems like the original bug was a reference count issue.
->>
->> Clearing the new migratable flag should also be unnecessary.
-> But even if we get rid of vmstate_unregister_ram(), the leak could
-> still be there?
-> 
-> I'm not sure what was leaked when b0e56e0b6 was introduced, I feel
-> like it's the RAMBlock of the memdev.  Here I think the ROM memory
-> region seems to be leaked as well (along with the RAMBlock inside)?
+On Tue, Jul 3, 2018 at 7:09 PM, Markus Armbruster <armbru@redhat.com> wrote:
 
-The leak would be another bug that vmstate_unregister_ram is just
-papering over.  We need to test memory unplug with
-vmstate_unregister_ram removed, and fix bugs if any.
+> Zhang Chen <zhangckid@gmail.com> writes:
+>
+> > Libvirt or other high level software can use this command query colo
+> status.
+> > You can test this command like that:
+> > {'execute':'query-colo-status'}
+> >
+> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> > ---
+> >  migration/colo.c    | 39 +++++++++++++++++++++++++++++++++++++++
+> >  qapi/migration.json | 34 ++++++++++++++++++++++++++++++++++
+> >  2 files changed, 73 insertions(+)
+> >
+> > diff --git a/migration/colo.c b/migration/colo.c
+> > index 8fdb79ac73..eb21978bff 100644
+> > --- a/migration/colo.c
+> > +++ b/migration/colo.c
+> > @@ -29,6 +29,7 @@
+> >  #include "net/colo.h"
+> >  #include "block/block.h"
+> >  #include "qapi/qapi-events-migration.h"
+> > +#include "qapi/qmp/qerror.h"
+> >
+> >  static bool vmstate_loading;
+> >  static Notifier packets_compare_notifier;
+> > @@ -237,6 +238,44 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
+> >  #endif
+> >  }
+> >
+> > +COLOStatus *qmp_query_colo_status(Error **errp)
+> > +{
+> > +    int state;
+> > +    COLOStatus *s = g_new0(COLOStatus, 1);
+> > +
+> > +    s->mode = get_colo_mode();
+> > +
+> > +    switch (s->mode) {
+> > +    case COLO_MODE_NONE:
+> > +        error_setg(errp, "COLO is disabled");
+> > +        state = MIGRATION_STATUS_NONE;
+> > +        break;
+> > +    case COLO_MODE_PRIMARY:
+> > +        state = migrate_get_current()->state;
+> > +        break;
+> > +    case COLO_MODE_SECONDARY:
+> > +        state = migration_incoming_get_current()->state;
+> > +        break;
+> > +    default:
+> > +        abort();
+> > +    }
+> > +
+> > +    s->active = state == MIGRATION_STATUS_COLO;
+> > +
+> > +    switch (failover_get_state()) {
+> > +    case FAILOVER_STATUS_NONE:
+> > +        s->reason = COLO_EXIT_REASON_NONE;
+> > +        break;
+> > +    case FAILOVER_STATUS_REQUIRE:
+> > +        s->reason = COLO_EXIT_REASON_REQUEST;
+> > +        break;
+> > +    default:
+> > +        s->reason = COLO_EXIT_REASON_ERROR;
+> > +    }
+> > +
+> > +    return s;
+> > +}
+> > +
+> >  static void colo_send_message(QEMUFile *f, COLOMessage msg,
+> >                                Error **errp)
+> >  {
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index c24f114104..73c64686ec 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -1248,6 +1248,40 @@
+> >  ##
+> >  { 'command': 'xen-colo-do-checkpoint' }
+> >
+> > +##
+> > +# @COLOStatus:
+> > +#
+> > +# The result format for 'query-colo-status'.
+> > +#
+> > +# @mode: COLO running mode. If COLO is running, this field will return
+> > +#        'primary' or 'secondary'.
+>
+> Please mention that @mode is "none" when COLO is not running.
+>
 
-Paolo
+OK.
+
+
+>
+> > +#
+> > +# @active: true if COLO is active.
+>
+> Please use consistent terminology: pick one of "COLO is running", "COLO
+> is active" and stick to it.  v8 had that here, v9 regressed.  Also use
+> this wording for the comment improvement I requested for PATCH 11.
+>
+> However, isn't @active redundant with @mode?
+>
+>
+I re-think about this and review the codes.
+The 'none' mode can cover this field, I will remove the @active in next
+version.
+By the way, can you review the diagram patch as your comments?
+(have some action not related to qmp, so I just drew a general diagram.)
+
+Thanks
+Zhang Chen
+
+
+
+> > +#
+> > +# @reason: describes the reason for the COLO exit.
+> > +#
+> > +# Since: 3.0
+> > +##
+> > +{ 'struct': 'COLOStatus',
+> > +  'data': { 'mode': 'COLOMode', 'active': 'bool', 'reason':
+> 'COLOExitReason' } }
+> > +
+> > +##
+> > +# @query-colo-status:
+> > +#
+> > +# Query COLO status while the vm is running.
+> > +#
+> > +# Returns: A @COLOStatus object showing the status.
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "query-colo-status" }
+> > +# <- { "return": { "mode": "primary", "active": true, "reason":
+> "request" } }
+> > +#
+> > +# Since: 3.0
+> > +##
+> > +{ 'command': 'query-colo-status',
+> > +  'returns': 'COLOStatus' }
+> > +
+> >  ##
+> >  # @migrate-recover:
+> >  #
+>
