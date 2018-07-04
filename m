@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faaaM-0008T4-H6
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:44:15 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1faamP-000299-EK
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faaaI-0003Vk-NU
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:44:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57736 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1faaaI-0003VT-Ii
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:44:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29EF840201C7
-	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 05:44:10 +0000 (UTC)
-Date: Wed, 4 Jul 2018 13:44:05 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180704054405.GB2568@xz-mi>
-References: <20180620073223.31964-1-peterx@redhat.com>
-	<871sctea4y.fsf@dusky.pond.sub.org>
-	<87sh52b3bp.fsf_-_@dusky.pond.sub.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1faamO-00018t-D1
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:56:41 -0400
+References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+	<20180703055804.13449-36-david@gibson.dropbear.id.au>
+	<4fce9ddd-5079-e833-b6c2-e6935322c73d@ilande.co.uk>
+	<b0f927a5f0eb2bd96798124e6925fa1f@sebastianbauer.info>
+	<9108e419-3120-b887-0da8-3748dbc19a17@ilande.co.uk>
+	<30fe8f08c522688f00af24ccc4f0629e@sebastianbauer.info>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <39a5cb1b-7dbc-f683-e4f8-0a655c146891@ilande.co.uk>
+Date: Wed, 4 Jul 2018 06:56:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87sh52b3bp.fsf_-_@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] monitor: enable OOB by default
+In-Reply-To: <30fe8f08c522688f00af24ccc4f0629e@sebastianbauer.info>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 35/35] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Jul 02, 2018 at 07:43:06AM +0200, Markus Armbruster wrote:
-> More lose ends:
+On 04/07/18 06:33, Sebastian Bauer wrote:
+
+> Am 2018-07-04 06:50, schrieb Mark Cave-Ayland:
+>>> Either to give up the vga cirrus preference or to apply the same as 
+>>> was done with the spapr machine. I would prefer the first variant but 
+>>> it would also cause some differences on other machines.
+>>
+>> I understand that the decision was taken to add VGA cirrus to the PPC
+>> build and therefore accept the default VGA device change, however your
+>> the commit message only mentions spapr and not all the other PPC
+>> machines whose defaults are also potentially affected:
+>>
+>> $ ./qemu-system-ppc -M ?
+>> Supported machines are:
+>> 40p                  IBM RS/6000 7020 (40p)
+>> bamboo               bamboo
+>> g3beige              Heathrow based PowerMAC (default)
+>> mac99                Mac99 based PowerMAC
+>> mpc8544ds            mpc8544ds
+>> none                 empty machine
+>> ppce500              generic paravirt e500 platform
+>> prep                 PowerPC PREP platform
+>> ref405ep             ref405ep
+>> sam460ex             aCube Sam460ex
+>> taihu                taihu
+>> virtex-ml507         Xilinx Virtex ML507 reference design
+>>
+>> I'm not able to personally validate all of these, but a quick check
+>> shows that at least both PReP machines (-M prep and -M 40p) are also
+>> broken by this patch which tells me it hasn't had much testing.
+>>
+>> David, do you know what the defaults are for the other PPC machines in
+>> order for Sebastian to test and send a follow-up patch?
 > 
-> * scripts/qmp/ doesn't support OOB, yet.  qmp-shell.py in particular
-> 
-> * test-qmp-cmds neglects to cover the OOB additions to qmp-dispatch.c
+> I don't know much how to validate these machines (I did a 'make check' 
+> but it does not show up any problems) and what impact these change has. 
+> But I suggested in the note section (which is not the commit message) 
+> that some of the machines properly behave different now (OTOH CirrusGD 
+> is a vga card nonetheless, I would have expected that at least the Mac 
+> can deal with that card). This can either be fixed by following the 
+> 'spapr' approach (as it explicitly forbids this card as the primary 
+> display and was therefore visible immediately) or by generally 
+> rethinking whether CirrusGD really should be the preferred card over std 
+> vga (after all it is considered as obsolete so why should it be 
+> preferred?). I think it would be nice if a consensus can be found about 
+> the "correct approach" way to fix it. I personally think that adding 
+> more exceptions is not the right way :)
 
-Would you mind I put these aside for now?
+Right, but as the patch submitter it's your responsibility to ensure 
+that your patch doesn't break other people's machines and/or follow up 
+with the appropriate patches. If you're not willing to do that then we 
+should revert the patch in its current form until a better way forward 
+has been found.
 
-I'm afraid things grow then we lose control, so not sure whether I can
-just focus on the bugs first (e.g., the COMMAND_DROP event
-broadcasting, and also the response queue flow control issue).
+> Last but not least, all of the targets should still work as before if 
+> you use -vga std option.
 
-Thanks,
+Except that -vga std has been the default for these machines for a long 
+time, and it's going to be me that will get a large majority of the 
+complaints if this behaviour changes.
 
--- 
-Peter Xu
+
+ATB,
+
+Mark.
