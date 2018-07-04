@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fahE0-0007Vq-P8
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:39 -0400
+	(envelope-from <drjones@redhat.com>) id 1fahE5-0007bx-FN
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fahDz-0000VO-Op
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:36 -0400
+	(envelope-from <drjones@redhat.com>) id 1fahE4-0000ZI-LX
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:49:41 -0400
 From: Andrew Jones <drjones@redhat.com>
-Date: Wed,  4 Jul 2018 14:49:21 +0200
-Message-Id: <20180704124923.32483-5-drjones@redhat.com>
+Date: Wed,  4 Jul 2018 14:49:23 +0200
+Message-Id: <20180704124923.32483-7-drjones@redhat.com>
 In-Reply-To: <20180704124923.32483-1-drjones@redhat.com>
 References: <20180704124923.32483-1-drjones@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 4/6] hw/arm/virt-acpi-build: distinguish
- possible and present cpus
+Subject: [Qemu-devel] [RFC PATCH 6/6] hw/arm/virt: cpu topology: don't allow
+ threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, imammedo@redhat.com, eric.auger@redhat.com, wei@redhat.com
 
-When building ACPI tables regarding CPUs we should always build
-them for the number of possible CPUs, not the number of present
-CPUs. We then ensure only the present CPUs are enabled.
+None of the cpu models supported by mach-virt support threads.
+Furthermore when running with KVM and cpu=host, while the host
+processor may support threads, we don't yet support telling KVM
+that we want the guest to see that. So if the user tries to
+select more than one thread for the cpu topology, just error-out.
+
+We'll remove the restriction for KVM guests after adding support
+to KVM and QEMU for userspace controlled VCPU MPIDRs.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt-acpi-build.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ hw/arm/virt.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 6ea47e258832..1d1fc824da6f 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -49,14 +49,22 @@
- #define ARM_SPI_BASE 32
- #define ACPI_POWER_BUTTON_DEVICE "PWRB"
- 
--static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
-+static int possible_cpus(VirtMachineState *vms)
-+{
-+    return MACHINE_GET_CLASS(vms)->possible_cpu_arch_ids(MACHINE(vms))->len;
-+}
-+
-+static void acpi_dsdt_add_cpus(Aml *scope, int possible, int present)
- {
-     uint16_t i;
- 
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < possible; i++) {
-         Aml *dev = aml_device("C%.03X", i);
-         aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
-         aml_append(dev, aml_name_decl("_UID", aml_int(i)));
-+        if (i >= present) {
-+            aml_append(dev, aml_name_decl("_STA", aml_int(0)));
-+        }
-         aml_append(scope, dev);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 6c5fecdd61df..8fc2751ab4bb 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1390,6 +1390,19 @@ static void machvirt_init(MachineState *machine)
+         exit(1);
      }
- }
-@@ -650,7 +658,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
-     gicd->version = vms->gic_version;
  
--    for (i = 0; i < vms->smp_cpus; i++) {
-+    for (i = 0; i < possible_cpus(vms); i++) {
-         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
-                                                            sizeof(*gicc));
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
-@@ -663,7 +671,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         gicc->cpu_interface_number = cpu_to_le32(i);
-         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
-         gicc->uid = cpu_to_le32(i);
--        gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
-+        if (i < vms->smp_cpus) {
-+            gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
++    if (!vmc->ignore_cpu_topology && smp_threads > 1) {
++        if (kvm_enabled() &&
++            strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("host")) == 0) {
++            error_report("mach-virt: KVM: user controlled MPIDR.MT not "
++                         "yet supported");
++        } else {
++            error_report("mach-virt: CPU type %s does not support SMT",
++                         machine->cpu_type);
 +        }
- 
-         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
-@@ -763,7 +773,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-      * the RTC ACPI device at all when using UEFI.
-      */
-     scope = aml_scope("\\_SB");
--    acpi_dsdt_add_cpus(scope, vms->smp_cpus);
-+    acpi_dsdt_add_cpus(scope, possible_cpus(vms), vms->smp_cpus);
-     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
-     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
++        error_report("mach-virt: smp_threads cannot be > 1");
++        exit(1);
++    }
++
+     /* If we have an EL3 boot ROM then the assumption is that it will
+      * implement PSCI itself, so disable QEMU's internal implementation
+      * so it doesn't get in the way. Instead of starting secondary
 -- 
 2.17.1
