@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fabMY-0002Bg-45
+	(envelope-from <jsnow@redhat.com>) id 1fabMY-0002Bh-4F
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 02:34:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fabMU-0004CJ-4i
+	(envelope-from <jsnow@redhat.com>) id 1fabMT-0004Bm-9L
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 02:34:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59072 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59068 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fabMU-0004C7-06
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 02:33:58 -0400
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fabMT-0004Au-5T
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 02:33:57 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Wed,  4 Jul 2018 02:33:55 -0400
-Message-Id: <20180704063355.25818-3-jsnow@redhat.com>
+Date: Wed,  4 Jul 2018 02:33:54 -0400
+Message-Id: <20180704063355.25818-2-jsnow@redhat.com>
 In-Reply-To: <20180704063355.25818-1-jsnow@redhat.com>
 References: <20180704063355.25818-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] dirty-bitmap: fix double lock on bitmap
- enabling
+Subject: [Qemu-devel] [PULL 1/2] block/dirty-bitmap: add
+ bdrv_enable_dirty_bitmap_locked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +29,55 @@ Cc: peter.maydell@linaro.org, jsnow@redhat.com, Vladimir Sementsov-Ogievskiy <vs
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Bitmap lock/unlock were added to bdrv_enable_dirty_bitmap in
-8b1402ce80d, but some places were not updated correspondingly, which
-leads to trying to take this lock twice, which is dead-lock. Fix this.
-
-Actually, iotest 199 (about dirty bitmap postcopy migration) is broken
-now, and this fixes it.
+Add _locked version of bdrv_enable_dirty_bitmap, to fix dirty bitmap
+migration in the following patch.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20180625165745.25259-3-vsementsov@virtuozzo.com
+Message-id: 20180625165745.25259-2-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c           | 3 ++-
- migration/block-dirty-bitmap.c | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ block/dirty-bitmap.c         | 9 +++++++--
+ include/block/dirty-bitmap.h | 1 +
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 93744b3565..c9b8a6fd52 100644
+index db1782ec1f..93744b3565 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -250,8 +250,9 @@ void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+@@ -241,6 +241,12 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+     return 0;
+ }
+ 
++void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
++{
++    assert(!bdrv_dirty_bitmap_frozen(bitmap));
++    bitmap->disabled = false;
++}
++
  /* Called with BQL taken. */
  void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
  {
-+    assert(bitmap->mutex == bitmap->successor->mutex);
-     qemu_mutex_lock(bitmap->mutex);
--    bdrv_enable_dirty_bitmap(bitmap->successor);
-+    bdrv_enable_dirty_bitmap_locked(bitmap->successor);
-     qemu_mutex_unlock(bitmap->mutex);
+@@ -424,8 +430,7 @@ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     bdrv_dirty_bitmap_lock(bitmap);
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
+-    bitmap->disabled = false;
++    bdrv_enable_dirty_bitmap_locked(bitmap);
+     bdrv_dirty_bitmap_unlock(bitmap);
  }
  
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 3bafbbdc4c..477826330c 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -511,7 +511,7 @@ void dirty_bitmap_mig_before_vm_start(void)
-         DirtyBitmapLoadBitmapState *b = item->data;
- 
-         if (b->migrated) {
--            bdrv_enable_dirty_bitmap(b->bitmap);
-+            bdrv_enable_dirty_bitmap_locked(b->bitmap);
-         } else {
-             bdrv_dirty_bitmap_enable_successor(b->bitmap);
-         }
-@@ -547,7 +547,7 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DirtyBitmapLoadState *s)
-         if (enabled_bitmaps == NULL) {
-             /* in postcopy */
-             bdrv_reclaim_dirty_bitmap_locked(s->bs, s->bitmap, &error_abort);
--            bdrv_enable_dirty_bitmap(s->bitmap);
-+            bdrv_enable_dirty_bitmap_locked(s->bitmap);
-         } else {
-             /* target not started, successor must be empty */
-             int64_t count = bdrv_get_dirty_count(s->bitmap);
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 288dc6adb6..259bd27c40 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -32,6 +32,7 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+                                          Error **errp);
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
++void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap);
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
+ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
 -- 
 2.14.4
