@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1facTN-00077J-Gv
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 03:45:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1facis-0000q8-2b
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1facTM-0007e9-Ff
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 03:45:09 -0400
-Date: Wed, 4 Jul 2018 09:44:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180704074453.GA4334@localhost.localdomain>
-References: <20180704061320.2041-1-famz@redhat.com>
-	<20180704061320.2041-2-famz@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1facim-0007be-8e
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:01:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1facim-0007aN-0P
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:01:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1facij-00053y-AQ
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 08:01:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1D74C2E81AC
+	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 08:01:01 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180704061320.2041-2-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: Fix dst total_sectors after
- copy offloading
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Jul 2018 07:52:27 -0000
+From: He Yi <1779634@bugs.launchpad.net>
+Reply-To: Bug 1779634 <1779634@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153052346519.30029.15773821079672320069.malonedeb@wampee.canonical.com>
+Message-Id: <153069074767.13494.7950027753615526702.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779634] Re: qemu-x86_64 on aarch64 reports
+ "Synchronous External Abort"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-Am 04.07.2018 um 08:13 hat Fam Zheng geschrieben:
-> This was noticed by the new image fleecing tests case 222. The issue is
-> apparent and we should just do the same right things as in
-> bdrv_aligned_pwritev.
-> 
-> Reported-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2945,6 +2945,10 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
->                                                    dst, dst_offset,
->                                                    bytes, flags);
->      }
-> +    if (ret == 0) {
-> +        int64_t end_sector = DIV_ROUND_UP(dst_offset + bytes, BDRV_SECTOR_SIZE);
-> +        dst->bs->total_sectors = MAX(dst->bs->total_sectors, end_sector);
-> +    }
+** Changed in: qemu
+       Status: Confirmed =3D> Invalid
 
-I think it's time to extract this stuff to a common function. I was
-already aware that a write request that extends the image isn't behaving
-exactly the same as bdrv_co_truncate(), and this one is bound to diverge
-from the other two instances as well.
+-- =
 
-This is what bdrv_aligned_pwritev() does after the write:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779634
 
-    atomic_inc(&bs->write_gen);
-    bdrv_set_dirty(bs, offset, bytes);
+Title:
+  qemu-x86_64 on aarch64 reports "Synchronous External Abort"
 
-    stat64_max(&bs->wr_highest_offset, offset + bytes);
+Status in QEMU:
+  Invalid
 
-    if (ret >= 0) {
-        bs->total_sectors = MAX(bs->total_sectors, end_sector);
-        ret = 0;
-    }
+Bug description:
+  Purpose: to run x86_64 utilities on aarch64 platform (Intel/Dell network =
+adapters' firmware upgrade tools)
+  System: aarch64 server platform, with ubuntu 16.04 (xenial) Linux 4.13.0-=
+45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:14:25 UTC 2018 aarch64 aarc=
+h64 aarch64 GNU/Linux
 
-Before the write, it also calls bs->before_write_notifiers.
+  Reproduce:
+  1) build linux-user qemu-x86_64 static from source (tried both version 2.=
+12.0 & 2.11.2)
+  =C2=A0=C2=A0=C2=A0./configure --target-list=3Dx86_64-linux-user --disable=
+-system --static --enable-linux-user
 
-This is what bdrv_co_truncate() does after truncating the image:
+  2) install the interpreter into binfmt_misc filesystem
+  =C2=A0=C2=A0=C2=A0$ cat /proc/sys/fs/binfmt_misc/qemu-x86_64
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0enabled
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0interpreter /usr/local/bin/qemu-x86_64
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0flags:
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0offset 0
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0magic 7f454c4602010100000000000000000002003=
+e00
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mask fffffffffffefefcfffffffffffffffffeffff=
+ff
 
-    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-    if (ret < 0) {
-        error_setg_errno(errp, -ret, "Could not refresh total sector count");
-    } else {
-        offset = bs->total_sectors * BDRV_SECTOR_SIZE;
-    }
-    bdrv_dirty_bitmap_truncate(bs, offset);
-    bdrv_parent_cb_resize(bs);
-    atomic_inc(&bs->write_gen);
+  3) packaging Intel/Dell upgrade utilities into docker images, I've publis=
+hed two on docker hub:
+  =C2=A0=C2=A0=C2=A0REPOSITORY          TAG
+  =C2=A0=C2=A0=C2=A0heyi/dellupdate     latest
+  =C2=A0=C2=A0=C2=A0heyi/nvmupdate64e   latest
 
-This means that we probably have at least the following bugs in
-bdrv_co_copy_range_internal():
+  4) run the docker container on aarch64 server platform:
+  =C2=A0=C2=A0=C2=A0docker run -it --privileged --network host --volume /us=
+r/local/bin/qemu-x86_64:/usr/local/bin/qemu-x86_64 heyi/dellupdate:latest
 
-1. bs->write_gen is not increased, a following flush is ignored
-2. Dirty bitmaps are not dirtied
-3. Dirty bitmaps are not resized when extending the image
-4. bs->wr_highest_offset is not adjusted correctly
-5. bs->total_sectors is not resized (the bug this patch fixes)
-6. The parent node isn't notified about an image size change
+  5) finally, within docker container run the upgrade tool:
+  =C2=A0=C2=A0=C2=A0# ./Network_Firmware_T6VN9_LN_18.5.17_A00.BIN
 
-Of these, 3. and 6. also seem to be bugs in bdrv_aligned_pwritev().
+  Errors: in dmesg it reports excessive 'Synchronous External Abort':
 
-Kevin
+  kernel: [242850.159893] Synchronous External Abort: synchronous external =
+abort (0x92000610) at 0x0000000000429958
+  kernel: [242850.169199] Unhandled fault: synchronous external abort (0x92=
+000610) at 0x0000000000429958
+
+  thanks and best regards, Yi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779634/+subscriptions
