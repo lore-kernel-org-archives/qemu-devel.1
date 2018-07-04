@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fajG5-0001uN-Jy
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:59:54 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fajIo-00049m-Ub
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fajG4-00076Z-SS
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:59:53 -0400
-From: Ari Sundholm <ari@tuxera.com>
-Date: Wed, 4 Jul 2018 17:59:34 +0300
-Message-ID: <1530716376-2235-2-git-send-email-ari@tuxera.com>
-In-Reply-To: <1530716376-2235-1-git-send-email-ari@tuxera.com>
-References: <1530716376-2235-1-git-send-email-ari@tuxera.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fajIl-0000cl-St
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:02:42 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed,  4 Jul 2018 12:02:29 -0300
+Message-Id: <20180704150229.9948-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 1/3] block/blklogwrites: Change
- log_sector_size from int64_t to uint64_t
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] block/crypto: Simplify
+ block_crypto_co_create_opts_luks to avoid a memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:blklogwrites" <qemu-block@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This was a simple oversight when working on intermediate versions
-of the original patch which introduced blklogwrites.
+After 1ec4f4160a1 Coverity reported:
 
-Signed-off-by: Ari Sundholm <ari@tuxera.com>
+  Variable cryptoopts going out of scope leaks the storage it points to.
+
+Fixes: Coverity CID 1393782 (Resource leak)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- block/blklogwrites.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+I think this check is superfluous but I respected the previous code:
 
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 47093fa..272e11a 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -79,7 +79,7 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
-     QemuOpts *opts;
-     Error *local_err = NULL;
-     int ret;
--    int64_t log_sector_size;
-+    uint64_t log_sector_size;
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -101,11 +101,9 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
-     log_sector_size = qemu_opt_get_size(opts, "log-sector-size",
-                                         BDRV_SECTOR_SIZE);
- 
--    if (log_sector_size < 0 || log_sector_size > (1ull << 23) ||
--        !is_power_of_2(log_sector_size))
--    {
-+    if (log_sector_size > (1ull << 23) || !is_power_of_2(log_sector_size)) {
+     ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
+     if (ret > 0) {
+         ret = 0;
+     }
+
+ block/crypto.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/block/crypto.c b/block/crypto.c
+index 994172a3de..d4d2c6c511 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -545,33 +545,36 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+     create_opts = block_crypto_create_opts_init(cryptoopts, errp);
+     if (!create_opts) {
          ret = -EINVAL;
--        error_setg(errp, "Invalid log sector size %"PRId64, log_sector_size);
-+        error_setg(errp, "Invalid log sector size %"PRIu64, log_sector_size);
-         goto fail;
+-        goto fail;
++        goto cleanup_cryptoopts;
      }
  
+     /* Create protocol layer */
+     ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+-        return ret;
++        goto cleanup_create_opts;
+     }
+ 
+     bs = bdrv_open(filename, NULL, NULL,
+                    BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
+     if (!bs) {
+         ret = -EINVAL;
+-        goto fail;
++        goto cleanup_create_opts;
+     }
+ 
+     /* Create format layer */
+     ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
+-    if (ret < 0) {
+-        goto fail;
++    if (ret > 0) {
++        ret = 0;
+     }
+ 
+-    ret = 0;
+-fail:
+     bdrv_unref(bs);
++
++cleanup_create_opts:
+     qapi_free_QCryptoBlockCreateOptions(create_opts);
++
++cleanup_cryptoopts:
+     qobject_unref(cryptoopts);
++
+     return ret;
+ }
+ 
 -- 
-2.7.4
+2.18.0
