@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fajsL-0006a9-A9
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:39:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fajsr-0006tY-F6
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fajsH-0003Qb-DZ
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:39:25 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fajsH-0003PZ-5S
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:39:21 -0400
-Received: by mail-wm0-x241.google.com with SMTP id 69-v6so6407042wmf.3
-	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 08:39:21 -0700 (PDT)
-References: <20180703151732.29843-1-richard.henderson@linaro.org>
-	<87y3er84ud.fsf@linaro.org>
-	<DC601B7F-5DCF-4005-8233-858B547C877E@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <DC601B7F-5DCF-4005-8233-858B547C877E@gmail.com>
-Date: Wed, 04 Jul 2018 16:39:18 +0100
-Message-ID: <87woub80yh.fsf@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fajsq-0003ZW-Jh
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:39:57 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed,  4 Jul 2018 12:39:12 -0300
+Message-Id: <20180704153919.12432-2-f4bug@amsat.org>
+In-Reply-To: <20180704153919.12432-1-f4bug@amsat.org>
+References: <20180704153919.12432-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1 0/7] target/ppc fp cleanups
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/8] qobject: Catch another straggler for use
+ of qdict_put_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
+Patch created mechanically by rerunning:
 
-Programmingkid <programmingkidx@gmail.com> writes:
+  $  spatch --sp-file scripts/coccinelle/qobject.cocci \
+            --macro-file scripts/cocci-macro-file.h \
+            --dir . --in-place
 
->> On Jul 4, 2018, at 10:15 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->>
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>
->>>
->>> Anyway, all of this has been broken long enough that it'll need to
->>> wait til next devel cycle before anything further gets done.
->>
->> When it gets done should we add some explicit ppc tests to tests/tcg/ppc
->> like we did with arm64 fcvt or would it be worth spending more time on
->> the general purpose FP test suite Emilio was working on as part of his
->> hard-float series?
->
-> My vote goes to adding PowerPC specific tests. I already made some and se=
-nt them to the list a couple of days ago. A general purpose floating point =
-test suite would probably not be able to test things like PowerPC floating =
-point flags.
->
-> I'm not certain how we would add floating point tests to QEMU. I'm
-> guessing it would involve some kind of bootable image file that would
-> load and run the tests. Hopefully there is an easier way to implement
-> testing.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ qobject/block-qdict.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You don't need system tests - this is all testable from linux-user. See
-tests/tcg/arm/fcvt.c and the .ref files in arm and aarch64 directories.
-Assuming the test isn't insane (like test-i386-fprem) we can just add a
-reference output recorded on know good hardware.
-
---
-Alex Benn=C3=A9e
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index 80c653013f..ae363708ab 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -572,7 +572,7 @@ static QObject *qdict_crumple_for_keyval_qiv(QDict *src, Error **errp)
+         if (!tmp) {
+             tmp = qdict_clone_shallow(src);
+         }
+-        qdict_put(tmp, ent->key, qstring_from_str(s));
++        qdict_put_str(tmp, ent->key, s);
+         g_free(buf);
+     }
+ 
+-- 
+2.18.0
