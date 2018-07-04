@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fagWB-00030g-2t
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:04:23 -0400
+	(envelope-from <david@redhat.com>) id 1fagXm-00041F-Vh
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fagW7-0003Ew-Vj
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:04:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52194 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fagW7-0003Ei-RS
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:04:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C70E77890
-	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 12:04:15 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-235.ams2.redhat.com
-	[10.36.117.235])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 843EA2026D76
-	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 12:04:14 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  4 Jul 2018 14:04:11 +0200
-Message-Id: <20180704120412.19020-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] pr-manager-helper: fix memory leak on event
+	(envelope-from <david@redhat.com>) id 1fagXl-0003kg-Ln
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 08:05:58 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
+	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
+	<df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
+Date: Wed, 4 Jul 2018 14:05:46 +0200
+MIME-Version: 1.0
+In-Reply-To: <df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +26,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-Reported by Coverity.
+On 03.07.2018 21:27, Auger Eric wrote:
+> Hi David,
+> On 07/03/2018 08:25 PM, David Hildenbrand wrote:
+>> On 03.07.2018 09:19, Eric Auger wrote:
+>>> We define a new hotpluggable RAM region (aka. device memory).
+>>> Its base is 2TB GPA. This obviously requires 42b IPA support
+>>> in KVM/ARM, FW and guest kernel. At the moment the device
+>>> memory region is max 2TB.
+>>
+>> Maybe a stupid question, but why exactly does it have to start at 2TB
+>> (and not e.g. at 1TB)?
+> not a stupid question. See tentative answer below.
+>>
+>>>
+>>> This is largely inspired of device memory initialization in
+>>> pc machine code.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>> ---
+>>>  hw/arm/virt.c         | 104 ++++++++++++++++++++++++++++++++++++----=
+----------
+>>>  include/hw/arm/arm.h  |   2 +
+>>>  include/hw/arm/virt.h |   1 +
+>>>  3 files changed, 79 insertions(+), 28 deletions(-)
+>>>
+>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>> index 5a4d0bf..6fefb78 100644
+>>> --- a/hw/arm/virt.c
+>>> +++ b/hw/arm/virt.c
+>>> @@ -59,6 +59,7 @@
+>>>  #include "qapi/visitor.h"
+>>>  #include "standard-headers/linux/input.h"
+>>>  #include "hw/arm/smmuv3.h"
+>>> +#include "hw/acpi/acpi.h"
+>>> =20
+>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc,=
+ \
+>>> @@ -94,34 +95,25 @@
+>>> =20
+>>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>> =20
+>>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this mean=
+s
+>>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>>> - * address space unallocated and free for future use between 256G an=
+d 512G.
+>>> - * If we need to provide more RAM to VMs in the future then we need =
+to:
+>>> - *  * allocate a second bank of RAM starting at 2TB and working up
+> I acknowledge this comment was the main justification. Now if you look =
+at
+>=20
+> Principles of ARM Memory Maps
+> http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_prin=
+ciples_of_arm_memory_maps.pdf
+> chapter 2.3 you will find that when adding PA bits, you always leave
+> space for reserved space and mapped IO.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scsi/pr-manager-helper.c | 1 +
- 1 file changed, 1 insertion(+)
+Thanks for the pointer!
 
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index 519a296905..3027dde60d 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -46,6 +46,7 @@ static void pr_manager_send_status_changed_event(PRManagerHelper *pr_mgr)
-     if (id) {
-         qapi_event_send_pr_manager_status_changed(id, !!pr_mgr->ioc,
-                                                   &error_abort);
-+        g_free(id);
-     }
- }
- 
--- 
-2.17.1
+So ... we can fit
+
+a) 2GB at 2GB
+b) 32GB at 32GB
+c) 512GB at 512GB
+d) 8TB at 8TB
+e) 128TB at 128TB
+
+(this is a nice rule of thumb if I understand it correctly :) )
+
+We should strive for device memory (maxram_size - ram_size) to fit
+exactly into one of these slots (otherwise things get nasty).
+
+Depending on the ram_size, we might have simpler setups and can support
+more configurations, no?
+
+E.g. ram_size <=3D 34GB, device_memory <=3D 512GB
+-> move ram into a) and b)
+-> move device memory into c)
+
+We should make up our mind right from the beginning how our setup will
+look, so we can avoid (possibly complicated) compatibility handling
+later on.
+
+>=20
+> On the other hand, if you look at chapter 5, "Proposed 44-bit and 48bit
+> Address Maps", we should logically put the additional RAM at 8TB if we
+> want to comply with that doc.
+
+I agree, 2TB es in the reserved area.
+
+>=20
+> Peter, was there any other justification why we should put the RAM at 2=
+TB?
+>=20
+> Thanks
+>=20
+> Eric
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
