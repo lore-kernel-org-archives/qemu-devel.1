@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faiZ7-0005xW-9z
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:15:30 -0400
+	(envelope-from <will.deacon@arm.com>) id 1faifY-0001Rj-0A
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:22:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1faiZ3-0006fL-5K
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:15:29 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1faiZ2-0006f2-M6
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:15:24 -0400
-Received: by mail-wm0-x243.google.com with SMTP id s14-v6so5921471wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 07:15:24 -0700 (PDT)
-References: <20180703151732.29843-1-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180703151732.29843-1-richard.henderson@linaro.org>
-Date: Wed, 04 Jul 2018 15:15:22 +0100
-Message-ID: <87y3er84ud.fsf@linaro.org>
+	(envelope-from <will.deacon@arm.com>) id 1faifT-0002hT-Vj
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:22:08 -0400
+Received: from foss.arm.com ([217.140.101.70]:45646)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <will.deacon@arm.com>) id 1faifT-0002hE-Pc
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:22:03 -0400
+Date: Wed, 4 Jul 2018 15:22:42 +0100
+From: Will Deacon <will.deacon@arm.com>
+Message-ID: <20180704142241.GG4828@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-25-git-send-email-suzuki.poulose@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1 0/7] target/ppc fp cleanups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1530270944-11351-25-git-send-email-suzuki.poulose@arm.com>
+Subject: Re: [Qemu-devel] [kvmtool test PATCH 24/24] kvmtool: arm: Add
+ support for creating VM with PA size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, programmingkidx@gmail.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 
+On Fri, Jun 29, 2018 at 12:15:44PM +0100, Suzuki K Poulose wrote:
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index 5701d41..b1969be 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -11,6 +11,8 @@
+>  #include <linux/kvm.h>
+>  #include <linux/sizes.h>
+>  
+> +unsigned long kvm_arm_type;
+> +
+>  struct kvm_ext kvm_req_ext[] = {
+>  	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
+>  	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+> @@ -18,6 +20,26 @@ struct kvm_ext kvm_req_ext[] = {
+>  	{ 0, 0 },
+>  };
+>  
+> +#ifndef KVM_ARM_GET_MAX_VM_PHYS_SHIFT
+> +#define KVM_ARM_GET_MAX_VM_PHYS_SHIFT		_IO(KVMIO, 0x0b)
+> +#endif
+> +
+> +void kvm__arch_init_hyp(struct kvm *kvm)
+> +{
+> +	int max_ipa;
+> +
+> +	max_ipa = ioctl(kvm->sys_fd, KVM_ARM_GET_MAX_VM_PHYS_SHIFT);
+> +	if (max_ipa < 0)
+> +		max_ipa = 40;
+> +	if (!kvm->cfg.arch.phys_shift)
+> +		kvm->cfg.arch.phys_shift = 40;
+> +	if (kvm->cfg.arch.phys_shift > max_ipa)
+> +		die("Requested PA size (%u) is not supported by the host (%ubits)\n",
+> +		    kvm->cfg.arch.phys_shift, max_ipa);
+> +	if (kvm->cfg.arch.phys_shift != 40)
+> +		kvm_arm_type = kvm->cfg.arch.phys_shift;
+> +}
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Seems a bit weird that the "machine type identifier" to KVM_CREATE_VM is
+dedicated entirely to holding the physical address shift verbatim. Is this
+really the ABI?
 
->
-> Anyway, all of this has been broken long enough that it'll need to
-> wait til next devel cycle before anything further gets done.
+Also, couldn't KVM figure it out automatically if you add memslots at high
+addresses, making this a niche tunable outside of testing?
 
-When it gets done should we add some explicit ppc tests to tests/tcg/ppc
-like we did with arm64 fcvt or would it be worth spending more time on
-the general purpose FP test suite Emilio was working on as part of his
-hard-float series?
-
->
->
-> r~
->
->
-> Richard Henderson (7):
->   target/ppc: Enable fp exceptions for user-only
->   target/ppc: Honor fpscr_ze semantics and tidy fdiv
->   target/ppc: Tidy helper_fmul
->   target/ppc: Tidy helper_fadd, helper_fsub
->   target/ppc: Tidy helper_fsqrt
->   target/ppc: Honor fpscr_ze semantics and tidy fre, fresqrt
->   target/ppc: Use non-arithmetic conversions for fp load/store
->
->  target/ppc/helper.h                |  14 +-
->  target/ppc/fpu_helper.c            | 294 +++++++++++++++++------------
->  target/ppc/translate/fp-impl.inc.c |  26 +--
->  target/ppc/translate_init.inc.c    |   2 +
->  4 files changed, 189 insertions(+), 147 deletions(-)
-
-
---
-Alex Benn=C3=A9e
+Will
