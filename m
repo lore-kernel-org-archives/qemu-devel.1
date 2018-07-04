@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <julien.grall@arm.com>) id 1fajGW-0002JX-JA
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:00:24 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1falEt-0008WV-1C
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 13:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <julien.grall@arm.com>) id 1fajGT-0007GQ-3s
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:00:20 -0400
-Received: from foss.arm.com ([217.140.101.70]:46388)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <julien.grall@arm.com>) id 1fajGS-0007FY-SH
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:00:17 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
-	<20180704140943.GF4828@arm.com>
-From: Julien Grall <julien.grall@arm.com>
-Message-ID: <8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
-Date: Wed, 4 Jul 2018 16:00:11 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1falEr-0004aA-Qp
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 13:06:47 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180703180751.243496-1-vsementsov@virtuozzo.com>
+	<20180703180751.243496-2-vsementsov@virtuozzo.com>
+	<0e6e9f14-ad45-51c5-0d14-3e2e3dcaf5cb@virtuozzo.com>
+	<20180704150833.GG4334@localhost.localdomain>
+	<f50dc336-cb33-de03-d8ab-a0c01cadd850@virtuozzo.com>
+	<20180704162031.GH4334@localhost.localdomain>
+	<b9e20c0c-c21e-0257-4e93-cc6d31680d8c@virtuozzo.com>
+Message-ID: <741f1831-2c65-17cc-1886-4f922ffe14cb@virtuozzo.com>
+Date: Wed, 4 Jul 2018 20:06:32 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180704140943.GF4828@arm.com>
+In-Reply-To: <b9e20c0c-c21e-0257-4e93-cc6d31680d8c@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [kvmtool test PATCH 22/24] kvmtool: arm64: Add
- support for guest physical address size
+Subject: Re: [Qemu-devel] [PATCH 1/2] block: add BDRV_REQ_SERIALISING flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +29,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Will Deacon <will.deacon@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
 
-Hi,
-
-On 04/07/18 15:09, Will Deacon wrote:
-> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
->> Add an option to specify the physical address size used by this
->> VM.
+04.07.2018 19:36, Vladimir Sementsov-Ogievskiy wrote:
+> 04.07.2018 19:20, Kevin Wolf wrote:
+>> Am 04.07.2018 um 18:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>> 04.07.2018 18:08, Kevin Wolf wrote:
+>>>> Am 04.07.2018 um 16:44 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>>> 03.07.2018 21:07, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Serialized writes should be used in copy-on-write of=20
+>>>>>> backup(sync=3Dnone)
+>>>>>> for image fleecing scheme.
+>>>>>>
+>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy=20
+>>>>>> <vsementsov@virtuozzo.com>
+>>>>>> ---
+>>>>>> =C2=A0=C2=A0=C2=A0 include/block/block.h | 5 ++++-
+>>>>>> =C2=A0=C2=A0=C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 4 ++++
+>>>>>> =C2=A0=C2=A0=C2=A0 2 files changed, 8 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/include/block/block.h b/include/block/block.h
+>>>>>> index e5c7759a0c..107113aad5 100644
+>>>>>> --- a/include/block/block.h
+>>>>>> +++ b/include/block/block.h
+>>>>>> @@ -58,8 +58,11 @@ typedef enum {
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * content. */
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_WRITE_UNCHANGED=
+=C2=A0=C2=A0=C2=A0 =3D 0x40,
+>>>>>> +=C2=A0=C2=A0=C2=A0 /* Force request serializing. Only for writes. *=
+/
+>>>>>> +=C2=A0=C2=A0=C2=A0 BDRV_REQ_SERIALISING=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 =3D 0x80,
+>>>>>> +
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Mask of valid flags */
+>>>>>> -=C2=A0=C2=A0=C2=A0 BDRV_REQ_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x7f,
+>>>>>> +=C2=A0=C2=A0=C2=A0 BDRV_REQ_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0xff,
+>>>>>> =C2=A0=C2=A0=C2=A0 } BdrvRequestFlags;
+>>>>>> =C2=A0=C2=A0=C2=A0 typedef struct BlockSizes {
+>>>>>> diff --git a/block/io.c b/block/io.c
+>>>>>> index 1a2272fad3..d5ba078514 100644
+>>>>>> --- a/block/io.c
+>>>>>> +++ b/block/io.c
+>>>>>> @@ -1572,6 +1572,10 @@ static int coroutine_fn=20
+>>>>>> bdrv_aligned_pwritev(BdrvChild *child,
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 max_transfer =3D=20
+>>>>>> QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 align);
+>>>>>> +=C2=A0=C2=A0=C2=A0 if (flags & BDRV_REQ_SERIALISING) {
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mark_request_serialising=
+(req, bdrv_get_cluster_size(bs));
+>>>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>>>> +
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 waited =3D wait_serialisi=
+ng_requests(req);
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(!waited || !req->s=
+erialising);
+>>>>> Kevin, about this assertion, introduced in 28de2dcd88de "block:=20
+>>>>> Assert
+>>>>> serialisation assumptions in pwritev"? Will not it fail with fleecing
+>>>>> scheme? I'm afraid it will, when we will wait for client read with=20
+>>>>> our
+>>>>> request, marked serializing a moment ago...
+>>>> Hm, looks like it yes.
+>>>>
+>>>>> Can we just switch it to assert(!waited || !req->partial);, setting
+>>>>> req->partial in bdrv_co_pwritev for parts of unaligned requests?=20
+>>>>> And allow
+>>>>> new flag only for aligned requests?
+>>>>>
+>>>>> Other ideas?
+>>>> The commit message of 28de2dcd88de tells you what we need to do (and
+>>>> that just changing the assertion is wrong):
+>>>>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 If a request calls wait_serialising_req=
+uests() and actually=20
+>>>> has to wait
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 in this function (i.e. a coroutine yiel=
+d), other requests can=20
+>>>> run and
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 previously read data (like the head or =
+tail buffer) could become
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 outdated. In this case, we would have t=
+o restart from the=20
+>>>> beginning to
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 read in the updated data.
+>>>>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 However, we're lucky and don't actually=
+ need to do that: A=20
+>>>> request can
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 only wait in the first call of wait_ser=
+ialising_requests()=20
+>>>> because we
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mark it as serialising before that call=
+, so any later=20
+>>>> requests would
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wait. So as we don't wait in practice, =
+we don't have to=20
+>>>> reload the data.
+>>>>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This is an important assumption that ma=
+y not be broken or data
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 corruption will happen. Document it wit=
+h some assertions.
+>>>>
+>>>> So we may need to return -EAGAIN here, check that in the caller and
+>>>> repeat the write request from the very start.
+>>> But in case of aligned request, there no previously read data, and=20
+>>> we can
+>>> safely continue. And actually it's our case (backup writes are=20
+>>> aligned).
+>> Hm, right. I don't particularly like req->partial because it's easy to
+>> forget to set it to false when you do something that would need to be
+>> repeated, but I don't have a better idea.
 >>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
->>   arm/include/arm-common/kvm-config-arch.h  | 1 +
->>   2 files changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
->> index 04be43d..dabd22c 100644
->> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
->> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
->> @@ -8,7 +8,10 @@
->>   			"Create PMUv3 device"),				\
->>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
->>   			"Specify random seed for Kernel Address Space "	\
->> -			"Layout Randomization (KASLR)"),
->> +			"Layout Randomization (KASLR)"),		\
->> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
->> +			"Specify maximum physical address size (not "	\
->> +			"the amount of memory)"),
-> 
-> Given that this is a shift value, I think the help message could be more
-> informative. Something like:
-> 
-> 	"Specify maximum number of bits in a guest physical address"
-> 
-> I think I'd actually leave out any mention of memory, because this does
-> actually have an effect on the amount of addressable memory in a way that I
-> don't think we want to describe in half of a usage message line :)
-Is there any particular reasons to expose this option to the user?
+>> Kevin
+>
+> I said partial, because I imagined unaligned request split to parts=20
+> for separate writing, but this is wrong, req->unaligned sound better=20
+> for me now.
+>
+> So, for aligned requests all is ok.
+>
+> But for unaligned all is ok too, because they are marked serializing=20
+> and waited on first call to wait_for_serializing, before reading tails=20
+> and before considered place in bdrv_aligned_pwritev.
+>
 
-I have recently sent a series to allow the user to specify the position
-of the RAM [1]. With that series in mind, I think the user would not 
-really need to specify the maximum physical shift. Instead we could 
-automatically find it.
+Is it correct "serialiSing" ? Google and Thunderbird both correcting me=20
+to serialiZing
 
-Cheers,
-
-[1] 
-http://archive.armlinux.org.uk/lurker/message/20180510.140428.1c295b5b.en.html
-
-> 
-> Will
-> 
-
--- 
-Julien Grall
+--=20
+Best regards,
+Vladimir
