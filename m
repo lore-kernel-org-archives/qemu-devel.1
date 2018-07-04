@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1faj3U-0001Up-Mh
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:46:53 -0400
+	(envelope-from <ari@tuxera.com>) id 1faj3U-0001UH-4K
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1faj3T-0007k3-JI
+	(envelope-from <ari@tuxera.com>) id 1faj3T-0007jl-9m
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:46:52 -0400
 From: Ari Sundholm <ari@tuxera.com>
-Date: Wed, 4 Jul 2018 17:46:37 +0300
-Message-ID: <1530715597-30975-4-git-send-email-ari@tuxera.com>
+Date: Wed, 4 Jul 2018 17:46:35 +0300
+Message-ID: <1530715597-30975-2-git-send-email-ari@tuxera.com>
 In-Reply-To: <1530715597-30975-1-git-send-email-ari@tuxera.com>
 References: <1530715597-30975-1-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 3/3] block/blklogwrites: Add an option for the
- update interval of the log superblock
+Subject: [Qemu-devel] [PATCH 1/3] block/blklogwrites: Change log_sector_size
+ from int64_t to uint64_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:blklogwrites" <qemu-block@nongnu.org>
+Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:blklogwrites" <qemu-block@nongnu.org>
 
-This is a way to ensure that the log superblock is periodically
-updated. Before, this was only done on flush requests, which may
-not be enough if the VM exits abnormally, omitting the final flush.
-
-The default interval is 4096 write requests.
+This was a simple oversight when working on intermediate versions
+of the original patch which introduced blklogwrites.
 
 Signed-off-by: Ari Sundholm <ari@tuxera.com>
 ---
- block/blklogwrites.c | 19 +++++++++++++++++--
- qapi/block-core.json |  6 +++++-
- 2 files changed, 22 insertions(+), 3 deletions(-)
+ block/blklogwrites.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 56154e7..963e4dd 100644
+index 47093fa..272e11a 100644
 --- a/block/blklogwrites.c
 +++ b/block/blklogwrites.c
-@@ -55,6 +55,7 @@ typedef struct {
-     uint32_t sectorbits;
-     uint64_t cur_log_sector;
-     uint64_t nr_entries;
-+    uint64_t update_interval;
- } BDRVBlkLogWritesState;
+@@ -79,7 +79,7 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+     QemuOpts *opts;
+     Error *local_err = NULL;
+     int ret;
+-    int64_t log_sector_size;
++    uint64_t log_sector_size;
  
- static QemuOptsList runtime_opts = {
-@@ -71,6 +72,11 @@ static QemuOptsList runtime_opts = {
-             .type = QEMU_OPT_SIZE,
-             .help = "Log sector size",
-         },
-+        {
-+            .name = "log-super-update-interval",
-+            .type = QEMU_OPT_NUMBER,
-+            .help = "Log superblock update interval (# of write requests)",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -234,6 +240,13 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+@@ -101,11 +101,9 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+     log_sector_size = qemu_opt_get_size(opts, "log-sector-size",
+                                         BDRV_SECTOR_SIZE);
  
-     s->sectorsize = log_sector_size;
-     s->sectorbits = blk_log_writes_log2(log_sector_size);
-+    s->update_interval = qemu_opt_get_number(opts, "log-super-update-interval",
-+                                             4096);
-+    if (!s->update_interval) {
-+        ret = -EINVAL;
-+        error_setg(errp, "Invalid log superblock update interval %"PRIu64,
-+                   s->update_interval);
-+    }
- 
-     ret = 0;
- fail_log:
-@@ -360,8 +373,10 @@ static void coroutine_fn blk_log_writes_co_do_log(BlkLogWritesLogReq *lr)
-                                             lr->zero_size, 0);
+-    if (log_sector_size < 0 || log_sector_size > (1ull << 23) ||
+-        !is_power_of_2(log_sector_size))
+-    {
++    if (log_sector_size > (1ull << 23) || !is_power_of_2(log_sector_size)) {
+         ret = -EINVAL;
+-        error_setg(errp, "Invalid log sector size %"PRId64, log_sector_size);
++        error_setg(errp, "Invalid log sector size %"PRIu64, log_sector_size);
+         goto fail;
      }
  
--    /* Update super block on flush */
--    if (lr->log_ret == 0 && lr->entry.flags & LOG_FLUSH_FLAG) {
-+    /* Update super block on flush or every update interval */
-+    if (lr->log_ret == 0 && ((lr->entry.flags & LOG_FLUSH_FLAG)
-+        || (s->nr_entries % s->update_interval == 0)))
-+    {
-         struct log_write_super super = {
-             .magic      = cpu_to_le64(WRITE_LOG_MAGIC),
-             .version    = cpu_to_le64(WRITE_LOG_VERSION),
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d1753a2..38b3125 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3057,13 +3057,17 @@
- # @log-sector-size: sector size used in logging writes to @file, determines
- #                   granularity of offsets and sizes of writes (default: 512)
- #
-+# @log-super-update-interval: interval of write requests after which the log
-+#                             super block is updated to disk (default: 4096)
-+#
- # Since: 3.0
- ##
- { 'struct': 'BlockdevOptionsBlklogwrites',
-   'data': { 'file': 'BlockdevRef',
-             'log': 'BlockdevRef',
-             '*log-sector-size': 'uint32',
--            '*log-append': 'bool' } }
-+            '*log-append': 'bool',
-+            '*log-super-update-interval': 'uint64' } }
- 
- ##
- # @BlockdevOptionsBlkverify:
 -- 
 2.7.4
