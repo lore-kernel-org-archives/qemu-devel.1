@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1faoWF-00066a-0s
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:36:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1faodN-0007Nx-Fs
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1faoWB-0001Ca-SJ
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:36:55 -0400
-Received: from smtp1.mail.ru ([94.100.179.111]:41454)
+	(envelope-from <ehabkost@redhat.com>) id 1faodK-0006cD-9z
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:44:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1faoWB-0001Bp-Gq
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:36:51 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Wed,  4 Jul 2018 23:36:39 +0300
-Message-Id: <20180704203639.29553-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH] target/arm: Forbid unprivileged mode for M
- Baseline
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1faodK-0006bl-1z
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:44:14 -0400
+Date: Wed, 4 Jul 2018 17:44:07 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180704204407.GA22336@localhost.localdomain>
+References: <20170901105331.11783-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901105331.11783-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] docs: add firmware.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-MSR handling is the only place where CONTROL.nPRIV is modified.
+On Fri, Sep 01, 2017 at 12:53:31PM +0200, Gerd Hoffmann wrote:
+> Document how guest firmware is handled in qemu today.
+> 
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- target/arm/helper.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Is this document still valid?  Should we apply this for QEMU 3.0?
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 5ee229eb35..83cca554ad 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10781,8 +10781,10 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-             !arm_v7m_is_handler_mode(env)) {
-             write_v7m_control_spsel(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
-         }
--        env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
--        env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
-+        if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
-+            env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
-+            env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
-+        }
-         break;
-     default:
-     bad_reg:
+> ---
+>  docs/firmware.txt | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 49 insertions(+)
+>  create mode 100644 docs/firmware.txt
+> 
+> diff --git a/docs/firmware.txt b/docs/firmware.txt
+> new file mode 100644
+> index 0000000000..e242413344
+> --- /dev/null
+> +++ b/docs/firmware.txt
+> @@ -0,0 +1,49 @@
+> +
+> +prebuilt firmware in qemu
+> +=========================
+> +
+> +The process of building firmware isn't as easy as building qemu
+> +itself, for example because you must have cross compilers installed
+> +when building firmware for other architectures.  So qemu ships
+> +prebuilt firmware binaries for convenience reasons.
+> +
+> +
+> +directories
+> +-----------
+> +
+> +pc-bios/
+> +    Firmware binaries.
+> +    Also other files like keymaps and logos which are copied to
+> +    $prefix/share/qemu by "make install".
+> +
+> +pc-bios/optionrom/
+> +    Firmware sources, part of the qemu project.
+> +
+> +roms/
+> +    Firmware sources, third-party projects, as git submodules.
+> +
+> +
+> +third-party git repos
+> +---------------------
+> +
+> +For third party firmware sources it is recommended to have a git
+> +mirror on git.qemu.org.  In case the firmware license is GPL the git
+> +mirror is mandatory for GPL compilance reasons:  We ship binaries, so
+> +we must provide sources too.
+> +
+> +
+> +building the firmware
+> +---------------------
+> +
+> +Firmware builds should be done using rules in roms/Makefile.  That
+> +serves as documentation how the firmware is built, and it also makes
+> +firmware updates easier for the maintainer.
+> +
+> +"make -C roms" prints a list of firmware build targets.
+> +"make -C roms $target" kicks a build.
+> +
+> +
+> +notes for specific firmwares
+> +----------------------------
+> +
+> +ipxe: see https://wiki.qemu.org/IpxeDownstreamForQemu
+> -- 
+> 2.9.3
+> 
+> 
+
 -- 
-2.17.1
+Eduardo
