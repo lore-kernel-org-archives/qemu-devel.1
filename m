@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1faoHP-000308-C0
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:21:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faoR5-0004Vq-Hc
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1faoHL-0004jx-Cq
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:21:35 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faoR2-000528-AV
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:31:35 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:44450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1faoR2-00051y-4n
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:31:32 -0400
+Received: by mail-qk0-x241.google.com with SMTP id v17-v6so971341qkb.11
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 13:31:32 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1530732637-28606-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1530732637-28606-6-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <57a2af86-a882-7974-645b-048b630e9ef7@amsat.org>
+Date: Wed, 4 Jul 2018 17:31:27 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <1530732637-28606-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date: Wed, 04 Jul 2018 22:21:19 +0200
-From: Sebastian Bauer <mail@sebastianbauer.info>
-In-Reply-To: <20180704185321.GZ7451@localhost.localdomain>
-References: <20180704112859.20146-1-kraxel@redhat.com>
-	<20180704185321.GZ7451@localhost.localdomain>
-Message-ID: <6a0aba7b46b168360fb291eaec769eb0@sebastianbauer.info>
-Subject: Re: [Qemu-devel] [PATCH] vga: make stdvga the global default
+Subject: Re: [Qemu-devel] [PATCH v3 5/8] target/mips: Add CP0 BadInstrX
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +36,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-Am 2018-07-04 20:53, schrieb Eduardo Habkost:
->>      mc->kvm_type = spapr_kvm_type;
->>      machine_class_allow_dynamic_sysbus_dev(mc, 
->> TYPE_SPAPR_PCI_HOST_BRIDGE);
->>      mc->pci_allow_0_address = true;
->> diff --git a/vl.c b/vl.c
->> index 16b913f9d5..e60bf2d6cd 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -4475,10 +4475,10 @@ int main(int argc, char **argv, char **envp)
->>      if (default_vga) {
->>          if (machine_class->default_display) {
->>              vga_model = machine_class->default_display;
->> -        } else if (vga_interface_available(VGA_CIRRUS)) {
->> -            vga_model = "cirrus";
->>          } else if (vga_interface_available(VGA_STD)) {
->>              vga_model = "std";
->> +        } else if (vga_interface_available(VGA_CIRRUS)) {
->> +            vga_model = "cirrus";
+Hi Aleksandar,
+
+On 07/04/2018 04:30 PM, Aleksandar Markovic wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
 > 
-> If we don't make the machines above have default_display=NULL, we
-> won't need this hunk, right?  In either case, I suggest doing
-> this change on a separate patch.
+> Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+> 
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  target/mips/cpu.h       |  1 +
+>  target/mips/machine.c   |  5 +++--
+>  target/mips/translate.c | 20 +++++++++++++++++++-
+>  3 files changed, 23 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index edbb66d..8ccbc21 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -323,6 +323,7 @@ struct CPUMIPSState {
+>      target_ulong CP0_BadVAddr;
+>      uint32_t CP0_BadInstr;
+>      uint32_t CP0_BadInstrP;
+> +    uint32_t CP0_BadInstrX;
+>      int32_t CP0_Count;
+>      target_ulong CP0_EntryHi;
+>  #define CP0EnHi_EHINV 10
+> diff --git a/target/mips/machine.c b/target/mips/machine.c
+> index 20100d5..5ba78ac 100644
+> --- a/target/mips/machine.c
+> +++ b/target/mips/machine.c
+> @@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
+>  
+>  const VMStateDescription vmstate_mips_cpu = {
+>      .name = "cpu",
+> -    .version_id = 10,
+> -    .minimum_version_id = 10,
+> +    .version_id = 11,
+> +    .minimum_version_id = 11,
+>      .post_load = cpu_post_load,
+>      .fields = (VMStateField[]) {
+>          /* Active TC */
+> @@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu = {
+>          VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
+>          VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
+>          VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
+> +        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Count, MIPSCPU),
+>          VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 88699ae..0562851 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -5315,7 +5315,12 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>              gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
+>              rn = "BadInstrP";
+>              break;
+> -        default:
+> +        case 3:
+> +            CP0_CHECK(ctx->bi);
+> +            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
+> +            rn = "BadInstrX";
+> +            break;
+> +       default:
+>              goto cp0_unimplemented;
+>          }
+>          break;
+> @@ -6006,6 +6011,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>              /* ignored */
+>              rn = "BadInstrP";
+>              break;
+> +        case 3:
+> +            /* ignored */
+> +            rn = "BadInstrX";
+> +            break;
+>          default:
+>              goto cp0_unimplemented;
+>          }
+> @@ -6711,6 +6720,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>              gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
+>              rn = "BadInstrP";
+>              break;
+> +        case 3:
+> +            CP0_CHECK(ctx->bi);
+> +            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
 
-An alternative would be to define the default always to VGA_STD if the 
-machine does not override it. This is from the observation that the 
-majority would chose std. Obviously, having default values always has 
-pro and cons. I would not consider it harmful here.
+I'm unsure re-using gen_mfc0_load32() is enough, shouldn't we zero the
+16 lower bits?
 
-Is there any configuration that includes VGA_CIRRUS but not VGA_STD?
-
-Bye
-Sebastian
+> +            rn = "BadInstrX";
+> +            break;
+>          default:
+>              goto cp0_unimplemented;
+>          }
+> @@ -7385,6 +7399,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>              /* ignored */
+>              rn = "BadInstrP";
+>              break;
+> +        case 3:
+> +            /* ignored */
+> +            rn = "BadInstrX";
+> +            break;
+>          default:
+>              goto cp0_unimplemented;
+>          }
+> 
