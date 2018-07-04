@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1faonT-00013f-EC
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:54:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1faoxc-0002z9-44
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 17:05:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1faonQ-0008Rf-Bu
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:54:43 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:39258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1faonP-0008Qm-Ta
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 16:54:40 -0400
-Received: by mail-pf0-x231.google.com with SMTP id s21-v6so3460392pfm.6
-	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 13:54:39 -0700 (PDT)
-References: <20180702151023.24532-1-shorne@gmail.com>
-	<20180702151023.24532-23-shorne@gmail.com>
-	<feef2195-8fd8-f9e1-da85-f3286a9e2b1d@amsat.org>
-	<CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <43d6bc18-440a-31e9-f055-8d0b14cbc74e@linaro.org>
-Date: Wed, 4 Jul 2018 13:54:35 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1faoxZ-00082p-Fn
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 17:05:12 -0400
+Date: Wed, 4 Jul 2018 17:52:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180704205206.GG7451@localhost.localdomain>
+References: <20180704112859.20146-1-kraxel@redhat.com>
+	<20180704185321.GZ7451@localhost.localdomain>
+	<6a0aba7b46b168360fb291eaec769eb0@sebastianbauer.info>
 MIME-Version: 1.0
-In-Reply-To: <CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL v2 22/25] linux-user: Implement signals for
- openrisc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a0aba7b46b168360fb291eaec769eb0@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] vga: make stdvga the global default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,14 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 07/03/2018 04:51 PM, Stafford Horne wrote:
-> Richard, how do you usually remove these before your pr?  I suppose you have
-> some kind of script?
+On Wed, Jul 04, 2018 at 10:21:19PM +0200, Sebastian Bauer wrote:
+> Am 2018-07-04 20:53, schrieb Eduardo Habkost:
+> > >      mc->kvm_type = spapr_kvm_type;
+> > >      machine_class_allow_dynamic_sysbus_dev(mc,
+> > > TYPE_SPAPR_PCI_HOST_BRIDGE);
+> > >      mc->pci_allow_0_address = true;
+> > > diff --git a/vl.c b/vl.c
+> > > index 16b913f9d5..e60bf2d6cd 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -4475,10 +4475,10 @@ int main(int argc, char **argv, char **envp)
+> > >      if (default_vga) {
+> > >          if (machine_class->default_display) {
+> > >              vga_model = machine_class->default_display;
+> > > -        } else if (vga_interface_available(VGA_CIRRUS)) {
+> > > -            vga_model = "cirrus";
+> > >          } else if (vga_interface_available(VGA_STD)) {
+> > >              vga_model = "std";
+> > > +        } else if (vga_interface_available(VGA_CIRRUS)) {
+> > > +            vga_model = "cirrus";
+> > 
+> > If we don't make the machines above have default_display=NULL, we
+> > won't need this hunk, right?  In either case, I suggest doing
+> > this change on a separate patch.
+> 
+> An alternative would be to define the default always to VGA_STD if the
+> machine does not override it. This is from the observation that the majority
+> would chose std. Obviously, having default values always has pro and cons. I
+> would not consider it harmful here.
 
-No, I just edit the things by hand.
+That would be my preference: not having any machine with
+default_display==NULL.  I just don't want to make this a
+requirement for fixing the current bug.
 
+> 
+> Is there any configuration that includes VGA_CIRRUS but not VGA_STD?
 
-r~
+Not sure, I'll check.
+
+-- 
+Eduardo
