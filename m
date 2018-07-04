@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famLL-0005p4-HP
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famLL-0005ov-FV
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:17:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famLI-0001OC-Vj
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famLH-0001ME-9J
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:17:31 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35348 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:35277 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1famLI-0001Mg-KK
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:17:28 -0400
+	id 1famLH-0001Kt-2Y
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:17:27 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed,  4 Jul 2018 20:17:15 +0200
-Message-Id: <1530728238-5608-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed,  4 Jul 2018 20:17:11 +0200
+Message-Id: <1530728238-5608-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530728238-5608-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530728238-5608-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 5/8] target/mips: Add CP0 BadInstrX register
+Subject: [Qemu-devel] [PATCH v2 1/8] target/mips: Update maintainer's email
+ addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +28,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <stefan.markovic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+Update email addresses of Aleksandar Markovic and Paul Burton in the
+MAINTAINERS file. Also, add corresponding items in the .mailmap file.
 
-Signed-off-by: Stefan Markovic <stefan.markovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/machine.c   |  5 +++--
- target/mips/translate.c | 20 +++++++++++++++++++-
- 3 files changed, 23 insertions(+), 3 deletions(-)
+ .mailmap    | 7 +++++--
+ MAINTAINERS | 9 +++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index edbb66d..8ccbc21 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -323,6 +323,7 @@ struct CPUMIPSState {
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-+    uint32_t CP0_BadInstrX;
-     int32_t CP0_Count;
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 20100d5..5ba78ac 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
+diff --git a/.mailmap b/.mailmap
+index 778a4d4..2c2b9b1 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -12,8 +12,11 @@ Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-7
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
+-Paul Burton <paul.burton@mips.com> <paul.burton@imgtec.com>
+-Paul Burton <paul.burton@mips.com> <paul@archlinuxmips.org>
++Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.com>
++Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec.com>
++Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
++Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
++Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
+ malc <av1474@comtv.ru> malc <malc@c046a42c-6fe2-441c-8c8c-71466251a162>
  
- const VMStateDescription vmstate_mips_cpu = {
-     .name = "cpu",
--    .version_id = 10,
--    .minimum_version_id = 10,
-+    .version_id = 11,
-+    .minimum_version_id = 11,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         /* Active TC */
-@@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
-+        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Count, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 91ac32e..0582e68 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -5315,7 +5315,12 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn = "BadInstrP";
-             break;
--        default:
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            rn = "BadInstrX";
-+            break;
-+       default:
-             goto cp0_unimplemented;
-         }
-         break;
-@@ -6006,6 +6011,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             /* ignored */
-             rn = "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn = "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -6711,6 +6720,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn = "BadInstrP";
-             break;
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            rn = "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7385,6 +7399,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             /* ignored */
-             rn = "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn = "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6630d69..f3863b1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -187,7 +187,7 @@ F: disas/microblaze.c
+ 
+ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/
+ F: hw/mips/
+@@ -718,7 +718,7 @@ S: Maintained
+ F: hw/mips/mips_malta.c
+ 
+ Mipssim
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -729,14 +729,15 @@ S: Maintained
+ F: hw/mips/mips_r4k.c
+ 
+ Fulong 2E
+-M: Aleksandar Markovic <aleksandar.markovic@mips.com>
++M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
++
+ F: include/hw/isa/vt82c686.h
+ 
+ Boston
+-M: Paul Burton <paul.burton@mips.com>
++M: Paul Burton <pburton@wavecomp.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
 -- 
 2.7.4
