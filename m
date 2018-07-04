@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1faebH-0006b5-Cq
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:01:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1faen4-0008M4-Qw
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1faebB-0000CL-F2
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:01:27 -0400
-Date: Wed, 4 Jul 2018 12:01:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180704120108.5e975fd2.cohuck@redhat.com>
-In-Reply-To: <1530312483-23864-4-git-send-email-akrowiak@linux.vnet.ibm.com>
-References: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1530312483-23864-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1faen3-0008Jh-F2
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:13:38 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:53561)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1faen2-0008IT-Qu
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:13:37 -0400
+Date: Wed, 4 Jul 2018 20:04:32 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180704100432.GA14307@umbus.fritz.box>
+References: <cover.1530697258.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 3/5] s390x/ap: base Adjunct Processor
- (AP) object model
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
+Content-Disposition: inline
+In-Reply-To: <cover.1530697258.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Misc sm501 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, Tony Krowiak <akrowiak@linux.ibm.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>, Philippe Mathieu-Daude <f4bug@amsat.org>
 
-On Fri, 29 Jun 2018 18:48:01 -0400
-Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
 
-> From: Tony Krowiak <akrowiak@linux.ibm.com>
+--liOOAslEiF7prFVr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You may want to switch your sending address to this one as well.
+On Wed, Jul 04, 2018 at 11:40:58AM +0200, BALATON Zoltan wrote:
+> Version 3 with changes to 1/7 suggested by Philippe Mathieu-Daud=E9.
+> Hopefully this haven't missed 3.0 yet.
 
-> 
-> Introduces the base object model for virtualizing AP devices.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  MAINTAINERS                  |   12 +++++++
->  hw/s390x/Makefile.objs       |    2 +
->  hw/s390x/ap-bridge.c         |   76 ++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/ap-device.c         |   39 +++++++++++++++++++++
->  hw/s390x/s390-virtio-ccw.c   |    4 ++
->  include/hw/s390x/ap-bridge.h |   37 ++++++++++++++++++++
->  include/hw/s390x/ap-device.h |   38 +++++++++++++++++++++
->  7 files changed, 208 insertions(+), 0 deletions(-)
->  create mode 100644 hw/s390x/ap-bridge.c
->  create mode 100644 hw/s390x/ap-device.c
->  create mode 100644 include/hw/s390x/ap-bridge.h
->  create mode 100644 include/hw/s390x/ap-device.h
-> 
+It has, sorry.  Applied to ppc-for-3.1.
 
-> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
-> new file mode 100644
-> index 0000000..4f10425
-> --- /dev/null
-> +++ b/hw/s390x/ap-bridge.c
-> @@ -0,0 +1,76 @@
-> +/*
-> + * ap bridge
-> + *
-> + * Copyright 2018 IBM Corp.
-> + * Author(s): Halil Pasic <pasic@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/bitops.h"
-> +#include "hw/s390x/ap-bridge.h"
-> +#include "cpu.h"
-> +
-> +static char *vfio_ap_bus_get_dev_path(DeviceState *dev)
-> +{
-> +    /* at most one */
-> +    return g_strdup_printf("/1");
+>=20
+> BALATON Zoltan (3):
+>   sm501: Implement i2c part for reading monitor EDID
+>   sm501: Fix support for non-zero frame buffer start address
+>   sm501: Set updated region dirty after 2D operation
+>=20
+> Sebastian Bauer (4):
+>   sm501: Perform a full update after palette change
+>   sm501: Use values from the pitch register for 2D operations
+>   sm501: Implement negated destination raster operation mode
+>   sm501: Log unimplemented raster operation modes
+>=20
+>  default-configs/ppc-softmmu.mak    |   1 +
+>  default-configs/ppcemb-softmmu.mak |   1 +
+>  default-configs/sh4-softmmu.mak    |   2 +
+>  default-configs/sh4eb-softmmu.mak  |   2 +
+>  hw/display/sm501.c                 | 230 +++++++++++++++++++++++++++++++=
+++++--
+>  5 files changed, 224 insertions(+), 12 deletions(-)
+>=20
 
-Looks a bit odd... add 'ap'? Start counting with 0?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +}
-> +
+--liOOAslEiF7prFVr
+Content-Type: application/pgp-signature; name="signature.asc"
 
-(...)
+-----BEGIN PGP SIGNATURE-----
 
-> diff --git a/include/hw/s390x/ap-bridge.h b/include/hw/s390x/ap-bridge.h
-> new file mode 100644
-> index 0000000..7841ec2
-> --- /dev/null
-> +++ b/include/hw/s390x/ap-bridge.h
-> @@ -0,0 +1,37 @@
-> +/*
-> + * ap bridge
-> + *
-> + * Copyright 2018 IBM Corp.
-> + * Author(s): Halil Pasic <pasic@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef HW_S390X_AP_BRIDGE_H
-> +#define HW_S390X_AP_BRIDGE_H
-> +#include "qom/object.h"
-> +#include "hw/qdev-core.h"
-> +#include "hw/sysbus.h"
-> +
-> +typedef struct APBridge {
-> +    SysBusDevice sysbus_dev;
-> +    bool css_dev_path;
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls8m6gACgkQbDjKyiDZ
+s5IiXBAAkl56Po6CST6P7lsQbjBrt+xm+AwT7gaKzicvYBmBfXt5qojD2pgOtVuH
+S+w8OWSENDxncNgyJhLemGkKvVDgPqlIxeZCaymdiuJcigmEuhlRmrt23MrSLO0/
+oXHSfov9ni1Eef1SqTeUyaI1+v3znQCvsO8BFmGz4gkZiJjc6Y3S806PU4ZPeekL
+BPhbOnSTx0x9Tg7hFwz4dKB4QTdtyF9jkfEAMiWP0BP7JkvFhgWeR76TIXePExU9
+aWT73WDf3PiOtsJBEBJ5ZdRCKhmic3mxlx9VKb6Nxq+nTUctbuZEFp0Xs/HAnAkf
+ehg4Cskh7G6ktiGtlzOJ0OFU58W/2n3ybGo32u+9Iv00jM5RetOrCzM+eabYp0NP
+4JsvrmzMWzTZ7EWO+ODi1IcvrozTfs92N+VtwxIKTo6kAT0FNXatymWFnfasJ1Fo
+qdzbCOgsvwd4sr5LEYAWVWtIQa1vr+HbijnFBTUtZ3+dluYvgAD84cbKHITXyPWj
+ZWfIzNoggB24ktNsCn60D4x0sAiXNod7Vfo6OGTlh3X/WTVC4MQsXGRJXI2HVs5S
+jiiw7IZTFYgewoqsUGqi9HBRHQ+lqborr91KYDjgZ0V9JK3lyUChZav9xWwjjz1M
+PXXQuAKNPd/J5f/X2uFPKWC6Z9tws74ZXOGbKlbtdFwlRCjaKBU=
+=wbyR
+-----END PGP SIGNATURE-----
 
-Probable copy-and-paste error?
-
-> +} APBridge;
-> +
-> +#define TYPE_AP_BRIDGE "ap-bridge"
-> +#define AP_BRIDGE(obj) \
-> +    OBJECT_CHECK(APBridge, (obj), TYPE_AP_BRIDGE)
-> +
-> +typedef struct VFIOAPBus {
-> +    BusState parent_obj;
-> +} VFIOAPBus;
-> +
-> +#define TYPE_VFIO_AP_BUS "vfio-ap-bus"
-> +#define VFIO_AP_BUS(obj) \
-> +     OBJECT_CHECK(VFIOAPBus, (obj), TYPE_VFIO_AP_BUS)
-> +
-> +void s390_init_ap(void);
-> +
-> +#endif
-
-Else, looks sane to me.
+--liOOAslEiF7prFVr--
