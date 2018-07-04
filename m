@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fakWJ-0003tW-3N
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 12:20:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fakXT-0004XG-Vl
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 12:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fakWH-00005o-AK
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 12:20:43 -0400
-Date: Wed, 4 Jul 2018 18:20:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180704162031.GH4334@localhost.localdomain>
-References: <20180703180751.243496-1-vsementsov@virtuozzo.com>
-	<20180703180751.243496-2-vsementsov@virtuozzo.com>
-	<0e6e9f14-ad45-51c5-0d14-3e2e3dcaf5cb@virtuozzo.com>
-	<20180704150833.GG4334@localhost.localdomain>
-	<f50dc336-cb33-de03-d8ab-a0c01cadd850@virtuozzo.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fakXP-0000bX-Te
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 12:21:55 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34491)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fakXP-0000b5-Cw
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 12:21:51 -0400
+Received: by mail-wm0-x243.google.com with SMTP id l15-v6so9700wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 09:21:51 -0700 (PDT)
+References: <20180704143014.8670-1-f4bug@amsat.org>
+	<87va9v80ut.fsf@linaro.org> <20180704154831.GM32267@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180704154831.GM32267@redhat.com>
+Date: Wed, 04 Jul 2018 17:21:49 +0100
+Message-ID: <87tvpf7yzm.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f50dc336-cb33-de03-d8ab-a0c01cadd850@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: add BDRV_REQ_SERIALISING flag
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Do not display host compilers
+ as cross-compilers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Dr . David
+	Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-Am 04.07.2018 um 18:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 04.07.2018 18:08, Kevin Wolf wrote:
-> > Am 04.07.2018 um 16:44 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > > 03.07.2018 21:07, Vladimir Sementsov-Ogievskiy wrote:
-> > > > Serialized writes should be used in copy-on-write of backup(sync=none)
-> > > > for image fleecing scheme.
-> > > > 
-> > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > > > ---
-> > > >    include/block/block.h | 5 ++++-
-> > > >    block/io.c            | 4 ++++
-> > > >    2 files changed, 8 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/include/block/block.h b/include/block/block.h
-> > > > index e5c7759a0c..107113aad5 100644
-> > > > --- a/include/block/block.h
-> > > > +++ b/include/block/block.h
-> > > > @@ -58,8 +58,11 @@ typedef enum {
-> > > >         * content. */
-> > > >        BDRV_REQ_WRITE_UNCHANGED    = 0x40,
-> > > > +    /* Force request serializing. Only for writes. */
-> > > > +    BDRV_REQ_SERIALISING        = 0x80,
-> > > > +
-> > > >        /* Mask of valid flags */
-> > > > -    BDRV_REQ_MASK               = 0x7f,
-> > > > +    BDRV_REQ_MASK               = 0xff,
-> > > >    } BdrvRequestFlags;
-> > > >    typedef struct BlockSizes {
-> > > > diff --git a/block/io.c b/block/io.c
-> > > > index 1a2272fad3..d5ba078514 100644
-> > > > --- a/block/io.c
-> > > > +++ b/block/io.c
-> > > > @@ -1572,6 +1572,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-> > > >        max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
-> > > >                                       align);
-> > > > +    if (flags & BDRV_REQ_SERIALISING) {
-> > > > +        mark_request_serialising(req, bdrv_get_cluster_size(bs));
-> > > > +    }
-> > > > +
-> > > >        waited = wait_serialising_requests(req);
-> > > >        assert(!waited || !req->serialising);
-> > > Kevin, about this assertion, introduced in 28de2dcd88de "block: Assert
-> > > serialisation assumptions in pwritev"? Will not it fail with fleecing
-> > > scheme? I'm afraid it will, when we will wait for client read with our
-> > > request, marked serializing a moment ago...
-> > Hm, looks like it yes.
-> > 
-> > > Can we just switch it to assert(!waited || !req->partial);, setting
-> > > req->partial in bdrv_co_pwritev for parts of unaligned requests? And allow
-> > > new flag only for aligned requests?
-> > > 
-> > > Other ideas?
-> > The commit message of 28de2dcd88de tells you what we need to do (and
-> > that just changing the assertion is wrong):
-> > 
-> >      If a request calls wait_serialising_requests() and actually has to wait
-> >      in this function (i.e. a coroutine yield), other requests can run and
-> >      previously read data (like the head or tail buffer) could become
-> >      outdated. In this case, we would have to restart from the beginning to
-> >      read in the updated data.
-> > 
-> >      However, we're lucky and don't actually need to do that: A request can
-> >      only wait in the first call of wait_serialising_requests() because we
-> >      mark it as serialising before that call, so any later requests would
-> >      wait. So as we don't wait in practice, we don't have to reload the data.
-> > 
-> >      This is an important assumption that may not be broken or data
-> >      corruption will happen. Document it with some assertions.
-> > 
-> > So we may need to return -EAGAIN here, check that in the caller and
-> > repeat the write request from the very start.
-> 
-> But in case of aligned request, there no previously read data, and we can
-> safely continue. And actually it's our case (backup writes are aligned).
 
-Hm, right. I don't particularly like req->partial because it's easy to
-forget to set it to false when you do something that would need to be
-repeated, but I don't have a better idea.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Kevin
+> On Wed, Jul 04, 2018 at 04:41:30PM +0100, Alex Benn=C3=A9e wrote:
+>>
+>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>
+>> > This silent (since d75402b5ee2):
+>> >
+>> >   ./configure
+>> >   [...]
+>> >   NOTE: cross-compilers enabled:  'cc'
+>> >
+>> > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> > ---
+>> >  configure | 2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> > diff --git a/configure b/configure
+>> > index b99ebdde24..fbb53ab6bb 100755
+>> > --- a/configure
+>> > +++ b/configure
+>> > @@ -7328,7 +7328,7 @@ echo "QEMU_CFLAGS+=3D$cflags" >> $config_target_=
+mak
+>> >
+>> >  done # for target in $targets
+>> >
+>> > -if test -n "$enabled_cross_compilers"; then
+>> > +if test -n "$target_compiler" -a -n "$enabled_cross_compilers"; then
+>> >      echo
+>> >      echo "NOTE: cross-compilers enabled: $enabled_cross_compilers"
+>> >  fi
+>>
+>> I had also added:
+>>
+>> -    echo "NOTE: cross-compilers enabled: $enabled_cross_compilers"
+>> +    echo "NOTE: compilers enabled for TCG tests: $enabled_cross_compile=
+rs"[
+>>
+>> to make things clearer.
+>
+> I think we should also 's/NOTE: //', because everything printed by
+> configure at the end is a note. Also get rid of the extra blank
+> line before it.
+
+*shrugs* I made the original decision because:
+
+WARNING: Use of SDL 1.2 is deprecated and will be removed in
+WARNING: future releases. Please switch to using SDL 2.0
+compilers enabled for TCG tests:  'aarch64-linux-gnu-gcc' 'arm-linux-gnueab=
+ihf-gcc' 'cc' 'aarch64-linux-gnu-gcc' 'arm-linux-gnueabihf-gcc' 'cc'
+
+offended my eye, but I'm happy either way really.
+
+>
+>>
+>> Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>
+> Regards,
+> Daniel
+
+
+--
+Alex Benn=C3=A9e
