@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fahR6-00084x-Qi
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:03:13 -0400
+	(envelope-from <berrange@redhat.com>) id 1fahWa-000224-FD
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:08:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fahR5-0000S2-Q0
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:03:08 -0400
-Date: Wed, 4 Jul 2018 15:02:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180704150256.408d4a07.cohuck@redhat.com>
-In-Reply-To: <20180703113229.GD3812@localhost.localdomain>
-References: <20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622143146.GQ23296@redhat.com>
-	<20180625095322.GC18580@redhat.com>
-	<20180625114106.GJ5024@localhost.localdomain>
-	<20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-	<20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1fahWX-0002zP-A1
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:08:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57669 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fahWX-0002z5-4Y
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:08:45 -0400
+Date: Wed, 4 Jul 2018 14:08:41 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180704130841.GF32267@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <87tvpfch8g.fsf@gnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87tvpfch8g.fsf@gnu.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?32-bit_=E2=80=9Cqemu-system-i386_-enable-?=
+ =?utf-8?q?kvm=E2=80=9D_segfaults_on_x86=5F64?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
+To: Ludovic =?utf-8?Q?Court=C3=A8s?= <ludo@gnu.org>
+Cc: qemu-devel@nongnu.org
 
-On Tue, 3 Jul 2018 13:32:29 +0200
-Kevin Wolf <kwolf@redhat.com> wrote:
+On Wed, Jul 04, 2018 at 02:34:07PM +0200, Ludovic Court=C3=A8s wrote:
+> Hello,
+>=20
+> (I=E2=80=99m reporting the issue here because for some reason the launc=
+hpad.net
+> login page redirects me to an =E2=80=9Coops=E2=80=9D page and fails to =
+log me in.)
+>=20
+> On a Linux 4.17 x86_64 host, =E2=80=9Cqemu-system-i386 -enable-kvm=E2=80=
+=9D, where
+> qemu-system-i386 is a 32-bit binary, crashes (it works fine without
+> =E2=80=98-enable-kvm=E2=80=99):
+>=20
+> --8<---------------cut here---------------start------------->8---
+> $ uname -rm
+> 4.17.3-gnu x86_64
+> $ file /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12.0/=
+bin/qemu-system-i386=20
+> /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12.0/bin/qem=
+u-system-i386: ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV=
+), dynamically linked, interpreter /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3=
+x5h9s-glibc-2.27/lib/ld-linux.so.2, for GNU/Linux 2.6.32, stripped
 
-> > > > Has serial/gemoetry been fixed meanwhile and will it make it into the
-> > > > next release?  
-> > > 
-> > > I cannot find an archive that has it, but it is on the libvirt mailing
-> > > list as "[libvirt] [PATCH v3] qemu: format serial and geometry on frontend disk device".
-> > > Review seems done, but it has missed libvirt 4.5 which was released today.  
-> > 
-> > Just posted latest version here:
-> > 
-> >   https://www.redhat.com/archives/libvir-list/2018-July/msg00130.html
-> > 
-> > It will be in the next release on ~ Aug 1st  
-> 
-> It would have been a lot nicer to have it the July release because this
-> means that we'll have the released libvirt broken during almost the
-> whole rc phase of QEMU 3.0, but the release is planned for Aug 8th the
-> earliest, so I guess we're still okay. People using QEMU from git will
-> just need libvirt from git as well.
+It appears that not only are you using qemu-system-i386 on x86_64
+host, but this has actually also been built as a 32-bit ELF binary,
+so will be using the 32-bit compat syscalls. This is quite possibly
+relevant to any crash, so it would be useful to know if qemu-system-i386,
+when built as a 64-bit ELF binary works or fails.
 
-Speaking as an innocent* bystander:
+It appears you are using 2.12.0 release, so it is also helpful if
+you would try using current git master to see if it still reproduces.
 
-I would usually presume that I can use any recent libvirt to test
-current QEMU, even bleeding edge. In this case, not even the latest
-released libvirt version will be fine, I would also need to build
-libvirt from git (which is probably not something a non-libvirt
-developer will usually do). If everything goes according to plan, I can
-only test QEMU with a released libvirt version at the very tail end of
-hardfreeze, where only release blockers are appropriate.
 
-I think it would be really beneficial to general QEMU test coverage to
-push deleting this option back a release or two. We should make testing
-QEMU in conjunction with libvirt as uncomplicated as possible.
+> $ /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12.0/bin/q=
+emu-system-i386 -enable-kvm /dev/null
+> WARNING: Image format was not specified for '/dev/null' and probing gue=
+ssed raw.
+>          Automatically detecting the format is dangerous for raw images=
+, write operations on block 0 will be restricted.
+>          Specify the 'raw' format explicitly to remove the restrictions=
+.
+> VNC server running on 127.0.0.1:5900
+> Adres-eraro(nekropsio el=C5=9Dutita)
+> --8<---------------cut here---------------start------------->8---
+>=20
+> I=E2=80=99d need debugging symbols to provide a useful backtrace, but p=
+erhaps
+> the strace gives useful hints:
 
-*YMMV
+strace's are fairly unhelpful I'm afraid, so collecting a stack trace
+would be best next step.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
