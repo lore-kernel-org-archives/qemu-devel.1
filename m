@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fag1a-00036J-5i
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:32:43 -0400
+	(envelope-from <david@redhat.com>) id 1fagG5-0006Yq-P5
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fag1Y-0002ll-VR
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:32:42 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  4 Jul 2018 13:32:27 +0200
-Message-Id: <20180704113227.23454-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: Don't silently truncate node names
+	(envelope-from <david@redhat.com>) id 1fagG4-00024X-R8
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:47:41 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-8-git-send-email-eric.auger@redhat.com>
+	<cc538632-e853-adbc-ec34-a2f524415406@redhat.com>
+	<4dfad441-b94f-916f-025e-fc69b6375465@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <30bba021-8537-8ef3-13ac-197cff7445cb@redhat.com>
+Date: Wed, 4 Jul 2018 13:47:31 +0200
+MIME-Version: 1.0
+In-Reply-To: <4dfad441-b94f-916f-025e-fc69b6375465@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 07/15] hw/arm/virt: Add memory hotplug
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,136 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-If the user passes a too long node name string, we silently truncate it
-to fit into BlockDriverState.node_name, i.e. to 31 characters. Apart
-from surprising the user when the node has a different name than
-requested, this also bypasses the check for duplicate names, so that the
-same name can be assigned to multiple nodes.
+On 03.07.2018 21:34, Auger Eric wrote:
+> Hi David,
+> 
+> On 07/03/2018 08:44 PM, David Hildenbrand wrote:
+>> On 03.07.2018 09:19, Eric Auger wrote:
+>>> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>>
+>>> This patch adds the the memory hot-plug/hot-unplug infrastructure
+>>> in machvirt.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>>
+>>> ---
+>>>
+>>> v1 -> v2:
+>>> - s/virt_dimm_plug|unplug/virt_memory_plug|unplug
+>>> - s/pc_dimm_memory_plug/pc_dimm_plug
+>>> - reworded title and commit message
+>>> - added pre_plug cb
+>>> - don't handle get_memory_region failure anymore
+>>> ---
+>>>  default-configs/arm-softmmu.mak |  2 ++
+>>>  hw/arm/virt.c                   | 68 ++++++++++++++++++++++++++++++++++++++++-
+>>>  2 files changed, 69 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>>> index 834d45c..28fe8f3 100644
+>>> --- a/default-configs/arm-softmmu.mak
+>>> +++ b/default-configs/arm-softmmu.mak
+>>> @@ -152,3 +152,5 @@ CONFIG_PCI_DESIGNWARE=y
+>>>  CONFIG_STRONGARM=y
+>>>  CONFIG_HIGHBANK=y
+>>>  CONFIG_MUSICPAL=y
+>>> +CONFIG_MEM_HOTPLUG=y
+>>> +
+>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>> index 6fefb78..7190962 100644
+>>> --- a/hw/arm/virt.c
+>>> +++ b/hw/arm/virt.c
+>>> @@ -60,6 +60,8 @@
+>>>  #include "standard-headers/linux/input.h"
+>>>  #include "hw/arm/smmuv3.h"
+>>>  #include "hw/acpi/acpi.h"
+>>> +#include "hw/mem/pc-dimm.h"
+>>> +#include "hw/mem/nvdimm.h"
+>>>  
+>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>>> @@ -1785,6 +1787,53 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>>>      return ms->possible_cpus;
+>>>  }
+>>>  
+>>> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>> +                                 Error **errp)
+>>> +{
+>>> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>>> +
+>>> +    if (is_nvdimm) {
+>>> +        error_setg(errp, "nvdimm is not yet supported");
+>>> +        return;
+>>> +    }
+>>
+>> You mention that actual hotplug is not supported, only coldplug.
+>> Wouldn't this be the right place to check for that? (only skimmed over
+>> your patches, how do you handle that?)
+> At the moment I don't check it. I did not look yet at ways to
+> discriminate both cases.
 
-Fix this by just making too long node names an error.
+Looking at dev->hotplugged should be enough I guess.
 
-Reported-by: Peter Krempa <pkrempa@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block.c                       |  6 ++++++
- tests/qemu-iotests/051        | 15 +++++++++++++++
- tests/qemu-iotests/051.out    | 23 +++++++++++++++++++++++
- tests/qemu-iotests/051.pc.out | 23 +++++++++++++++++++++++
- 4 files changed, 67 insertions(+)
+> 
+> Thanks
+> 
+> Eric
+>>
+>>
 
-diff --git a/block.c b/block.c
-index 961ec97d26..ac8b3a3511 100644
---- a/block.c
-+++ b/block.c
-@@ -1156,6 +1156,12 @@ static void bdrv_assign_node_name(BlockDriverState *bs,
-         goto out;
-     }
- 
-+    /* Make sure that the node name isn't truncated */
-+    if (strlen(node_name) >= sizeof(bs->node_name)) {
-+        error_setg(errp, "Node name too long");
-+        goto out;
-+    }
-+
-     /* copy node name into the bs and insert it into the graph list */
-     pstrcpy(bs->node_name, sizeof(bs->node_name), node_name);
-     QTAILQ_INSERT_TAIL(&graph_bdrv_states, bs, node_list);
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index f617e25e24..ee9c820d0f 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -100,6 +100,21 @@ run_qemu -drive file="$TEST_IMG",driver=raw,format=qcow2
- run_qemu -drive file="$TEST_IMG",driver=qcow2,format=qcow2
- 
- echo
-+echo === Node names ===
-+echo
-+
-+# Maximum length: 31 characters
-+run_qemu -drive file="$TEST_IMG",node-name=x123456789012345678901234567890
-+run_qemu -drive file="$TEST_IMG",node-name=x1234567890123456789012345678901
-+
-+# First character must be alphabetic
-+# Following characters alphanumeric or -._
-+run_qemu -drive file="$TEST_IMG",node-name=All-Types.of_all0wed_chars
-+run_qemu -drive file="$TEST_IMG",node-name=123foo
-+run_qemu -drive file="$TEST_IMG",node-name=_foo
-+run_qemu -drive file="$TEST_IMG",node-name=foo#12
-+
-+echo
- echo === Device without drive ===
- echo
- 
-diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
-index dd9846d1ce..b7273505c7 100644
---- a/tests/qemu-iotests/051.out
-+++ b/tests/qemu-iotests/051.out
-@@ -47,6 +47,29 @@ Testing: -drive file=TEST_DIR/t.qcow2,driver=qcow2,format=qcow2
- QEMU_PROG: -drive file=TEST_DIR/t.qcow2,driver=qcow2,format=qcow2: Cannot specify both 'driver' and 'format'
- 
- 
-+=== Node names ===
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=x123456789012345678901234567890
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) quit
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=x1234567890123456789012345678901
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=x1234567890123456789012345678901: Node name too long
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=All-Types.of_all0wed_chars
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) quit
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=123foo
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=123foo: Invalid node name
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=_foo
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=_foo: Invalid node name
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=foo#12
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=foo#12: Invalid node name
-+
-+
- === Device without drive ===
- 
- Testing: -device VIRTIO_SCSI -device scsi-hd
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index b01f9a90d7..e9257fe318 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -47,6 +47,29 @@ Testing: -drive file=TEST_DIR/t.qcow2,driver=qcow2,format=qcow2
- QEMU_PROG: -drive file=TEST_DIR/t.qcow2,driver=qcow2,format=qcow2: Cannot specify both 'driver' and 'format'
- 
- 
-+=== Node names ===
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=x123456789012345678901234567890
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) quit
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=x1234567890123456789012345678901
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=x1234567890123456789012345678901: Node name too long
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=All-Types.of_all0wed_chars
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) quit
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=123foo
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=123foo: Invalid node name
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=_foo
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=_foo: Invalid node name
-+
-+Testing: -drive file=TEST_DIR/t.qcow2,node-name=foo#12
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,node-name=foo#12: Invalid node name
-+
-+
- === Device without drive ===
- 
- Testing: -device VIRTIO_SCSI -device scsi-hd
+
 -- 
-2.13.6
+
+Thanks,
+
+David / dhildenb
