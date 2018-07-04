@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fanvH-0004op-GP
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:58:44 -0400
+	(envelope-from <jusual@mail.ru>) id 1fanvO-0004tC-Hj
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fanvG-0001in-Es
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:58:43 -0400
-Received: from smtp37.i.mail.ru ([94.100.177.97]:45132)
+	(envelope-from <jusual@mail.ru>) id 1fanvL-0001ls-BB
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:58:50 -0400
+Received: from smtp37.i.mail.ru ([94.100.177.97]:51456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fanvG-0001iB-16
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:58:42 -0400
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fanvL-0001l6-2F
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:58:47 -0400
 From: Julia Suvorova <jusual@mail.ru>
-Date: Wed,  4 Jul 2018 22:58:11 +0300
-Message-Id: <20180704195812.28798-2-jusual@mail.ru>
+Date: Wed,  4 Jul 2018 22:58:12 +0300
+Message-Id: <20180704195812.28798-3-jusual@mail.ru>
 In-Reply-To: <20180704195812.28798-1-jusual@mail.ru>
 References: <20180704195812.28798-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH 1/2] nvic: Handle ARMv6-M SCS reserved registers
+Subject: [Qemu-devel] [RFC 2/2] tests: Add ARMv6-M reserved register test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,175 +26,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-Handle SCS reserved registers listed in ARMv6-M ARM D3.6.1.
-All reserved registers are RAZ/WI.
+Check that reserved SCS registers return 0 at read,
+and writes are ignored.
+
+Based-on: <20180627143815.1829-1-joel@jms.id.au>
+Based-on: <20180630091343.14391-1-stefanha@redhat.com>
 
 Signed-off-by: Julia Suvorova <jusual@mail.ru>
 ---
- hw/intc/armv7m_nvic.c | 69 +++++++++++++++++++++++++++++++++++--------
- 1 file changed, 57 insertions(+), 12 deletions(-)
+Test will work if Joel's patches will use ARMv6-M.
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index aba4510c70..fb61a1d08d 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -865,6 +865,9 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         }
-         return val;
-     case 0xd10: /* System Control.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            return 0;
-+        }
-         return cpu->env.v7m.scr[attrs.secure];
-     case 0xd14: /* Configuration Control.  */
-         /* The BFHFNMIGN bit is the only non-banked bit; we
-@@ -986,12 +989,21 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         }
-         return val;
-     case 0xd2c: /* Hard Fault Status.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            return 0;
-+        }
-         return cpu->env.v7m.hfsr;
-     case 0xd30: /* Debug Fault Status.  */
-         return cpu->env.v7m.dfsr;
-     case 0xd34: /* MMFAR MemManage Fault Address */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            return 0;
-+        }
-         return cpu->env.v7m.mmfar[attrs.secure];
-     case 0xd38: /* Bus Fault Address.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            return 0;
-+        }
-         return cpu->env.v7m.bfar;
-     case 0xd3c: /* Aux Fault Status.  */
-         /* TODO: Implement fault status registers.  */
-@@ -1292,8 +1304,10 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-          * QEMU's implementation ignores SEVONPEND and SLEEPONEXIT, which
-          * is architecturally permitted.
-          */
--        value &= ~(R_V7M_SCR_SLEEPDEEP_MASK | R_V7M_SCR_SLEEPDEEPS_MASK);
--        cpu->env.v7m.scr[attrs.secure] = value;
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            value &= ~(R_V7M_SCR_SLEEPDEEP_MASK | R_V7M_SCR_SLEEPDEEPS_MASK);
-+            cpu->env.v7m.scr[attrs.secure] = value;
-+        }
-         break;
-     case 0xd14: /* Configuration Control.  */
-         /* Enforce RAZ/WI on reserved and must-RAZ/WI bits */
-@@ -1388,16 +1402,22 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         nvic_irq_update(s);
-         break;
-     case 0xd2c: /* Hard Fault Status.  */
--        cpu->env.v7m.hfsr &= ~value; /* W1C */
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            cpu->env.v7m.hfsr &= ~value; /* W1C */
-+        }
-         break;
-     case 0xd30: /* Debug Fault Status.  */
-         cpu->env.v7m.dfsr &= ~value; /* W1C */
-         break;
-     case 0xd34: /* Mem Manage Address.  */
--        cpu->env.v7m.mmfar[attrs.secure] = value;
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            cpu->env.v7m.mmfar[attrs.secure] = value;
-+        }
-         return;
-     case 0xd38: /* Bus Fault Address.  */
--        cpu->env.v7m.bfar = value;
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            cpu->env.v7m.bfar = value;
-+        }
-         return;
-     case 0xd3c: /* Aux Fault Status.  */
-         qemu_log_mask(LOG_UNIMP,
-@@ -1624,13 +1644,13 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         cpu->env.v7m.sfsr = value;
-         break;
-     case 0xf00: /* Software Triggered Interrupt Register */
--    {
--        int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
--        if (excnum < s->num_irq) {
--            armv7m_nvic_set_pending(s, excnum, false);
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            int excnum  = (value & 0x1ff) + NVIC_FIRST_IRQ;
-+            if (excnum < s->num_irq) {
-+                armv7m_nvic_set_pending(s, excnum, false);
-+            }
-         }
-         break;
--    }
-     case 0xf50: /* ICIALLU */
-     case 0xf58: /* ICIMVAU */
-     case 0xf5c: /* DCIMVAC */
-@@ -1775,7 +1795,13 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-             }
-         }
-         break;
--    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
-+    case 0xd18: /* System Handler Priority (SHPR1) */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+            val = 0;
-+            break;
-+        }
-+        /* fall through */
-+    case 0xd1c ... 0xd23: /* System Handler Priority (SHPR2, SHPR3) */
-         val = 0;
-         for (i = 0; i < size; i++) {
-             unsigned hdlidx = (offset - 0xd14) + i;
-@@ -1791,10 +1817,20 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         /* The BFSR bits [15:8] are shared between security states
-          * and we store them in the NS copy
-          */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+            val = 0;
-+            break;
-+        };
-         val = s->cpu->env.v7m.cfsr[attrs.secure];
-         val |= s->cpu->env.v7m.cfsr[M_REG_NS] & R_V7M_CFSR_BFSR_MASK;
-         val = extract32(val, (offset - 0xd28) * 8, size * 8);
-         break;
-+    case 0xd40 ... 0xd7c: /* CPUID registers */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+            val = 0;
-+            break;
-+        }
-+        goto proceed_to_readl;
-     case 0xfe0 ... 0xfff: /* ID.  */
-         if (offset & 3) {
-             val = 0;
-@@ -1803,6 +1839,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         }
-         break;
-     default:
-+    proceed_to_readl:
-         if (size == 4) {
-             val = nvic_readl(s, offset, attrs);
-         } else {
-@@ -1882,7 +1919,12 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-         }
-         nvic_irq_update(s);
-         return MEMTX_OK;
--    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
-+    case 0xd18: /* System Handler Priority (SHPR1) */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+            return MEMTX_OK;
-+        }
-+        /* fall through */
-+    case 0xd1c ... 0xd23: /* System Handler Priority (SHPR2, SHPR3) */
-         for (i = 0; i < size; i++) {
-             unsigned hdlidx = (offset - 0xd14) + i;
-             int newprio = extract32(value, i * 8, 8);
-@@ -1899,6 +1941,9 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-         /* All bits are W1C, so construct 32 bit value with 0s in
-          * the parts not written by the access size
-          */
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+            return MEMTX_OK;
-+        }
-         value <<= ((offset - 0xd28) * 8);
+ tests/Makefile.include            |  2 ++
+ tests/tcg/arm/test-reserved-reg.c | 60 +++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
+ create mode 100644 tests/tcg/arm/test-reserved-reg.c
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index d323c42682..8ab0b0d15f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -387,6 +387,7 @@ gcov-files-arm-y += hw/timer/arm_mptimer.c
+ check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+ check-qtest-arm-y += tests/hexloader-test$(EXESUF)
++check-qtest-arm-y += tests/tcg/arm/test-reserved-reg$(EXESUF)
  
-         s->cpu->env.v7m.cfsr[attrs.secure] &= ~value;
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+ check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
+@@ -771,6 +772,7 @@ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+ tests/rtc-test$(EXESUF): tests/rtc-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
+ tests/hexloader-test$(EXESUF): tests/hexloader-test.o
++tests/test-reserved-reg$(EXESUF): tests/tcg/arm/test-reserved-reg.o
+ tests/endianness-test$(EXESUF): tests/endianness-test.o
+ tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
+diff --git a/tests/tcg/arm/test-reserved-reg.c b/tests/tcg/arm/test-reserved-reg.c
+new file mode 100644
+index 0000000000..97273ff24d
+--- /dev/null
++++ b/tests/tcg/arm/test-reserved-reg.c
+@@ -0,0 +1,60 @@
++/*
++ * Test ARMv6-M SCS reserved registers
++ *
++ * Copyright (c) 2018 Julia Suvorova <jusual@mail.ru>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2
++ * or later. See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++static void test_reserved_reg(void)
++{
++    QTestState *s;
++    int i;
++    static const uint64_t reserved_reg[] = { 0xe000ed10, /* SCR */
++                                             0xe000ed18, /* SHPR1 */
++                                             0xe000ed28, /* CFSR */
++                                             0xe000ed2c, /* HFSR */
++                                             0xe000ed34, /* MMFAR */
++                                             0xe000ed38, /* BFAR */
++                                             0xe000ed3c, /* AFSR */
++                                             0xe000ed40, /* CPUID */
++                                             0xe000ed88, /* CPACR */
++                                             0xe000ef00  /* STIR */ };
++    static const uint8_t mini_kernel[] = { 0x00, 0x00, 0x00, 0x00,
++                                           0x09, 0x00, 0x00, 0x00 };
++    ssize_t wlen, kernel_size = sizeof(mini_kernel);
++    int code_fd;
++    char codetmp[] = "/tmp/reserved-reg-test-XXXXXX";
++
++    code_fd = mkstemp(codetmp);
++    wlen = write(code_fd, mini_kernel, sizeof(mini_kernel));
++    g_assert(wlen == kernel_size);
++    close(code_fd);
++
++    s = qtest_startf("-kernel %s -M microbit -nographic", codetmp);
++
++    for (i = 0; i < ARRAY_SIZE(reserved_reg); i++) {
++        int res;
++        qtest_writel(s, reserved_reg[i], 1);
++        res = qtest_readl(s, reserved_reg[i]);
++        g_assert(!res);
++    }
++
++    qtest_quit(s);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("tcg/arm/test-reserved-reg", test_reserved_reg);
++    ret = g_test_run();
++
++    return ret;
++}
 -- 
 2.17.1
