@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD8-00072z-3u
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD8-00072x-4J
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:09:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD3-0003c1-0z
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD4-0003dL-Gn
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:09:01 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54539 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54680 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1famD2-0003O7-Qo
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:08:56 -0400
+	id 1famD4-0003cQ-58
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:08:58 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed,  4 Jul 2018 20:08:23 +0200
-Message-Id: <1530727708-5416-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed,  4 Jul 2018 20:08:27 +0200
+Message-Id: <1530727708-5416-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530727708-5416-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530727708-5416-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 3/8] target/mips: Update some CP0 registers bit
- definitions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 7/8] target/mips: Don't update BadVAddr
+ register in Debug Mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +31,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, aleksandar.markovic@wavecomp.com, petar.jovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Update CP0 registers Config0, Config1, and Config5 bit definitions.
+BadVAddr should not be updated if (env->hflags & MIPS_HFLAG_DM) is
+set.
 
-Some of these bits will be utilized by upcoming nanoMIPS changes.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philippe.mathieu.daude@gmail.co=
+m>
 ---
- target/mips/cpu.h | 41 ++++++++++++++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 13 deletions(-)
+ target/mips/helper.c    |  4 +++-
+ target/mips/op_helper.c | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index cfe1735..edbb66d 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -388,26 +388,27 @@ struct CPUMIPSState {
-     target_ulong CP0_CMGCRBase;
-     int32_t CP0_Config0;
- #define CP0C0_M    31
--#define CP0C0_K23  28
--#define CP0C0_KU   25
-+#define CP0C0_K23  28    /* 30..28 */
-+#define CP0C0_KU   25    /* 27..25 */
- #define CP0C0_MDU  20
- #define CP0C0_MM   18
- #define CP0C0_BM   16
-+#define CP0C0_Impl 16    /* 24..16 */
- #define CP0C0_BE   15
--#define CP0C0_AT   13
--#define CP0C0_AR   10
--#define CP0C0_MT   7
-+#define CP0C0_AT   13    /* 14..13 */
-+#define CP0C0_AR   10    /* 12..10 */
-+#define CP0C0_MT   7     /*  9..7  */
- #define CP0C0_VI   3
--#define CP0C0_K0   0
-+#define CP0C0_K0   0     /*  2..0  */
-     int32_t CP0_Config1;
- #define CP0C1_M    31
--#define CP0C1_MMU  25
--#define CP0C1_IS   22
--#define CP0C1_IL   19
--#define CP0C1_IA   16
--#define CP0C1_DS   13
--#define CP0C1_DL   10
--#define CP0C1_DA   7
-+#define CP0C1_MMU  25    /* 30..25 */
-+#define CP0C1_IS   22    /* 24..22 */
-+#define CP0C1_IL   19    /* 21..19 */
-+#define CP0C1_IA   16    /* 18..16 */
-+#define CP0C1_DS   13    /* 15..13 */
-+#define CP0C1_DL   10    /* 12..10 */
-+#define CP0C1_DA   7     /*  9..7  */
- #define CP0C1_C2   6
- #define CP0C1_MD   5
- #define CP0C1_PC   4
-@@ -468,7 +469,21 @@ struct CPUMIPSState {
- #define CP0C5_CV         29
- #define CP0C5_EVA        28
- #define CP0C5_MSAEn      27
-+#define CP0C5_PMJ2       25
-+#define CP0C5_PMJ1       24
-+#define CP0C5_PMJ0       23
-+#define CP0C5_WR2        22
-+#define CP0C5_NMS        21
-+#define CP0C5_ULS        20
-+#define CP0C5_XPA        19
-+#define CP0C5_CRCP       18
-+#define CP0C5_MI         17
-+#define CP0C5_GI1        16
-+#define CP0C5_GI0        15
-+#define CP0C5_CA2        14
- #define CP0C5_XNP        13
-+#define CP0C5_DEC        11
-+#define CP0C5_L2C        10
- #define CP0C5_UFE        9
- #define CP0C5_FRE        8
- #define CP0C5_VP         7
--- 
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 8cf91ce..e215af9 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, ta=
+rget_ulong address,
+         break;
+     }
+     /* Raise exception */
+-    env->CP0_BadVAddr =3D address;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D address;
++    }
+     env->CP0_Context =3D (env->CP0_Context & ~0x007fffff) |
+                        ((address >> 9) & 0x007ffff0);
+     env->CP0_EntryHi =3D (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask)=
+ |
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 0b8ec7d..a6a57bd 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSStat=
+e *env,
+ target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_=
+idx)  \
+ {                                                                       =
+      \
+     if (arg & almask) {                                                 =
+      \
+-        env->CP0_BadVAddr =3D arg;                                      =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg;                                  =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdEL, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
+        \
+@@ -291,7 +293,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
+ulong arg1,              \
+     target_long tmp;                                                    =
+      \
+                                                                         =
+      \
+     if (arg2 & almask) {                                                =
+      \
+-        env->CP0_BadVAddr =3D arg2;                                     =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg2;                                 =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdES, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
+{         \
+@@ -2456,7 +2460,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vad=
+dr addr,
+     int error_code =3D 0;
+     int excp;
+=20
+-    env->CP0_BadVAddr =3D addr;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D addr;
++    }
+=20
+     if (access_type =3D=3D MMU_DATA_STORE) {
+         excp =3D EXCP_AdES;
+--=20
 2.7.4
