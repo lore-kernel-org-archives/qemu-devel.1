@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fad9h-0006sl-O4
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:28:54 -0400
+	(envelope-from <famz@redhat.com>) id 1fadNN-0000Lo-R0
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:43:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fad9c-0005Pk-7u
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:28:53 -0400
-Received: from foss.arm.com ([217.140.101.70]:40606)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fad9c-0005PK-1w
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:28:48 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-11-git-send-email-suzuki.poulose@arm.com>
-	<e0c8dc62-42e8-ee24-5519-e19b2739160b@redhat.com>
-	<a6fa912a-b2ff-ac1e-0120-b2f7eabb6f7f@arm.com>
-	<3192c7dc-4127-ec97-6ba3-262fa3ff6243@redhat.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <1696a35f-9cd5-d807-f2e9-41d9f19d919a@arm.com>
-Date: Wed, 4 Jul 2018 09:29:06 +0100
+	(envelope-from <famz@redhat.com>) id 1fadNM-0005Kb-Sk
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:43:01 -0400
+Date: Wed, 4 Jul 2018 16:42:42 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180704084242.GA8621@lemon.usersys.redhat.com>
+References: <20180704061320.2041-1-famz@redhat.com>
+	<20180704061320.2041-2-famz@redhat.com>
+	<20180704074453.GA4334@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <3192c7dc-4127-ec97-6ba3-262fa3ff6243@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 10/20] kvm: arm64: Dynamic configuration
- of VTTBR mask
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180704074453.GA4334@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 1/2] block: Fix dst total_sectors after
+ copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, julien.grall@arm.com, james.morse@arm.com, kvmarm@lists.cs.columbia.edu
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 07/04/2018 09:24 AM, Auger Eric wrote:
->>>> + *
->>>> + * We have a magic formula for the Magic_N below.
->>>> + *
->>>> + *  Magic_N(PAGE_SIZE, Entry_Level) = 64 - ((PAGE_SHIFT - 3) *
->>>> Number of levels)
->>
->> [0] ^^^
->>
->>
->>
->>>> + *
->>>> + * where number of levels = (4 - Entry_Level).
->>
->> ^^^ Doesn't this help make it clear ? Using the expansion makes it a bit
->> more
->> unreadable below.
+On Wed, 07/04 09:44, Kevin Wolf wrote:
+> Am 04.07.2018 um 08:13 hat Fam Zheng geschrieben:
+> > This was noticed by the new image fleecing tests case 222. The issue is
+> > apparent and we should just do the same right things as in
+> > bdrv_aligned_pwritev.
+> > 
+> > Reported-by: John Snow <jsnow@redhat.com>
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
 > 
-> I just wanted to mention the tables you refer (D4-23 and D4-25) give
-> Magic_N for a larger scope as they deal with any lookup level while we
-> only care about the entry level for BADDR. So I was a little bit
-> confused when reading the explanation but that's not a big deal.
+> > --- a/block/io.c
+> > +++ b/block/io.c
+> > @@ -2945,6 +2945,10 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
+> >                                                    dst, dst_offset,
+> >                                                    bytes, flags);
+> >      }
+> > +    if (ret == 0) {
+> > +        int64_t end_sector = DIV_ROUND_UP(dst_offset + bytes, BDRV_SECTOR_SIZE);
+> > +        dst->bs->total_sectors = MAX(dst->bs->total_sectors, end_sector);
+> > +    }
+> 
+> I think it's time to extract this stuff to a common function. I was
+> already aware that a write request that extends the image isn't behaving
+> exactly the same as bdrv_co_truncate(), and this one is bound to diverge
+> from the other two instances as well.
+> 
+> This is what bdrv_aligned_pwritev() does after the write:
+> 
+>     atomic_inc(&bs->write_gen);
+>     bdrv_set_dirty(bs, offset, bytes);
+> 
+>     stat64_max(&bs->wr_highest_offset, offset + bytes);
+> 
+>     if (ret >= 0) {
+>         bs->total_sectors = MAX(bs->total_sectors, end_sector);
+>         ret = 0;
+>     }
+> 
+> Before the write, it also calls bs->before_write_notifiers.
+> 
+> This is what bdrv_co_truncate() does after truncating the image:
+> 
+>     ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+>     if (ret < 0) {
+>         error_setg_errno(errp, -ret, "Could not refresh total sector count");
+>     } else {
+>         offset = bs->total_sectors * BDRV_SECTOR_SIZE;
+>     }
+>     bdrv_dirty_bitmap_truncate(bs, offset);
+>     bdrv_parent_cb_resize(bs);
+>     atomic_inc(&bs->write_gen);
+> 
+> This means that we probably have at least the following bugs in
+> bdrv_co_copy_range_internal():
+> 
+> 1. bs->write_gen is not increased, a following flush is ignored
+> 2. Dirty bitmaps are not dirtied
+> 3. Dirty bitmaps are not resized when extending the image
+> 4. bs->wr_highest_offset is not adjusted correctly
+> 5. bs->total_sectors is not resized (the bug this patch fixes)
+> 6. The parent node isn't notified about an image size change
+> 
+> Of these, 3. and 6. also seem to be bugs in bdrv_aligned_pwritev().
+> 
 
-Ah, ok. I will try to clarify it.
+Indeed, great insight. I'll work on v2.
 
-Cheers
-Suzuki
+Fam
