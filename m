@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fahak-0003xs-Kg
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:13:07 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fahiU-0005xo-B5
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fahah-0004ox-EW
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:13:06 -0400
-Received: from mga03.intel.com ([134.134.136.65]:39291)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fahah-0004oN-4D
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:13:03 -0400
-From: Jingqi Liu <jingqi.liu@intel.com>
-Date: Wed,  4 Jul 2018 21:12:22 +0800
-Message-Id: <1530709942-87947-1-git-send-email-jingqi.liu@intel.com>
-Subject: [Qemu-devel] [PATCH] kvm: x86: Add support for -machine
- split-lock-ac
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fahiT-0001qF-48
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 09:21:06 -0400
+References: <20180703180751.243496-1-vsementsov@virtuozzo.com>
+	<20180703180751.243496-3-vsementsov@virtuozzo.com>
+	<20180704103918.GC4334@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <15ce8930-b00e-3d1e-ebd7-fc6bcc68bfce@virtuozzo.com>
+Date: Wed, 4 Jul 2018 16:20:48 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180704103918.GC4334@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/backup: fix fleecing scheme: use
+ serialized writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, wei.w.wang@intel.com, Jingqi Liu <jingqi.liu@intel.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
 
-Add the option split-lock-ac to control whether the #AC
-exception is generated for split locked accesses, which
-is introduced for the machine, there is an example to enable it:
--machine split-lock-ac=on
-It is disabled on default.
+04.07.2018 13:39, Kevin Wolf wrote:
+> Am 03.07.2018 um 20:07 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> Fleecing scheme works as follows: we want a kind of temporary snapshot
+>> of active drive A. We create temporary image B, with B->backing = A.
+>> Then we start backup(sync=none) from A to B. From this point, B reads
+>> as point-in-time snapshot of A (A continues to be active drive,
+>> accepting guest IO).
+>>
+>> This scheme needs some additional synchronization between reads from B
+>> and backup COW operations, otherwise, the following situation is
+>> theoretically possible:
+>>
+>> (assume B is qcow2, client is NBD client, reading from B)
+>>
+>> 1. client starts reading and take qcow2 mutex in qcow2_co_preadv, and
+>>     goes up to l2 table loading (assume cache miss)
+>>
+>> 2) guest write => backup COW => qcow2 write =>
+>>     try to take qcow2 mutex => waiting
+>>
+>> 3. l2 table loaded, we see that cluster is UNALLOCATED, go to
+>>     "case QCOW2_CLUSTER_UNALLOCATED" and unlock mutex before
+>>     bdrv_co_preadv(bs->backing, ...)
+>>
+>> 4) aha, mutex unlocked, backup COW continues, and we finally finish
+>>     guest write and change cluster in our active disk A
+>>
+>> 5. actually, do bdrv_co_preadv(bs->backing, ...) and read
+>>     _new updated_ data.
+>>
+>> To avoid this, let's make all COW writes serializing, to not intersect
+>> with reads from B.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> I think this should work, even though we can still improve it a bit.
+>
+> First, I don't think we need to disable copy offloading as long as we
+> add BDRV_REQ_SERIALISING support to bdrv_co_copy_range_internal(). The
+> thing that's a bit strange there is that there is only a single flags
+> parameter for both source and target. We may need to split that so
+> that we can pass BDRV_REQ_NO_SERIALISING for the source and
+> BDRV_REQ_SERIALISING for the target.
 
-When bit 29 of the MSR (33H) is set, the processor
-causes an #AC exception to be issued instead of suppressing LOCK on
-bus(during split lock access).
+here is interesting point: why copy_range skips wait_for_serializing for 
+write if k? I think it should influence only on read, isn't it? is it a bug?
 
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
----
- accel/kvm/kvm-all.c       | 10 ++++++++++
- hw/core/machine.c         | 19 +++++++++++++++++++
- include/hw/boards.h       |  1 +
- linux-headers/linux/kvm.h |  1 +
- qemu-options.hx           |  3 +++
- 5 files changed, 34 insertions(+)
+another question, I don't see, where is request alignment handled in 
+copy_range path, like in bdrv_co_pwritev/readv ?
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index eb7db92..e960a4d 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1699,6 +1699,16 @@ static int kvm_init(MachineState *ms)
- 
-     s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
- 
-+    if (ms->split_lock_ac &&
-+        kvm_check_extension(s, KVM_CAP_X86_SPLIT_LOCK_AC)) {
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_SPLIT_LOCK_AC, 0);
-+        if (ret) {
-+            fprintf(stderr, "Could not enable the feature that #AC exception"
-+                    "will be generated for split lock accesses!\n");
-+            goto err;
-+        }
-+    }
-+
-     return 0;
- 
- err:
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 617e5f8..e054119 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -350,6 +350,22 @@ static void machine_set_memory_encryption(Object *obj, const char *value,
-     ms->memory_encryption = g_strdup(value);
- }
- 
-+static void machine_set_split_lock_ac(Object *obj, bool value,
-+                                      Error **errp)
-+{
-+    MachineState *ms = MACHINE(obj);
-+
-+    ms->split_lock_ac = value;
-+}
-+
-+static bool machine_get_split_lock_ac(Object *obj, Error **errp)
-+{
-+    MachineState *ms = MACHINE(obj);
-+
-+    return ms->split_lock_ac;
-+}
-+
-+
- void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type)
- {
-     strList *item = g_new0(strList, 1);
-@@ -634,6 +650,9 @@ static void machine_class_init(ObjectClass *oc, void *data)
-         &error_abort);
-     object_class_property_set_description(oc, "memory-encryption",
-         "Set memory encyption object to use", &error_abort);
-+    object_class_property_add_bool(oc, "split-lock-ac",
-+        machine_get_split_lock_ac, machine_set_split_lock_ac,
-+        &error_abort);
- }
- 
- static void machine_class_base_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 79069dd..9c1e2c0 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -256,6 +256,7 @@ struct MachineState {
-     bool suppress_vmdesc;
-     bool enforce_config_section;
-     bool enable_graphics;
-+    bool split_lock_ac;
-     char *memory_encryption;
-     DeviceMemoryState *device_memory;
- 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 98f389a..4bfa879 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_GET_MSR_FEATURES 153
- #define KVM_CAP_HYPERV_EVENTFD 154
- #define KVM_CAP_HYPERV_TLBFLUSH 155
-+#define KVM_CAP_X86_SPLIT_LOCK_AC 156
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 81b1e99..935cefe 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -44,6 +44,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                nvdimm=on|off controls NVDIMM support (default=off)\n"
-     "                enforce-config-section=on|off enforce configuration section migration (default=off)\n"
-     "                s390-squash-mcss=on|off (deprecated) controls support for squashing into default css (default=off)\n"
-+    "                split-lock-ac=on|off controls support #AC exception for split locked accesses (default=off)\n"
-     "                memory-encryption=@var{} memory encryption object to use (default=none)\n",
-     QEMU_ARCH_ALL)
- STEXI
-@@ -113,6 +114,8 @@ NOTE: this parameter is deprecated. Please use @option{-global}
- @option{migration.send-configuration}=@var{on|off} instead.
- @item memory-encryption=@var{}
- Memory encryption object to use. The default is none.
-+@item split-lock-ac=on|off
-+Enables or disables #AC exception for split locked accesses.
- @end table
- ETEXI
- 
+>
+>> +    /* Detect image fleecing */
+>> +    fleecing = sync_mode == MIRROR_SYNC_MODE_NONE && target->backing->bs == bs;
+> The other thing is that I'm not convinced of the condition here. This is
+> the narrowest thinkable condition to recognise the exact fleecing setup
+> we have in mind right now. However, it is not the condition to flag all
+> setups that are affected by the same problem.
+>
+> I don't think sync_mode actually makes a meaningful difference here. If
+> someone wants to create a full backup and already access it while the
+> job is still in progress, they will still want it to be consistent.
+>
+> It also doesn't make a difference whether the fleecing overlay has the
+> source directly attached as a backing node or whether there is a filter
+> node between them.
+>
+> So while I'm not sure whether it really covers all interesting cases,
+> this condition would already be a lot better:
+>
+>      fleecing = bdrv_chain_contains(target, bs);
+>
+> Maybe rename the variable to serialise_target_writes because it's no
+> longer restricted to the exact fleecing case.
+>
+>> +    if (fleecing) {
+>> +        if (compress) {
+>> +            error_setg(errp, "Image fleecing doesn't support compressed mode.");
+>> +            return NULL;
+>> +        }
+>> +    }
+> Why not fleecing && compress instead of a nested if? And why is
+> fleecing even at odds with compression?
+>
+> Kevin
+
+
 -- 
-1.8.3.1
+Best regards,
+Vladimir
