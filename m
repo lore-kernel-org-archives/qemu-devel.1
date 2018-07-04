@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fanVI-0002iQ-8N
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:31:55 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fanVO-0002l0-5a
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:32:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fanVF-0001EH-2Q
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:31:52 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:47934 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fanVN-0001H9-55
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:31:58 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:47960 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fanVE-0001Dz-La
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:31:48 -0400
+	id 1fanVM-0001Gh-Ow
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 15:31:57 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed,  4 Jul 2018 21:30:35 +0200
-Message-Id: <1530732637-28606-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed,  4 Jul 2018 21:30:36 +0200
+Message-Id: <1530732637-28606-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530732637-28606-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530732637-28606-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 6/8] target/mips: Amend CP0 WatchHi register
- implementation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 7/8] target/mips: Don't update BadVAddr
+ register in Debug Mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,203 +33,94 @@ Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.c
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-WatchHi is extended by the field MemoryMapID with the GINVT instruction.
-The field is accessible by MTHC0/MFHC0 in 32-bit architectures and DMTC0/
-DMFC0 in 64-bit architectures.
+BadVAddr should not be updated if (env->hflags & MIPS_HFLAG_DM) is
+set.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philippe.mathieu.daude@gmail.co=
+m>
 ---
- target/mips/cpu.h       |  2 +-
- target/mips/helper.h    |  3 +++
- target/mips/machine.c   |  6 +++---
- target/mips/op_helper.c | 23 +++++++++++++++++++++--
- target/mips/translate.c | 28 +++++++++++++++++++++++++++-
- 5 files changed, 55 insertions(+), 7 deletions(-)
+ target/mips/helper.c    |  4 +++-
+ target/mips/op_helper.c | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 8ccbc21..3253b7d 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -506,7 +506,7 @@ struct CPUMIPSState {
-     uint64_t CP0_LLAddr_rw_bitmask;
-     int CP0_LLAddr_shift;
-     target_ulong CP0_WatchLo[8];
--    int32_t CP0_WatchHi[8];
-+    uint64_t CP0_WatchHi[8];
- #define CP0WH_ASID 16
-     target_ulong CP0_XContext;
-     int32_t CP0_Framemask;
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 5f49234..151441a 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -74,6 +74,7 @@ DEF_HELPER_1(mfc0_maar, tl, env)
- DEF_HELPER_1(mfhc0_maar, tl, env)
- DEF_HELPER_2(mfc0_watchlo, tl, env, i32)
- DEF_HELPER_2(mfc0_watchhi, tl, env, i32)
-+DEF_HELPER_2(mfhc0_watchhi, tl, env, i32)
- DEF_HELPER_1(mfc0_debug, tl, env)
- DEF_HELPER_1(mftc0_debug, tl, env)
- #ifdef TARGET_MIPS64
-@@ -85,6 +86,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
- DEF_HELPER_1(dmfc0_lladdr, tl, env)
- DEF_HELPER_1(dmfc0_maar, tl, env)
- DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
-+DEF_HELPER_2(dmfc0_watchhi, tl, env, i32)
- #endif /* TARGET_MIPS64 */
- 
- DEF_HELPER_2(mtc0_index, void, env, tl)
-@@ -148,6 +150,7 @@ DEF_HELPER_2(mthc0_maar, void, env, tl)
- DEF_HELPER_2(mtc0_maari, void, env, tl)
- DEF_HELPER_3(mtc0_watchlo, void, env, tl, i32)
- DEF_HELPER_3(mtc0_watchhi, void, env, tl, i32)
-+DEF_HELPER_3(mthc0_watchhi, void, env, tl, i32)
- DEF_HELPER_2(mtc0_xcontext, void, env, tl)
- DEF_HELPER_2(mtc0_framemask, void, env, tl)
- DEF_HELPER_2(mtc0_debug, void, env, tl)
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 5ba78ac..5e9c559 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
- 
- const VMStateDescription vmstate_mips_cpu = {
-     .name = "cpu",
--    .version_id = 11,
--    .minimum_version_id = 11,
-+    .version_id = 12,
-+    .minimum_version_id = 12,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         /* Active TC */
-@@ -288,7 +288,7 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
-         VMSTATE_UINT64(env.lladdr, MIPSCPU),
-         VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
--        VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-+        VMSTATE_UINT64_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-         VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Framemask, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Debug, MIPSCPU),
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 8cf91ce..e215af9 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, ta=
+rget_ulong address,
+         break;
+     }
+     /* Raise exception */
+-    env->CP0_BadVAddr =3D address;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D address;
++    }
+     env->CP0_Context =3D (env->CP0_Context & ~0x007fffff) |
+                        ((address >> 9) & 0x007ffff0);
+     env->CP0_EntryHi =3D (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask)=
+ |
 diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 41d3634..0b8ec7d 100644
+index 0b8ec7d..a6a57bd 100644
 --- a/target/mips/op_helper.c
 +++ b/target/mips/op_helper.c
-@@ -893,7 +893,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, uint32_t sel)
- 
- target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
- {
--    return env->CP0_WatchHi[sel];
-+    return (int32_t) env->CP0_WatchHi[sel];
-+}
-+
-+target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
-+{
-+    return env->CP0_WatchHi[sel] >> 32;
- }
- 
- target_ulong helper_mfc0_debug(CPUMIPSState *env)
-@@ -961,6 +966,11 @@ target_ulong helper_dmfc0_watchlo(CPUMIPSState *env, uint32_t sel)
- {
-     return env->CP0_WatchLo[sel];
- }
-+
-+target_ulong helper_dmfc0_watchhi(CPUMIPSState *env, uint32_t sel)
-+{
-+    return env->CP0_WatchHi[sel];
-+}
- #endif /* TARGET_MIPS64 */
- 
- void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
-@@ -1662,11 +1672,20 @@ void helper_mtc0_watchlo(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
- 
- void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
- {
--    int mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
-+    uint64_t mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
-+    if ((env->CP0_Config5 >> CP0C5_MI) & 1) {
-+        mask |= 0xFFFFFFFF00000000ULL; /* MMID */
+@@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSStat=
+e *env,
+ target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_=
+idx)  \
+ {                                                                       =
+      \
+     if (arg & almask) {                                                 =
+      \
+-        env->CP0_BadVAddr =3D arg;                                      =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg;                                  =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdEL, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
+        \
+@@ -291,7 +293,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
+ulong arg1,              \
+     target_long tmp;                                                    =
+      \
+                                                                         =
+      \
+     if (arg2 & almask) {                                                =
+      \
+-        env->CP0_BadVAddr =3D arg2;                                     =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg2;                                 =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdES, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
+{         \
+@@ -2456,7 +2460,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vad=
+dr addr,
+     int error_code =3D 0;
+     int excp;
+=20
+-    env->CP0_BadVAddr =3D addr;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D addr;
 +    }
-     env->CP0_WatchHi[sel] = arg1 & mask;
-     env->CP0_WatchHi[sel] &= ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
- }
- 
-+void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
-+{
-+    env->CP0_WatchHi[sel] = ((uint64_t) (arg1) << 32) |
-+                            (env->CP0_WatchHi[sel] & 0x00000000ffffffffULL);
-+}
-+
- void helper_mtc0_xcontext(CPUMIPSState *env, target_ulong arg1)
- {
-     target_ulong mask = (1ULL << (env->SEGBITS - 7)) - 1;
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 0562851..fa1da7e 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1458,6 +1458,7 @@ typedef struct DisasContext {
-     bool mrp;
-     bool nan2008;
-     bool abs2008;
-+    bool mi;
- } DisasContext;
- 
- #define DISAS_STOP       DISAS_TARGET_0
-@@ -4923,6 +4924,18 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             goto cp0_unimplemented;
-         }
-         break;
-+    case 19:
-+        switch (sel) {
-+        case 0 ...7:
-+            /* upper 32 bits are only available when Config5MI != 0 */
-+            CP0_CHECK(ctx->mi);
-+            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_WatchHi[sel]), 0);
-+            rn = "WatchHi";
-+            break;
-+        default:
-+            goto cp0_unimplemented;
-+        }
-+        break;
-     case 28:
-         switch (sel) {
-         case 0:
-@@ -4995,6 +5008,18 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             goto cp0_unimplemented;
-         }
-         break;
-+    case 19:
-+        switch (sel) {
-+        case 0 ...7:
-+            /* upper 32 bits are only available when Config5MI != 0 */
-+            CP0_CHECK(ctx->mi);
-+            gen_helper_0e1i(mthc0_watchhi, arg, sel);
-+            rn = "WatchHi";
-+            break;
-+        default:
-+            goto cp0_unimplemented;
-+        }
-+        break;
-     case 28:
-         switch (sel) {
-         case 0:
-@@ -6925,7 +6950,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         case 5:
-         case 6:
-         case 7:
--            gen_helper_1e0i(mfc0_watchhi, arg, sel);
-+            gen_helper_1e0i(dmfc0_watchhi, arg, sel);
-             rn = "WatchHi";
-             break;
-         default:
-@@ -20401,6 +20426,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
-     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
-     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-+    ctx->mi = (env->CP0_Config5 >> CP0C5_MI) & 1;
-     restore_cpu_state(env, ctx);
- #ifdef CONFIG_USER_ONLY
-         ctx->mem_idx = MIPS_HFLAG_UM;
--- 
+=20
+     if (access_type =3D=3D MMU_DATA_STORE) {
+         excp =3D EXCP_AdES;
+--=20
 2.7.4
