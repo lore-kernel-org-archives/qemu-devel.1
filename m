@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fakAG-0002rL-5m
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:57:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fakAK-0002sr-Jh
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fakAD-0003V4-3S
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:57:56 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47342
-	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suzuki.poulose@arm.com>) id 1fakAC-0003Uc-S9
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:57:53 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-25-git-send-email-suzuki.poulose@arm.com>
-	<20180704142241.GG4828@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <66e93016-91bd-5fbb-2479-9f1d87795e5e@arm.com>
-Date: Wed, 4 Jul 2018 16:58:12 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1fakAJ-0003ZU-Gx
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:58:00 -0400
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:36580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fakAJ-0003XI-2A
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 11:57:59 -0400
+Received: by mail-oi0-x22c.google.com with SMTP id r16-v6so11582369oie.3
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 08:57:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180704142241.GG4828@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [kvmtool test PATCH 24/24] kvmtool: arm: Add
- support for creating VM with PA size
+In-Reply-To: <20180703121013.12126-1-kraxel@redhat.com>
+References: <20180703121013.12126-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 4 Jul 2018 16:57:36 +0100
+Message-ID: <CAFEAcA8QGCgPm-_1eBx9aoC3upsBm4RXL9DhVi0PDCZMh2Sj8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Audio 20180703 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Will,
+On 3 July 2018 at 13:10, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit ab08440a4ee09032d1a9cb22fdcab23bc7e1c656:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180702' into staging (2018-07-02 17:57:46 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/audio-20180703-pull-request
+>
+> for you to fetch changes up to 1a961e785f59eba1fa8e06d5b1ebc84927b4b3a3:
+>
+>   audio: add audio timer trace points (2018-07-03 11:46:47 +0200)
+>
+> ----------------------------------------------------------------
+> audio: hda fixes, timer tracing
+>
+> ----------------------------------------------------------------
+Applied, thanks.
 
-On 07/04/2018 03:22 PM, Will Deacon wrote:
-> On Fri, Jun 29, 2018 at 12:15:44PM +0100, Suzuki K Poulose wrote:
->> diff --git a/arm/kvm.c b/arm/kvm.c
->> index 5701d41..b1969be 100644
->> --- a/arm/kvm.c
->> +++ b/arm/kvm.c
->> @@ -11,6 +11,8 @@
->>   #include <linux/kvm.h>
->>   #include <linux/sizes.h>
->>   
->> +unsigned long kvm_arm_type;
->> +
->>   struct kvm_ext kvm_req_ext[] = {
->>   	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
->>   	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
->> @@ -18,6 +20,26 @@ struct kvm_ext kvm_req_ext[] = {
->>   	{ 0, 0 },
->>   };
->>   
->> +#ifndef KVM_ARM_GET_MAX_VM_PHYS_SHIFT
->> +#define KVM_ARM_GET_MAX_VM_PHYS_SHIFT		_IO(KVMIO, 0x0b)
->> +#endif
->> +
->> +void kvm__arch_init_hyp(struct kvm *kvm)
->> +{
->> +	int max_ipa;
->> +
->> +	max_ipa = ioctl(kvm->sys_fd, KVM_ARM_GET_MAX_VM_PHYS_SHIFT);
->> +	if (max_ipa < 0)
->> +		max_ipa = 40;
->> +	if (!kvm->cfg.arch.phys_shift)
->> +		kvm->cfg.arch.phys_shift = 40;
->> +	if (kvm->cfg.arch.phys_shift > max_ipa)
->> +		die("Requested PA size (%u) is not supported by the host (%ubits)\n",
->> +		    kvm->cfg.arch.phys_shift, max_ipa);
->> +	if (kvm->cfg.arch.phys_shift != 40)
->> +		kvm_arm_type = kvm->cfg.arch.phys_shift;
->> +}
-> 
-> Seems a bit weird that the "machine type identifier" to KVM_CREATE_VM is
-> dedicated entirely to holding the physical address shift verbatim. Is this
-> really the ABI?
-
-The bits[7:0] of the machine type has been reserved for the IPA shift.
-This version is missing the updates to the ABI documentation, I have it
-for the next version.
-
-> 
-> Also, couldn't KVM figure it out automatically if you add memslots at high
-> addresses, making this a niche tunable outside of testing?
-
-The stage2 pgd size is really dependent on the max IPA. Also, unlike the 
-stage1 (where the maximum size will be 1 page), the size can go upto 16
-pages (and different number of levels due to concatenation), so we need
-to finalize this at least before the first memory gets mapped (RAM or 
-Device). That implies, we cannot wait until all the memory slots are
-created.
-
-The first version of the series added a separate ioctl for specifying
-the limit, which had its own complexities. So, this ABI was suggested
-to keep things simpler.
-
-
-Suzuki
+-- PMM
