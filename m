@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faZs6-00011D-SR
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:58:31 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1faaPq-0005OA-Qh
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1faZs6-00019a-3E
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:58:30 -0400
-Date: Wed, 4 Jul 2018 13:31:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180704033134.GE14043@umbus.fritz.box>
-References: <20180703151732.29843-1-richard.henderson@linaro.org>
+	(envelope-from <mail@sebastianbauer.info>) id 1faaPn-0002h0-Mg
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 01:33:22 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7LkOrbQMr4cezO2T"
-Content-Disposition: inline
-In-Reply-To: <20180703151732.29843-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-3.1 0/7] target/ppc fp cleanups
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 04 Jul 2018 07:33:08 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <9108e419-3120-b887-0da8-3748dbc19a17@ilande.co.uk>
+References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+	<20180703055804.13449-36-david@gibson.dropbear.id.au>
+	<4fce9ddd-5079-e833-b6c2-e6935322c73d@ilande.co.uk>
+	<b0f927a5f0eb2bd96798124e6925fa1f@sebastianbauer.info>
+	<9108e419-3120-b887-0da8-3748dbc19a17@ilande.co.uk>
+Message-ID: <30fe8f08c522688f00af24ccc4f0629e@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PULL 35/35] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, programmingkidx@gmail.com, qemu-ppc@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
+Am 2018-07-04 06:50, schrieb Mark Cave-Ayland:
+>> Either to give up the vga cirrus preference or to apply the same as 
+>> was done with the spapr machine. I would prefer the first variant but 
+>> it would also cause some differences on other machines.
+> 
+> I understand that the decision was taken to add VGA cirrus to the PPC
+> build and therefore accept the default VGA device change, however your
+> the commit message only mentions spapr and not all the other PPC
+> machines whose defaults are also potentially affected:
+> 
+> $ ./qemu-system-ppc -M ?
+> Supported machines are:
+> 40p                  IBM RS/6000 7020 (40p)
+> bamboo               bamboo
+> g3beige              Heathrow based PowerMAC (default)
+> mac99                Mac99 based PowerMAC
+> mpc8544ds            mpc8544ds
+> none                 empty machine
+> ppce500              generic paravirt e500 platform
+> prep                 PowerPC PREP platform
+> ref405ep             ref405ep
+> sam460ex             aCube Sam460ex
+> taihu                taihu
+> virtex-ml507         Xilinx Virtex ML507 reference design
+> 
+> I'm not able to personally validate all of these, but a quick check
+> shows that at least both PReP machines (-M prep and -M 40p) are also
+> broken by this patch which tells me it hasn't had much testing.
+> 
+> David, do you know what the defaults are for the other PPC machines in
+> order for Sebastian to test and send a follow-up patch?
 
---7LkOrbQMr4cezO2T
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I don't know much how to validate these machines (I did a 'make check' 
+but it does not show up any problems) and what impact these change has. 
+But I suggested in the note section (which is not the commit message) 
+that some of the machines properly behave different now (OTOH CirrusGD 
+is a vga card nonetheless, I would have expected that at least the Mac 
+can deal with that card). This can either be fixed by following the 
+'spapr' approach (as it explicitly forbids this card as the primary 
+display and was therefore visible immediately) or by generally 
+rethinking whether CirrusGD really should be the preferred card over std 
+vga (after all it is considered as obsolete so why should it be 
+preferred?). I think it would be nice if a consensus can be found about 
+the "correct approach" way to fix it. I personally think that adding 
+more exceptions is not the right way :)
 
-On Tue, Jul 03, 2018 at 08:17:25AM -0700, Richard Henderson wrote:
-> Beginning with John Arbuckle's fdiv test case, clean up some
-> of the fp helpers.  As with fdiv, fre and fresqrt are missing
-> divide-by-zero exceptions.
->=20
-> I've also noticed that load/store were using arithmetic conversions
-> to/from float32.  These should be using the non-arithmetic algorithms
-> listed in the manual.
->=20
-> Aside from cleaning up all of the rest of the helpers, I believe that
-> the implementation of the single-precision operations are incorrect.
-> They are currently implemented with the double-precision operation
-> followed by a round-to-single.  This causes incorrect results via
-> double rounding.  I believe better results could be had by using
-> these non-arithmetic converters to produce float32 operands, use the
-> proper float32 softfloat operations, and then convert back.
->=20
-> Anyway, all of this has been broken long enough that it'll need to
-> wait til next devel cycle before anything further gets done.
+Last but not least, all of the targets should still work as before if 
+you use -vga std option.
 
-Applied to ppc-for-3.1 (newly created).
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---7LkOrbQMr4cezO2T
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls8P5QACgkQbDjKyiDZ
-s5LiQQ/9HV4VjL6bNDJ5ihhZkFTQ84/pBbt8LYVS/ibuUtMF0CKT5rbtHcLNbk6q
-hGfaMNGmsd++8mT6cmzSWXVQAllB7f4W+jYn8gseTkCP/h5w7ZyKf8kNb8JscP4n
-oSiH1QysV6BvGGWM2JridaEJVKxBq+KHJVsnOs8A6y+amdcWjDysgn+OS4fo7Im2
-a0JOvQTjirPUDUMAI8m9gXcadu3H5cXxpUIUtq9/EsRwMDiIVOQIAZy+CYPBF4/R
-RKjiOF/CKHhktWpEa8atjZB/F+glc7Q+z1bM2/4Oz4RbgfOCH9/cf03HSti1H1I2
-qiM8wD5a6SXtNBevyXNQD9RwWeGmBuvye54KTCmUVqVK6KRQn/l1p4PSyzOjBuJS
-yjnuPvh7m+cJrHuHR+oBrJUjKNvtiLc6zjWOk2U7brh7us2cTcWBWl7AT1uAHCu/
-yKmu44SozxKHX7ceQV40nvcqT7EKJwOsG5Hgilbow2WxYDdpOFGuRGQj+KiDyWup
-Xfo71+TdQwp1ePxNAF0sg/2PWhi0ERTiOge7Su+cbvbylbVulOWh/14gtPcMWuHs
-0ueEqWys04UXUjn/ZPi0ytUzmIP6ZU8+H4a7JG9IoIAYA+tymBIRNkyde87PI57u
-EBdbsCIFDh5Y98Z9RpPRdN8Tseenh/pKEdFzfsyPmQxyEINGrks=
-=ATvr
------END PGP SIGNATURE-----
-
---7LkOrbQMr4cezO2T--
+Bye
+Sebastian
