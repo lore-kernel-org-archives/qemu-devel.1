@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fajAh-0007Ct-88
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:54:20 -0400
+	(envelope-from <ari@tuxera.com>) id 1fajG5-0001uQ-Ls
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:59:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fajAg-0002Pe-8r
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:54:19 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  4 Jul 2018 15:54:10 +0100
-Message-Id: <20180704145410.794-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] throttle-groups: fix hang when group member
- leaves
+	(envelope-from <ari@tuxera.com>) id 1fajG4-00076e-UO
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 10:59:53 -0400
+From: Ari Sundholm <ari@tuxera.com>
+Date: Wed, 4 Jul 2018 17:59:33 +0300
+Message-ID: <1530716376-2235-1-git-send-email-ari@tuxera.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 0/3] blklogwrites improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,56 +20,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Throttle groups consist of members sharing one throttling state
-(including bps/iops limits).  Round-robin scheduling is used to ensure
-fairness.  If a group member already has a timer pending then other
-groups members do not schedule their own timers.  The next group member
-will have its turn when the existing timer expires.
+This patch set contains a trivial printf format fix, followed by two
+new features for the blklogwrites driver.
 
-A hang may occur when a group member leaves while it had a timer
-scheduled.  Although the code carefully removes the group member from
-the round-robin list, it does not schedule the next member.  Therefore
-remaining members continue to wait for the removed member's timer to
-expire.
+The first feature is an option to append to an existing log, adopting
+its sector size and other metadata in its superblock. This can be
+useful, and was suggested by Kevin Wolf.
 
-This patch schedules the next request if a timer is pending.
-Unfortunately the actual bug is a race condition that I've been unable
-to capture in a test case.
+The second feature is an option for specifying how often the log
+superblock is updated, in terms of number of total write entries
+logged. This ensures that the log superblock is relatively up-to-date
+even in the face of abnormal QEMU shutdown.
 
-Sometimes drive2 hangs when drive1 is removed from the throttling group:
+v2:
+  - Fix error path of log superblock update interval set to 0
 
-  $ qemu ... -drive if=none,id=drive1,cache=none,format=qcow2,file=data1.qcow2,iops=100,group=foo \
-             -device virtio-blk-pci,id=virtio-blk-pci0,drive=drive1 \
-             -drive if=none,id=drive2,cache=none,format=qcow2,file=data2.qcow2,iops=10,group=foo \
-             -device virtio-blk-pci,id=virtio-blk-pci1,drive=drive2
-  (guest-console1)# fio -filename /dev/vda 4k-seq-read.job
-  (guest-console2)# fio -filename /dev/vdb 4k-seq-read.job
-  (qmp) {"execute": "block_set_io_throttle", "arguments": {"device": "drive1","bps": 0,"bps_rd": 0,"bps_wr": 0,"iops": 0,"iops_rd": 0,"iops_wr": 0}}
+Based-on: <1530629328-10193-1-git-send-email-ari@tuxera.com>
 
-Reported-by: Nini Gu <ngu@redhat.com>
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1535914
-Cc: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/throttle-groups.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Ari Sundholm (3):
+  block/blklogwrites: Change log_sector_size from int64_t to uint64_t
+  block/blklogwrites: Add an option for appending to an old log
+  block/blklogwrites: Add an option for the update interval of the log
+    superblock
 
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index 36cc0430c3..e297b04e17 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -564,6 +564,10 @@ void throttle_group_unregister_tgm(ThrottleGroupMember *tgm)
- 
-     qemu_mutex_lock(&tg->lock);
-     for (i = 0; i < 2; i++) {
-+        if (timer_pending(tgm->throttle_timers.timers[i])) {
-+            tg->any_timer_armed[i] = false;
-+            schedule_next_request(tgm, i);
-+        }
-         if (tg->tokens[i] == tgm) {
-             token = throttle_group_next_tgm(tgm);
-             /* Take care of the case where this is the last tgm in the group */
+ block/blklogwrites.c | 171 +++++++++++++++++++++++++++++++++++++++++++++------
+ qapi/block-core.json |   7 ++-
+ 2 files changed, 158 insertions(+), 20 deletions(-)
+
 -- 
-2.17.1
+2.7.4
