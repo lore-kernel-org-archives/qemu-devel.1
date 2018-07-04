@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD8-000730-4r
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD8-00072v-2C
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:09:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD4-0003dS-I6
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1famD4-0003dF-DB
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:09:01 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54678 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54681 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1famD4-0003cO-6h
+	id 1famD4-0003cR-4u
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 14:08:58 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed,  4 Jul 2018 20:08:25 +0200
-Message-Id: <1530727708-5416-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed,  4 Jul 2018 20:08:28 +0200
+Message-Id: <1530727708-5416-9-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530727708-5416-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530727708-5416-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 5/8] target/mips: Add CP0 BadInstrX register
+Subject: [Qemu-devel] [PATCH 8/8] target/mips: Check ELPA flag only in some
+ cases of MFHC0 and MTHC0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +28,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, aleksandar.markovic@wavecomp.com, petar.jovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <stefan.markovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
+and placing ELPA flag checks befor switch statement were technically
+correct. However, after adding handling more registers, these checks
+should be moved to act only in cases of handling EntryLo0 and
+EntryLo1.
 
-Signed-off-by: Stefan Markovic <stefan.markovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/machine.c   |  5 +++--
- target/mips/translate.c | 20 +++++++++++++++++++-
- 3 files changed, 23 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index edbb66d..8ccbc21 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -323,6 +323,7 @@ struct CPUMIPSState {
-     target_ulong CP0_BadVAddr;
-     uint32_t CP0_BadInstr;
-     uint32_t CP0_BadInstrP;
-+    uint32_t CP0_BadInstrX;
-     int32_t CP0_Count;
-     target_ulong CP0_EntryHi;
- #define CP0EnHi_EHINV 10
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 20100d5..5ba78ac 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
- 
- const VMStateDescription vmstate_mips_cpu = {
-     .name = "cpu",
--    .version_id = 10,
--    .minimum_version_id = 10,
-+    .version_id = 11,
-+    .minimum_version_id = 11,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         /* Active TC */
-@@ -266,6 +266,7 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_UINTTL(env.CP0_BadVAddr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstr, MIPSCPU),
-         VMSTATE_UINT32(env.CP0_BadInstrP, MIPSCPU),
-+        VMSTATE_UINT32(env.CP0_BadInstrX, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Count, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_EntryHi, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Compare, MIPSCPU),
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 91ac32e..0582e68 100644
+index aee39d0..57e24f3 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -5315,7 +5315,12 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn = "BadInstrP";
+@@ -4884,12 +4884,11 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+ {
+     const char *rn = "invalid";
+ 
+-    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+-
+     switch (reg) {
+     case 2:
+         switch (sel) {
+         case 0:
++            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
+             rn = "EntryLo0";
              break;
--        default:
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            rn = "BadInstrX";
-+            break;
-+       default:
-             goto cp0_unimplemented;
-         }
-         break;
-@@ -6006,6 +6011,10 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             /* ignored */
-             rn = "BadInstrP";
+@@ -4900,6 +4899,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+     case 3:
+         switch (sel) {
+         case 0:
++            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
+             rn = "EntryLo1";
              break;
-+        case 3:
-+            /* ignored */
-+            rn = "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -6711,6 +6720,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrP));
-             rn = "BadInstrP";
-             break;
-+        case 3:
-+            CP0_CHECK(ctx->bi);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_BadInstrX));
-+            rn = "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7385,6 +7399,10 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             /* ignored */
-             rn = "BadInstrP";
-             break;
-+        case 3:
-+            /* ignored */
-+            rn = "BadInstrX";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
+@@ -4964,12 +4964,11 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+     const char *rn = "invalid";
+     uint64_t mask = ctx->PAMask >> 36;
+ 
+-    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+-
+     switch (reg) {
+     case 2:
+         switch (sel) {
+         case 0:
++            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+             tcg_gen_andi_tl(arg, arg, mask);
+             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
+             rn = "EntryLo0";
+@@ -4981,6 +4980,7 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+     case 3:
+         switch (sel) {
+         case 0:
++            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
+             tcg_gen_andi_tl(arg, arg, mask);
+             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
+             rn = "EntryLo1";
 -- 
 2.7.4
