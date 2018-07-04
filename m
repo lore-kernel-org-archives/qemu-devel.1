@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1faftm-0008U2-Cq
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:24:39 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fafyE-0001vj-KC
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1faftj-0005Tj-9j
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:24:38 -0400
-Date: Wed, 4 Jul 2018 13:24:29 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180704132429.3444bd18.cohuck@redhat.com>
-In-Reply-To: <1530312483-23864-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-References: <1530312483-23864-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1530312483-23864-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 4/5] s390x/vfio: ap: Introduce VFIO AP
- device
+	(envelope-from <kraxel@redhat.com>) id 1fafyA-00005O-TA
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:29:14 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed,  4 Jul 2018 13:28:59 +0200
+Message-Id: <20180704112859.20146-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vga: make stdvga the global default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +17,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, Tony Krowiak <akrowiak@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Sebastian Bauer <mail@sebastianbauer.info>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, 29 Jun 2018 18:48:02 -0400
-Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
+This reverts the stdvga vs. cirrus selection logic.  Current state is
+that "cirrus" is the default and MachineClass->default_display is set to
+"std" by some machine types to override that.
 
-> Introduces a VFIO based AP device. The device is defined via
-> the QEMU command line by specifying:
-> 
->     -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
-> 
-> There may be only one vfio-ap device configured for a guest.
-> 
-> The mediated matrix device is created by the VFIO AP device
-> driver by writing a UUID to a sysfs attribute file (see
-> docs/vfio-ap.txt). The mediated matrix device will be named
-> after the UUID. Symbolic links to the $uuid are created in
-> many places, so the path to the mediated matrix device $uuid
-> can be specified in any of the following ways:
-> 
-> /sys/devices/vfio_ap/matrix/$uuid
-> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/devices/$uuid
-> /sys/bus/mdev/devices/$uuid
-> /sys/bus/mdev/drivers/vfio_mdev/$uuid
-> 
-> When the vfio-ap device is realized, it acquires and opens the
-> VFIO iommu group to which the mediated matrix device is
-> bound. This causes a VFIO group notification event to be
-> signaled. The vfio_ap device driver's group notification
-> handler will get called at which time the device driver
-> will configure the the AP devices to which the guest will
-> be granted access.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+The patch makes "std" the default.  Setting default_display to "std" is
+dropped.  Machine types which likely depend on cirrus (alpha, mips, old
+pc versions) will explicitly set default_display to "cirrus".
 
-Nit: You may want to decide one address or the other :)
+With this patch applied all ppc machine types will use "std" as default
+display, no matter whenever cirrus-vga is compiled in or not.
 
-> ---
->  MAINTAINERS                       |    1 +
->  default-configs/s390x-softmmu.mak |    1 +
->  hw/vfio/Makefile.objs             |    1 +
->  hw/vfio/ap.c                      |  183 +++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-common.h     |    1 +
->  5 files changed, 187 insertions(+), 0 deletions(-)
->  create mode 100644 hw/vfio/ap.c
+Fixes: 29f9cef39e ppc: Include vga cirrus card into the compiling process
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/alpha/dp264.c     | 1 +
+ hw/i386/pc_piix.c    | 3 +--
+ hw/i386/pc_q35.c     | 1 -
+ hw/mips/mips_malta.c | 1 +
+ hw/mips/mips_r4k.c   | 1 +
+ hw/ppc/spapr.c       | 1 -
+ vl.c                 | 4 ++--
+ 7 files changed, 6 insertions(+), 6 deletions(-)
 
-No complaints about the code from me.
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 80b987f7fb..668e6d099f 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -182,6 +182,7 @@ static void clipper_machine_init(MachineClass *mc)
+     mc->max_cpus = 4;
+     mc->is_default = 1;
+     mc->default_cpu_type = ALPHA_CPU_TYPE_NAME("ev67");
++    mc->default_display = "cirrus";
+ }
+ 
+ DEFINE_MACHINE("clipper", clipper_machine_init)
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index dc09466b3e..30ad22e2e3 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -424,7 +424,6 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     m->family = "pc_piix";
+     m->desc = "Standard PC (i440FX + PIIX, 1996)";
+     m->default_machine_opts = "firmware=bios-256k.bin";
+-    m->default_display = "std";
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+ }
+ 
+@@ -566,7 +565,7 @@ static void pc_i440fx_2_1_machine_options(MachineClass *m)
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_i440fx_2_2_machine_options(m);
+     m->hw_version = "2.1.0";
+-    m->default_display = NULL;
++    m->default_display = "cirrus";
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_1);
+     pcmc->smbios_uuid_encoded = false;
+     pcmc->enforce_aligned_dimm = false;
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 532241e3f8..8f2c8c8b8b 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -303,7 +303,6 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->desc = "Standard PC (Q35 + ICH9, 2009)";
+     m->units_per_default_bus = 1;
+     m->default_machine_opts = "firmware=bios-256k.bin";
+-    m->default_display = "std";
+     m->no_floppy = 1;
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 3467451482..998971c53a 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1242,6 +1242,7 @@ static void mips_malta_machine_init(MachineClass *mc)
+     mc->block_default_type = IF_IDE;
+     mc->max_cpus = 16;
+     mc->is_default = 1;
++    mc->default_display = "cirrus";
+ #ifdef TARGET_MIPS64
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("20Kc");
+ #else
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index d5725d0555..c4c7ee8aa5 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -295,6 +295,7 @@ static void mips_machine_init(MachineClass *mc)
+     mc->desc = "mips r4k platform";
+     mc->init = mips_r4k_init;
+     mc->block_default_type = IF_IDE;
++    mc->default_display = "cirrus";
+ #ifdef TARGET_MIPS64
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("R4000");
+ #else
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3f5e1d3ec2..0ab90f3aa8 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3962,7 +3962,6 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     mc->no_parallel = 1;
+     mc->default_boot_order = "";
+     mc->default_ram_size = 512 * MiB;
+-    mc->default_display = "std";
+     mc->kvm_type = spapr_kvm_type;
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SPAPR_PCI_HOST_BRIDGE);
+     mc->pci_allow_0_address = true;
+diff --git a/vl.c b/vl.c
+index 16b913f9d5..e60bf2d6cd 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4475,10 +4475,10 @@ int main(int argc, char **argv, char **envp)
+     if (default_vga) {
+         if (machine_class->default_display) {
+             vga_model = machine_class->default_display;
+-        } else if (vga_interface_available(VGA_CIRRUS)) {
+-            vga_model = "cirrus";
+         } else if (vga_interface_available(VGA_STD)) {
+             vga_model = "std";
++        } else if (vga_interface_available(VGA_CIRRUS)) {
++            vga_model = "cirrus";
+         }
+     }
+     if (vga_model) {
+-- 
+2.9.3
