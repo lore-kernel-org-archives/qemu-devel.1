@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fafIz-0000gP-IV
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:46:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1fafh2-0004vK-5K
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fafIt-0003La-62
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:46:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42920)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fafIs-0003JS-Qw
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 06:46:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fafIr-0005KS-HW
-	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 10:46:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 681242E8198
-	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 10:46:29 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fafgz-0007GO-G1
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:11:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54704 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fafgz-0007GG-Bm
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 07:11:25 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180704033642.15996-1-caoxinhua@huawei.com>
+Date: Wed, 04 Jul 2018 13:11:23 +0200
+In-Reply-To: <20180704033642.15996-1-caoxinhua@huawei.com> (xinhua Cao's
+	message of "Wed, 4 Jul 2018 11:36:42 +0800")
+Message-ID: <8736wzgsro.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Jul 2018 10:32:10 -0000
-From: Gerd Hoffmann <1191326@bugs.launchpad.net>
-Reply-To: Bug 1191326 <1191326@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130615151015.21597.4187.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153070033102.7467.14067759786727298154.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1191326] Re: QNX 4 doesn't boot on qemu >= 1.3
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qemu-char: check errno together with ret <
+ 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "xinhua.Cao" <caoxinhua@huawei.com>
+Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, eblake@redhat.com, anton.nefedov@virtuozzo.com, vsementsov@virtuozzo.com, weidong.huang@huawei.com, weifuqiang@huawei.com, qemu-devel@nongnu.org, king.wang@huawei.com, liuyongan@huawei.com, arei.gonglei@huawei.com
 
-qemu git master has a prebuilt seabios with CONFIG_ATA_DMA=3Dy now.
+xinhua.Cao <caoxinhua@huawei.com> writes:
 
--- =
+> In the tcp_chr_write function, we checked errno,
+> but errno was not reset before a read or write operation.
+> Therefore, this check of errno's actions is often
+> incorrect after EAGAIN has occurred.
+> we need check errno together with ret < 0.
+>
+> Signed-off-by: xinhua.Cao <caoxinhua@huawei.com>
+> ---
+>  chardev/char-socket.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 17519ec..efbad6e 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -134,8 +134,11 @@ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+>                                          s->write_msgfds,
+>                                          s->write_msgfds_num);
+>  
+> -        /* free the written msgfds in any cases other than errno==EAGAIN */
+> -        if (EAGAIN != errno && s->write_msgfds_num) {
+> +        /* free the written msgfds in any cases
+> +         * other than ret < 0 && errno == EAGAIN
+> +         */
+> +        if (!(ret < 0 && EAGAIN == errno)
+> +            && s->write_msgfds_num) {
+>              g_free(s->write_msgfds);
+>              s->write_msgfds = 0;
+>              s->write_msgfds_num = 0;
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1191326
-
-Title:
-  QNX 4 doesn't boot on qemu >=3D 1.3
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  I am using virtual machine with QNX4 operating system installed on it.  I=
- updated my qemu from version
-  to newer and QNX4 doesn't start any more. All is ok on version 1.2 but wh=
-en I try to use any newer version
-  (1.3, 1.4, 1.5)  QNX4 doesn't boot.  I tried on windows and linux ubuntu =
-hosts - effects are the same.
-
-  When virtual machine boots qnx bootloader loads and starts operating syst=
-em. In the next step
-  qnx starts its ide driver, which detects qemu harddisk and cdrom. Problem=
- starts when operating system
-  tries mount partition - an error occur and qnx stop booting procedure:
-
-  mount -p "No bios signature in partition sector on /dev/hd0"
-
-  I have tried install qnx from cdrom but it seems that there is the same p=
-roblem. QNX installer boot from
-  cdrom, detects hard disk and cdrom, but cdrom can't be mounted in the nex=
-t step of installation procedure.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1191326/+subscriptions
+The comment feels pretty worthless to me.
