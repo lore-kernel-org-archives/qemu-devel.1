@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1faeOo-0008D4-9d
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:48:36 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1faeOo-0008D2-48
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1faeOk-0003vt-SQ
+	(envelope-from <balaton@eik.bme.hu>) id 1faeOj-0003uo-Ag
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:48:34 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:46771)
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:46749)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1faeOk-0003vM-CZ
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:48:30 -0400
-Message-Id: <216f2ade44cffa51ec743113e1aaa869bc3df57d.1530697258.git.balaton@eik.bme.hu>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1faeOj-0003uU-4G
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 05:48:29 -0400
+Message-Id: <9f1748f9606783e4bd84d9567a7d50b82c57553a.1530697258.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1530697258.git.balaton@eik.bme.hu>
 References: <cover.1530697258.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Wed, 04 Jul 2018 11:40:58 +0200
-Subject: [Qemu-devel] [PATCH v3 1/7] sm501: Implement i2c part for reading
- monitor EDID
+Subject: [Qemu-devel] [PATCH v3 2/7] sm501: Perform a full update after
+ palette change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,320 +27,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Sebastian Bauer <mail@sebastianbauer.info>, Philippe Mathieu-Daude <f4bug@amsat.org>
 
-Emulate the i2c part of SM501 which is used to access the EDID info
-from a monitor.
+From: Sebastian Bauer <mail@sebastianbauer.info>
 
-The vmstate structure is changed and its version is increased but
-SM501 is only used on SH and PPC sam460ex machines that don't support
-cross-version migration.
+Changing the palette of a color index has as an immediate effect on
+all pixels with the corresponding index on real hardware. Performing a
+full update after a palette change is a simple way to emulate this
+effect.
 
+Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3:
-- Fixed resetting error bit in status reg
-- Add comment for ddc
-v2:
-- added constants for register bits
-- fix clearing error bit in reset reg
-- set max access size to 1
-v1: fixed build with SH
+v2: change type to bool
 
- default-configs/ppc-softmmu.mak    |   1 +
- default-configs/ppcemb-softmmu.mak |   1 +
- default-configs/sh4-softmmu.mak    |   2 +
- default-configs/sh4eb-softmmu.mak  |   2 +
- hw/display/sm501.c                 | 147 ++++++++++++++++++++++++++++++++++++-
- 5 files changed, 149 insertions(+), 4 deletions(-)
+ hw/display/sm501.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 6f12bf8..3181bbf 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -25,6 +25,7 @@ CONFIG_ETSEC=y
- CONFIG_SAM460EX=y
- CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
-+CONFIG_DDC=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
- CONFIG_BITBANG_I2C=y
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 37af193..ac44f15 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -17,6 +17,7 @@ CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
- CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
-+CONFIG_DDC=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
- CONFIG_BITBANG_I2C=y
-diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index 546d855..caeccd5 100644
---- a/default-configs/sh4-softmmu.mak
-+++ b/default-configs/sh4-softmmu.mak
-@@ -9,6 +9,8 @@ CONFIG_PFLASH_CFI02=y
- CONFIG_SH4=y
- CONFIG_IDE_MMIO=y
- CONFIG_SM501=y
-+CONFIG_I2C=y
-+CONFIG_DDC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_I82378=y
- CONFIG_I8259=y
-diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index 2d3fd49..53b9cd7 100644
---- a/default-configs/sh4eb-softmmu.mak
-+++ b/default-configs/sh4eb-softmmu.mak
-@@ -9,6 +9,8 @@ CONFIG_PFLASH_CFI02=y
- CONFIG_SH4=y
- CONFIG_IDE_MMIO=y
- CONFIG_SM501=y
-+CONFIG_I2C=y
-+CONFIG_DDC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_I82378=y
- CONFIG_I8259=y
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 9dec0d3..05c964b 100644
+index 05c964b..b095134 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-+#include "qemu/log.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/hw.h"
-@@ -34,6 +35,8 @@
- #include "hw/devices.h"
- #include "hw/sysbus.h"
- #include "hw/pci/pci.h"
-+#include "hw/i2c/i2c.h"
-+#include "hw/i2c/i2c-ddc.h"
- #include "qemu/range.h"
- #include "ui/pixel_ops.h"
- 
-@@ -216,6 +219,14 @@
- #define SM501_I2C_SLAVE_ADDRESS         (0x03)
- #define SM501_I2C_DATA                  (0x04)
- 
-+#define SM501_I2C_CONTROL_START         (1 << 2)
-+#define SM501_I2C_CONTROL_ENABLE        (1 << 0)
-+
-+#define SM501_I2C_STATUS_COMPLETE       (1 << 3)
-+#define SM501_I2C_STATUS_ERROR          (1 << 2)
-+
-+#define SM501_I2C_RESET_ERROR           (1 << 2)
-+
- /* SSP base */
- #define SM501_SSP                       (0x020000)
- 
-@@ -471,10 +482,12 @@ typedef struct SM501State {
-     MemoryRegion local_mem_region;
-     MemoryRegion mmio_region;
-     MemoryRegion system_config_region;
-+    MemoryRegion i2c_region;
-     MemoryRegion disp_ctrl_region;
+@@ -487,6 +487,7 @@ typedef struct SM501State {
      MemoryRegion twoD_engine_region;
      uint32_t last_width;
      uint32_t last_height;
-+    I2CBus *i2c_bus;
++    bool do_full_update; /* perform a full update next time */
+     I2CBus *i2c_bus;
  
      /* mmio registers */
-     uint32_t system_control;
-@@ -487,6 +500,11 @@ typedef struct SM501State {
-     uint32_t misc_timing;
-     uint32_t power_mode_control;
+@@ -1042,6 +1043,7 @@ static void sm501_palette_write(void *opaque, hwaddr addr,
  
-+    uint8_t i2c_byte_count;
-+    uint8_t i2c_status;
-+    uint8_t i2c_addr;
-+    uint8_t i2c_data[16];
-+
-     uint32_t uart0_ier;
-     uint32_t uart0_lcr;
-     uint32_t uart0_mcr;
-@@ -897,6 +915,109 @@ static const MemoryRegionOps sm501_system_config_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+     assert(range_covers_byte(0, 0x400 * 3, addr));
+     *(uint32_t *)&s->dc_palette[addr] = value;
++    s->do_full_update = true;
+ }
  
-+static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    SM501State *s = (SM501State *)opaque;
-+    uint8_t ret = 0;
-+
-+    switch (addr) {
-+    case SM501_I2C_BYTE_COUNT:
-+        ret = s->i2c_byte_count;
-+        break;
-+    case SM501_I2C_STATUS:
-+        ret = s->i2c_status;
-+        break;
-+    case SM501_I2C_SLAVE_ADDRESS:
-+        ret = s->i2c_addr;
-+        break;
-+    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
-+        ret = s->i2c_data[addr - SM501_I2C_DATA];
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register read."
-+                      " addr=0x%" HWADDR_PRIx "\n", addr);
+ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
+@@ -1630,6 +1632,12 @@ static void sm501_update_display(void *opaque)
+         full_update = 1;
+     }
+ 
++    /* someone else requested a full update */
++    if (s->do_full_update) {
++        s->do_full_update = false;
++        full_update = 1;
 +    }
 +
-+    SM501_DPRINTF("sm501 i2c regs : read addr=%" HWADDR_PRIx " val=%x\n",
-+                  addr, ret);
-+    return ret;
-+}
-+
-+static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-+                            unsigned size)
-+{
-+    SM501State *s = (SM501State *)opaque;
-+    SM501_DPRINTF("sm501 i2c regs : write addr=%" HWADDR_PRIx
-+                  " val=%" PRIx64 "\n", addr, value);
-+
-+    switch (addr) {
-+    case SM501_I2C_BYTE_COUNT:
-+        s->i2c_byte_count = value & 0xf;
-+        break;
-+    case SM501_I2C_CONTROL:
-+        if (value & SM501_I2C_CONTROL_ENABLE) {
-+            if (value & SM501_I2C_CONTROL_START) {
-+                int res = i2c_start_transfer(s->i2c_bus,
-+                                             s->i2c_addr >> 1,
-+                                             s->i2c_addr & 1);
-+                s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-+                if (!res) {
-+                    int i;
-+                    SM501_DPRINTF("sm501 i2c : transferring %d bytes to 0x%x\n",
-+                                  s->i2c_byte_count + 1, s->i2c_addr >> 1);
-+                    for (i = 0; i <= s->i2c_byte_count; i++) {
-+                        res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-+                                            !(s->i2c_addr & 1));
-+                        if (res) {
-+                            SM501_DPRINTF("sm501 i2c : transfer failed"
-+                                          " i=%d, res=%d\n", i, res);
-+                            s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-+                            return;
-+                        }
-+                    }
-+                    if (i) {
-+                        SM501_DPRINTF("sm501 i2c : transferred %d bytes\n", i);
-+                        s->i2c_status = SM501_I2C_STATUS_COMPLETE;
-+                    }
-+                }
-+            } else {
-+                SM501_DPRINTF("sm501 i2c : end transfer\n");
-+                i2c_end_transfer(s->i2c_bus);
-+                s->i2c_status &= ~SM501_I2C_STATUS_ERROR;
-+            }
-+        }
-+        break;
-+    case SM501_I2C_RESET:
-+        if ((value & SM501_I2C_RESET_ERROR) == 0) {
-+            s->i2c_status &= ~SM501_I2C_STATUS_ERROR;
-+        }
-+        break;
-+    case SM501_I2C_SLAVE_ADDRESS:
-+        s->i2c_addr = value & 0xff;
-+        break;
-+    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
-+        s->i2c_data[addr - SM501_I2C_DATA] = value & 0xff;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register write. "
-+                      "addr=0x%" HWADDR_PRIx " val=%" PRIx64 "\n", addr, value);
-+    }
-+}
-+
-+static const MemoryRegionOps sm501_i2c_ops = {
-+    .read = sm501_i2c_read,
-+    .write = sm501_i2c_write,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
- static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
- {
-     SM501State *s = (SM501State *)opaque;
-@@ -1577,6 +1698,10 @@ static void sm501_reset(SM501State *s)
-     s->irq_mask = 0;
-     s->misc_timing = 0;
-     s->power_mode_control = 0;
-+    s->i2c_byte_count = 0;
-+    s->i2c_status = 0;
-+    s->i2c_addr = 0;
-+    memset(s->i2c_data, 0, 16);
-     s->dc_panel_control = 0x00010000; /* FIFO level 3 */
-     s->dc_video_control = 0;
-     s->dc_crt_control = 0x00010000;
-@@ -1615,6 +1740,12 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-     memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
-     s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
- 
-+    /* i2c */
-+    s->i2c_bus = i2c_init_bus(dev, "sm501.i2c");
-+    /* ddc */
-+    I2CDDCState *ddc = I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2CDDC));
-+    i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
-+
-     /* mmio */
-     memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
-     memory_region_init_io(&s->system_config_region, OBJECT(dev),
-@@ -1622,6 +1753,9 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-                           "sm501-system-config", 0x6c);
-     memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
-                                 &s->system_config_region);
-+    memory_region_init_io(&s->i2c_region, OBJECT(dev), &sm501_i2c_ops, s,
-+                          "sm501-i2c", 0x14);
-+    memory_region_add_subregion(&s->mmio_region, SM501_I2C, &s->i2c_region);
-     memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
-                           &sm501_disp_ctrl_ops, s,
-                           "sm501-disp-ctrl", 0x1000);
-@@ -1705,6 +1839,11 @@ static const VMStateDescription vmstate_sm501_state = {
-         VMSTATE_UINT32(twoD_destination_base, SM501State),
-         VMSTATE_UINT32(twoD_alpha, SM501State),
-         VMSTATE_UINT32(twoD_wrap, SM501State),
-+        /* Added in version 2 */
-+        VMSTATE_UINT8(i2c_byte_count, SM501State),
-+        VMSTATE_UINT8(i2c_status, SM501State),
-+        VMSTATE_UINT8(i2c_addr, SM501State),
-+        VMSTATE_UINT8_ARRAY(i2c_data, SM501State, 16),
-         VMSTATE_END_OF_LIST()
-      }
- };
-@@ -1770,8 +1909,8 @@ static void sm501_reset_sysbus(DeviceState *dev)
- 
- static const VMStateDescription vmstate_sm501_sysbus = {
-     .name = TYPE_SYSBUS_SM501,
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_STRUCT(state, SM501SysBusState, 1,
-                        vmstate_sm501_state, SM501State),
-@@ -1843,8 +1982,8 @@ static void sm501_reset_pci(DeviceState *dev)
- 
- static const VMStateDescription vmstate_sm501_pci = {
-     .name = TYPE_PCI_SM501,
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, SM501PCIState),
-         VMSTATE_STRUCT(state, SM501PCIState, 1,
+     /* draw each line according to conditions */
+     snap = memory_region_snapshot_and_clear_dirty(&s->local_mem_region,
+               offset, width * height * src_bpp, DIRTY_MEMORY_VGA);
 -- 
 2.7.6
