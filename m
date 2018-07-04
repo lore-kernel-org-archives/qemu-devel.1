@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faZKu-0004yN-3O
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:24:14 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1faZkh-0008Fv-Fd
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faZKq-0006zh-OJ
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:24:12 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:39278)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1faZKq-0006zJ-JW
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:24:08 -0400
-Received: by mail-qt0-x242.google.com with SMTP id q12-v6so3558507qtp.6
-	for <qemu-devel@nongnu.org>; Tue, 03 Jul 2018 21:24:08 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1530047900.git.balaton@eik.bme.hu>
-	<alpine.BSF.2.21.1806302231400.45338@zero.eik.bme.hu>
-	<CAFEAcA_ymngY5i5BWQ6-xAveCWjs0QKrORSAy9nH1A8m9672Fg@mail.gmail.com>
-	<20180703002815.GF3422@umbus.fritz.box>
-	<CAFEAcA9qTxmHPffpjvZ=bgyaAYZivJd--3wEWFxk+UdABkyt3g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7b8b2df2-8d19-4bab-5692-8c9745db99a3@amsat.org>
-Date: Wed, 4 Jul 2018 01:24:03 -0300
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1faZkg-0005Gf-Fq
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 00:50:51 -0400
+References: <20180703055804.13449-1-david@gibson.dropbear.id.au>
+	<20180703055804.13449-36-david@gibson.dropbear.id.au>
+	<4fce9ddd-5079-e833-b6c2-e6935322c73d@ilande.co.uk>
+	<b0f927a5f0eb2bd96798124e6925fa1f@sebastianbauer.info>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <9108e419-3120-b887-0da8-3748dbc19a17@ilande.co.uk>
+Date: Wed, 4 Jul 2018 05:50:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9qTxmHPffpjvZ=bgyaAYZivJd--3wEWFxk+UdABkyt3g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Misc sm501 improvements
+In-Reply-To: <b0f927a5f0eb2bd96798124e6925fa1f@sebastianbauer.info>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 35/35] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,68 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Sebastian Bauer <mail@sebastianbauer.info>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi David, I'll reply to you using Peter mail :)
+On 03/07/18 20:24, Sebastian Bauer wrote:
 
-On 07/03/2018 06:13 AM, Peter Maydell wrote:
-> On 3 July 2018 at 01:28, David Gibson <david@gibson.dropbear.id.au> wrote:
->> On Mon, Jul 02, 2018 at 10:42:07AM +0100, Peter Maydell wrote:
->>> I can have a look, but really I think these should go via the
->>> ppc tree -- the device is used in a ppc machine and an sh4 one,
->>> and the ppc tree is much more active than sh4.
+> Am 2018-07-03 21:00, schrieb Mark Cave-Ayland:
+>> On 03/07/18 06:58, David Gibson wrote:
 >>
->> Hm, well, if you like.  Although the gradual creep of my
->> maintainership scope into things I know less and less about makes me
->> rather nervous.  I tried to convince Balaton Zoltan to become sm501
->> maintainer, but he didn't bite.
+>>> From: Sebastian Bauer <mail@sebastianbauer.info>
+>>>
+>>> Drivers for this card exists on PPC-based AmigaOS guests so it is 
+>>> useful to
+>>> allow users to emulate the graphics card for PPC machines.
+>>>
+>>> As cirrus vga is currently preferred over std(vga) in absence of any 
+>>> user
+>>> choice, this change also sets the default display of spapr machines to
+>>> std as otherwise qemu refuses to start these machines.
+>>
+>> ... which has quite nicely broken the VGA display for both the PPC Mac
+>> machines. Patch to follow shortly.
 > 
-> It's not like I know anything more about the sm501 than you do :-)
+> Please see my note in the comment section of the patch where I propose 
+> two possible solutions:
 > 
-> The arm parts of the tree have a lot of board and device code
-> I'm not familiar with either. Generally the approach I use is:
->  * eyeball the code to see if it's doing anything that looks
->    "obviously wrong", failing to use correct QEMU APIs, etc
+> Either to give up the vga cirrus preference or to apply the same as was 
+> done with the spapr machine. I would prefer the first variant but it 
+> would also cause some differences on other machines.
 
-Gerd Hoffmann did a review for the graphic code,
-then commented "all look sane":
-http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg06493.html
+I understand that the decision was taken to add VGA cirrus to the PPC 
+build and therefore accept the default VGA device change, however your 
+the commit message only mentions spapr and not all the other PPC 
+machines whose defaults are also potentially affected:
 
-I don't have a serious understanding of QEMU graphic internals, but
-looked at those patches and didn't find anything "obviously wrong".
+$ ./qemu-system-ppc -M ?
+Supported machines are:
+40p                  IBM RS/6000 7020 (40p)
+bamboo               bamboo
+g3beige              Heathrow based PowerMAC (default)
+mac99                Mac99 based PowerMAC
+mpc8544ds            mpc8544ds
+none                 empty machine
+ppce500              generic paravirt e500 platform
+prep                 PowerPC PREP platform
+ref405ep             ref405ep
+sam460ex             aCube Sam460ex
+taihu                taihu
+virtex-ml507         Xilinx Virtex ML507 reference design
 
->  * anything that touches 'core' code or code common to multiple
->    machines gets closer scrutiny
+I'm not able to personally validate all of these, but a quick check 
+shows that at least both PReP machines (-M prep and -M 40p) are also 
+broken by this patch which tells me it hasn't had much testing.
 
-The only SH4 tests I run are using Aurelien Debian:
-https://people.debian.org/~aurel32/qemu/sh4/
+David, do you know what the defaults are for the other PPC machines in 
+order for Sebastian to test and send a follow-up patch?
 
->  * I might check the data sheet if I'm feeling enthusastic or
->    if the code looks like it's doing weird things, but often
->    not, especially if the code has had review from somebody else
 
-I did a review of the I2C/DDC patch with the specs at hand.
+ATB,
 
->  * if I have a test image to hand I'll do a smoke test, but often
->    I don't have a test image
-
-Neither do I.
-
-> Basically I think the important thing is to make sure the
-> codebase stays maintainable and generally the quality bar
-> in terms of using the right APIs and design approaches
-> tends to ratchet up rather than down. If our implementation
-> of an obscure device isn't actually right, that doesn't
-> really affect very many users, so I worry less about that
-> side of things.
-
-Zoltan used few deprecated API but said updating "could be done in
-separate clean up", which I agree :)
-http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg06911.html
-
-FWIW and using Peter's criteria I think this series is good to go.
-
-Regards,
-
-Phil.
+Mark.
