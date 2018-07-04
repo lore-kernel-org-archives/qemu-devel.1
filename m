@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fadNN-0000Lo-R0
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:43:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1fadPY-0001AG-U3
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fadNM-0005Kb-Sk
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:43:01 -0400
-Date: Wed, 4 Jul 2018 16:42:42 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180704084242.GA8621@lemon.usersys.redhat.com>
-References: <20180704061320.2041-1-famz@redhat.com>
-	<20180704061320.2041-2-famz@redhat.com>
-	<20180704074453.GA4334@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180704074453.GA4334@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: Fix dst total_sectors after
- copy offloading
+	(envelope-from <peterx@redhat.com>) id 1fadPY-0005jv-3o
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:45:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34366 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fadPX-0005jn-Nb
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 04:45:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D885401DEA8
+	for <qemu-devel@nongnu.org>; Wed,  4 Jul 2018 08:45:15 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  4 Jul 2018 16:44:59 +0800
+Message-Id: <20180704084507.14560-2-peterx@redhat.com>
+In-Reply-To: <20180704084507.14560-1-peterx@redhat.com>
+References: <20180704084507.14560-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/9] monitor: simplify
+ monitor_qmp_setup_handlers_bh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, 07/04 09:44, Kevin Wolf wrote:
-> Am 04.07.2018 um 08:13 hat Fam Zheng geschrieben:
-> > This was noticed by the new image fleecing tests case 222. The issue is
-> > apparent and we should just do the same right things as in
-> > bdrv_aligned_pwritev.
-> > 
-> > Reported-by: John Snow <jsnow@redhat.com>
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> 
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -2945,6 +2945,10 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
-> >                                                    dst, dst_offset,
-> >                                                    bytes, flags);
-> >      }
-> > +    if (ret == 0) {
-> > +        int64_t end_sector = DIV_ROUND_UP(dst_offset + bytes, BDRV_SECTOR_SIZE);
-> > +        dst->bs->total_sectors = MAX(dst->bs->total_sectors, end_sector);
-> > +    }
-> 
-> I think it's time to extract this stuff to a common function. I was
-> already aware that a write request that extends the image isn't behaving
-> exactly the same as bdrv_co_truncate(), and this one is bound to diverge
-> from the other two instances as well.
-> 
-> This is what bdrv_aligned_pwritev() does after the write:
-> 
->     atomic_inc(&bs->write_gen);
->     bdrv_set_dirty(bs, offset, bytes);
-> 
->     stat64_max(&bs->wr_highest_offset, offset + bytes);
-> 
->     if (ret >= 0) {
->         bs->total_sectors = MAX(bs->total_sectors, end_sector);
->         ret = 0;
->     }
-> 
-> Before the write, it also calls bs->before_write_notifiers.
-> 
-> This is what bdrv_co_truncate() does after truncating the image:
-> 
->     ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
->     if (ret < 0) {
->         error_setg_errno(errp, -ret, "Could not refresh total sector count");
->     } else {
->         offset = bs->total_sectors * BDRV_SECTOR_SIZE;
->     }
->     bdrv_dirty_bitmap_truncate(bs, offset);
->     bdrv_parent_cb_resize(bs);
->     atomic_inc(&bs->write_gen);
-> 
-> This means that we probably have at least the following bugs in
-> bdrv_co_copy_range_internal():
-> 
-> 1. bs->write_gen is not increased, a following flush is ignored
-> 2. Dirty bitmaps are not dirtied
-> 3. Dirty bitmaps are not resized when extending the image
-> 4. bs->wr_highest_offset is not adjusted correctly
-> 5. bs->total_sectors is not resized (the bug this patch fixes)
-> 6. The parent node isn't notified about an image size change
-> 
-> Of these, 3. and 6. also seem to be bugs in bdrv_aligned_pwritev().
-> 
+When we reach monitor_qmp_setup_handlers_bh() we must be using the
+IOThread then, so no need to check against it any more.  Instead, we
+assert.
 
-Indeed, great insight. I'll work on v2.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ monitor.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-Fam
+diff --git a/monitor.c b/monitor.c
+index 14af7b7ea6..0e3ac52d87 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4583,15 +4583,10 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+     Monitor *mon = opaque;
+     GMainContext *context;
+ 
+-    if (mon->use_io_thread) {
+-        /* Use @mon_iothread context */
+-        context = monitor_get_io_context();
+-        assert(context);
+-    } else {
+-        /* Use default main loop context */
+-        context = NULL;
+-    }
+-
++    assert(mon->use_io_thread);
++    /* Use @mon_iothread context */
++    context = monitor_get_io_context();
++    assert(context);
+     qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+                              monitor_qmp_event, NULL, mon, context, true);
+     monitor_list_append(mon);
+-- 
+2.17.1
