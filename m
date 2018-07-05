@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fb2ri-0007Ri-JD
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:56:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1fb2sW-0007uS-54
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fb2re-00071S-M4
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:56:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33016 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fb2sS-00018k-9m
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:56:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46056 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fb2re-0006zO-GG
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:55:58 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fb2sR-00015X-UQ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:56:48 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
-	<20180326150916.9602-11-marcandre.lureau@redhat.com>
-Date: Thu, 05 Jul 2018 13:55:51 +0200
-In-Reply-To: <20180326150916.9602-11-marcandre.lureau@redhat.com>
+	<20180326150916.9602-12-marcandre.lureau@redhat.com>
+Date: Thu, 05 Jul 2018 13:56:46 +0200
+In-Reply-To: <20180326150916.9602-12-marcandre.lureau@redhat.com>
 	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Mon, 26 Mar 2018 17:08:48 +0200")
-Message-ID: <87bmbl99rs.fsf@dusky.pond.sub.org>
+	Lureau"'s message of "Mon, 26 Mar 2018 17:08:49 +0200")
+Message-ID: <877em999q9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 10/38] tests: add a few qemu-qmp tests
+Subject: Re: [Qemu-devel] [PATCH v3 11/38] tests: change /0.15/* tests to
+ /qmp/*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +31,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> These 2 tests exhibited two qmp bugs that were fixed in 2.7
-> (series from commit e64c75a9752c5d0fd64eb2e684c656a5ea7d03c6 to
-> commit 1382d4abdf9619985e4078e37e49e487cea9935e)
+> Presumably 0.15 was the version it was first introduced, but
+> qmp keeps evolving. There is no point in having that version
+> as test prefix, 'qmp' makes more sense here.
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Thanks for holding on to the test cases :)
-
-Needs a rebase.
-
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  tests/qmp-test.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
+>  tests/test-qmp-cmds.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-> index 07c0b87e27..642f46a332 100644
-> --- a/tests/qmp-test.c
-> +++ b/tests/qmp-test.c
-> @@ -224,7 +224,50 @@ static void test_qmp_oob(void)
->          }
->          QDECREF(resp);
->      }
-> +    qtest_end();
-> +}
-> +
-> +static void test_object_add_without_props(void)
-> +{
-> +    QDict *ret, *error;
-> +    const gchar *klass, *desc;
-> +
-> +    qtest_start("-machine none");
->=20=20
-> +    ret =3D qmp("{'execute': 'object-add',"
-> +              " 'arguments': { 'qom-type': 'memory-backend-ram', 'id': '=
-ram1' } }");
-> +    g_assert_nonnull(ret);
-> +
-> +    error =3D qdict_get_qdict(ret, "error");
-> +    klass =3D qdict_get_try_str(error, "class");
-> +    desc =3D qdict_get_try_str(error, "desc");
-> +
-> +    g_assert_cmpstr(klass, =3D=3D, "GenericError");
-> +    g_assert_cmpstr(desc, =3D=3D, "can't create backend with size 0");
-
-Sure checking "desc" is worthwhile?  We don't do that elsewhere in this
-test program, and only rarely in other test programs.
-
-> +
-> +    QDECREF(ret);
-> +    qtest_end();
-> +}
-> +
-> +static void test_qom_set_without_value(void)
-> +{
-> +    QDict *ret, *error;
-> +    const gchar *klass, *desc;
-> +
-> +    qtest_start("-machine none");
-> +
-> +    ret =3D qmp("{'execute': 'qom-set',"
-> +              " 'arguments': { 'path': '/machine', 'property': 'rtc-time=
-' } }");
-> +    g_assert_nonnull(ret);
-> +
-> +    error =3D qdict_get_qdict(ret, "error");
-> +    klass =3D qdict_get_try_str(error, "class");
-> +    desc =3D qdict_get_try_str(error, "desc");
-> +
-> +    g_assert_cmpstr(klass, =3D=3D, "GenericError");
-> +    g_assert_cmpstr(desc, =3D=3D, "Parameter 'value' is missing");
-
-Likewise.
-
-> +
-> +    QDECREF(ret);
->      qtest_end();
->  }
->=20=20
-> @@ -411,13 +454,19 @@ int main(int argc, char *argv[])
->=20=20
+> diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+> index 93fbbb1b73..b49e9dd029 100644
+> --- a/tests/test-qmp-cmds.c
+> +++ b/tests/test-qmp-cmds.c
+> @@ -273,11 +273,11 @@ int main(int argc, char **argv)
+>  {
 >      g_test_init(&argc, &argv, NULL);
 >=20=20
-> +    qtest_add_func("qmp/object-add-without-props",
-> +                   test_object_add_without_props);
-> +    qtest_add_func("qmp/qom-set-without-value",
-> +                   test_qom_set_without_value);
->      qtest_add_func("qmp/protocol", test_qmp_protocol);
->      qtest_add_func("qmp/oob", test_qmp_oob);
-> +
->      qmp_schema_init(&schema);
->      add_query_tests(&schema);
+> -    g_test_add_func("/0.15/dispatch_cmd", test_dispatch_cmd);
+> -    g_test_add_func("/0.15/dispatch_cmd_failure", test_dispatch_cmd_fail=
+ure);
+> -    g_test_add_func("/0.15/dispatch_cmd_io", test_dispatch_cmd_io);
+> -    g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
+> -    g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
+> +    g_test_add_func("/qmp/dispatch_cmd", test_dispatch_cmd);
+> +    g_test_add_func("/qmp/dispatch_cmd_failure", test_dispatch_cmd_failu=
+re);
+> +    g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
+> +    g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
+> +    g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
 >=20=20
->      ret =3D g_test_run();
->=20=20
->      qmp_schema_cleanup(&schema);
-> +
->      return ret;
->  }
+>      test_qmp_init_marshal(&qmp_commands);
+>      g_test_run();
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
