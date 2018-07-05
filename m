@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fb0L2-00040x-1s
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb0Mk-0005Qq-4f
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fb0Kz-0001MD-0N
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41922 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fb0Mg-0006EK-PC
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:15:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38568 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fb0Ky-0001LN-Qm
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:04 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb0Mg-0006DS-JJ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:15:50 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81C4240704BC
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:14:04 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  5 Jul 2018 11:14:02 +0200
-Message-Id: <20180705091402.26244-3-armbru@redhat.com>
-In-Reply-To: <20180705091402.26244-1-armbru@redhat.com>
-References: <20180705091402.26244-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] cli qmp: Mark --preconfig,
- exit-preconfig experimental
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C12987928
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:15:50 +0000 (UTC)
+Date: Thu, 5 Jul 2018 10:15:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180705091546.GC2538@work-vm>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-3-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705031755.3254-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 2/9] migration: loosen recovery
+ check when load vm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +34,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, eblake@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-Committing to the current --preconfig / exit-preconfig interface
-before it has seen any use is premature.  Mark both as experimental,
-the former in documentation, the latter by renaming it to
-x-exit-preconfig.
+* Peter Xu (peterx@redhat.com) wrote:
+> We were checking against -EIO, assuming that it will cover all IO
+> failures.  But actually it is not.  One example is that in
+> qemu_loadvm_section_start_full() we can have tons of places that will
+> return -EINVAL even if the error is caused by IO failures on the
+> network.
 
-See the previous commit for more detailed rationale.
+I suspect we should fix those; but OK; I think the only cases
+in there that could hit that are the get_counted_string and the
+check_section_footer; they could both be fixed to return an errno
+like the other cases.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hmp.c             | 2 +-
- qapi/misc.json    | 6 +++---
- qemu-options.hx   | 9 +++++----
- qemu-tech.texi    | 8 ++++----
- qmp.c             | 2 +-
- tests/numa-test.c | 2 +-
- tests/qmp-test.c  | 6 +++---
- 7 files changed, 18 insertions(+), 17 deletions(-)
+> Let's loosen the recovery check logic here to cover all the error cases
+> happened by removing the explicit check against -EIO.  After all we
+> won't lose anything here if any other failure happened.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/savevm.c | 16 ++++++----------
+>  1 file changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 851d74e8b6..efcc795071 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2276,18 +2276,14 @@ out:
+>          qemu_file_set_error(f, ret);
+>  
+>          /*
+> -         * Detect whether it is:
+> -         *
+> -         * 1. postcopy running (after receiving all device data, which
+> -         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
+> -         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
+> -         *    still receiving device states).
+> -         * 2. network failure (-EIO)
+> -         *
+> -         * If so, we try to wait for a recovery.
+> +         * If we are during an active postcopy, then we pause instead
+> +         * of bail out to at least keep the VM's dirty data.  Note
+> +         * that POSTCOPY_INCOMING_LISTENING stage is still not enough,
+> +         * during which we're still receiving device states and we
+> +         * still haven't yet started the VM on destination.
+>           */
+>          if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
+> -            ret == -EIO && postcopy_pause_incoming(mis)) {
+> +            postcopy_pause_incoming(mis)) {
 
-diff --git a/hmp.c b/hmp.c
-index fe4477a8fb..3e689dfc6b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1074,7 +1074,7 @@ void hmp_exit_preconfig(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
- 
--    qmp_exit_preconfig(&err);
-+    qmp_x_exit_preconfig(&err);
-     hmp_handle_error(mon, &err);
- }
- 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 29da7856e3..2e9902371a 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1205,7 +1205,7 @@
- { 'command': 'cont' }
- 
- ##
--# @exit-preconfig:
-+# @x-exit-preconfig:
- #
- # Exit from "preconfig" state
- #
-@@ -1221,11 +1221,11 @@
- #
- # Example:
- #
--# -> { "execute": "exit-preconfig" }
-+# -> { "execute": "x-exit-preconfig" }
- # <- { "return": {} }
- #
- ##
--{ 'command': 'exit-preconfig', 'allow-preconfig': true }
-+{ 'command': 'x-exit-preconfig', 'allow-preconfig': true }
- 
- ##
- # @system_wakeup:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 16208f63f2..1d04613a17 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3291,16 +3291,17 @@ Run the emulation in single step mode.
- ETEXI
- 
- DEF("preconfig", 0, QEMU_OPTION_preconfig, \
--    "--preconfig     pause QEMU before machine is initialized\n",
-+    "--preconfig     pause QEMU before machine is initialized (experimental)\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item --preconfig
- @findex --preconfig
- Pause QEMU for interactive configuration before the machine is created,
- which allows querying and configuring properties that will affect
--machine initialization. Use the QMP command 'exit-preconfig' to exit
--the preconfig state and move to the next state (ie. run guest if -S
--isn't used or pause the second time if -S is used).
-+machine initialization.  Use QMP command 'x-exit-preconfig' to exit
-+the preconfig state and move to the next state (i.e. run guest if -S
-+isn't used or pause the second time if -S is used).  This option is
-+experimental.
- ETEXI
- 
- DEF("S", 0, QEMU_OPTION_S, \
-diff --git a/qemu-tech.texi b/qemu-tech.texi
-index f843341ffa..7c3d1f05e1 100644
---- a/qemu-tech.texi
-+++ b/qemu-tech.texi
-@@ -336,9 +336,9 @@ additionally configure the machine (by hotplugging devices) in runtime before
- allowing VM code to run.
- 
- However, at the -S pause point, it's impossible to configure options that affect
--initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. That's
--when the --preconfig command line option should be used. It allows pausing QEMU
--before the initial VM creation, in a new preconfig state, where additional
-+initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. The
-+experimental --preconfig command line option  allows pausing QEMU
-+before the initial VM creation, in a ``preconfig'' state, where additional
- queries and configuration can be performed via QMP before moving on to
- the resulting configuration startup. In the preconfig state, QEMU only allows
- a limited set of commands over the QMP monitor, where the commands do not
-@@ -348,7 +348,7 @@ depend on an initialized machine, including but not limited to:
- @item query-qmp-schema
- @item query-commands
- @item query-status
--@item exit-preconfig
-+@item x-exit-preconfig
- @end table
- 
- @node Bibliography
-diff --git a/qmp.c b/qmp.c
-index 73e46d795f..411e3210bb 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -161,7 +161,7 @@ SpiceInfo *qmp_query_spice(Error **errp)
- };
- #endif
- 
--void qmp_exit_preconfig(Error **errp)
-+void qmp_x_exit_preconfig(Error **errp)
- {
-     if (!runstate_check(RUN_STATE_PRECONFIG)) {
-         error_setg(errp, "The command is permitted only in '%s' state",
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index b7a6ef8815..893f826acb 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -285,7 +285,7 @@ static void pc_dynamic_cpu_cfg(const void *data)
-         " 'arguments': { 'type': 'cpu', 'node-id': 1, 'socket-id': 0 } }")));
- 
-     /* let machine initialization to complete and run */
--    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
-     qtest_qmp_eventwait(qs, "RESUME");
- 
-     /* check that CPUs are mapped as expected */
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index a49cbc6fde..ca8c599526 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -412,7 +412,7 @@ static void test_qmp_preconfig(void)
-     qobject_unref(rsp);
- 
-     /* exit preconfig state */
--    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
-     qtest_qmp_eventwait(qs, "RESUME");
- 
-     /* check that query-status returns running state */
-@@ -422,8 +422,8 @@ static void test_qmp_preconfig(void)
-     g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "running");
-     qobject_unref(rsp);
- 
--    /* check that exit-preconfig returns error after exiting preconfig */
--    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
-+    /* check that x-exit-preconfig returns error after exiting preconfig */
-+    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
- 
-     /* enabled commands, no error expected  */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
--- 
-2.17.1
+Hmm, OK; It does make me a bit nervous we might trigger this
+too often, but I see the other cases where we're missing stuff
+we should trigger it.  We might find we need to go the other way
+and blacklist some errors.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>              /* Reset f to point to the newly created channel */
+>              f = mis->from_src_file;
+>              goto retry;
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
