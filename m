@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb6Wv-0001rW-II
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fb6e1-00046S-5f
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:58:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb6Wu-0007NP-O9
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:49 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:46782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fb6Wu-0007N2-KJ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:48 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id y207-v6so17766275oie.13
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 08:50:48 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1fb6e0-0004v9-Ez
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:58:09 -0400
+Date: Thu, 5 Jul 2018 17:57:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180705155755.GN3309@localhost.localdomain>
+References: <20180705073701.10558-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180705102604.4986-1-kwolf@redhat.com>
-References: <20180705102604.4986-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jul 2018 16:50:27 +0100
-Message-ID: <CAFEAcA-CtuWBSENpNsGBaTcyA8KdQmMuGT6DJMFxwmGJwNux3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/12] Block layer patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705073701.10558-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] block: Fix dst reading after tail
+ copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +23,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 5 July 2018 at 11:25, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit fe8d2d5737ab20ed0118863f5eb888cae37122ab:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.0-pull-request' into staging (2018-07-04 22:38:10 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 7c20c808a5cbf5d244735bc78fc3138c739c1946:
->
->   file-posix: Unlock FD after creation (2018-07-05 11:07:58 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - qcow2: Use worker threads for compression to improve performance of
->   'qemu-img convert -W' and compressed backup jobs
-> - blklogwrites: New filter driver to log write requests to an image in
->   the dm-log-writes format
-> - file-posix: Fix image locking during image creation
-> - crypto: Fix memory leak in error path
-> - Error out instead of silently truncating node names
->
+Am 05.07.2018 um 09:36 hat Fam Zheng geschrieben:
+> Qcow2 allocates new clusters after the end of the file. If it is the destinaton
+> of copy offloading, we must adjust dst->bs->total_sectors. Otherwise, further
+> reads will drop to the "beyond EOF" code path and return zeroes, which problem
+> is caught by iotests 222.
+> 
+> Follow the logic in the normal write code and update bs->total_sectors after
+> I/O is done.
+> 
+> While at it, add a few convenient trace points to aid future debug experiences
+> in the topic.
 
-Applied, thanks.
+Apart from the comments I made, this series also conflicts with
+Vladimir's "[PATCH v3 0/4] fix image fleecing". Can you please rebase on
+top of his series for the next version?
 
--- PMM
+Kevin
