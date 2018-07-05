@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb13I-0003z2-97
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:53 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb13K-0003zI-FH
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb13E-0003eP-CX
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:52 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56137 helo=mail.rt-rk.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fb13G-0003kf-Jf
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57438 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Aleksandar.Markovic@rt-rk.com>)
-	id 1fb13E-0002WQ-0b
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:48 -0400
-in-reply-to: <f5f4cd65-545e-42f7-3d8d-1d57ced676d7@amsat.org>
-from: "Aleksandar Markovic" <Aleksandar.Markovic@rt-rk.com>
-message-id: <4269-5b3dec00-3-5fa78980@135404596>
-date: Thu, 05 Jul 2018 11:59:19 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb13G-0003jU-Cy
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:50 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B94F5DFF8
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:59:49 +0000 (UTC)
+Date: Thu, 5 Jul 2018 10:59:45 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180705095944.GF2538@work-vm>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-5-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?b?Pz09P3V0Zi04P3E/IFtQQVRDSCB2MyAyLzhdIHRh?=
- =?utf-8?q?rget/mips=3A_Workaround_for_checkpatch=2Epl_hanging_on_msa=5Fhe?=
- =?utf-8?q?lper=2Ec?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705031755.3254-5-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 4/9] tests: introduce
+ migrate_postcopy_* helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +34,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-> Hi Aleksandar,
+* Peter Xu (peterx@redhat.com) wrote:
+> Separate the old postcopy UNIX socket test into three steps, provide a
+> helper for each step.  With these helpers, we can do more compliated
+> tests like postcopy recovery, while keep the codes shared.
 > 
-> On 07/04/2018 04:30 PM, Aleksandar Markovic wrote:
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > If checkpatch.pl is applied (using switch "-f") on file
-> > target/mips/msa=5Fhelper.c, it will hang.
-> >
-> > This is a workaround by correcting the source file. The workaround =
-is
-> > found by partial deleting and undeleting of the code in msa=5Fhelpe=
-r.c
-> > in binary search fashion.
-> >
-> > The bug (for checkpatch.pl) is already reported to the qemu-devel l=
-ist.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  tests/migration-test.c | 38 +++++++++++++++++++++++++++-----------
+>  1 file changed, 27 insertions(+), 11 deletions(-)
 > 
-> Paolo already sent a fix for this bug:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg01250.html=
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 3a85446f95..2155869b96 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -351,13 +351,19 @@ static void migrate(QTestState *who, const char *uri)
+>      qobject_unref(rsp);
+>  }
+>  
+> -static void migrate_start_postcopy(QTestState *who)
+> +static void migrate_postcopy_start(QTestState *from, QTestState *to)
+>  {
+>      QDict *rsp;
+>  
+> -    rsp = wait_command(who, "{ 'execute': 'migrate-start-postcopy' }");
+> +    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
+>      g_assert(qdict_haskey(rsp, "return"));
+>      qobject_unref(rsp);
+> +
+> +    if (!got_stop) {
+> +        qtest_qmp_eventwait(from, "STOP");
+> +    }
+> +
+> +    qtest_qmp_eventwait(to, "RESUME");
+>  }
+>  
+>  static void test_migrate_start(QTestState **from, QTestState **to,
+> @@ -505,7 +511,8 @@ static void test_deprecated(void)
+>      qtest_quit(from);
+>  }
+>  
+> -static void test_postcopy(void)
+> +static void migrate_postcopy_prepare(QTestState **from_ptr,
+> +                                     QTestState **to_ptr)
+>  {
+>      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+>      QTestState *from, *to;
+> @@ -527,28 +534,37 @@ static void test_postcopy(void)
+>      wait_for_serial("src_serial");
+>  
+>      migrate(from, uri);
+> +    g_free(uri);
+>  
+>      wait_for_migration_pass(from);
+>  
+> -    migrate_start_postcopy(from);
+> -
+> -    if (!got_stop) {
+> -        qtest_qmp_eventwait(from, "STOP");
+> -    }
+> +    *from_ptr = from;
+> +    *to_ptr = to;
+> +}
+>  
+> -    qtest_qmp_eventwait(to, "RESUME");
+> +static void migrate_postcopy_complete(QTestState *from, QTestState *to)
+> +{
+> +    wait_for_migration_complete(from);
+>  
+> +    /* Make sure we get at least one "B" on destination */
+>      wait_for_serial("dest_serial");
+> -    wait_for_migration_complete(from);
 
+That change is OK, but it shouldn't be necessary with postcopy; we
+should be seeing B's before the migration completes.
+
+It's OK however, so:
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>      if (uffd_feature_thread_id) {
+>          read_blocktime(to);
+>      }
+> -    g_free(uri);
+>  
+>      test_migrate_end(from, to, true);
+>  }
+>  
+> +static void test_postcopy(void)
+> +{
+> +    QTestState *from, *to;
+> +
+> +    migrate_postcopy_prepare(&from, &to);
+> +    migrate_postcopy_start(from, to);
+> +    migrate_postcopy_complete(from, to);
+> +}
+> +
+>  static void test_baddest(void)
+>  {
+>      QTestState *from, *to;
+> -- 
+> 2.17.1
 > 
-> Can you test it?
-
-Philippe, I tested Paolo's fix and I confirm that it fixed the original=
- issue - there is no hang.
-
-Regards,
-Aleksandar
-=C2=A0
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
