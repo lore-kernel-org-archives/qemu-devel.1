@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fb0yy-0002wQ-P3
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:55:26 -0400
+	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb13I-0003z2-97
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fb0yu-0007Gu-QF
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:55:24 -0400
-Resent-Message-Id: <E1fb0yu-0007Gu-QF@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21053)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fb0yu-0007C6-I1
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:55:20 -0400
-In-Reply-To: <1530781798-183214-1-git-send-email-robert.hu@linux.intel.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153078448871.1215.1657841619161125592@946cad8fd14e>
+	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb13E-0003eP-CX
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:52 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56137 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Aleksandar.Markovic@rt-rk.com>)
+	id 1fb13E-0002WQ-0b
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:48 -0400
+in-reply-to: <f5f4cd65-545e-42f7-3d8d-1d57ced676d7@amsat.org>
+from: "Aleksandar Markovic" <Aleksandar.Markovic@rt-rk.com>
+message-id: <4269-5b3dec00-3-5fa78980@135404596>
+date: Thu, 05 Jul 2018 11:59:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 5 Jul 2018 02:54:49 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add Icelake CPU model
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?Pz09P3V0Zi04P3E/IFtQQVRDSCB2MyAyLzhdIHRh?=
+ =?utf-8?q?rget/mips=3A_Workaround_for_checkpatch=2Epl_hanging_on_msa=5Fhe?=
+ =?utf-8?q?lper=2Ec?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: robert.hu@linux.intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, robert.hu@intel.com, wei.w.wang@intel.com, jingqi.liu@intel.com
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MzA3ODE3OTgtMTgzMjE0LTEtZ2l0LXNlbmQtZW1haWwtcm9iZXJ0Lmh1QGxp
-bnV4LmludGVsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0gQWRkIElj
-ZWxha2UgQ1BVIG1vZGVsCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBmZThkMmQ1NzM3Li44YmViOGNjNjRk
-ICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzE1MzA3ODE3OTgtMTgzMjE0LTEtZ2l0LXNlbmQtZW1haWwtcm9iZXJ0Lmh1QGxpbnV4LmludGVs
-LmNvbSAtPiBwYXRjaGV3LzE1MzA3ODE3OTgtMTgzMjE0LTEtZ2l0LXNlbmQtZW1haWwtcm9iZXJ0
-Lmh1QGxpbnV4LmludGVsLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIw
-MTgwNzA1MDMxNzU1LjMyNTQtMS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNzA1
-MDMxNzU1LjMyNTQtMS1wZXRlcnhAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzIwMTgwNzA1MDgwMDE3LjMxMTIzLTEtYmFsYTI0QGxpbnV4LnZuZXQuaWJtLmNv
-bSAtPiBwYXRjaGV3LzIwMTgwNzA1MDgwMDE3LjMxMTIzLTEtYmFsYTI0QGxpbnV4LnZuZXQuaWJt
-LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNzA1MDkxNDAyLjI2
-MjQ0LTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDcwNTA5MTQwMi4yNjI0NC0x
-LWFybWJydUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
-ODA3MDUwOTIxMzkuNzc2MDY5LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcv
-MjAxODA3MDUwOTIxMzkuNzc2MDY5LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzU3MjE5ZGQ2NiBpMzg2OiBBZGQgbmV3IENQVSBtb2Rl
-bCBJY2VsYWtlLXtTZXJ2ZXIsIENsaWVudH0KZTRiNDFlNjY5NCBpMzg2OiBBZGQgQ1BVSUQgYml0
-IGZvciBXQk5PSU5WRAowZDM2M2U0YjVhIGkzODY6IEFkZCBDUFVJRCBiaXQgZm9yIFBDT05GSUcK
-MWYxOTg1NzljNiBpMzg2OiBBZGQgQ1BVSUQgYml0IGFuZCBmZWF0dXJlIHdvcmRzIGZvciBJQTMy
-X0FSQ0hfQ0FQQUJJTElUSUVTIE1TUgoyN2JkZjJhNmEyIGkzODY6IEFkZCBuZXcgTVNSIGluZGlj
-ZXMgZm9yIElBMzJfUFJFRF9DTUQgYW5kIElBMzJfQVJDSF9DQVBBQklMSVRJRVMKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogaTM4NjogQWRkIG5ldyBNU1IgaW5kaWNl
-cyBmb3IgSUEzMl9QUkVEX0NNRCBhbmQgSUEzMl9BUkNIX0NBUEFCSUxJVElFUy4uLgpDaGVja2lu
-ZyBQQVRDSCAyLzU6IGkzODY6IEFkZCBDUFVJRCBiaXQgYW5kIGZlYXR1cmUgd29yZHMgZm9yIElB
-MzJfQVJDSF9DQVBBQklMSVRJRVMgTVNSLi4uCkNoZWNraW5nIFBBVENIIDMvNTogaTM4NjogQWRk
-IENQVUlEIGJpdCBmb3IgUENPTkZJRy4uLgpDaGVja2luZyBQQVRDSCA0LzU6IGkzODY6IEFkZCBD
-UFVJRCBiaXQgZm9yIFdCTk9JTlZELi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-MzQ6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5oOjY5ODoKKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZG8g
-bm90IGludmFsaWRhdGUgY2FjaGUgKi8KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTYg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
-Y2tpbmcgUEFUQ0ggNS81OiBpMzg2OiBBZGQgbmV3IENQVSBtb2RlbCBJY2VsYWtlLXtTZXJ2ZXIs
-IENsaWVudH0uLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+> Hi Aleksandar,
+> 
+> On 07/04/2018 04:30 PM, Aleksandar Markovic wrote:
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > If checkpatch.pl is applied (using switch "-f") on file
+> > target/mips/msa=5Fhelper.c, it will hang.
+> >
+> > This is a workaround by correcting the source file. The workaround =
+is
+> > found by partial deleting and undeleting of the code in msa=5Fhelpe=
+r.c
+> > in binary search fashion.
+> >
+> > The bug (for checkpatch.pl) is already reported to the qemu-devel l=
+ist.
+> 
+> Paolo already sent a fix for this bug:
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg01250.html=
+
+> 
+> Can you test it?
+
+Philippe, I tested Paolo's fix and I confirm that it fixed the original=
+ issue - there is no hang.
+
+Regards,
+Aleksandar
+=C2=A0
