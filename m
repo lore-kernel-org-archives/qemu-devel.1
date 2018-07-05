@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fb6mx-00032n-OW
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:07:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1fb6sX-00081h-6N
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fb6ms-0001z5-Rm
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:07:23 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52497)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fb6ms-0001yi-KH
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:07:18 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Thu,  5 Jul 2018 12:07:17 -0400
-Message-Id: <1530806837-5416-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH] translate-all: honour CF_NOCACHE in tb_gen_code
+	(envelope-from <eblake@redhat.com>) id 1fb6sS-0007CP-Qv
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:09 -0400
+References: <20180705155811.20366-1-f4bug@amsat.org>
+	<20180705155811.20366-5-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <af8abd7f-d72d-0445-298c-4ff91fccdb5e@redhat.com>
+Date: Thu, 5 Jul 2018 11:13:01 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180705155811.20366-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] tests/bios-tables-test: Remove an
+ useless cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,87 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-This fixes a record-replay regression introduced by 95590e2
-("translate-all: discard TB when tb_link_page returns an existing
-matching TB", 2018-06-15). The problem is that code using CF_NOCACHE
-assumes that the TB returned from tb_gen_code is always a
-newly-generated one. This assumption, however, was broken in
-the aforementioned commit.
+On 07/05/2018 10:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Patch created mechanically by rerunning:
 
-Fix it by honouring CF_NOCACHE, so that tb_gen_code always
-returns a newly-generated TB when CF_NOCACHE is passed to it.
-Do this by avoiding the TB hash table if CF_NOCACHE is set.
+In the subject: s/an useless/a useless/
 
-Reported-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Tested-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- accel/tcg/translate-all.c | 34 +++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
+(English is weird; we use "a" when the 'u' is pronounced hard as in=20
+"unicorn", and "an" when the 'u' is soft as in "umbrella")
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 170b957..49d77fa 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1446,7 +1446,8 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
-     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
-     h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb_cflags(tb) & CF_HASH_MASK,
-                      tb->trace_vcpu_dstate);
--    if (!qht_remove(&tb_ctx.htable, tb, h)) {
-+    if (!(tb->cflags & CF_NOCACHE) &&
-+        !qht_remove(&tb_ctx.htable, tb, h)) {
-         return;
-     }
- 
-@@ -1604,8 +1605,6 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
- {
-     PageDesc *p;
-     PageDesc *p2 = NULL;
--    void *existing_tb = NULL;
--    uint32_t h;
- 
-     assert_memory_lock();
- 
-@@ -1625,20 +1624,25 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-         tb->page_addr[1] = -1;
-     }
- 
--    /* add in the hash table */
--    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
--                     tb->trace_vcpu_dstate);
--    qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
-+    if (!(tb->cflags & CF_NOCACHE)) {
-+        void *existing_tb = NULL;
-+        uint32_t h;
- 
--    /* remove TB from the page(s) if we couldn't insert it */
--    if (unlikely(existing_tb)) {
--        tb_page_remove(p, tb);
--        invalidate_page_bitmap(p);
--        if (p2) {
--            tb_page_remove(p2, tb);
--            invalidate_page_bitmap(p2);
-+        /* add in the hash table */
-+        h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
-+                         tb->trace_vcpu_dstate);
-+        qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
-+
-+        /* remove TB from the page(s) if we couldn't insert it */
-+        if (unlikely(existing_tb)) {
-+            tb_page_remove(p, tb);
-+            invalidate_page_bitmap(p);
-+            if (p2) {
-+                tb_page_remove(p2, tb);
-+                invalidate_page_bitmap(p2);
-+            }
-+            tb = existing_tb;
-         }
--        tb = existing_tb;
-     }
- 
-     if (p2 && p2 != p) {
--- 
-2.7.4
+>=20
+>    $  spatch --sp-file scripts/coccinelle/typecast.cocci \
+>              --macro-file scripts/cocci-macro-file.h \
+>              --dir . --in-place
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
