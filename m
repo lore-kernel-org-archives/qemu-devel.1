@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb3op-0001eI-Eq
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:57:08 -0400
+	(envelope-from <quintela@redhat.com>) id 1fb3rf-0003V7-Ck
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:00:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb3oo-000439-IJ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:57:07 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fb3oo-00042F-Ca
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:57:06 -0400
-Received: by mail-oi0-x241.google.com with SMTP id i12-v6so16635912oik.2
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 05:57:06 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1fb3ra-0004y4-Fs
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:00:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35780 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fb3ra-0004tc-AZ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:59:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E3550401EF04
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 12:59:56 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180705031755.3254-2-peterx@redhat.com> (Peter Xu's message of
+	"Thu, 5 Jul 2018 11:17:47 +0800")
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-2-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 05 Jul 2018 14:59:46 +0200
+Message-ID: <87601t3kjh.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1530775623-32399-1-git-send-email-eric.auger@redhat.com>
-References: <1530775623-32399-1-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jul 2018 13:56:44 +0100
-Message-ID: <CAFEAcA8YkDgJgr5Mgv4PgpmhQDpr+61hfaxmpnQWGXocEawxdg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for 3.0] hw/arm/smmu-common: Fix devfn
- computation in smmu_iommu_mr
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-3.0 1/9] migration: simplify check to
+ use qemu file buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +35,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 5 July 2018 at 08:27, Eric Auger <eric.auger@redhat.com> wrote:
-> smmu_iommu_mr() aims at returning the IOMMUMemoryRegion corresponding
-> to a given sid. The function extracts both the PCIe bus number and
-> the devfn to return this data. Current computation of devfn is wrong
-> as it only returns the PCIe function instead of slot | function.
+Peter Xu <peterx@redhat.com> wrote:
+> Firstly, renaming the old matching_page_sizes variable to
+> matching_target_page_size, which suites more to what it did (it only
+> checks against target page size rather than multiple page sizes).
+> Meanwhile, simplify the check logic a bit, and enhance the comments.
+> Should have no functional change.
 >
-> Fixes 32cfd7f39e08 ("hw/arm/smmuv3: Cache/invalidate config data")
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+agree with dave suggestion, even:
+same_target_page_size O:-)
+
 > ---
->  hw/arm/smmu-common.c         | 2 +-
->  include/hw/arm/smmu-common.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  migration/ram.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
 >
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index 3098915..55c75d6 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -351,7 +351,7 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
->      bus_n = PCI_BUS_NUM(sid);
->      smmu_bus = smmu_find_smmu_pcibus(s, bus_n);
->      if (smmu_bus) {
-> -        devfn = sid & 0x7;
-> +        devfn = SMMU_PCI_DEVFN(sid);
->          smmu = smmu_bus->pbdev[devfn];
->          if (smmu) {
->              return &smmu->iommu;
-> diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-> index 50e2912..b07cadd 100644
-> --- a/include/hw/arm/smmu-common.h
-> +++ b/include/hw/arm/smmu-common.h
-> @@ -24,6 +24,7 @@
->
->  #define SMMU_PCI_BUS_MAX      256
->  #define SMMU_PCI_DEVFN_MAX    256
-> +#define SMMU_PCI_DEVFN(sid)   (sid & 0xFF)
->
->  #define SMMU_MAX_VA_BITS      48
-
-Applied to target-arm.next, thanks.
-
-As I was reviewing this, I checked where we allocate the pbdev array
-to confirm that it's big enough (which it is), and I noticed an oddity:
-in include/hw/arm/smmu-common.h we define the SMMUPciBus struct like this:
-
-typedef struct SMMUPciBus {
-    PCIBus       *bus;
-    SMMUDevice   *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
-} SMMUPciBus;
-
-but in fact we don't ever have local variables of this type and the
-only place we dynamically allocate them is in smmu_find_add_as(),
-which does
-        sbus = g_malloc0(sizeof(SMMUPciBus) +
-                         sizeof(SMMUDevice *) * SMMU_PCI_DEVFN_MAX);
-
-Is there a reason I missed why we don't just define the struct
-to have
-  SMMUDevice *pbdev[SMMU_PCI_DEVFN_MAX];
-?
-
-thanks
--- PMM
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 23cea47090..fbeb23f750 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -3580,7 +3580,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>  {
+>      int flags = 0, ret = 0;
+>      bool place_needed = false;
+> -    bool matching_page_sizes = false;
+> +    bool matching_target_page_size = false;
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>      /* Temporary page that is later 'placed' */
+>      void *postcopy_host_page = postcopy_get_tmp_page(mis);
+> @@ -3620,7 +3620,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>                  ret = -EINVAL;
+>                  break;
+>              }
+> -            matching_page_sizes = block->page_size == TARGET_PAGE_SIZE;
+> +            matching_target_page_size = block->page_size == TARGET_PAGE_SIZE;
+>              /*
+>               * Postcopy requires that we place whole host pages atomically;
+>               * these may be huge pages for RAMBlocks that are backed by
+> @@ -3668,12 +3668,17 @@ static int ram_load_postcopy(QEMUFile *f)
+>  
+>          case RAM_SAVE_FLAG_PAGE:
+>              all_zero = false;
+> -            if (!place_needed || !matching_page_sizes) {
+> +            if (!matching_target_page_size) {
+> +                /* For huge pages, we always use temporary buffer */
+>                  qemu_get_buffer(f, page_buffer, TARGET_PAGE_SIZE);
+>              } else {
+> -                /* Avoids the qemu_file copy during postcopy, which is
+> -                 * going to do a copy later; can only do it when we
+> -                 * do this read in one go (matching page sizes)
+> +                /*
+> +                 * For small pages that matches target page size, we
+> +                 * avoid the qemu_file copy.  Instead we directly use
+> +                 * the buffer of QEMUFile to place the page.  Note: we
+> +                 * cannot do any QEMUFile operation before using that
+> +                 * buffer to make sure the buffer is valid when
+> +                 * placing the page.
+>                   */
+>                  qemu_get_buffer_in_place(f, (uint8_t **)&place_source,
+>                                           TARGET_PAGE_SIZE);
