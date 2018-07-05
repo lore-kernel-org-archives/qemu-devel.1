@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fb8jj-0007HE-V6
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:12:13 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rc-0004Jw-Sp
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fb8je-00024H-UX
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:12:11 -0400
-Received: from 11.mo1.mail-out.ovh.net ([188.165.48.29]:57280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fb8je-00023n-Nw
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:12:06 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.122.113])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id EDF24F93AB
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 20:12:04 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  5 Jul 2018 20:11:48 +0200
-Message-Id: <20180705181148.26871-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rX-00068A-UN
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:20 -0400
+Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:44687)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1fb8rX-00067u-Nv
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:15 -0400
+Received: by mail-pl0-x233.google.com with SMTP id m16-v6so1627220pls.11
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 11:20:15 -0700 (PDT)
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Date: Thu,  5 Jul 2018 11:19:47 -0700
+Message-Id: <20180705182001.16537-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 00/14] Generalize Dallas/Maxim I2C RTC devices
+ v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-PCI devices needing a ROM allocate an optional MemoryRegion with
-pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
-device is destroyed. The only action taken by this routine is to call
-vmstate_unregister_ram() which clears the id string of the optional
-ROM RAMBlock and now, also flags the RAMBlock as non-migratable. This
-was recently added by commit b895de502717 ("migration: discard
-non-migratable RAMBlocks"), .
+This series generalizes the ds1338 model to also support the ds1375.
+As previously, only the time of day registers are modeled.  This
+series (v3) is a minor iteration on the previous v2.
 
-VFIO devices do their own allocation of the PCI ROM region. It is
-initialized in vfio_pci_size_rom() in which the PCI attribute
-'has_rom' is set to true but the RAMBlock of the ROM region is not
-allocated. When the associated PCI device is deleted,
-pci_del_option_rom() calls vmstate_unregister_ram() which tries to
-flag a NULL RAMBlock because 'has_rom' is set, leading to a SEGV .
+No changes were made to the unittests.
 
-The use of vmstate_unregister_ram() in the PCI device was added in
-commit b0e56e0b63f350691b52d3e75e89bb64143fbeff ("unset RAMBlock idstr
-when unregister MemoryRegion") and from the archive in
-http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html, it
-seems that it was trying to fix a reference count issue.
+Summary of changes by patch name in response to comments by Peter Maydell.
 
-vmstate_unregister_ram() being a work around, let's remove it to fix
-the current SEGV issue and let's try to find a fix for the initial ref
-count issue if we can reproduce.
+= timer: ds1338 use registerfields.h
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/pci/pci.c | 11 -----------
- 1 file changed, 11 deletions(-)
+Changed as requested to be more direct translation.
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 80bc45930dee..78bf74e19f22 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -191,7 +191,6 @@ static PCIBus *pci_find_bus_nr(PCIBus *bus, int bus_n=
-um);
- static void pci_update_mappings(PCIDevice *d);
- static void pci_irq_handler(void *opaque, int irq_num, int level);
- static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom, Err=
-or **);
--static void pci_del_option_rom(PCIDevice *pdev);
-=20
- static uint16_t pci_default_sub_vendor_id =3D PCI_SUBVENDOR_ID_REDHAT_QU=
-MRANET;
- static uint16_t pci_default_sub_device_id =3D PCI_SUBDEVICE_ID_QEMU;
-@@ -1096,7 +1095,6 @@ static void pci_qdev_unrealize(DeviceState *dev, Er=
-ror **errp)
-     PCIDeviceClass *pc =3D PCI_DEVICE_GET_CLASS(pci_dev);
-=20
-     pci_unregister_io_regions(pci_dev);
--    pci_del_option_rom(pci_dev);
-=20
-     if (pc->exit) {
-         pc->exit(pci_dev);
-@@ -2262,15 +2260,6 @@ static void pci_add_option_rom(PCIDevice *pdev, bo=
-ol is_default_rom,
-     pci_register_bar(pdev, PCI_ROM_SLOT, 0, &pdev->rom);
- }
-=20
--static void pci_del_option_rom(PCIDevice *pdev)
--{
--    if (!pdev->has_rom)
--        return;
--
--    vmstate_unregister_ram(&pdev->rom, &pdev->qdev);
--    pdev->has_rom =3D false;
--}
--
- /*
-  * On success, pci_add_capability() returns a positive value
-  * that the offset of the pci capability.
---=20
-2.13.6
+= timer: ds1338 persist 12-hour mode selection
+
+On 04/12/2018 11:03 AM, Peter Maydell wrote:
+> The code change here looks like a reasonable no-behaviour-change
+> simplification of the code, but it doesn't match up with
+> the description in the commit message ?
+
+While it isn't clear from the diff, the condtional
+involved has 3 arms, only two of these were updating
+'s->nvram[]'.  The arm handling control register
+writes is the one which didn't.  So attempts to set
+the 12 hour mode bit were ignored, and subsequent
+reads always returned 24 hour time.
+
+So this is a behaviour change, and a minor bug fix.
+
+= timer: ds1338 clarify HOUR handling
+= timer: ds1338 fix wday_offset handling
+
+These two are combined as requested.
+
+= timer: generalize ds1338
+
+The change to CTRL register handling is split out
+as a seperate patch "timer: ds1338 remove vestige of un-modeled OSF"
+
+= timer: ds-rtc handle CENTURY bit
+
+Changed as suggested.
+
+
+
+Michael Davidsaver (14):
+  tests: more thorough tests of ds1338
+  timer: ds1338 use registerfields.h
+  timer: ds1338 persist 12-hour mode selection
+  timer: ds1338 clarify HOUR handling
+  timer: ds1338 change write handling and fix wday_offset handling
+  tests: ds-rtc test 12 hour mode
+  tests: ds-rtc test wday offset
+  timer: rename ds1338 -> dsrtc
+  timer: rename file ds1338.c -> ds-rtc.c
+  timer: ds1338 remove vestige of un-modeled OSF
+  timer: generalize ds1338
+  timer: ds-rtc handle CENTURY bit
+  timer: ds-rtc model ds1375
+  tests: drop ds1338-test
+
+ default-configs/arm-softmmu.mak |   2 +-
+ hw/timer/Makefile.objs          |   2 +-
+ hw/timer/ds-rtc.c               | 335 ++++++++++++++++++++++++++++++++++++++++
+ hw/timer/ds1338.c               | 239 ----------------------------
+ tests/Makefile.include          |   6 +-
+ tests/ds-rtc-common.h           |  71 +++++++++
+ tests/ds-rtc-current-test.c     |  66 ++++++++
+ tests/ds-rtc-set-test.c         | 171 ++++++++++++++++++++
+ tests/ds1338-test.c             |  75 ---------
+ 9 files changed, 649 insertions(+), 318 deletions(-)
+ create mode 100644 hw/timer/ds-rtc.c
+ delete mode 100644 hw/timer/ds1338.c
+ create mode 100644 tests/ds-rtc-common.h
+ create mode 100644 tests/ds-rtc-current-test.c
+ create mode 100644 tests/ds-rtc-set-test.c
+ delete mode 100644 tests/ds1338-test.c
+
+-- 
+2.11.0
