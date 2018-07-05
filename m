@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1faxAo-0004rg-8w
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:51:23 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1faxBt-0005Mh-Q2
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:52:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1faxAl-0007Q1-61
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:51:22 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:58368)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1faxAk-0007HQ-OO
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:51:19 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180614193147.29680-15-richard.henderson@linaro.org>
-	<000601d40f7a$4be320b0$e3a96210$@ru>
-	<20180629184832.GB14726@flamenco>
-	<000901d411c8$d3bfc9c0$7b3f5d40$@ru>
-	<20180702195234.GB20840@flamenco>
-	<000601d41290$205c56a0$611503e0$@ru>
-	<20180704193808.GA32390@flamenco>
-In-Reply-To: <20180704193808.GA32390@flamenco>
-Date: Thu, 5 Jul 2018 08:51:20 +0300
-Message-ID: <000001d41424$32d36540$987a2fc0$@ru>
+	(envelope-from <kernellwp@gmail.com>) id 1faxBs-0003Cl-Nt
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:52:29 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1faxBs-0003B8-GZ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:52:28 -0400
+Received: by mail-oi0-x244.google.com with SMTP id n84-v6so14545155oib.9
+	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 22:52:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PULL,
- 14/18] translate-all: discard TB when tb_link_page returns an
- existing matching TB
+References: <20180615222855.44421-1-mst@redhat.com>
+	<20180615222855.44421-2-mst@redhat.com>
+	<b59883c6-1dc0-4e81-439c-587c8f2d3e83@redhat.com>
+	<f87772ab-7d59-4ab2-59e3-c1ac77eaf725@redhat.com>
+	<20180620030236-mutt-send-email-mst@kernel.org>
+	<CANRm+CyZyo49ga=-dM-VES8fTEYiv+FM0WZdsf5F+jhnLbcLtw@mail.gmail.com>
+	<20180620053855-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180620053855-mutt-send-email-mst@kernel.org>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Thu, 5 Jul 2018 13:52:29 +0800
+Message-ID: <CANRm+Cz956boUFODZRAfrLHXiAFbDZ2Yu3oiVroy58CTg7veNw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] kvm: support -dedicated
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,99 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Emilio G. Cota'" <cota@braap.org>
-Cc: 'Richard Henderson' <richard.henderson@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: eblake@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm <kvm@vger.kernel.org>, Richard Henderson <rth@twiddle.net>
 
-> From: Emilio G. Cota [mailto:cota@braap.org]
-> On Tue, Jul 03, 2018 at 08:38:52 +0300, Pavel Dovgalyuk wrote:
-> > > From: Emilio G. Cota [mailto:cota@braap.org]
-> > > On Mon, Jul 02, 2018 at 08:52:14 +0300, Pavel Dovgalyuk wrote:
-> > > > The same failure can be reproduced with linux-0.2.img, which was
-> > > > downloaded from QEMU site.
-> > > > I can't find it now, but I can upload this file if needed.
+On Wed, 20 Jun 2018 at 10:41, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jun 20, 2018 at 08:46:10AM +0800, Wanpeng Li wrote:
+> > On Wed, 20 Jun 2018 at 08:07, Michael S. Tsirkin <mst@redhat.com> wrote:
 > > >
-> > > Please upload it somewhere and share the full QEMU invocation
-> > > needed to replicate.
+> > > On Tue, Jun 19, 2018 at 05:07:46PM -0500, Eric Blake wrote:
+> > > > On 06/19/2018 10:17 AM, Paolo Bonzini wrote:
+> > > > > On 16/06/2018 00:29, Michael S. Tsirkin wrote:
+> > > > > > +static QemuOptsList qemu_dedicated_opts = {
+> > > > > > +    .name = "dedicated",
+> > > > > > +    .head = QTAILQ_HEAD_INITIALIZER(qemu_dedicated_opts.head),
+> > > > > > +    .desc = {
+> > > > > > +        {
+> > > > > > +            .name = "mem-lock",
+> > > > > > +            .type = QEMU_OPT_BOOL,
+> > > > > > +        },
+> > > > > > +        {
+> > > > > > +            .name = "cpu-pm",
+> > > > > > +            .type = QEMU_OPT_BOOL,
+> > > > > > +        },
+> > > > > > +        { /* end of list */ }
+> > > > > > +    },
+> > > > > > +};
+> > > > > > +
+> > > > >
+> > > > > Let the bikeshedding begin!
+> > > > >
+> > > > > 1) Should we deprecate -realtime?
+> > > > >
+> > > > > 2) Maybe -hostresource?
+> > > >
+> > > > What further things might we add in the future?
+> > > >
+> > > > -dedicated sounds wrong (it is an adjective, while most of our options are
+> > > > nouns - thing -machine, -drive, -object, ...)
+> > > >
+> > > > -hostresource at least sounds like a noun, but is long to type.  But at
+> > > > least '-hostresource cpu-pm=on' reads reasonably well.
+> > >
+> > > Yes but host resource what? I feel it says nothing at all about what
+> > > one can expect to find in this flag.
+> > >
+> > > > About the only other noun I could think of would be '-feature cpu-pm=on'.
+> > >
+> > > If we have nothing at all to say about what is grouping these things,
+> > > we don't need a new flag. We can make it a machine property.
+> > >
+> > > It's user's hint that some host resource is dedicated to a VM.
 > >
-> > https://github.com/Dovgalyuk/qemu-images/blob/master/linux-0.2.img
+> > The commit 633711e82 (kvm: rename KVM_HINTS_DEDICATED to
+> > KVM_HINTS_REALTIME) should be reverted according to several threads
+> > discussion I think.
 > >
-> > qemu-system-i386 -drive file=images/linux-0.2.img,if=none,snapshot,id=img -drive
-> > driver=blkreplay,if=none,id=rr,image=img -device ide-hd,drive=rr -net none -icount
-> > shift=5,rr=record,rrfile=linux02.rr
-> 
-> The appended patch fixes it for me. Can you please test on your
-> windows image?
-> 
-> The rationale is to honour CF_NOCACHE, so that we always return
-> a new TB from tb_gen_code.
+> > Regards,
+> > Wanpeng Li
+>
+> IMHO that is unrelated - these KVM hints are hints to *guest*.
 
-Works for me, thank you.
+Actually I really don't like the KVM_HINT_REALTIME renaming, there are
+dedicated instances in public cloud environment consider security or
+performance. The financial customers may prefer dedicated pCPUs when
+considering security, and other gaming customers may prefer dedicated
+pCPUs when considering performance. So "realtime" is not suitable.
 
-Tested-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
-Pavel Dovgalyuk
-
-> 
-> ---
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 170b957..49d77fa 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1446,7 +1446,8 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool
-> rm_from_page_list)
->      phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
->      h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb_cflags(tb) & CF_HASH_MASK,
->                       tb->trace_vcpu_dstate);
-> -    if (!qht_remove(&tb_ctx.htable, tb, h)) {
-> +    if (!(tb->cflags & CF_NOCACHE) &&
-> +        !qht_remove(&tb_ctx.htable, tb, h)) {
->          return;
->      }
-> 
-> @@ -1604,8 +1605,6 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
->  {
->      PageDesc *p;
->      PageDesc *p2 = NULL;
-> -    void *existing_tb = NULL;
-> -    uint32_t h;
-> 
->      assert_memory_lock();
-> 
-> @@ -1625,20 +1624,25 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
->          tb->page_addr[1] = -1;
->      }
-> 
-> -    /* add in the hash table */
-> -    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
-> -                     tb->trace_vcpu_dstate);
-> -    qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
-> +    if (!(tb->cflags & CF_NOCACHE)) {
-> +        void *existing_tb = NULL;
-> +        uint32_t h;
-> 
-> -    /* remove TB from the page(s) if we couldn't insert it */
-> -    if (unlikely(existing_tb)) {
-> -        tb_page_remove(p, tb);
-> -        invalidate_page_bitmap(p);
-> -        if (p2) {
-> -            tb_page_remove(p2, tb);
-> -            invalidate_page_bitmap(p2);
-> +        /* add in the hash table */
-> +        h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
-> +                         tb->trace_vcpu_dstate);
-> +        qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
-> +
-> +        /* remove TB from the page(s) if we couldn't insert it */
-> +        if (unlikely(existing_tb)) {
-> +            tb_page_remove(p, tb);
-> +            invalidate_page_bitmap(p);
-> +            if (p2) {
-> +                tb_page_remove(p2, tb);
-> +                invalidate_page_bitmap(p2);
-> +            }
-> +            tb = existing_tb;
->          }
-> -        tb = existing_tb;
->      }
-> 
->      if (p2 && p2 != p) {
+Regards,
+Wanpeng Li
