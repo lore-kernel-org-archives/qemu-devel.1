@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fb3vi-00062E-Dk
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:04:15 -0400
+	(envelope-from <quintela@redhat.com>) id 1fb3wx-0006pY-TB
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fb3vc-0002m1-TF
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:04:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48154 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fb3wt-0007Kx-Rb
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:05:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34072 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fb3vc-0002k9-PK
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:04:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fb3wt-0007II-0s
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:05:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5A87D4067720
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 13:04:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 85F6981663C5
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 13:05:26 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180705031755.3254-5-peterx@redhat.com> (Peter Xu's message of
-	"Thu, 5 Jul 2018 11:17:50 +0800")
+In-Reply-To: <20180705031755.3254-6-peterx@redhat.com> (Peter Xu's message of
+	"Thu, 5 Jul 2018 11:17:51 +0800")
 References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180705031755.3254-5-peterx@redhat.com>
+	<20180705031755.3254-6-peterx@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Thu, 05 Jul 2018 15:03:58 +0200
-Message-ID: <87sh4x25s1.fsf@secure.mitica>
+Date: Thu, 05 Jul 2018 15:05:18 +0200
+Message-ID: <87o9fl25pt.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-3.0 4/9] tests: introduce
- migrate_postcopy_* helpers
+Subject: Re: [Qemu-devel] [PATCH for-3.0 5/9] tests: allow migrate() to take
+ extra flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,10 +39,64 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 Peter Xu <peterx@redhat.com> wrote:
-> Separate the old postcopy UNIX socket test into three steps, provide a
-> helper for each step.  With these helpers, we can do more compliated
-> tests like postcopy recovery, while keep the codes shared.
+> For example, we can pass in '"resume": true' to resume a migration.
 >
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+sometime I miss a "hmp_to_qmp()" function O:-)
+
+
+> ---
+>  tests/migration-test.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 2155869b96..af82a04789 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -337,14 +337,14 @@ static void migrate_set_capability(QTestState *who, const char *capability,
+>      qobject_unref(rsp);
+>  }
+>  
+> -static void migrate(QTestState *who, const char *uri)
+> +static void migrate(QTestState *who, const char *uri, const char *extra)
+>  {
+>      QDict *rsp;
+>      gchar *cmd;
+>  
+>      cmd = g_strdup_printf("{ 'execute': 'migrate',"
+> -                          "'arguments': { 'uri': '%s' } }",
+> -                          uri);
+> +                          "  'arguments': { 'uri': '%s' %s } }",
+> +                          uri, extra ? extra : "");
+>      rsp = qtest_qmp(who, cmd);
+>      g_free(cmd);
+>      g_assert(qdict_haskey(rsp, "return"));
+> @@ -533,7 +533,7 @@ static void migrate_postcopy_prepare(QTestState **from_ptr,
+>      /* Wait for the first serial output from the source */
+>      wait_for_serial("src_serial");
+>  
+> -    migrate(from, uri);
+> +    migrate(from, uri, NULL);
+>      g_free(uri);
+>  
+>      wait_for_migration_pass(from);
+> @@ -573,7 +573,7 @@ static void test_baddest(void)
+>      bool failed;
+>  
+>      test_migrate_start(&from, &to, "tcp:0:0", true);
+> -    migrate(from, "tcp:0:0");
+> +    migrate(from, "tcp:0:0", NULL);
+>      do {
+>          rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
+>          rsp_return = qdict_get_qdict(rsp, "return");
+> @@ -615,7 +615,7 @@ static void test_precopy_unix(void)
+>      /* Wait for the first serial output from the source */
+>      wait_for_serial("src_serial");
+>  
+> -    migrate(from, uri);
+> +    migrate(from, uri, NULL);
+>  
+>      wait_for_migration_pass(from);
