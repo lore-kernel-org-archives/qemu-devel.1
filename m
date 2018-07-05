@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1fb818-0000DP-PI
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:26:07 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1fb80y-000087-Uo
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1fb817-0001dB-4M
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:26:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51826)
+	(envelope-from <jjherne@linux.ibm.com>) id 1fb80u-00019e-4Y
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:25:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49628
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1fb816-0001ax-Kt
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:26:04 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w65HNfp1022048
-	for <qemu-devel@nongnu.org>; Thu, 5 Jul 2018 13:26:03 -0400
+	id 1fb80t-00018d-TU
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:25:52 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w65HNfdS173704
+	for <qemu-devel@nongnu.org>; Thu, 5 Jul 2018 13:25:51 -0400
 Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k1qb18xs1-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2k1pupj44s-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 13:26:03 -0400
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 13:25:50 -0400
 Received: from localhost
 	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Thu, 5 Jul 2018 13:26:02 -0400
+	Thu, 5 Jul 2018 13:25:50 -0400
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Thu,  5 Jul 2018 13:25:40 -0400
+Date: Thu,  5 Jul 2018 13:25:30 -0400
 In-Reply-To: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
 References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1530811543-6881-13-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [RFC 12/15] s390-bios: Use control unit type to
- determine boot method
+Message-Id: <1530811543-6881-3-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [RFC 02/15] s390-bios: decouple cio setup from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,39 +42,62 @@ To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux
 
 From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
 
-The boot method is different depending on which device type we are
-booting from. Let's examine the control unit type to determine if we're
-a virtio device. We'll eventually add a case to check for a real dasd device
-here as well.
+Move channel i/o setup code out to a separate function. This decouples cio
+setup from the virtio code path and allows us to make use of it for booting
+dasd devices.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- pc-bios/s390-ccw/main.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 20c30c6..e4236c0 100644
+index 544851d..63117d1 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -204,9 +204,16 @@ int main(void)
-     cio_setup();
-     boot_setup();
-     find_boot_device();
-+    enable_subchannel(blk_schid);
+@@ -99,6 +99,18 @@ static void menu_setup(void)
+     }
+ }
  
--    virtio_setup();
--    zipl_load(); /* no return */
-+    switch (cu_type(blk_schid)) {
-+    case 0x3832:  /* Virtio device */
-+        virtio_setup();
-+        zipl_load(); /* no return */
-+        break;
-+    default:
-+        panic("Attempting to boot from unexpected device type\n");
-+    }
++/*
++ * Initialize the channel I/O subsystem so we can talk to our ipl/boot device.
++ */
++static void cio_setup(void)
++{
++    /*
++     * Unconditionally enable mss support. In every sane configuration this
++     * will succeed; and even if it doesn't, stsch_err() can handle it.
++     */
++    enable_mss_facility();
++}
++
+ static void virtio_setup(void)
+ {
+     Schib schib;
+@@ -109,13 +121,6 @@ static void virtio_setup(void)
+     VDev *vdev = virtio_get_device();
+     QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
  
-     panic("Failed to load OS from hard disk\n");
-     return 0; /* make compiler happy */
+-    /*
+-     * We unconditionally enable mss support. In every sane configuration,
+-     * this will succeed; and even if it doesn't, stsch_err() can deal
+-     * with the consequences.
+-     */
+-    enable_mss_facility();
+-
+     sclp_get_loadparm_ascii(loadparm_str);
+     memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+     sclp_print(ldp);
+@@ -168,6 +173,7 @@ static void virtio_setup(void)
+ int main(void)
+ {
+     sclp_setup();
++    cio_setup();
+     virtio_setup();
+ 
+     zipl_load(); /* no return */
 -- 
 2.7.4
