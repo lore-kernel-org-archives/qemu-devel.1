@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1faysa-00040P-7s
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:40:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fayyU-0008Ur-Er
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1faysX-0000fN-2H
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:40:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35166 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1faysW-0000eP-SA
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:40:36 -0400
-Date: Thu, 5 Jul 2018 15:40:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180705074033.GA2893@lemon.usersys.redhat.com>
-References: <20180704181010.GA918@computer>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180704181010.GA918@computer>
-Subject: Re: [Qemu-devel] [PATCH v4] module: Use QEMU_MODULE_DIR as a search
- path
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fayyR-0001lr-B5
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:46:46 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  5 Jul 2018 10:46:34 +0300
+Message-Id: <20180705074638.770905-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] fix image fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +17,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ryang <decatf@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On Wed, 07/04 14:10, ryang wrote:
-> The current paths for modules are CONFIG_QEMU_MODDIR and paths relative
-> to the executable. Qemu and its modules can be installed and executed in
-> paths that are different from these search paths. This change allows
-> a search path to be specified by environment variable.
-> 
-> An example usage for this is postmarketOS[1]. This is a build environment
-> for Alpine Linux. It sets up Alpine Linux in a chroot environment.
-> Alpine's Qemu packages are installed in the chroot. The Alpine Linux Qemu
-> package is used to test compiled Alpine Linux system images. This way there
-> isn't a reliance on the which ever version of Qemu the host system / distro
-> provides.
-> 
-> postmarketOS executes Qemu on host system outside of the chroot
-> The Qemu module search path needs to point to the location of the
-> chroot relative to the host system.
-> 
-> e.g.
-> The root of the Alpine Linux chroot is:
-> ~/.local/var/pmbootstrap/chroot_native/
-> 
-> Alpine's Qemu is installed at
-> ~/.local/var/pmbootstrap/chroot_native/usr/bin/
-> 
-> The Qemu module search path needs to be:
-> QEMU_MODULE_DIR=~/.local/var/pmbootstrap/chroot_native/usr/lib/qemu/
-> 
-> [1] https://postmarketos.org/
-> 
-> Signed-off-by: ryang <decatf@gmail.com>
-> ---
-> 
-> v2:
->  - fix checkpatch errors
-> v3:
->  - initialize n_dirs variable
-> v4:
->  - change env variable suffix from _PATH to _DIR
->  - renamed search_path to search_dir and make it const
-> 
->  util/module.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
-> 
-> diff --git a/util/module.c b/util/module.c
-> index c909737..1259dd3 100644
-> --- a/util/module.c
-> +++ b/util/module.c
-> @@ -162,9 +162,10 @@ void module_load_one(const char *prefix, const char *lib_name)
->  #ifdef CONFIG_MODULES
->      char *fname = NULL;
->      char *exec_dir;
-> -    char *dirs[3];
-> +    const char *search_dir;
-> +    char *dirs[4];
->      char *module_name;
-> -    int i = 0;
-> +    int i = 0, n_dirs = 0;
->      int ret;
->      static GHashTable *loaded_modules;
->  
-> @@ -186,14 +187,19 @@ void module_load_one(const char *prefix, const char *lib_name)
->      g_hash_table_insert(loaded_modules, module_name, module_name);
->  
->      exec_dir = qemu_get_exec_dir();
-> -    dirs[i++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
-> -    dirs[i++] = g_strdup_printf("%s/..", exec_dir ? : "");
-> -    dirs[i++] = g_strdup_printf("%s", exec_dir ? : "");
-> -    assert(i == ARRAY_SIZE(dirs));
-> +    search_dir = getenv("QEMU_MODULE_DIR");
-> +    if (search_dir != NULL) {
-> +        dirs[n_dirs++] = g_strdup_printf("%s", search_dir);
-> +    }
-> +    dirs[n_dirs++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
-> +    dirs[n_dirs++] = g_strdup_printf("%s/..", exec_dir ? : "");
-> +    dirs[n_dirs++] = g_strdup_printf("%s", exec_dir ? : "");
-> +    assert(n_dirs <= ARRAY_SIZE(dirs));
-> +
->      g_free(exec_dir);
->      exec_dir = NULL;
->  
-> -    for (i = 0; i < ARRAY_SIZE(dirs); i++) {
-> +    for (i = 0; i < n_dirs; i++) {
->          fname = g_strdup_printf("%s/%s%s",
->                  dirs[i], module_name, HOST_DSOSUF);
->          ret = module_load_file(fname);
-> @@ -205,7 +211,7 @@ void module_load_one(const char *prefix, const char *lib_name)
->          }
->      }
->  
-> -    for (i = 0; i < ARRAY_SIZE(dirs); i++) {
-> +    for (i = 0; i < n_dirs; i++) {
->          g_free(dirs[i]);
->      }
->  
-> -- 
-> 2.7.4
-> 
+Hi all.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+This fixes image fleecing scheme for 3.0, details are in 04 patch.
+
+v3:
+02: fix typo in assert, to fix build
+
+v2:
+01,02: new patches
+
+03: - improve comment
+    - fix assert in bdrv_aligned_pwritev
+    - add asserts to not use the flag on read requests
+    - support copy_range
+
+04: - expand "detected cases" range 
+    - s/fleecing/serialize_target_writes
+    - support backup_cow_with_offload
+    - drop restriction on compressed writes
+
+
+v1 cover:
+
+It's a continuation of discussion under
+"[PATCH v2 2/3] block/fleecing-filter: new filter driver for fleecing" [1].
+
+Here is my try to implement Kevin's idea, that all backup writes (for
+fleecing case) should be serialized. (However, I've skipped for now
+fixing related permissions).
+
+Looks like these patches may replace patch [1], to make fleecing scheme
+safe. But I'm not sure, a look by Kevin is necessary.
+
+A test is still needed, to prove that this patch is necessary and that it
+works..
+
+Vladimir Sementsov-Ogievskiy (4):
+  block: disallow BDRV_REQ_NO_SERIALISING for write
+  block: split flags in copy_range
+  block: add BDRV_REQ_SERIALISING flag
+  block/backup: fix fleecing scheme: use serialized writes
+
+ include/block/block.h          | 31 ++++++++++++++++--
+ include/block/block_int.h      | 14 +++++---
+ include/sysemu/block-backend.h |  3 +-
+ block/backup.c                 | 20 ++++++++----
+ block/block-backend.c          |  5 +--
+ block/file-posix.c             | 21 +++++++-----
+ block/io.c                     | 74 ++++++++++++++++++++++++++++++------------
+ block/iscsi.c                  |  9 +++--
+ block/qcow2.c                  | 20 +++++++-----
+ block/raw-format.c             | 24 +++++++++-----
+ qemu-img.c                     |  2 +-
+ 11 files changed, 159 insertions(+), 64 deletions(-)
+
+-- 
+2.11.1
