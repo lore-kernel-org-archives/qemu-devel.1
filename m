@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fb0HC-0000u3-Mk
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:10:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1fb0IF-0001lD-JS
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fb0HB-0007Fc-3c
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:10:10 -0400
-Received: from mga02.intel.com ([134.134.136.20]:23698)
+	(envelope-from <peterx@redhat.com>) id 1fb0IC-0001nY-Dp
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:11:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41614 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fb0HA-0006vV-O1
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:10:09 -0400
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Thu,  5 Jul 2018 17:09:58 +0800
-Message-Id: <1530781798-183214-6-git-send-email-robert.hu@linux.intel.com>
-In-Reply-To: <1530781798-183214-1-git-send-email-robert.hu@linux.intel.com>
-References: <1530781798-183214-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v4 5/5] i386: Add new CPU model Icelake-{Server, Client}
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fb0IC-0001kX-89
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:11:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37F3E407049A
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:11:11 +0000 (UTC)
+Date: Thu, 5 Jul 2018 17:11:06 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180705091106.GB1389@xz-mi>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-2-peterx@redhat.com>
+	<20180705090109.GB2538@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180705090109.GB2538@work-vm>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 1/9] migration: simplify check to
+ use qemu file buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,159 +35,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: robert.hu@intel.com, wei.w.wang@intel.com, jingqi.liu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-New CPU models mostly inherit features from ancestor Skylake, while addin new
-features: UMIP, New Instructions ( PCONIFIG (server only), WBNOINVD,
-AVX512_VBMI2, GFNI, AVX512_VNNI, VPCLMULQDQ, VAES, AVX512_BITALG),
-Intel PT and 5-level paging (Server only). As well as
-IA32_PRED_CMD, SSBD support for speculative execution
-side channel mitigations.
+On Thu, Jul 05, 2018 at 10:01:09AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Firstly, renaming the old matching_page_sizes variable to
+> > matching_target_page_size, which suites more to what it did (it only
+> > checks against target page size rather than multiple page sizes).
+> > Meanwhile, simplify the check logic a bit, and enhance the comments.
+> > Should have no functional change.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/ram.c | 17 +++++++++++------
+> >  1 file changed, 11 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index 23cea47090..fbeb23f750 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -3580,7 +3580,7 @@ static int ram_load_postcopy(QEMUFile *f)
+> >  {
+> >      int flags = 0, ret = 0;
+> >      bool place_needed = false;
+> > -    bool matching_page_sizes = false;
+> > +    bool matching_target_page_size = false;
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> >      /* Temporary page that is later 'placed' */
+> >      void *postcopy_host_page = postcopy_get_tmp_page(mis);
+> > @@ -3620,7 +3620,7 @@ static int ram_load_postcopy(QEMUFile *f)
+> >                  ret = -EINVAL;
+> >                  break;
+> >              }
+> > -            matching_page_sizes = block->page_size == TARGET_PAGE_SIZE;
+> > +            matching_target_page_size = block->page_size == TARGET_PAGE_SIZE;
+> 
+> That's OK, although 'matches_target_page_size' would be better wording.
+> ('matching_target_page_size' implies we know something about the sources
+> target page size)
 
-Note:
-For 5-level paging, Guest physical address width can be configured, with
-parameter "phys-bits". Unless explicitly specified, we still use its default
-value, even for Icelake-Server cpu model.
-At present, hold on expose IA32_ARCH_CAPABILITIES to guest, as 1) This MSR
-actually presents more than 1 'feature', maintainers are considering expanding current
-features presentation of only CPUIDs to MSR bits; 2) a reasonable default value
-for MSR_IA32_ARCH_CAPABILITIES needs to settled first. These 2 are actully
-beyond Icelake CPU model itself but fundamental. So split these work apart
-and do it later.
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00774.html
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00796.html
+Sure thing.
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
----
- target/i386/cpu.c | 115 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 115 insertions(+)
+> 
+> >              /*
+> >               * Postcopy requires that we place whole host pages atomically;
+> >               * these may be huge pages for RAMBlocks that are backed by
+> > @@ -3668,12 +3668,17 @@ static int ram_load_postcopy(QEMUFile *f)
+> >  
+> >          case RAM_SAVE_FLAG_PAGE:
+> >              all_zero = false;
+> > -            if (!place_needed || !matching_page_sizes) {
+> > +            if (!matching_target_page_size) {
+> > +                /* For huge pages, we always use temporary buffer */
+> >                  qemu_get_buffer(f, page_buffer, TARGET_PAGE_SIZE);
+> >              } else {
+> > -                /* Avoids the qemu_file copy during postcopy, which is
+> > -                 * going to do a copy later; can only do it when we
+> > -                 * do this read in one go (matching page sizes)
+> > +                /*
+> > +                 * For small pages that matches target page size, we
+> > +                 * avoid the qemu_file copy.  Instead we directly use
+> > +                 * the buffer of QEMUFile to place the page.  Note: we
+> > +                 * cannot do any QEMUFile operation before using that
+> > +                 * buffer to make sure the buffer is valid when
+> > +                 * placing the page.
+> >                   */
+> >                  qemu_get_buffer_in_place(f, (uint8_t **)&place_source,
+> >                                           TARGET_PAGE_SIZE);
+> 
+> But, yes I think that's right; since this is in ram_load_postcopy
+> the only time we have !place_needed is in the not-last subpage of a 
+> hugepage (or host page > target_page), so that's already covered
+> by the !matching_page_sizes check.
+> 
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 8de15cb..0ec6ced 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2381,6 +2381,121 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .model_id = "Intel Xeon Processor (Skylake, IBRS)",
-     },
-     {
-+        .name = "Icelake-Client",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 126,
-+        .stepping = 0,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-+            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-+            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-+            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-+            CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-+            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-+            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_8000_0008_EBX] =
-+            CPUID_8000_0008_EBX_WBNOINVD,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-+            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-+            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_INTEL_PT,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-+            CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-+            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-+            CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-+        /* Missing: XSAVES (not supported by some Linux versions,
-+                * including v4.1 to v4.12).
-+                * KVM doesn't yet expose any XSAVES state save component,
-+                * and the only one defined in Skylake (processor tracing)
-+                * probably will block migration anyway.
-+                */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Core Processor (Icelake)",
-+    },
-+    {
-+        .name = "Icelake-Server",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_INTEL,
-+        .family = 6,
-+        .model = 134,
-+        .stepping = 0,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-+            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-+            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-+            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-+            CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-+            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-+            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-+            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA | CPUID_EXT_MOVBE |
-+            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-+            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM | CPUID_EXT3_3DNOWPREFETCH,
-+        .features[FEAT_8000_0008_EBX] =
-+            CPUID_8000_0008_EBX_WBNOINVD,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-+            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP |
-+            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_INVPCID |
-+            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-+            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
-+            CPUID_7_0_EBX_INTEL_PT,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-+            CPUID_7_0_ECX_OSPKE | CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-+            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-+            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_PCONFIG | CPUID_7_0_EDX_SPEC_CTRL |
-+            CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-+        /* Missing: XSAVES (not supported by some Linux versions,
-+                * including v4.1 to v4.12).
-+                * KVM doesn't yet expose any XSAVES state save component,
-+                * and the only one defined in Skylake (processor tracing)
-+                * probably will block migration anyway.
-+                */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x80000008,
-+        .model_id = "Intel Xeon Processor (Icelake)",
-+    },
-+    {
-         .name = "KnightsMill",
-         .level = 0xd,
-         .vendor = CPUID_VENDOR_INTEL,
+Thanks!
+
 -- 
-1.8.3.1
+Peter Xu
