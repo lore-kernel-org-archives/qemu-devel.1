@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6jJ-0008Mc-OY
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6jH-0008KQ-8i
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6jI-0007yz-NU
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:37 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:53352)
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6jF-0007wL-8j
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:35 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:51004)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fb6jI-0007yM-HX
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:36 -0400
-Received: by mail-wm0-x230.google.com with SMTP id b188-v6so12141609wme.3
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:03:36 -0700 (PDT)
+	id 1fb6jF-0007vj-1x
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:33 -0400
+Received: by mail-wm0-x229.google.com with SMTP id v25-v6so12156532wmc.0
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:03:32 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  5 Jul 2018 17:03:17 +0100
-Message-Id: <20180705160329.30386-9-alex.bennee@linaro.org>
+Date: Thu,  5 Jul 2018 17:03:11 +0100
+Message-Id: <20180705160329.30386-3-alex.bennee@linaro.org>
 In-Reply-To: <20180705160329.30386-1-alex.bennee@linaro.org>
 References: <20180705160329.30386-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 08/20] build-system: add clean-coverage target
+Subject: [Qemu-devel] [PULL v3 02/20] travis: do not waste time cloning
+ unused submodules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +31,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
-This can be used to remove any stale coverage data before any
-particular test run. This is useful for analysing individual tests.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+Builds only require:
+- dtc
+- keycodemapdb
+- capstone
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[AJB: drop wget cache]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>---
 
-diff --git a/Makefile b/Makefile
-index 39fd4c0546..9731ec1bb7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -723,6 +723,14 @@ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
- 	"GEN","$@")
- 
-+ifdef CONFIG_GCOV
-+.PHONY: clean-coverage
-+clean-coverage:
-+	$(call quiet-command, \
-+		find . \( -name '*.gcda' -o -name '*.gcov' \) -type f -exec rm {} +, \
-+		"CLEAN", "coverage files")
-+endif
-+
- clean:
- # avoid old build problems by removing potentially incorrect old files
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
-@@ -1073,6 +1081,9 @@ endif
- 		echo '')
- 	@echo  'Cleaning targets:'
- 	@echo  '  clean           - Remove most generated files but keep the config'
-+ifdef CONFIG_GCOV
-+	@echo  '  clean-coverage  - Remove coverage files'
-+endif
- 	@echo  '  distclean       - Remove all generated files'
- 	@echo  '  dist            - Build a distributable tarball'
- 	@echo  ''
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 66ef219f69..7f04ca104e 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -161,9 +161,14 @@ GCC gcov support
- ``gcov`` is a GCC tool to analyze the testing coverage by
- instrumenting the tested code. To use it, configure QEMU with
- ``--enable-gcov`` option and build. Then run ``make check`` as usual.
--Reports can be obtained by running ``gcov`` command on the output
--files under ``$build_dir/tests/``, please read the ``gcov``
--documentation for more information.
-+
-+If you want to gather coverage information on a single test the ``make
-+clean-coverage`` target can be used to delete any existing coverage
-+information before running a single test.
-+
-+Reports can be obtained by running ``gcov`` command
-+on the output files under ``$build_dir/tests/``, please read the
-+``gcov`` documentation for more information.
- 
- QEMU iotests
- ============
+diff --git a/.travis.yml b/.travis.yml
+index bd66c18fed..134d5331fe 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -66,8 +66,7 @@ git:
+ before_install:
+   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
+   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ; fi
+-  - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+-  - git submodule update --init --recursive
++  - git submodule update --init --recursive capstone dtc ui/keycodemapdb
+ before_script:
+   - ./configure ${CONFIG} || { cat config.log && exit 1; }
+ script:
 -- 
 2.17.1
