@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fbCdH-0007mQ-Nv
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 18:21:48 -0400
+	(envelope-from <jusual@mail.ru>) id 1fbChz-0001j8-7A
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 18:26:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fbCdE-0003fv-Io
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 18:21:47 -0400
-Received: from smtp32.i.mail.ru ([94.100.177.92]:51122)
+	(envelope-from <jusual@mail.ru>) id 1fbChv-0001fa-Sh
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 18:26:39 -0400
+Received: from smtp57.i.mail.ru ([217.69.128.37]:54132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fbCdE-0003e1-AL
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 18:21:44 -0400
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fbChv-0001ax-KX
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 18:26:35 -0400
 From: Julia Suvorova <jusual@mail.ru>
-Date: Fri,  6 Jul 2018 01:21:15 +0300
-Message-Id: <20180705222115.17013-3-jusual@mail.ru>
-In-Reply-To: <20180705222115.17013-1-jusual@mail.ru>
-References: <20180705222115.17013-1-jusual@mail.ru>
-Subject: [Qemu-devel] [RFC v3 2/2] tests: Add ARMv6-M reserved register test
+Date: Fri,  6 Jul 2018 01:26:22 +0300
+Message-Id: <20180705222622.17139-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH v2] target/arm: Forbid unprivileged mode for M
+ Baseline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +25,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-Check that reserved SCS registers return 0 at read,
-and writes are ignored.
-
-Based-on: <20180627143815.1829-1-joel@jms.id.au>
-Based-on: <20180630091343.14391-1-stefanha@redhat.com>
+MSR handling is the only place where CONTROL.nPRIV is modified.
 
 Signed-off-by: Julia Suvorova <jusual@mail.ru>
 ---
-Test will work if Joel's patches will use ARMv6-M.
+v2:
+    * Add the check in the CONTROL_NS case
 
- tests/Makefile.include            |  2 ++
- tests/tcg/arm/test-reserved-reg.c | 60 +++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
- create mode 100644 tests/tcg/arm/test-reserved-reg.c
+ target/arm/helper.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d323c42682..8ab0b0d15f 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -387,6 +387,7 @@ gcov-files-arm-y += hw/timer/arm_mptimer.c
- check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
- check-qtest-arm-y += tests/sdhci-test$(EXESUF)
- check-qtest-arm-y += tests/hexloader-test$(EXESUF)
-+check-qtest-arm-y += tests/tcg/arm/test-reserved-reg$(EXESUF)
- 
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
-@@ -771,6 +772,7 @@ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
- tests/hexloader-test$(EXESUF): tests/hexloader-test.o
-+tests/test-reserved-reg$(EXESUF): tests/tcg/arm/test-reserved-reg.o
- tests/endianness-test$(EXESUF): tests/endianness-test.o
- tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
- tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
-diff --git a/tests/tcg/arm/test-reserved-reg.c b/tests/tcg/arm/test-reserved-reg.c
-new file mode 100644
-index 0000000000..97273ff24d
---- /dev/null
-+++ b/tests/tcg/arm/test-reserved-reg.c
-@@ -0,0 +1,60 @@
-+/*
-+ * Test ARMv6-M SCS reserved registers
-+ *
-+ * Copyright (c) 2018 Julia Suvorova <jusual@mail.ru>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2
-+ * or later. See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+
-+static void test_reserved_reg(void)
-+{
-+    QTestState *s;
-+    int i;
-+    static const uint64_t reserved_reg[] = { 0xe000ed10, /* SCR */
-+                                             0xe000ed18, /* SHPR1 */
-+                                             0xe000ed28, /* CFSR */
-+                                             0xe000ed2c, /* HFSR */
-+                                             0xe000ed34, /* MMFAR */
-+                                             0xe000ed38, /* BFAR */
-+                                             0xe000ed3c, /* AFSR */
-+                                             0xe000ed40, /* CPUID */
-+                                             0xe000ed88, /* CPACR */
-+                                             0xe000ef00  /* STIR */ };
-+    static const uint8_t mini_kernel[] = { 0x00, 0x00, 0x00, 0x00,
-+                                           0x09, 0x00, 0x00, 0x00 };
-+    ssize_t wlen, kernel_size = sizeof(mini_kernel);
-+    int code_fd;
-+    char codetmp[] = "/tmp/reserved-reg-test-XXXXXX";
-+
-+    code_fd = mkstemp(codetmp);
-+    wlen = write(code_fd, mini_kernel, sizeof(mini_kernel));
-+    g_assert(wlen == kernel_size);
-+    close(code_fd);
-+
-+    s = qtest_startf("-kernel %s -M microbit -nographic", codetmp);
-+
-+    for (i = 0; i < ARRAY_SIZE(reserved_reg); i++) {
-+        int res;
-+        qtest_writel(s, reserved_reg[i], 1);
-+        res = qtest_readl(s, reserved_reg[i]);
-+        g_assert(!res);
-+    }
-+
-+    qtest_quit(s);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("tcg/arm/test-reserved-reg", test_reserved_reg);
-+    ret = g_test_run();
-+
-+    return ret;
-+}
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 5ee229eb35..2343aa5069 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10686,8 +10686,10 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+             write_v7m_control_spsel_for_secstate(env,
+                                                  val & R_V7M_CONTROL_SPSEL_MASK,
+                                                  M_REG_NS);
+-            env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
+-            env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
++            if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
++                env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
++                env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
++            }
+             return;
+         case 0x98: /* SP_NS */
+         {
+@@ -10781,8 +10783,10 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+             !arm_v7m_is_handler_mode(env)) {
+             write_v7m_control_spsel(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+         }
+-        env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
+-        env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
++        if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
++            env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
++            env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
++        }
+         break;
+     default:
+     bad_reg:
 -- 
 2.17.1
