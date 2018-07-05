@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fb4iD-0001CO-3L
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:54:22 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fb4ni-0002cP-Id
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:00:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fb4iA-0003uG-19
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:54:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37058 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fb4i9-0003sQ-Ra
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:54:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4191B401EF13
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 13:54:17 +0000 (UTC)
-Date: Thu, 5 Jul 2018 16:54:16 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180705165348-mutt-send-email-mst@kernel.org>
-References: <20180705123929.GB16293@redhat.com>
-	<20180705125231.GD16293@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1fb4nf-00079I-Hm
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:00:02 -0400
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:36238)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1fb4nf-00077B-Ar
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:59:59 -0400
+Received: by mail-it0-x230.google.com with SMTP id j185-v6so12182366ite.1
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 06:59:59 -0700 (PDT)
+Received: from [192.168.0.4] ([69.14.184.20]) by smtp.gmail.com with ESMTPSA id
+	u20-v6sm3009388itc.7.2018.07.05.06.59.57 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 05 Jul 2018 06:59:57 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705125231.GD16293@redhat.com>
-Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Message-Id: <F5A73E79-846C-4678-B740-1950B791AE5D@gmail.com>
+References: <F863D1F5-0218-488E-A0E0-9F5991339BC8@gmail.com>
+Date: Thu, 5 Jul 2018 09:59:56 -0400
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-3.1 0/7] target/ppc fp
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, berrange@redhat.com, jferlan@redhat.com
-
-On Thu, Jul 05, 2018 at 01:52:31PM +0100, Richard W.M. Jones wrote:
-> On Thu, Jul 05, 2018 at 01:39:29PM +0100, Richard W.M. Jones wrote:
-> > I was doing a bit of investigation around how different hypervisors
-> > handle the VM Generation ID feature.  QEMU's behaviour seems quite
-> > strange, I wonder if this is a bug or expected?
-> > 
-> > (1) I booted a Windows 2016 VM with:
-> > 
-> >   qemu-system-x86_64 -M pc,accel=kvm -m 2G -hda w2k16-mincore.img \
-> >       -device vmgenid,guid=01020304-0506-0708-090a-0b0c0d0e0f00,id=vmgenid0
-> > 
-> > (2) Inside the guest I used the VMGENID.EXE program from:
-> > 
-> >   https://bugzilla.redhat.com/show_bug.cgi?id=1598350#c3
-> >   https://docs.microsoft.com/en-gb/windows/desktop/HyperV_v2/virtual-machine-generation-identifier
-> > 
-> > Note this is self-compiled using mingw64-g++ (not using Visual Studio
-> > which I don't have available), but I don't believe that could have
-> > caused the problem.
-> > 
-> > (3) The program prints:
-> > 
-> >   VmCounterValue: 708050601020304:f0e0d0c0b0a09
-> > 
-> > To make it easier to see, this is the same number but zero-extended:
-> > 
-> >   VmCounterValue: 07 08 05 06 01 02 03 04 : 00 0f 0e 0d 0c 0b 0a 09
-> >                   \________ LOW ________/   \_______ HIGH _______/
-> >                             WORD                     WORD
-> > 
-> > As you can see it looks like there is no clear relationship between
-> > the order of the bytes in the guid= parameter and the order that they
-> > are seen by Windows.
-> 
-> OK after examining util/uuid.c and the qemu_uuid_bswap function,
-> I sort of see what's going on here.
-> 
-> FWIW other hypervisors seem to store these as two 64 bit integers.
-> 
-> Rich.
-
-What do others do, and what is, in your opinion, the correct behaviour here?
+To: QEMU Developers <qemu-devel@nongnu.org>
 
 
-> -- 
-> Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-> Read my programming and virtualization blog: http://rwmj.wordpress.com
-> Fedora Windows cross-compiler. Compile Windows programs, test, and
-> build Windows installers. Over 100 libraries supported.
-> http://fedoraproject.org/wiki/MinGW
+> Hi,
+>=20
+> qemu-system-ppc has an issue after building from the 3.1 branch. Mac
+> OS 9 hangs at the grey boot screen, OSX 10.3 hangs after verbose boot,
+> just before entering the graphical desktop.
+>=20
+> Command line to reproduce:
+>=20
+> qemu-system-ppc -L pc-bios -boot c -M mac99,via=3Dpmu -m 512 -prom-env
+> 'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env =
+'vga-ndrv?=3Dtrue'
+> -drive file=3DMacOS9.2.img,format=3Draw,media=3Ddisk -netdev
+> user,id=3Dnetwork01 -device sungem,netdev=3Dnetwork01
+>=20
+> I bisected to this commit:
+>=20
+> cdee6bed3e2ed60f039fb84f63c5dc5f4af4619c is the first bad commit
+> commit cdee6bed3e2ed60f039fb84f63c5dc5f4af4619c
+> Author: Richard Henderson <richard.henderson@linaro.org>
+> Date:   Tue Jul 3 08:17:32 2018 -0700
+>=20
+>   target/ppc: Use non-arithmetic conversions for fp load/store
+>=20
+>   Memory operations have no side effects on fp state.
+>   The use of a "real" conversions between float64 and float32
+>   would raise exceptions for SNaN and out-of-range inputs.
+>=20
+>   Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>   Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> :040000 040000 d61b35b777c3ac2f28980a98fc83b8dfdce11bba
+> ec7c15afcef93cc469c5ee0a2bfda293ba745dc3 M    target
+>=20
+> Thanks for looking into it.
+>=20
+> Best regards,
+> Howard
+
+I also noticed that my Mac OS 10.4.3 VM stopped booting. When I reversed =
+the above patch the VM started booting again. I am CC'ing Richard =
+Henderson on this issue.=20
