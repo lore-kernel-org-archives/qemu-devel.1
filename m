@@ -1,32 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb0c5-0005EQ-Kv
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:31:46 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fb0cG-0005Ii-HM
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb0c2-00088P-Ef
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:31:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56704 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fb0c2-00087Q-7j
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:31:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDD7ADFF8
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:31:41 +0000 (UTC)
-Date: Thu, 5 Jul 2018 17:31:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180705093136.GF1389@xz-mi>
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fb0cD-0000C1-CY
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:31:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40862
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1fb0cD-00009j-4v
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:31:53 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w659Sktx032736
+	for <qemu-devel@nongnu.org>; Thu, 5 Jul 2018 05:31:52 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k1cqu1hcy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 05:31:52 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Thu, 5 Jul 2018 10:31:50 +0100
+Date: Thu, 5 Jul 2018 15:01:44 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
 References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180705031755.3254-3-peterx@redhat.com>
-	<20180705091546.GC2538@work-vm>
+	<20180705031755.3254-5-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180705091546.GC2538@work-vm>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 2/9] migration: loosen recovery
- check when load vm
+In-Reply-To: <20180705031755.3254-5-peterx@redhat.com>
+Message-Id: <20180705093144.GA22608@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 4/9] tests: introduce
+ migrate_postcopy_* helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,72 +43,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Jul 05, 2018 at 10:15:47AM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > We were checking against -EIO, assuming that it will cover all IO
-> > failures.  But actually it is not.  One example is that in
-> > qemu_loadvm_section_start_full() we can have tons of places that will
-> > return -EINVAL even if the error is caused by IO failures on the
-> > network.
+On Thu, Jul 05, 2018 at 11:17:50AM +0800, Peter Xu wrote:
+> Separate the old postcopy UNIX socket test into three steps, provide a
+> helper for each step.  With these helpers, we can do more compliated
+> tests like postcopy recovery, while keep the codes shared.
 > 
-> I suspect we should fix those; but OK; I think the only cases
-> in there that could hit that are the get_counted_string and the
-> check_section_footer; they could both be fixed to return an errno
-> like the other cases.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  tests/migration-test.c | 38 +++++++++++++++++++++++++++-----------
+>  1 file changed, 27 insertions(+), 11 deletions(-)
 > 
-> > Let's loosen the recovery check logic here to cover all the error cases
-> > happened by removing the explicit check against -EIO.  After all we
-> > won't lose anything here if any other failure happened.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/savevm.c | 16 ++++++----------
-> >  1 file changed, 6 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/migration/savevm.c b/migration/savevm.c
-> > index 851d74e8b6..efcc795071 100644
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -2276,18 +2276,14 @@ out:
-> >          qemu_file_set_error(f, ret);
-> >  
-> >          /*
-> > -         * Detect whether it is:
-> > -         *
-> > -         * 1. postcopy running (after receiving all device data, which
-> > -         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
-> > -         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
-> > -         *    still receiving device states).
-> > -         * 2. network failure (-EIO)
-> > -         *
-> > -         * If so, we try to wait for a recovery.
-> > +         * If we are during an active postcopy, then we pause instead
-> > +         * of bail out to at least keep the VM's dirty data.  Note
-> > +         * that POSTCOPY_INCOMING_LISTENING stage is still not enough,
-> > +         * during which we're still receiving device states and we
-> > +         * still haven't yet started the VM on destination.
-> >           */
-> >          if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
-> > -            ret == -EIO && postcopy_pause_incoming(mis)) {
-> > +            postcopy_pause_incoming(mis)) {
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 3a85446f95..2155869b96 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -351,13 +351,19 @@ static void migrate(QTestState *who, const char *uri)
+>      qobject_unref(rsp);
+>  }
 > 
-> Hmm, OK; It does make me a bit nervous we might trigger this
-> too often, but I see the other cases where we're missing stuff
-> we should trigger it.  We might find we need to go the other way
-> and blacklist some errors.
+> -static void migrate_start_postcopy(QTestState *who)
+> +static void migrate_postcopy_start(QTestState *from, QTestState *to)
+>  {
+>      QDict *rsp;
+> 
+> -    rsp = wait_command(who, "{ 'execute': 'migrate-start-postcopy' }");
+> +    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
+>      g_assert(qdict_haskey(rsp, "return"));
+>      qobject_unref(rsp);
+> +
+> +    if (!got_stop) {
+> +        qtest_qmp_eventwait(from, "STOP");
+> +    }
+> +
+> +    qtest_qmp_eventwait(to, "RESUME");
+>  }
+> 
+>  static void test_migrate_start(QTestState **from, QTestState **to,
+> @@ -505,7 +511,8 @@ static void test_deprecated(void)
+>      qtest_quit(from);
+>  }
+> 
+> -static void test_postcopy(void)
+> +static void migrate_postcopy_prepare(QTestState **from_ptr,
+> +                                     QTestState **to_ptr)
 
-AFAIU the difference will be only that we pause instead of quit QEMU.
-IMHO the whitelist/blacklist will be more meaningful when there is a
-third choice for us (besides "quit" and "go into pause state").
+if we have uri as one of the configurable argument, it would be still
+better, so that in future we can call migrate_postcopy_prepare() with
+any different uri.
 
+-- Bala
+
+>  {
+>      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+>      QTestState *from, *to;
+> @@ -527,28 +534,37 @@ static void test_postcopy(void)
+>      wait_for_serial("src_serial");
+> 
+>      migrate(from, uri);
+> +    g_free(uri);
+> 
+>      wait_for_migration_pass(from);
+> 
+> -    migrate_start_postcopy(from);
+> -
+> -    if (!got_stop) {
+> -        qtest_qmp_eventwait(from, "STOP");
+> -    }
+> +    *from_ptr = from;
+> +    *to_ptr = to;
+> +}
+> 
+> -    qtest_qmp_eventwait(to, "RESUME");
+> +static void migrate_postcopy_complete(QTestState *from, QTestState *to)
+> +{
+> +    wait_for_migration_complete(from);
+> 
+> +    /* Make sure we get at least one "B" on destination */
+>      wait_for_serial("dest_serial");
+> -    wait_for_migration_complete(from);
+> 
+>      if (uffd_feature_thread_id) {
+>          read_blocktime(to);
+>      }
+> -    g_free(uri);
+> 
+>      test_migrate_end(from, to, true);
+>  }
+> 
+> +static void test_postcopy(void)
+> +{
+> +    QTestState *from, *to;
+> +
+> +    migrate_postcopy_prepare(&from, &to);
+> +    migrate_postcopy_start(from, to);
+> +    migrate_postcopy_complete(from, to);
+> +}
+> +
+
+
+
+
+>  static void test_baddest(void)
+>  {
+>      QTestState *from, *to;
+> -- 
+> 2.17.1
 > 
 > 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
-
--- 
-Peter Xu
