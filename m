@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1faxnP-00046l-DI
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:31:17 -0400
+	(envelope-from <kraxel@redhat.com>) id 1faxzh-0006Zx-OH
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1faxnM-0002zc-AA
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:31:15 -0400
-Date: Thu, 5 Jul 2018 08:31:07 +0200
+	(envelope-from <kraxel@redhat.com>) id 1faxze-00078t-MO
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:43:57 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180705063107.d6osq5lrt7v6kbga@sirius.home.kraxel.org>
-References: <20180704112859.20146-1-kraxel@redhat.com>
-	<20180704185321.GZ7451@localhost.localdomain>
-	<6a0aba7b46b168360fb291eaec769eb0@sebastianbauer.info>
-	<20180704205206.GG7451@localhost.localdomain>
-	<20180704210459.GH7451@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180704210459.GH7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] vga: make stdvga the global default
+Date: Thu,  5 Jul 2018 08:43:48 +0200
+Message-Id: <20180705064348.3162-3-kraxel@redhat.com>
+In-Reply-To: <20180705064348.3162-1-kraxel@redhat.com>
+References: <20180705064348.3162-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] vga: don't pick cirrus by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +19,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Sebastian Bauer <mail@sebastianbauer.info>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Sebastian Bauer <mail@sebastianbauer.info>, Gerd Hoffmann <kraxel@redhat.com>
 
-> roms/config.vga-bochs-display:CONFIG_VGA_PCI=y
-> roms/config.vga-cirrus:CONFIG_VGA_CIRRUS=y
-> roms/config.vga-cirrus:CONFIG_VGA_PCI=y
-> roms/config.vga-isavga:CONFIG_VGA_PCI=n
-> roms/config.vga-qxl:CONFIG_VGA_PCI=y
-> roms/config.vga-ramfb:CONFIG_VGA_PCI=n
-> roms/config.vga-stdvga:CONFIG_VGA_PCI=y
-> roms/config.vga-virtio:CONFIG_VGA_PCI=y
-> roms/config.vga-vmware:CONFIG_VGA_PCI=y
-> 
-> * I have no idea what this is, I guess this is not related to the
->   QEMU build system at all.  :)
+Now that all machines which need cirrus explicitly select it qemu
+doesn't need to consider it as default display any more.  Drop it.
 
-seabios config, for vgabios builds (make -C roms vgabios).
+With this patch applied all ppc machine types will use "std" as default
+display, no matter whenever cirrus-vga is compiled in or not.
 
-cheers,
-  Gerd
+Fixes: 29f9cef39e ppc: Include vga cirrus card into the compiling process
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ vl.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/vl.c b/vl.c
+index 16b913f9d5..117e4e6879 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4475,8 +4475,6 @@ int main(int argc, char **argv, char **envp)
+     if (default_vga) {
+         if (machine_class->default_display) {
+             vga_model = machine_class->default_display;
+-        } else if (vga_interface_available(VGA_CIRRUS)) {
+-            vga_model = "cirrus";
+         } else if (vga_interface_available(VGA_STD)) {
+             vga_model = "std";
+         }
+-- 
+2.9.3
