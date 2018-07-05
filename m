@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fb2vY-0000qH-Tk
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:00:02 -0400
+	(envelope-from <david@redhat.com>) id 1fb2vd-0000un-Jf
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:00:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fb2vX-0002y3-VJ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:00:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60366 helo=mx1.redhat.com)
+	(envelope-from <david@redhat.com>) id 1fb2vZ-00032m-Jj
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:00:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46290 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fb2vX-0002vq-Pk
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:59:59 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fb2vZ-00031f-F8
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:00:01 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4E757805A530
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 11:59:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EC3E94074474
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 12:00:00 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  5 Jul 2018 13:59:40 +0200
-Message-Id: <20180705115943.29402-9-david@redhat.com>
+Date: Thu,  5 Jul 2018 13:59:41 +0200
+Message-Id: <20180705115943.29402-10-david@redhat.com>
 In-Reply-To: <20180705115943.29402-1-david@redhat.com>
 References: <20180705115943.29402-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 08/11] memory-device: complete factoring out
- pre_plug handling
+Subject: [Qemu-devel] [PATCH v1 09/11] memory-device: complete factoring out
+ plug handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,122 +33,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, David Hildenbrand <david@redhat.com>
 
-With all required memory device class functions in place, we can factor
-out pre_plug handling of memory devices. Take proper care of errors. We
-still have to carry along legacy_align required for pc compatibility
-handling.
+With the new memory device functions in place, we can factor out
+plugging of memory devices completely.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/memory-device.c         | 29 ++++++++++++++++++++++++++---
- hw/mem/pc-dimm.c               | 16 +++-------------
- include/hw/mem/memory-device.h |  5 ++---
- 3 files changed, 31 insertions(+), 19 deletions(-)
+ hw/mem/memory-device.c         | 7 +++++--
+ hw/mem/pc-dimm.c               | 7 +------
+ include/hw/mem/memory-device.h | 3 +--
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index a69ae343f8..3ed067debb 100644
+index 3ed067debb..ec81133edf 100644
 --- a/hw/mem/memory-device.c
 +++ b/hw/mem/memory-device.c
-@@ -96,9 +96,10 @@ static void memory_device_check_addable(MachineState *ms, uint64_t size,
- 
- }
- 
--uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
--                                     uint64_t align, uint64_t size,
--                                     Error **errp)
-+static uint64_t memory_device_get_free_addr(MachineState *ms,
-+                                            const uint64_t *hint,
-+                                            uint64_t align, uint64_t size,
-+                                            Error **errp)
- {
-     uint64_t address_space_start, address_space_end;
-     GSList *list = NULL, *item;
-@@ -252,6 +253,28 @@ uint64_t get_plugged_memory_size(void)
-     return size;
- }
- 
-+void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
-+                            const uint64_t *legacy_align, Error **errp)
-+{
-+    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    Error *local_err = NULL;
-+    uint64_t addr, align;
-+    MemoryRegion *mr;
-+
-+    mr = mdc->get_memory_region(md, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+
-+    align = legacy_align ? *legacy_align : memory_region_get_alignment(mr);
-+    addr = mdc->get_addr(md);
-+    addr = memory_device_get_free_addr(ms, !addr ? NULL : &addr, align,
-+                                       memory_region_size(mr), &local_err);
-+    mdc->set_addr(md, addr, &local_err);
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
- void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
-                                uint64_t addr)
- {
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index bb8e10903f..33ab0621cc 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -32,11 +32,8 @@ static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
-                       const uint64_t *legacy_align, Error **errp)
- {
--    PCDIMMDevice *dimm = PC_DIMM(dev);
--    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     Error *local_err = NULL;
--    MemoryRegion *mr;
--    uint64_t addr, align;
-+    uint64_t addr;
-     int slot;
- 
-     slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
-@@ -49,22 +46,15 @@ void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine,
-     object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
-     trace_mhp_pc_dimm_assigned_slot(slot);
- 
--    mr = ddc->get_memory_region(dimm, &local_err);
-+    memory_device_pre_plug(MEMORY_DEVICE(dev), machine, legacy_align,
-+                           &local_err);
-     if (local_err) {
-         goto out;
-     }
- 
--    align = legacy_align ? *legacy_align : memory_region_get_alignment(mr);
-     addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
-                                     &error_abort);
--    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
--                                       memory_region_size(mr), &local_err);
--    if (local_err) {
--        goto out;
--    }
-     trace_mhp_pc_dimm_assigned_address(addr);
--    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP,
--                             &error_abort);
- out:
+@@ -275,9 +275,12 @@ out:
      error_propagate(errp, local_err);
  }
+ 
+-void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+-                               uint64_t addr)
++void memory_device_plug(MemoryDeviceState *md, MachineState *ms)
+ {
++    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
++    const uint64_t addr = mdc->get_addr(md);
++    MemoryRegion *mr = mdc->get_memory_region(md, &error_abort);
++
+     /* we expect a previous call to memory_device_get_free_addr() */
+     g_assert(ms->device_memory);
+ 
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 33ab0621cc..4760b17062 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -65,13 +65,8 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp)
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+                                                               &error_abort);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+-    uint64_t addr;
+-
+-    addr = object_property_get_uint(OBJECT(dev), PC_DIMM_ADDR_PROP,
+-                                    &error_abort);
+ 
+-    memory_device_plug_region(machine, mr, addr);
++    memory_device_plug(MEMORY_DEVICE(dev), machine);
+     vmstate_register_ram(vmstate_mr, dev);
+ }
+ 
 diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index cf5d182ac2..fb920b9f44 100644
+index fb920b9f44..ea9331a778 100644
 --- a/include/hw/mem/memory-device.h
 +++ b/include/hw/mem/memory-device.h
-@@ -57,9 +57,8 @@ typedef struct MemoryDeviceClass {
- 
- MemoryDeviceInfoList *qmp_memory_device_list(void);
+@@ -59,8 +59,7 @@ MemoryDeviceInfoList *qmp_memory_device_list(void);
  uint64_t get_plugged_memory_size(void);
--uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
--                                     uint64_t align, uint64_t size,
--                                     Error **errp);
-+void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
-+                            const uint64_t *legacy_align, Error **errp);
- void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
-                                uint64_t addr);
+ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+                             const uint64_t *legacy_align, Error **errp);
+-void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+-                               uint64_t addr);
++void memory_device_plug(MemoryDeviceState *md, MachineState *ms);
  void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr);
+ 
+ #endif
 -- 
 2.17.1
