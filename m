@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ludo@gnu.org>) id 1fazMs-0001O7-23
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:12:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fazcz-0003zW-9f
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ludo@gnu.org>) id 1fazMn-00016R-W2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:11:58 -0400
-From: ludo@gnu.org (Ludovic =?utf-8?Q?Court=C3=A8s?=)
-References: <87tvpfch8g.fsf@gnu.org> <20180704130841.GF32267@redhat.com>
-Date: Thu, 05 Jul 2018 10:11:51 +0200
-In-Reply-To: <20180704130841.GF32267@redhat.com> ("Daniel P.
-	\=\?utf-8\?Q\?Ber\?\= \=\?utf-8\?Q\?rang\=C3\=A9\=22's\?\=
-	message of "Wed, 4 Jul 2018 14:08:41 +0100")
-Message-ID: <877emahzjs.fsf@gnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1fazcy-0007VS-Cx
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:28:37 -0400
+Date: Thu, 5 Jul 2018 10:28:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180705082829.GA3309@localhost.localdomain>
+References: <20180703145915.32607-1-kwolf@redhat.com>
+	<CAFEAcA-xXYTcGJFtC90AvtFReRbFeAWuQNk2uobFCsioLHCikg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?q?32-bit_=E2=80=9Cqemu-system-i386_-enable-?=
- =?utf-8?q?kvm=E2=80=9D_segfaults_on_x86=5F64?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-xXYTcGJFtC90AvtFReRbFeAWuQNk2uobFCsioLHCikg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/5] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,211 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: vsementsov@virtuozzo.com
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Daniel,
+Am 04.07.2018 um 20:30 hat Peter Maydell geschrieben:
+> On 3 July 2018 at 15:59, Kevin Wolf <kwolf@redhat.com> wrote:
+> > The following changes since commit a395717cbd26e7593d3c3fe81faca121ec6d13e8:
+> >
+> >   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-07-03 11:49:51 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+> >
+> > for you to fetch changes up to 59738025a1674bb7e07713c3c93ff4fb9c5079f5:
+> >
+> >   block: Add blklogwrites (2018-07-03 16:09:48 +0200)
+> >
+> > ----------------------------------------------------------------
+> > Block layer patches:
+> >
+> > - qcow2: Use worker threads for compression to improve performance of
+> >   'qemu-img convert -W' and compressed backup jobs
+> > - blklogwrites: New filter driver to log write requests to an image in
+> >   the dm-log-writes format
+> >
+> > ----------------------------------------------------------------
+> 
+> Hi; this gives some a warning on OpenBSD and NetBSD:
+> 
+> /home/qemu/block/qcow2.c: In function 'qcow2_compress':
+> /home/qemu/block/qcow2.c:3684:18: warning: assignment discards 'const'
+> qualifier from pointer target type
+>      strm.next_in = src;
 
-Thanks for the quick reply.
+Hm, looks like they use a really old version of the zlib header, which
+doesn't care about const correctness. I'll add a cast to work around it.
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> skribis:
-
-> On Wed, Jul 04, 2018 at 02:34:07PM +0200, Ludovic Court=C3=A8s wrote:
->> Hello,
->>=20
->> (I=E2=80=99m reporting the issue here because for some reason the launch=
-pad.net
->> login page redirects me to an =E2=80=9Coops=E2=80=9D page and fails to l=
-og me in.)
->>=20
->> On a Linux 4.17 x86_64 host, =E2=80=9Cqemu-system-i386 -enable-kvm=E2=80=
-=9D, where
->> qemu-system-i386 is a 32-bit binary, crashes (it works fine without
->> =E2=80=98-enable-kvm=E2=80=99):
->>=20
->> --8<---------------cut here---------------start------------->8---
->> $ uname -rm
->> 4.17.3-gnu x86_64
->> $ file /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12.0/b=
-in/qemu-system-i386=20
->> /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12.0/bin/qemu=
--system-i386: ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV), =
-dynamically linked, interpreter /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/ld-linux.so.2, for GNU/Linux 2.6.32, stripped
->
-> It appears that not only are you using qemu-system-i386 on x86_64
-> host, but this has actually also been built as a 32-bit ELF binary,
-> so will be using the 32-bit compat syscalls. This is quite possibly
-> relevant to any crash, so it would be useful to know if qemu-system-i386,
-> when built as a 64-bit ELF binary works or fails.
-
-The 64-bit qemu-system-i386 works fine.
-
-> It appears you are using 2.12.0 release, so it is also helpful if
-> you would try using current git master to see if it still reproduces.
-
-Here=E2=80=99s what I get with today=E2=80=99s master (commit
-6d8ad1614e0c97c59a87e6c6208ebeb94e769149):
-
---8<---------------cut here---------------start------------->8---
-$ file /gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-minimal-2.12.0-6d8a=
-d16/bin/qemu-system-i386
-/gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-minimal-2.12.0-6d8ad16/bin=
-/qemu-system-i386: ELF 32-bit LSB shared object, Intel 80386, version 1 (SY=
-SV), dynamically linked, interpreter /gnu/stor
-e/4aka3nwppxf3z072l6vr8cxvwj3x5h9s-glibc-2.27/lib/ld-linux.so.2, for GNU/Li=
-nux 2.6.32, with debug_info, not stripped
-$ /gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-minimal-2.12.0-6d8ad16/b=
-in/qemu-system-i386 -enable-kvm /dev/null
-WARNING: Image format was not specified for '/dev/null' and probing guessed=
- raw.
-         Automatically detecting the format is dangerous for raw images, wr=
-ite operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
-VNC server running on 127.0.0.1:5900
-Adres-eraro(nekropsio el=C5=9Dutita)
---8<---------------cut here---------------end--------------->8---
-
-And the backtraces:
-
---8<---------------cut here---------------start------------->8---
-Core was generated by `/gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-min=
-imal-2.12.0-6d8ad16/bin/qem'.
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  0x5674c42e in kvm_vcpu_ioctl (cpu=3D0x580d3e60, type=3D44672) at /tmp/g=
-uix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.c:2097
-2097    /tmp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/=
-kvm-all.c: Dosiero a=C5=AD dosierujo ne ekzistas.
-[Current thread is 1 (Thread 0xf611db40 (LWP 9698))]
-
-[...]
-
-(gdb) thread apply all bt
-
-Thread 5 (Thread 0xf76e1bc0 (LWP 9695)):
-#0  0xf7f60059 in __kernel_vsyscall ()
-#1  0xf78425e4 in ppoll () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/libc.so.6
-#2  0x56c3eec0 in qemu_poll_ns (fds=3D0x580e8340, nfds=3D5, timeout=3D98088=
-9000) at util/qemu-timer.c:334
-#3  0x56c400db in os_host_main_loop_wait (timeout=3D980889000) at util/main=
--loop.c:233
-#4  0x56c401d6 in main_loop_wait (nonblocking=3D0) at util/main-loop.c:497
-#5  0x56890b45 in main_loop () at vl.c:1866
-#6  0x56898676 in main (argc=3D3, argv=3D0xffc58ee4, envp=3D0xffc58ef4) at =
-vl.c:4644
-
-Thread 4 (Thread 0xf76e0b40 (LWP 9696)):
-#0  0xf7f60059 in __kernel_vsyscall ()
-#1  0xf793fa0b in nanosleep () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
-5h9s-glibc-2.27/lib/libpthread.so.0
-#2  0xf7c59fe3 in g_usleep () from /gnu/store/1k808cq1dwlcjlfqmd4p5rxjpz2vc=
-kra-glib-2.56.0/lib/libglib-2.0.so.0
-#3  0x56c5c614 in call_rcu_thread (opaque=3D0x0) at util/rcu.c:253
-#4  0x56c452a5 in qemu_thread_start (args=3D0x5802b1d0) at util/qemu-thread=
--posix.c:504
-#5  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8cxvw=
-j3x5h9s-glibc-2.27/lib/libpthread.so.0
-#6  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/libc.so.6
-
-Thread 3 (Thread 0xec536b40 (LWP 9701)):
-#0  0xf7f60059 in __kernel_vsyscall ()
-#1  0xf793b35c in pthread_cond_wait@@GLIBC_2.3.2 () from /gnu/store/4aka3nw=
-ppxf3z072l6vr8cxvwj3x5h9s-glibc-2.27/lib/libpthread.so.0
-#2  0x56c44a4f in qemu_cond_wait_impl (cond=3D0x5910a7c0, mutex=3D0x5910a7f=
-4, file=3D0x56e3f412 "ui/vnc-jobs.c", line=3D213) at util/qemu-thread-posix=
-.c:161
-#3  0x56b0eb4f in vnc_worker_thread_loop (queue=3D0x5910a7c0) at ui/vnc-job=
-s.c:213
-#4  0x56b0f0e6 in vnc_worker_thread (arg=3D0x5910a7c0) at ui/vnc-jobs.c:323
-#5  0x56c452a5 in qemu_thread_start (args=3D0x581486d0) at util/qemu-thread=
--posix.c:504
-#6  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8cxvw=
-j3x5h9s-glibc-2.27/lib/libpthread.so.0
-#7  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/libc.so.6
-
-Thread 2 (Thread 0xf6cffb40 (LWP 9697)):
-#0  0xf7f60059 in __kernel_vsyscall ()
-#1  0xf78425e4 in ppoll () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/libc.so.6
-#2  0x56c3ee4a in qemu_poll_ns (fds=3D0xf63005d0, nfds=3D1, timeout=3D-1) a=
-t util/qemu-timer.c:322
-#3  0x56c41dcc in aio_poll (ctx=3D0x5804ebc0, blocking=3Dtrue) at util/aio-=
-posix.c:629
-#4  0x56887a63 in iothread_run (opaque=3D0x5804e9d0) at iothread.c:64
-#5  0x56c452a5 in qemu_thread_start (args=3D0x5804fb10) at util/qemu-thread=
--posix.c:504
-#6  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8cxvw=
-j3x5h9s-glibc-2.27/lib/libpthread.so.0
-#7  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/libc.so.6
-
-Thread 1 (Thread 0xf611db40 (LWP 9698)):
-#0  0x5674c42e in kvm_vcpu_ioctl (cpu=3D0x580d3e60, type=3D44672) at /tmp/g=
-uix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.c:2097
-#1  0x5674bf61 in kvm_cpu_exec (cpu=3D0x580d3e60) at /tmp/guix-build-qemu-m=
-inimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.c:1929
-#2  0x56714634 in qemu_kvm_cpu_thread_fn (arg=3D0x580d3e60) at /tmp/guix-bu=
-ild-qemu-minimal-2.12.0-6d8ad16.drv-0/source/cpus.c:1215
-#3  0x56c452a5 in qemu_thread_start (args=3D0x580e75d0) at util/qemu-thread=
--posix.c:504
-#4  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8cxvw=
-j3x5h9s-glibc-2.27/lib/libpthread.so.0
-#5  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x5h9s=
--glibc-2.27/lib/libc.so.6
-(gdb) thread 1
-[Switching to thread 1 (Thread 0xf611db40 (LWP 9698))]
-#0  0x5674c42e in kvm_vcpu_ioctl (cpu=3D0x580d3e60, type=3D44672) at /tmp/g=
-uix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.c:2097
-2097    in /tmp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/k=
-vm/kvm-all.c
-(gdb) info locals
-ret =3D 0
-arg =3D 0x0
-ap =3D 0xf611d03c "\366\276tV \200+W\310%\034W\222\345\210V`>\rX{\347\210V\=
-t"
-(gdb) p *cpu
-$1 =3D {parent_obj =3D {parent_obj =3D {class =3D 0x5807baa0, free =3D 0xf7=
-c35800 <g_free>, properties =3D 0x580aed90, ref =3D 1, parent =3D 0x580b1ad=
-0}, id =3D 0x0,=20
-    canonical_path =3D 0x580b1ce0 "/machine/unattached/device[0]", realized=
- =3D true, pending_deleted_event =3D false, opts =3D 0x0, hotplugged =3D 0,=
- parent_bus =3D 0x0, gpios =3D {lh_first =3D 0x0},=20
-    child_bus =3D {lh_first =3D 0x0}, num_child_bus =3D 0, instance_id_alia=
-s =3D -1, alias_required_for_version =3D 0}, nr_cores =3D 1, nr_threads =3D=
- 1, thread =3D 0x580e7580, thread_id =3D 9698, running =3D true,=20
-  has_waiter =3D false, halt_cond =3D 0x580e7590, thread_kicked =3D false, =
-created =3D true, stop =3D false, stopped =3D false, unplug =3D false, cras=
-h_occurred =3D false, exit_request =3D false,=20
-  cflags_next_tb =3D 4294967295, interrupt_request =3D 0, singlestep_enable=
-d =3D 0, icount_budget =3D 0, icount_extra =3D 0, jmp_env =3D {{__jmpbuf =
-=3D {0, 0, 0, 0, 0, 0}, __mask_was_saved =3D 0,=20
-      __saved_mask =3D {__val =3D {0 <repeats 32 times>}}}}, work_mutex =3D=
- {lock =3D {__data =3D {__lock =3D 0, __count =3D 0, __owner =3D 0, __kind =
-=3D 0, __nusers =3D 0, {__elision_data =3D {__espins =3D 0,=20
-            __eelision =3D 0}, __list =3D {__next =3D 0x0}}}, __size =3D '\=
-000' <repeats 23 times>, __align =3D 0}, file =3D 0x0, line =3D 0, initiali=
-zed =3D true}, queued_work_first =3D 0x0,=20
-  queued_work_last =3D 0x0, cpu_ases =3D 0x580e7520, num_ases =3D 1, as =3D=
- 0x580e74d0, memory =3D 0x58099300, env_ptr =3D 0x580d8030, tb_jmp_cache =
-=3D {0x0 <repeats 4096 times>}, gdb_regs =3D 0x0,=20
-  gdb_num_regs =3D 41, gdb_num_g_regs =3D 41, node =3D {tqe_next =3D 0x0, t=
-qe_prev =3D 0x571c300c <cpus>}, breakpoints =3D {tqh_first =3D 0x0, tqh_las=
-t =3D 0x580d7fcc}, watchpoints =3D {tqh_first =3D 0x0,=20
-    tqh_last =3D 0x580d7fd4}, watchpoint_hit =3D 0x0, opaque =3D 0x0, mem_i=
-o_pc =3D 0, mem_io_vaddr =3D 0, kvm_fd =3D 16, kvm_state =3D 0x580bc2c0, kv=
-m_run =3D 0xf6edd000, trace_dstate_delayed =3D {0},=20
-  trace_dstate =3D {0}, cpu_index =3D 0, halted =3D 0, can_do_io =3D 1, exc=
-eption_index =3D -1, vcpu_dirty =3D false, throttle_thread_scheduled =3D fa=
-lse, ignore_memory_transaction_failures =3D false,=20
-  icount_decr =3D {u32 =3D 0, u16 =3D {low =3D 0, high =3D 0}}, hax_vcpu =
-=3D 0x0, pending_tlb_flush =3D 0, hvf_fd =3D 0, iommu_notifiers =3D 0x58055=
-d00}
---8<---------------cut here---------------end--------------->8---
-
-Let me know if you need more information.
-
-Thank you,
-Ludo=E2=80=99.
+Kevin
