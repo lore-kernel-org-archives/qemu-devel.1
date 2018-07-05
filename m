@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <julien.grall@arm.com>) id 1fb3fb-0005E2-98
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:47:36 -0400
+	(envelope-from <rjones@redhat.com>) id 1fb3kW-0006nU-Gv
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <julien.grall@arm.com>) id 1fb3fY-0006Xu-71
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:47:35 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:56632
-	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <julien.grall@arm.com>) id 1fb3fX-0006Uv-W0
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:47:32 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
-	<20180704140943.GF4828@arm.com>
-	<8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
-	<20180704155231.GP4828@arm.com>
-From: Julien Grall <julien.grall@arm.com>
-Message-ID: <ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
-Date: Thu, 5 Jul 2018 13:47:26 +0100
+	(envelope-from <rjones@redhat.com>) id 1fb3kR-0006k3-TW
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:52:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1fb3kR-0006g5-Nf
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:52:35 -0400
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A9183C058CA5
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 12:52:34 +0000 (UTC)
+Date: Thu, 5 Jul 2018 13:52:31 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180705125231.GD16293@redhat.com>
+References: <20180705123929.GB16293@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180704155231.GP4828@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [kvmtool test PATCH 22/24] kvmtool: arm64: Add
- support for guest physical address size
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705123929.GB16293@redhat.com>
+Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com, berrange@redhat.com, jferlan@redhat.com
 
-Hi Will,
-
-On 04/07/18 16:52, Will Deacon wrote:
-> On Wed, Jul 04, 2018 at 04:00:11PM +0100, Julien Grall wrote:
->> On 04/07/18 15:09, Will Deacon wrote:
->>> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
->>>> Add an option to specify the physical address size used by this
->>>> VM.
->>>>
->>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> ---
->>>>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
->>>>   arm/include/arm-common/kvm-config-arch.h  | 1 +
->>>>   2 files changed, 5 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>> index 04be43d..dabd22c 100644
->>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
->>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>> @@ -8,7 +8,10 @@
->>>>   			"Create PMUv3 device"),				\
->>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
->>>>   			"Specify random seed for Kernel Address Space "	\
->>>> -			"Layout Randomization (KASLR)"),
->>>> +			"Layout Randomization (KASLR)"),		\
->>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
->>>> +			"Specify maximum physical address size (not "	\
->>>> +			"the amount of memory)"),
->>>
->>> Given that this is a shift value, I think the help message could be more
->>> informative. Something like:
->>>
->>> 	"Specify maximum number of bits in a guest physical address"
->>>
->>> I think I'd actually leave out any mention of memory, because this does
->>> actually have an effect on the amount of addressable memory in a way that I
->>> don't think we want to describe in half of a usage message line :)
->> Is there any particular reasons to expose this option to the user?
->>
->> I have recently sent a series to allow the user to specify the position
->> of the RAM [1]. With that series in mind, I think the user would not really
->> need to specify the maximum physical shift. Instead we could automatically
->> find it.
+On Thu, Jul 05, 2018 at 01:39:29PM +0100, Richard W.M. Jones wrote:
+> I was doing a bit of investigation around how different hypervisors
+> handle the VM Generation ID feature.  QEMU's behaviour seems quite
+> strange, I wonder if this is a bug or expected?
 > 
-> Marc makes a good point that it doesn't help for MMIO regions, so I'm trying
-> to understand whether we can do something differently there and avoid
-> sacrificing the type parameter.
+> (1) I booted a Windows 2016 VM with:
+> 
+>   qemu-system-x86_64 -M pc,accel=kvm -m 2G -hda w2k16-mincore.img \
+>       -device vmgenid,guid=01020304-0506-0708-090a-0b0c0d0e0f00,id=vmgenid0
+> 
+> (2) Inside the guest I used the VMGENID.EXE program from:
+> 
+>   https://bugzilla.redhat.com/show_bug.cgi?id=1598350#c3
+>   https://docs.microsoft.com/en-gb/windows/desktop/HyperV_v2/virtual-machine-generation-identifier
+> 
+> Note this is self-compiled using mingw64-g++ (not using Visual Studio
+> which I don't have available), but I don't believe that could have
+> caused the problem.
+> 
+> (3) The program prints:
+> 
+>   VmCounterValue: 708050601020304:f0e0d0c0b0a09
+> 
+> To make it easier to see, this is the same number but zero-extended:
+> 
+>   VmCounterValue: 07 08 05 06 01 02 03 04 : 00 0f 0e 0d 0c 0b 0a 09
+>                   \________ LOW ________/   \_______ HIGH _______/
+>                             WORD                     WORD
+> 
+> As you can see it looks like there is no clear relationship between
+> the order of the bytes in the guid= parameter and the order that they
+> are seen by Windows.
 
-I am not sure to understand this. kvmtools knows the memory layout 
-(including MMIOs) of the guest, so couldn't it guess the maximum 
-physical shift for that?
+OK after examining util/uuid.c and the qemu_uuid_bswap function,
+I sort of see what's going on here.
 
-Cheers,
+FWIW other hypervisors seem to store these as two 64 bit integers.
+
+Rich.
 
 -- 
-Julien Grall
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
