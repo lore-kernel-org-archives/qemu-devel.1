@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faxbh-0001i0-TL
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:19:10 -0400
+	(envelope-from <kraxel@redhat.com>) id 1faxmM-0003Xd-MO
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:30:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faxbe-0001tt-Ou
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:19:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60416 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1faxbe-0001sk-IP
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:19:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2EA8487A76
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 06:19:06 +0000 (UTC)
-Date: Thu, 5 Jul 2018 14:18:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180705061859.GA1389@xz-mi>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-3-peterx@redhat.com>
-	<87601ucj9u.fsf@dusky.pond.sub.org>
+	(envelope-from <kraxel@redhat.com>) id 1faxmJ-00006E-JZ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 02:30:10 -0400
+Date: Thu, 5 Jul 2018 08:30:03 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180705063003.awyx3lhgrt5nm7it@sirius.home.kraxel.org>
+References: <20180704112859.20146-1-kraxel@redhat.com>
+	<20180704185321.GZ7451@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87601ucj9u.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 2/9] qapi: allow build_params to return
- "void"
+In-Reply-To: <20180704185321.GZ7451@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] vga: make stdvga the global default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Sebastian Bauer <mail@sebastianbauer.info>
 
-On Thu, Jul 05, 2018 at 08:02:21AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
+> > -    m->default_display = "std";
+> >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
 > 
-> > When there is no parameter at all for a function prototype, return
-> > "void" for the parameter list.  This will happen after the next patch
-> > where we removed the Error* for some of the emit functions.
-> 
-> Error **, actually.  Let's say
-> 
->   qapi: Fix build_params() for empty parameter list
-> 
->   build_params() returns '' instead of 'void' when there are no
->   parameters.  Can't happen now, but the next commit will change that.
+> I wouldn't like to do this.  Long term, it would be a good idea
+> to have zero machines with default_display==NULL, so let's keep
+> default_machine="std" on PC?
 
-Sure.
+Fine with me, I'll send a v2.
 
+> > -        } else if (vga_interface_available(VGA_CIRRUS)) {
+> > -            vga_model = "cirrus";
+> >          } else if (vga_interface_available(VGA_STD)) {
+> >              vga_model = "std";
+> > +        } else if (vga_interface_available(VGA_CIRRUS)) {
+> > +            vga_model = "cirrus";
 > 
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  scripts/qapi/common.py | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> > index 8b6708dbf1..105c82742f 100644
-> > --- a/scripts/qapi/common.py
-> > +++ b/scripts/qapi/common.py
-> > @@ -1963,7 +1963,7 @@ extern const QEnumLookup %(c_name)s_lookup;
-> >  def build_params(arg_type, boxed, extra):
-> >      if not arg_type:
-> >          assert not boxed
-> > -        return extra
-> > +        return extra if extra else "void"
-> >      ret = ''
-> >      sep = ''
-> >      if boxed:
-> > @@ -1980,7 +1980,7 @@ def build_params(arg_type, boxed, extra):
-> >                                c_name(memb.name))
-> >      if extra:
-> >          ret += sep + extra
-> > -    return ret
-> > +    return ret if ret else "void"
-> >  
-> >  
-> >  #
-> 
-> Please use ' instead of " for local consistency.
-> 
-> Duplicating "if ret else 'void'" minimizes churn, but it's slightly
-> ugly.  I append my attempt to avoid it.  What do you think?
-> 
-> 
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 8b6708dbf1..01384c5360 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -1961,15 +1961,13 @@ extern const QEnumLookup %(c_name)s_lookup;
->  
->  
->  def build_params(arg_type, boxed, extra):
-> -    if not arg_type:
-> -        assert not boxed
-> -        return extra
->      ret = ''
->      sep = ''
->      if boxed:
-> +        assert arg_type
->          ret += '%s arg' % arg_type.c_param_type()
->          sep = ', '
-> -    else:
-> +    elif arg_type:
->          assert not arg_type.variants
->          for memb in arg_type.members:
->              ret += sep
-> @@ -1980,7 +1978,7 @@ def build_params(arg_type, boxed, extra):
->                                c_name(memb.name))
->      if extra:
->          ret += sep + extra
-> -    return ret
-> +    return ret if ret else 'void'
+> If we don't make the machines above have default_display=NULL, we
+> won't need this hunk, right?  In either case, I suggest doing
+> this change on a separate patch.
 
-Yeah, this looks good to me.
+ok.
 
-Thanks,
-
--- 
-Peter Xu
+cheers,
+  Gerd
