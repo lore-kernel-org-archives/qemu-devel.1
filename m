@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fax40-0003Tq-JQ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:44:21 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1faxAo-0004rg-8w
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fax3v-0004xP-OO
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:44:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36242 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fax3v-0004wJ-Jl
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:44:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 21B44406F8B2
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 05:44:15 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-2-peterx@redhat.com>
-Date: Thu, 05 Jul 2018 07:44:09 +0200
-In-Reply-To: <20180704084507.14560-2-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 4 Jul 2018 16:44:59 +0800")
-Message-ID: <87efgick46.fsf@dusky.pond.sub.org>
+	(envelope-from <dovgaluk@ispras.ru>) id 1faxAl-0007Q1-61
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:51:22 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:58368)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1faxAk-0007HQ-OO
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:51:19 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180614193147.29680-15-richard.henderson@linaro.org>
+	<000601d40f7a$4be320b0$e3a96210$@ru>
+	<20180629184832.GB14726@flamenco>
+	<000901d411c8$d3bfc9c0$7b3f5d40$@ru>
+	<20180702195234.GB20840@flamenco>
+	<000601d41290$205c56a0$611503e0$@ru>
+	<20180704193808.GA32390@flamenco>
+In-Reply-To: <20180704193808.GA32390@flamenco>
+Date: Thu, 5 Jul 2018 08:51:20 +0300
+Message-ID: <000001d41424$32d36540$987a2fc0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/9] monitor: simplify
- monitor_qmp_setup_handlers_bh
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL,
+ 14/18] translate-all: discard TB when tb_link_page returns an
+ existing matching TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "'Emilio G. Cota'" <cota@braap.org>
+Cc: 'Richard Henderson' <richard.henderson@linaro.org>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Peter Xu <peterx@redhat.com> writes:
+> From: Emilio G. Cota [mailto:cota@braap.org]
+> On Tue, Jul 03, 2018 at 08:38:52 +0300, Pavel Dovgalyuk wrote:
+> > > From: Emilio G. Cota [mailto:cota@braap.org]
+> > > On Mon, Jul 02, 2018 at 08:52:14 +0300, Pavel Dovgalyuk wrote:
+> > > > The same failure can be reproduced with linux-0.2.img, which was
+> > > > downloaded from QEMU site.
+> > > > I can't find it now, but I can upload this file if needed.
+> > >
+> > > Please upload it somewhere and share the full QEMU invocation
+> > > needed to replicate.
+> >
+> > https://github.com/Dovgalyuk/qemu-images/blob/master/linux-0.2.img
+> >
+> > qemu-system-i386 -drive file=images/linux-0.2.img,if=none,snapshot,id=img -drive
+> > driver=blkreplay,if=none,id=rr,image=img -device ide-hd,drive=rr -net none -icount
+> > shift=5,rr=record,rrfile=linux02.rr
+> 
+> The appended patch fixes it for me. Can you please test on your
+> windows image?
+> 
+> The rationale is to honour CF_NOCACHE, so that we always return
+> a new TB from tb_gen_code.
 
-> When we reach monitor_qmp_setup_handlers_bh() we must be using the
-> IOThread then, so no need to check against it any more.  Instead, we
-> assert.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Works for me, thank you.
+
+Tested-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+
+Pavel Dovgalyuk
+
+> 
 > ---
->  monitor.c | 13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
->
-> diff --git a/monitor.c b/monitor.c
-> index 14af7b7ea6..0e3ac52d87 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4583,15 +4583,10 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
->      Monitor *mon = opaque;
->      GMainContext *context;
->  
-> -    if (mon->use_io_thread) {
-> -        /* Use @mon_iothread context */
-> -        context = monitor_get_io_context();
-> -        assert(context);
-> -    } else {
-> -        /* Use default main loop context */
-> -        context = NULL;
-> -    }
-> -
-> +    assert(mon->use_io_thread);
-> +    /* Use @mon_iothread context */
-> +    context = monitor_get_io_context();
-> +    assert(context);
->      qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
->                               monitor_qmp_event, NULL, mon, context, true);
->      monitor_list_append(mon);
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 170b957..49d77fa 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1446,7 +1446,8 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool
+> rm_from_page_list)
+>      phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+>      h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb_cflags(tb) & CF_HASH_MASK,
+>                       tb->trace_vcpu_dstate);
+> -    if (!qht_remove(&tb_ctx.htable, tb, h)) {
+> +    if (!(tb->cflags & CF_NOCACHE) &&
+> +        !qht_remove(&tb_ctx.htable, tb, h)) {
+>          return;
+>      }
+> 
+> @@ -1604,8 +1605,6 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+>  {
+>      PageDesc *p;
+>      PageDesc *p2 = NULL;
+> -    void *existing_tb = NULL;
+> -    uint32_t h;
+> 
+>      assert_memory_lock();
+> 
+> @@ -1625,20 +1624,25 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+>          tb->page_addr[1] = -1;
+>      }
+> 
+> -    /* add in the hash table */
+> -    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
+> -                     tb->trace_vcpu_dstate);
+> -    qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
+> +    if (!(tb->cflags & CF_NOCACHE)) {
+> +        void *existing_tb = NULL;
+> +        uint32_t h;
+> 
+> -    /* remove TB from the page(s) if we couldn't insert it */
+> -    if (unlikely(existing_tb)) {
+> -        tb_page_remove(p, tb);
+> -        invalidate_page_bitmap(p);
+> -        if (p2) {
+> -            tb_page_remove(p2, tb);
+> -            invalidate_page_bitmap(p2);
+> +        /* add in the hash table */
+> +        h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
+> +                         tb->trace_vcpu_dstate);
+> +        qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
+> +
+> +        /* remove TB from the page(s) if we couldn't insert it */
+> +        if (unlikely(existing_tb)) {
+> +            tb_page_remove(p, tb);
+> +            invalidate_page_bitmap(p);
+> +            if (p2) {
+> +                tb_page_remove(p2, tb);
+> +                invalidate_page_bitmap(p2);
+> +            }
+> +            tb = existing_tb;
+>          }
+> -        tb = existing_tb;
+>      }
+> 
+>      if (p2 && p2 != p) {
