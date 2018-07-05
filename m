@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1fb3xe-0007FL-LS
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:06:16 -0400
+	(envelope-from <quintela@redhat.com>) id 1fb3xw-0007QK-Uy
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1fb3xa-0001LM-MJ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:06:14 -0400
-Received: from relay8-d.mail.gandi.net ([217.70.183.201]:45965)
+	(envelope-from <quintela@redhat.com>) id 1fb3xs-0002Pl-WE
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:06:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35974 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1fb3xa-0001Bz-Bq
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:06:10 -0400
-References: <cover.1530395710.git.jcd@tribudubois.net>
-	<CAFEAcA8OPpt1ZVc7ryzeK6W=t+Prc-J3KYXqPpS5rdBJxs+zZg@mail.gmail.com>
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <44416ec7-bd4b-2f96-610a-c92ddf53a54d@tribudubois.net>
-Date: Thu, 5 Jul 2018 15:06:05 +0200
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fb3xs-0002Om-Qs
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:06:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 78587401EF04
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 13:06:28 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180705031755.3254-7-peterx@redhat.com> (Peter Xu's message of
+	"Thu, 5 Jul 2018 11:17:52 +0800")
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-7-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 05 Jul 2018 15:06:18 +0200
+Message-ID: <87k1q925o5.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8OPpt1ZVc7ryzeK6W=t+Prc-J3KYXqPpS5rdBJxs+zZg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/3] i.MX: Add the i.MX6UL SOC and a
- reference board.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-3.0 6/9] tests: introduce
+ migrate_query*() helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +35,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Andrey Smirnov <andrew.smirnov@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Le 01/07/2018 à 12:44, Peter Maydell a écrit :
-> On 30 June 2018 at 22:57, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
->> This series adds the i.MX6UL SOC from NXP/Freescale and the reference
->> evaluation board.
->>
->> This series as tested by booting linux 4.18 (built using imx_v6_v7_defconfig)
->> on the emulated board (with the appropriate device tree).
->>
->> Jean-Christophe Dubois (3):
->>    i.MX6UL: Add i.MX6UL specific CCM device
->>    i.MX6UL: Add i.MX6UL SOC
->>    i.MX6UL: Add Freescale i.MX6 UltraLite 14x14 EVK Board
-> Hi; thanks for this patchset. I've put it on my to-review queue,
-> but since it's too late to get in for softfreeze for 3.0 I'm
-> planning to prioritize release-related work so it may take
-> me a little while to get back to it.
+Peter Xu <peterx@redhat.com> wrote:
+> Introduce helpers to query migration states and use it.
 >
-> thanks
-> -- PMM
->
-OK, take your time.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Also for the record, I believe the Qemu FEC/ENET device doesn't work 
-with linux 4.18 on the i.MX6Q/DL sabrelite emulation.
-
-JC
+Reviewed-by: Juan Quintela <quintela@redhat.com>
