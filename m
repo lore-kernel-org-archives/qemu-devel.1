@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1faxBt-0005Mh-Q2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:52:30 -0400
+	(envelope-from <clg@kaod.org>) id 1faxGX-0006ae-HF
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1faxBs-0003Cl-Nt
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:52:29 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42787)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1faxBs-0003B8-GZ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:52:28 -0400
-Received: by mail-oi0-x244.google.com with SMTP id n84-v6so14545155oib.9
-	for <qemu-devel@nongnu.org>; Wed, 04 Jul 2018 22:52:28 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1faxGU-0000Ve-Fj
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:57:17 -0400
+Received: from 10.mo7.mail-out.ovh.net ([178.33.250.56]:41580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1faxGU-0008PG-6r
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:57:14 -0400
+Received: from player793.ha.ovh.net (unknown [10.109.122.120])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 54E8FB7492
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 07:57:04 +0200 (CEST)
+References: <20180701171953.9921-1-clg@kaod.org> <20180702035726.GK2455@xz-mi>
+	<b5f38492-22a4-aa8a-ab42-f7e06c28c753@kaod.org>
+	<20180704022648.GA2568@xz-mi>
+	<f67c2a72-b3ac-fe8d-52c9-b03f58556caa@kaod.org>
+	<95fe81b1-13ee-5c82-22e2-e5ef4abd1168@redhat.com>
+	<20180704095520.GD2568@xz-mi>
+	<9e9c51da-f7aa-c3d1-0beb-4dbfaf31a592@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <16ec29ab-a5ec-a68a-91d0-2c63838d0695@kaod.org>
+Date: Thu, 5 Jul 2018 07:56:54 +0200
 MIME-Version: 1.0
-References: <20180615222855.44421-1-mst@redhat.com>
-	<20180615222855.44421-2-mst@redhat.com>
-	<b59883c6-1dc0-4e81-439c-587c8f2d3e83@redhat.com>
-	<f87772ab-7d59-4ab2-59e3-c1ac77eaf725@redhat.com>
-	<20180620030236-mutt-send-email-mst@kernel.org>
-	<CANRm+CyZyo49ga=-dM-VES8fTEYiv+FM0WZdsf5F+jhnLbcLtw@mail.gmail.com>
-	<20180620053855-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180620053855-mutt-send-email-mst@kernel.org>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Thu, 5 Jul 2018 13:52:29 +0800
-Message-ID: <CANRm+Cz956boUFODZRAfrLHXiAFbDZ2Yu3oiVroy58CTg7veNw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] kvm: support -dedicated
- cpu-pm=on|off
+In-Reply-To: <9e9c51da-f7aa-c3d1-0beb-4dbfaf31a592@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] exec.c: check RAMBlock validity before
+ changing its flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: eblake@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm <kvm@vger.kernel.org>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, 20 Jun 2018 at 10:41, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Jun 20, 2018 at 08:46:10AM +0800, Wanpeng Li wrote:
-> > On Wed, 20 Jun 2018 at 08:07, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Tue, Jun 19, 2018 at 05:07:46PM -0500, Eric Blake wrote:
-> > > > On 06/19/2018 10:17 AM, Paolo Bonzini wrote:
-> > > > > On 16/06/2018 00:29, Michael S. Tsirkin wrote:
-> > > > > > +static QemuOptsList qemu_dedicated_opts = {
-> > > > > > +    .name = "dedicated",
-> > > > > > +    .head = QTAILQ_HEAD_INITIALIZER(qemu_dedicated_opts.head),
-> > > > > > +    .desc = {
-> > > > > > +        {
-> > > > > > +            .name = "mem-lock",
-> > > > > > +            .type = QEMU_OPT_BOOL,
-> > > > > > +        },
-> > > > > > +        {
-> > > > > > +            .name = "cpu-pm",
-> > > > > > +            .type = QEMU_OPT_BOOL,
-> > > > > > +        },
-> > > > > > +        { /* end of list */ }
-> > > > > > +    },
-> > > > > > +};
-> > > > > > +
-> > > > >
-> > > > > Let the bikeshedding begin!
-> > > > >
-> > > > > 1) Should we deprecate -realtime?
-> > > > >
-> > > > > 2) Maybe -hostresource?
-> > > >
-> > > > What further things might we add in the future?
-> > > >
-> > > > -dedicated sounds wrong (it is an adjective, while most of our options are
-> > > > nouns - thing -machine, -drive, -object, ...)
-> > > >
-> > > > -hostresource at least sounds like a noun, but is long to type.  But at
-> > > > least '-hostresource cpu-pm=on' reads reasonably well.
-> > >
-> > > Yes but host resource what? I feel it says nothing at all about what
-> > > one can expect to find in this flag.
-> > >
-> > > > About the only other noun I could think of would be '-feature cpu-pm=on'.
-> > >
-> > > If we have nothing at all to say about what is grouping these things,
-> > > we don't need a new flag. We can make it a machine property.
-> > >
-> > > It's user's hint that some host resource is dedicated to a VM.
-> >
-> > The commit 633711e82 (kvm: rename KVM_HINTS_DEDICATED to
-> > KVM_HINTS_REALTIME) should be reverted according to several threads
-> > discussion I think.
-> >
-> > Regards,
-> > Wanpeng Li
->
-> IMHO that is unrelated - these KVM hints are hints to *guest*.
+Hello Paolo,
 
-Actually I really don't like the KVM_HINT_REALTIME renaming, there are
-dedicated instances in public cloud environment consider security or
-performance. The financial customers may prefer dedicated pCPUs when
-considering security, and other gaming customers may prefer dedicated
-pCPUs when considering performance. So "realtime" is not suitable.
+On 07/04/2018 02:16 PM, Paolo Bonzini wrote:
+> On 04/07/2018 11:55, Peter Xu wrote:
+>>>     commit b0e56e0b63f350691b52d3e75e89bb64143fbeff
+>>>     Author: Hu Tao <hutao@cn.fujitsu.com>
+>>>     Date:   Wed Apr 2 15:13:27 2014 +0800
+>>>
+>>>     unset RAMBlock idstr when unregister MemoryRegion
+>>>
+>>>     Signed-off-by: Hu Tao <hutao@cn.fujitsu.com>
+>>>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>
+>>> whose commit message is a bit lacking, but
+>>> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html helps
+>>> more.  It seems like the original bug was a reference count issue.
+>>>
+>>> Clearing the new migratable flag should also be unnecessary.
+>> But even if we get rid of vmstate_unregister_ram(), the leak could
+>> still be there?
+>>
+>> I'm not sure what was leaked when b0e56e0b6 was introduced, I feel
+>> like it's the RAMBlock of the memdev.  Here I think the ROM memory
+>> region seems to be leaked as well (along with the RAMBlock inside)?
+> 
+> The leak would be another bug that vmstate_unregister_ram is just
+> papering over.  We need to test memory unplug with
+> vmstate_unregister_ram removed, and fix bugs if any.
 
-Regards,
-Wanpeng Li
+So for the time being, you would just get rid of pci_del_option_rom()
+which only does vmstate_unregister_ram() ? 
+
+Thanks,
+
+C.
