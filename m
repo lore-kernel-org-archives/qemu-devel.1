@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1mR-0003Ju-Pz
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:46:32 -0400
+	(envelope-from <jusual@mail.ru>) id 1fb1oK-0004Qy-PY
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:48:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1mQ-0002U0-W3
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:46:31 -0400
-Date: Thu, 5 Jul 2018 12:46:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180705104622.GF3309@localhost.localdomain>
-References: <20180705092139.776069-1-vsementsov@virtuozzo.com>
+	(envelope-from <jusual@mail.ru>) id 1fb1oG-0008JN-T1
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:48:28 -0400
+Received: from smtp16.mail.ru ([94.100.176.153]:37072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fb1oG-0008BA-Gm
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:48:24 -0400
+References: <20180704203639.29553-1-jusual@mail.ru>
+	<CAFEAcA_6213s2e+_sDfCRemnVViPQ8ACSS8nRNAYs05a8xhbQA@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <f0fc8b58-d320-2b6e-6c5b-404c2e400097@mail.ru>
+Date: Thu, 5 Jul 2018 13:48:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705092139.776069-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qcow2: add overlap check for bitmap
- directory
+In-Reply-To: <CAFEAcA_6213s2e+_sDfCRemnVViPQ8ACSS8nRNAYs05a8xhbQA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Forbid unprivileged mode for M
+ Baseline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
 
-Am 05.07.2018 um 11:21 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> If it appropriate for 3.0, let's push it. If not - then for 3.1
-> with fixed "since". Should I cc stable?
+On 05.07.2018 13:33, Peter Maydell wrote:
+> On 4 July 2018 at 21:36, Julia Suvorova <jusual@mail.ru> wrote:
+>> MSR handling is the only place where CONTROL.nPRIV is modified.
+>>
+>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>> ---
+>>   target/arm/helper.c | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index 5ee229eb35..83cca554ad 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -10781,8 +10781,10 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+>>               !arm_v7m_is_handler_mode(env)) {
+>>               write_v7m_control_spsel(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+>>           }
+>> -        env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
+>> -        env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
+>> +        if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
+>> +            env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
+>> +            env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
+>> +        }
+>>           break;
+>>       default:
+>>       bad_reg:
+>> --
 > 
-> v3: - update Qcow2OverlapCheckFlags in qapi/block-core.json [Max]
+> Could you also guard the similar code in the CONTROL_NS case a
+> little earlier, in the function, please?
 > 
-> v2: - squash 02 (indentation fix) to 01
->     - drop comment from qcow2_check_metadata_overlap()
->     - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in-place case in
->       bitmap_list_store. I don't think non-inplace case should be changed,
->       as it don't touch active bitmap directory.
+>              env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
+>              env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block-core.json   | 21 ++++++++++++---------
->  block/qcow2.h          | 45 ++++++++++++++++++++++++---------------------
->  block/qcow2-bitmap.c   |  7 ++++++-
->  block/qcow2-refcount.c | 10 ++++++++++
->  block/qcow2.c          | 22 ++++++++++++++--------
->  5 files changed, 66 insertions(+), 39 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 90e554ed0f..e7393e0313 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2695,18 +2695,21 @@
->  # @template: Specifies a template mode which can be adjusted using the other
->  #            flags, defaults to 'cached'
->  #
-> +# @bitmap-directory: since 3.0
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'Qcow2OverlapCheckFlags',
-> -  'data': { '*template':       'Qcow2OverlapCheckMode',
-> -            '*main-header':    'bool',
-> -            '*active-l1':      'bool',
-> -            '*active-l2':      'bool',
-> -            '*refcount-table': 'bool',
-> -            '*refcount-block': 'bool',
-> -            '*snapshot-table': 'bool',
-> -            '*inactive-l1':    'bool',
-> -            '*inactive-l2':    'bool' } }
-> +  'data': { '*template':        'Qcow2OverlapCheckMode',
-> +            '*main-header':     'bool',
-> +            '*active-l1':       'bool',
-> +            '*active-l2':       'bool',
-> +            '*refcount-table':  'bool',
-> +            '*refcount-block':  'bool',
-> +            '*snapshot-table':  'bool',
-> +            '*inactive-l1':     'bool',
-> +            '*inactive-l2':     'bool',
-> +            '*bitmap-directory': 'bool' } }
+> That won't be executed for v6M but for v8M it matters.
 
-Did you intend to add two spaces to each line? Because this still isn't
-aligned to the same column.
+Sure, I'll send v2.
 
-Kevin
+Best regards, Julia Suvorova.
