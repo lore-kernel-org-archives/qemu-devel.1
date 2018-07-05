@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb1Zw-0004PV-5j
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:33:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb1cg-0006fQ-TL
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb1Zv-0000h6-AV
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:33:36 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fb1Zv-0000gD-5K
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:33:35 -0400
-Received: by mail-oi0-x242.google.com with SMTP id n84-v6so15868608oib.9
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 03:33:35 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fb1ce-0000Lf-T9
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:36:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41486 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb1ce-0000Jc-MC
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:36:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0064C87928
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 10:36:24 +0000 (UTC)
+Date: Thu, 5 Jul 2018 11:36:21 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180705103620.GK2538@work-vm>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-10-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180704203639.29553-1-jusual@mail.ru>
-References: <20180704203639.29553-1-jusual@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jul 2018 11:33:14 +0100
-Message-ID: <CAFEAcA_6213s2e+_sDfCRemnVViPQ8ACSS8nRNAYs05a8xhbQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Forbid unprivileged mode for M
- Baseline
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705031755.3254-10-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 9/9] tests: hide stderr for
+ postcopy recovery test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 4 July 2018 at 21:36, Julia Suvorova <jusual@mail.ru> wrote:
-> MSR handling is the only place where CONTROL.nPRIV is modified.
->
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+* Peter Xu (peterx@redhat.com) wrote:
+> We dumped something when network failure happens.  We should avoid those
+> messages to be dumped when running the tests:
+> 
+>   $ ./tests/migration-test -p /x86_64/migration/postcopy/recovery
+>   /x86_64/migration/postcopy/recovery: qemu-system-x86_64: check_section_footer: Read section footer failed: -5
+>   qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
+>   qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
+>   OK
+
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> After the patch:
+> 
+>   $ ./tests/migration-test -p /x86_64/migration/postcopy/recovery
+>   /x86_64/migration/postcopy/recovery: OK
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  target/arm/helper.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 5ee229eb35..83cca554ad 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -10781,8 +10781,10 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
->              !arm_v7m_is_handler_mode(env)) {
->              write_v7m_control_spsel(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
->          }
-> -        env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
-> -        env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
-> +        if (arm_feature(env, ARM_FEATURE_M_MAIN)) {
-> +            env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
-> +            env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
-> +        }
->          break;
->      default:
->      bad_reg:
-> --
-
-Could you also guard the similar code in the CONTROL_NS case a
-little earlier, in the function, please?
-
-            env->v7m.control[M_REG_NS] &= ~R_V7M_CONTROL_NPRIV_MASK;
-            env->v7m.control[M_REG_NS] |= val & R_V7M_CONTROL_NPRIV_MASK;
-
-That won't be executed for v6M but for v8M it matters.
-
-Otherwise I agree this is all we need to do to avoid the guest
-incorrectly getting into nonpriviliged mode.
-
-thanks
--- PMM
+>  tests/migration-test.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 182fc88e93..96e69dab99 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -567,12 +567,13 @@ static void test_deprecated(void)
+>  }
+>  
+>  static void migrate_postcopy_prepare(QTestState **from_ptr,
+> -                                     QTestState **to_ptr)
+> +                                     QTestState **to_ptr,
+> +                                     bool hide_error)
+>  {
+>      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+>      QTestState *from, *to;
+>  
+> -    test_migrate_start(&from, &to, uri, false);
+> +    test_migrate_start(&from, &to, uri, hide_error);
+>  
+>      migrate_set_capability(from, "postcopy-ram", "true");
+>      migrate_set_capability(to, "postcopy-ram", "true");
+> @@ -615,7 +616,7 @@ static void test_postcopy(void)
+>  {
+>      QTestState *from, *to;
+>  
+> -    migrate_postcopy_prepare(&from, &to);
+> +    migrate_postcopy_prepare(&from, &to, false);
+>      migrate_postcopy_start(from, to);
+>      migrate_postcopy_complete(from, to);
+>  }
+> @@ -625,7 +626,7 @@ static void test_postcopy_recovery(void)
+>      QTestState *from, *to;
+>      char *uri;
+>  
+> -    migrate_postcopy_prepare(&from, &to);
+> +    migrate_postcopy_prepare(&from, &to, true);
+>  
+>      /* Turn postcopy speed down, 4K/s is slow enough on any machines */
+>      migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
