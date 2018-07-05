@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fb537-0000Xb-H4
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:15:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb54w-0001Jg-Eu
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:17:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fb532-0000mn-IN
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:15:57 -0400
-Received: from foss.arm.com ([217.140.101.70]:58018)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marc.zyngier@arm.com>) id 1fb532-0000iM-8e
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:15:52 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
-	<20180704140943.GF4828@arm.com>
-	<8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
-	<20180704155231.GP4828@arm.com>
-	<ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
-	<d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
-	<bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Message-ID: <29208b59-0224-00d2-0e2a-6f53a0cbc963@arm.com>
-Date: Thu, 5 Jul 2018 15:15:46 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1fb54r-0007Na-FA
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:17:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36232 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb54r-0007M1-8l
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:17:45 -0400
+Date: Thu, 5 Jul 2018 15:17:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180705141739.GM2538@work-vm>
+References: <20180629174305.42849-1-dgilbert@redhat.com>
+	<CAFEAcA8AdAYdnaCgyyEDwqbNd+0ZovfG2O3wLGcumRg2b3RW1g@mail.gmail.com>
+	<CAFEAcA_wvRnHvy7CVO48DdHNaQxCyBhmjUrBVM-rGiXViH+jDg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [kvmtool test PATCH 22/24] kvmtool: arm64: Add
- support for guest physical address size
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_wvRnHvy7CVO48DdHNaQxCyBhmjUrBVM-rGiXViH+jDg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] tests/migration: Skip tests for ppc tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,106 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Xu <peterx@redhat.com>
 
-Hi Eric,
-
-On 05/07/18 14:46, Auger Eric wrote:
-> Hi Marc,
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 30 June 2018 at 17:28, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 29 June 2018 at 18:43, Dr. David Alan Gilbert (git)
+> > <dgilbert@redhat.com> wrote:
+> >> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >>
+> >> PPC tcg seems to be failing migration tests quite regularly;
+> >> we believe this is TCG bugs in dirty bit updating; it's
+> >> not clear why PPC fails more but lets skip for the moment.
+> >>
+> >> $ ./tests/migration-test
+> >> /ppc64/migration/deprecated: OK
+> >> /ppc64/migration/bad_dest: SKIP
+> >> /ppc64/migration/postcopy/unix: SKIP
+> >> /ppc64/migration/precopy/unix: SKIP
+> >
+> > This patch seems to make the test fail in some setups:
 > 
-> On 07/05/2018 03:20 PM, Marc Zyngier wrote:
->> On 05/07/18 13:47, Julien Grall wrote:
->>> Hi Will,
->>>
->>> On 04/07/18 16:52, Will Deacon wrote:
->>>> On Wed, Jul 04, 2018 at 04:00:11PM +0100, Julien Grall wrote:
->>>>> On 04/07/18 15:09, Will Deacon wrote:
->>>>>> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
->>>>>>> Add an option to specify the physical address size used by this
->>>>>>> VM.
->>>>>>>
->>>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>>>> ---
->>>>>>>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
->>>>>>>   arm/include/arm-common/kvm-config-arch.h  | 1 +
->>>>>>>   2 files changed, 5 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>>> index 04be43d..dabd22c 100644
->>>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>>> @@ -8,7 +8,10 @@
->>>>>>>   			"Create PMUv3 device"),				\
->>>>>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
->>>>>>>   			"Specify random seed for Kernel Address Space "	\
->>>>>>> -			"Layout Randomization (KASLR)"),
->>>>>>> +			"Layout Randomization (KASLR)"),		\
->>>>>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
->>>>>>> +			"Specify maximum physical address size (not "	\
->>>>>>> +			"the amount of memory)"),
->>>>>>
->>>>>> Given that this is a shift value, I think the help message could be more
->>>>>> informative. Something like:
->>>>>>
->>>>>> 	"Specify maximum number of bits in a guest physical address"
->>>>>>
->>>>>> I think I'd actually leave out any mention of memory, because this does
->>>>>> actually have an effect on the amount of addressable memory in a way that I
->>>>>> don't think we want to describe in half of a usage message line :)
->>>>> Is there any particular reasons to expose this option to the user?
->>>>>
->>>>> I have recently sent a series to allow the user to specify the position
->>>>> of the RAM [1]. With that series in mind, I think the user would not really
->>>>> need to specify the maximum physical shift. Instead we could automatically
->>>>> find it.
->>>>
->>>> Marc makes a good point that it doesn't help for MMIO regions, so I'm trying
->>>> to understand whether we can do something differently there and avoid
->>>> sacrificing the type parameter.
->>>
->>> I am not sure to understand this. kvmtools knows the memory layout 
->>> (including MMIOs) of the guest, so couldn't it guess the maximum 
->>> physical shift for that?
->>
->> That's exactly what Will was trying to avoid, by having KVM to compute
->> the size of the IPA space based on the registered memslots. We've now
->> established that it doesn't work, so what we need to define is:
->>
->> - whether we need another ioctl(), or do we carry on piggy-backing on
->> the CPU type,
-> kvm type I guess
-
-I really meant target here. Whatever you pass as a "-cpu" on your QEMU
-command line.
-
->> - assuming the latter, whether we can reduce the number of bits used in
->> the ioctl parameter by subtly encoding the IPA size.
-> Getting benefit from your Freudian slip, how should guest CPU PARange
-> and maximum number of bits in a guest physical address relate?
-
-Freudian? I'm not on the sofa yet... ;-)
-
-> My understanding is they are not correlated at the moment and our guest
-> PARange is fixed at the moment. But shouldn't they?
+> Specifically, it's the 'gtester' command in 'make check'
+> that makes the difference:
 > 
-> On Intel there is
->    qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,phys-bits=36
-> or
->    qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,host-phys-bits=true
+> e104462:xenial:ppc$ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64
+> tests/migration-test
+> /ppc64/migration/deprecated: OK
+> /ppc64/migration/bad_dest: SKIP
+> /ppc64/migration/postcopy/unix: SKIP
+> /ppc64/migration/precopy/unix: SKIP
+> e104462:xenial:ppc$ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64
+> gtester -k --verbose -m=quick tests/migration-test
+> TEST: tests/migration-test... (pid=23304)
+>   /ppc64/migration/deprecated:                                         OK
+>   /ppc64/migration/bad_dest:                                           FAIL
+> GTester: last random seed: R02Sa45f28859314d31ea4e89aeee4851d87
+>   /ppc64/migration/postcopy/unix:                                      FAIL
+> GTester: last random seed: R02Sa45f28859314d31ea4e89aeee4851d87
+>   /ppc64/migration/precopy/unix:                                       FAIL
+> GTester: last random seed: R02Sa45f28859314d31ea4e89aeee4851d87
+> PASS: tests/migration-test
 > 
-> where phys-bits, as far as I understand has a a similar semantics as the
-> PARange.
+> This seems to be a bug in gtester:
+> https://bugzilla.gnome.org/show_bug.cgi?id=790934
 
-I think there is value in having it global, just like on x86. We don't
-really support heterogeneous guests anyway.
+Bah, and I liked that I was using a nice new gtk feature.
 
-Independently, we should also repaint/satinize PARange so that the guest
-observes the same thing, no matter what CPU it runs on (an A53/A57
-system could be confusing in that respect).
+> which I guess we need to work around -- the easy approach would be to just
+> call this a pass rather than a skip, I suppose.
 
-Thanks,
+Yeh, I'll rework it.  I'll include a printf saying we skipped it though
+just to remove any false feeling of warmth and reassurance of an OK.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> I also note that in that bug report the glib folks say
+> "don't use gtester, it's not maintained", and recommend that
+> we switch to something else (a 'TAP harness', whatever that is)...
+
+https://testanything.org/ I think, but I don't know anything about it.
+
+Dave
+
+> 
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
