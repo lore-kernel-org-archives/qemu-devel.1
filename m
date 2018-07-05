@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rc-0004Jw-Sp
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:22 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1fb8re-0004Ld-U1
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rX-00068A-UN
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:20 -0400
-Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:44687)
+	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rd-0006BV-VZ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:22 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:41448)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1fb8rX-00067u-Nv
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:15 -0400
-Received: by mail-pl0-x233.google.com with SMTP id m16-v6so1627220pls.11
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 11:20:15 -0700 (PDT)
+	id 1fb8rd-0006B9-Pa
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:21 -0400
+Received: by mail-pf0-x242.google.com with SMTP id c21-v6so1515042pfn.8
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 11:20:21 -0700 (PDT)
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Thu,  5 Jul 2018 11:19:47 -0700
-Message-Id: <20180705182001.16537-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 00/14] Generalize Dallas/Maxim I2C RTC devices
- v3
+Date: Thu,  5 Jul 2018 11:19:51 -0700
+Message-Id: <20180705182001.16537-5-mdavidsaver@gmail.com>
+In-Reply-To: <20180705182001.16537-1-mdavidsaver@gmail.com>
+References: <20180705182001.16537-1-mdavidsaver@gmail.com>
+Subject: [Qemu-devel] [PATCH 04/14] timer: ds1338 clarify HOUR handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +29,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-This series generalizes the ds1338 model to also support the ds1375.
-As previously, only the time of day registers are modeled.  This
-series (v3) is a minor iteration on the previous v2.
+Simplify and comment the translation between
+registers and struct tm.
 
-No changes were made to the unittests.
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ hw/timer/ds1338.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-Summary of changes by patch name in response to comments by Peter Maydell.
-
-= timer: ds1338 use registerfields.h
-
-Changed as requested to be more direct translation.
-
-= timer: ds1338 persist 12-hour mode selection
-
-On 04/12/2018 11:03 AM, Peter Maydell wrote:
-> The code change here looks like a reasonable no-behaviour-change
-> simplification of the code, but it doesn't match up with
-> the description in the commit message ?
-
-While it isn't clear from the diff, the condtional
-involved has 3 arms, only two of these were updating
-'s->nvram[]'.  The arm handling control register
-writes is the one which didn't.  So attempts to set
-the 12 hour mode bit were ignored, and subsequent
-reads always returned 24 hour time.
-
-So this is a behaviour change, and a minor bug fix.
-
-= timer: ds1338 clarify HOUR handling
-= timer: ds1338 fix wday_offset handling
-
-These two are combined as requested.
-
-= timer: generalize ds1338
-
-The change to CTRL register handling is split out
-as a seperate patch "timer: ds1338 remove vestige of un-modeled OSF"
-
-= timer: ds-rtc handle CENTURY bit
-
-Changed as suggested.
-
-
-
-Michael Davidsaver (14):
-  tests: more thorough tests of ds1338
-  timer: ds1338 use registerfields.h
-  timer: ds1338 persist 12-hour mode selection
-  timer: ds1338 clarify HOUR handling
-  timer: ds1338 change write handling and fix wday_offset handling
-  tests: ds-rtc test 12 hour mode
-  tests: ds-rtc test wday offset
-  timer: rename ds1338 -> dsrtc
-  timer: rename file ds1338.c -> ds-rtc.c
-  timer: ds1338 remove vestige of un-modeled OSF
-  timer: generalize ds1338
-  timer: ds-rtc handle CENTURY bit
-  timer: ds-rtc model ds1375
-  tests: drop ds1338-test
-
- default-configs/arm-softmmu.mak |   2 +-
- hw/timer/Makefile.objs          |   2 +-
- hw/timer/ds-rtc.c               | 335 ++++++++++++++++++++++++++++++++++++++++
- hw/timer/ds1338.c               | 239 ----------------------------
- tests/Makefile.include          |   6 +-
- tests/ds-rtc-common.h           |  71 +++++++++
- tests/ds-rtc-current-test.c     |  66 ++++++++
- tests/ds-rtc-set-test.c         | 171 ++++++++++++++++++++
- tests/ds1338-test.c             |  75 ---------
- 9 files changed, 649 insertions(+), 318 deletions(-)
- create mode 100644 hw/timer/ds-rtc.c
- delete mode 100644 hw/timer/ds1338.c
- create mode 100644 tests/ds-rtc-common.h
- create mode 100644 tests/ds-rtc-current-test.c
- create mode 100644 tests/ds-rtc-set-test.c
- delete mode 100644 tests/ds1338-test.c
-
+diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
+index b56db5852e..637a0f4246 100644
+--- a/hw/timer/ds1338.c
++++ b/hw/timer/ds1338.c
+@@ -89,9 +89,13 @@ static void capture_current_time(DS1338State *s)
+      */
+     struct tm now;
+     qemu_get_timedate(&now, s->offset);
++
+     s->nvram[R_SEC] = to_bcd(now.tm_sec);
+     s->nvram[R_MIN] = to_bcd(now.tm_min);
+     if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
++        /* 12 hour mode.
++         * map 0-23 to 1-12 am/pm
++         */
+         int tmp = now.tm_hour;
+         if (tmp % 12 == 0) {
+             tmp += 12;
+@@ -101,7 +105,9 @@ static void capture_current_time(DS1338State *s)
+         } else {
+             s->nvram[R_HOUR] = R_HOUR_SET12_MASK | R_HOUR_AMPM_MASK | to_bcd(tmp - 12);
+         }
++
+     } else {
++        /* 24 hour mode. */
+         s->nvram[R_HOUR] = to_bcd(now.tm_hour);
+     }
+     s->nvram[R_WDAY] = (now.tm_wday + s->wday_offset) % 7 + 1;
+@@ -178,14 +184,13 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+             break;
+         case R_HOUR:
+             if (FIELD_EX32(data, HOUR, SET12)) {
+-                int tmp = from_bcd(FIELD_EX32(data, HOUR, HOUR12));
++                /* 12 hour (1-12) */
++                /* read and wrap 1-12 -> 0-11 */
++                now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR12)) % 12u;
+                 if (FIELD_EX32(data, HOUR, AMPM)) {
+-                    tmp += 12;
++                    now.tm_hour += 12;
+                 }
+-                if (tmp % 12 == 0) {
+-                    tmp -= 12;
+-                }
+-                now.tm_hour = tmp;
++
+             } else {
+                 now.tm_hour = from_bcd(FIELD_EX32(data, HOUR, HOUR24));
+             }
 -- 
 2.11.0
