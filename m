@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fayyU-0008Up-EM
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:46:48 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fayyU-0008Us-FF
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fayyR-0001m9-Dx
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fayyR-0001m4-C9
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 03:46:46 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  5 Jul 2018 10:46:35 +0300
-Message-Id: <20180705074638.770905-2-vsementsov@virtuozzo.com>
+Date: Thu,  5 Jul 2018 10:46:38 +0300
+Message-Id: <20180705074638.770905-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20180705074638.770905-1-vsementsov@virtuozzo.com>
 References: <20180705074638.770905-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] block: disallow BDRV_REQ_NO_SERIALISING
- for write
+Subject: [Qemu-devel] [PATCH v3 4/4] block/backup: fix fleecing scheme: use
+ serialized writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +23,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Before commit 9ded4a01149 "backup: Use copy offloading",
-BDRV_REQ_NO_SERIALISING was used for only one case: read in
-copy-on-write operation during backup. Also, the flag was handled only
-on read path (in bdrv_co_preadv and bdrv_aligned_preadv).
+Fleecing scheme works as follows: we want a kind of temporary snapshot
+of active drive A. We create temporary image B, with B->backing = A.
+Then we start backup(sync=none) from A to B. From this point, B reads
+as point-in-time snapshot of A (A continues to be active drive,
+accepting guest IO).
 
-After 9ded4a01149, flag is used for not waiting serializing operations
-on backup target (in same case of copy-on-write operation). This
-behavior change is unsubstantiated and potentially dangerous, let's
-drop it.
+This scheme needs some additional synchronization between reads from B
+and backup COW operations, otherwise, the following situation is
+theoretically possible:
+
+(assume B is qcow2, client is NBD client, reading from B)
+
+1. client starts reading and take qcow2 mutex in qcow2_co_preadv, and
+   goes up to l2 table loading (assume cache miss)
+
+2) guest write => backup COW => qcow2 write =>
+   try to take qcow2 mutex => waiting
+
+3. l2 table loaded, we see that cluster is UNALLOCATED, go to
+   "case QCOW2_CLUSTER_UNALLOCATED" and unlock mutex before
+   bdrv_co_preadv(bs->backing, ...)
+
+4) aha, mutex unlocked, backup COW continues, and we finally finish
+   guest write and change cluster in our active disk A
+
+5. actually, do bdrv_co_preadv(bs->backing, ...) and read
+   _new updated_ data.
+
+To avoid this, let's make backup writes serializing, to not intersect
+with reads from B.
+
+Note: we expand range of handled cases from (sync=none and
+B->backing = A) to just (A in backing chain of B), to finally allow
+safe reading from B during backup for all cases when A in backing chain
+of B, i.e. B formally looks like point-in-time snapshot of A.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block.h | 13 +++++++++++++
- block/io.c            |  7 ++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ block/backup.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index e5c7759a0c..a06a4d27de 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -50,6 +50,19 @@ typedef enum {
-      * opened with BDRV_O_UNMAP.
-      */
-     BDRV_REQ_MAY_UNMAP          = 0x4,
+diff --git a/block/backup.c b/block/backup.c
+index f3e4e814b6..319fc922e8 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -47,6 +47,8 @@ typedef struct BackupBlockJob {
+     HBitmap *copy_bitmap;
+     bool use_copy_range;
+     int64_t copy_range_size;
 +
-+    /* The BDRV_REQ_NO_SERIALISING means that we don't want to
-+     * wait_serialising_requests(), when reading.
-+     *
-+     * This flag is used for backup copy on write operation, when we need to
-+     * read old data before write (write notifier triggered). It is ok, due to
-+     * we already waited for serializing requests in initiative write (see
-+     * bdrv_aligned_pwritev), and it is necessary for the case when initiative
-+     * write is serializing itself (we'll dead lock waiting it).
-+     *
-+     * The described case is the only usage for the flag for now, so, it is
-+     * supported only for read operation and restricted for write.
-+     */
-     BDRV_REQ_NO_SERIALISING     = 0x8,
-     BDRV_REQ_FUA                = 0x10,
-     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
-diff --git a/block/io.c b/block/io.c
-index 1a2272fad3..51bef9fc50 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1572,6 +1572,8 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
-                                    align);
++    bool serialize_target_writes;
+ } BackupBlockJob;
  
-+    /* BDRV_REQ_NO_SERIALISING is only for read operation */
-+    assert(!(flags & BDRV_REQ_NO_SERIALISING));
-     waited = wait_serialising_requests(req);
-     assert(!waited || !req->serialising);
-     assert(req->overlap_offset <= offset);
-@@ -2931,9 +2933,12 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
-                           bytes, BDRV_TRACKED_WRITE);
+ static const BlockJobDriver backup_job_driver;
+@@ -102,6 +104,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+     QEMUIOVector qiov;
+     BlockBackend *blk = job->common.blk;
+     int nbytes;
++    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
  
-     if (!(flags & BDRV_REQ_NO_SERIALISING)) {
-+        /* BDRV_REQ_NO_SERIALISING is only for read */
-         wait_serialising_requests(&src_req);
--        wait_serialising_requests(&dst_req);
+     hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
+     nbytes = MIN(job->cluster_size, job->len - start);
+@@ -112,8 +116,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+     iov.iov_len = nbytes;
+     qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+-    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
+-                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
++    ret = blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
+     if (ret < 0) {
+         trace_backup_do_cow_read_fail(job, start, ret);
+         if (error_is_read) {
+@@ -124,11 +127,11 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+ 
+     if (qemu_iovec_is_zero(&qiov)) {
+         ret = blk_co_pwrite_zeroes(job->target, start,
+-                                   qiov.size, BDRV_REQ_MAY_UNMAP);
++                                   qiov.size, write_flags | BDRV_REQ_MAY_UNMAP);
+     } else {
+         ret = blk_co_pwritev(job->target, start,
+-                             qiov.size, &qiov,
+-                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
++                             qiov.size, &qiov, write_flags |
++                             (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
      }
+     if (ret < 0) {
+         trace_backup_do_cow_write_fail(job, start, ret);
+@@ -156,6 +159,8 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+     int nr_clusters;
+     BlockBackend *blk = job->common.blk;
+     int nbytes;
++    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
+ 
+     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
+     nbytes = MIN(job->copy_range_size, end - start);
+@@ -163,7 +168,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+     hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
+                   nr_clusters);
+     ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
+-                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0, 0);
++                            read_flags, write_flags);
+     if (ret < 0) {
+         trace_backup_do_cow_copy_range_fail(job, start, ret);
+         hbitmap_set(job->copy_bitmap, start / job->cluster_size,
+@@ -701,6 +706,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+                        sync_bitmap : NULL;
+     job->compress = compress;
+ 
++    /* Detect image-fleecing (and similar) schemes */
++    job->serialize_target_writes = bdrv_chain_contains(target, bs);
 +
-+    wait_serialising_requests(&dst_req);
-+
-     if (recurse_src) {
-         ret = src->bs->drv->bdrv_co_copy_range_from(src->bs,
-                                                     src, src_offset,
+     /* If there is no backing file on the target, we cannot rely on COW if our
+      * backup cluster size is smaller than the target cluster size. Even for
+      * targets with a backing file, try to avoid COW if possible. */
 -- 
 2.11.1
