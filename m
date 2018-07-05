@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1NJ-0003mo-4j
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:20:34 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb1QV-0005KS-EI
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:23:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1NI-00062D-5b
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:20:33 -0400
-Date: Thu, 5 Jul 2018 12:20:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180705102022.GE3309@localhost.localdomain>
-References: <20180704150229.9948-1-f4bug@amsat.org>
+	(envelope-from <dgilbert@redhat.com>) id 1fb1QQ-0006On-Fa
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:23:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59944 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb1QQ-0006NW-8D
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:23:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D513B401CB89
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 10:23:45 +0000 (UTC)
+Date: Thu, 5 Jul 2018 11:23:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180705102339.GH2538@work-vm>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-7-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180704150229.9948-1-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block/crypto: Simplify
- block_crypto_co_create_opts_luks to avoid a memory leak
+In-Reply-To: <20180705031755.3254-7-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 6/9] tests: introduce
+ migrate_query*() helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +34,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-Am 04.07.2018 um 17:02 hat Philippe Mathieu-Daud=E9 geschrieben:
-> After 1ec4f4160a1 Coverity reported:
->=20
->   Variable cryptoopts going out of scope leaks the storage it points to=
-.
->=20
-> Fixes: Coverity CID 1393782 (Resource leak)
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+* Peter Xu (peterx@redhat.com) wrote:
+> Introduce helpers to query migration states and use it.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  tests/migration-test.c | 64 ++++++++++++++++++++++++++++--------------
+>  1 file changed, 43 insertions(+), 21 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index af82a04789..1d85ccbef1 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -168,6 +168,37 @@ static QDict *wait_command(QTestState *who, const char *command)
+>      return response;
+>  }
+>  
+> +/*
+> + * Note: caller is responsible to free the returned object via
+> + * qobject_unref() after use
+> + */
+> +static QDict *migrate_query(QTestState *who)
+> +{
+> +    QDict *rsp, *rsp_return;
+> +
+> +    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
 
-I already sent a much simpler fix:
-[PATCH] block/crypto: Fix memory leak in create error path
+having a 'migrate_query' function that issues 'query-migrate' is a bit
+odd; I think I'd have called it query_migrate just to match; however
+that's just a nit-pick:
 
-The only thing that is needed is replacing the return with a goto.
-Splitting it in three different error paths is unnecessary because the
-cleanup function handle NULL values just fine.
 
-> I think this check is superfluous but I respected the previous code:
->=20
->      ret =3D block_crypto_co_create_generic(bs, size, create_opts, errp=
-);
->      if (ret > 0) {
->          ret =3D 0;
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> +    rsp_return = qdict_get_qdict(rsp, "return");
+> +    g_assert(rsp_return);
+> +    qobject_ref(rsp_return);
+> +    qobject_unref(rsp);
+> +
+> +    return rsp_return;
+> +}
+> +
+> +/*
+> + * Note: caller is responsible to free the returned object via
+> + * g_free() after use
+> + */
+> +static gchar *migrate_query_status(QTestState *who)
+> +{
+> +    QDict *rsp_return = migrate_query(who);
+> +    gchar *status = g_strdup(qdict_get_str(rsp_return, "status"));
+> +
+> +    g_assert(status);
+> +    qobject_unref(rsp_return);
+> +
+> +    return status;
+> +}
+>  
+>  /*
+>   * It's tricky to use qemu's migration event capability with qtest,
+> @@ -176,11 +207,10 @@ static QDict *wait_command(QTestState *who, const char *command)
+>  
+>  static uint64_t get_migration_pass(QTestState *who)
+>  {
+> -    QDict *rsp, *rsp_return, *rsp_ram;
+> +    QDict *rsp_return, *rsp_ram;
+>      uint64_t result;
+>  
+> -    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> -    rsp_return = qdict_get_qdict(rsp, "return");
+> +    rsp_return = migrate_query(who);
+>      if (!qdict_haskey(rsp_return, "ram")) {
+>          /* Still in setup */
+>          result = 0;
+> @@ -188,33 +218,29 @@ static uint64_t get_migration_pass(QTestState *who)
+>          rsp_ram = qdict_get_qdict(rsp_return, "ram");
+>          result = qdict_get_try_int(rsp_ram, "dirty-sync-count", 0);
 >      }
-
-It is wrong, too. The old code keep the error code, goto fail skipped
-the ret =3D 0.
-
-Kevin
+> -    qobject_unref(rsp);
+> +    qobject_unref(rsp_return);
+>      return result;
+>  }
+>  
+>  static void read_blocktime(QTestState *who)
+>  {
+> -    QDict *rsp, *rsp_return;
+> +    QDict *rsp_return;
+>  
+> -    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> -    rsp_return = qdict_get_qdict(rsp, "return");
+> +    rsp_return = migrate_query(who);
+>      g_assert(qdict_haskey(rsp_return, "postcopy-blocktime"));
+> -    qobject_unref(rsp);
+> +    qobject_unref(rsp_return);
+>  }
+>  
+>  static void wait_for_migration_complete(QTestState *who)
+>  {
+>      while (true) {
+> -        QDict *rsp, *rsp_return;
+>          bool completed;
+> -        const char *status;
+> +        char *status;
+>  
+> -        rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> -        rsp_return = qdict_get_qdict(rsp, "return");
+> -        status = qdict_get_str(rsp_return, "status");
+> +        status = migrate_query_status(who);
+>          completed = strcmp(status, "completed") == 0;
+>          g_assert_cmpstr(status, !=,  "failed");
+> -        qobject_unref(rsp);
+> +        g_free(status);
+>          if (completed) {
+>              return;
+>          }
+> @@ -569,20 +595,16 @@ static void test_baddest(void)
+>  {
+>      QTestState *from, *to;
+>      QDict *rsp, *rsp_return;
+> -    const char *status;
+> +    char *status;
+>      bool failed;
+>  
+>      test_migrate_start(&from, &to, "tcp:0:0", true);
+>      migrate(from, "tcp:0:0", NULL);
+>      do {
+> -        rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
+> -        rsp_return = qdict_get_qdict(rsp, "return");
+> -
+> -        status = qdict_get_str(rsp_return, "status");
+> -
+> +        status = migrate_query_status(from);
+>          g_assert(!strcmp(status, "setup") || !(strcmp(status, "failed")));
+>          failed = !strcmp(status, "failed");
+> -        qobject_unref(rsp);
+> +        g_free(status);
+>      } while (!failed);
+>  
+>      /* Is the machine currently running? */
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
