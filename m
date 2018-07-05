@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fb2o7-00060c-Vn
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:52:21 -0400
+	(envelope-from <david@redhat.com>) id 1fb2q6-0006iL-JA
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:54:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fb2o4-0003rS-3S
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:52:20 -0400
-Resent-Message-Id: <E1fb2o4-0003rS-3S@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fb2o3-0003oS-Qe
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:52:16 -0400
-In-Reply-To: <20180705080017.31123-1-bala24@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153077799264.1209.10409652147339493418@946cad8fd14e>
+	(envelope-from <david@redhat.com>) id 1fb2q5-0001SL-5k
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:54:22 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
+	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
+	<df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
+	<43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
+	<5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <405e3f2b-3044-d7fc-8df4-b07a8487470f@redhat.com>
+Date: Thu, 5 Jul 2018 13:54:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 5 Jul 2018 01:06:33 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/2] tests: multifd migration test scenarios
+In-Reply-To: <5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +28,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bala24@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com, quintela@redhat.com
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: wei@redhat.com, drjones@redhat.com, david@gibson.dropbear.id.au, dgilbert@redhat.com, agraf@suse.de
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzA1MDgwMDE3LjMxMTIzLTEtYmFsYTI0QGxpbnV4LnZuZXQuaWJtLmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gIFtQQVRDSCAwLzJdIHRlc3RzOiBtdWx0aWZkIG1pZ3Jh
-dGlvbiB0ZXN0IHNjZW5hcmlvcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxMmU3ZTg5MTgzIHRlc3RzOiBhZGQgcHJlY29weSBtdWx0
-aWZkIG1pZ3JhdGlvbiB3aXRoIGZkIHByb3RvY29sCjcyZjJjYWE2NGIgdGVzdHM6IGFkZCBwcmVj
-b3B5IG11bHRpZmQgbWlncmF0aW9uIHRlc3Qgd2l0aCB1bml4Cgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzI6IHRlc3RzOiBhZGQgcHJlY29weSBtdWx0aWZkIG1pZ3JhdGlv
-biB0ZXN0IHdpdGggdW5peC4uLgpDaGVja2luZyBQQVRDSCAyLzI6IHRlc3RzOiBhZGQgcHJlY29w
-eSBtdWx0aWZkIG1pZ3JhdGlvbiB3aXRoIGZkIHByb3RvY29sLi4uCkVSUk9SOiBicmFjZXMge30g
-YXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzUwOiBGSUxFOiB0
-ZXN0cy9taWdyYXRpb24tdGVzdC5jOjYzOToKKyAgICBpZiAocGlwZShmZCkgPT0gLTEpClsuLi5d
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDgxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 05.07.2018 13:42, Auger Eric wrote:
+> Hi David,
+> 
+> On 07/04/2018 02:05 PM, David Hildenbrand wrote:
+>> On 03.07.2018 21:27, Auger Eric wrote:
+>>> Hi David,
+>>> On 07/03/2018 08:25 PM, David Hildenbrand wrote:
+>>>> On 03.07.2018 09:19, Eric Auger wrote:
+>>>>> We define a new hotpluggable RAM region (aka. device memory).
+>>>>> Its base is 2TB GPA. This obviously requires 42b IPA support
+>>>>> in KVM/ARM, FW and guest kernel. At the moment the device
+>>>>> memory region is max 2TB.
+>>>>
+>>>> Maybe a stupid question, but why exactly does it have to start at 2TB
+>>>> (and not e.g. at 1TB)?
+>>> not a stupid question. See tentative answer below.
+>>>>
+>>>>>
+>>>>> This is largely inspired of device memory initialization in
+>>>>> pc machine code.
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>>>> ---
+>>>>>  hw/arm/virt.c         | 104 ++++++++++++++++++++++++++++++++++++--------------
+>>>>>  include/hw/arm/arm.h  |   2 +
+>>>>>  include/hw/arm/virt.h |   1 +
+>>>>>  3 files changed, 79 insertions(+), 28 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>>>> index 5a4d0bf..6fefb78 100644
+>>>>> --- a/hw/arm/virt.c
+>>>>> +++ b/hw/arm/virt.c
+>>>>> @@ -59,6 +59,7 @@
+>>>>>  #include "qapi/visitor.h"
+>>>>>  #include "standard-headers/linux/input.h"
+>>>>>  #include "hw/arm/smmuv3.h"
+>>>>> +#include "hw/acpi/acpi.h"
+>>>>>  
+>>>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+>>>>> @@ -94,34 +95,25 @@
+>>>>>  
+>>>>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>>>>  
+>>>>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+>>>>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>>>>> - * address space unallocated and free for future use between 256G and 512G.
+>>>>> - * If we need to provide more RAM to VMs in the future then we need to:
+>>>>> - *  * allocate a second bank of RAM starting at 2TB and working up
+>>> I acknowledge this comment was the main justification. Now if you look at
+>>>
+>>> Principles of ARM Memory Maps
+>>> http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_principles_of_arm_memory_maps.pdf
+>>> chapter 2.3 you will find that when adding PA bits, you always leave
+>>> space for reserved space and mapped IO.
+>>
+>> Thanks for the pointer!
+>>
+>> So ... we can fit
+>>
+>> a) 2GB at 2GB
+>> b) 32GB at 32GB
+>> c) 512GB at 512GB
+>> d) 8TB at 8TB
+>> e) 128TB at 128TB
+>>
+>> (this is a nice rule of thumb if I understand it correctly :) )
+>>
+>> We should strive for device memory (maxram_size - ram_size) to fit
+>> exactly into one of these slots (otherwise things get nasty).
+>>
+>> Depending on the ram_size, we might have simpler setups and can support
+>> more configurations, no?
+>>
+>> E.g. ram_size <= 34GB, device_memory <= 512GB
+>> -> move ram into a) and b)
+>> -> move device memory into c)
+> 
+> The issue is machvirt doesn't comply with that document.
+> At the moment we have
+> 0 -> 1GB MMIO
+> 1GB -> 256GB RAM
+> 256GB -> 512GB is theoretically reserved for IO but most is free.
+> 512GB -> 1T is reserved for ECAM MMIO range. This is the top of our
+> existing 40b GPA space.
+> 
+> We don't want to change this address map due to legacy reasons.
+> 
+
+Thanks, good to know!
+
+> Another question! do you know if it would be possible to have
+> device_memory region split into several discontinuous segments?
+
+It can be implemented for sure, but I would try to avoid that, as it
+makes certain configurations impossible (and very end user unfriendly).
+
+E.g. (numbers completely made up, but it should show what I mean)
+
+-m 20G,maxmem=120G:
+-> Try to add a DIMM with 100G -> error.
+-> But we can add e.g. two DIMMs with 40G and 60G.
+
+This exposes internal details to the end user. And the end user has no
+idea what is going on.
+
+So I think we should try our best to keep that area consecutive.
+
+> 
+> Thanks
+> 
+> Eric
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
