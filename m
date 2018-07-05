@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6jK-0008NC-FB
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6jN-0008Ni-UL
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6jE-0007vT-4V
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:38 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:55699)
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6jM-00081q-Qd
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:41 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:33962)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fb6jD-0007v7-Tf
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:32 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id v16-v6so12128563wmv.5
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:03:31 -0700 (PDT)
+	id 1fb6jM-00081O-JF
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:40 -0400
+Received: by mail-wr1-x430.google.com with SMTP id c13-v6so1432746wrt.1
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:03:40 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  5 Jul 2018 17:03:09 +0100
-Message-Id: <20180705160329.30386-1-alex.bennee@linaro.org>
+Date: Thu,  5 Jul 2018 17:03:21 +0100
+Message-Id: <20180705160329.30386-13-alex.bennee@linaro.org>
+In-Reply-To: <20180705160329.30386-1-alex.bennee@linaro.org>
+References: <20180705160329.30386-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 00/20] Travis,
- Code Coverage and Cross Build updates
+Subject: [Qemu-devel] [PULL v3 12/20] docker: ubuntu: Update the package
+ list before installing new ones
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +31,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
-The following changes since commit 6cf495be0b445789eeb7e88a6015c8cf74d4c1cf:
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2018-07-05 13:33:52 +0100)
+Since docker caches the different layers, updating the package
+list does not invalidate the previous "apt-get update" layer,
+and it is likely "apt-get install" hits an outdated repository.
 
-are available in the Git repository at:
+See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#apt-get
 
-  https://github.com/stsquad/qemu.git tags/pull-code-coverage-and-build-tweaks-050718-3
+This fixes:
 
-for you to fetch changes up to 19c9a18f45fc8d8b8e96a6b8ea6074d08b6a8612:
+  $ make docker-image-ubuntu V=1
+  ./tests/docker/docker.py build qemu:ubuntu tests/docker/dockerfiles/ubuntu.docker   --add-current-user
+  Sending build context to Docker daemon  3.072kB
+  [...]
+  E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/main/m/mesa/libgles2-mesa_17.0.7-0ubuntu0.16.04.2_amd64.deb  404  Not Found
+  E: Failed to fetch http://archive.ubuntu.com/ubuntu/pool/main/m/mesa/libgles2-mesa-dev_17.0.7-0ubuntu0.16.04.2_amd64.deb  404  Not Found
+  E: Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?
+  The command '/bin/sh -c apt-get -y install $PACKAGES' returned a non-zero code: 100
+  tests/docker/Makefile.include:40: recipe for target 'docker-image-ubuntu' failed
+  make: *** [docker-image-ubuntu] Error 1
 
-  docker: add linux-user powered cross builder for QEMU (2018-07-05 16:57:39 +0100)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-----------------------------------------------------------------
-Code coverage and other build tweaks
-
-  - revert 208ecb3e (and drop filter for mingw, tweak for check-tcg)
-  - some travis speed-ups
-  - modernise code coverage support
-  - docker image cleanups
-  - clean-up binfmt_misc docker infrastructure
-  - add debian-powerpc-user-cross image for ppc32 build
-
-----------------------------------------------------------------
-Alex Bennée (14):
-      Revert "Makefile: Rename TARGET_DIRS to TARGET_LIST"
-      build-system: remove per-test GCOV reporting
-      .gitignore: add .gcov files
-      docker: add gcovr to travis image
-      travis: add gcovr summary for GCOV build
-      build-system: add clean-coverage target
-      build-system: add coverage-report target
-      linux-user: introduce preexit_cleanup
-      linux-user: add gcov support to preexit_cleanup
-      docker: drop QEMU build-dep from bootstrap
-      docker: debian-bootstrap.pre allow customising of variant/url
-      docker: add special handling for FROM:debian-%-user targets
-      docker: add special rule for deboostrapped images
-      docker: add linux-user powered cross builder for QEMU
-
-Philippe Mathieu-Daudé (6):
-      travis: do not waste time cloning unused submodules
-      travis: test out-of-tree builds
-      docker: ubuntu: Update the package list before installing new ones
-      docker: ubuntu: Use SDL2
-      docker: Clean the MXE base image
-      docker: Do not run tests in 'intermediate' images
-
- .gitignore                                         |  1 +
- .travis.yml                                        | 14 ++++--
- MAINTAINERS                                        |  1 +
- Makefile                                           | 44 +++++++++++++-----
- configure                                          |  2 +-
- docs/devel/testing.rst                             | 21 ++++++---
- linux-user/Makefile.objs                           |  2 +-
- linux-user/exit.c                                  | 35 +++++++++++++++
- linux-user/qemu.h                                  |  8 ++++
- linux-user/syscall.c                               | 10 +----
- scripts/create_config                              |  2 +-
- scripts/travis/coverage-summary.sh                 | 27 +++++++++++
- tests/Makefile.include                             | 16 ++-----
- tests/docker/Makefile.include                      | 52 ++++++++++++++++++++--
- tests/docker/docker.py                             |  4 ++
- tests/docker/dockerfiles/debian-bootstrap.docker   |  2 -
- tests/docker/dockerfiles/debian-bootstrap.pre      | 11 ++++-
- .../dockerfiles/debian-powerpc-user-cross.docker   | 15 +++++++
- tests/docker/dockerfiles/debian8-mxe.docker        |  2 +-
- tests/docker/dockerfiles/travis.docker             |  2 +-
- tests/docker/dockerfiles/ubuntu.docker             |  8 ++--
- 21 files changed, 223 insertions(+), 56 deletions(-)
- create mode 100644 linux-user/exit.c
- create mode 100755 scripts/travis/coverage-summary.sh
- create mode 100644 tests/docker/dockerfiles/debian-powerpc-user-cross.docker
-
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
+index dabbf2a8a4..c03520ce3f 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -1,7 +1,6 @@
+ FROM ubuntu:16.04
+ RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
+     /etc/apt/sources.list
+-RUN apt-get update
+ ENV PACKAGES flex bison \
+     libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
+     libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
+@@ -13,6 +12,7 @@ ENV PACKAGES flex bison \
+     libjemalloc-dev libcacard-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
+     texinfo \
+     gettext git make ccache python-yaml gcc clang sparse
+-RUN apt-get -y install $PACKAGES
++RUN apt-get update && \
++    apt-get -y install $PACKAGES
+ RUN dpkg -l $PACKAGES | sort > /packages.txt
+ ENV FEATURES clang pyyaml
 -- 
 2.17.1
