@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fb6v9-0002IN-0n
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:15:51 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fb6vz-0002sf-Ms
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fb6v4-000144-TF
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:15:50 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:45568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fb6v4-00011l-Mq
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:15:46 -0400
-Received: by mail-pl0-x243.google.com with SMTP id bi1-v6so1479437plb.12
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:15:46 -0700 (PDT)
-References: <1530806837-5416-1-git-send-email-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <899abe1c-ed7a-d0f0-dde5-bf65225a8da9@linaro.org>
-Date: Thu, 5 Jul 2018 09:15:42 -0700
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fb6vu-0002J5-Oc
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:16:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53682 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fb6vu-0002Ic-Ju
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:16:38 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  5 Jul 2018 18:16:29 +0200
+Message-Id: <20180705161629.13734-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1530806837-5416-1-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] translate-all: honour CF_NOCACHE in
- tb_gen_code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qga: fix 'driver' leak in guest-get-fsinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 07/05/2018 09:07 AM, Emilio G. Cota wrote:
-> This fixes a record-replay regression introduced by 95590e2
-> ("translate-all: discard TB when tb_link_page returns an existing
-> matching TB", 2018-06-15). The problem is that code using CF_NOCACHE
-> assumes that the TB returned from tb_gen_code is always a
-> newly-generated one. This assumption, however, was broken in
-> the aforementioned commit.
-> 
-> Fix it by honouring CF_NOCACHE, so that tb_gen_code always
-> returns a newly-generated TB when CF_NOCACHE is passed to it.
-> Do this by avoiding the TB hash table if CF_NOCACHE is set.
-> 
-> Reported-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> Tested-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  accel/tcg/translate-all.c | 34 +++++++++++++++++++---------------
->  1 file changed, 19 insertions(+), 15 deletions(-)
+'driver' is leaked when the loop is not broken.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Leak introduced by commit 743c71d03c20d64f2bae5fba6f26cdf5e4b1bda6,
+spotted by ASAN.
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qga/commands-posix.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-r~
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 233f78a406..c46767b0dd 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -890,6 +890,7 @@ static void build_guest_fsinfo_for_real_device(char c=
+onst *syspath,
+             break;
+         }
+=20
++        g_free(driver);
+         if (sscanf(p, "/%x:%x:%x.%x%n",
+                           pci, pci + 1, pci + 2, pci + 3, &pcilen) =3D=3D=
+ 4) {
+             p +=3D pcilen;
+--=20
+2.18.0.rc1
