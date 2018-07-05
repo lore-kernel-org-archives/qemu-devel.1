@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb0Er-0008Pt-0b
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:07:46 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fb0HB-0000rp-N8
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:10:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb0Eq-0000iv-3o
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:07:44 -0400
-Date: Thu, 5 Jul 2018 11:07:36 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180705090736.GC3309@localhost.localdomain>
-References: <1530716376-2235-1-git-send-email-ari@tuxera.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1530716376-2235-1-git-send-email-ari@tuxera.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] blklogwrites improvements
+	(envelope-from <robert.hu@linux.intel.com>) id 1fb0H6-00072u-30
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:10:09 -0400
+Received: from mga02.intel.com ([134.134.136.20]:23698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fb0H5-0006vV-Or
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:10:04 -0400
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Thu,  5 Jul 2018 17:09:53 +0800
+Message-Id: <1530781798-183214-1-git-send-email-robert.hu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v4 0/5] Add Icelake CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,25 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ari Sundholm <ari@tuxera.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: robert.hu@intel.com, wei.w.wang@intel.com, jingqi.liu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
-Am 04.07.2018 um 16:59 hat Ari Sundholm geschrieben:
-> This patch set contains a trivial printf format fix, followed by two
-> new features for the blklogwrites driver.
-> 
-> The first feature is an option to append to an existing log, adopting
-> its sector size and other metadata in its superblock. This can be
-> useful, and was suggested by Kevin Wolf.
-> 
-> The second feature is an option for specifying how often the log
-> superblock is updated, in terms of number of total write entries
-> logged. This ensures that the log superblock is relatively up-to-date
-> even in the face of abnormal QEMU shutdown.
-> 
-> v2:
->   - Fix error path of log superblock update interval set to 0
+This patch set defines the new guest CPU models of Icelake.
 
-Thanks, applied to the block branch.
+The first patch defines new indices for IA32_PRED_CMD MSR (IBPB) and IA32_ARCH_CAPABILITIES MSR.
+Other patches add CPUID bits feature words for new features, like PCONFIG,
+WBNOINVD. The final patch defines Icelake-{Server,Client} CPU models.
 
-Kevin
+Changelog:
+v4
+	At present, mark CPUID_7_0_EDX_ARCH_CAPABILITIES unmigratable.
+v3
+	Remove ARCH_CAPABILITIES from Icelake CPU model, at present. Going to
+compose a separate patch to do 1) qemu set ARCH_CAPABILITES MSR with some default
+value. 2) expand current CPU feature expression frame work from CPUID features
+only to MSR bit included as well.
+	Fix some patch format error and update some trivial patch descrptions.
+v2
+	Per Paolo's comment, remove unnecessary CPU vmstate check for write/read only
+IA32_PRED_CMD and IA32_ARCH_CAPABILITIES MSRs.
+
+Robert Hoo (5):
+  i386: Add new MSR indices for IA32_PRED_CMD and IA32_ARCH_CAPABILITIES
+  i386: Add CPUID bit and feature words for IA32_ARCH_CAPABILITIES MSR
+  i386: Add CPUID bit for PCONFIG
+  i386: Add CPUID bit for WBNOINVD
+  i386: Add new CPU model Icelake-{Server,Client}
+
+ target/i386/cpu.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ target/i386/cpu.h |   6 +++
+ 2 files changed, 125 insertions(+), 3 deletions(-)
+
+-- 
+1.8.3.1
