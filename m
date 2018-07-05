@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fb5ye-0006yJ-1y
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:15:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fb5yz-0007Fh-IV
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fb5yZ-0004FU-Hr
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:15:24 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  5 Jul 2018 18:15:15 +0300
-Message-Id: <20180705151515.779173-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4] qcow2: add overlap check for bitmap
- directory
+	(envelope-from <kwolf@redhat.com>) id 1fb5yv-0004OP-9Q
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:15:45 -0400
+Date: Thu, 5 Jul 2018 17:15:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180705151531.GM3309@localhost.localdomain>
+References: <1530787950-25306-1-git-send-email-pl@kamp.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1530787950-25306-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V3] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,215 +23,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+Am 05.07.2018 um 12:52 hat Peter Lieven geschrieben:
+> We currently don't enforce that the sparse segments we detect during convert are
+> aligned. This leads to unnecessary and costly read-modify-write cycles either
+> internally in Qemu or in the background on the storage device as nearly all
+> modern filesystems or hardware have a 4k alignment internally.
+> 
+> The number of RMW cycles when converting an example image [1] to a raw device that
+> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+> write requests. With this path the additional 4600 read requests are eliminated.
+> 
+> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
+> 
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+> V2->V3: - ensure that s.alignment is a power of 2
+>         - correctly handle n < alignment in is_allocated_sectors if
+>           sector_num % alignment > 0.
+> V1->V2: - take the current sector offset into account [Max]
+>         - try to figure out the target alignment [Max]
+> 
+>  qemu-img.c | 46 ++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 36 insertions(+), 10 deletions(-)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index e1a506f..db91b9e 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1105,8 +1105,11 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
+>   *
+>   * 'pnum' is set to the number of sectors (including and immediately following
+>   * the first one) that are known to be in the same allocated/unallocated state.
+> + * The function will try to align 'pnum' to the number of sectors specified
+> + * in 'alignment' to avoid unnecassary RMW cycles on modern hardware.
+>   */
+> -static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+> +static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
+> +                                int64_t sector_num, int alignment)
+>  {
+>      bool is_zero;
+>      int i;
+> @@ -1115,14 +1118,26 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+>          *pnum = 0;
+>          return 0;
+>      }
+> -    is_zero = buffer_is_zero(buf, 512);
+> -    for(i = 1; i < n; i++) {
+> -        buf += 512;
+> -        if (is_zero != buffer_is_zero(buf, 512)) {
+> +
+> +    if (n % alignment) {
+> +        alignment = 1;
+> +    }
 
-If it appropriate for 3.0, let's push it. If not - then for 3.1
-with fixed "since". Should I cc stable?
+So if n is unaligned, we keep the result unaligned, too. Makes sense,
+because otherwise we'd just split the request in two, but still get the
+same result.
 
-v4: - fix indentation
+Worth mentioning in the function comment, though?
 
-v3: - update Qcow2OverlapCheckFlags in qapi/block-core.json [Max]
+> +
+> +    if (sector_num % alignment) {
+> +        n = ROUND_UP(sector_num, alignment) - sector_num;
+> +        alignment = 1;
+> +    }
 
-v2: - squash 02 (indentation fix) to 01
-    - drop comment from qcow2_check_metadata_overlap()
-    - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in-place case in
-      bitmap_list_store. I don't think non-inplace case should be changed,
-      as it don't touch active bitmap directory.
+So if the start is unaligned, only check until the next alignment
+boundary.
 
- qapi/block-core.json   | 21 ++++++++++++---------
- block/qcow2.h          | 45 ++++++++++++++++++++++++---------------------
- block/qcow2-bitmap.c   |  7 ++++++-
- block/qcow2-refcount.c | 10 ++++++++++
- block/qcow2.c          | 22 ++++++++++++++--------
- 5 files changed, 66 insertions(+), 39 deletions(-)
+This one isn't obvious to me. Doesn't it result in the same scenario
+where a request is needlessly split in two? Wouldn't it be better to
+first check the unaligned head and then continue with the rest of n if
+that results in an aligned end offset?
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 90e554ed0f..30f7714674 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2695,18 +2695,21 @@
- # @template: Specifies a template mode which can be adjusted using the other
- #            flags, defaults to 'cached'
- #
-+# @bitmap-directory: since 3.0
-+#
- # Since: 2.9
- ##
- { 'struct': 'Qcow2OverlapCheckFlags',
--  'data': { '*template':       'Qcow2OverlapCheckMode',
--            '*main-header':    'bool',
--            '*active-l1':      'bool',
--            '*active-l2':      'bool',
--            '*refcount-table': 'bool',
--            '*refcount-block': 'bool',
--            '*snapshot-table': 'bool',
--            '*inactive-l1':    'bool',
--            '*inactive-l2':    'bool' } }
-+  'data': { '*template':         'Qcow2OverlapCheckMode',
-+            '*main-header':      'bool',
-+            '*active-l1':        'bool',
-+            '*active-l2':        'bool',
-+            '*refcount-table':   'bool',
-+            '*refcount-block':   'bool',
-+            '*snapshot-table':   'bool',
-+            '*inactive-l1':      'bool',
-+            '*inactive-l2':      'bool',
-+            '*bitmap-directory': 'bool' } }
- 
- ##
- # @Qcow2OverlapChecks:
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1c9c0d3631..f90e6e2de2 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -94,6 +94,7 @@
- #define QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE "overlap-check.snapshot-table"
- #define QCOW2_OPT_OVERLAP_INACTIVE_L1 "overlap-check.inactive-l1"
- #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-l2"
-+#define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY "overlap-check.bitmap-directory"
- #define QCOW2_OPT_CACHE_SIZE "cache-size"
- #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
- #define QCOW2_OPT_L2_CACHE_ENTRY_SIZE "l2-cache-entry-size"
-@@ -397,34 +398,36 @@ typedef enum QCow2ClusterType {
- } QCow2ClusterType;
- 
- typedef enum QCow2MetadataOverlap {
--    QCOW2_OL_MAIN_HEADER_BITNR    = 0,
--    QCOW2_OL_ACTIVE_L1_BITNR      = 1,
--    QCOW2_OL_ACTIVE_L2_BITNR      = 2,
--    QCOW2_OL_REFCOUNT_TABLE_BITNR = 3,
--    QCOW2_OL_REFCOUNT_BLOCK_BITNR = 4,
--    QCOW2_OL_SNAPSHOT_TABLE_BITNR = 5,
--    QCOW2_OL_INACTIVE_L1_BITNR    = 6,
--    QCOW2_OL_INACTIVE_L2_BITNR    = 7,
--
--    QCOW2_OL_MAX_BITNR            = 8,
--
--    QCOW2_OL_NONE           = 0,
--    QCOW2_OL_MAIN_HEADER    = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
--    QCOW2_OL_ACTIVE_L1      = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
--    QCOW2_OL_ACTIVE_L2      = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
--    QCOW2_OL_REFCOUNT_TABLE = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
--    QCOW2_OL_REFCOUNT_BLOCK = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
--    QCOW2_OL_SNAPSHOT_TABLE = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
--    QCOW2_OL_INACTIVE_L1    = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
-+    QCOW2_OL_MAIN_HEADER_BITNR      = 0,
-+    QCOW2_OL_ACTIVE_L1_BITNR        = 1,
-+    QCOW2_OL_ACTIVE_L2_BITNR        = 2,
-+    QCOW2_OL_REFCOUNT_TABLE_BITNR   = 3,
-+    QCOW2_OL_REFCOUNT_BLOCK_BITNR   = 4,
-+    QCOW2_OL_SNAPSHOT_TABLE_BITNR   = 5,
-+    QCOW2_OL_INACTIVE_L1_BITNR      = 6,
-+    QCOW2_OL_INACTIVE_L2_BITNR      = 7,
-+    QCOW2_OL_BITMAP_DIRECTORY_BITNR = 8,
-+
-+    QCOW2_OL_MAX_BITNR              = 9,
-+
-+    QCOW2_OL_NONE             = 0,
-+    QCOW2_OL_MAIN_HEADER      = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
-+    QCOW2_OL_ACTIVE_L1        = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
-+    QCOW2_OL_ACTIVE_L2        = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
-+    QCOW2_OL_REFCOUNT_TABLE   = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
-+    QCOW2_OL_REFCOUNT_BLOCK   = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
-+    QCOW2_OL_SNAPSHOT_TABLE   = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
-+    QCOW2_OL_INACTIVE_L1      = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
-     /* NOTE: Checking overlaps with inactive L2 tables will result in bdrv
-      * reads. */
--    QCOW2_OL_INACTIVE_L2    = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
-+    QCOW2_OL_INACTIVE_L2      = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
-+    QCOW2_OL_BITMAP_DIRECTORY = (1 << QCOW2_OL_BITMAP_DIRECTORY_BITNR),
- } QCow2MetadataOverlap;
- 
- /* Perform all overlap checks which can be done in constant time */
- #define QCOW2_OL_CONSTANT \
-     (QCOW2_OL_MAIN_HEADER | QCOW2_OL_ACTIVE_L1 | QCOW2_OL_REFCOUNT_TABLE | \
--     QCOW2_OL_SNAPSHOT_TABLE)
-+     QCOW2_OL_SNAPSHOT_TABLE | QCOW2_OL_BITMAP_DIRECTORY)
- 
- /* Perform all overlap checks which don't require disk access */
- #define QCOW2_OL_CACHED \
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 69485aa1de..ba978ad2aa 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -775,7 +775,12 @@ static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm_list,
-         }
-     }
- 
--    ret = qcow2_pre_write_overlap_check(bs, 0, dir_offset, dir_size);
-+    /* Actually, even in in-place case ignoring QCOW2_OL_BITMAP_DIRECTORY is not
-+     * necessary, because we drop QCOW2_AUTOCLEAR_BITMAPS when updating bitmap
-+     * directory in-place (actually, turn-off the extension), which is checked
-+     * in qcow2_check_metadata_overlap() */
-+    ret = qcow2_pre_write_overlap_check(
-+            bs, in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0, dir_offset, dir_size);
-     if (ret < 0) {
-         goto fail;
-     }
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 18c729aa27..1b9ecb1ca0 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2705,6 +2705,16 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-         }
-     }
- 
-+    if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
-+        (s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS))
-+    {
-+        if (overlaps_with(s->bitmap_directory_offset,
-+                          s->bitmap_directory_size))
-+        {
-+            return QCOW2_OL_BITMAP_DIRECTORY;
-+        }
-+    }
-+
-     return 0;
- }
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2f9e58e0c4..af51220499 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -676,6 +676,11 @@ static QemuOptsList qcow2_runtime_opts = {
-             .help = "Check for unintended writes into an inactive L2 table",
-         },
-         {
-+            .name = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
-+            .type = QEMU_OPT_BOOL,
-+            .help = "Check for unintended writes into the bitmap directory",
-+        },
-+        {
-             .name = QCOW2_OPT_CACHE_SIZE,
-             .type = QEMU_OPT_SIZE,
-             .help = "Maximum combined metadata (L2 tables and refcount blocks) "
-@@ -708,14 +713,15 @@ static QemuOptsList qcow2_runtime_opts = {
- };
- 
- static const char *overlap_bool_option_names[QCOW2_OL_MAX_BITNR] = {
--    [QCOW2_OL_MAIN_HEADER_BITNR]    = QCOW2_OPT_OVERLAP_MAIN_HEADER,
--    [QCOW2_OL_ACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L1,
--    [QCOW2_OL_ACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L2,
--    [QCOW2_OL_REFCOUNT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
--    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
--    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
--    [QCOW2_OL_INACTIVE_L1_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L1,
--    [QCOW2_OL_INACTIVE_L2_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L2,
-+    [QCOW2_OL_MAIN_HEADER_BITNR]      = QCOW2_OPT_OVERLAP_MAIN_HEADER,
-+    [QCOW2_OL_ACTIVE_L1_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L1,
-+    [QCOW2_OL_ACTIVE_L2_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L2,
-+    [QCOW2_OL_REFCOUNT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
-+    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
-+    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
-+    [QCOW2_OL_INACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L1,
-+    [QCOW2_OL_INACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L2,
-+    [QCOW2_OL_BITMAP_DIRECTORY_BITNR] = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
- };
- 
- static void cache_clean_timer_cb(void *opaque)
--- 
-2.11.1
+Actually, should the order of both checks be reversed, because an
+unaligned n with an unaligned sector_num could actually result in an
+aligned end offset?
+
+> +    n /= alignment;
+> +
+> +    is_zero = buffer_is_zero(buf, BDRV_SECTOR_SIZE * alignment);
+> +    for (i = 1; i < n; i++) {
+> +        buf += BDRV_SECTOR_SIZE * alignment;
+> +        if (is_zero != buffer_is_zero(buf, BDRV_SECTOR_SIZE * alignment)) {
+>              break;
+>          }
+>      }
+> -    *pnum = i;
+> +    *pnum = i * alignment;
+>      return !is_zero;
+>  }
+
+Kevin
