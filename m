@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fb4fM-0007Js-F3
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:51:25 -0400
+	(envelope-from <linux@roeck-us.net>) id 1fb4fh-0007Z7-JI
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fb4fJ-00011E-CM
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:51:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35546 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fb4fJ-0000zD-6r
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:51:21 -0400
-Date: Thu, 5 Jul 2018 16:51:20 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180705164913-mutt-send-email-mst@kernel.org>
-References: <20180705021038.14036-1-douly.fnst@cn.fujitsu.com>
+	(envelope-from <linux@roeck-us.net>) id 1fb4fg-0002Un-Mr
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:51:45 -0400
+From: Guenter Roeck <linux@roeck-us.net>
+Date: Thu,  5 Jul 2018 06:51:24 -0700
+Message-Id: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705021038.14036-1-douly.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/acpi-build: Add a check for non-memory
- NUMA nodes.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] sam460ex: Add comment explaining ignored
+ errors from fdt operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +21,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Guenter Roeck <linux@roeck-us.net>, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?q?Pilippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jul 05, 2018 at 10:10:38AM +0800, Dou Liyang wrote:
-> Currently, Qemu ACPI builder doesn't consider the non-memory NUMA nodes, eg:
-> 
->   -m 4G,slots=4,maxmem=8G \
->   -numa node,nodeid=0 \
->   -numa node,nodeid=1,mem=2G \
->   -numa node,nodeid=2,mem=2G \
->   -numa node,nodeid=3\
-> 
-> Guest Linux will report
-> 
->   [    0.000000] ACPI: SRAT: Node 0 PXM 0 [mem 0x00000000-0xffffffffffffffff]
->   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
->   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
->   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
->   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
->   [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x13fffffff]
->   [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
-> 
-> [mem 0x00000000-0xffffffffffffffff] and [mem 0x140000000-0x13fffffff] are bogus.
-> 
-> Add a check to avoid building srat memory for non-memory NUMA nodes, also update
-> the test file. Now the info in guest linux will be
-> 
->   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
->   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
->   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
->   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
->   [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
-> 
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Failing to set serial port clock frequencies is not fatal. Add a comment
+into the code explaining this, and typecast the function to void to
+silence static analyzers.
 
-Igor, can you review pls?
+Cc: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Pilippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ hw/ppc/sam460ex.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> ---
-> Have done a bootup test in Linux and window 10, 7
-> ---
->  hw/i386/acpi-build.c                  |   9 ++++++---
->  tests/acpi-test-data/pc/SRAT.numamem  | Bin 224 -> 224 bytes
->  tests/acpi-test-data/q35/SRAT.numamem | Bin 224 -> 224 bytes
->  3 files changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 9e8350c55d..c584642e4e 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2392,9 +2392,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->              mem_len = next_base - pcms->below_4g_mem_size;
->              next_base = mem_base + mem_len;
->          }
-> -        numamem = acpi_data_push(table_data, sizeof *numamem);
-> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> -                          MEM_AFFINITY_ENABLED);
-> +
-> +        if (mem_len > 0) {
-> +            numamem = acpi_data_push(table_data, sizeof *numamem);
-> +            build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> +                              MEM_AFFINITY_ENABLED);
-> +        }
->      }
->      slots = (table_data->len - numa_start) / sizeof *numamem;
->      for (; slots < pcms->numa_nodes + 2; slots++) {
-> diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/acpi-test-data/pc/SRAT.numamem
-> index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
-> GIT binary patch
-> delta 24
-> gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
-> 
-> delta 24
-> gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
-> 
-> diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/acpi-test-data/q35/SRAT.numamem
-> index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
-> GIT binary patch
-> delta 24
-> gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
-> 
-> delta 24
-> gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
-> 
-> -- 
-> 2.14.3
-> 
-> 
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 7eed2ec..b004cda 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -324,7 +324,10 @@ static int sam460ex_load_device_tree(hwaddr addr,
+     /* set serial port clocks */
+     offset = fdt_node_offset_by_compatible(fdt, -1, "ns16550");
+     while (offset >= 0) {
+-        fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FREQ);
++        /* Failure to set serial port clocks is not fatal, so just ignore
++         * errors when trying to do so.
++         */
++        (void)fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FREQ);
+         offset = fdt_node_offset_by_compatible(fdt, offset, "ns16550");
+     }
+ 
+-- 
+2.7.4
