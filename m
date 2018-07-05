@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1favHx-00053k-9L
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:50:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1fawyg-0008EN-IN
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1favHw-000423-9u
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:50:37 -0400
-References: <CA++5wji+jjiTcBT+Uhd4VL2U70vmRFnvacbRqhnxWX3M=f7svA@mail.gmail.com>
-From: Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <edee4a56-e75e-f3cb-8423-2f891be1ff3f@oracle.com>
-Date: Thu, 5 Jul 2018 11:50:50 +0800
+	(envelope-from <armbru@redhat.com>) id 1fawyf-0008Hp-O0
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 01:38:50 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180704153919.12432-1-f4bug@amsat.org>
+	<20180704153919.12432-2-f4bug@amsat.org>
+Date: Thu, 05 Jul 2018 07:38:38 +0200
+In-Reply-To: <20180704153919.12432-2-f4bug@amsat.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 4 Jul 2018 12:39:12
+	-0300")
+Message-ID: <877emadyxt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CA++5wji+jjiTcBT+Uhd4VL2U70vmRFnvacbRqhnxWX3M=f7svA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-discuss] IRQ per CPU
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/8] qobject: Catch another straggler for
+ use of qdict_put_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Probir Roy <roy@probir.info>
-Cc: qemu-discuss@nongnu.org, qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "open
+	list:Block layer core" <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
+> Patch created mechanically by rerunning:
+>
+>   $  spatch --sp-file scripts/coccinelle/qobject.cocci \
+>             --macro-file scripts/cocci-macro-file.h \
+>             --dir . --in-place
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  qobject/block-qdict.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+> index 80c653013f..ae363708ab 100644
+> --- a/qobject/block-qdict.c
+> +++ b/qobject/block-qdict.c
+> @@ -572,7 +572,7 @@ static QObject *qdict_crumple_for_keyval_qiv(QDict *s=
+rc, Error **errp)
+>          if (!tmp) {
+>              tmp =3D qdict_clone_shallow(src);
+>          }
+> -        qdict_put(tmp, ent->key, qstring_from_str(s));
+> +        qdict_put_str(tmp, ent->key, s);
+>          g_free(buf);
+>      }
 
-On 07/04/2018 10:32 PM, Probir Roy wrote:
-> I am writing a virtual device that would generate IRQ per CPU basis. I
-
-Does 'per CPU basis' indicates irq per cpu, or irq per device queue?
-
-AFAIK, the device may create multiple queues in the driver (in OS) and we would
-have one irq (vector) per queue?
-
-If you are talking about irq (vector) per queue, I would suggest read about
-following on nvme which involves per-queue vector.
-
-https://github.com/qemu/qemu/blob/master/hw/block/nvme.c
-
-Although I am not expert on qemu, in my opinion the qemu nvme code is very
-helpful for understanding per-queue vector.
-
-> have written a PCI device from the template which does not generate
-> IRQ per CPU. How can write such device in Qemu?
-> 
-> The code of current device is here:
-> https://gist.github.com/proywm/6ca98d3e8ca001965e2c8792fcf97911
-> 
-> Regards,
-> Probir
-> 
-
-Dongli Zhang
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
