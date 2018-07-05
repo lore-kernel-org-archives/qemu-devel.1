@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fb9mz-0001DV-5n
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 15:19:38 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fb9xy-0005F5-Sx
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 15:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fb9my-0004BU-AZ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 15:19:37 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:46470)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fb9my-0004Aw-4B
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 15:19:36 -0400
-Received: by mail-pl0-x242.google.com with SMTP id 30-v6so1692327pld.13
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 12:19:36 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  5 Jul 2018 12:19:29 -0700
-Message-Id: <20180705191929.30773-3-richard.henderson@linaro.org>
-In-Reply-To: <20180705191929.30773-1-richard.henderson@linaro.org>
-References: <20180705191929.30773-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/2] target/arm: Fix do_predset for large VL
+	(envelope-from <alex.williamson@redhat.com>) id 1fb9xu-0005ZW-As
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 15:30:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fb9xu-0005XN-5K
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 15:30:54 -0400
+Date: Thu, 5 Jul 2018 13:30:44 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180705133044.634ede43@t450s.home>
+In-Reply-To: <20180705181148.26871-1-clg@kaod.org>
+References: <20180705181148.26871-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Use MAKE_64BIT_MASK instead of open-coding.  Remove an odd
-vector size check that is unlikely to be more profitable
-than 3 64-bit integer stores.  Correct the iteration for WORD
-to avoid writing too much data.
+On Thu,  5 Jul 2018 20:11:48 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Fixes RISU tests of PTRUE for VL 256.
+> PCI devices needing a ROM allocate an optional MemoryRegion with
+> pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
+> device is destroyed. The only action taken by this routine is to call
+> vmstate_unregister_ram() which clears the id string of the optional
+> ROM RAMBlock and now, also flags the RAMBlock as non-migratable. This
+> was recently added by commit b895de502717 ("migration: discard
+> non-migratable RAMBlocks"), .
+>=20
+> VFIO devices do their own allocation of the PCI ROM region. It is
+> initialized in vfio_pci_size_rom() in which the PCI attribute
+> 'has_rom' is set to true but the RAMBlock of the ROM region is not
+> allocated. When the associated PCI device is deleted,
+> pci_del_option_rom() calls vmstate_unregister_ram() which tries to
+> flag a NULL RAMBlock because 'has_rom' is set, leading to a SEGV .
+>=20
+> The use of vmstate_unregister_ram() in the PCI device was added in
+> commit b0e56e0b63f350691b52d3e75e89bb64143fbeff ("unset RAMBlock idstr
+> when unregister MemoryRegion") and from the archive in
+> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html, it
+> seems that it was trying to fix a reference count issue.
+>=20
+> vmstate_unregister_ram() being a work around, let's remove it to fix
+> the current SEGV issue and let's try to find a fix for the initial ref
+> count issue if we can reproduce.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/pci/pci.c | 11 -----------
+>  1 file changed, 11 deletions(-)
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-sve.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+Looking back through git history, I think vfio sets PCIDevice.has_rom
+because we needed that to have memory_region_destroy() called, but that
+changed with Paolo's:
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index d41f1155f9..374051cd20 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -1438,7 +1438,7 @@ static bool do_predset(DisasContext *s, int esz, int rd, int pat, bool setflag)
-         setsz = numelem << esz;
-         lastword = word = pred_esz_masks[esz];
-         if (setsz % 64) {
--            lastword &= ~(-1ull << (setsz % 64));
-+            lastword &= MAKE_64BIT_MASK(0, setsz % 64);
-         }
-     }
- 
-@@ -1457,19 +1457,13 @@ static bool do_predset(DisasContext *s, int esz, int rd, int pat, bool setflag)
-             tcg_gen_gvec_dup64i(ofs, oprsz, maxsz, word);
-             goto done;
-         }
--        if (oprsz * 8 == setsz + 8) {
--            tcg_gen_gvec_dup64i(ofs, oprsz, maxsz, word);
--            tcg_gen_movi_i64(t, 0);
--            tcg_gen_st_i64(t, cpu_env, ofs + oprsz - 8);
--            goto done;
--        }
-     }
- 
-     setsz /= 8;
-     fullsz /= 8;
- 
-     tcg_gen_movi_i64(t, word);
--    for (i = 0; i < setsz; i += 8) {
-+    for (i = 0; i < QEMU_ALIGN_DOWN(setsz, 8); i += 8) {
-         tcg_gen_st_i64(t, cpu_env, ofs + i);
-     }
-     if (lastword != word) {
--- 
-2.17.1
+469b046ead06 ("memory: remove memory_region_destroy")
+
+Now the MemoryRegion gets freed automagically, so maybe the better
+option is that vfio-pci should not set has_rom to keep it out of this
+path.  I don't see that has_rom serves any other purpose.  Thanks,
+
+Alex
