@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb0IF-0001lD-JS
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:11:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fb0Jo-00034z-UO
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:12:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb0IC-0001nY-Dp
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:11:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41614 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fb0IC-0001kX-89
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:11:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37F3E407049A
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:11:11 +0000 (UTC)
-Date: Thu, 5 Jul 2018 17:11:06 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180705091106.GB1389@xz-mi>
-References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180705031755.3254-2-peterx@redhat.com>
-	<20180705090109.GB2538@work-vm>
+	(envelope-from <kwolf@redhat.com>) id 1fb0Jo-0006JV-7L
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:12:52 -0400
+Date: Thu, 5 Jul 2018 11:12:45 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180705091245.GD3309@localhost.localdomain>
+References: <20180704144751.28527-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180705090109.GB2538@work-vm>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 1/9] migration: simplify check to
- use qemu file buffer
+In-Reply-To: <20180704144751.28527-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] file-posix: Fix creation locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +22,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Jul 05, 2018 at 10:01:09AM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Firstly, renaming the old matching_page_sizes variable to
-> > matching_target_page_size, which suites more to what it did (it only
-> > checks against target page size rather than multiple page sizes).
-> > Meanwhile, simplify the check logic a bit, and enhance the comments.
-> > Should have no functional change.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/ram.c | 17 +++++++++++------
-> >  1 file changed, 11 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 23cea47090..fbeb23f750 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -3580,7 +3580,7 @@ static int ram_load_postcopy(QEMUFile *f)
-> >  {
-> >      int flags = 0, ret = 0;
-> >      bool place_needed = false;
-> > -    bool matching_page_sizes = false;
-> > +    bool matching_target_page_size = false;
-> >      MigrationIncomingState *mis = migration_incoming_get_current();
-> >      /* Temporary page that is later 'placed' */
-> >      void *postcopy_host_page = postcopy_get_tmp_page(mis);
-> > @@ -3620,7 +3620,7 @@ static int ram_load_postcopy(QEMUFile *f)
-> >                  ret = -EINVAL;
-> >                  break;
-> >              }
-> > -            matching_page_sizes = block->page_size == TARGET_PAGE_SIZE;
-> > +            matching_target_page_size = block->page_size == TARGET_PAGE_SIZE;
-> 
-> That's OK, although 'matches_target_page_size' would be better wording.
-> ('matching_target_page_size' implies we know something about the sources
-> target page size)
+Am 04.07.2018 um 16:47 hat Max Reitz geschrieben:
+> This series fixes two bugs Kevin spotted in file-posix's creation
+> locking.
 
-Sure thing.
+Thanks, applied to the block branch.
 
-> 
-> >              /*
-> >               * Postcopy requires that we place whole host pages atomically;
-> >               * these may be huge pages for RAMBlocks that are backed by
-> > @@ -3668,12 +3668,17 @@ static int ram_load_postcopy(QEMUFile *f)
-> >  
-> >          case RAM_SAVE_FLAG_PAGE:
-> >              all_zero = false;
-> > -            if (!place_needed || !matching_page_sizes) {
-> > +            if (!matching_target_page_size) {
-> > +                /* For huge pages, we always use temporary buffer */
-> >                  qemu_get_buffer(f, page_buffer, TARGET_PAGE_SIZE);
-> >              } else {
-> > -                /* Avoids the qemu_file copy during postcopy, which is
-> > -                 * going to do a copy later; can only do it when we
-> > -                 * do this read in one go (matching page sizes)
-> > +                /*
-> > +                 * For small pages that matches target page size, we
-> > +                 * avoid the qemu_file copy.  Instead we directly use
-> > +                 * the buffer of QEMUFile to place the page.  Note: we
-> > +                 * cannot do any QEMUFile operation before using that
-> > +                 * buffer to make sure the buffer is valid when
-> > +                 * placing the page.
-> >                   */
-> >                  qemu_get_buffer_in_place(f, (uint8_t **)&place_source,
-> >                                           TARGET_PAGE_SIZE);
-> 
-> But, yes I think that's right; since this is in ram_load_postcopy
-> the only time we have !place_needed is in the not-last subpage of a 
-> hugepage (or host page > target_page), so that's already covered
-> by the !matching_page_sizes check.
-> 
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
-
--- 
-Peter Xu
+Kevin
