@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fb1QV-0005KS-EI
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:23:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fb1Ry-0006LN-Ps
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:25:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fb1QQ-0006On-Fa
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:23:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59944 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb1QQ-0006NW-8D
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:23:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D513B401CB89
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 10:23:45 +0000 (UTC)
-Date: Thu, 5 Jul 2018 11:23:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180705102339.GH2538@work-vm>
-References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180705031755.3254-7-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fb1Rx-0002EO-QD
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:25:22 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:35635)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fb1Rx-0002D6-K6
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:25:21 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id i12-v6so15847715oik.2
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 03:25:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705031755.3254-7-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 6/9] tests: introduce
- migrate_query*() helpers
+In-Reply-To: <20180703210613.25619-1-armbru@redhat.com>
+References: <20180703210613.25619-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Jul 2018 11:25:00 +0100
+Message-ID: <CAFEAcA8Fgc7SOszMOoyv22NFUcd+gkbzisJMK4RbaoQBog02Ow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/14] QAPI patches for 2018-07-03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,148 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Introduce helpers to query migration states and use it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  tests/migration-test.c | 64 ++++++++++++++++++++++++++++--------------
->  1 file changed, 43 insertions(+), 21 deletions(-)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index af82a04789..1d85ccbef1 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -168,6 +168,37 @@ static QDict *wait_command(QTestState *who, const char *command)
->      return response;
->  }
->  
-> +/*
-> + * Note: caller is responsible to free the returned object via
-> + * qobject_unref() after use
-> + */
-> +static QDict *migrate_query(QTestState *who)
-> +{
-> +    QDict *rsp, *rsp_return;
-> +
-> +    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+On 3 July 2018 at 22:05, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit b07cd3e748b3f27a17c27afeee578dc4eedb8d=
+d5:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-3.0-20180703=
+' into staging (2018-07-03 14:59:27 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-07-03
+>
+> for you to fetch changes up to 514337c142f9522f6ab89c3d2f964f446ebeb1cd:
+>
+>   qapi: add conditions to SPICE type/commands/events on the schema (2018-=
+07-03 18:38:54 +0200)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2018-07-03
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (13):
+>       qapi: add 'if' to top-level expressions
+>       qapi: pass 'if' condition into QAPISchemaEntity objects
+>       qapi: leave the ifcond attribute undefined until check()
+>       qapi: add 'ifcond' to visitor methods
+>       qapi: mcgen() shouldn't indent # lines
+>       qapi: add #if/#endif helpers
+>       qapi-introspect: modify to_qlit() to append ',' on level > 0
+>       qapi-introspect: add preprocessor conditions to generated QLit
+>       qapi/commands: add #if conditions to commands
+>       qapi/events: add #if conditions to events
+>       qapi: add 'If:' section to generated documentation
+>       qapi: add conditions to VNC type/commands/events on the schema
+>       qapi: add conditions to SPICE type/commands/events on the schema
+>
+> Markus Armbruster (1):
+>       qapi-types: add #if conditions to types & visitors
+>
 
-having a 'migrate_query' function that issues 'query-migrate' is a bit
-odd; I think I'd have called it query_migrate just to match; however
-that's just a nit-pick:
+Applied, thanks.
 
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +    rsp_return = qdict_get_qdict(rsp, "return");
-> +    g_assert(rsp_return);
-> +    qobject_ref(rsp_return);
-> +    qobject_unref(rsp);
-> +
-> +    return rsp_return;
-> +}
-> +
-> +/*
-> + * Note: caller is responsible to free the returned object via
-> + * g_free() after use
-> + */
-> +static gchar *migrate_query_status(QTestState *who)
-> +{
-> +    QDict *rsp_return = migrate_query(who);
-> +    gchar *status = g_strdup(qdict_get_str(rsp_return, "status"));
-> +
-> +    g_assert(status);
-> +    qobject_unref(rsp_return);
-> +
-> +    return status;
-> +}
->  
->  /*
->   * It's tricky to use qemu's migration event capability with qtest,
-> @@ -176,11 +207,10 @@ static QDict *wait_command(QTestState *who, const char *command)
->  
->  static uint64_t get_migration_pass(QTestState *who)
->  {
-> -    QDict *rsp, *rsp_return, *rsp_ram;
-> +    QDict *rsp_return, *rsp_ram;
->      uint64_t result;
->  
-> -    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
-> -    rsp_return = qdict_get_qdict(rsp, "return");
-> +    rsp_return = migrate_query(who);
->      if (!qdict_haskey(rsp_return, "ram")) {
->          /* Still in setup */
->          result = 0;
-> @@ -188,33 +218,29 @@ static uint64_t get_migration_pass(QTestState *who)
->          rsp_ram = qdict_get_qdict(rsp_return, "ram");
->          result = qdict_get_try_int(rsp_ram, "dirty-sync-count", 0);
->      }
-> -    qobject_unref(rsp);
-> +    qobject_unref(rsp_return);
->      return result;
->  }
->  
->  static void read_blocktime(QTestState *who)
->  {
-> -    QDict *rsp, *rsp_return;
-> +    QDict *rsp_return;
->  
-> -    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
-> -    rsp_return = qdict_get_qdict(rsp, "return");
-> +    rsp_return = migrate_query(who);
->      g_assert(qdict_haskey(rsp_return, "postcopy-blocktime"));
-> -    qobject_unref(rsp);
-> +    qobject_unref(rsp_return);
->  }
->  
->  static void wait_for_migration_complete(QTestState *who)
->  {
->      while (true) {
-> -        QDict *rsp, *rsp_return;
->          bool completed;
-> -        const char *status;
-> +        char *status;
->  
-> -        rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
-> -        rsp_return = qdict_get_qdict(rsp, "return");
-> -        status = qdict_get_str(rsp_return, "status");
-> +        status = migrate_query_status(who);
->          completed = strcmp(status, "completed") == 0;
->          g_assert_cmpstr(status, !=,  "failed");
-> -        qobject_unref(rsp);
-> +        g_free(status);
->          if (completed) {
->              return;
->          }
-> @@ -569,20 +595,16 @@ static void test_baddest(void)
->  {
->      QTestState *from, *to;
->      QDict *rsp, *rsp_return;
-> -    const char *status;
-> +    char *status;
->      bool failed;
->  
->      test_migrate_start(&from, &to, "tcp:0:0", true);
->      migrate(from, "tcp:0:0", NULL);
->      do {
-> -        rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
-> -        rsp_return = qdict_get_qdict(rsp, "return");
-> -
-> -        status = qdict_get_str(rsp_return, "status");
-> -
-> +        status = migrate_query_status(from);
->          g_assert(!strcmp(status, "setup") || !(strcmp(status, "failed")));
->          failed = !strcmp(status, "failed");
-> -        qobject_unref(rsp);
-> +        g_free(status);
->      } while (!failed);
->  
->      /* Is the machine currently running? */
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
