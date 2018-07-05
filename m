@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fb5Dh-0003Vd-UA
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:26:55 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fb5EA-0003lP-HV
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fb5Db-0000MB-TV
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:26:53 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:40755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fb5Db-0000IF-OQ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:26:47 -0400
-Received: by mail-it0-x244.google.com with SMTP id 188-v6so12593927ita.5
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 07:26:47 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1fb5E8-0002XU-C5
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:27:22 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
+	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
+	<df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
+	<43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
+	<5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
+	<405e3f2b-3044-d7fc-8df4-b07a8487470f@redhat.com>
+	<f2d61062-21df-4478-bc61-c32e92329cf8@redhat.com>
+	<57030c9f-c3d1-49a8-090e-d6b316e7a818@redhat.com>
+	<fc6a29d4-1094-8d29-d415-fc30d5e30c31@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA838712003@FRAEML521-MBX.china.huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <fd7e2831-86a8-c2a1-fe0c-d9784bc2d3cb@redhat.com>
+Date: Thu, 5 Jul 2018 16:27:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180627185952.GJ2423@work-vm>
-References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
-	<1528212489-19137-9-git-send-email-lidongchen@tencent.com>
-	<20180627185952.GJ2423@work-vm>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Thu, 5 Jul 2018 22:26:46 +0800
-Message-ID: <CAOGPPbfMZRTdfiXj0ekij1bwL3JgQEF3zHGR4AKuor-MGmQGiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 08/10] migration: create a dedicated
- thread to release rdma resource
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA838712003@FRAEML521-MBX.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,147 +32,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Gal Shachaf <galsha@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, David Hildenbrand <david@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "agraf@suse.de" <agraf@suse.de>, "drjones@redhat.com" <drjones@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 
-On Thu, Jun 28, 2018 at 2:59 AM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
->> ibv_dereg_mr wait for a long time for big memory size virtual server.
->>
->> The test result is:
->>   10GB  326ms
->>   20GB  699ms
->>   30GB  1021ms
->>   40GB  1387ms
->>   50GB  1712ms
->>   60GB  2034ms
->>   70GB  2457ms
->>   80GB  2807ms
->>   90GB  3107ms
->>   100GB 3474ms
->>   110GB 3735ms
->>   120GB 4064ms
->>   130GB 4567ms
->>   140GB 4886ms
->>
->> this will cause the guest os hang for a while when migration finished.
->> So create a dedicated thread to release rdma resource.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> ---
->>  migration/rdma.c | 43 +++++++++++++++++++++++++++----------------
->>  1 file changed, 27 insertions(+), 16 deletions(-)
->>
->> diff --git a/migration/rdma.c b/migration/rdma.c
->> index dfa4f77..f12e8d5 100644
->> --- a/migration/rdma.c
->> +++ b/migration/rdma.c
->> @@ -2979,35 +2979,46 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
->>      }
->>  }
->>
->> -static int qio_channel_rdma_close(QIOChannel *ioc,
->> -                                  Error **errp)
->> +static void *qio_channel_rdma_close_thread(void *arg)
->>  {
->> -    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->> -    RDMAContext *rdmain, *rdmaout;
->> -    trace_qemu_rdma_close();
->> +    RDMAContext **rdma = arg;
->> +    RDMAContext *rdmain = rdma[0];
->> +    RDMAContext *rdmaout = rdma[1];
->>
->> -    rdmain = rioc->rdmain;
->> -    if (rdmain) {
->> -        atomic_rcu_set(&rioc->rdmain, NULL);
->> -    }
->> -
->> -    rdmaout = rioc->rdmaout;
->> -    if (rdmaout) {
->> -        atomic_rcu_set(&rioc->rdmaout, NULL);
->> -    }
->> +    rcu_register_thread();
->>
->>      synchronize_rcu();
->
-> * see below
->
->> -
->>      if (rdmain) {
->>          qemu_rdma_cleanup(rdmain);
->>      }
->> -
->>      if (rdmaout) {
->>          qemu_rdma_cleanup(rdmaout);
->>      }
->>
->>      g_free(rdmain);
->>      g_free(rdmaout);
->> +    g_free(rdma);
->> +
->> +    rcu_unregister_thread();
->> +    return NULL;
->> +}
->> +
->> +static int qio_channel_rdma_close(QIOChannel *ioc,
->> +                                  Error **errp)
->> +{
->> +    QemuThread t;
->> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->> +    RDMAContext **rdma = g_new0(RDMAContext*, 2);
->> +
->> +    trace_qemu_rdma_close();
->> +    if (rioc->rdmain || rioc->rdmaout) {
->> +        rdma[0] =  rioc->rdmain;
->> +        rdma[1] =  rioc->rdmaout;
->> +        qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
->> +                           rdma, QEMU_THREAD_DETACHED);
->> +        atomic_rcu_set(&rioc->rdmain, NULL);
->> +        atomic_rcu_set(&rioc->rdmaout, NULL);
->
-> I'm not sure this pair is ordered with the synchronise_rcu above;
-> Doesn't that mean, on a bad day, that you could get:
->
->
->     main-thread          rdma_cleanup     another-thread
->     qmu_thread_create
->                       synchronise_rcu
->                                         reads rioc->rdmain
->                                         starts doing something with rdmain
->     atomic_rcu_set
->                       rdma_cleanup
->
->
-> so the another-thread is using it during the cleanup?
-> Would just moving the atomic_rcu_sets before the qemu_thread_create
-> fix that?
-yes, I will fix it.
+Hi Shameer,
 
->
-> However, I've got other worries as well:
->    a) qemu_rdma_cleanup does:
->        migrate_get_current()->state == MIGRATION_STATUS_CANCELLING
->
->       which worries me a little if someone immediately tries to restart
->       the migration.
->
->    b) I don't understand what happens if someone does try and restart
->       the migration after that, but in the ~5s it takes the ibv cleanup
->       to happen.
-
-yes, I will try to fix it.
-
->
-> Dave
->
->
->> +    }
+On 07/05/2018 03:19 PM, Shameerali Kolothum Thodi wrote:
+> 
+>> -----Original Message-----
+>> From: Auger Eric [mailto:eric.auger@redhat.com]
+>> Sent: 05 July 2018 13:18
+>> To: David Hildenbrand <david@redhat.com>; eric.auger.pro@gmail.com;
+>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
+>> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+>> imammedo@redhat.com
+>> Cc: wei@redhat.com; drjones@redhat.com; david@gibson.dropbear.id.au;
+>> dgilbert@redhat.com; agraf@suse.de
+>> Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate
+>> device_memory
 >>
->>      return 0;
->>  }
->> --
->> 1.8.3.1
+>> Hi David,
 >>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> On 07/05/2018 02:09 PM, David Hildenbrand wrote:
+>>> On 05.07.2018 14:00, Auger Eric wrote:
+>>>> Hi David,
+>>>>
+>>>> On 07/05/2018 01:54 PM, David Hildenbrand wrote:
+>>>>> On 05.07.2018 13:42, Auger Eric wrote:
+>>>>>> Hi David,
+>>>>>>
+>>>>>> On 07/04/2018 02:05 PM, David Hildenbrand wrote:
+>>>>>>> On 03.07.2018 21:27, Auger Eric wrote:
+>>>>>>>> Hi David,
+>>>>>>>> On 07/03/2018 08:25 PM, David Hildenbrand wrote:
+>>>>>>>>> On 03.07.2018 09:19, Eric Auger wrote:
+>>>>>>>>>> We define a new hotpluggable RAM region (aka. device memory).
+>>>>>>>>>> Its base is 2TB GPA. This obviously requires 42b IPA support
+>>>>>>>>>> in KVM/ARM, FW and guest kernel. At the moment the device
+>>>>>>>>>> memory region is max 2TB.
+>>>>>>>>>
+>>>>>>>>> Maybe a stupid question, but why exactly does it have to start at 2TB
+>>>>>>>>> (and not e.g. at 1TB)?
+>>>>>>>> not a stupid question. See tentative answer below.
+>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> This is largely inspired of device memory initialization in
+>>>>>>>>>> pc machine code.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>>>>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>>>>>>>>> ---
+>>>>>>>>>>  hw/arm/virt.c         | 104
+>> ++++++++++++++++++++++++++++++++++++--------------
+>>>>>>>>>>  include/hw/arm/arm.h  |   2 +
+>>>>>>>>>>  include/hw/arm/virt.h |   1 +
+>>>>>>>>>>  3 files changed, 79 insertions(+), 28 deletions(-)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>>>>>>>>> index 5a4d0bf..6fefb78 100644
+>>>>>>>>>> --- a/hw/arm/virt.c
+>>>>>>>>>> +++ b/hw/arm/virt.c
+>>>>>>>>>> @@ -59,6 +59,7 @@
+>>>>>>>>>>  #include "qapi/visitor.h"
+>>>>>>>>>>  #include "standard-headers/linux/input.h"
+>>>>>>>>>>  #include "hw/arm/smmuv3.h"
+>>>>>>>>>> +#include "hw/acpi/acpi.h"
+>>>>>>>>>>
+>>>>>>>>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>>>>>>>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc,
+>> \
+>>>>>>>>>> @@ -94,34 +95,25 @@
+>>>>>>>>>>
+>>>>>>>>>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>>>>>>>>>
+>>>>>>>>>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this
+>> means
+>>>>>>>>>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+>>>>>>>>>> - * address space unallocated and free for future use between 256G
+>> and 512G.
+>>>>>>>>>> - * If we need to provide more RAM to VMs in the future then we
+>> need to:
+>>>>>>>>>> - *  * allocate a second bank of RAM starting at 2TB and working up
+>>>>>>>> I acknowledge this comment was the main justification. Now if you look
+>> at
+>>>>>>>>
+>>>>>>>> Principles of ARM Memory Maps
+>>>>>>>>
+>> http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_princ
+>> iples_of_arm_memory_maps.pdf
+>>>>>>>> chapter 2.3 you will find that when adding PA bits, you always leave
+>>>>>>>> space for reserved space and mapped IO.
+>>>>>>>
+>>>>>>> Thanks for the pointer!
+>>>>>>>
+>>>>>>> So ... we can fit
+>>>>>>>
+>>>>>>> a) 2GB at 2GB
+>>>>>>> b) 32GB at 32GB
+>>>>>>> c) 512GB at 512GB
+>>>>>>> d) 8TB at 8TB
+>>>>>>> e) 128TB at 128TB
+>>>>>>>
+>>>>>>> (this is a nice rule of thumb if I understand it correctly :) )
+>>>>>>>
+>>>>>>> We should strive for device memory (maxram_size - ram_size) to fit
+>>>>>>> exactly into one of these slots (otherwise things get nasty).
+>>>>>>>
+>>>>>>> Depending on the ram_size, we might have simpler setups and can
+>> support
+>>>>>>> more configurations, no?
+>>>>>>>
+>>>>>>> E.g. ram_size <= 34GB, device_memory <= 512GB
+>>>>>>> -> move ram into a) and b)
+>>>>>>> -> move device memory into c)
+>>>>>>
+>>>>>> The issue is machvirt doesn't comply with that document.
+>>>>>> At the moment we have
+>>>>>> 0 -> 1GB MMIO
+>>>>>> 1GB -> 256GB RAM
+>>>>>> 256GB -> 512GB is theoretically reserved for IO but most is free.
+>>>>>> 512GB -> 1T is reserved for ECAM MMIO range. This is the top of our
+>>>>>> existing 40b GPA space.
+>>>>>>
+>>>>>> We don't want to change this address map due to legacy reasons.
+>>>>>>
+>>>>>
+>>>>> Thanks, good to know!
+>>>>>
+>>>>>> Another question! do you know if it would be possible to have
+>>>>>> device_memory region split into several discontinuous segments?
+>>>>>
+>>>>> It can be implemented for sure, but I would try to avoid that, as it
+>>>>> makes certain configurations impossible (and very end user unfriendly).
+>>>>>
+>>>>> E.g. (numbers completely made up, but it should show what I mean)
+>>>>>
+>>>>> -m 20G,maxmem=120G:
+>>>>> -> Try to add a DIMM with 100G -> error.
+>>>>> -> But we can add e.g. two DIMMs with 40G and 60G.
+>>>>>
+>>>>> This exposes internal details to the end user. And the end user has no
+>>>>> idea what is going on.
+>>>>>
+>>>>> So I think we should try our best to keep that area consecutive.
+>>>>
+>>>> Actually I didn't sufficiently detail the context. I would like
+>>>> 1) 1 segment to be exposed to the end-user through slot|maxmem stuff
+>>>> (what this series targets) and
+>>>> 2) another segment used to instantiate PC-DIMM for internal needs as
+>>>> replacement of part of the 1GB -> 256GB static RAM. This was the purpose
+>>>> of Shameer's original series
+>>>
+>>> I am not sure if PC-DIMMs are exactly what you want for internal purposes.
+>>>
+>>>>
+>>>> [1] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+>>>> http://patchwork.ozlabs.org/cover/914694/
+>>>> This approach is not yet validated though.
+>>>>
+>>>> The rationale is sometimes you must have "holes" in RAM as some GPAs
+>>>> match reserved IOVAs for assigned devices.
+>>>
+>>> So if I understand it correctly, all you want is some memory region that
+>>> a) contains only initially defined memory
+>>> b) can have some holes in it
+>>>
+>>> This is exactly what x86 already does (pc_memory_init): Simply construct
+>>> your own memory region leaving holes in it.
+>>>
+>>>
+>>> memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
+>>>                          0, pcms->below_4g_mem_size);
+>>> memory_region_add_subregion(system_memory, 0, ram_below_4g);
+>>> ...
+>>> if (pcms->above_4g_mem_size > 0)
+>>>     memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
+>>>     ...
+>>>     memory_region_add_subregion(system_memory, 0x100000000ULL,
+>>>     ...
+>>>
+>>> They "indicate" these different GPA areas using the e820 map to the guest.
+>>>
+>>> Would that also work for you?
+>>
+>> I would tentatively say yes. Effectively I am not sure that if we were
+>> to actually put holes in the 1G-256GB RAM segment, PC-DIMM would be the
+>> natural choice. Also the reserved IOVA issue impacts the device_memory
+>> region area I think. I am skeptical about the fact we can put holes in
+>> static RAM and device_memory regions like that.
+> 
+> The first approach[1] we had to address the holes in memory was using
+> the memory alias way mentioned above.  And based on Drew's review, the
+> pc-dimm way of handling was introduced. I think the main argument was that
+> it will be useful when we eventually support hotplug.
+
+That's my understanding too.
+
+ But since that is added
+> anyway as part of this series, I am not sure we have any other benefit in
+> modeling it as pc-dimm. May be I am missing something here.
+
+I tentatively agree with you. I was trying to understand if the
+device_memory region was fitting the original needs too but I think
+standard alias approach is more adapted to hole creation.
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> Shameer
+> 
+> [1]. https://lists.gnu.org/archive/html/qemu-arm/2018-04/msg00243.html
+> 
+> 
+>> Thanks!
+>>
+>> Eric
+>>>
+>>>>
+>>>> Thanks
+>>>>
+>>>> Eric
+>>>>
+>>>>>
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> Eric
+>>>>>
+>>>>>
+>>>
+>>>
