@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fazBu-0006YC-8h
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fazC1-0006Zq-TB
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:00:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fazBp-0000G9-Ck
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:00:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53142
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fazBv-0000WP-VY
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:00:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
-	id 1fazBp-0000AR-6T
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:00:33 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w657tImt068233
-	for <qemu-devel@nongnu.org>; Thu, 5 Jul 2018 04:00:31 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2k1d3vd781-1
+	id 1fazBv-0000US-MT
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:00:39 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w657sKGO024762
+	for <qemu-devel@nongnu.org>; Thu, 5 Jul 2018 04:00:38 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k1c6tq07x-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 04:00:31 -0400
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 04:00:37 -0400
 Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
-	Thu, 5 Jul 2018 09:00:29 +0100
+	Thu, 5 Jul 2018 09:00:35 +0100
 From: Balamuruhan S <bala24@linux.vnet.ibm.com>
-Date: Thu,  5 Jul 2018 13:30:15 +0530
-Message-Id: <20180705080017.31123-1-bala24@linux.vnet.ibm.com>
-Subject: [Qemu-devel]  [PATCH 0/2] tests: multifd migration test scenarios
+Date: Thu,  5 Jul 2018 13:30:16 +0530
+In-Reply-To: <20180705080017.31123-1-bala24@linux.vnet.ibm.com>
+References: <20180705080017.31123-1-bala24@linux.vnet.ibm.com>
+Message-Id: <20180705080017.31123-2-bala24@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/2] tests: add precopy multifd migration test
+ with unix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,42 +41,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, quintela@redhat.com, peterx@redhat.com, Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-This patchset adds test scenarios for precopy multifd migration
-using fd and unix.
+multifd migration feature is in with commit: 35374cbdff, this patch
+adds test for it using unix socket.
 
-Also I am working on adding scenarios in tp-qemu using Avocado-VT
-and observed `Segmentation fault` with recently added test scenario
-using fd where as unix and tcp got PASS, 
+Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+---
+ tests/migration-test.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-https://github.com/autotest/tp-qemu/pull/1433
-
-so thought to recreate using qtest but it works fine here, I will debug
-more whether it is a test environment issue or real bug meanwhile.
-
-QTest results:
-# QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 \
-QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( \
-${RANDOM:-0} % 255 + 1))} gtester -k --verbose -m=quick \
-tests/migration-test
-TEST: tests/migration-test... (pid=23465)
-  /ppc64/migration/deprecated: OK
-  /ppc64/migration/bad_dest: OK
-  /ppc64/migration/postcopy/unix: OK
-  /ppc64/migration/precopy/unix: OK
-  /ppc64/migration/multifd/unix: OK
-  /ppc64/migration/multifd/fd: OK
-PASS: tests/migration-test
-
-Please help review,
-
--- Bala
-
-Balamuruhan S (2):
-  tests: add precopy multifd migration test
-  tests: add precopy multifd migration with fd protocol
-
- tests/migration-test.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
-
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 3a85446f95..e2434e70ea 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -619,6 +619,36 @@ static void test_precopy_unix(void)
+     g_free(uri);
+ }
+ 
++static void test_multifd_unix(void)
++{
++    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
++    test_migrate_start(&from, &to, uri, false);
++
++    /* set multifd capability on source and target */
++    migrate_set_capability(from, "x-multifd", "true");
++    migrate_set_capability(to, "x-multifd", "true");
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    /* perform migration */
++    migrate(from, uri);
++
++    wait_for_migration_pass(from);
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++    test_migrate_end(from, to, true);
++    g_free(uri);
++}
++
+ int main(int argc, char **argv)
+ {
+     char template[] = "/tmp/migration-test-XXXXXX";
+@@ -642,6 +672,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
++    qtest_add_func("/migration/multifd/unix", test_multifd_unix);
+ 
+     ret = g_test_run();
+ 
 -- 
 2.14.3
