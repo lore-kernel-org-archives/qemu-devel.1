@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fb5Yx-0007PS-Qm
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:48:52 -0400
+	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb5Zt-0007ud-7q
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fb5Yw-00022E-PM
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:48:51 -0400
-References: <20180705092139.776069-1-vsementsov@virtuozzo.com>
-	<20180705104622.GF3309@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <37451f0c-2ebc-8c06-2716-a6ead65e6e9c@virtuozzo.com>
-Date: Thu, 5 Jul 2018 17:48:34 +0300
+	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb5Zq-0005Rc-3F
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:49:49 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48426 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Aleksandar.Markovic@rt-rk.com>)
+	id 1fb5Zp-0005Il-NK
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 10:49:46 -0400
+from: "Aleksandar Markovic" <Aleksandar.Markovic@rt-rk.com>
+date: Thu, 05 Jul 2018 16:49:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180705104622.GF3309@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3] qcow2: add overlap check for bitmap
- directory
+message-id: <588b-5b3e3000-9-4af27280@234961430>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] =?utf-8?b?RndkOj89PT91dGYtOD9xPyBGdzogc29tZSB0aG91?=
+ =?utf-8?q?ghts_on_nanoMIPS_solution?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, den@openvz.org
+To: richard.henderson@linaro.org, qemu-devel@nongnu.org, Petar Jovanovic <Petar.Jovanovic@rt-rk.com>
 
-05.07.2018 13:46, Kevin Wolf wrote:
-> Am 05.07.2018 um 11:21 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> If it appropriate for 3.0, let's push it. If not - then for 3.1
->> with fixed "since". Should I cc stable?
->>
->> v3: - update Qcow2OverlapCheckFlags in qapi/block-core.json [Max]
->>
->> v2: - squash 02 (indentation fix) to 01
->>      - drop comment from qcow2_check_metadata_overlap()
->>      - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in-place case in
->>        bitmap_list_store. I don't think non-inplace case should be changed,
->>        as it don't touch active bitmap directory.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   qapi/block-core.json   | 21 ++++++++++++---------
->>   block/qcow2.h          | 45 ++++++++++++++++++++++++---------------------
->>   block/qcow2-bitmap.c   |  7 ++++++-
->>   block/qcow2-refcount.c | 10 ++++++++++
->>   block/qcow2.c          | 22 ++++++++++++++--------
->>   5 files changed, 66 insertions(+), 39 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 90e554ed0f..e7393e0313 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -2695,18 +2695,21 @@
->>   # @template: Specifies a template mode which can be adjusted using the other
->>   #            flags, defaults to 'cached'
->>   #
->> +# @bitmap-directory: since 3.0
->> +#
->>   # Since: 2.9
->>   ##
->>   { 'struct': 'Qcow2OverlapCheckFlags',
->> -  'data': { '*template':       'Qcow2OverlapCheckMode',
->> -            '*main-header':    'bool',
->> -            '*active-l1':      'bool',
->> -            '*active-l2':      'bool',
->> -            '*refcount-table': 'bool',
->> -            '*refcount-block': 'bool',
->> -            '*snapshot-table': 'bool',
->> -            '*inactive-l1':    'bool',
->> -            '*inactive-l2':    'bool' } }
->> +  'data': { '*template':        'Qcow2OverlapCheckMode',
->> +            '*main-header':     'bool',
->> +            '*active-l1':       'bool',
->> +            '*active-l2':       'bool',
->> +            '*refcount-table':  'bool',
->> +            '*refcount-block':  'bool',
->> +            '*snapshot-table':  'bool',
->> +            '*inactive-l1':     'bool',
->> +            '*inactive-l2':     'bool',
->> +            '*bitmap-directory': 'bool' } }
-> Did you intend to add two spaces to each line? Because this still isn't
-> aligned to the same column.
+> > Therefore, I think it makes sense to (more or less) split translate=
+.c into,
+> > let's say, following set of files:
+> >
+> >=C2=A0=C2=A0 * translate=5Fcmn=5Fchk.h - definitions of (typically i=
+nlined) functions check=5FXXX()
+> >=C2=A0=C2=A0 * translate=5Fcmn=5Fgen.h - declarations of gen=5FXXX()=
+ family of functions, and
+> >=C2=A0=C2=A0=C2=A0=C2=A0 definitions of such functions among them th=
+at are inlined
+> >=C2=A0=C2=A0 * translate=5Fcmn=5Fgen.c - definitions of non-inlined =
+gen=5FXXX() functions
+> >=C2=A0=C2=A0=C2=A0=C2=A0 (including all their callees)
+> >
+> >=C2=A0=C2=A0 * translate.h - common structure definitions such as Di=
+sasContext
+> >=C2=A0=C2=A0 * translate.c - the rest of=C2=A0code after splitting
+> >
+> >
+> > The nanoMIPS code would be, in such organization, in a separate fil=
+e:
+> >
+> >=C2=A0=C2=A0 * translate=5Fnanomips.c
 >
-> Kevin
+> This sounds fine.=C2=A0 Thanks for being willing to tackle this.
 
-Aha, I forget to add '*', and added it late, after indentation.
+I may submit something that attempts to be "the best of both worlds" be=
+tween yours and mine alternative in next few days. Let's talk over the =
+code. :)
 
--- 
-Best regards,
-Vladimir
+Regards,
+Aleksandar
+=C2=A0@bn7pr08mb4868.namprd08.prod.outlook.com>
