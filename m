@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49747)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fbAYQ-0004FR-Sl
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:08:40 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50871)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1fbAee-0007CC-Mk
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:15:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fbAYP-0002lQ-Hw
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:08:38 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:42156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1fbAYP-0002kg-D7
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:08:37 -0400
-Received: by mail-qk0-x243.google.com with SMTP id u62-v6so5164570qkf.9
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 13:08:37 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Date: Thu,  5 Jul 2018 17:08:13 -0300
-Message-Id: <20180705200813.2033-4-danielhb413@gmail.com>
-In-Reply-To: <20180705200813.2033-1-danielhb413@gmail.com>
-References: <20180705200813.2033-1-danielhb413@gmail.com>
-Subject: [Qemu-devel] [PATCH v8 3/3] qmp hmp: Make system_wakeup check
- wake-up support and run state
+	(envelope-from <pl@kamp.de>) id 1fbAea-0007Nr-MH
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:15:04 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34876 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fbAea-0007MG-Cu
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:15:00 -0400
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 5 Jul 2018 22:14:53 +0200
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Peter Lieven <pl@kamp.de>
+In-Reply-To: <20180705151531.GM3309@localhost.localdomain>
+Date: Thu, 5 Jul 2018 22:14:54 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C85D9257-D4E7-48A2-9DF4-A696E2E08015@kamp.de>
+References: <1530787950-25306-1-git-send-email-pl@kamp.de>
+	<20180705151531.GM3309@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH V3] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,141 +31,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, Daniel Henrique Barboza <danielhb413@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-The qmp/hmp command 'system_wakeup' is simply a direct call to
-'qemu_system_wakeup_request' from vl.c. This function verifies if
-runstate is SUSPENDED and if the wake up reason is valid before
-proceeding. However, no error or warning is thrown if any of those
-pre-requirements isn't met. There is no way for the caller to
-differentiate between a successful wakeup or an error state caused
-when trying to wake up a guest that wasn't suspended.
 
-This means that system_wakeup is silently failing, which can be
-considered a bug. Adding error handling isn't an API break in this
-case - applications that didn't check the result will remain broken,
-the ones that check it will have a chance to deal with it.
+> Am 05.07.2018 um 17:15 schrieb Kevin Wolf <kwolf@redhat.com>:
+>=20
+> Am 05.07.2018 um 12:52 hat Peter Lieven geschrieben:
+>> We currently don't enforce that the sparse segments we detect during =
+convert are
+>> aligned. This leads to unnecessary and costly read-modify-write =
+cycles either
+>> internally in Qemu or in the background on the storage device as =
+nearly all
+>> modern filesystems or hardware have a 4k alignment internally.
+>>=20
+>> The number of RMW cycles when converting an example image [1] to a =
+raw device that
+>> has 4k sector size is about 4600 4k read requests to perform a total =
+of about 15000
+>> write requests. With this path the additional 4600 read requests are =
+eliminated.
+>>=20
+>> [1] =
+https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server=
+-cloudimg-amd64-disk1.vmdk
+>>=20
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>> ---
+>> V2->V3: - ensure that s.alignment is a power of 2
+>>        - correctly handle n < alignment in is_allocated_sectors if
+>>          sector_num % alignment > 0.
+>> V1->V2: - take the current sector offset into account [Max]
+>>        - try to figure out the target alignment [Max]
+>>=20
+>> qemu-img.c | 46 ++++++++++++++++++++++++++++++++++++----------
+>> 1 file changed, 36 insertions(+), 10 deletions(-)
+>>=20
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index e1a506f..db91b9e 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -1105,8 +1105,11 @@ static int64_t find_nonzero(const uint8_t =
+*buf, int64_t n)
+>>  *
+>>  * 'pnum' is set to the number of sectors (including and immediately =
+following
+>>  * the first one) that are known to be in the same =
+allocated/unallocated state.
+>> + * The function will try to align 'pnum' to the number of sectors =
+specified
+>> + * in 'alignment' to avoid unnecassary RMW cycles on modern =
+hardware.
+>>  */
+>> -static int is_allocated_sectors(const uint8_t *buf, int n, int =
+*pnum)
+>> +static int is_allocated_sectors(const uint8_t *buf, int n, int =
+*pnum,
+>> +                                int64_t sector_num, int alignment)
+>> {
+>>     bool is_zero;
+>>     int i;
+>> @@ -1115,14 +1118,26 @@ static int is_allocated_sectors(const uint8_t =
+*buf, int n, int *pnum)
+>>         *pnum =3D 0;
+>>         return 0;
+>>     }
+>> -    is_zero =3D buffer_is_zero(buf, 512);
+>> -    for(i =3D 1; i < n; i++) {
+>> -        buf +=3D 512;
+>> -        if (is_zero !=3D buffer_is_zero(buf, 512)) {
+>> +
+>> +    if (n % alignment) {
+>> +        alignment =3D 1;
+>> +    }
+>=20
+> So if n is unaligned, we keep the result unaligned, too. Makes sense,
+> because otherwise we'd just split the request in two, but still get =
+the
+> same result.
+>=20
+> Worth mentioning in the function comment, though?
+>=20
+>> +
+>> +    if (sector_num % alignment) {
+>> +        n =3D ROUND_UP(sector_num, alignment) - sector_num;
+>> +        alignment =3D 1;
+>> +    }
+>=20
+> So if the start is unaligned, only check until the next alignment
+> boundary.
+>=20
+> This one isn't obvious to me. Doesn't it result in the same scenario
+> where a request is needlessly split in two? Wouldn't it be better to
+> first check the unaligned head and then continue with the rest of n if
+> that results in an aligned end offset?
+>=20
+> Actually, should the order of both checks be reversed, because an
+> unaligned n with an unaligned sector_num could actually result in an
+> aligned end offset?
 
-Adding to that, the commit before previous created a new QMP API called
-query-current-machine, with a new flag called wakeup-suspend-support,
-that indicates if the guest has the capability of waking up from suspended
-state. Although such guest will never reach SUSPENDED state and erroring
-it out in this scenario would suffice, it is more informative for the user
-to differentiate between a failure because the guest isn't suspended versus
-a failure because the guest does not have support for wake up at all.
 
-All this considered, this patch changes qmp_system_wakeup to:
+I think the key is that the function should just try to end with an =
+aligned
+offset.
 
-- check if the guest has the capability to wake-up from suspend. If
-not, error out informing about the lack of support;
+It seems not trivial to decide how to round up or down to the next =
+boundary tough...
 
-- make the runstate verification before proceeding to call
-qemu_system_wakeup_request, firing up an error message if the user tries
-to wake up a machine that isn't in SUSPENDED state.
+I think for the allocated case its just rounding up to the next boundary =
+(if its not
+beyond the end of the buffer). If the status is unallocated it is =
+rounding down, if *pnum will still be > 0?
 
-After this patch, this is the output of system_wakeup in a guest that
-does not have wake-up from suspend support (ppc64):
+Please keep in mind that is_allocated_sectors is only invoked from =
+is_allocated_sectors_min, so a small *pnum for unallocated sectors will =
+have no effect of a split request as everything below min (which is =
+min_sparse) will be count as allocated.
 
-(qemu) system_wakeup
-wake-up from suspend is not supported by this guest
-(qemu)
-
-And this is the output of system_wakeup in a x86 guest that has the
-support but isn't suspended:
-
-(qemu) system_wakeup
-Unable to wake up: guest is not in suspended state
-(qemu)
-
-Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- hmp.c                   |  5 ++++-
- include/sysemu/sysemu.h |  1 +
- qapi/misc.json          |  5 ++++-
- qmp.c                   | 11 ++++++++++-
- vl.c                    |  2 +-
- 5 files changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/hmp.c b/hmp.c
-index 41f5e39b72..83a8041d11 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1169,7 +1169,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
- 
- void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
- {
--    qmp_system_wakeup(NULL);
-+    Error *err = NULL;
-+
-+    qmp_system_wakeup(&err);
-+    hmp_handle_error(mon, &err);
- }
- 
- void hmp_nmi(Monitor *mon, const QDict *qdict)
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index b921c6f3b7..483f804b36 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -70,6 +70,7 @@ void qemu_exit_preconfig_request(void);
- void qemu_system_reset_request(ShutdownCause reason);
- void qemu_system_suspend_request(void);
- void qemu_register_suspend_notifier(Notifier *notifier);
-+bool qemu_wakeup_suspend_support(void);
- void qemu_system_wakeup_request(WakeupReason reason);
- void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
- void qemu_register_wakeup_notifier(Notifier *notifier);
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 266f88cb09..86195d79e9 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1230,7 +1230,10 @@
- ##
- # @system_wakeup:
- #
--# Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
-+# If the guest has wake-up from suspend support enabled
-+# (wakeup-suspend-support flag from query-current-machine), wakeup guest
-+# from suspend if the guest is in SUSPENDED state. Returns an error
-+# otherwise.
- #
- # Since:  1.1
- #
-diff --git a/qmp.c b/qmp.c
-index 73e46d795f..0673ff1fa5 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -215,7 +215,16 @@ void qmp_cont(Error **errp)
- 
- void qmp_system_wakeup(Error **errp)
- {
--    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
-+    if (!qemu_wakeup_suspend_support()) {
-+        error_setg(errp,
-+                   "wake-up from suspend is not supported by this guest");
-+        return;
-+    }
-+    if (!runstate_check(RUN_STATE_SUSPENDED)) {
-+        error_setg(errp,
-+                   "Unable to wake up: guest is not in suspended state");
-+        return;
-+    }
- }
- 
- ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
-diff --git a/vl.c b/vl.c
-index 96ad448d57..2af10b75cb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1769,7 +1769,7 @@ void qemu_register_wakeup_notifier(Notifier *notifier)
-     notifier_list_add(&wakeup_notifiers, notifier);
- }
- 
--static bool qemu_wakeup_suspend_support(void)
-+bool qemu_wakeup_suspend_support(void)
- {
-     return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
- }
--- 
-2.17.1
+Best,
+Peter
