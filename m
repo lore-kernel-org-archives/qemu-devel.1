@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbC3Z-0007bw-Iu
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:44:54 -0400
+	(envelope-from <jusual@mail.ru>) id 1fbC9p-0000OK-UL
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbC3W-0001Pu-GK
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:44:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49136 helo=mx1.redhat.com)
+	(envelope-from <jusual@mail.ru>) id 1fbC9m-00006F-SD
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:51:22 -0400
+Received: from smtp39.i.mail.ru ([94.100.177.99]:45568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fbC3W-0001PV-B2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:44:50 -0400
-References: <20180705181148.26871-1-clg@kaod.org>
-	<20180705133044.634ede43@t450s.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
-Date: Thu, 5 Jul 2018 23:44:44 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180705133044.634ede43@t450s.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fbC9m-0008Ry-FX
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:51:18 -0400
+From: Julia Suvorova <jusual@mail.ru>
+Date: Fri,  6 Jul 2018 00:50:50 +0300
+Message-Id: <20180705215052.8795-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH v2 0/2] nvic: Handle ARMv6-M SCS reserved
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +22,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-On 05/07/2018 21:30, Alex Williamson wrote:
-> On Thu,  5 Jul 2018 20:11:48 +0200
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> PCI devices needing a ROM allocate an optional MemoryRegion with
->> pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
->> device is destroyed. The only action taken by this routine is to call
->> vmstate_unregister_ram() which clears the id string of the optional
->> ROM RAMBlock and now, also flags the RAMBlock as non-migratable. This
->> was recently added by commit b895de502717 ("migration: discard
->> non-migratable RAMBlocks"), .
->>
->> VFIO devices do their own allocation of the PCI ROM region. It is
->> initialized in vfio_pci_size_rom() in which the PCI attribute
->> 'has_rom' is set to true but the RAMBlock of the ROM region is not
->> allocated. When the associated PCI device is deleted,
->> pci_del_option_rom() calls vmstate_unregister_ram() which tries to
->> flag a NULL RAMBlock because 'has_rom' is set, leading to a SEGV .
->>
->> The use of vmstate_unregister_ram() in the PCI device was added in
->> commit b0e56e0b63f350691b52d3e75e89bb64143fbeff ("unset RAMBlock idstr
->> when unregister MemoryRegion") and from the archive in
->> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html, it
->> seems that it was trying to fix a reference count issue.
->>
->> vmstate_unregister_ram() being a work around, let's remove it to fix
->> the current SEGV issue and let's try to find a fix for the initial ref
->> count issue if we can reproduce.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/pci/pci.c | 11 -----------
->>  1 file changed, 11 deletions(-)
->=20
-> Looking back through git history, I think vfio sets PCIDevice.has_rom
-> because we needed that to have memory_region_destroy() called, but that
-> changed with Paolo's:
->=20
-> 469b046ead06 ("memory: remove memory_region_destroy")
->=20
-> Now the MemoryRegion gets freed automagically, so maybe the better
-> option is that vfio-pci should not set has_rom to keep it out of this
-> path.  I don't see that has_rom serves any other purpose.  Thanks,
+v2:
+    * Use ARM_FEATURE_M_MAIN instead of ARM_FEATURE_V7 in most cases
+    * Remove CPUID registers check
+    * Use bad_offset instead of return
+    * Misc style fixes
 
-That would work for me too!
+Julia Suvorova (2):
+  nvic: Handle ARMv6-M SCS reserved registers
+  tests: Add ARMv6-M reserved register test
 
-Paolo
+ hw/intc/armv7m_nvic.c             | 51 ++++++++++++++++++++++++--
+ tests/Makefile.include            |  2 ++
+ tests/tcg/arm/test-reserved-reg.c | 60 +++++++++++++++++++++++++++++++
+ 3 files changed, 111 insertions(+), 2 deletions(-)
+ create mode 100644 tests/tcg/arm/test-reserved-reg.c
+
+-- 
+2.17.1
