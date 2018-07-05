@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb7ya-0007Hz-LD
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:23:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fb7ze-0007oO-Hb
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb7yZ-0007X3-Vb
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:23:28 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:35222)
+	(envelope-from <peter.maydell@linaro.org>) id 1fb7zd-0000HJ-LA
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:24:34 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:40120)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fb7yZ-0007Vj-P2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:23:27 -0400
-Received: by mail-oi0-x235.google.com with SMTP id i12-v6so18346724oik.2
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 10:23:27 -0700 (PDT)
+	id 1fb7zd-0000H7-Fw
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:24:33 -0400
+Received: by mail-oi0-x233.google.com with SMTP id w126-v6so18340039oie.7
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 10:24:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <9419467c-62a0-2bbc-1685-7eb9e3f40845@steffen-goertz.de>
-References: <20180626093204.27612-1-contrib@steffen-goertz.de>
-	<20180627094456.GB4325@stefanha-x1.localdomain>
-	<CAFEAcA-j8z4TLN=Qo82JicSQ_=YnJnGjAoLiMOnyfmd1QtQo7w@mail.gmail.com>
-	<20180703093113.GF16791@stefanha-x1.localdomain>
-	<CAFEAcA-_LjPDWpVPt1mfGA815ur_6i_MjBMtFLqohFCaO0R9Uw@mail.gmail.com>
-	<9419467c-62a0-2bbc-1685-7eb9e3f40845@steffen-goertz.de>
+In-Reply-To: <20180705131417.1847-1-armbru@redhat.com>
+References: <20180705131417.1847-1-armbru@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jul 2018 18:23:06 +0100
-Message-ID: <CAFEAcA_UBdBNyfKWGqZhGsx7qUPUJh_Zr2N52EA61mqgKRGcUg@mail.gmail.com>
+Date: Thu, 5 Jul 2018 18:24:12 +0100
+Message-ID: <CAFEAcA-0U5R4NfudXuD39Q+FHoeZ_v9aSOQAuc11tD7O90iqmQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2] arm: Add NRF51 SOC non-volatile memory
- controller
+Subject: Re: [Qemu-devel] [PULL 0/1] Coverity model patches for 2018-07-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,15 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 5 July 2018 at 18:14, Steffen G=C3=B6rtz <mail@steffen-goertz.de> wrote:
-> I would like to provide all four devices (NVMC, CODE, FICR, UICR) from
-> one module and rename nrf51_nvmc.[ch] to nrf51_nvm.[ch]. Is this
-> acceptable or would you rather prefer three modules?
+On 5 July 2018 at 14:14, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 4fd1cbaf146d4ab35f465bba0fe23115c33cd5a7:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-monitor-2018-07-03-v2' into staging (2018-07-05 11:25:14 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-cov-model-2018-07-05
+>
+> for you to fetch changes up to 19020d41759c7d34eae78d6afbec27c523d55bcd:
+>
+>   coverity-model: Fix replay_get_byte() (2018-07-05 15:09:52 +0200)
+>
+> ----------------------------------------------------------------
+> Coverity model patches for 2018-07-05
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (1):
+>       coverity-model: Fix replay_get_byte()
+>
+>  scripts/coverity-model.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+>
+Applied, thanks.
 
-Yeah, that would be ok too.
-
-thanks
 -- PMM
