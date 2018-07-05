@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fazib-0006IY-77
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:34:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1fazrG-00009O-Nt
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1faziZ-0008Oy-Us
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:34:25 -0400
-Date: Thu, 5 Jul 2018 10:34:16 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180705083416.GB3309@localhost.localdomain>
-References: <20180703180751.243496-1-vsementsov@virtuozzo.com>
-	<20180703180751.243496-2-vsementsov@virtuozzo.com>
-	<0e6e9f14-ad45-51c5-0d14-3e2e3dcaf5cb@virtuozzo.com>
-	<20180704150833.GG4334@localhost.localdomain>
-	<f50dc336-cb33-de03-d8ab-a0c01cadd850@virtuozzo.com>
-	<20180704162031.GH4334@localhost.localdomain>
-	<b9e20c0c-c21e-0257-4e93-cc6d31680d8c@virtuozzo.com>
-	<741f1831-2c65-17cc-1886-4f922ffe14cb@virtuozzo.com>
+	(envelope-from <armbru@redhat.com>) id 1fazrD-0002Nw-Ke
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:43:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57108 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fazrD-0002MQ-ER
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:43:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C2099401EF26
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 08:43:18 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180704084507.14560-1-peterx@redhat.com>
+	<20180704084507.14560-4-peterx@redhat.com>
+Date: Thu, 05 Jul 2018 10:43:13 +0200
+In-Reply-To: <20180704084507.14560-4-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 4 Jul 2018 16:45:01 +0800")
+Message-ID: <871sciax9a.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <741f1831-2c65-17cc-1886-4f922ffe14cb@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: add BDRV_REQ_SERIALISING flag
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/9] qapi: remove error checks for event
+ emission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,155 +34,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Am 04.07.2018 um 19:06 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 04.07.2018 19:36, Vladimir Sementsov-Ogievskiy wrote:
-> > 04.07.2018 19:20, Kevin Wolf wrote:
-> > > Am 04.07.2018 um 18:11 hat Vladimir Sementsov-Ogievskiy geschrieben=
-:
-> > > > 04.07.2018 18:08, Kevin Wolf wrote:
-> > > > > Am 04.07.2018 um 16:44 hat Vladimir Sementsov-Ogievskiy geschri=
-eben:
-> > > > > > 03.07.2018 21:07, Vladimir Sementsov-Ogievskiy wrote:
-> > > > > > > Serialized writes should be used in copy-on-write of
-> > > > > > > backup(sync=3Dnone)
-> > > > > > > for image fleecing scheme.
-> > > > > > >=20
-> > > > > > > Signed-off-by: Vladimir Sementsov-Ogievskiy
-> > > > > > > <vsementsov@virtuozzo.com>
-> > > > > > > ---
-> > > > > > > =A0=A0=A0 include/block/block.h | 5 ++++-
-> > > > > > > =A0=A0=A0 block/io.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 | 4 +=
-+++
-> > > > > > > =A0=A0=A0 2 files changed, 8 insertions(+), 1 deletion(-)
-> > > > > > >=20
-> > > > > > > diff --git a/include/block/block.h b/include/block/block.h
-> > > > > > > index e5c7759a0c..107113aad5 100644
-> > > > > > > --- a/include/block/block.h
-> > > > > > > +++ b/include/block/block.h
-> > > > > > > @@ -58,8 +58,11 @@ typedef enum {
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0=A0 * content. */
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0 BDRV_REQ_WRITE_UNCHANGED=A0=A0=A0 =3D=
- 0x40,
-> > > > > > > +=A0=A0=A0 /* Force request serializing. Only for writes. *=
-/
-> > > > > > > +=A0=A0=A0 BDRV_REQ_SERIALISING=A0=A0=A0=A0=A0=A0=A0 =3D 0x=
-80,
-> > > > > > > +
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0 /* Mask of valid flags */
-> > > > > > > -=A0=A0=A0 BDRV_REQ_MASK=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 =3D 0x7f,
-> > > > > > > +=A0=A0=A0 BDRV_REQ_MASK=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 =3D 0xff,
-> > > > > > > =A0=A0=A0 } BdrvRequestFlags;
-> > > > > > > =A0=A0=A0 typedef struct BlockSizes {
-> > > > > > > diff --git a/block/io.c b/block/io.c
-> > > > > > > index 1a2272fad3..d5ba078514 100644
-> > > > > > > --- a/block/io.c
-> > > > > > > +++ b/block/io.c
-> > > > > > > @@ -1572,6 +1572,10 @@ static int coroutine_fn
-> > > > > > > bdrv_aligned_pwritev(BdrvChild *child,
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0 max_transfer =3D
-> > > > > > > QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer,
-> > > > > > > INT_MAX),
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 align);
-> > > > > > > +=A0=A0=A0 if (flags & BDRV_REQ_SERIALISING) {
-> > > > > > > +=A0=A0=A0=A0=A0=A0=A0 mark_request_serialising(req, bdrv_g=
-et_cluster_size(bs));
-> > > > > > > +=A0=A0=A0 }
-> > > > > > > +
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0 waited =3D wait_serialising_requests(=
-req);
-> > > > > > > =A0=A0=A0=A0=A0=A0=A0 assert(!waited || !req->serialising);
-> > > > > > Kevin, about this assertion, introduced in 28de2dcd88de
-> > > > > > "block: Assert
-> > > > > > serialisation assumptions in pwritev"? Will not it fail with =
-fleecing
-> > > > > > scheme? I'm afraid it will, when we will wait for client
-> > > > > > read with our
-> > > > > > request, marked serializing a moment ago...
-> > > > > Hm, looks like it yes.
-> > > > >=20
-> > > > > > Can we just switch it to assert(!waited || !req->partial);, s=
-etting
-> > > > > > req->partial in bdrv_co_pwritev for parts of unaligned
-> > > > > > requests? And allow
-> > > > > > new flag only for aligned requests?
-> > > > > >=20
-> > > > > > Other ideas?
-> > > > > The commit message of 28de2dcd88de tells you what we need to do=
- (and
-> > > > > that just changing the assertion is wrong):
-> > > > >=20
-> > > > > =A0=A0=A0=A0=A0 If a request calls wait_serialising_requests() =
-and
-> > > > > actually has to wait
-> > > > > =A0=A0=A0=A0=A0 in this function (i.e. a coroutine yield), othe=
-r
-> > > > > requests can run and
-> > > > > =A0=A0=A0=A0=A0 previously read data (like the head or tail buf=
-fer) could become
-> > > > > =A0=A0=A0=A0=A0 outdated. In this case, we would have to restar=
-t from
-> > > > > the beginning to
-> > > > > =A0=A0=A0=A0=A0 read in the updated data.
-> > > > >=20
-> > > > > =A0=A0=A0=A0=A0 However, we're lucky and don't actually need to=
- do
-> > > > > that: A request can
-> > > > > =A0=A0=A0=A0=A0 only wait in the first call of
-> > > > > wait_serialising_requests() because we
-> > > > > =A0=A0=A0=A0=A0 mark it as serialising before that call, so any=
- later
-> > > > > requests would
-> > > > > =A0=A0=A0=A0=A0 wait. So as we don't wait in practice, we don't=
- have
-> > > > > to reload the data.
-> > > > >=20
-> > > > > =A0=A0=A0=A0=A0 This is an important assumption that may not be=
- broken or data
-> > > > > =A0=A0=A0=A0=A0 corruption will happen. Document it with some a=
-ssertions.
-> > > > >=20
-> > > > > So we may need to return -EAGAIN here, check that in the caller=
- and
-> > > > > repeat the write request from the very start.
-> > > > But in case of aligned request, there no previously read data,
-> > > > and we can
-> > > > safely continue. And actually it's our case (backup writes are
-> > > > aligned).
-> > > Hm, right. I don't particularly like req->partial because it's easy=
- to
-> > > forget to set it to false when you do something that would need to =
-be
-> > > repeated, but I don't have a better idea.
-> > >=20
-> > > Kevin
-> >=20
-> > I said partial, because I imagined unaligned request split to parts f=
-or
-> > separate writing, but this is wrong, req->unaligned sound better for =
-me
-> > now.
-> >=20
-> > So, for aligned requests all is ok.
-> >=20
-> > But for unaligned all is ok too, because they are marked serializing =
-and
-> > waited on first call to wait_for_serializing, before reading tails an=
-d
-> > before considered place in bdrv_aligned_pwritev.
-> >=20
->=20
-> Is it correct "serialiSing" ? Google and Thunderbird both correcting me=
- to
-> serialiZing
+Peter Xu <peterx@redhat.com> writes:
 
-Both are correct, it's just British vs. American spelling. In the
-context of request serialisation, we seem to use the spelling with S, so
-it would be more consistent to stay with it.
+> In the whole QAPI event emission code we're passing in an Error* object
+> along the whole stack.  That's never useful since it never fails after
+> all.  Remove that.
+>
+> Then, remove that parameter from all the callers to send an event.
+>
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+[...]
+> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+> index 5657524688..3953dc9837 100644
+> --- a/scripts/qapi/events.py
+> +++ b/scripts/qapi/events.py
+> @@ -18,7 +18,7 @@ from qapi.common import *
+>  def build_event_send_proto(name, arg_type, boxed):
+>      return 'void qapi_event_send_%(c_name)s(%(param)s)' % {
+>          'c_name': c_name(name.lower()),
+> -        'param': build_params(arg_type, boxed, 'Error **errp')}
+> +        'param': build_params(arg_type, boxed, "")}
 
-Kevin
+Use ' instead of " for consistency.
+
+But let's make @extra optional in the previous patch (default it to
+None), so this spot becomes simpler.
+
+>  
+>  
+>  def gen_event_send_decl(name, arg_type, boxed):
+> @@ -70,7 +70,6 @@ def gen_event_send(name, arg_type, boxed, event_enum_name):
+>  %(proto)s
+>  {
+>      QDict *qmp;
+> -    Error *err = NULL;
+>      QMPEventFuncEmit emit;
+>  ''',
+>                  proto=build_event_send_proto(name, arg_type, boxed))
+> @@ -103,45 +102,35 @@ def gen_event_send(name, arg_type, boxed, event_enum_name):
+>  ''')
+>          if not arg_type.is_implicit():
+>              ret += mcgen('''
+> -    visit_type_%(c_name)s(v, "%(name)s", &arg, &err);
+> +    visit_type_%(c_name)s(v, "%(name)s", &arg, NULL);
+
+&error_abort, please.  This should never fail, and when it does,
+something's seriously wrong.
+
+>  ''',
+>                           name=name, c_name=arg_type.c_name())
+>          else:
+>              ret += mcgen('''
+>  
+> -    visit_start_struct(v, "%(name)s", NULL, 0, &err);
+> -    if (err) {
+> -        goto out;
+> -    }
+> -    visit_type_%(c_name)s_members(v, &param, &err);
+> -    if (!err) {
+> -        visit_check_struct(v, &err);
+> -    }
+> +    visit_start_struct(v, "%(name)s", NULL, 0, NULL);
+> +    visit_type_%(c_name)s_members(v, &param, NULL);
+> +    visit_check_struct(v, NULL);
+
+Likewise.
+
+>      visit_end_struct(v, NULL);
+>  ''',
+>                           name=name, c_name=arg_type.c_name())
+>          ret += mcgen('''
+> -    if (err) {
+> -        goto out;
+> -    }
+>  
+>      visit_complete(v, &obj);
+>      qdict_put_obj(qmp, "data", obj);
+>  ''')
+>  
+>      ret += mcgen('''
+> -    emit(%(c_enum)s, qmp, &err);
+> +    emit(%(c_enum)s, qmp);
+>  
+>  ''',
+>                   c_enum=c_enum_const(event_enum_name, name))
+>  
+>      if arg_type and not arg_type.is_empty():
+>          ret += mcgen('''
+> -out:
+>      visit_free(v);
+>  ''')
+>      ret += mcgen('''
+> -    error_propagate(errp, err);
+>      qobject_unref(qmp);
+>  }
+>  ''')
