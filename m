@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fb2VF-0000fg-LX
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:32:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1fb2Y0-0001WA-7z
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fb2VE-0002tC-N2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:32:49 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fb2VE-0002ql-Ge
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:32:48 -0400
-Received: by mail-wm0-x243.google.com with SMTP id p11-v6so10231972wmc.4
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 04:32:48 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fb2Xv-0003Dj-A9
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:35:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45872 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fb2Xv-0003C6-4j
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:35:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180326150916.9602-1-marcandre.lureau@redhat.com>
+	<20180326150916.9602-8-marcandre.lureau@redhat.com>
+Date: Thu, 05 Jul 2018 13:35:33 +0200
+In-Reply-To: <20180326150916.9602-8-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 26 Mar 2018 17:08:45 +0200")
+Message-ID: <87o9fl9apm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87sh4y7xcw.fsf@dusky.pond.sub.org>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-5-peterx@redhat.com>
-	<87woua9iay.fsf@dusky.pond.sub.org> <20180705094903.GA23001@xz-mi>
-	<87sh4y7xcw.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 5 Jul 2018 13:32:46 +0200
-Message-ID: <CAJ+F1CL1r034g1eGNtiZE1birByMNvyJLwym8e3Jn058cbbnOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/9] monitor: move need_resume flag into
- monitor struct
+Subject: Re: [Qemu-devel] [PATCH v3 07/38] json-parser: always set an error
+ if return NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-On Thu, Jul 5, 2018 at 1:09 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> Peter Xu <peterx@redhat.com> writes:
+> Let's make json_parser_parse_err() suck less, and simplify caller
+> error handling.
 >
->> On Thu, Jul 05, 2018 at 10:51:33AM +0200, Markus Armbruster wrote:
->>> Peter Xu <peterx@redhat.com> writes:
->>>
->>> > It was put into the request object to show whether we'll need to resu=
-me
->>> > the monitor after dispatching the command.  Now we move that into the
->>> > monitor struct so that it might be even used in other places in the
->>> > future, e.g., out-of-band message flow controls.
->>> >
->>> > One thing to mention is that there is no lock needed before when
->>> > accessing the flag since the request object will always be owned by a
->>> > single thread.  After we move it into monitor struct we need to prote=
-ct
->>> > that flag since it might be accessed by multiple threads now.  Renami=
-ng
->>> > the qmp_queue_lock into qmp_lock to protect the flag as well.
->>> >
->>> > No functional change.
->>> >
->>> > Signed-off-by: Peter Xu <peterx@redhat.com>
->>>
->>> Marc-Andr=C3=A9's "[PATCH v3 04/38] monitor: no need to save need_resum=
-e" and
->>> "[PATCH v3 05/38] monitor: further simplify previous patch" also mess
->>> with need_resume.  Marc-Andr=C3=A9, could you have a look at this patch=
- and
->>> the next one?
->>
->> Sorry I should have looked at those before hand.  I think I must be
->> waiting for another post to split the patches into two (after
->> Marc-Andre poked me with that thread) but then I forgot about that.
->>
->> So now I suspect we'd better keep that flag since in the next patch
->> the suspend operation can happen conditionally now.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  monitor.c             | 4 ----
+>  qobject/json-parser.c | 7 ++++++-
+>  2 files changed, 6 insertions(+), 5 deletions(-)
 >
-> Could you two together figure out how to combine your work?  Would take
-> me off this critical path...
->
+> diff --git a/monitor.c b/monitor.c
+> index 5889a32231..e9d0c4d172 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4053,10 +4053,6 @@ static void handle_qmp_command(JSONMessageParser *=
+parser, GQueue *tokens)
+>      QMPRequest *req_obj;
+>=20=20
+>      req =3D json_parser_parse_err(tokens, NULL, &err);
+> -    if (!req && !err) {
+> -        /* json_parser_parse_err() sucks: can fail without setting @err =
+*/
+> -        error_setg(&err, QERR_JSON_PARSING);
+> -    }
+>      if (err) {
+>          goto err;
+>      }
+> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+> index 769b960c9f..c39cd8e4d7 100644
+> --- a/qobject/json-parser.c
+> +++ b/qobject/json-parser.c
+> @@ -591,7 +591,12 @@ QObject *json_parser_parse_err(GQueue *tokens, va_li=
+st *ap, Error **errp)
+>=20=20
+>      result =3D parse_value(ctxt, ap);
+>=20=20
+> -    error_propagate(errp, ctxt->err);
+> +    if (!result && !ctxt->err) {
+> +        /* TODO: improve error reporting */
+> +        error_setg(errp, "Failed to parse JSON");
+> +    } else {
+> +        error_propagate(errp, ctxt->err);
+> +    }
+>=20=20
+>      parser_context_free(ctxt);
 
-With Peter patches, the monitor is also suspended when the queue of
-command is too long (when oob-enabled). Thus the variable now covers
-one of two different cases.
+I'd be tempted to put more colorful language in that comment ;)
 
-My patches only covered the first case simplification (legacy /
-!oob-enabled suspend).
+You update just one caller.  Let's review the other ones:
 
-The second case could probably use a similar simplification, looking
-at the queue length, but at this point I think I'd prefer to keep the
-variable for clarity and sanity state checking.
+* qga/main.c process_event()
 
+    qdict =3D qobject_to(QDict, json_parser_parse_err(tokens, NULL, &err));
+    if (err || !qdict) {
+        qobject_unref(qdict);
+        qdict =3D qdict_new();
+        if (!err) {
+            g_warning("failed to parse event: unknown error");
+            error_setg(&err, QERR_JSON_PARSING);
+        } else {
+            g_warning("failed to parse event: %s", error_get_pretty(err));
+        }
+        qdict_put_obj(qdict, "error", qmp_build_error_object(err));
+        error_free(err);
+    }
 
---=20
-Marc-Andr=C3=A9 Lureau
+  The if (!err) conditional is now dead.  Please drop it.
+
+* qobject/json-parser.c json_parser_parse()
+
+  Ignores the error.  Okay.
+
+* qobject/qjson.c qobject_from_jsonv() via parse_json()
+
+  - qobject_from_json()
+
+    ~ block.c parse_json_filename()
+
+        options_obj =3D qobject_from_json(filename, errp);
+        if (!options_obj) {
+            /* Work around qobject_from_json() lossage TODO fix that */
+            if (errp && !*errp) {
+                error_setg(errp, "Could not parse the JSON options");
+                return NULL;
+            }
+            error_prepend(errp, "Could not parse the JSON options: ");
+            return NULL;
+        }
+
+      The work-around is now dead.  Please drop it.
+
+    ~ More callers, please review them.
+
+  - qobject_from_jsonf()
+
+        va_start(ap, string);
+        obj =3D qobject_from_jsonv(string, &ap, &error_abort);
+        va_end(ap);
+
+        assert(obj !=3D NULL);
+
+    Now dies in error_handle_fatal() instead of the assertion.  Okay.
+
+  - tests/libqtest.c qmp_fd_sendv()
+
+    Passes &error_abort, does nothing when qobject_from_jsonv() returns
+    null.  Your fix makes this catch invalid JSON instead of silently
+    ignoring it.  Good, but please mention it in the commit message.
+
+  - tests/test-qobject-input-visitor.c
+    visitor_input_test_init_internal()
+
+    Like qobject_from_jsonf().  Okay.
