@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fb6sX-00081h-6N
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6sr-0008Os-Bl
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fb6sS-0007CP-Qv
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:09 -0400
-References: <20180705155811.20366-1-f4bug@amsat.org>
-	<20180705155811.20366-5-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <af8abd7f-d72d-0445-298c-4ff91fccdb5e@redhat.com>
-Date: Thu, 5 Jul 2018 11:13:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6so-0007W4-Pp
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:29 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:33516)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fb6so-0007Vj-JA
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:26 -0400
+Received: by mail-wm0-x236.google.com with SMTP id z6-v6so3223880wma.0
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:13:26 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  5 Jul 2018 17:03:27 +0100
+Message-Id: <20180705160329.30386-19-alex.bennee@linaro.org>
+In-Reply-To: <20180705160329.30386-1-alex.bennee@linaro.org>
+References: <20180705160329.30386-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180705155811.20366-5-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] tests/bios-tables-test: Remove an
- useless cast
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v3 18/20] docker: add special handling for
+ FROM:debian-%-user targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 07/05/2018 10:58 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Patch created mechanically by rerunning:
+These will have been build with debootstrap so we need to check
+against the debian-bootstrap dockerfile. This does mean sticking to
+debian-FOO-user as the naming conventions for boot-strapped images.
+The actual cross image is built on top.
 
-In the subject: s/an useless/a useless/
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-(English is weird; we use "a" when the 'u' is pronounced hard as in=20
-"unicorn", and "an" when the 'u' is soft as in "umbrella")
-
->=20
->    $  spatch --sp-file scripts/coccinelle/typecast.cocci \
->              --macro-file scripts/cocci-macro-file.h \
->              --dir . --in-place
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index b279836154..69e7130db7 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -113,6 +113,10 @@ def _copy_binary_with_libs(src, dest_dir):
+             _copy_with_mkdir(l , dest_dir, so_path)
+ 
+ def _read_qemu_dockerfile(img_name):
++    # special case for Debian linux-user images
++    if img_name.startswith("debian") and img_name.endswith("user"):
++        img_name = "debian-bootstrap"
++
+     df = os.path.join(os.path.dirname(__file__), "dockerfiles",
+                       img_name + ".docker")
+     return open(df, "r").read()
+-- 
+2.17.1
