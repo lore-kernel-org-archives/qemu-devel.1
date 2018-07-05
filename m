@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fbBLh-0000as-DC
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:59:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fbC3Z-0007bw-Iu
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:44:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fbBLd-0001Mm-FD
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:59:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36272)
+	(envelope-from <pbonzini@redhat.com>) id 1fbC3W-0001Pu-GK
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:44:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49136 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1fbBLd-0001MO-AH
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:59:29 -0400
-Date: Thu, 5 Jul 2018 21:59:24 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180705205924.GQ1455@redhat.com>
-References: <20180705123929.GB16293@redhat.com>
-	<20180705125231.GD16293@redhat.com>
-	<d154245b-46c0-58b0-b6f9-1f1313634c80@redhat.com>
-	<20180705164343.GE16293@redhat.com>
-	<20180705200659-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fbC3W-0001PV-B2
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 17:44:50 -0400
+References: <20180705181148.26871-1-clg@kaod.org>
+	<20180705133044.634ede43@t450s.home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
+Date: Thu, 5 Jul 2018 23:44:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705200659-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
+In-Reply-To: <20180705133044.634ede43@t450s.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, berrange@redhat.com, jferlan@redhat.com, ben@skyportsystems.com
+To: Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On Thu, Jul 05, 2018 at 08:10:15PM +0300, Michael S. Tsirkin wrote:
-> On Thu, Jul 05, 2018 at 05:43:43PM +0100, Richard W.M. Jones wrote:
-> > On Thu, Jul 05, 2018 at 04:20:33PM +0200, Laszlo Ersek wrote:
-> > > QEMU does the right thing. If other hypervisors don't do this -- while
-> > > still taking and displaying the value in UUID / GUID textual format --,
-> > > they are wrong. The VMGENID spec from Microsoft
-> > > <http://go.microsoft.com/fwlink/?LinkId=260709> specifically mentions
-> > > "GUID".
-> > 
-> > The MSFT spec does mention GUID, but it seems to me that it's only
-> > using GUID as an incidental example -- ie. that you might use the VM
-> > Generation ID to generate a GUID.  Outside that example it
-> > consistently refers to the VM Gen ID as a 128-bit integer.  It also
-> > says that it could be used as a "high entropy random data source",
-> > which is not in fact true if it's a UUID.
-> > 
-> > It has to be said that after reading the spec again [the MSFT spec,
-> > not qemu's spec] and what other hypervisors are doing, I'm not sure
-> > qemu is doing the right thing here.
-> > 
-> > Rich.
-> 
-> So right now we have a "GUID" property.
-> We could always add an alternative property for people who want
-> to treat the ID as an integer. Would that address the issue?
+On 05/07/2018 21:30, Alex Williamson wrote:
+> On Thu,  5 Jul 2018 20:11:48 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> PCI devices needing a ROM allocate an optional MemoryRegion with
+>> pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
+>> device is destroyed. The only action taken by this routine is to call
+>> vmstate_unregister_ram() which clears the id string of the optional
+>> ROM RAMBlock and now, also flags the RAMBlock as non-migratable. This
+>> was recently added by commit b895de502717 ("migration: discard
+>> non-migratable RAMBlocks"), .
+>>
+>> VFIO devices do their own allocation of the PCI ROM region. It is
+>> initialized in vfio_pci_size_rom() in which the PCI attribute
+>> 'has_rom' is set to true but the RAMBlock of the ROM region is not
+>> allocated. When the associated PCI device is deleted,
+>> pci_del_option_rom() calls vmstate_unregister_ram() which tries to
+>> flag a NULL RAMBlock because 'has_rom' is set, leading to a SEGV .
+>>
+>> The use of vmstate_unregister_ram() in the PCI device was added in
+>> commit b0e56e0b63f350691b52d3e75e89bb64143fbeff ("unset RAMBlock idstr
+>> when unregister MemoryRegion") and from the archive in
+>> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html, it
+>> seems that it was trying to fix a reference count issue.
+>>
+>> vmstate_unregister_ram() being a work around, let's remove it to fix
+>> the current SEGV issue and let's try to find a fix for the initial ref
+>> count issue if we can reproduce.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/pci/pci.c | 11 -----------
+>>  1 file changed, 11 deletions(-)
+>=20
+> Looking back through git history, I think vfio sets PCIDevice.has_rom
+> because we needed that to have memory_region_destroy() called, but that
+> changed with Paolo's:
+>=20
+> 469b046ead06 ("memory: remove memory_region_destroy")
+>=20
+> Now the MemoryRegion gets freed automagically, so maybe the better
+> option is that vfio-pci should not set has_rom to keep it out of this
+> path.  I don't see that has_rom serves any other purpose.  Thanks,
 
-TBH I'm fairly relaxed about this and I don't want to put in any
-effort to change anything.  As Dan says later in the thread, no data
-is ever lost in the transformation.
+That would work for me too!
 
-I have now written a "128 bit int" -> "GUID" mangler for virt-v2v's
-VM Generation ID handling code, so I'm happy enough.
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+Paolo
