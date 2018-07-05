@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1faumm-0004Jh-4F
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:18:26 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1favBV-0003q2-JH
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fauml-0002Nu-3c
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:18:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1faumk-0002Mr-Vc
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:18:23 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A50881A4EAD
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 03:18:22 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Thu,  5 Jul 2018 11:17:55 +0800
-Message-Id: <20180705031755.3254-10-peterx@redhat.com>
-In-Reply-To: <20180705031755.3254-1-peterx@redhat.com>
-References: <20180705031755.3254-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.0 9/9] tests: hide stderr for postcopy
- recovery test
+	(envelope-from <mail@sebastianbauer.info>) id 1favBS-0005M9-Dh
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:43:57 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 05 Jul 2018 05:43:45 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <20180704210459.GH7451@localhost.localdomain>
+References: <20180704112859.20146-1-kraxel@redhat.com>
+	<20180704185321.GZ7451@localhost.localdomain>
+	<6a0aba7b46b168360fb291eaec769eb0@sebastianbauer.info>
+	<20180704205206.GG7451@localhost.localdomain>
+	<20180704210459.GH7451@localhost.localdomain>
+Message-ID: <e60e8b1220bd00040b5ae08f93095e28@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH] vga: make stdvga the global default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-We dumped something when network failure happens.  We should avoid those
-messages to be dumped when running the tests:
+Am 2018-07-04 23:04, schrieb Eduardo Habkost:
+> On Wed, Jul 04, 2018 at 05:52:06PM -0300, Eduardo Habkost wrote:
+>> On Wed, Jul 04, 2018 at 10:21:19PM +0200, Sebastian Bauer wrote:
+>> > Am 2018-07-04 20:53, schrieb Eduardo Habkost:
+>> > > >      mc->kvm_type = spapr_kvm_type;
+>> > > >      machine_class_allow_dynamic_sysbus_dev(mc,
+>> > > > TYPE_SPAPR_PCI_HOST_BRIDGE);
+>> > > >      mc->pci_allow_0_address = true;
+>> > > > diff --git a/vl.c b/vl.c
+>> > > > index 16b913f9d5..e60bf2d6cd 100644
+>> > > > --- a/vl.c
+>> > > > +++ b/vl.c
+>> > > > @@ -4475,10 +4475,10 @@ int main(int argc, char **argv, char **envp)
+>> > > >      if (default_vga) {
+>> > > >          if (machine_class->default_display) {
+>> > > >              vga_model = machine_class->default_display;
+>> > > > -        } else if (vga_interface_available(VGA_CIRRUS)) {
+>> > > > -            vga_model = "cirrus";
+>> > > >          } else if (vga_interface_available(VGA_STD)) {
+>> > > >              vga_model = "std";
+>> > > > +        } else if (vga_interface_available(VGA_CIRRUS)) {
+>> > > > +            vga_model = "cirrus";
+>> > >
+>> > > If we don't make the machines above have default_display=NULL, we
+>> > > won't need this hunk, right?  In either case, I suggest doing
+>> > > this change on a separate patch.
+>> >
+>> > An alternative would be to define the default always to VGA_STD if the
+>> > machine does not override it. This is from the observation that the majority
+>> > would chose std. Obviously, having default values always has pro and cons. I
+>> > would not consider it harmful here.
+>> 
+>> That would be my preference: not having any machine with
+>> default_display==NULL.  I just don't want to make this a
+>> requirement for fixing the current bug.
+>> 
+>> >
+>> > Is there any configuration that includes VGA_CIRRUS but not VGA_STD?
+>> 
+>> Not sure, I'll check.
+> 
+> I couldn't find any:
 
-  $ ./tests/migration-test -p /x86_64/migration/postcopy/recovery
-  /x86_64/migration/postcopy/recovery: qemu-system-x86_64: check_section_footer: Read section footer failed: -5
-  qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
-  qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
-  OK
+Thanks for checking! In that case, the VGA_CIRRUS branch in the above 
+hunk will never be executed (for any current config) after the proposed 
+patch. So that branch could be eliminated.
 
-After the patch:
+I also checked the code, default values are used also for other fields 
+in that struct (e.g., default_cpus). If default values are considered 
+fragile, they must be changed as well in the middle term. However, given 
+a solid documentation (which is currently missing for these fields) I 
+still think that default values are acceptable.
 
-  $ ./tests/migration-test -p /x86_64/migration/postcopy/recovery
-  /x86_64/migration/postcopy/recovery: OK
+Note that there seems also be the possibility to set != NULL default 
+values in the machine_class_init() function.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/migration-test.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 182fc88e93..96e69dab99 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -567,12 +567,13 @@ static void test_deprecated(void)
- }
- 
- static void migrate_postcopy_prepare(QTestState **from_ptr,
--                                     QTestState **to_ptr)
-+                                     QTestState **to_ptr,
-+                                     bool hide_error)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
- 
--    test_migrate_start(&from, &to, uri, false);
-+    test_migrate_start(&from, &to, uri, hide_error);
- 
-     migrate_set_capability(from, "postcopy-ram", "true");
-     migrate_set_capability(to, "postcopy-ram", "true");
-@@ -615,7 +616,7 @@ static void test_postcopy(void)
- {
-     QTestState *from, *to;
- 
--    migrate_postcopy_prepare(&from, &to);
-+    migrate_postcopy_prepare(&from, &to, false);
-     migrate_postcopy_start(from, to);
-     migrate_postcopy_complete(from, to);
- }
-@@ -625,7 +626,7 @@ static void test_postcopy_recovery(void)
-     QTestState *from, *to;
-     char *uri;
- 
--    migrate_postcopy_prepare(&from, &to);
-+    migrate_postcopy_prepare(&from, &to, true);
- 
-     /* Turn postcopy speed down, 4K/s is slow enough on any machines */
-     migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
--- 
-2.17.1
+Bye
+Sebastian
