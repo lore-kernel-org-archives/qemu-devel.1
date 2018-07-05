@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1Ss-0006pp-GQ
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fb1Ss-0006q2-LM
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1Sq-0004Vg-KJ
+	(envelope-from <kwolf@redhat.com>) id 1fb1Sq-0004WU-TA
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:18 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  5 Jul 2018 12:25:54 +0200
-Message-Id: <20180705102604.4986-3-kwolf@redhat.com>
-In-Reply-To: <20180705102604.4986-1-kwolf@redhat.com>
-References: <20180705102604.4986-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/12] qcow2: refactor data compression
+Date: Thu,  5 Jul 2018 12:25:52 +0200
+Message-Id: <20180705102604.4986-1-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 00/12] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,136 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The following changes since commit fe8d2d5737ab20ed0118863f5eb888cae37122=
+ab:
 
-Make a separate function for compression to be parallelized later.
- - use .avail_out field instead of .next_out to calculate size of
-   compressed data. It looks more natural and it allows to keep dest to
-   be void pointer
- - set avail_out to be at least one byte less than input, to be sure
-   avoid inefficient compression earlier
+  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.0-p=
+ull-request' into staging (2018-07-04 22:38:10 +0100)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qcow2.c | 78 ++++++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 51 insertions(+), 27 deletions(-)
+are available in the git repository at:
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2f9e58e0c4..9cee653d96 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -23,11 +23,14 @@
-  */
- 
- #include "qemu/osdep.h"
-+
-+#define ZLIB_CONST
-+#include <zlib.h>
-+
- #include "block/block_int.h"
- #include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
--#include <zlib.h>
- #include "qcow2.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -3650,6 +3653,48 @@ fail:
-     return ret;
- }
- 
-+/*
-+ * qcow2_compress()
-+ *
-+ * @dest - destination buffer, at least of @size-1 bytes
-+ * @src - source buffer, @size bytes
-+ *
-+ * Returns: compressed size on success
-+ *          -1 if compression is inefficient
-+ *          -2 on any other error
-+ */
-+static ssize_t qcow2_compress(void *dest, const void *src, size_t size)
-+{
-+    ssize_t ret;
-+    z_stream strm;
-+
-+    /* best compression, small window, no zlib header */
-+    memset(&strm, 0, sizeof(strm));
-+    ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
-+                       -12, 9, Z_DEFAULT_STRATEGY);
-+    if (ret != 0) {
-+        return -2;
-+    }
-+
-+    /* strm.next_in is not const in old zlib versions, such as those used on
-+     * OpenBSD/NetBSD, so cast the const away */
-+    strm.avail_in = size;
-+    strm.next_in = (void *) src;
-+    strm.avail_out = size - 1;
-+    strm.next_out = dest;
-+
-+    ret = deflate(&strm, Z_FINISH);
-+    if (ret == Z_STREAM_END) {
-+        ret = size - 1 - strm.avail_out;
-+    } else {
-+        ret = (ret == Z_OK ? -1 : -2);
-+    }
-+
-+    deflateEnd(&strm);
-+
-+    return ret;
-+}
-+
- /* XXX: put compressed sectors first, then all the cluster aligned
-    tables to avoid losing bytes in alignment */
- static coroutine_fn int
-@@ -3659,8 +3704,8 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-     BDRVQcow2State *s = bs->opaque;
-     QEMUIOVector hd_qiov;
-     struct iovec iov;
--    z_stream strm;
--    int ret, out_len;
-+    int ret;
-+    size_t out_len;
-     uint8_t *buf, *out_buf;
-     int64_t cluster_offset;
- 
-@@ -3694,32 +3739,11 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
- 
-     out_buf = g_malloc(s->cluster_size);
- 
--    /* best compression, small window, no zlib header */
--    memset(&strm, 0, sizeof(strm));
--    ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION,
--                       Z_DEFLATED, -12,
--                       9, Z_DEFAULT_STRATEGY);
--    if (ret != 0) {
-+    out_len = qcow2_compress(out_buf, buf, s->cluster_size);
-+    if (out_len == -2) {
-         ret = -EINVAL;
-         goto fail;
--    }
--
--    strm.avail_in = s->cluster_size;
--    strm.next_in = (uint8_t *)buf;
--    strm.avail_out = s->cluster_size;
--    strm.next_out = out_buf;
--
--    ret = deflate(&strm, Z_FINISH);
--    if (ret != Z_STREAM_END && ret != Z_OK) {
--        deflateEnd(&strm);
--        ret = -EINVAL;
--        goto fail;
--    }
--    out_len = strm.next_out - out_buf;
--
--    deflateEnd(&strm);
--
--    if (ret != Z_STREAM_END || out_len >= s->cluster_size) {
-+    } else if (out_len == -1) {
-         /* could not compress: write normal cluster */
-         ret = qcow2_co_pwritev(bs, offset, bytes, qiov, 0);
-         if (ret < 0) {
--- 
-2.13.6
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to 7c20c808a5cbf5d244735bc78fc3138c739c1946:
+
+  file-posix: Unlock FD after creation (2018-07-05 11:07:58 +0200)
+
+----------------------------------------------------------------
+Block layer patches:
+
+- qcow2: Use worker threads for compression to improve performance of
+  'qemu-img convert -W' and compressed backup jobs
+- blklogwrites: New filter driver to log write requests to an image in
+  the dm-log-writes format
+- file-posix: Fix image locking during image creation
+- crypto: Fix memory leak in error path
+- Error out instead of silently truncating node names
+
+----------------------------------------------------------------
+Aapo Vienamo (1):
+      block: Add blklogwrites
+
+Ari Sundholm (4):
+      block: Move two block permission constants to the relevant enum
+      block/blklogwrites: Change log_sector_size from int64_t to uint64_t
+      block/blklogwrites: Add an option for appending to an old log
+      block/blklogwrites: Add an option for the update interval of the lo=
+g superblock
+
+Kevin Wolf (2):
+      block: Don't silently truncate node names
+      block/crypto: Fix memory leak in create error path
+
+Max Reitz (2):
+      file-posix: Fix creation locking
+      file-posix: Unlock FD after creation
+
+Vladimir Sementsov-Ogievskiy (3):
+      qemu-img: allow compressed not-in-order writes
+      qcow2: refactor data compression
+      qcow2: add compress threads
+
+ qapi/block-core.json          |  38 ++-
+ block/qcow2.h                 |   3 +
+ include/block/block.h         |   7 +
+ block.c                       |  12 +-
+ block/blklogwrites.c          | 547 ++++++++++++++++++++++++++++++++++++=
+++++++
+ block/crypto.c                |   2 +-
+ block/file-posix.c            |  21 +-
+ block/qcow2.c                 | 138 ++++++++---
+ qemu-img.c                    |   5 -
+ MAINTAINERS                   |   6 +
+ block/Makefile.objs           |   1 +
+ tests/qemu-iotests/051        |  15 ++
+ tests/qemu-iotests/051.out    |  23 ++
+ tests/qemu-iotests/051.pc.out |  23 ++
+ 14 files changed, 791 insertions(+), 50 deletions(-)
+ create mode 100644 block/blklogwrites.c
