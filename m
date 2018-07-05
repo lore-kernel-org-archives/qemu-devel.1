@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fasLu-0000a5-F8
+	(envelope-from <dgibson@ozlabs.org>) id 1fasLu-0000a6-NA
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 20:42:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fasLt-0008VE-Br
+	(envelope-from <dgibson@ozlabs.org>) id 1fasLt-0008VK-CO
 	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 20:42:30 -0400
-Date: Thu, 5 Jul 2018 10:13:04 +1000
+Date: Thu, 5 Jul 2018 10:16:41 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180705001304.GC3450@umbus.fritz.box>
-References: <20180704144400.9419-1-f4bug@amsat.org>
-	<alpine.BSF.2.21.1807041838350.151@zero.eik.bme.hu>
+Message-ID: <20180705001641.GE3450@umbus.fritz.box>
+References: <20180704183855.18304-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YD3LsXFS42OYHhNZ"
+	protocol="application/pgp-signature"; boundary="mR8QP4gmHujQHb1c"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1807041838350.151@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] ppc440_uc: Fix a copy/paste error
+In-Reply-To: <20180704183855.18304-1-laurent@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix build on ppc64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org
 
 
---YD3LsXFS42OYHhNZ
-Content-Type: text/plain; charset=iso-8859-1
+--mR8QP4gmHujQHb1c
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 04, 2018 at 06:40:35PM +0200, BALATON Zoltan wrote:
-> On Wed, 4 Jul 2018, Philippe Mathieu-Daud=E9 wrote:
-> > Missed in 3c409c1927e, hopefully reported by Coverity.
+On Wed, Jul 04, 2018 at 08:38:55PM +0200, Laurent Vivier wrote:
+1;5202;0c> When I try to build a ppc64 target on a ppc64 host (gcc 8.1.1), =
+I have:
 >=20
-> Apparently Coverity did report it and Paolo already notified me about tha=
-t.
-> I was about to send a patch but you were faster. Thank you very much.
+> .../target/ppc/int_helper.c: In function 'helper_vinsertb':
+> .../target/ppc/int_helper.c:1954:32: error: array subscript 1844674407370=
+9551608 is above array bounds of 'uint8_t[16]' {aka 'unsigned char[16]'} [-=
+Werror=3Darray-bounds]
+>          memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],          =
+    \
+>                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> .../target/ppc/int_helper.c:1965:1: note: in expansion of macro 'VINSERT'
 >=20
-> Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+> If we compare with the macro for ppc64le, we can see
+> sizeof(r->element[0]) should be used instead of sizeof(r->element).
+>=20
+> And VINSERT uses only u8, u16, u32 and u64, so the maximum value
+> of sizeof(r->element[0]) is 8
+>=20
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
 Applied to ppc-for-3.0, thanks.
 
+> ---
+>  target/ppc/int_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> > Fixes: Coverity CID 1393788 (Copy-paste error)
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > ---
-> > hw/ppc/ppc440_uc.c | 2 +-
-> > 1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-> > index 0bbaa6844a..09ccda548f 100644
-> > --- a/hw/ppc/ppc440_uc.c
-> > +++ b/hw/ppc/ppc440_uc.c
-> > @@ -935,7 +935,7 @@ static void dcr_write_dma(void *opaque, int dcrn, u=
-int32_t val)
-> >                     if (wptr) {
-> >                         cpu_physical_memory_unmap(wptr, wlen, 1, didx);
-> >                     }
-> > -                    if (wptr) {
-> > +                    if (rptr) {
-> >                         cpu_physical_memory_unmap(rptr, rlen, 0, sidx);
-> >                     }
-> >                 }
-> >=20
-
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 03d37da79f..d52338ed71 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -1951,7 +1951,7 @@ VSPLT(w, u32)
+>  #define VINSERT(suffix, element)                                        =
+    \
+>      void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t ind=
+ex) \
+>      {                                                                   =
+    \
+> -        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],          =
+    \
+> +        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element[0])],       =
+    \
+>                 sizeof(r->element[0]));                                  =
+    \
+>      }
+>  #else
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -75,24 +86,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YD3LsXFS42OYHhNZ
+--mR8QP4gmHujQHb1c
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls9YpAACgkQbDjKyiDZ
-s5LB5A//d9LhtzjhexyMQp58XWQ0pxndtPwlumt1GR8LvHa0gbqcHIqQmJ0kYA82
-u627zmjWb0PUr+nvrRP9aPjmcSE87KXvevnIRso90/ndaGtfcS2HezaFuRxIE8CF
-Sx12aZY7zyQhEIymzSPXxY2uI+G9JWTmJP2Z2TXrw7q5ax4APkJ8WfBRdMAKb8hl
-15SQlrPbod+QaGBj13BkuSm92nKHupBrI/+6aBGIXqH7N3Rq1ttZ2AhlyjgeLwCU
-+OQutTAvE0KkbPzc2ItVuYNeLsNLBTYnFX+2FpD+VnxVfMVuaNxkudB9ZFiKqIEX
-j2VTP6JCIXHy7gPAsx2OwohbsUmsCjB836mKXztdkor35fZVcQlVVf2ETGJFkJBp
-cOoqFdf2zm2XPcIXTO4W8rBByC4A+LGluE6udYzu/a/gZwWVFV0mV4LgjHsZCSnf
-iwpQq8JQzC8CqxPYJeEjLIIGQTEeJOYVMPBgynWhvP3+BUkmF4PfRPVXDcSRBYiv
-+P4wZCyF9dBeT7F9jvLuNyKRPYuox6PLOIKRwFF1v9fXrJ1d2isiKoPJWWXcI/n9
-UNvQb4letOZbOvgQhYGm24xj2HWMGlmSR+eLzTIgioeR6e1jHZfOug0Z02BQ2KiQ
-sl70E9VnkUHIJqHd0PzY5gNn+aRNSdy3FlCTRvcra5suHjyF6hE=
-=Eme0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls9Y2gACgkQbDjKyiDZ
+s5LN+hAA5FK751LxSNeizuOu6fxvx39YcJ75gDsnCP7DZpmpoAOkLkganWTXrPax
+zw7/NflGjpZXJxvHILgIYUUdDJCTShOkm2Hcy3DCkMDDwFz6C0R5q0cyww7wsKFE
+vjM1wX4LTWvZq0AMTXJQjgzKrsZZaJmZ/iH/2E4yFmGOHbM6F+Pf+tH4AN9GCjZk
+cNHnIb6+Uyu6pwEIzzcGtIN3E5a9ZDHsKidqvfZz1KKCCaM/0SI9/EjVZ7iDRq6d
+Duk08RzXV2529neYEDQAO93vrH8JYPz+Hb/E7dTwZy4C0NVnVu8zt9vT0FSuSj77
+sw//eHqd7iRP0Ow+YhhnbtJ3Z8dQHdJuVvWLdQyniIpZ//IPLDi8PdvCyuMKhvZS
+8n8xJl9UbY7d6x1FZtJZKJkTbgKghXAsVCY808pIycVjczp/32qlrNj8V6Lyqqt3
+lgEmOG1YYARlfwbAXrEiAgahKZcHA+e5xdIyaYPQO0Lkw14dPChdIQLalkfDc3FB
+kYn0RUjwQQA72Q3q2kvMFPyGrhg6N6IlX2JXjLBgZSIoota9nwHZzJPwaFgaLwr1
+XJw1lDKL7TiooL0uf7yhvB63Syoo4TPem/zxybKoGTjBCX0MW7R0BjvMokIk0zDa
+LzUOthgxv594jAem52Vk/u9VO9tK08Kz0XPv3LCvc/34ZOz22ko=
+=Pdo5
 -----END PGP SIGNATURE-----
 
---YD3LsXFS42OYHhNZ--
+--mR8QP4gmHujQHb1c--
