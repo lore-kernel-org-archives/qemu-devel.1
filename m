@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fb6fV-0005Oq-0v
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:59:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6jH-0008KP-8M
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fb6fR-0005XT-Va
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:59:41 -0400
-References: <20180704112302.471456-1-vsementsov@virtuozzo.com>
-	<20180704112302.471456-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <68016e9d-eefe-adb0-2dee-3935ee0aa549@redhat.com>
-Date: Thu, 5 Jul 2018 10:59:33 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6jE-0007vz-O8
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:35 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fb6jE-0007vL-F7
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:03:32 -0400
+Received: by mail-wm0-x234.google.com with SMTP id 69-v6so11741927wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:03:32 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  5 Jul 2018 17:03:10 +0100
+Message-Id: <20180705160329.30386-2-alex.bennee@linaro.org>
+In-Reply-To: <20180705160329.30386-1-alex.bennee@linaro.org>
+References: <20180705160329.30386-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180704112302.471456-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] nbd/server: send more than one extent
- of base:allocation context
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v3 01/20] Revert "Makefile: Rename TARGET_DIRS
+ to TARGET_LIST"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +30,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 07/04/2018 06:23 AM, Vladimir Sementsov-Ogievskiy wrote:
-> This is necessary for efficient block-status export, for clients which
-> support it.
+This reverts commit 208ecb3e1acc8d55dab49fdf721a86d513691688. This was
+causing problems by making DEF_TARGET_LIST pointless and having to
+jump through hoops to build on mingw with a dully enabled config.
+This includes a change to fix the per-guest TCG test probe which was
+added after 208ecb3 and used TARGET_LIST.
 
-qemu as client doesn't currently process additional information when 
-querying block status.  Should it?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Are there other clients which DO make use of the additional information?
-
-This is a feature, so it is indeed 3.1 material.
-
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   nbd/server.c | 77 +++++++++++++++++++++++++++++++++++++++++++++---------------
->   1 file changed, 58 insertions(+), 19 deletions(-)
-> 
-> diff --git a/nbd/server.c b/nbd/server.c
-> index ea5fe0eb33..a6d013aec4 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -1844,11 +1844,22 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
->       return ret;
->   }
->   
-> -static int blockstatus_to_extent_be(BlockDriverState *bs, uint64_t offset,
-> -                                    uint64_t bytes, NBDExtent *extent)
-> +/*
-> + * Populate @extents from block status. Store in @bytes the byte length encoded
-> + * (which may be smaller but (unlike bitmap_to_extents) _never_ larger than the
-> + * original), and store in @nb_extents the number of extents used.
-
-I don't think the comparison to bitmap_to_extents in a nested 
-parenthetical buys us anything; the shorter:
-
-(which may be smaller than the original)
-
-would do just fine for the function contract.
-
-> + *
-> + * Returns zero on success and -errno on bdrv_block_status_above failure.
-
-Is it worth returning a positive value for one less pointer parameter 
-used for output?
-
-> + */
-> +static int blockstatus_to_extents(BlockDriverState *bs, uint64_t offset,
-> +                                  uint64_t *bytes, NBDExtent *extents,
-> +                                  unsigned int *nb_extents)
->   {
-> -    uint64_t remaining_bytes = bytes;
-> +    uint64_t remaining_bytes = *bytes;
-> +    NBDExtent *extent = extents, *extents_end = extents + *nb_extents;
-
-So both bytes and nb_extents are in-out.
-
-
-> @@ -1910,21 +1940,29 @@ static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
->   /* Get block status from the exported device and send it to the client */
->   static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
->                                       BlockDriverState *bs, uint64_t offset,
-> -                                    uint32_t length, bool last,
-> -                                    uint32_t context_id, Error **errp)
-> +                                    uint32_t length, bool dont_fragment,
-> +                                    bool last, uint32_t context_id,
-> +                                    Error **errp)
->   {
->       int ret;
-> -    NBDExtent extent;
-> +    unsigned int nb_extents = dont_fragment ? 1 : NBD_MAX_BITMAP_EXTENTS;
-> +    NBDExtent *extents = g_new(NBDExtent, nb_extents);
-> +    uint64_t final_length = length;
->   
-> -    ret = blockstatus_to_extent_be(bs, offset, length, &extent);
-> +    ret = blockstatus_to_extents(bs, offset, &final_length, extents,
-> +                                 &nb_extents);
->       if (ret < 0) {
-> +        g_free(extents);
->           return nbd_co_send_structured_error(
->                   client, handle, -ret, "can't get block status", errp);
->       }
->   
-> -    return nbd_co_send_extents(client, handle, &extent, 1,
-> -                               be32_to_cpu(extent.length), last,
-> -                               context_id, errp);
-> +    ret = nbd_co_send_extents(client, handle, extents, nb_extents,
-> +                              final_length, last, context_id, errp);
-> +
-> +    g_free(extents);
-> +
-
-At any rate, this conversion looks sane.
-
-> +    return ret;
->   }
->   
->   /*
-> @@ -2228,10 +2266,11 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
->               (client->export_meta.base_allocation ||
->                client->export_meta.bitmap))
->           {
-> +            bool dont_fragment = request->flags & NBD_CMD_FLAG_REQ_ONE;
->               if (client->export_meta.base_allocation) {
-
-Blank lines between declarations and statements can aid in legibility; I 
-can add when queuing.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/Makefile b/Makefile
+index 7ed9cc4a21..39fd4c0546 100644
+--- a/Makefile
++++ b/Makefile
+@@ -60,8 +60,8 @@ seems to have been used for an in-tree build. You can fix this by running \
+ endif
+ endif
+ 
+-CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
+-CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
++CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
++CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
+ CONFIG_XEN := $(CONFIG_XEN_BACKEND)
+ CONFIG_ALL=y
+ -include config-all-devices.mak
+@@ -365,8 +365,8 @@ DOCS=
+ endif
+ 
+ SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
+-SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
+-SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
++SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
++SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
+ 
+ ifeq ($(SUBDIR_DEVICES_MAK),)
+ config-all-devices.mak:
+@@ -469,7 +469,7 @@ config-host.h-timestamp: config-host.mak
+ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+ 
+-SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
++SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
+ SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
+ 
+ $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+@@ -513,7 +513,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+ romsubdir-%:
+ 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
+ 
+-ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
++ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
+ 
+ recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+ 
+@@ -770,7 +770,7 @@ distclean: clean
+ 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+ 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+ 	rm -f docs/qemu-block-drivers.7
+-	for d in $(TARGET_LIST); do \
++	for d in $(TARGET_DIRS); do \
+ 	rm -rf $$d || exit 1 ; \
+         done
+ 	rm -Rf .sdk
+@@ -871,7 +871,7 @@ endif
+ 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
+ 	done
+ 	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
+-	for d in $(TARGET_LIST); do \
++	for d in $(TARGET_DIRS); do \
+ 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
+         done
+ 
+@@ -1066,9 +1066,9 @@ endif
+ 	@echo  '  ctags/TAGS      - Generate tags file for editors'
+ 	@echo  '  cscope          - Generate cscope index'
+ 	@echo  ''
+-	@$(if $(TARGET_LIST), \
++	@$(if $(TARGET_DIRS), \
+ 		echo 'Architecture specific targets:'; \
+-		$(foreach t, $(TARGET_LIST), \
++		$(foreach t, $(TARGET_DIRS), \
+ 		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
+ 		echo '')
+ 	@echo  'Cleaning targets:'
+diff --git a/configure b/configure
+index b99ebdde24..2a7796ea80 100755
+--- a/configure
++++ b/configure
+@@ -6212,7 +6212,7 @@ qemu_version=$(head $source_path/VERSION)
+ echo "VERSION=$qemu_version" >>$config_host_mak
+ echo "PKGVERSION=$pkgversion" >>$config_host_mak
+ echo "SRC_PATH=$source_path" >> $config_host_mak
+-echo "TARGET_LIST=$target_list" >> $config_host_mak
++echo "TARGET_DIRS=$target_list" >> $config_host_mak
+ if [ "$docs" = "yes" ] ; then
+   echo "BUILD_DOCS=yes" >> $config_host_mak
+ fi
+diff --git a/scripts/create_config b/scripts/create_config
+index 58948a67a4..d727e5e36e 100755
+--- a/scripts/create_config
++++ b/scripts/create_config
+@@ -107,7 +107,7 @@ case $line in
+     target_name=${line#*=}
+     echo "#define TARGET_NAME \"$target_name\""
+     ;;
+- TARGET_LIST=*)
++ TARGET_DIRS=*)
+     # do nothing
+     ;;
+  TARGET_*=y) # configuration
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 1affc49ca3..0c0f9509f5 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -874,7 +874,7 @@ endif
+ 
+ # QTest rules
+ 
+-TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
++TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+ ifeq ($(CONFIG_POSIX),y)
+ QTEST_TARGETS = $(TARGETS)
+ check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
+@@ -938,14 +938,14 @@ check-report.html: check-report.xml
+ 
+ # Per guest TCG tests
+ 
+-LINUX_USER_TARGETS=$(filter %-linux-user,$(TARGET_LIST))
++LINUX_USER_TARGETS=$(filter %-linux-user,$(TARGET_DIRS))
+ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(LINUX_USER_TARGETS))
+ CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
+ RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARGETS))
+ 
+ ifeq ($(HAVE_USER_DOCKER),y)
+ # Probe for the Docker Builds needed for each build
+-$(foreach PROBE_TARGET,$(TARGET_LIST), 				\
++$(foreach PROBE_TARGET,$(TARGET_DIRS), 				\
+ 	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.probe) 	\
+ 	$(if $(DOCKER_PREREQ), 					\
+ 		$(eval build-tcg-tests-$(PROBE_TARGET): $(DOCKER_PREREQ))))
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
