@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb32S-0006W6-UP
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:07:13 -0400
+	(envelope-from <david@redhat.com>) id 1fb355-0000Rx-7d
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fb32R-0002gC-QY
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:07:08 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fb32R-0002do-Dm
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:07:07 -0400
-Received: by mail-oi0-x244.google.com with SMTP id 13-v6so16380108ois.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 05:07:07 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fb34y-0001gb-WB
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:09:51 -0400
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
+	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
+	<df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
+	<43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
+	<5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
+	<405e3f2b-3044-d7fc-8df4-b07a8487470f@redhat.com>
+	<f2d61062-21df-4478-bc61-c32e92329cf8@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <57030c9f-c3d1-49a8-090e-d6b316e7a818@redhat.com>
+Date: Thu, 5 Jul 2018 14:09:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <d9228ff1-bdfa-506c-e32f-d0fbb69578be@mail.ru>
-References: <20180704195812.28798-1-jusual@mail.ru>
-	<20180704195812.28798-2-jusual@mail.ru>
-	<CAFEAcA_ojVz=2Kbivr8b-VQQRCJUwnOf4w+pLAb4AoukMd8c_g@mail.gmail.com>
-	<d9228ff1-bdfa-506c-e32f-d0fbb69578be@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jul 2018 13:06:46 +0100
-Message-ID: <CAFEAcA-dP0vRB4P1k-sQqs-E_H3ibfObGKXh8CJZ74+hy=4Fzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] nvic: Handle ARMv6-M SCS reserved
- registers
+In-Reply-To: <f2d61062-21df-4478-bc61-c32e92329cf8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +30,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
+Cc: wei@redhat.com, drjones@redhat.com, david@gibson.dropbear.id.au, dgilbert@redhat.com, agraf@suse.de
 
-On 5 July 2018 at 12:25, Julia Suvorova <jusual@mail.ru> wrote:
-> Thank you for the review. I did not dare to set the ARM_FEATURE_M_MAIN,
-> because I was not completely sure about the v8M behavior in certain cases.
-> I'll update the code taking into account all the comments, and send v2.
+On 05.07.2018 14:00, Auger Eric wrote:
+> Hi David,
+>=20
+> On 07/05/2018 01:54 PM, David Hildenbrand wrote:
+>> On 05.07.2018 13:42, Auger Eric wrote:
+>>> Hi David,
+>>>
+>>> On 07/04/2018 02:05 PM, David Hildenbrand wrote:
+>>>> On 03.07.2018 21:27, Auger Eric wrote:
+>>>>> Hi David,
+>>>>> On 07/03/2018 08:25 PM, David Hildenbrand wrote:
+>>>>>> On 03.07.2018 09:19, Eric Auger wrote:
+>>>>>>> We define a new hotpluggable RAM region (aka. device memory).
+>>>>>>> Its base is 2TB GPA. This obviously requires 42b IPA support
+>>>>>>> in KVM/ARM, FW and guest kernel. At the moment the device
+>>>>>>> memory region is max 2TB.
+>>>>>>
+>>>>>> Maybe a stupid question, but why exactly does it have to start at =
+2TB
+>>>>>> (and not e.g. at 1TB)?
+>>>>> not a stupid question. See tentative answer below.
+>>>>>>
+>>>>>>>
+>>>>>>> This is largely inspired of device memory initialization in
+>>>>>>> pc machine code.
+>>>>>>>
+>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+>>>>>>> ---
+>>>>>>>  hw/arm/virt.c         | 104 ++++++++++++++++++++++++++++++++++++=
+--------------
+>>>>>>>  include/hw/arm/arm.h  |   2 +
+>>>>>>>  include/hw/arm/virt.h |   1 +
+>>>>>>>  3 files changed, 79 insertions(+), 28 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>>>>>> index 5a4d0bf..6fefb78 100644
+>>>>>>> --- a/hw/arm/virt.c
+>>>>>>> +++ b/hw/arm/virt.c
+>>>>>>> @@ -59,6 +59,7 @@
+>>>>>>>  #include "qapi/visitor.h"
+>>>>>>>  #include "standard-headers/linux/input.h"
+>>>>>>>  #include "hw/arm/smmuv3.h"
+>>>>>>> +#include "hw/acpi/acpi.h"
+>>>>>>> =20
+>>>>>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>>>>>>>      static void virt_##major##_##minor##_class_init(ObjectClass =
+*oc, \
+>>>>>>> @@ -94,34 +95,25 @@
+>>>>>>> =20
+>>>>>>>  #define PLATFORM_BUS_NUM_IRQS 64
+>>>>>>> =20
+>>>>>>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this =
+means
+>>>>>>> - * RAM can go up to the 256GB mark, leaving 256GB of the physica=
+l
+>>>>>>> - * address space unallocated and free for future use between 256=
+G and 512G.
+>>>>>>> - * If we need to provide more RAM to VMs in the future then we n=
+eed to:
+>>>>>>> - *  * allocate a second bank of RAM starting at 2TB and working =
+up
+>>>>> I acknowledge this comment was the main justification. Now if you l=
+ook at
+>>>>>
+>>>>> Principles of ARM Memory Maps
+>>>>> http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_=
+principles_of_arm_memory_maps.pdf
+>>>>> chapter 2.3 you will find that when adding PA bits, you always leav=
+e
+>>>>> space for reserved space and mapped IO.
+>>>>
+>>>> Thanks for the pointer!
+>>>>
+>>>> So ... we can fit
+>>>>
+>>>> a) 2GB at 2GB
+>>>> b) 32GB at 32GB
+>>>> c) 512GB at 512GB
+>>>> d) 8TB at 8TB
+>>>> e) 128TB at 128TB
+>>>>
+>>>> (this is a nice rule of thumb if I understand it correctly :) )
+>>>>
+>>>> We should strive for device memory (maxram_size - ram_size) to fit
+>>>> exactly into one of these slots (otherwise things get nasty).
+>>>>
+>>>> Depending on the ram_size, we might have simpler setups and can supp=
+ort
+>>>> more configurations, no?
+>>>>
+>>>> E.g. ram_size <=3D 34GB, device_memory <=3D 512GB
+>>>> -> move ram into a) and b)
+>>>> -> move device memory into c)
+>>>
+>>> The issue is machvirt doesn't comply with that document.
+>>> At the moment we have
+>>> 0 -> 1GB MMIO
+>>> 1GB -> 256GB RAM
+>>> 256GB -> 512GB is theoretically reserved for IO but most is free.
+>>> 512GB -> 1T is reserved for ECAM MMIO range. This is the top of our
+>>> existing 40b GPA space.
+>>>
+>>> We don't want to change this address map due to legacy reasons.
+>>>
+>>
+>> Thanks, good to know!
+>>
+>>> Another question! do you know if it would be possible to have
+>>> device_memory region split into several discontinuous segments?
+>>
+>> It can be implemented for sure, but I would try to avoid that, as it
+>> makes certain configurations impossible (and very end user unfriendly)=
+.
+>>
+>> E.g. (numbers completely made up, but it should show what I mean)
+>>
+>> -m 20G,maxmem=3D120G:
+>> -> Try to add a DIMM with 100G -> error.
+>> -> But we can add e.g. two DIMMs with 40G and 60G.
+>>
+>> This exposes internal details to the end user. And the end user has no
+>> idea what is going on.
+>>
+>> So I think we should try our best to keep that area consecutive.
+>=20
+> Actually I didn't sufficiently detail the context. I would like
+> 1) 1 segment to be exposed to the end-user through slot|maxmem stuff
+> (what this series targets) and
+> 2) another segment used to instantiate PC-DIMM for internal needs as
+> replacement of part of the 1GB -> 256GB static RAM. This was the purpos=
+e
+> of Shameer's original series
 
-FWIW, I was working from the v8M Arm ARM, which is downloadable from
-https://developer.arm.com/products/architecture/m-profile/docs
--- the descriptions for each register include a "Configurations"
-sections which will say if the register is present only if
-the main extension is implemented.
+I am not sure if PC-DIMMs are exactly what you want for internal purposes=
+.
 
-thanks
--- PMM
+>=20
+> [1] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
+> http://patchwork.ozlabs.org/cover/914694/
+> This approach is not yet validated though.
+>=20
+> The rationale is sometimes you must have "holes" in RAM as some GPAs
+> match reserved IOVAs for assigned devices.
+
+So if I understand it correctly, all you want is some memory region that
+a) contains only initially defined memory
+b) can have some holes in it
+
+This is exactly what x86 already does (pc_memory_init): Simply construct
+your own memory region leaving holes in it.
+
+
+memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
+                         0, pcms->below_4g_mem_size);
+memory_region_add_subregion(system_memory, 0, ram_below_4g);
+...
+if (pcms->above_4g_mem_size > 0)
+    memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
+    ...
+    memory_region_add_subregion(system_memory, 0x100000000ULL,
+    ...
+
+They "indicate" these different GPA areas using the e820 map to the guest=
+.
+
+Would that also work for you?
+
+>=20
+> Thanks
+>=20
+> Eric
+>=20
+>>
+>>>
+>>> Thanks
+>>>
+>>> Eric
+>>
+>>
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
