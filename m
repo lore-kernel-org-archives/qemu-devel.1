@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fb2eV-0002yO-E0
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:42:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb2it-0004SZ-Ng
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fb2eU-0007Oa-56
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:42:23 -0400
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
-	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
-	<df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
-	<43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
-Date: Thu, 5 Jul 2018 13:42:08 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fb2ip-0003eN-8c
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:46:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33622 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb2ip-0003cp-1C
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 07:46:51 -0400
+Date: Thu, 5 Jul 2018 12:46:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180705114646.GA2539@work-vm>
+References: <87tvpfch8g.fsf@gnu.org> <20180704130841.GF32267@redhat.com>
+	<877emahzjs.fsf@gnu.org>
 MIME-Version: 1.0
-In-Reply-To: <43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
+Content-Disposition: inline
+In-Reply-To: <877emahzjs.fsf@gnu.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?32-bit_=E2=80=9Cqemu-system-i386_-enable-?=
+ =?utf-8?q?kvm=E2=80=9D_segfaults_on_x86=5F64?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,120 +30,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com
-Cc: wei@redhat.com, drjones@redhat.com, david@gibson.dropbear.id.au, dgilbert@redhat.com, agraf@suse.de
+To: Ludovic =?iso-8859-1?Q?Court=E8s?= <ludo@gnu.org>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org
 
-Hi David,
+* Ludovic Court=C3=A8s (ludo@gnu.org) wrote:
+> Hi Daniel,
+>=20
+> Thanks for the quick reply.
+>=20
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> skribis:
+>=20
+> > On Wed, Jul 04, 2018 at 02:34:07PM +0200, Ludovic Court=C3=A8s wrote:
+> >> Hello,
+> >>=20
+> >> (I=E2=80=99m reporting the issue here because for some reason the la=
+unchpad.net
+> >> login page redirects me to an =E2=80=9Coops=E2=80=9D page and fails =
+to log me in.)
+> >>=20
+> >> On a Linux 4.17 x86_64 host, =E2=80=9Cqemu-system-i386 -enable-kvm=E2=
+=80=9D, where
+> >> qemu-system-i386 is a 32-bit binary, crashes (it works fine without
+> >> =E2=80=98-enable-kvm=E2=80=99):
+> >>=20
+> >> --8<---------------cut here---------------start------------->8---
+> >> $ uname -rm
+> >> 4.17.3-gnu x86_64
+> >> $ file /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12=
+.0/bin/qemu-system-i386=20
+> >> /gnu/store/h22dc67wzkv0w2l3775f0xqkyr318x5j-qemu-minimal-2.12.0/bin/=
+qemu-system-i386: ELF 32-bit LSB shared object, Intel 80386, version 1 (S=
+YSV), dynamically linked, interpreter /gnu/store/4aka3nwppxf3z072l6vr8cxv=
+wj3x5h9s-glibc-2.27/lib/ld-linux.so.2, for GNU/Linux 2.6.32, stripped
+> >
+> > It appears that not only are you using qemu-system-i386 on x86_64
+> > host, but this has actually also been built as a 32-bit ELF binary,
+> > so will be using the 32-bit compat syscalls. This is quite possibly
+> > relevant to any crash, so it would be useful to know if qemu-system-i=
+386,
+> > when built as a 64-bit ELF binary works or fails.
+>=20
+> The 64-bit qemu-system-i386 works fine.
+>=20
+> > It appears you are using 2.12.0 release, so it is also helpful if
+> > you would try using current git master to see if it still reproduces.
+>=20
+> Here=E2=80=99s what I get with today=E2=80=99s master (commit
+> 6d8ad1614e0c97c59a87e6c6208ebeb94e769149):
 
-On 07/04/2018 02:05 PM, David Hildenbrand wrote:
-> On 03.07.2018 21:27, Auger Eric wrote:
->> Hi David,
->> On 07/03/2018 08:25 PM, David Hildenbrand wrote:
->>> On 03.07.2018 09:19, Eric Auger wrote:
->>>> We define a new hotpluggable RAM region (aka. device memory).
->>>> Its base is 2TB GPA. This obviously requires 42b IPA support
->>>> in KVM/ARM, FW and guest kernel. At the moment the device
->>>> memory region is max 2TB.
->>>
->>> Maybe a stupid question, but why exactly does it have to start at 2TB
->>> (and not e.g. at 1TB)?
->> not a stupid question. See tentative answer below.
->>>
->>>>
->>>> This is largely inspired of device memory initialization in
->>>> pc machine code.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
->>>> ---
->>>>  hw/arm/virt.c         | 104 ++++++++++++++++++++++++++++++++++++--------------
->>>>  include/hw/arm/arm.h  |   2 +
->>>>  include/hw/arm/virt.h |   1 +
->>>>  3 files changed, 79 insertions(+), 28 deletions(-)
->>>>
->>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>>> index 5a4d0bf..6fefb78 100644
->>>> --- a/hw/arm/virt.c
->>>> +++ b/hw/arm/virt.c
->>>> @@ -59,6 +59,7 @@
->>>>  #include "qapi/visitor.h"
->>>>  #include "standard-headers/linux/input.h"
->>>>  #include "hw/arm/smmuv3.h"
->>>> +#include "hw/acpi/acpi.h"
->>>>  
->>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
->>>> @@ -94,34 +95,25 @@
->>>>  
->>>>  #define PLATFORM_BUS_NUM_IRQS 64
->>>>  
->>>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
->>>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
->>>> - * address space unallocated and free for future use between 256G and 512G.
->>>> - * If we need to provide more RAM to VMs in the future then we need to:
->>>> - *  * allocate a second bank of RAM starting at 2TB and working up
->> I acknowledge this comment was the main justification. Now if you look at
->>
->> Principles of ARM Memory Maps
->> http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_principles_of_arm_memory_maps.pdf
->> chapter 2.3 you will find that when adding PA bits, you always leave
->> space for reserved space and mapped IO.
-> 
-> Thanks for the pointer!
-> 
-> So ... we can fit
-> 
-> a) 2GB at 2GB
-> b) 32GB at 32GB
-> c) 512GB at 512GB
-> d) 8TB at 8TB
-> e) 128TB at 128TB
-> 
-> (this is a nice rule of thumb if I understand it correctly :) )
-> 
-> We should strive for device memory (maxram_size - ram_size) to fit
-> exactly into one of these slots (otherwise things get nasty).
-> 
-> Depending on the ram_size, we might have simpler setups and can support
-> more configurations, no?
-> 
-> E.g. ram_size <= 34GB, device_memory <= 512GB
-> -> move ram into a) and b)
-> -> move device memory into c)
+If you do a dmesg after you get the seg fault do you see
+any unusual messages ?
 
-The issue is machvirt doesn't comply with that document.
-At the moment we have
-0 -> 1GB MMIO
-1GB -> 256GB RAM
-256GB -> 512GB is theoretically reserved for IO but most is free.
-512GB -> 1T is reserved for ECAM MMIO range. This is the top of our
-existing 40b GPA space.
+Dave
 
-We don't want to change this address map due to legacy reasons.
-
-Another question! do you know if it would be possible to have
-device_memory region split into several discontinuous segments?
-
-Thanks
-
-Eric
-> 
-> We should make up our mind right from the beginning how our setup will
-> look, so we can avoid (possibly complicated) compatibility handling
-> later on.
-> 
->>
->> On the other hand, if you look at chapter 5, "Proposed 44-bit and 48bit
->> Address Maps", we should logically put the additional RAM at 8TB if we
->> want to comply with that doc.
-> 
-> I agree, 2TB es in the reserved area.
-> 
->>
->> Peter, was there any other justification why we should put the RAM at 2TB?
->>
->> Thanks
->>
->> Eric
-> 
-> 
+> --8<---------------cut here---------------start------------->8---
+> $ file /gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-minimal-2.12.0-=
+6d8ad16/bin/qemu-system-i386
+> /gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-minimal-2.12.0-6d8ad16=
+/bin/qemu-system-i386: ELF 32-bit LSB shared object, Intel 80386, version=
+ 1 (SYSV), dynamically linked, interpreter /gnu/stor
+> e/4aka3nwppxf3z072l6vr8cxvwj3x5h9s-glibc-2.27/lib/ld-linux.so.2, for GN=
+U/Linux 2.6.32, with debug_info, not stripped
+> $ /gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu-minimal-2.12.0-6d8ad=
+16/bin/qemu-system-i386 -enable-kvm /dev/null
+> WARNING: Image format was not specified for '/dev/null' and probing gue=
+ssed raw.
+>          Automatically detecting the format is dangerous for raw images=
+, write operations on block 0 will be restricted.
+>          Specify the 'raw' format explicitly to remove the restrictions=
+.
+> VNC server running on 127.0.0.1:5900
+> Adres-eraro(nekropsio el=C5=9Dutita)
+> --8<---------------cut here---------------end--------------->8---
+>=20
+> And the backtraces:
+>=20
+> --8<---------------cut here---------------start------------->8---
+> Core was generated by `/gnu/store/5fds9826wk2mhl1kcyr2l3a2nd2bypf4-qemu=
+-minimal-2.12.0-6d8ad16/bin/qem'.
+> Program terminated with signal SIGSEGV, Segmentation fault.
+> #0  0x5674c42e in kvm_vcpu_ioctl (cpu=3D0x580d3e60, type=3D44672) at /t=
+mp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.=
+c:2097
+> 2097    /tmp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/=
+kvm/kvm-all.c: Dosiero a=C5=AD dosierujo ne ekzistas.
+> [Current thread is 1 (Thread 0xf611db40 (LWP 9698))]
+>=20
+> [...]
+>=20
+> (gdb) thread apply all bt
+>=20
+> Thread 5 (Thread 0xf76e1bc0 (LWP 9695)):
+> #0  0xf7f60059 in __kernel_vsyscall ()
+> #1  0xf78425e4 in ppoll () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
+5h9s-glibc-2.27/lib/libc.so.6
+> #2  0x56c3eec0 in qemu_poll_ns (fds=3D0x580e8340, nfds=3D5, timeout=3D9=
+80889000) at util/qemu-timer.c:334
+> #3  0x56c400db in os_host_main_loop_wait (timeout=3D980889000) at util/=
+main-loop.c:233
+> #4  0x56c401d6 in main_loop_wait (nonblocking=3D0) at util/main-loop.c:=
+497
+> #5  0x56890b45 in main_loop () at vl.c:1866
+> #6  0x56898676 in main (argc=3D3, argv=3D0xffc58ee4, envp=3D0xffc58ef4)=
+ at vl.c:4644
+>=20
+> Thread 4 (Thread 0xf76e0b40 (LWP 9696)):
+> #0  0xf7f60059 in __kernel_vsyscall ()
+> #1  0xf793fa0b in nanosleep () from /gnu/store/4aka3nwppxf3z072l6vr8cxv=
+wj3x5h9s-glibc-2.27/lib/libpthread.so.0
+> #2  0xf7c59fe3 in g_usleep () from /gnu/store/1k808cq1dwlcjlfqmd4p5rxjp=
+z2vckra-glib-2.56.0/lib/libglib-2.0.so.0
+> #3  0x56c5c614 in call_rcu_thread (opaque=3D0x0) at util/rcu.c:253
+> #4  0x56c452a5 in qemu_thread_start (args=3D0x5802b1d0) at util/qemu-th=
+read-posix.c:504
+> #5  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8=
+cxvwj3x5h9s-glibc-2.27/lib/libpthread.so.0
+> #6  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
+5h9s-glibc-2.27/lib/libc.so.6
+>=20
+> Thread 3 (Thread 0xec536b40 (LWP 9701)):
+> #0  0xf7f60059 in __kernel_vsyscall ()
+> #1  0xf793b35c in pthread_cond_wait@@GLIBC_2.3.2 () from /gnu/store/4ak=
+a3nwppxf3z072l6vr8cxvwj3x5h9s-glibc-2.27/lib/libpthread.so.0
+> #2  0x56c44a4f in qemu_cond_wait_impl (cond=3D0x5910a7c0, mutex=3D0x591=
+0a7f4, file=3D0x56e3f412 "ui/vnc-jobs.c", line=3D213) at util/qemu-thread=
+-posix.c:161
+> #3  0x56b0eb4f in vnc_worker_thread_loop (queue=3D0x5910a7c0) at ui/vnc=
+-jobs.c:213
+> #4  0x56b0f0e6 in vnc_worker_thread (arg=3D0x5910a7c0) at ui/vnc-jobs.c=
+:323
+> #5  0x56c452a5 in qemu_thread_start (args=3D0x581486d0) at util/qemu-th=
+read-posix.c:504
+> #6  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8=
+cxvwj3x5h9s-glibc-2.27/lib/libpthread.so.0
+> #7  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
+5h9s-glibc-2.27/lib/libc.so.6
+>=20
+> Thread 2 (Thread 0xf6cffb40 (LWP 9697)):
+> #0  0xf7f60059 in __kernel_vsyscall ()
+> #1  0xf78425e4 in ppoll () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
+5h9s-glibc-2.27/lib/libc.so.6
+> #2  0x56c3ee4a in qemu_poll_ns (fds=3D0xf63005d0, nfds=3D1, timeout=3D-=
+1) at util/qemu-timer.c:322
+> #3  0x56c41dcc in aio_poll (ctx=3D0x5804ebc0, blocking=3Dtrue) at util/=
+aio-posix.c:629
+> #4  0x56887a63 in iothread_run (opaque=3D0x5804e9d0) at iothread.c:64
+> #5  0x56c452a5 in qemu_thread_start (args=3D0x5804fb10) at util/qemu-th=
+read-posix.c:504
+> #6  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8=
+cxvwj3x5h9s-glibc-2.27/lib/libpthread.so.0
+> #7  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
+5h9s-glibc-2.27/lib/libc.so.6
+>=20
+> Thread 1 (Thread 0xf611db40 (LWP 9698)):
+> #0  0x5674c42e in kvm_vcpu_ioctl (cpu=3D0x580d3e60, type=3D44672) at /t=
+mp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.=
+c:2097
+> #1  0x5674bf61 in kvm_cpu_exec (cpu=3D0x580d3e60) at /tmp/guix-build-qe=
+mu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.c:1929
+> #2  0x56714634 in qemu_kvm_cpu_thread_fn (arg=3D0x580d3e60) at /tmp/gui=
+x-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/cpus.c:1215
+> #3  0x56c452a5 in qemu_thread_start (args=3D0x580e75d0) at util/qemu-th=
+read-posix.c:504
+> #4  0xf793535b in start_thread () from /gnu/store/4aka3nwppxf3z072l6vr8=
+cxvwj3x5h9s-glibc-2.27/lib/libpthread.so.0
+> #5  0xf784c5d6 in clone () from /gnu/store/4aka3nwppxf3z072l6vr8cxvwj3x=
+5h9s-glibc-2.27/lib/libc.so.6
+> (gdb) thread 1
+> [Switching to thread 1 (Thread 0xf611db40 (LWP 9698))]
+> #0  0x5674c42e in kvm_vcpu_ioctl (cpu=3D0x580d3e60, type=3D44672) at /t=
+mp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/accel/kvm/kvm-all.=
+c:2097
+> 2097    in /tmp/guix-build-qemu-minimal-2.12.0-6d8ad16.drv-0/source/acc=
+el/kvm/kvm-all.c
+> (gdb) info locals
+> ret =3D 0
+> arg =3D 0x0
+> ap =3D 0xf611d03c "\366\276tV \200+W\310%\034W\222\345\210V`>\rX{\347\2=
+10V\t"
+> (gdb) p *cpu
+> $1 =3D {parent_obj =3D {parent_obj =3D {class =3D 0x5807baa0, free =3D =
+0xf7c35800 <g_free>, properties =3D 0x580aed90, ref =3D 1, parent =3D 0x5=
+80b1ad0}, id =3D 0x0,=20
+>     canonical_path =3D 0x580b1ce0 "/machine/unattached/device[0]", real=
+ized =3D true, pending_deleted_event =3D false, opts =3D 0x0, hotplugged =
+=3D 0, parent_bus =3D 0x0, gpios =3D {lh_first =3D 0x0},=20
+>     child_bus =3D {lh_first =3D 0x0}, num_child_bus =3D 0, instance_id_=
+alias =3D -1, alias_required_for_version =3D 0}, nr_cores =3D 1, nr_threa=
+ds =3D 1, thread =3D 0x580e7580, thread_id =3D 9698, running =3D true,=20
+>   has_waiter =3D false, halt_cond =3D 0x580e7590, thread_kicked =3D fal=
+se, created =3D true, stop =3D false, stopped =3D false, unplug =3D false=
+, crash_occurred =3D false, exit_request =3D false,=20
+>   cflags_next_tb =3D 4294967295, interrupt_request =3D 0, singlestep_en=
+abled =3D 0, icount_budget =3D 0, icount_extra =3D 0, jmp_env =3D {{__jmp=
+buf =3D {0, 0, 0, 0, 0, 0}, __mask_was_saved =3D 0,=20
+>       __saved_mask =3D {__val =3D {0 <repeats 32 times>}}}}, work_mutex=
+ =3D {lock =3D {__data =3D {__lock =3D 0, __count =3D 0, __owner =3D 0, _=
+_kind =3D 0, __nusers =3D 0, {__elision_data =3D {__espins =3D 0,=20
+>             __eelision =3D 0}, __list =3D {__next =3D 0x0}}}, __size =3D=
+ '\000' <repeats 23 times>, __align =3D 0}, file =3D 0x0, line =3D 0, ini=
+tialized =3D true}, queued_work_first =3D 0x0,=20
+>   queued_work_last =3D 0x0, cpu_ases =3D 0x580e7520, num_ases =3D 1, as=
+ =3D 0x580e74d0, memory =3D 0x58099300, env_ptr =3D 0x580d8030, tb_jmp_ca=
+che =3D {0x0 <repeats 4096 times>}, gdb_regs =3D 0x0,=20
+>   gdb_num_regs =3D 41, gdb_num_g_regs =3D 41, node =3D {tqe_next =3D 0x=
+0, tqe_prev =3D 0x571c300c <cpus>}, breakpoints =3D {tqh_first =3D 0x0, t=
+qh_last =3D 0x580d7fcc}, watchpoints =3D {tqh_first =3D 0x0,=20
+>     tqh_last =3D 0x580d7fd4}, watchpoint_hit =3D 0x0, opaque =3D 0x0, m=
+em_io_pc =3D 0, mem_io_vaddr =3D 0, kvm_fd =3D 16, kvm_state =3D 0x580bc2=
+c0, kvm_run =3D 0xf6edd000, trace_dstate_delayed =3D {0},=20
+>   trace_dstate =3D {0}, cpu_index =3D 0, halted =3D 0, can_do_io =3D 1,=
+ exception_index =3D -1, vcpu_dirty =3D false, throttle_thread_scheduled =
+=3D false, ignore_memory_transaction_failures =3D false,=20
+>   icount_decr =3D {u32 =3D 0, u16 =3D {low =3D 0, high =3D 0}}, hax_vcp=
+u =3D 0x0, pending_tlb_flush =3D 0, hvf_fd =3D 0, iommu_notifiers =3D 0x5=
+8055d00}
+> --8<---------------cut here---------------end--------------->8---
+>=20
+> Let me know if you need more information.
+>=20
+> Thank you,
+> Ludo=E2=80=99.
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
