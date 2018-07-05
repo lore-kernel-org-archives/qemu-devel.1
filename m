@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb2x5-00029z-4O
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:01:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fb2xL-0002L3-2V
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:01:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb2x1-00081J-1V
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:01:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60458 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fb2xH-0000RM-7L
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:01:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34244 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fb2x0-0007zy-T9
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:01:30 -0400
-Date: Thu, 5 Jul 2018 20:01:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180705120125.GB23001@xz-mi>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-5-peterx@redhat.com>
-	<87woua9iay.fsf@dusky.pond.sub.org> <20180705094903.GA23001@xz-mi>
-	<87sh4y7xcw.fsf@dusky.pond.sub.org>
-	<CAJ+F1CL1r034g1eGNtiZE1birByMNvyJLwym8e3Jn058cbbnOA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fb2xH-0000OO-1H
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 08:01:47 -0400
+References: <20180701171953.9921-1-clg@kaod.org> <20180702035726.GK2455@xz-mi>
+	<b5f38492-22a4-aa8a-ab42-f7e06c28c753@kaod.org>
+	<20180704022648.GA2568@xz-mi>
+	<f67c2a72-b3ac-fe8d-52c9-b03f58556caa@kaod.org>
+	<95fe81b1-13ee-5c82-22e2-e5ef4abd1168@redhat.com>
+	<20180704095520.GD2568@xz-mi>
+	<9e9c51da-f7aa-c3d1-0beb-4dbfaf31a592@redhat.com>
+	<16ec29ab-a5ec-a68a-91d0-2c63838d0695@kaod.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <250b3fa9-6321-e1b1-35e5-c7fdaa6ef6d7@redhat.com>
+Date: Thu, 5 Jul 2018 14:01:42 +0200
 MIME-Version: 1.0
+In-Reply-To: <16ec29ab-a5ec-a68a-91d0-2c63838d0695@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CL1r034g1eGNtiZE1birByMNvyJLwym8e3Jn058cbbnOA@mail.gmail.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/9] monitor: move need_resume flag into
- monitor struct
+Subject: Re: [Qemu-devel] [PATCH] exec.c: check RAMBlock validity before
+ changing its flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +35,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, Jul 05, 2018 at 01:32:46PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+On 05/07/2018 07:56, C=C3=A9dric Le Goater wrote:
+> Hello Paolo,
 >=20
-> On Thu, Jul 5, 2018 at 1:09 PM, Markus Armbruster <armbru@redhat.com> w=
-rote:
-> > Peter Xu <peterx@redhat.com> writes:
-> >
-> >> On Thu, Jul 05, 2018 at 10:51:33AM +0200, Markus Armbruster wrote:
-> >>> Peter Xu <peterx@redhat.com> writes:
-> >>>
-> >>> > It was put into the request object to show whether we'll need to =
-resume
-> >>> > the monitor after dispatching the command.  Now we move that into=
- the
-> >>> > monitor struct so that it might be even used in other places in t=
-he
-> >>> > future, e.g., out-of-band message flow controls.
-> >>> >
-> >>> > One thing to mention is that there is no lock needed before when
-> >>> > accessing the flag since the request object will always be owned =
-by a
-> >>> > single thread.  After we move it into monitor struct we need to p=
-rotect
-> >>> > that flag since it might be accessed by multiple threads now.  Re=
-naming
-> >>> > the qmp_queue_lock into qmp_lock to protect the flag as well.
-> >>> >
-> >>> > No functional change.
-> >>> >
-> >>> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >>>
-> >>> Marc-Andr=C3=A9's "[PATCH v3 04/38] monitor: no need to save need_r=
-esume" and
-> >>> "[PATCH v3 05/38] monitor: further simplify previous patch" also me=
-ss
-> >>> with need_resume.  Marc-Andr=C3=A9, could you have a look at this p=
-atch and
-> >>> the next one?
-> >>
-> >> Sorry I should have looked at those before hand.  I think I must be
-> >> waiting for another post to split the patches into two (after
-> >> Marc-Andre poked me with that thread) but then I forgot about that.
-> >>
-> >> So now I suspect we'd better keep that flag since in the next patch
-> >> the suspend operation can happen conditionally now.
-> >
-> > Could you two together figure out how to combine your work?  Would ta=
-ke
-> > me off this critical path...
-> >
+> On 07/04/2018 02:16 PM, Paolo Bonzini wrote:
+>> On 04/07/2018 11:55, Peter Xu wrote:
+>>>>     commit b0e56e0b63f350691b52d3e75e89bb64143fbeff
+>>>>     Author: Hu Tao <hutao@cn.fujitsu.com>
+>>>>     Date:   Wed Apr 2 15:13:27 2014 +0800
+>>>>
+>>>>     unset RAMBlock idstr when unregister MemoryRegion
+>>>>
+>>>>     Signed-off-by: Hu Tao <hutao@cn.fujitsu.com>
+>>>>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>>
+>>>> whose commit message is a bit lacking, but
+>>>> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html h=
+elps
+>>>> more.  It seems like the original bug was a reference count issue.
+>>>>
+>>>> Clearing the new migratable flag should also be unnecessary.
+>>> But even if we get rid of vmstate_unregister_ram(), the leak could
+>>> still be there?
+>>>
+>>> I'm not sure what was leaked when b0e56e0b6 was introduced, I feel
+>>> like it's the RAMBlock of the memdev.  Here I think the ROM memory
+>>> region seems to be leaked as well (along with the RAMBlock inside)?
+>>
+>> The leak would be another bug that vmstate_unregister_ram is just
+>> papering over.  We need to test memory unplug with
+>> vmstate_unregister_ram removed, and fix bugs if any.
 >=20
-> With Peter patches, the monitor is also suspended when the queue of
-> command is too long (when oob-enabled). Thus the variable now covers
-> one of two different cases.
->=20
-> My patches only covered the first case simplification (legacy /
-> !oob-enabled suspend).
->=20
-> The second case could probably use a similar simplification, looking
-> at the queue length, but at this point I think I'd prefer to keep the
-> variable for clarity and sanity state checking.
+> So for the time being, you would just get rid of pci_del_option_rom()
+> which only does vmstate_unregister_ram() ?=20
 
-Thanks for confirming that.
+Yes, I think so.
 
-Meanwhile, I'm not 100% sure whether the trick can be played again
-here (e.g., resume when queue length is N-1 for either of the queue).
-If without the flag, there should be a very tricky condition (when
-both queues are with length N-1) that we might resume the monitor
-twice while we should only do that once.
-
-Regards,
-
---=20
-Peter Xu
+Paolo
