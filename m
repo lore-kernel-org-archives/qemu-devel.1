@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fazrG-00009O-Nt
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:43:23 -0400
+	(envelope-from <robert.hu@intel.com>) id 1fazu1-0001mc-Bo
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fazrD-0002Nw-Ke
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:43:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57108 helo=mx1.redhat.com)
+	(envelope-from <robert.hu@intel.com>) id 1fazty-0002dV-7i
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:46:13 -0400
+Received: from mga02.intel.com ([134.134.136.20]:30077)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fazrD-0002MQ-ER
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:43:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C2099401EF26
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 08:43:18 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-4-peterx@redhat.com>
-Date: Thu, 05 Jul 2018 10:43:13 +0200
-In-Reply-To: <20180704084507.14560-4-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 4 Jul 2018 16:45:01 +0800")
-Message-ID: <871sciax9a.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <robert.hu@intel.com>) id 1faztx-0002Wg-Tp
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 04:46:10 -0400
+From: "Hu, Robert" <robert.hu@intel.com>
+Date: Thu, 5 Jul 2018 08:45:51 +0000
+Message-ID: <9E79D1C9A97CFD4097BCE431828FDD3115E86C30@SHSMSX103.ccr.corp.intel.com>
+References: <1530709942-87947-1-git-send-email-jingqi.liu@intel.com>
+	<cfe2a879-d038-f80f-cbec-ae247afde702@redhat.com>
+In-Reply-To: <cfe2a879-d038-f80f-cbec-ae247afde702@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/9] qapi: remove error checks for event
- emission
+Subject: Re: [Qemu-devel] [PATCH] kvm: x86: Add support for -machine
+ split-lock-ac
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Liu, Jingqi" <jingqi.liu@intel.com>
+Cc: "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wang, Wei W" <wei.w.wang@intel.com>
 
-Peter Xu <peterx@redhat.com> writes:
-
-> In the whole QAPI event emission code we're passing in an Error* object
-> along the whole stack.  That's never useful since it never fails after
-> all.  Remove that.
->
-> Then, remove that parameter from all the callers to send an event.
->
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-[...]
-> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-> index 5657524688..3953dc9837 100644
-> --- a/scripts/qapi/events.py
-> +++ b/scripts/qapi/events.py
-> @@ -18,7 +18,7 @@ from qapi.common import *
->  def build_event_send_proto(name, arg_type, boxed):
->      return 'void qapi_event_send_%(c_name)s(%(param)s)' % {
->          'c_name': c_name(name.lower()),
-> -        'param': build_params(arg_type, boxed, 'Error **errp')}
-> +        'param': build_params(arg_type, boxed, "")}
-
-Use ' instead of " for consistency.
-
-But let's make @extra optional in the previous patch (default it to
-None), so this spot becomes simpler.
-
->  
->  
->  def gen_event_send_decl(name, arg_type, boxed):
-> @@ -70,7 +70,6 @@ def gen_event_send(name, arg_type, boxed, event_enum_name):
->  %(proto)s
->  {
->      QDict *qmp;
-> -    Error *err = NULL;
->      QMPEventFuncEmit emit;
->  ''',
->                  proto=build_event_send_proto(name, arg_type, boxed))
-> @@ -103,45 +102,35 @@ def gen_event_send(name, arg_type, boxed, event_enum_name):
->  ''')
->          if not arg_type.is_implicit():
->              ret += mcgen('''
-> -    visit_type_%(c_name)s(v, "%(name)s", &arg, &err);
-> +    visit_type_%(c_name)s(v, "%(name)s", &arg, NULL);
-
-&error_abort, please.  This should never fail, and when it does,
-something's seriously wrong.
-
->  ''',
->                           name=name, c_name=arg_type.c_name())
->          else:
->              ret += mcgen('''
->  
-> -    visit_start_struct(v, "%(name)s", NULL, 0, &err);
-> -    if (err) {
-> -        goto out;
-> -    }
-> -    visit_type_%(c_name)s_members(v, &param, &err);
-> -    if (!err) {
-> -        visit_check_struct(v, &err);
-> -    }
-> +    visit_start_struct(v, "%(name)s", NULL, 0, NULL);
-> +    visit_type_%(c_name)s_members(v, &param, NULL);
-> +    visit_check_struct(v, NULL);
-
-Likewise.
-
->      visit_end_struct(v, NULL);
->  ''',
->                           name=name, c_name=arg_type.c_name())
->          ret += mcgen('''
-> -    if (err) {
-> -        goto out;
-> -    }
->  
->      visit_complete(v, &obj);
->      qdict_put_obj(qmp, "data", obj);
->  ''')
->  
->      ret += mcgen('''
-> -    emit(%(c_enum)s, qmp, &err);
-> +    emit(%(c_enum)s, qmp);
->  
->  ''',
->                   c_enum=c_enum_const(event_enum_name, name))
->  
->      if arg_type and not arg_type.is_empty():
->          ret += mcgen('''
-> -out:
->      visit_free(v);
->  ''')
->      ret += mcgen('''
-> -    error_propagate(errp, err);
->      qobject_unref(qmp);
->  }
->  ''')
+DQoNCkJlc3QgUmVnYXJkcywNClJvYmVydCBIb28NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
+LS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTZW50
+OiBXZWRuZXNkYXksIEp1bHkgNCwgMjAxOCAyMTozOQ0KPiBUbzogTGl1LCBKaW5ncWkgPGppbmdx
+aS5saXVAaW50ZWwuY29tPg0KPiBDYzogcnRoQHR3aWRkbGUubmV0OyBlaGFia29zdEByZWRoYXQu
+Y29tOyBtdG9zYXR0aUByZWRoYXQuY29tOyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnOyBXYW5n
+LCBXZWkgVyA8d2VpLncud2FuZ0BpbnRlbC5jb20+OyBIdSwgUm9iZXJ0DQo+IDxyb2JlcnQuaHVA
+aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBrdm06IHg4NjogQWRkIHN1cHBvcnQg
+Zm9yIC1tYWNoaW5lIHNwbGl0LWxvY2stYWMNCj4gDQo+IE9uIDA0LzA3LzIwMTggMTU6MTIsIEpp
+bmdxaSBMaXUgd3JvdGU6DQo+ID4gQWRkIHRoZSBvcHRpb24gc3BsaXQtbG9jay1hYyB0byBjb250
+cm9sIHdoZXRoZXIgdGhlICNBQyBleGNlcHRpb24gaXMNCj4gPiBnZW5lcmF0ZWQgZm9yIHNwbGl0
+IGxvY2tlZCBhY2Nlc3Nlcywgd2hpY2ggaXMgaW50cm9kdWNlZCBmb3IgdGhlDQo+ID4gbWFjaGlu
+ZSwgdGhlcmUgaXMgYW4gZXhhbXBsZSB0byBlbmFibGUgaXQ6DQo+ID4gLW1hY2hpbmUgc3BsaXQt
+bG9jay1hYz1vbg0KPiA+IEl0IGlzIGRpc2FibGVkIG9uIGRlZmF1bHQuDQo+ID4NCj4gPiBXaGVu
+IGJpdCAyOSBvZiB0aGUgTVNSICgzM0gpIGlzIHNldCwgdGhlIHByb2Nlc3NvciBjYXVzZXMgYW4g
+I0FDDQo+ID4gZXhjZXB0aW9uIHRvIGJlIGlzc3VlZCBpbnN0ZWFkIG9mIHN1cHByZXNzaW5nIExP
+Q0sgb24gYnVzKGR1cmluZyBzcGxpdA0KPiA+IGxvY2sgYWNjZXNzKS4NCj4gDQo+IFRoaXMgc2hv
+dWxkIGJlIGEgQ1BVIGZlYXR1cmUsIG5vdCBhIG1hY2hpbmUgZmVhdHVyZS4gIEFzIG1lbnRpb25l
+ZCBpbiB0aGUNCj4gcmV2aWV3IG9mIHRoZSBrZXJuZWwgcGF0Y2gsIHBsZWFzZSB3b3JrIHdpdGgg
+Um9iZXJ0IHRvIHVzZSB0aGUgc2FtZQ0KPiBpbmZyYXN0cnVjdHVyZSBmb3IgYm90aCBNU1JfVEVT
+VF9DVEwgYW5kIE1TUl9JQTMyX0FSQ0hfQ0FQQUJJTElUSUVTLg0KPiANCj4gKFJvYmVydCwgZG9l
+cyBJY2VMYWtlIGhhdmUgdGhpcyBmZWF0dXJlPyAgSWYgc28sIHdlIGNhbm5vdCBjcmVhdGUgdGhl
+IENQVSBtb2RlbA0KPiB1bnRpbCBldmVyeXRoaW5nIGlzIGluIHBsYWNlKS4NCg0KW1JvYmVydCBI
+b29dIA0KSGkgUGFvbG8sDQpUaGlzIGlzIG5vdCBhbiBJY2VsYWtlICBmZWF0dXJlLg0KPiANCj4g
+QlRXLCB3aHkgaXMgdGhlIGF2YWlsYWJpbGl0eSBvZiB0aGUgZmVhdHVyZSBub3QgZXhwb3NlZCB3
+aXRoIGEgQ1BVSUQgYml0PyAgSXQNCj4gZG9lc24ndCBtYWtlIG11Y2ggc2Vuc2UuDQo+IA0KPiBQ
+YW9sbw0KPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBKaW5ncWkgTGl1IDxqaW5ncWkubGl1QGludGVs
+LmNvbT4NCj4gPiAtLS0NCj4gPiAgYWNjZWwva3ZtL2t2bS1hbGwuYyAgICAgICB8IDEwICsrKysr
+KysrKysNCj4gPiAgaHcvY29yZS9tYWNoaW5lLmMgICAgICAgICB8IDE5ICsrKysrKysrKysrKysr
+KysrKysNCj4gPiAgaW5jbHVkZS9ody9ib2FyZHMuaCAgICAgICB8ICAxICsNCj4gPiAgbGludXgt
+aGVhZGVycy9saW51eC9rdm0uaCB8ICAxICsNCj4gPiAgcWVtdS1vcHRpb25zLmh4ICAgICAgICAg
+ICB8ICAzICsrKw0KPiA+ICA1IGZpbGVzIGNoYW5nZWQsIDM0IGluc2VydGlvbnMoKykNCj4gPg0K
+PiA+IGRpZmYgLS1naXQgYS9hY2NlbC9rdm0va3ZtLWFsbC5jIGIvYWNjZWwva3ZtL2t2bS1hbGwu
+YyBpbmRleA0KPiA+IGViN2RiOTIuLmU5NjBhNGQgMTAwNjQ0DQo+ID4gLS0tIGEvYWNjZWwva3Zt
+L2t2bS1hbGwuYw0KPiA+ICsrKyBiL2FjY2VsL2t2bS9rdm0tYWxsLmMNCj4gPiBAQCAtMTY5OSw2
+ICsxNjk5LDE2IEBAIHN0YXRpYyBpbnQga3ZtX2luaXQoTWFjaGluZVN0YXRlICptcykNCj4gPg0K
+PiA+ICAgICAgcy0+c3luY19tbXUgPSAhIWt2bV92bV9jaGVja19leHRlbnNpb24oa3ZtX3N0YXRl
+LA0KPiA+IEtWTV9DQVBfU1lOQ19NTVUpOw0KPiA+DQo+ID4gKyAgICBpZiAobXMtPnNwbGl0X2xv
+Y2tfYWMgJiYNCj4gPiArICAgICAgICBrdm1fY2hlY2tfZXh0ZW5zaW9uKHMsIEtWTV9DQVBfWDg2
+X1NQTElUX0xPQ0tfQUMpKSB7DQo+ID4gKyAgICAgICAgcmV0ID0ga3ZtX3ZtX2VuYWJsZV9jYXAo
+cywgS1ZNX0NBUF9YODZfU1BMSVRfTE9DS19BQywgMCk7DQo+ID4gKyAgICAgICAgaWYgKHJldCkg
+ew0KPiA+ICsgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIkNvdWxkIG5vdCBlbmFibGUgdGhl
+IGZlYXR1cmUgdGhhdCAjQUMgZXhjZXB0aW9uIg0KPiA+ICsgICAgICAgICAgICAgICAgICAgICJ3
+aWxsIGJlIGdlbmVyYXRlZCBmb3Igc3BsaXQgbG9jayBhY2Nlc3NlcyFcbiIpOw0KPiA+ICsgICAg
+ICAgICAgICBnb3RvIGVycjsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+
+ICAgICAgcmV0dXJuIDA7DQo+ID4NCj4gPiAgZXJyOg0KPiA+IGRpZmYgLS1naXQgYS9ody9jb3Jl
+L21hY2hpbmUuYyBiL2h3L2NvcmUvbWFjaGluZS5jIGluZGV4DQo+ID4gNjE3ZTVmOC4uZTA1NDEx
+OSAxMDA2NDQNCj4gPiAtLS0gYS9ody9jb3JlL21hY2hpbmUuYw0KPiA+ICsrKyBiL2h3L2NvcmUv
+bWFjaGluZS5jDQo+ID4gQEAgLTM1MCw2ICszNTAsMjIgQEAgc3RhdGljIHZvaWQgbWFjaGluZV9z
+ZXRfbWVtb3J5X2VuY3J5cHRpb24oT2JqZWN0DQo+ICpvYmosIGNvbnN0IGNoYXIgKnZhbHVlLA0K
+PiA+ICAgICAgbXMtPm1lbW9yeV9lbmNyeXB0aW9uID0gZ19zdHJkdXAodmFsdWUpOyAgfQ0KPiA+
+DQo+ID4gK3N0YXRpYyB2b2lkIG1hY2hpbmVfc2V0X3NwbGl0X2xvY2tfYWMoT2JqZWN0ICpvYmos
+IGJvb2wgdmFsdWUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+RXJyb3IgKiplcnJwKSB7DQo+ID4gKyAgICBNYWNoaW5lU3RhdGUgKm1zID0gTUFDSElORShvYmop
+Ow0KPiA+ICsNCj4gPiArICAgIG1zLT5zcGxpdF9sb2NrX2FjID0gdmFsdWU7DQo+ID4gK30NCj4g
+PiArDQo+ID4gK3N0YXRpYyBib29sIG1hY2hpbmVfZ2V0X3NwbGl0X2xvY2tfYWMoT2JqZWN0ICpv
+YmosIEVycm9yICoqZXJycCkgew0KPiA+ICsgICAgTWFjaGluZVN0YXRlICptcyA9IE1BQ0hJTkUo
+b2JqKTsNCj4gPiArDQo+ID4gKyAgICByZXR1cm4gbXMtPnNwbGl0X2xvY2tfYWM7DQo+ID4gK30N
+Cj4gPiArDQo+ID4gKw0KPiA+ICB2b2lkIG1hY2hpbmVfY2xhc3NfYWxsb3dfZHluYW1pY19zeXNi
+dXNfZGV2KE1hY2hpbmVDbGFzcyAqbWMsIGNvbnN0DQo+ID4gY2hhciAqdHlwZSkgIHsNCj4gPiAg
+ICAgIHN0ckxpc3QgKml0ZW0gPSBnX25ldzAoc3RyTGlzdCwgMSk7IEBAIC02MzQsNiArNjUwLDkg
+QEAgc3RhdGljDQo+ID4gdm9pZCBtYWNoaW5lX2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKm9jLCB2
+b2lkICpkYXRhKQ0KPiA+ICAgICAgICAgICZlcnJvcl9hYm9ydCk7DQo+ID4gICAgICBvYmplY3Rf
+Y2xhc3NfcHJvcGVydHlfc2V0X2Rlc2NyaXB0aW9uKG9jLCAibWVtb3J5LWVuY3J5cHRpb24iLA0K
+PiA+ICAgICAgICAgICJTZXQgbWVtb3J5IGVuY3lwdGlvbiBvYmplY3QgdG8gdXNlIiwgJmVycm9y
+X2Fib3J0KTsNCj4gPiArICAgIG9iamVjdF9jbGFzc19wcm9wZXJ0eV9hZGRfYm9vbChvYywgInNw
+bGl0LWxvY2stYWMiLA0KPiA+ICsgICAgICAgIG1hY2hpbmVfZ2V0X3NwbGl0X2xvY2tfYWMsIG1h
+Y2hpbmVfc2V0X3NwbGl0X2xvY2tfYWMsDQo+ID4gKyAgICAgICAgJmVycm9yX2Fib3J0KTsNCj4g
+PiAgfQ0KPiA+DQo+ID4gIHN0YXRpYyB2b2lkIG1hY2hpbmVfY2xhc3NfYmFzZV9pbml0KE9iamVj
+dENsYXNzICpvYywgdm9pZCAqZGF0YSkgZGlmZg0KPiA+IC0tZ2l0IGEvaW5jbHVkZS9ody9ib2Fy
+ZHMuaCBiL2luY2x1ZGUvaHcvYm9hcmRzLmggaW5kZXgNCj4gPiA3OTA2OWRkLi45YzFlMmMwIDEw
+MDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvaHcvYm9hcmRzLmgNCj4gPiArKysgYi9pbmNsdWRlL2h3
+L2JvYXJkcy5oDQo+ID4gQEAgLTI1Niw2ICsyNTYsNyBAQCBzdHJ1Y3QgTWFjaGluZVN0YXRlIHsN
+Cj4gPiAgICAgIGJvb2wgc3VwcHJlc3Nfdm1kZXNjOw0KPiA+ICAgICAgYm9vbCBlbmZvcmNlX2Nv
+bmZpZ19zZWN0aW9uOw0KPiA+ICAgICAgYm9vbCBlbmFibGVfZ3JhcGhpY3M7DQo+ID4gKyAgICBi
+b29sIHNwbGl0X2xvY2tfYWM7DQo+ID4gICAgICBjaGFyICptZW1vcnlfZW5jcnlwdGlvbjsNCj4g
+PiAgICAgIERldmljZU1lbW9yeVN0YXRlICpkZXZpY2VfbWVtb3J5Ow0KPiA+DQo+ID4gZGlmZiAt
+LWdpdCBhL2xpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggYi9saW51eC1oZWFkZXJzL2xpbnV4L2t2
+bS5oDQo+ID4gaW5kZXggOThmMzg5YS4uNGJmYTg3OSAxMDA2NDQNCj4gPiAtLS0gYS9saW51eC1o
+ZWFkZXJzL2xpbnV4L2t2bS5oDQo+ID4gKysrIGIvbGludXgtaGVhZGVycy9saW51eC9rdm0uaA0K
+PiA+IEBAIC05NDksNiArOTQ5LDcgQEAgc3RydWN0IGt2bV9wcGNfcmVzaXplX2hwdCB7ICAjZGVm
+aW5lDQo+ID4gS1ZNX0NBUF9HRVRfTVNSX0ZFQVRVUkVTIDE1MyAgI2RlZmluZSBLVk1fQ0FQX0hZ
+UEVSVl9FVkVOVEZEDQo+IDE1NA0KPiA+ICNkZWZpbmUgS1ZNX0NBUF9IWVBFUlZfVExCRkxVU0gg
+MTU1DQo+ID4gKyNkZWZpbmUgS1ZNX0NBUF9YODZfU1BMSVRfTE9DS19BQyAxNTYNCj4gPg0KPiA+
+ICAjaWZkZWYgS1ZNX0NBUF9JUlFfUk9VVElORw0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3FlbXUt
+b3B0aW9ucy5oeCBiL3FlbXUtb3B0aW9ucy5oeCBpbmRleCA4MWIxZTk5Li45MzVjZWZlDQo+ID4g
+MTAwNjQ0DQo+ID4gLS0tIGEvcWVtdS1vcHRpb25zLmh4DQo+ID4gKysrIGIvcWVtdS1vcHRpb25z
+Lmh4DQo+ID4gQEAgLTQ0LDYgKzQ0LDcgQEAgREVGKCJtYWNoaW5lIiwgSEFTX0FSRywgUUVNVV9P
+UFRJT05fbWFjaGluZSwgXA0KPiA+ICAgICAgIiAgICAgICAgICAgICAgICBudmRpbW09b258b2Zm
+IGNvbnRyb2xzIE5WRElNTSBzdXBwb3J0IChkZWZhdWx0PW9mZilcbiINCj4gPiAgICAgICIgICAg
+ICAgICAgICAgICAgZW5mb3JjZS1jb25maWctc2VjdGlvbj1vbnxvZmYgZW5mb3JjZSBjb25maWd1
+cmF0aW9uIHNlY3Rpb24NCj4gbWlncmF0aW9uIChkZWZhdWx0PW9mZilcbiINCj4gPiAgICAgICIg
+ICAgICAgICAgICAgICAgczM5MC1zcXVhc2gtbWNzcz1vbnxvZmYgKGRlcHJlY2F0ZWQpIGNvbnRy
+b2xzIHN1cHBvcnQgZm9yDQo+IHNxdWFzaGluZyBpbnRvIGRlZmF1bHQgY3NzIChkZWZhdWx0PW9m
+ZilcbiINCj4gPiArICAgICIgICAgICAgICAgICAgICAgc3BsaXQtbG9jay1hYz1vbnxvZmYgY29u
+dHJvbHMgc3VwcG9ydCAjQUMgZXhjZXB0aW9uIGZvciBzcGxpdA0KPiBsb2NrZWQgYWNjZXNzZXMg
+KGRlZmF1bHQ9b2ZmKVxuIg0KPiA+ICAgICAgIiAgICAgICAgICAgICAgICBtZW1vcnktZW5jcnlw
+dGlvbj1AdmFye30gbWVtb3J5IGVuY3J5cHRpb24gb2JqZWN0IHRvIHVzZQ0KPiAoZGVmYXVsdD1u
+b25lKVxuIiwNCj4gPiAgICAgIFFFTVVfQVJDSF9BTEwpDQo+ID4gIFNURVhJDQo+ID4gQEAgLTEx
+Myw2ICsxMTQsOCBAQCBOT1RFOiB0aGlzIHBhcmFtZXRlciBpcyBkZXByZWNhdGVkLiBQbGVhc2Ug
+dXNlDQo+ID4gQG9wdGlvbnstZ2xvYmFsfSAgQG9wdGlvbnttaWdyYXRpb24uc2VuZC1jb25maWd1
+cmF0aW9ufT1AdmFye29ufG9mZn0NCj4gaW5zdGVhZC4NCj4gPiAgQGl0ZW0gbWVtb3J5LWVuY3J5
+cHRpb249QHZhcnt9DQo+ID4gIE1lbW9yeSBlbmNyeXB0aW9uIG9iamVjdCB0byB1c2UuIFRoZSBk
+ZWZhdWx0IGlzIG5vbmUuDQo+ID4gK0BpdGVtIHNwbGl0LWxvY2stYWM9b258b2ZmDQo+ID4gK0Vu
+YWJsZXMgb3IgZGlzYWJsZXMgI0FDIGV4Y2VwdGlvbiBmb3Igc3BsaXQgbG9ja2VkIGFjY2Vzc2Vz
+Lg0KPiA+ICBAZW5kIHRhYmxlDQo+ID4gIEVURVhJDQo+ID4NCj4gPg0KDQo=
