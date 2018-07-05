@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fb7p2-0004Kr-0E
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:13:37 -0400
+	(envelope-from <mail@steffen-goertz.de>) id 1fb7pt-0004p7-Vz
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fb7oy-0000C8-2Z
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:13:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fb7ox-00009D-Tm
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:13:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0EAA3400ADCC
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 17:13:26 +0000 (UTC)
-Date: Thu, 5 Jul 2018 18:13:20 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180705171320.GM3814@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180705123929.GB16293@redhat.com>
-	<20180705125231.GD16293@redhat.com>
-	<d154245b-46c0-58b0-b6f9-1f1313634c80@redhat.com>
-	<20180705164343.GE16293@redhat.com>
+	(envelope-from <mail@steffen-goertz.de>) id 1fb7pq-0000d5-0k
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:14:29 -0400
+Received: from steffen-goertz.de ([88.198.119.201]:54414)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mail@steffen-goertz.de>) id 1fb7pp-0000cb-MC
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 13:14:25 -0400
+References: <20180626093204.27612-1-contrib@steffen-goertz.de>
+	<20180627094456.GB4325@stefanha-x1.localdomain>
+	<CAFEAcA-j8z4TLN=Qo82JicSQ_=YnJnGjAoLiMOnyfmd1QtQo7w@mail.gmail.com>
+	<20180703093113.GF16791@stefanha-x1.localdomain>
+	<CAFEAcA-_LjPDWpVPt1mfGA815ur_6i_MjBMtFLqohFCaO0R9Uw@mail.gmail.com>
+From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+Message-ID: <9419467c-62a0-2bbc-1685-7eb9e3f40845@steffen-goertz.de>
+Date: Thu, 5 Jul 2018 19:14:23 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-_LjPDWpVPt1mfGA815ur_6i_MjBMtFLqohFCaO0R9Uw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180705164343.GE16293@redhat.com>
-Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2] arm: Add NRF51 SOC non-volatile memory
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, jferlan@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>
 
-On Thu, Jul 05, 2018 at 05:43:43PM +0100, Richard W.M. Jones wrote:
-> On Thu, Jul 05, 2018 at 04:20:33PM +0200, Laszlo Ersek wrote:
-> > QEMU does the right thing. If other hypervisors don't do this -- while
-> > still taking and displaying the value in UUID / GUID textual format --,
-> > they are wrong. The VMGENID spec from Microsoft
-> > <http://go.microsoft.com/fwlink/?LinkId=260709> specifically mentions
-> > "GUID".
-> 
-> The MSFT spec does mention GUID, but it seems to me that it's only
-> using GUID as an incidental example -- ie. that you might use the VM
-> Generation ID to generate a GUID.  Outside that example it
-> consistently refers to the VM Gen ID as a 128-bit integer.  It also
-> says that it could be used as a "high entropy random data source",
-> which is not in fact true if it's a UUID.
-> 
-> It has to be said that after reading the spec again [the MSFT spec,
-> not qemu's spec] and what other hypervisors are doing, I'm not sure
-> qemu is doing the right thing here.
+Hello Peter,
 
-I'm not sure it particularly matters, as long as there is a way to
-encode the 128-bit integer as a UUID without irreversable mangling
-or data loss.  We could document it, or if we really wanted to,
-provide an alternative syntax that QEMU internals changes into its
-UUID form (or the reverse).  Libvirt would probably still need to
-expose it as a UUID though, due to compatibility needs in the XML.
+thank you for your very elaborate remarks!
+>  [ CPU ] -+- [ NVM, either FICR, UICR or CODE ]
+>           |      |
+>           \- [ NVMC ]
+>=20
+> where the CPU can talk to either the NVMC or the NVMs, and the
+> NVMC also has a control connection to the NVM. (See the block
+> diagram in the nRF51 manual.)
+>=20
+> The behaviour this allows is:
+>=20
+>  * the CPU can directly read and execute from the NVMs (which it
+>    can see in its address space at 0x00000000, 0x10000000, 0x10001000)
+>  * the NVMC controls whether the CPU can write to the NVMs. If the
+>    NVMC CONFIG register permits writes then the CPU writes directly
+>    to the mapped NVMs, and gets the usual flash-memory behaviour that
+>    writes can turn 1s to 0s but not 0s to 1s.
+>  * the NVMC also has support for performing erases of either pages
+>    or entire NVMs (which writes them to all-1s)
+>=20
+> My suggestion for the best way to model this is:
+>=20
+>  * the NVMs are (sysbus) devices which expose a MemoryRegion which
+>    they have created with memory_region_init_rom_device().
+>    MRs of this sort can be directly read (from a ram block), but
+>    writes always go via a MemoryRegionOps write function. This
+>    will let us do fast execution and reading, but catch writes so
+>    we can make them behave correctly (be forbidden, not allow
+>    writing of 0->1, etc).
 
+In the latest revision of my NVMC model i included the FICR/UICR as
+sysbus devices which expose a memory region using
+memory_region_init_device. I can change this using init_rom_device for
+performance. Furthermore i will add the CODE device.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I would like to provide all four devices (NVMC, CODE, FICR, UICR) from
+one module and rename nrf51_nvmc.[ch] to nrf51_nvm.[ch]. Is this
+acceptable or would you rather prefer three modules?
+
+>  * the NVMs should implement a QOM interface that defines
+>    how we model the "control connection" from the NVMC --
+>    basically this will have some methods for "erase all",
+>    "erase this page", and "set the writes permitted flag".
+>  * the NVMC should have QOM link properties for its NVMCs, and
+>    the SoC code sets those link properties to pointers to the
+>    NVMCs
+>  * the NVMC implements an ordinary IO MemoryRegion for its
+>    register interface; guest writes to the registers may cause
+>    it to tell the NVMs what to do by calling methods on the
+>    NVMs (which it has pointers to via the link properties)
+>  * the SoC code maps the NVMs and the NVMC's registers into
+>    the right places in its address space
+
+Thank you for these remarks, i will follow them.
+
+Steffen
