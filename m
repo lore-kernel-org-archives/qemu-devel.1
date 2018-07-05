@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fb0L2-00040u-1S
+	(envelope-from <armbru@redhat.com>) id 1fb0L2-00040x-1s
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fb0Kz-0001My-3p
+	(envelope-from <armbru@redhat.com>) id 1fb0Kz-0001MD-0N
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56182 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41922 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fb0Ky-0001LX-V8
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fb0Ky-0001LN-Qm
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:14:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97D22DFD1
+	by mx1.redhat.com (Postfix) with ESMTPS id 81C4240704BC
 	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:14:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  5 Jul 2018 11:14:01 +0200
-Message-Id: <20180705091402.26244-2-armbru@redhat.com>
+Date: Thu,  5 Jul 2018 11:14:02 +0200
+Message-Id: <20180705091402.26244-3-armbru@redhat.com>
 In-Reply-To: <20180705091402.26244-1-armbru@redhat.com>
 References: <20180705091402.26244-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] qapi: Do not expose "allow-preconfig" in
- query-qmp-schema
+Subject: [Qemu-devel] [PATCH 2/2] cli qmp: Mark --preconfig,
+ exit-preconfig experimental
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +33,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: imammedo@redhat.com, eblake@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com
 
-According to commit 047f7038f58, option --preconfig
+Committing to the current --preconfig / exit-preconfig interface
+before it has seen any use is premature.  Mark both as experimental,
+the former in documentation, the latter by renaming it to
+x-exit-preconfig.
 
-    [...] allows pausing QEMU in the new RUN_STATE_PRECONFIG state,
-    allowing the configuration of QEMU from QMP before the machine
-    jumps into board initialization code of machine_run_board_init()
-
-    The intent is to allow management to query machine state and
-    additionally configure it using previous query results within one
-    QEMU instance (i.e. eliminate the need to start QEMU twice, 1st to
-    query board specific parameters and 2nd for actual VM start using
-    query results for additional parameters).
-
-The implementation is a bit of a hack: it splices in an additional
-main loop before machine creation, in special runstate preconfig.  New
-command exit-preconfig exits that main loop.  QEMU continues
-initializing, creates the machine, and runs the good old main loop.
-The replacement of the main loop is transparent to monitors.
-
-Sadly, some commands expect initialization to be complete.  Running
-them in --preconfig's main loop violates their preconditions.  Since
-we don't really know which commands are safe, we use a whitelist.
-This drags the concept of run state into the QMP core.
-
-The whitelist is done as a command flag in the QAPI schema (commit
-d6fe3d02e9a).  Drags the concept of run state further into the QAPI
-language.
-
-The command flag is exposed in query-qmp-schema (also commit
-d6fe3d02e9a).  This makes it ABI.
-
-I consider the whole thing an offensively ugly hack, but sometimes an
-ugly hack is the best we can do to solve a problem people have.
-
-The need described by the commit message quote above is genuine.  The
-proper solution would be a main loop that permits complete
-configuration via QMP.  This is out of reach, thus the hack.
-
-However, even though the need is genuine, it isn't urgent: libvirt is
-not going to use this anytime soon.  Baking a hack into ABI before it
-has any users is a bad idea.
-
-This commit reverts the parts of commit d6fe3d02e9a that affect ABI
-via query-qmp-schema.  The commit did the following:
-
-(1) Add command flag 'allow-preconfig' to the QAPI schema language
-
-(2) Pass it to code generators
-
-(3) Have the commands.py code generator pass it to the command
-    registry (so commit 047f7038f58 can use it as whitelist)
-
-(4) Add 'allow-preconfig' to SchemaInfoCommand (neglecting to update
-    qapi-code-gen.txt section "Client JSON Protocol introspection")
-
-(5) Set 'allow-preconfig': true for commands qmp_capabilities,
-    query-commands, query-command-line-options, query-status
-
-Revert exactly (4), plus a bit of documentation added to
-qemu-tech.info in commit 047f7038f58.
-
-Shrinks query-qmp-schema's output from 126.5KiB to 121.8KiB for me.
+See the previous commit for more detailed rationale.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/introspect.json       | 5 +----
- qemu-tech.texi             | 3 ---
- scripts/qapi/introspect.py | 3 +--
- 3 files changed, 2 insertions(+), 9 deletions(-)
+ hmp.c             | 2 +-
+ qapi/misc.json    | 6 +++---
+ qemu-options.hx   | 9 +++++----
+ qemu-tech.texi    | 8 ++++----
+ qmp.c             | 2 +-
+ tests/numa-test.c | 2 +-
+ tests/qmp-test.c  | 6 +++---
+ 7 files changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 80a0a3e656..c7f67b7d78 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -262,16 +262,13 @@
- # @allow-oob: whether the command allows out-of-band execution.
- #             (Since: 2.12)
- #
--# @allow-preconfig: command can be executed in preconfig runstate,
--#                   default: false (Since 3.0)
--#
- # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
- #
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoCommand',
-   'data': { 'arg-type': 'str', 'ret-type': 'str',
--            'allow-oob': 'bool', 'allow-preconfig': 'bool' } }
-+            'allow-oob': 'bool' } }
+diff --git a/hmp.c b/hmp.c
+index fe4477a8fb..3e689dfc6b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1074,7 +1074,7 @@ void hmp_exit_preconfig(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+ 
+-    qmp_exit_preconfig(&err);
++    qmp_x_exit_preconfig(&err);
+     hmp_handle_error(mon, &err);
+ }
+ 
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 29da7856e3..2e9902371a 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1205,7 +1205,7 @@
+ { 'command': 'cont' }
  
  ##
- # @SchemaInfoEvent:
+-# @exit-preconfig:
++# @x-exit-preconfig:
+ #
+ # Exit from "preconfig" state
+ #
+@@ -1221,11 +1221,11 @@
+ #
+ # Example:
+ #
+-# -> { "execute": "exit-preconfig" }
++# -> { "execute": "x-exit-preconfig" }
+ # <- { "return": {} }
+ #
+ ##
+-{ 'command': 'exit-preconfig', 'allow-preconfig': true }
++{ 'command': 'x-exit-preconfig', 'allow-preconfig': true }
+ 
+ ##
+ # @system_wakeup:
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 16208f63f2..1d04613a17 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3291,16 +3291,17 @@ Run the emulation in single step mode.
+ ETEXI
+ 
+ DEF("preconfig", 0, QEMU_OPTION_preconfig, \
+-    "--preconfig     pause QEMU before machine is initialized\n",
++    "--preconfig     pause QEMU before machine is initialized (experimental)\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item --preconfig
+ @findex --preconfig
+ Pause QEMU for interactive configuration before the machine is created,
+ which allows querying and configuring properties that will affect
+-machine initialization. Use the QMP command 'exit-preconfig' to exit
+-the preconfig state and move to the next state (ie. run guest if -S
+-isn't used or pause the second time if -S is used).
++machine initialization.  Use QMP command 'x-exit-preconfig' to exit
++the preconfig state and move to the next state (i.e. run guest if -S
++isn't used or pause the second time if -S is used).  This option is
++experimental.
+ ETEXI
+ 
+ DEF("S", 0, QEMU_OPTION_S, \
 diff --git a/qemu-tech.texi b/qemu-tech.texi
-index dcecba83cb..f843341ffa 100644
+index f843341ffa..7c3d1f05e1 100644
 --- a/qemu-tech.texi
 +++ b/qemu-tech.texi
-@@ -350,9 +350,6 @@ depend on an initialized machine, including but not limited to:
+@@ -336,9 +336,9 @@ additionally configure the machine (by hotplugging devices) in runtime before
+ allowing VM code to run.
+ 
+ However, at the -S pause point, it's impossible to configure options that affect
+-initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. That's
+-when the --preconfig command line option should be used. It allows pausing QEMU
+-before the initial VM creation, in a new preconfig state, where additional
++initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. The
++experimental --preconfig command line option  allows pausing QEMU
++before the initial VM creation, in a ``preconfig'' state, where additional
+ queries and configuration can be performed via QMP before moving on to
+ the resulting configuration startup. In the preconfig state, QEMU only allows
+ a limited set of commands over the QMP monitor, where the commands do not
+@@ -348,7 +348,7 @@ depend on an initialized machine, including but not limited to:
+ @item query-qmp-schema
+ @item query-commands
  @item query-status
- @item exit-preconfig
+-@item exit-preconfig
++@item x-exit-preconfig
  @end table
--The full list of commands is in QMP schema which could be queried with
--query-qmp-schema, where commands supported at preconfig state have option
--'allow-preconfig' set to true.
  
  @node Bibliography
- @section Bibliography
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index 6ad198ae5b..802b1949d0 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -175,8 +175,7 @@ const QLitObject %(c_name)s = %(c_string)s;
-         self._gen_qlit(name, 'command',
-                        {'arg-type': self._use_type(arg_type),
-                         'ret-type': self._use_type(ret_type),
--                        'allow-oob': allow_oob,
--                        'allow-preconfig': allow_preconfig})
-+                        'allow-oob': allow_oob})
+diff --git a/qmp.c b/qmp.c
+index 73e46d795f..411e3210bb 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -161,7 +161,7 @@ SpiceInfo *qmp_query_spice(Error **errp)
+ };
+ #endif
  
-     def visit_event(self, name, info, arg_type, boxed):
-         arg_type = arg_type or self._schema.the_empty_object_type
+-void qmp_exit_preconfig(Error **errp)
++void qmp_x_exit_preconfig(Error **errp)
+ {
+     if (!runstate_check(RUN_STATE_PRECONFIG)) {
+         error_setg(errp, "The command is permitted only in '%s' state",
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index b7a6ef8815..893f826acb 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -285,7 +285,7 @@ static void pc_dynamic_cpu_cfg(const void *data)
+         " 'arguments': { 'type': 'cpu', 'node-id': 1, 'socket-id': 0 } }")));
+ 
+     /* let machine initialization to complete and run */
+-    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
+     qtest_qmp_eventwait(qs, "RESUME");
+ 
+     /* check that CPUs are mapped as expected */
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index a49cbc6fde..ca8c599526 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -412,7 +412,7 @@ static void test_qmp_preconfig(void)
+     qobject_unref(rsp);
+ 
+     /* exit preconfig state */
+-    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
+     qtest_qmp_eventwait(qs, "RESUME");
+ 
+     /* check that query-status returns running state */
+@@ -422,8 +422,8 @@ static void test_qmp_preconfig(void)
+     g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "running");
+     qobject_unref(rsp);
+ 
+-    /* check that exit-preconfig returns error after exiting preconfig */
+-    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
++    /* check that x-exit-preconfig returns error after exiting preconfig */
++    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
+ 
+     /* enabled commands, no error expected  */
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
 -- 
 2.17.1
