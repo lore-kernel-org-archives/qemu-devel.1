@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fasLu-0000a6-NA
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 20:42:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fasLw-0000aG-F9
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 20:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fasLt-0008VK-CO
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 20:42:30 -0400
-Date: Thu, 5 Jul 2018 10:16:41 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fasLt-0008VB-BG
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 20:42:32 -0400
+Date: Thu, 5 Jul 2018 10:09:51 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180705001641.GE3450@umbus.fritz.box>
-References: <20180704183855.18304-1-laurent@vivier.eu>
+Message-ID: <20180705000951.GA3450@umbus.fritz.box>
+References: <20180703151732.29843-1-richard.henderson@linaro.org>
+	<20180704033134.GE14043@umbus.fritz.box>
+	<5DE66F68-07F2-4494-9CC7-51632A386542@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mR8QP4gmHujQHb1c"
+	protocol="application/pgp-signature"; boundary="Kj7319i9nmIyA2yE"
 Content-Disposition: inline
-In-Reply-To: <20180704183855.18304-1-laurent@vivier.eu>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix build on ppc64 host
+In-Reply-To: <5DE66F68-07F2-4494-9CC7-51632A386542@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 0/7] target/ppc fp cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---mR8QP4gmHujQHb1c
+--Kj7319i9nmIyA2yE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 04, 2018 at 08:38:55PM +0200, Laurent Vivier wrote:
-1;5202;0c> When I try to build a ppc64 target on a ppc64 host (gcc 8.1.1), =
-I have:
+On Wed, Jul 04, 2018 at 09:42:16AM -0400, Programmingkid wrote:
 >=20
-> .../target/ppc/int_helper.c: In function 'helper_vinsertb':
-> .../target/ppc/int_helper.c:1954:32: error: array subscript 1844674407370=
-9551608 is above array bounds of 'uint8_t[16]' {aka 'unsigned char[16]'} [-=
-Werror=3Darray-bounds]
->          memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],          =
-    \
->                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> .../target/ppc/int_helper.c:1965:1: note: in expansion of macro 'VINSERT'
+> > On Jul 3, 2018, at 11:31 PM, David Gibson <david@gibson.dropbear.id.au>=
+ wrote:
+> >=20
+> > On Tue, Jul 03, 2018 at 08:17:25AM -0700, Richard Henderson wrote:
+> >> Beginning with John Arbuckle's fdiv test case, clean up some
+> >> of the fp helpers.  As with fdiv, fre and fresqrt are missing
+> >> divide-by-zero exceptions.
+> >>=20
+> >> I've also noticed that load/store were using arithmetic conversions
+> >> to/from float32.  These should be using the non-arithmetic algorithms
+> >> listed in the manual.
+> >>=20
+> >> Aside from cleaning up all of the rest of the helpers, I believe that
+> >> the implementation of the single-precision operations are incorrect.
+> >> They are currently implemented with the double-precision operation
+> >> followed by a round-to-single.  This causes incorrect results via
+> >> double rounding.  I believe better results could be had by using
+> >> these non-arithmetic converters to produce float32 operands, use the
+> >> proper float32 softfloat operations, and then convert back.
+> >>=20
+> >> Anyway, all of this has been broken long enough that it'll need to
+> >> wait til next devel cycle before anything further gets done.
+> >=20
+> > Applied to ppc-for-3.1 (newly created)
 >=20
-> If we compare with the macro for ppc64le, we can see
-> sizeof(r->element[0]) should be used instead of sizeof(r->element).
->=20
-> And VINSERT uses only u8, u16, u32 and u64, so the maximum value
-> of sizeof(r->element[0]) is 8
->=20
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Could I have the address for your ppc-for-3.1 repo please? Would you
+> like future floating point patches to be based on this repo?
 
-Applied to ppc-for-3.0, thanks.
+See https://github.com/dgibson/qemu/tree/ppc-for-3.1
 
-> ---
->  target/ppc/int_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index 03d37da79f..d52338ed71 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -1951,7 +1951,7 @@ VSPLT(w, u32)
->  #define VINSERT(suffix, element)                                        =
-    \
->      void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t ind=
-ex) \
->      {                                                                   =
-    \
-> -        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],          =
-    \
-> +        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element[0])],       =
-    \
->                 sizeof(r->element[0]));                                  =
-    \
->      }
->  #else
+Same repo as my existing ppc-for-3.0 tree, different branch.
+
+And yes, patches should be based on this tree, unless they're
+important bugfixes that are aimed at 3.0.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -86,24 +77,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---mR8QP4gmHujQHb1c
+--Kj7319i9nmIyA2yE
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls9Y2gACgkQbDjKyiDZ
-s5LN+hAA5FK751LxSNeizuOu6fxvx39YcJ75gDsnCP7DZpmpoAOkLkganWTXrPax
-zw7/NflGjpZXJxvHILgIYUUdDJCTShOkm2Hcy3DCkMDDwFz6C0R5q0cyww7wsKFE
-vjM1wX4LTWvZq0AMTXJQjgzKrsZZaJmZ/iH/2E4yFmGOHbM6F+Pf+tH4AN9GCjZk
-cNHnIb6+Uyu6pwEIzzcGtIN3E5a9ZDHsKidqvfZz1KKCCaM/0SI9/EjVZ7iDRq6d
-Duk08RzXV2529neYEDQAO93vrH8JYPz+Hb/E7dTwZy4C0NVnVu8zt9vT0FSuSj77
-sw//eHqd7iRP0Ow+YhhnbtJ3Z8dQHdJuVvWLdQyniIpZ//IPLDi8PdvCyuMKhvZS
-8n8xJl9UbY7d6x1FZtJZKJkTbgKghXAsVCY808pIycVjczp/32qlrNj8V6Lyqqt3
-lgEmOG1YYARlfwbAXrEiAgahKZcHA+e5xdIyaYPQO0Lkw14dPChdIQLalkfDc3FB
-kYn0RUjwQQA72Q3q2kvMFPyGrhg6N6IlX2JXjLBgZSIoota9nwHZzJPwaFgaLwr1
-XJw1lDKL7TiooL0uf7yhvB63Syoo4TPem/zxybKoGTjBCX0MW7R0BjvMokIk0zDa
-LzUOthgxv594jAem52Vk/u9VO9tK08Kz0XPv3LCvc/34ZOz22ko=
-=Pdo5
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls9Yc0ACgkQbDjKyiDZ
+s5I45g/9FasxME9Ak2w7JYpn7YJPbo4ks3XkIbITQV/2pDJhrQuJRBb7gStV1gil
+U30vOqZ4hpKQnOguVvnmi9URqwDLEatVTBQ1CBZ0csT/EfMyH/T+Fh1PrLhLGv3b
+x3cBdNCmjOVBmqUj85oAEItfOttG6RVVrh+mpXydLL3dNNCjtIYHRktn9Edrd2J/
+PL3mIhkVkYJdt/xwYUqC8sERu8hwGbDekBGTDdX7jq7+m/DWE6lJ9jSr4505INGm
+fD8BlzsmVEMz/zJ8HOJ8gilnMBUDtauvsesdXw2oXLasZnkEUmhCJ6DGUHb47tt+
+J+1KKvCzJi5lbWBRsAjkw978pin+OnuEofkYbhJzSaVUGHtGf5XprMYjfzicV9rr
+uobBOf3CU8xdLe2a4Ibv9uK93cdBIamOPlgWQqn+HDkBPKJpmQaL2/7G0mOqafhS
+VIdfV4mRj9FsIczPICSncxoJajWitAsEurCKPDrW8KpgeeEaDkC9y8wZ9Z5APzSl
+c+pB0ru02La4DtG/yKmk+8i5Qe5IkzN//fl4SRHwuSuRxYp5sK7FsYCIbYxK8BfW
+ea+FDWObAA+laAhK0vYU7+J59ERNZEBR/a23TdJbzIpQY9JK+pNOsKdwlLOUBHX6
+fFIVDkvWiqnt2uK1Htj7/2bk4zqO/D9R0aIaJ2Pwpn+OWZe4tWk=
+=6ag6
 -----END PGP SIGNATURE-----
 
---mR8QP4gmHujQHb1c--
+--Kj7319i9nmIyA2yE--
