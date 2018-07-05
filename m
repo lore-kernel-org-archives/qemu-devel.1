@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fb6WB-0001Me-0P
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fb6Wv-0001rW-II
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fb6W7-0006yV-UT
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:03 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:43724)
+	(envelope-from <peter.maydell@linaro.org>) id 1fb6Wu-0007NP-O9
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:49 -0400
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:46782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fb6W7-0006yD-Ng
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:49:59 -0400
-Received: by mail-pf0-x244.google.com with SMTP id y8-v6so5788839pfm.10
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 08:49:59 -0700 (PDT)
-References: <1530732637-28606-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1530732637-28606-5-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20f56ce2-9998-75c1-a15f-80633a70bd5e@linaro.org>
-Date: Thu, 5 Jul 2018 08:49:55 -0700
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fb6Wu-0007N2-KJ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:50:48 -0400
+Received: by mail-oi0-x22e.google.com with SMTP id y207-v6so17766275oie.13
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 08:50:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1530732637-28606-5-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] target/mips: Avoid case statements
- formulated by ranges
+In-Reply-To: <20180705102604.4986-1-kwolf@redhat.com>
+References: <20180705102604.4986-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Jul 2018 16:50:27 +0100
+Message-ID: <CAFEAcA-CtuWBSENpNsGBaTcyA8KdQmMuGT6DJMFxwmGJwNux3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/12] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: pburton@wavecomp.com, smarkovic@wavecomp.com, philippe.mathieu.daude@gmail.com, amarkovic@wavecomp.com, pjovanovic@wavecomp.com, aurelien@aurel32.net
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 07/04/2018 12:30 PM, Aleksandar Markovic wrote:
->      case 18:
->          switch (sel) {
-> -        case 0 ... 7:
-> +        case 0:
-> +        case 1:
-> +        case 2:
-> +        case 3:
-> +        case 4:
-> +        case 5:
-> +        case 6:
-> +        case 7:
+On 5 July 2018 at 11:25, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit fe8d2d5737ab20ed0118863f5eb888cae37122ab:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.0-pull-request' into staging (2018-07-04 22:38:10 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 7c20c808a5cbf5d244735bc78fc3138c739c1946:
+>
+>   file-posix: Unlock FD after creation (2018-07-05 11:07:58 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - qcow2: Use worker threads for compression to improve performance of
+>   'qemu-img convert -W' and compressed backup jobs
+> - blklogwrites: New filter driver to log write requests to an image in
+>   the dm-log-writes format
+> - file-posix: Fix image locking during image creation
+> - crypto: Fix memory leak in error path
+> - Error out instead of silently truncating node names
+>
 
-I don't see the point in this.  It is clear what 0 ... 7 means.
+Applied, thanks.
 
-> -    case OPC_MULT ... OPC_DIVU:
-> +    case OPC_MULT:
-> +    case OPC_MULTU:
-> +    case OPC_DIV:
-> +    case OPC_DIVU:
-
-These on the other hand are a good cleanup, because there's no obvious
-relationship between the beginning and end of the range.
-
-
-r~
+-- PMM
