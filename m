@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fatji-0004qM-Bx
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 22:11:11 -0400
+	(envelope-from <peterx@redhat.com>) id 1faumR-00041X-Dw
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fatjf-0001Ub-60
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 22:11:10 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:48806
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fatje-0001Ki-2A
-	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 22:11:07 -0400
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Date: Thu, 5 Jul 2018 10:10:38 +0800
-Message-ID: <20180705021038.14036-1-douly.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] hw/acpi-build: Add a check for non-memory NUMA
- nodes.
+	(envelope-from <peterx@redhat.com>) id 1faumO-0001TD-8G
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:18:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47280 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1faumO-0001SB-3g
+	for qemu-devel@nongnu.org; Wed, 04 Jul 2018 23:18:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A67F481A4EAD
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 03:17:59 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Thu,  5 Jul 2018 11:17:46 +0800
+Message-Id: <20180705031755.3254-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0 0/9] migration: postcopy recovery unit
+ test, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +29,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Currently, Qemu ACPI builder doesn't consider the non-memory NUMA nodes, eg:
+Based-on: <20180627132246.5576-1-peterx@redhat.com>
 
-  -m 4G,slots=4,maxmem=8G \
-  -numa node,nodeid=0 \
-  -numa node,nodeid=1,mem=2G \
-  -numa node,nodeid=2,mem=2G \
-  -numa node,nodeid=3\
+Based on the series to unbreak postcopy:
+  Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
+  Message-Id: <20180627132246.5576-1-peterx@redhat.com>
 
-Guest Linux will report
+This series introduce a new postcopy recovery test.  The new test
+actually helped me to identify two bugs there so fix them as well
+before 3.0 release.
 
-  [    0.000000] ACPI: SRAT: Node 0 PXM 0 [mem 0x00000000-0xffffffffffffffff]
-  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
-  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
-  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
-  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
-  [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x13fffffff]
-  [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+Patch 1: a trivial cleanup for existing postcopy ram load, which I
+         found a bit confusing during debugging the problem.
 
-[mem 0x00000000-0xffffffffffffffff] and [mem 0x140000000-0x13fffffff] are bogus.
+Patch 2-3: two bug fixes that address different issues.  Please see
+           the commit log for more information.
 
-Add a check to avoid building srat memory for non-memory NUMA nodes, also update
-the test file. Now the info in guest linux will be
+Patch 4-9: add the postcopy recovery unit test.
 
-  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
-  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
-  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
-  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
-  [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+Please review.  Thanks,
 
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
----
-Have done a bootup test in Linux and window 10, 7
----
- hw/i386/acpi-build.c                  |   9 ++++++---
- tests/acpi-test-data/pc/SRAT.numamem  | Bin 224 -> 224 bytes
- tests/acpi-test-data/q35/SRAT.numamem | Bin 224 -> 224 bytes
- 3 files changed, 6 insertions(+), 3 deletions(-)
+Peter Xu (9):
+  migration: simplify check to use qemu file buffer
+  migration: loosen recovery check when load vm
+  migration: fix incorrect bitmap size calculation
+  tests: introduce migrate_postcopy_* helpers
+  tests: allow migrate() to take extra flags
+  tests: introduce migrate_query*() helpers
+  tests: introduce wait_for_migration_status()
+  tests: add postcopy recovery test
+  tests: hide stderr for postcopy recovery test
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9e8350c55d..c584642e4e 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2392,9 +2392,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-             mem_len = next_base - pcms->below_4g_mem_size;
-             next_base = mem_base + mem_len;
-         }
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                          MEM_AFFINITY_ENABLED);
-+
-+        if (mem_len > 0) {
-+            numamem = acpi_data_push(table_data, sizeof *numamem);
-+            build_srat_memory(numamem, mem_base, mem_len, i - 1,
-+                              MEM_AFFINITY_ENABLED);
-+        }
-     }
-     slots = (table_data->len - numa_start) / sizeof *numamem;
-     for (; slots < pcms->numa_nodes + 2; slots++) {
-diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/acpi-test-data/pc/SRAT.numamem
-index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
-GIT binary patch
-delta 24
-gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
-
-delta 24
-gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
-
-diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/acpi-test-data/q35/SRAT.numamem
-index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
-GIT binary patch
-delta 24
-gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
-
-delta 24
-gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
+ migration/ram.c        |  21 +++--
+ migration/savevm.c     |  16 ++--
+ tests/migration-test.c | 198 ++++++++++++++++++++++++++++++++---------
+ 3 files changed, 176 insertions(+), 59 deletions(-)
 
 -- 
-2.14.3
+2.17.1
