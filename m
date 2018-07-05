@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fb13K-0003zI-FH
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:55 -0400
+	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb17X-0005S9-Uu
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fb13G-0003kf-Jf
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57438 helo=mx1.redhat.com)
+	(envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1fb17U-0001Wn-05
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:04:15 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:58892 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb13G-0003jU-Cy
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:59:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B94F5DFF8
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:59:49 +0000 (UTC)
-Date: Thu, 5 Jul 2018 10:59:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180705095944.GF2538@work-vm>
-References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180705031755.3254-5-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <Aleksandar.Markovic@rt-rk.com>)
+	id 1fb17T-0001T6-Kk
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:04:11 -0400
+in-reply-to: <d87018ab-f66f-565c-813e-e1cdd204e635@amsat.org>
+from: "Aleksandar Markovic" <Aleksandar.Markovic@rt-rk.com>
+message-id: <2a85-5b3ded00-1-74fc2b80@223492324>
+date: Thu, 05 Jul 2018 12:04:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705031755.3254-5-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 4/9] tests: introduce
- migrate_postcopy_* helpers
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?Pz09P3V0Zi04P3E/IFtQQVRDSCB2MyAzLzhdIHRh?=
+ =?utf-8?q?rget/mips=3A_Update_some_CP0_registers_bit_definitions?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,111 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com, qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Separate the old postcopy UNIX socket test into three steps, provide a
-> helper for each step.  With these helpers, we can do more compliated
-> tests like postcopy recovery, while keep the codes shared.
+Hi, Philippe!
+
+I truly appreciate your review.
+
+> > #define CP0C5=5FEVA 28
+> > #define CP0C5=5FMSAEn 27
+> > +#define CP0C5=5FPMJ2 25
+> > +#define CP0C5=5FPMJ1 24
+> > +#define CP0C5=5FPMJ0 23
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  tests/migration-test.c | 38 +++++++++++++++++++++++++++-----------
->  1 file changed, 27 insertions(+), 11 deletions(-)
+> Why not use:
 > 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 3a85446f95..2155869b96 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -351,13 +351,19 @@ static void migrate(QTestState *who, const char *uri)
->      qobject_unref(rsp);
->  }
->  
-> -static void migrate_start_postcopy(QTestState *who)
-> +static void migrate_postcopy_start(QTestState *from, QTestState *to)
->  {
->      QDict *rsp;
->  
-> -    rsp = wait_command(who, "{ 'execute': 'migrate-start-postcopy' }");
-> +    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
->      g_assert(qdict_haskey(rsp, "return"));
->      qobject_unref(rsp);
-> +
-> +    if (!got_stop) {
-> +        qtest_qmp_eventwait(from, "STOP");
-> +    }
-> +
-> +    qtest_qmp_eventwait(to, "RESUME");
->  }
->  
->  static void test_migrate_start(QTestState **from, QTestState **to,
-> @@ -505,7 +511,8 @@ static void test_deprecated(void)
->      qtest_quit(from);
->  }
->  
-> -static void test_postcopy(void)
-> +static void migrate_postcopy_prepare(QTestState **from_ptr,
-> +                                     QTestState **to_ptr)
->  {
->      char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
->      QTestState *from, *to;
-> @@ -527,28 +534,37 @@ static void test_postcopy(void)
->      wait_for_serial("src_serial");
->  
->      migrate(from, uri);
-> +    g_free(uri);
->  
->      wait_for_migration_pass(from);
->  
-> -    migrate_start_postcopy(from);
-> -
-> -    if (!got_stop) {
-> -        qtest_qmp_eventwait(from, "STOP");
-> -    }
-> +    *from_ptr = from;
-> +    *to_ptr = to;
-> +}
->  
-> -    qtest_qmp_eventwait(to, "RESUME");
-> +static void migrate_postcopy_complete(QTestState *from, QTestState *to)
-> +{
-> +    wait_for_migration_complete(from);
->  
-> +    /* Make sure we get at least one "B" on destination */
->      wait_for_serial("dest_serial");
-> -    wait_for_migration_complete(from);
-
-That change is OK, but it shouldn't be necessary with postcopy; we
-should be seeing B's before the migration completes.
-
-It's OK however, so:
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
->      if (uffd_feature_thread_id) {
->          read_blocktime(to);
->      }
-> -    g_free(uri);
->  
->      test_migrate_end(from, to, true);
->  }
->  
-> +static void test_postcopy(void)
-> +{
-> +    QTestState *from, *to;
-> +
-> +    migrate_postcopy_prepare(&from, &to);
-> +    migrate_postcopy_start(from, to);
-> +    migrate_postcopy_complete(from, to);
-> +}
-> +
->  static void test_baddest(void)
->  {
->      QTestState *from, *to;
-> -- 
-> 2.17.1
+> #define CP0C5=5FPMJ 23 /* 25..23 */
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+I now think that the way you suggested here is better, and will integra=
+te it in v4.
+
+> > +#define CP0C5=5FWR2 22
+> > +#define CP0C5=5FNMS 21
+> > +#define CP0C5=5FULS 20
+> > +#define CP0C5=5FXPA 19
+> > +#define CP0C5=5FCRCP 18
+> > +#define CP0C5=5FMI 17
+> > +#define CP0C5=5FGI1 16
+> > +#define CP0C5=5FGI0 15
+> 
+> Ditto:
+> 
+> #define CP0C5=5FGI 15 /* 16..15 */
+> 
+
+The same.
+
+> > +#define CP0C5=5FCA2 14
+> > #define CP0C5=5FXNP 13
+> > +#define CP0C5=5FDEC 11
+
+Sincerely,
+Aleksandar
