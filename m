@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fb4Ax-0006XI-Tt
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:20:03 -0400
+	(envelope-from <marc.zyngier@arm.com>) id 1fb4C5-000794-Aw
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fb4Aw-00063k-17
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:19:59 -0400
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Thu, 5 Jul 2018 13:19:44 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA838712003@FRAEML521-MBX.china.huawei.com>
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-	<1530602398-16127-7-git-send-email-eric.auger@redhat.com>
-	<a856ba3a-c211-5f35-4023-97ef73eb5c31@redhat.com>
-	<df091f31-6f85-64d8-0c3b-7fd463d31c63@redhat.com>
-	<43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
-	<5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
-	<405e3f2b-3044-d7fc-8df4-b07a8487470f@redhat.com>
-	<f2d61062-21df-4478-bc61-c32e92329cf8@redhat.com>
-	<57030c9f-c3d1-49a8-090e-d6b316e7a818@redhat.com>
-	<fc6a29d4-1094-8d29-d415-fc30d5e30c31@redhat.com>
-In-Reply-To: <fc6a29d4-1094-8d29-d415-fc30d5e30c31@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <marc.zyngier@arm.com>) id 1fb4C2-0001L2-3m
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:21:09 -0400
+Received: from foss.arm.com ([217.140.101.70]:57040)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <marc.zyngier@arm.com>) id 1fb4C1-0001Gd-Tn
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 09:21:06 -0400
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+	<1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
+	<20180704140943.GF4828@arm.com>
+	<8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
+	<20180704155231.GP4828@arm.com>
+	<ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Message-ID: <d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
+Date: Thu, 5 Jul 2018 14:20:59 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
+In-Reply-To: <ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [kvmtool test PATCH 22/24] kvmtool: arm64: Add
+ support for guest physical address size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,147 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, David Hildenbrand <david@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "imammedo@redhat.com" <imammedo@redhat.com>
-Cc: "wei@redhat.com" <wei@redhat.com>, "drjones@redhat.com" <drjones@redhat.com>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "agraf@suse.de" <agraf@suse.de>
+To: Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, eric.auger@redhat.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEF1Z2VyIEVyaWMgW21haWx0
-bzplcmljLmF1Z2VyQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDA1IEp1bHkgMjAxOCAxMzoxOA0KPiBU
-bzogRGF2aWQgSGlsZGVuYnJhbmQgPGRhdmlkQHJlZGhhdC5jb20+OyBlcmljLmF1Z2VyLnByb0Bn
-bWFpbC5jb207DQo+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS1hcm1Abm9uZ251Lm9yZzsg
-cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOw0KPiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxz
-aGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+Ow0KPiBpbWFtbWVkb0ByZWRoYXQu
-Y29tDQo+IENjOiB3ZWlAcmVkaGF0LmNvbTsgZHJqb25lc0ByZWRoYXQuY29tOyBkYXZpZEBnaWJz
-b24uZHJvcGJlYXIuaWQuYXU7DQo+IGRnaWxiZXJ0QHJlZGhhdC5jb207IGFncmFmQHN1c2UuZGUN
-Cj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZDIHYzIDA2LzE1XSBody9hcm0vdmlydDog
-QWxsb2NhdGUNCj4gZGV2aWNlX21lbW9yeQ0KPiANCj4gSGkgRGF2aWQsDQo+IA0KPiBPbiAwNy8w
-NS8yMDE4IDAyOjA5IFBNLCBEYXZpZCBIaWxkZW5icmFuZCB3cm90ZToNCj4gPiBPbiAwNS4wNy4y
-MDE4IDE0OjAwLCBBdWdlciBFcmljIHdyb3RlOg0KPiA+PiBIaSBEYXZpZCwNCj4gPj4NCj4gPj4g
-T24gMDcvMDUvMjAxOCAwMTo1NCBQTSwgRGF2aWQgSGlsZGVuYnJhbmQgd3JvdGU6DQo+ID4+PiBP
-biAwNS4wNy4yMDE4IDEzOjQyLCBBdWdlciBFcmljIHdyb3RlOg0KPiA+Pj4+IEhpIERhdmlkLA0K
-PiA+Pj4+DQo+ID4+Pj4gT24gMDcvMDQvMjAxOCAwMjowNSBQTSwgRGF2aWQgSGlsZGVuYnJhbmQg
-d3JvdGU6DQo+ID4+Pj4+IE9uIDAzLjA3LjIwMTggMjE6MjcsIEF1Z2VyIEVyaWMgd3JvdGU6DQo+
-ID4+Pj4+PiBIaSBEYXZpZCwNCj4gPj4+Pj4+IE9uIDA3LzAzLzIwMTggMDg6MjUgUE0sIERhdmlk
-IEhpbGRlbmJyYW5kIHdyb3RlOg0KPiA+Pj4+Pj4+IE9uIDAzLjA3LjIwMTggMDk6MTksIEVyaWMg
-QXVnZXIgd3JvdGU6DQo+ID4+Pj4+Pj4+IFdlIGRlZmluZSBhIG5ldyBob3RwbHVnZ2FibGUgUkFN
-IHJlZ2lvbiAoYWthLiBkZXZpY2UgbWVtb3J5KS4NCj4gPj4+Pj4+Pj4gSXRzIGJhc2UgaXMgMlRC
-IEdQQS4gVGhpcyBvYnZpb3VzbHkgcmVxdWlyZXMgNDJiIElQQSBzdXBwb3J0DQo+ID4+Pj4+Pj4+
-IGluIEtWTS9BUk0sIEZXIGFuZCBndWVzdCBrZXJuZWwuIEF0IHRoZSBtb21lbnQgdGhlIGRldmlj
-ZQ0KPiA+Pj4+Pj4+PiBtZW1vcnkgcmVnaW9uIGlzIG1heCAyVEIuDQo+ID4+Pj4+Pj4NCj4gPj4+
-Pj4+PiBNYXliZSBhIHN0dXBpZCBxdWVzdGlvbiwgYnV0IHdoeSBleGFjdGx5IGRvZXMgaXQgaGF2
-ZSB0byBzdGFydCBhdCAyVEINCj4gPj4+Pj4+PiAoYW5kIG5vdCBlLmcuIGF0IDFUQik/DQo+ID4+
-Pj4+PiBub3QgYSBzdHVwaWQgcXVlc3Rpb24uIFNlZSB0ZW50YXRpdmUgYW5zd2VyIGJlbG93Lg0K
-PiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4+DQo+ID4+Pj4+Pj4+IFRoaXMgaXMgbGFyZ2VseSBpbnNwaXJl
-ZCBvZiBkZXZpY2UgbWVtb3J5IGluaXRpYWxpemF0aW9uIGluDQo+ID4+Pj4+Pj4+IHBjIG1hY2hp
-bmUgY29kZS4NCj4gPj4+Pj4+Pj4NCj4gPj4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogRXJpYyBBdWdl
-ciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+Pj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBLd2Fu
-Z3dvbyBMZWUgPGt3YW5nd29vLmxlZUBzay5jb20+DQo+ID4+Pj4+Pj4+IC0tLQ0KPiA+Pj4+Pj4+
-PiAgaHcvYXJtL3ZpcnQuYyAgICAgICAgIHwgMTA0DQo+ICsrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+ID4+Pj4+Pj4+ICBpbmNsdWRlL2h3L2FybS9h
-cm0uaCAgfCAgIDIgKw0KPiA+Pj4+Pj4+PiAgaW5jbHVkZS9ody9hcm0vdmlydC5oIHwgICAxICsN
-Cj4gPj4+Pj4+Pj4gIDMgZmlsZXMgY2hhbmdlZCwgNzkgaW5zZXJ0aW9ucygrKSwgMjggZGVsZXRp
-b25zKC0pDQo+ID4+Pj4+Pj4+DQo+ID4+Pj4+Pj4+IGRpZmYgLS1naXQgYS9ody9hcm0vdmlydC5j
-IGIvaHcvYXJtL3ZpcnQuYw0KPiA+Pj4+Pj4+PiBpbmRleCA1YTRkMGJmLi42ZmVmYjc4IDEwMDY0
-NA0KPiA+Pj4+Pj4+PiAtLS0gYS9ody9hcm0vdmlydC5jDQo+ID4+Pj4+Pj4+ICsrKyBiL2h3L2Fy
-bS92aXJ0LmMNCj4gPj4+Pj4+Pj4gQEAgLTU5LDYgKzU5LDcgQEANCj4gPj4+Pj4+Pj4gICNpbmNs
-dWRlICJxYXBpL3Zpc2l0b3IuaCINCj4gPj4+Pj4+Pj4gICNpbmNsdWRlICJzdGFuZGFyZC1oZWFk
-ZXJzL2xpbnV4L2lucHV0LmgiDQo+ID4+Pj4+Pj4+ICAjaW5jbHVkZSAiaHcvYXJtL3NtbXV2My5o
-Ig0KPiA+Pj4+Pj4+PiArI2luY2x1ZGUgImh3L2FjcGkvYWNwaS5oIg0KPiA+Pj4+Pj4+Pg0KPiA+
-Pj4+Pj4+PiAgI2RlZmluZSBERUZJTkVfVklSVF9NQUNISU5FX0xBVEVTVChtYWpvciwgbWlub3Is
-IGxhdGVzdCkgXA0KPiA+Pj4+Pj4+PiAgICAgIHN0YXRpYyB2b2lkIHZpcnRfIyNtYWpvciMjXyMj
-bWlub3IjI19jbGFzc19pbml0KE9iamVjdENsYXNzICpvYywNCj4gXA0KPiA+Pj4+Pj4+PiBAQCAt
-OTQsMzQgKzk1LDI1IEBADQo+ID4+Pj4+Pj4+DQo+ID4+Pj4+Pj4+ICAjZGVmaW5lIFBMQVRGT1JN
-X0JVU19OVU1fSVJRUyA2NA0KPiA+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+PiAtLyogUkFNIGxpbWl0IGlu
-IEdCLiBTaW5jZSBWSVJUX01FTSBzdGFydHMgYXQgdGhlIDFHQiBtYXJrLCB0aGlzDQo+IG1lYW5z
-DQo+ID4+Pj4+Pj4+IC0gKiBSQU0gY2FuIGdvIHVwIHRvIHRoZSAyNTZHQiBtYXJrLCBsZWF2aW5n
-IDI1NkdCIG9mIHRoZSBwaHlzaWNhbA0KPiA+Pj4+Pj4+PiAtICogYWRkcmVzcyBzcGFjZSB1bmFs
-bG9jYXRlZCBhbmQgZnJlZSBmb3IgZnV0dXJlIHVzZSBiZXR3ZWVuIDI1NkcNCj4gYW5kIDUxMkcu
-DQo+ID4+Pj4+Pj4+IC0gKiBJZiB3ZSBuZWVkIHRvIHByb3ZpZGUgbW9yZSBSQU0gdG8gVk1zIGlu
-IHRoZSBmdXR1cmUgdGhlbiB3ZQ0KPiBuZWVkIHRvOg0KPiA+Pj4+Pj4+PiAtICogICogYWxsb2Nh
-dGUgYSBzZWNvbmQgYmFuayBvZiBSQU0gc3RhcnRpbmcgYXQgMlRCIGFuZCB3b3JraW5nIHVwDQo+
-ID4+Pj4+PiBJIGFja25vd2xlZGdlIHRoaXMgY29tbWVudCB3YXMgdGhlIG1haW4ganVzdGlmaWNh
-dGlvbi4gTm93IGlmIHlvdSBsb29rDQo+IGF0DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gUHJpbmNpcGxl
-cyBvZiBBUk0gTWVtb3J5IE1hcHMNCj4gPj4+Pj4+DQo+IGh0dHA6Ly9pbmZvY2VudGVyLmFybS5j
-b20vaGVscC90b3BpYy9jb20uYXJtLmRvYy5kZW4wMDAxYy9ERU4wMDAxQ19wcmluYw0KPiBpcGxl
-c19vZl9hcm1fbWVtb3J5X21hcHMucGRmDQo+ID4+Pj4+PiBjaGFwdGVyIDIuMyB5b3Ugd2lsbCBm
-aW5kIHRoYXQgd2hlbiBhZGRpbmcgUEEgYml0cywgeW91IGFsd2F5cyBsZWF2ZQ0KPiA+Pj4+Pj4g
-c3BhY2UgZm9yIHJlc2VydmVkIHNwYWNlIGFuZCBtYXBwZWQgSU8uDQo+ID4+Pj4+DQo+ID4+Pj4+
-IFRoYW5rcyBmb3IgdGhlIHBvaW50ZXIhDQo+ID4+Pj4+DQo+ID4+Pj4+IFNvIC4uLiB3ZSBjYW4g
-Zml0DQo+ID4+Pj4+DQo+ID4+Pj4+IGEpIDJHQiBhdCAyR0INCj4gPj4+Pj4gYikgMzJHQiBhdCAz
-MkdCDQo+ID4+Pj4+IGMpIDUxMkdCIGF0IDUxMkdCDQo+ID4+Pj4+IGQpIDhUQiBhdCA4VEINCj4g
-Pj4+Pj4gZSkgMTI4VEIgYXQgMTI4VEINCj4gPj4+Pj4NCj4gPj4+Pj4gKHRoaXMgaXMgYSBuaWNl
-IHJ1bGUgb2YgdGh1bWIgaWYgSSB1bmRlcnN0YW5kIGl0IGNvcnJlY3RseSA6KSApDQo+ID4+Pj4+
-DQo+ID4+Pj4+IFdlIHNob3VsZCBzdHJpdmUgZm9yIGRldmljZSBtZW1vcnkgKG1heHJhbV9zaXpl
-IC0gcmFtX3NpemUpIHRvIGZpdA0KPiA+Pj4+PiBleGFjdGx5IGludG8gb25lIG9mIHRoZXNlIHNs
-b3RzIChvdGhlcndpc2UgdGhpbmdzIGdldCBuYXN0eSkuDQo+ID4+Pj4+DQo+ID4+Pj4+IERlcGVu
-ZGluZyBvbiB0aGUgcmFtX3NpemUsIHdlIG1pZ2h0IGhhdmUgc2ltcGxlciBzZXR1cHMgYW5kIGNh
-bg0KPiBzdXBwb3J0DQo+ID4+Pj4+IG1vcmUgY29uZmlndXJhdGlvbnMsIG5vPw0KPiA+Pj4+Pg0K
-PiA+Pj4+PiBFLmcuIHJhbV9zaXplIDw9IDM0R0IsIGRldmljZV9tZW1vcnkgPD0gNTEyR0INCj4g
-Pj4+Pj4gLT4gbW92ZSByYW0gaW50byBhKSBhbmQgYikNCj4gPj4+Pj4gLT4gbW92ZSBkZXZpY2Ug
-bWVtb3J5IGludG8gYykNCj4gPj4+Pg0KPiA+Pj4+IFRoZSBpc3N1ZSBpcyBtYWNodmlydCBkb2Vz
-bid0IGNvbXBseSB3aXRoIHRoYXQgZG9jdW1lbnQuDQo+ID4+Pj4gQXQgdGhlIG1vbWVudCB3ZSBo
-YXZlDQo+ID4+Pj4gMCAtPiAxR0IgTU1JTw0KPiA+Pj4+IDFHQiAtPiAyNTZHQiBSQU0NCj4gPj4+
-PiAyNTZHQiAtPiA1MTJHQiBpcyB0aGVvcmV0aWNhbGx5IHJlc2VydmVkIGZvciBJTyBidXQgbW9z
-dCBpcyBmcmVlLg0KPiA+Pj4+IDUxMkdCIC0+IDFUIGlzIHJlc2VydmVkIGZvciBFQ0FNIE1NSU8g
-cmFuZ2UuIFRoaXMgaXMgdGhlIHRvcCBvZiBvdXINCj4gPj4+PiBleGlzdGluZyA0MGIgR1BBIHNw
-YWNlLg0KPiA+Pj4+DQo+ID4+Pj4gV2UgZG9uJ3Qgd2FudCB0byBjaGFuZ2UgdGhpcyBhZGRyZXNz
-IG1hcCBkdWUgdG8gbGVnYWN5IHJlYXNvbnMuDQo+ID4+Pj4NCj4gPj4+DQo+ID4+PiBUaGFua3Ms
-IGdvb2QgdG8ga25vdyENCj4gPj4+DQo+ID4+Pj4gQW5vdGhlciBxdWVzdGlvbiEgZG8geW91IGtu
-b3cgaWYgaXQgd291bGQgYmUgcG9zc2libGUgdG8gaGF2ZQ0KPiA+Pj4+IGRldmljZV9tZW1vcnkg
-cmVnaW9uIHNwbGl0IGludG8gc2V2ZXJhbCBkaXNjb250aW51b3VzIHNlZ21lbnRzPw0KPiA+Pj4N
-Cj4gPj4+IEl0IGNhbiBiZSBpbXBsZW1lbnRlZCBmb3Igc3VyZSwgYnV0IEkgd291bGQgdHJ5IHRv
-IGF2b2lkIHRoYXQsIGFzIGl0DQo+ID4+PiBtYWtlcyBjZXJ0YWluIGNvbmZpZ3VyYXRpb25zIGlt
-cG9zc2libGUgKGFuZCB2ZXJ5IGVuZCB1c2VyIHVuZnJpZW5kbHkpLg0KPiA+Pj4NCj4gPj4+IEUu
-Zy4gKG51bWJlcnMgY29tcGxldGVseSBtYWRlIHVwLCBidXQgaXQgc2hvdWxkIHNob3cgd2hhdCBJ
-IG1lYW4pDQo+ID4+Pg0KPiA+Pj4gLW0gMjBHLG1heG1lbT0xMjBHOg0KPiA+Pj4gLT4gVHJ5IHRv
-IGFkZCBhIERJTU0gd2l0aCAxMDBHIC0+IGVycm9yLg0KPiA+Pj4gLT4gQnV0IHdlIGNhbiBhZGQg
-ZS5nLiB0d28gRElNTXMgd2l0aCA0MEcgYW5kIDYwRy4NCj4gPj4+DQo+ID4+PiBUaGlzIGV4cG9z
-ZXMgaW50ZXJuYWwgZGV0YWlscyB0byB0aGUgZW5kIHVzZXIuIEFuZCB0aGUgZW5kIHVzZXIgaGFz
-IG5vDQo+ID4+PiBpZGVhIHdoYXQgaXMgZ29pbmcgb24uDQo+ID4+Pg0KPiA+Pj4gU28gSSB0aGlu
-ayB3ZSBzaG91bGQgdHJ5IG91ciBiZXN0IHRvIGtlZXAgdGhhdCBhcmVhIGNvbnNlY3V0aXZlLg0K
-PiA+Pg0KPiA+PiBBY3R1YWxseSBJIGRpZG4ndCBzdWZmaWNpZW50bHkgZGV0YWlsIHRoZSBjb250
-ZXh0LiBJIHdvdWxkIGxpa2UNCj4gPj4gMSkgMSBzZWdtZW50IHRvIGJlIGV4cG9zZWQgdG8gdGhl
-IGVuZC11c2VyIHRocm91Z2ggc2xvdHxtYXhtZW0gc3R1ZmYNCj4gPj4gKHdoYXQgdGhpcyBzZXJp
-ZXMgdGFyZ2V0cykgYW5kDQo+ID4+IDIpIGFub3RoZXIgc2VnbWVudCB1c2VkIHRvIGluc3RhbnRp
-YXRlIFBDLURJTU0gZm9yIGludGVybmFsIG5lZWRzIGFzDQo+ID4+IHJlcGxhY2VtZW50IG9mIHBh
-cnQgb2YgdGhlIDFHQiAtPiAyNTZHQiBzdGF0aWMgUkFNLiBUaGlzIHdhcyB0aGUgcHVycG9zZQ0K
-PiA+PiBvZiBTaGFtZWVyJ3Mgb3JpZ2luYWwgc2VyaWVzDQo+ID4NCj4gPiBJIGFtIG5vdCBzdXJl
-IGlmIFBDLURJTU1zIGFyZSBleGFjdGx5IHdoYXQgeW91IHdhbnQgZm9yIGludGVybmFsIHB1cnBv
-c2VzLg0KPiA+DQo+ID4+DQo+ID4+IFsxXSBbUkZDIHYyIDAvNl0gaHcvYXJtOiBBZGQgc3VwcG9y
-dCBmb3Igbm9uLWNvbnRpZ3VvdXMgaW92YSByZWdpb25zDQo+ID4+IGh0dHA6Ly9wYXRjaHdvcmsu
-b3psYWJzLm9yZy9jb3Zlci85MTQ2OTQvDQo+ID4+IFRoaXMgYXBwcm9hY2ggaXMgbm90IHlldCB2
-YWxpZGF0ZWQgdGhvdWdoLg0KPiA+Pg0KPiA+PiBUaGUgcmF0aW9uYWxlIGlzIHNvbWV0aW1lcyB5
-b3UgbXVzdCBoYXZlICJob2xlcyIgaW4gUkFNIGFzIHNvbWUgR1BBcw0KPiA+PiBtYXRjaCByZXNl
-cnZlZCBJT1ZBcyBmb3IgYXNzaWduZWQgZGV2aWNlcy4NCj4gPg0KPiA+IFNvIGlmIEkgdW5kZXJz
-dGFuZCBpdCBjb3JyZWN0bHksIGFsbCB5b3Ugd2FudCBpcyBzb21lIG1lbW9yeSByZWdpb24gdGhh
-dA0KPiA+IGEpIGNvbnRhaW5zIG9ubHkgaW5pdGlhbGx5IGRlZmluZWQgbWVtb3J5DQo+ID4gYikg
-Y2FuIGhhdmUgc29tZSBob2xlcyBpbiBpdA0KPiA+DQo+ID4gVGhpcyBpcyBleGFjdGx5IHdoYXQg
-eDg2IGFscmVhZHkgZG9lcyAocGNfbWVtb3J5X2luaXQpOiBTaW1wbHkgY29uc3RydWN0DQo+ID4g
-eW91ciBvd24gbWVtb3J5IHJlZ2lvbiBsZWF2aW5nIGhvbGVzIGluIGl0Lg0KPiA+DQo+ID4NCj4g
-PiBtZW1vcnlfcmVnaW9uX2luaXRfYWxpYXMocmFtX2JlbG93XzRnLCBOVUxMLCAicmFtLWJlbG93
-LTRnIiwgcmFtLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAwLCBwY21zLT5iZWxvd180
-Z19tZW1fc2l6ZSk7DQo+ID4gbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVnaW9uKHN5c3RlbV9tZW1v
-cnksIDAsIHJhbV9iZWxvd180Zyk7DQo+ID4gLi4uDQo+ID4gaWYgKHBjbXMtPmFib3ZlXzRnX21l
-bV9zaXplID4gMCkNCj4gPiAgICAgbWVtb3J5X3JlZ2lvbl9pbml0X2FsaWFzKHJhbV9hYm92ZV80
-ZywgTlVMTCwgInJhbS1hYm92ZS00ZyIsIHJhbSwNCj4gPiAgICAgLi4uDQo+ID4gICAgIG1lbW9y
-eV9yZWdpb25fYWRkX3N1YnJlZ2lvbihzeXN0ZW1fbWVtb3J5LCAweDEwMDAwMDAwMFVMTCwNCj4g
-PiAgICAgLi4uDQo+ID4NCj4gPiBUaGV5ICJpbmRpY2F0ZSIgdGhlc2UgZGlmZmVyZW50IEdQQSBh
-cmVhcyB1c2luZyB0aGUgZTgyMCBtYXAgdG8gdGhlIGd1ZXN0Lg0KPiA+DQo+ID4gV291bGQgdGhh
-dCBhbHNvIHdvcmsgZm9yIHlvdT8NCj4gDQo+IEkgd291bGQgdGVudGF0aXZlbHkgc2F5IHllcy4g
-RWZmZWN0aXZlbHkgSSBhbSBub3Qgc3VyZSB0aGF0IGlmIHdlIHdlcmUNCj4gdG8gYWN0dWFsbHkg
-cHV0IGhvbGVzIGluIHRoZSAxRy0yNTZHQiBSQU0gc2VnbWVudCwgUEMtRElNTSB3b3VsZCBiZSB0
-aGUNCj4gbmF0dXJhbCBjaG9pY2UuIEFsc28gdGhlIHJlc2VydmVkIElPVkEgaXNzdWUgaW1wYWN0
-cyB0aGUgZGV2aWNlX21lbW9yeQ0KPiByZWdpb24gYXJlYSBJIHRoaW5rLiBJIGFtIHNrZXB0aWNh
-bCBhYm91dCB0aGUgZmFjdCB3ZSBjYW4gcHV0IGhvbGVzIGluDQo+IHN0YXRpYyBSQU0gYW5kIGRl
-dmljZV9tZW1vcnkgcmVnaW9ucyBsaWtlIHRoYXQuDQoNClRoZSBmaXJzdCBhcHByb2FjaFsxXSB3
-ZSBoYWQgdG8gYWRkcmVzcyB0aGUgaG9sZXMgaW4gbWVtb3J5IHdhcyB1c2luZw0KdGhlIG1lbW9y
-eSBhbGlhcyB3YXkgbWVudGlvbmVkIGFib3ZlLiAgQW5kIGJhc2VkIG9uIERyZXcncyByZXZpZXcs
-IHRoZQ0KcGMtZGltbSB3YXkgb2YgaGFuZGxpbmcgd2FzIGludHJvZHVjZWQuIEkgdGhpbmsgdGhl
-IG1haW4gYXJndW1lbnQgd2FzIHRoYXQNCml0IHdpbGwgYmUgdXNlZnVsIHdoZW4gd2UgZXZlbnR1
-YWxseSBzdXBwb3J0IGhvdHBsdWcuIEJ1dCBzaW5jZSB0aGF0IGlzIGFkZGVkDQphbnl3YXkgYXMg
-cGFydCBvZiB0aGlzIHNlcmllcywgSSBhbSBub3Qgc3VyZSB3ZSBoYXZlIGFueSBvdGhlciBiZW5l
-Zml0IGluDQptb2RlbGluZyBpdCBhcyBwYy1kaW1tLiBNYXkgYmUgSSBhbSBtaXNzaW5nIHNvbWV0
-aGluZyBoZXJlLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNClsxXS4gaHR0cHM6Ly9saXN0cy5nbnUu
-b3JnL2FyY2hpdmUvaHRtbC9xZW11LWFybS8yMDE4LTA0L21zZzAwMjQzLmh0bWwNCg0KDQo+IFRo
-YW5rcyENCj4gDQo+IEVyaWMNCj4gPg0KPiA+Pg0KPiA+PiBUaGFua3MNCj4gPj4NCj4gPj4gRXJp
-Yw0KPiA+Pg0KPiA+Pj4NCj4gPj4+Pg0KPiA+Pj4+IFRoYW5rcw0KPiA+Pj4+DQo+ID4+Pj4gRXJp
-Yw0KPiA+Pj4NCj4gPj4+DQo+ID4NCj4gPg0K
+On 05/07/18 13:47, Julien Grall wrote:
+> Hi Will,
+> 
+> On 04/07/18 16:52, Will Deacon wrote:
+>> On Wed, Jul 04, 2018 at 04:00:11PM +0100, Julien Grall wrote:
+>>> On 04/07/18 15:09, Will Deacon wrote:
+>>>> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
+>>>>> Add an option to specify the physical address size used by this
+>>>>> VM.
+>>>>>
+>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>> ---
+>>>>>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
+>>>>>   arm/include/arm-common/kvm-config-arch.h  | 1 +
+>>>>>   2 files changed, 5 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>>> index 04be43d..dabd22c 100644
+>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>>> @@ -8,7 +8,10 @@
+>>>>>   			"Create PMUv3 device"),				\
+>>>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+>>>>>   			"Specify random seed for Kernel Address Space "	\
+>>>>> -			"Layout Randomization (KASLR)"),
+>>>>> +			"Layout Randomization (KASLR)"),		\
+>>>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
+>>>>> +			"Specify maximum physical address size (not "	\
+>>>>> +			"the amount of memory)"),
+>>>>
+>>>> Given that this is a shift value, I think the help message could be more
+>>>> informative. Something like:
+>>>>
+>>>> 	"Specify maximum number of bits in a guest physical address"
+>>>>
+>>>> I think I'd actually leave out any mention of memory, because this does
+>>>> actually have an effect on the amount of addressable memory in a way that I
+>>>> don't think we want to describe in half of a usage message line :)
+>>> Is there any particular reasons to expose this option to the user?
+>>>
+>>> I have recently sent a series to allow the user to specify the position
+>>> of the RAM [1]. With that series in mind, I think the user would not really
+>>> need to specify the maximum physical shift. Instead we could automatically
+>>> find it.
+>>
+>> Marc makes a good point that it doesn't help for MMIO regions, so I'm trying
+>> to understand whether we can do something differently there and avoid
+>> sacrificing the type parameter.
+> 
+> I am not sure to understand this. kvmtools knows the memory layout 
+> (including MMIOs) of the guest, so couldn't it guess the maximum 
+> physical shift for that?
+
+That's exactly what Will was trying to avoid, by having KVM to compute
+the size of the IPA space based on the registered memslots. We've now
+established that it doesn't work, so what we need to define is:
+
+- whether we need another ioctl(), or do we carry on piggy-backing on
+the CPU type,
+- assuming the latter, whether we can reduce the number of bits used in
+the ioctl parameter by subtly encoding the IPA size.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
