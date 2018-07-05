@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rn-0004SW-O2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:32 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rp-0004UK-9r
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rm-0006Fy-77
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:31 -0400
-Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:35334)
+	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rn-0006Gv-U0
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:32 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:43483)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1fb8rm-0006FW-0b
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:30 -0400
-Received: by mail-pf0-x22d.google.com with SMTP id q7-v6so5028706pff.2
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 11:20:29 -0700 (PDT)
+	id 1fb8rn-0006GX-N7
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:31 -0400
+Received: by mail-pf0-x242.google.com with SMTP id y8-v6so6130019pfm.10
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 11:20:31 -0700 (PDT)
 From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Thu,  5 Jul 2018 11:19:56 -0700
-Message-Id: <20180705182001.16537-10-mdavidsaver@gmail.com>
+Date: Thu,  5 Jul 2018 11:19:57 -0700
+Message-Id: <20180705182001.16537-11-mdavidsaver@gmail.com>
 In-Reply-To: <20180705182001.16537-1-mdavidsaver@gmail.com>
 References: <20180705182001.16537-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 09/14] timer: rename file ds1338.c -> ds-rtc.c
+Subject: [Qemu-devel] [PATCH 10/14] timer: ds1338 remove vestige of
+ un-modeled OSF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +30,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- default-configs/arm-softmmu.mak | 2 +-
- hw/timer/Makefile.objs          | 2 +-
- hw/timer/{ds1338.c => ds-rtc.c} | 0
- 3 files changed, 2 insertions(+), 2 deletions(-)
- rename hw/timer/{ds1338.c => ds-rtc.c} (100%)
+Oscillator stop has never been modeled, so the
+Oscillator Stop Flag can never be set.
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 834d45cfaf..84f42b821b 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -34,7 +34,7 @@ CONFIG_SMC91C111=y
- CONFIG_ALLWINNER_EMAC=y
- CONFIG_IMX_FEC=y
- CONFIG_FTGMAC100=y
--CONFIG_DS1338=y
-+CONFIG_DSRTC=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_PFLASH_CFI02=y
- CONFIG_MICRODRIVE=y
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index e16b2b913c..b3d3b80232 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -3,7 +3,7 @@ common-obj-$(CONFIG_ARM_MPTIMER) += arm_mptimer.o
- common-obj-$(CONFIG_ARM_V7M) += armv7m_systick.o
- common-obj-$(CONFIG_A9_GTIMER) += a9gtimer.o
- common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
--common-obj-$(CONFIG_DS1338) += ds1338.o
-+common-obj-$(CONFIG_DSRTC) += ds-rtc.o
- common-obj-$(CONFIG_HPET) += hpet.o
- common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
- common-obj-$(CONFIG_M41T80) += m41t80.o
-diff --git a/hw/timer/ds1338.c b/hw/timer/ds-rtc.c
-similarity index 100%
-rename from hw/timer/ds1338.c
-rename to hw/timer/ds-rtc.c
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+---
+ hw/timer/ds-rtc.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/hw/timer/ds-rtc.c b/hw/timer/ds-rtc.c
+index 3c5781d53c..126566ce1f 100644
+--- a/hw/timer/ds-rtc.c
++++ b/hw/timer/ds-rtc.c
+@@ -21,8 +21,6 @@
+  */
+ #define NVRAM_SIZE 64
+ 
+-#define CTRL_OSF   0x20
+-
+ #define TYPE_DSRTC "ds1338"
+ #define DSRTC(obj) OBJECT_CHECK(DSRTCState, (obj), TYPE_DSRTC)
+ 
+@@ -216,13 +214,11 @@ static int dsrtc_send(I2CSlave *i2c, uint8_t data)
+     if (s->ptr == R_CTRL) {
+         /* Control register. */
+ 
+-        /* Ensure bits 2, 3 and 6 will read back as zero. */
+-        data &= 0xB3;
+-
+-        /* Attempting to write the OSF flag to logic 1 leaves the
+-           value unchanged. */
+-        data = (data & ~CTRL_OSF) | (data & s->nvram[s->ptr] & CTRL_OSF);
+-
++        /* Allow guest to set no-op controls for clock out pin and
++         * rate select.  Ignore write 1 to clear OSF.  We don't model
++         * oscillator stop, so it is never set.
++         */
++        data = data & 0x93;
+     }
+     s->nvram[s->ptr] = data;
+     if (s->ptr <= R_YEAR) {
 -- 
 2.11.0
