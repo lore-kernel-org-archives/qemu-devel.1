@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb6e1-00046S-5f
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:58:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fb6eL-0004JY-4O
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:58:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb6e0-0004v9-Ez
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:58:09 -0400
-Date: Thu, 5 Jul 2018 17:57:55 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180705155755.GN3309@localhost.localdomain>
-References: <20180705073701.10558-1-famz@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fb6eK-00052n-8x
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:58:29 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu,  5 Jul 2018 12:58:04 -0300
+Message-Id: <20180705155811.20366-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705073701.10558-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] block: Fix dst reading after tail
- copy offloading
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/7] Coccinelle cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,23 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-trivial@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, David Hildenbrand <david@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Am 05.07.2018 um 09:36 hat Fam Zheng geschrieben:
-> Qcow2 allocates new clusters after the end of the file. If it is the destinaton
-> of copy offloading, we must adjust dst->bs->total_sectors. Otherwise, further
-> reads will drop to the "beyond EOF" code path and return zeroes, which problem
-> is caught by iotests 222.
-> 
-> Follow the logic in the normal write code and update bs->total_sectors after
-> I/O is done.
-> 
-> While at it, add a few convenient trace points to aid future debug experiences
-> in the topic.
+Hi Michael,
 
-Apart from the comments I made, this series also conflicts with
-Vladimir's "[PATCH v3 0/4] fix image fleecing". Can you please rebase on
-top of his series for the next version?
+Nothing exciting here, patches created mechanically
+(common after soft freeze).
 
-Kevin
+All patches are reviewed, can you queue them in your Trivial tree?
+
+Thanks,
+
+Phil.
+
+Since v1:
+- rebased
+- dropped incorrect "crypto: Remove useless casts" (Daniel)
+- use PCI_DEVICE() to access XenPCIPassthroughState->dev (Peter)
+- added R-b, A-b
+
+Philippe Mathieu-Daudé (7):
+  qobject: Catch another straggler for use of qdict_put_str()
+  error: Remove NULL checks on error_propagate() calls
+  xen: Use the PCI_DEVICE macro
+  tests/bios-tables-test: Remove an useless cast
+  ui/vnc: Remove useless parenthesis around DIV_ROUND_UP macro
+  hw/pci-host: Remove useless parenthesis around DIV_ROUND_UP macro
+  hw/intc/gicv3: Remove useless parenthesis around DIV_ROUND_UP macro
+
+ include/hw/intc/arm_gicv3_common.h | 2 +-
+ hw/pci-host/piix.c                 | 2 +-
+ hw/pci-host/q35.c                  | 2 +-
+ hw/s390x/virtio-ccw.c              | 4 +---
+ hw/xen/xen_pt_config_init.c        | 8 ++++----
+ qobject/block-qdict.c              | 2 +-
+ tests/bios-tables-test.c           | 2 +-
+ ui/vnc-enc-tight.c                 | 2 +-
+ ui/vnc.c                           | 3 ++-
+ 9 files changed, 13 insertions(+), 14 deletions(-)
+
+-- 
+2.18.0
