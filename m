@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fb6JG-0005Uv-VP
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:36:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1fb6P2-00071B-V6
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fb6JD-000071-QP
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:36:42 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fb6JD-00006p-Kd
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:36:39 -0400
-Received: by mail-qt0-x244.google.com with SMTP id m13-v6so7453680qth.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 08:36:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180704153919.12432-1-f4bug@amsat.org>
-	<20180704153919.12432-5-f4bug@amsat.org>
-	<CAFEAcA-mhvAxF4bG3Zxx_w57Rkf4xnpTBuPrjekNzEK1vB0j9Q@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ceb3a31b-f7d5-70fb-c02a-798ec446d881@amsat.org>
-Date: Thu, 5 Jul 2018 12:36:33 -0300
+	(envelope-from <eblake@redhat.com>) id 1fb6P2-0002um-0z
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:42:41 -0400
+References: <20180704112302.471456-1-vsementsov@virtuozzo.com>
+	<20180704112302.471456-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2fd38919-a733-692f-488d-3071eeea4bd1@redhat.com>
+Date: Thu, 5 Jul 2018 10:42:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-mhvAxF4bG3Zxx_w57Rkf4xnpTBuPrjekNzEK1vB0j9Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180704112302.471456-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/8] xen: Remove useless casts
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] nbd/server: fix
+ nbd_co_send_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-On 07/05/2018 07:16 AM, Peter Maydell wrote:
-> On 4 July 2018 at 16:39, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Patch created mechanically by rerunning:
->>
->>   $  spatch --sp-file scripts/coccinelle/typecast.cocci \
->>             --macro-file scripts/cocci-macro-file.h \
->>             --dir . --in-place
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/xen/xen_pt_config_init.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
->> index aee31c62bb..55a83333f2 100644
->> --- a/hw/xen/xen_pt_config_init.c
->> +++ b/hw/xen/xen_pt_config_init.c
->> @@ -543,7 +543,7 @@ static int xen_pt_exp_rom_bar_reg_write(XenPCIPassthroughState *s,
->>  {
->>      XenPTRegInfo *reg = cfg_entry->reg;
->>      XenPTRegion *base = NULL;
->> -    PCIDevice *d = (PCIDevice *)&s->dev;
->> +    PCIDevice *d = &s->dev;
+On 07/04/2018 06:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Call nbd_co_send_extents() with correct length parameter
+> (extent.length may be smaller than original length).
+
+Only matters for tracing purposes, but indeed worth an accurate trace.
+
 > 
-> This line of code is odd even without the cast. XenPCIPassthroughState*
-> is a QOM object (TYPE_XEN_PT_DEVICE) which is a subclass of TYPE_PCI_DEVICE,
-> so the standard way to get the PCIDevice pointer for s would be
->   PCIDevice *d = PCI_DEVICE(s);
+> Also, switch length parameter type to uint32_t, to correspond with
+> request->len and similar nbd_co_send_bitmap().
 
-You have eagle eyes...
+No semantic impact.
 
-Thanks for your review :)
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   nbd/server.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/nbd/server.c b/nbd/server.c
+> index e52b76bd1a..ea5fe0eb33 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -1910,7 +1910,7 @@ static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
+>   /* Get block status from the exported device and send it to the client */
+>   static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
+>                                       BlockDriverState *bs, uint64_t offset,
+> -                                    uint64_t length, bool last,
+> +                                    uint32_t length, bool last,
+>                                       uint32_t context_id, Error **errp)
+>   {
+>       int ret;
+> @@ -1922,7 +1922,8 @@ static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
+>                   client, handle, -ret, "can't get block status", errp);
+>       }
+>   
+> -    return nbd_co_send_extents(client, handle, &extent, 1, length, last,
+> +    return nbd_co_send_extents(client, handle, &extent, 1,
+> +                               be32_to_cpu(extent.length), last,
 
-Phil.
+be32_to_cpu() is necessary to undo the fact that extent is already 
+encoded for transmission over the wire.  Alternatively, 
+blockstatus_to_extent_be() could be modified to return negative on 
+error, or the total length encoded on success, or set the final length 
+via a pointer parameter.  But the next patch will probably deal with 
+that more directly.
+
+This one is fine for 3.0,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
