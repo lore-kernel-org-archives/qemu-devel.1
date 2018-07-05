@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb0sz-0001h3-S2
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:49:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fb0yy-0002wQ-P3
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:55:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fb0su-0004gg-Vy
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:49:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39742 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fb0su-0004er-Qh
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:49:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 13856B5C5
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 09:49:08 +0000 (UTC)
-Date: Thu, 5 Jul 2018 17:49:03 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180705094903.GA23001@xz-mi>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-5-peterx@redhat.com>
-	<87woua9iay.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1fb0yu-0007Gu-QF
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:55:24 -0400
+Resent-Message-Id: <E1fb0yu-0007Gu-QF@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21053)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fb0yu-0007C6-I1
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 05:55:20 -0400
+In-Reply-To: <1530781798-183214-1-git-send-email-robert.hu@linux.intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153078448871.1215.1657841619161125592@946cad8fd14e>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87woua9iay.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/9] monitor: move need_resume flag into
- monitor struct
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 5 Jul 2018 02:54:49 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add Icelake CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: robert.hu@linux.intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, robert.hu@intel.com, wei.w.wang@intel.com, jingqi.liu@intel.com
 
-On Thu, Jul 05, 2018 at 10:51:33AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
->=20
-> > It was put into the request object to show whether we'll need to resu=
-me
-> > the monitor after dispatching the command.  Now we move that into the
-> > monitor struct so that it might be even used in other places in the
-> > future, e.g., out-of-band message flow controls.
-> >
-> > One thing to mention is that there is no lock needed before when
-> > accessing the flag since the request object will always be owned by a
-> > single thread.  After we move it into monitor struct we need to prote=
-ct
-> > that flag since it might be accessed by multiple threads now.  Renami=
-ng
-> > the qmp_queue_lock into qmp_lock to protect the flag as well.
-> >
-> > No functional change.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
->=20
-> Marc-Andr=C3=A9's "[PATCH v3 04/38] monitor: no need to save need_resum=
-e" and
-> "[PATCH v3 05/38] monitor: further simplify previous patch" also mess
-> with need_resume.  Marc-Andr=C3=A9, could you have a look at this patch=
- and
-> the next one?
-
-Sorry I should have looked at those before hand.  I think I must be
-waiting for another post to split the patches into two (after
-Marc-Andre poked me with that thread) but then I forgot about that.
-
-So now I suspect we'd better keep that flag since in the next patch
-the suspend operation can happen conditionally now.
-
-Thanks,
-
---=20
-Peter Xu
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MzA3ODE3OTgtMTgzMjE0LTEtZ2l0LXNlbmQtZW1haWwtcm9iZXJ0Lmh1QGxp
+bnV4LmludGVsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0gQWRkIElj
+ZWxha2UgQ1BVIG1vZGVsCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
+QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
+YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
+QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
+bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
+IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
+KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBmZThkMmQ1NzM3Li44YmViOGNjNjRk
+ICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
+LzE1MzA3ODE3OTgtMTgzMjE0LTEtZ2l0LXNlbmQtZW1haWwtcm9iZXJ0Lmh1QGxpbnV4LmludGVs
+LmNvbSAtPiBwYXRjaGV3LzE1MzA3ODE3OTgtMTgzMjE0LTEtZ2l0LXNlbmQtZW1haWwtcm9iZXJ0
+Lmh1QGxpbnV4LmludGVsLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIw
+MTgwNzA1MDMxNzU1LjMyNTQtMS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNzA1
+MDMxNzU1LjMyNTQtMS1wZXRlcnhAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
+ICBwYXRjaGV3LzIwMTgwNzA1MDgwMDE3LjMxMTIzLTEtYmFsYTI0QGxpbnV4LnZuZXQuaWJtLmNv
+bSAtPiBwYXRjaGV3LzIwMTgwNzA1MDgwMDE3LjMxMTIzLTEtYmFsYTI0QGxpbnV4LnZuZXQuaWJt
+LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNzA1MDkxNDAyLjI2
+MjQ0LTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDcwNTA5MTQwMi4yNjI0NC0x
+LWFybWJydUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODA3MDUwOTIxMzkuNzc2MDY5LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcv
+MjAxODA3MDUwOTIxMzkuNzc2MDY5LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzU3MjE5ZGQ2NiBpMzg2OiBBZGQgbmV3IENQVSBtb2Rl
+bCBJY2VsYWtlLXtTZXJ2ZXIsIENsaWVudH0KZTRiNDFlNjY5NCBpMzg2OiBBZGQgQ1BVSUQgYml0
+IGZvciBXQk5PSU5WRAowZDM2M2U0YjVhIGkzODY6IEFkZCBDUFVJRCBiaXQgZm9yIFBDT05GSUcK
+MWYxOTg1NzljNiBpMzg2OiBBZGQgQ1BVSUQgYml0IGFuZCBmZWF0dXJlIHdvcmRzIGZvciBJQTMy
+X0FSQ0hfQ0FQQUJJTElUSUVTIE1TUgoyN2JkZjJhNmEyIGkzODY6IEFkZCBuZXcgTVNSIGluZGlj
+ZXMgZm9yIElBMzJfUFJFRF9DTUQgYW5kIElBMzJfQVJDSF9DQVBBQklMSVRJRVMKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogaTM4NjogQWRkIG5ldyBNU1IgaW5kaWNl
+cyBmb3IgSUEzMl9QUkVEX0NNRCBhbmQgSUEzMl9BUkNIX0NBUEFCSUxJVElFUy4uLgpDaGVja2lu
+ZyBQQVRDSCAyLzU6IGkzODY6IEFkZCBDUFVJRCBiaXQgYW5kIGZlYXR1cmUgd29yZHMgZm9yIElB
+MzJfQVJDSF9DQVBBQklMSVRJRVMgTVNSLi4uCkNoZWNraW5nIFBBVENIIDMvNTogaTM4NjogQWRk
+IENQVUlEIGJpdCBmb3IgUENPTkZJRy4uLgpDaGVja2luZyBQQVRDSCA0LzU6IGkzODY6IEFkZCBD
+UFVJRCBiaXQgZm9yIFdCTk9JTlZELi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MzQ6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5oOjY5ODoKKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZG8g
+bm90IGludmFsaWRhdGUgY2FjaGUgKi8KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTYg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
+Y2tpbmcgUEFUQ0ggNS81OiBpMzg2OiBBZGQgbmV3IENQVSBtb2RlbCBJY2VsYWtlLXtTZXJ2ZXIs
+IENsaWVudH0uLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
