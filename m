@@ -1,31 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fb1y3-0008KH-Ac
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:58:32 -0400
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fb1yy-0000Nc-SS
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fb1y0-0001zC-8Q
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:58:31 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fb1y0-0001sH-20
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:58:28 -0400
-Received: by mail-wm0-x244.google.com with SMTP id s14-v6so10144012wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 03:58:26 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1530709942-87947-1-git-send-email-jingqi.liu@intel.com>
-	<cfe2a879-d038-f80f-cbec-ae247afde702@redhat.com>
-	<20180704175234.GX7451@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ae5043f-78ec-bc54-8b13-119111e62101@redhat.com>
-Date: Thu, 5 Jul 2018 12:58:23 +0200
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fb1yv-0004Jj-OV
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:59:28 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55298
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1fb1yv-0004HB-Hr
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:59:25 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w65Ax9XF024277
+	for <qemu-devel@nongnu.org>; Thu, 5 Jul 2018 06:59:24 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k1j2a80d9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 06:59:24 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Thu, 5 Jul 2018 11:59:23 +0100
+Date: Thu, 5 Jul 2018 16:29:16 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-7-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180704175234.GX7451@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] kvm: x86: Add support for -machine
- split-lock-ac
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705031755.3254-7-peterx@redhat.com>
+Message-Id: <20180705105916.GB22608@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 6/9] tests: introduce
+ migrate_query*() helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +43,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Jingqi Liu <jingqi.liu@intel.com>, rth@twiddle.net, mtosatti@redhat.com, qemu-devel@nongnu.org, wei.w.wang@intel.com, "Hu, Robert" <robert.hu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 04/07/2018 19:52, Eduardo Habkost wrote:
->> (Robert, does IceLake have this feature?  If so, we cannot create the
->> CPU model until everything is in place).
-> I don't think we need to block the CPU model because QEMU+KVM
-> doesn't support some features yet, as long as kernel versions
-> capable of running the 3.0 version of IceLake-Server will be also
-> capable of running the 3.1 version of IceLake-Server.
+On Thu, Jul 05, 2018 at 11:17:52AM +0800, Peter Xu wrote:
+> Introduce helpers to query migration states and use it.
 > 
-> Now, if that condition won't be true and we have some IceLake
-> features that will added only to more recent kernels, it might be
-> a good idea to hold the inclusion of the CPU model until
-> everything is in place.
-> 
-> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Yeah, the reason for that is to wait for the kernel side of the
-implementation.
+Looks good to me.
 
-Paolo
+Reviewed-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> ---
+>  tests/migration-test.c | 64 ++++++++++++++++++++++++++++--------------
+>  1 file changed, 43 insertions(+), 21 deletions(-)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index af82a04789..1d85ccbef1 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -168,6 +168,37 @@ static QDict *wait_command(QTestState *who, const char *command)
+>      return response;
+>  }
+> 
+> +/*
+> + * Note: caller is responsible to free the returned object via
+> + * qobject_unref() after use
+> + */
+> +static QDict *migrate_query(QTestState *who)
+> +{
+> +    QDict *rsp, *rsp_return;
+> +
+> +    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> +    rsp_return = qdict_get_qdict(rsp, "return");
+> +    g_assert(rsp_return);
+> +    qobject_ref(rsp_return);
+> +    qobject_unref(rsp);
+> +
+> +    return rsp_return;
+> +}
+> +
+> +/*
+> + * Note: caller is responsible to free the returned object via
+> + * g_free() after use
+> + */
+> +static gchar *migrate_query_status(QTestState *who)
+> +{
+> +    QDict *rsp_return = migrate_query(who);
+> +    gchar *status = g_strdup(qdict_get_str(rsp_return, "status"));
+> +
+> +    g_assert(status);
+> +    qobject_unref(rsp_return);
+> +
+> +    return status;
+> +}
+> 
+>  /*
+>   * It's tricky to use qemu's migration event capability with qtest,
+> @@ -176,11 +207,10 @@ static QDict *wait_command(QTestState *who, const char *command)
+> 
+>  static uint64_t get_migration_pass(QTestState *who)
+>  {
+> -    QDict *rsp, *rsp_return, *rsp_ram;
+> +    QDict *rsp_return, *rsp_ram;
+>      uint64_t result;
+> 
+> -    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> -    rsp_return = qdict_get_qdict(rsp, "return");
+> +    rsp_return = migrate_query(who);
+>      if (!qdict_haskey(rsp_return, "ram")) {
+>          /* Still in setup */
+>          result = 0;
+> @@ -188,33 +218,29 @@ static uint64_t get_migration_pass(QTestState *who)
+>          rsp_ram = qdict_get_qdict(rsp_return, "ram");
+>          result = qdict_get_try_int(rsp_ram, "dirty-sync-count", 0);
+>      }
+> -    qobject_unref(rsp);
+> +    qobject_unref(rsp_return);
+>      return result;
+>  }
+> 
+>  static void read_blocktime(QTestState *who)
+>  {
+> -    QDict *rsp, *rsp_return;
+> +    QDict *rsp_return;
+> 
+> -    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> -    rsp_return = qdict_get_qdict(rsp, "return");
+> +    rsp_return = migrate_query(who);
+>      g_assert(qdict_haskey(rsp_return, "postcopy-blocktime"));
+> -    qobject_unref(rsp);
+> +    qobject_unref(rsp_return);
+>  }
+> 
+>  static void wait_for_migration_complete(QTestState *who)
+>  {
+>      while (true) {
+> -        QDict *rsp, *rsp_return;
+>          bool completed;
+> -        const char *status;
+> +        char *status;
+> 
+> -        rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+> -        rsp_return = qdict_get_qdict(rsp, "return");
+> -        status = qdict_get_str(rsp_return, "status");
+> +        status = migrate_query_status(who);
+>          completed = strcmp(status, "completed") == 0;
+>          g_assert_cmpstr(status, !=,  "failed");
+> -        qobject_unref(rsp);
+> +        g_free(status);
+>          if (completed) {
+>              return;
+>          }
+> @@ -569,20 +595,16 @@ static void test_baddest(void)
+>  {
+>      QTestState *from, *to;
+>      QDict *rsp, *rsp_return;
+> -    const char *status;
+> +    char *status;
+>      bool failed;
+> 
+>      test_migrate_start(&from, &to, "tcp:0:0", true);
+>      migrate(from, "tcp:0:0", NULL);
+>      do {
+> -        rsp = wait_command(from, "{ 'execute': 'query-migrate' }");
+> -        rsp_return = qdict_get_qdict(rsp, "return");
+> -
+> -        status = qdict_get_str(rsp_return, "status");
+> -
+> +        status = migrate_query_status(from);
+>          g_assert(!strcmp(status, "setup") || !(strcmp(status, "failed")));
+>          failed = !strcmp(status, "failed");
+> -        qobject_unref(rsp);
+> +        g_free(status);
+>      } while (!failed);
+> 
+>      /* Is the machine currently running? */
+> -- 
+> 2.17.1
+> 
+> 
