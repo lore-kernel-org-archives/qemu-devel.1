@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fb1U8-0007yr-Gn
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:27:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fb1XT-0002Xo-Js
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fb1U3-0007lU-Ke
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:27:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44156 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fb1XO-0000Kx-N9
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:31:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57872 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb1U3-0007kj-GC
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:27:31 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fb1XO-0000JY-H6
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:30:58 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16DD240251DD
-	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 10:27:31 +0000 (UTC)
-Date: Thu, 5 Jul 2018 11:27:25 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id 0BF3981A4EAA
+	for <qemu-devel@nongnu.org>; Thu,  5 Jul 2018 10:30:58 +0000 (UTC)
+Date: Thu, 5 Jul 2018 11:30:52 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180705102725.GI2538@work-vm>
+Message-ID: <20180705103052.GJ2538@work-vm>
 References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180705031755.3254-8-peterx@redhat.com>
+	<20180705031755.3254-9-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180705031755.3254-8-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 7/9] tests: introduce
- wait_for_migration_status()
+In-Reply-To: <20180705031755.3254-9-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 8/9] tests: add postcopy recovery
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,51 +38,116 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
 * Peter Xu (peterx@redhat.com) wrote:
-> It's generalized from wait_for_migration_complete() to allow us to wait
-> for any migration status besides failure.
+> Test the postcopy recovery procedure by emulating a network failure
+> using migrate-pause command.
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
+
+OK, that's nice.
+
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  tests/migration-test.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+>  tests/migration-test.c | 71 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 71 insertions(+)
 > 
 > diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 1d85ccbef1..761bf62ffe 100644
+> index 761bf62ffe..182fc88e93 100644
 > --- a/tests/migration-test.c
 > +++ b/tests/migration-test.c
-> @@ -231,14 +231,15 @@ static void read_blocktime(QTestState *who)
->      qobject_unref(rsp_return);
+> @@ -352,6 +352,29 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
+>      migrate_check_parameter(who, parameter, value);
 >  }
 >  
-> -static void wait_for_migration_complete(QTestState *who)
-> +static void wait_for_migration_status(QTestState *who,
-> +                                      const char *goal)
->  {
->      while (true) {
->          bool completed;
->          char *status;
->  
->          status = migrate_query_status(who);
-> -        completed = strcmp(status, "completed") == 0;
-> +        completed = strcmp(status, goal) == 0;
->          g_assert_cmpstr(status, !=,  "failed");
->          g_free(status);
->          if (completed) {
-> @@ -248,6 +249,11 @@ static void wait_for_migration_complete(QTestState *who)
->      }
->  }
->  
-> +static void wait_for_migration_complete(QTestState *who)
+> +static void migrate_pause(QTestState *who)
 > +{
-> +    wait_for_migration_status(who, "completed");
+> +    QDict *rsp;
+> +
+> +    rsp = wait_command(who, "{ 'execute': 'migrate-pause' }");
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    qobject_unref(rsp);
 > +}
 > +
->  static void wait_for_migration_pass(QTestState *who)
+> +static void migrate_recover(QTestState *who, const char *uri)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd = g_strdup_printf(
+> +        "{ 'execute': 'migrate-recover', "
+> +        "  'id': 'recover-cmd', "
+> +        "  'arguments': { 'uri': '%s' } }", uri);
+> +
+> +    rsp = wait_command(who, cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    g_free(cmd);
+> +    qobject_unref(rsp);
+> +}
+> +
+>  static void migrate_set_capability(QTestState *who, const char *capability,
+>                                     const char *value)
 >  {
->      uint64_t initial_pass = get_migration_pass(who);
+> @@ -597,6 +620,53 @@ static void test_postcopy(void)
+>      migrate_postcopy_complete(from, to);
+>  }
+>  
+> +static void test_postcopy_recovery(void)
+> +{
+> +    QTestState *from, *to;
+> +    char *uri;
+> +
+> +    migrate_postcopy_prepare(&from, &to);
+> +
+> +    /* Turn postcopy speed down, 4K/s is slow enough on any machines */
+> +    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
+> +
+> +    /* Now we start the postcopy */
+> +    migrate_postcopy_start(from, to);
+> +
+> +    /*
+> +     * Wait until postcopy is really started; we can only run the
+> +     * migrate-pause command during a postcopy
+> +     */
+> +    wait_for_migration_status(from, "postcopy-active");
+> +
+> +    /*
+> +     * Manually stop the postcopy migration. This emulates a network
+> +     * failure with the migration socket
+> +     */
+> +    migrate_pause(from);
+> +
+> +    /*
+> +     * Create a new socket to emulate a new channel that is different
+> +     * from the broken migration channel; tell the destination to
+> +     * listen to the new port
+> +     */
+> +    uri = g_strdup_printf("unix:%s/migsocket-recover", tmpfs);
+> +    migrate_recover(to, uri);
+> +
+> +    /*
+> +     * Try to rebuild the migration channel using the resume flag and
+> +     * the newly created channel
+> +     */
+> +    wait_for_migration_status(from, "postcopy-paused");
+> +    migrate(from, uri, ", 'resume': true");
+> +    g_free(uri);
+> +
+> +    /* Restore the postcopy bandwidth to unlimited */
+> +    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
+> +
+> +    migrate_postcopy_complete(from, to);
+> +}
+> +
+>  static void test_baddest(void)
+>  {
+>      QTestState *from, *to;
+> @@ -683,6 +753,7 @@ int main(int argc, char **argv)
+>      module_call_init(MODULE_INIT_QOM);
+>  
+>      qtest_add_func("/migration/postcopy/unix", test_postcopy);
+> +    qtest_add_func("/migration/postcopy/recovery", test_postcopy_recovery);
+>      qtest_add_func("/migration/deprecated", test_deprecated);
+>      qtest_add_func("/migration/bad_dest", test_baddest);
+>      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
 > -- 
 > 2.17.1
 > 
