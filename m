@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fb8rx-0004bo-Vc
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:43 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fb9MH-0001MA-SZ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fb8ru-0006Lc-Gj
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:41 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:42387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
-	id 1fb8ru-0006LE-Aa
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:20:38 -0400
-Received: by mail-pl0-x243.google.com with SMTP id y8-v6so1625896plr.9
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 11:20:38 -0700 (PDT)
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-Date: Thu,  5 Jul 2018 11:20:01 -0700
-Message-Id: <20180705182001.16537-15-mdavidsaver@gmail.com>
-In-Reply-To: <20180705182001.16537-1-mdavidsaver@gmail.com>
-References: <20180705182001.16537-1-mdavidsaver@gmail.com>
-Subject: [Qemu-devel] [PATCH 14/14] tests: drop ds1338-test
+	(envelope-from <jsnow@redhat.com>) id 1fb9MG-0005iO-OS
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 14:52:01 -0400
+References: <20180703105305.45398-1-vsementsov@virtuozzo.com>
+	<20180703105305.45398-2-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d7e510dc-c6f6-3d5b-b716-0df88759440c@redhat.com>
+Date: Thu, 5 Jul 2018 14:51:39 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180703105305.45398-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] drity-bitmap: refactor merge: separte
+ can_merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 
-redundant to ds-rtc-*-test.c
 
-Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
----
- tests/Makefile.include |  2 --
- tests/ds1338-test.c    | 75 --------------------------------------------------
- 2 files changed, 77 deletions(-)
- delete mode 100644 tests/ds1338-test.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 6ce5a9ff4d..8cf438260b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -377,7 +377,6 @@ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
- 
- check-qtest-arm-y = tests/tmp105-test$(EXESUF)
- check-qtest-arm-y += tests/pca9552-test$(EXESUF)
--check-qtest-arm-y += tests/ds1338-test$(EXESUF)
- check-qtest-arm-y += tests/ds-rtc-current-test$(EXESUF)
- check-qtest-arm-y += tests/ds-rtc-set-test$(EXESUF)
- check-qtest-arm-y += tests/m25p80-test$(EXESUF)
-@@ -788,7 +787,6 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
- tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
- tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
- tests/pca9552-test$(EXESUF): tests/pca9552-test.o $(libqos-omap-obj-y)
--tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
- tests/ds-rtc-current-test$(EXESUF): tests/ds-rtc-current-test.o $(libqos-imx-obj-y)
- tests/ds-rtc-set-test$(EXESUF): tests/ds-rtc-set-test.o $(libqos-imx-obj-y)
- tests/m25p80-test$(EXESUF): tests/m25p80-test.o
-diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
-deleted file mode 100644
-index 742dad9113..0000000000
---- a/tests/ds1338-test.c
-+++ /dev/null
-@@ -1,75 +0,0 @@
--/*
-- * QTest testcase for the DS1338 RTC
-- *
-- * Copyright (c) 2013 Jean-Christophe Dubois
-- *
-- *  This program is free software; you can redistribute it and/or modify it
-- *  under the terms of the GNU General Public License as published by the
-- *  Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful, but WITHOUT
-- *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-- *  for more details.
-- *
-- *  You should have received a copy of the GNU General Public License along
-- *  with this program; if not, see <http://www.gnu.org/licenses/>.
-- */
--
--#include "qemu/osdep.h"
--#include "libqtest.h"
--#include "libqos/i2c.h"
--
--#define IMX25_I2C_0_BASE 0x43F80000
--
--#define DS1338_ADDR 0x68
--
--static I2CAdapter *i2c;
--static uint8_t addr;
--
--static inline uint8_t bcd2bin(uint8_t x)
--{
--    return ((x) & 0x0f) + ((x) >> 4) * 10;
--}
--
--static void send_and_receive(void)
--{
--    uint8_t cmd[1];
--    uint8_t resp[7];
--    time_t now = time(NULL);
--    struct tm *tm_ptr = gmtime(&now);
--
--    /* reset the index in the RTC memory */
--    cmd[0] = 0;
--    i2c_send(i2c, addr, cmd, 1);
--
--    /* retrieve the date */
--    i2c_recv(i2c, addr, resp, 7);
--
--    /* check retrieved time againt local time */
--    g_assert_cmpuint(bcd2bin(resp[4]), == , tm_ptr->tm_mday);
--    g_assert_cmpuint(bcd2bin(resp[5]), == , 1 + tm_ptr->tm_mon);
--    g_assert_cmpuint(2000 + bcd2bin(resp[6]), == , 1900 + tm_ptr->tm_year);
--}
--
--int main(int argc, char **argv)
--{
--    QTestState *s = NULL;
--    int ret;
--
--    g_test_init(&argc, &argv, NULL);
--
--    s = qtest_start("-display none -machine imx25-pdk");
--    i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
--    addr = DS1338_ADDR;
--
--    qtest_add_func("/ds1338/tx-rx", send_and_receive);
--
--    ret = g_test_run();
--
--    qtest_quit(s);
--    g_free(i2c);
--
--    return ret;
--}
--- 
-2.11.0
+On 07/03/2018 06:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Separate can_merge, to reuse it for transaction support for merge
+> command.
+> 
+> Also, switch some asserts to errors.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/dirty-bitmap.h |  3 +++
+>  include/qemu/hbitmap.h       |  8 ++++++++
+>  block/dirty-bitmap.c         | 32 +++++++++++++++++++++++++++-----
+>  blockdev.c                   | 10 ----------
+>  util/hbitmap.c               |  6 +++++-
+>  5 files changed, 43 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 288dc6adb6..412a333c02 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -71,6 +71,9 @@ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+>  void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
+>  void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>                               Error **errp);
+> +bool bdrv_can_merge_dirty_bitmap(BdrvDirtyBitmap *dst,
+> +                                 const BdrvDirtyBitmap *src,
+> +                                 Error **errp);
+>  
+>  /* Functions that require manual locking.  */
+>  void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
+> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+> index ddca52c48e..d08bc20ea3 100644
+> --- a/include/qemu/hbitmap.h
+> +++ b/include/qemu/hbitmap.h
+> @@ -85,6 +85,14 @@ void hbitmap_truncate(HBitmap *hb, uint64_t size);
+>  bool hbitmap_merge(HBitmap *a, const HBitmap *b);
+>  
+>  /**
+> + * hbitmap_can_merge:
+> + *
+> + * Returns same value as hbitmap_merge, but do not do actual merge.
+> + *
+> + */
+> +bool hbitmap_can_merge(HBitmap *a, const HBitmap *b);
+> +
+> +/**
+>   * hbitmap_empty:
+>   * @hb: HBitmap to operate on.
+>   *
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index db1782ec1f..1137224aaa 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -784,6 +784,30 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+>      return hbitmap_next_zero(bitmap->bitmap, offset);
+>  }
+>  
+> +bool bdrv_can_merge_dirty_bitmap(BdrvDirtyBitmap *dst,
+> +                                 const BdrvDirtyBitmap *src,
+> +                                 Error **errp)
+> +{
+> +    if (bdrv_dirty_bitmap_frozen(dst)) {
+> +        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
+> +                   dst->name);
+> +        return false;
+> +    }
+> +
+> +    if (bdrv_dirty_bitmap_readonly(dst)) {
+> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
+> +                   dst->name);
+> +        return false;
+> +    }
+> +
+> +    if (!hbitmap_can_merge(dst->bitmap, src->bitmap)) {
+> +        error_setg(errp, "Bitmaps are incompatible and can't be merged");
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+>  void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>                               Error **errp)
+>  {
+> @@ -792,11 +816,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>  
+>      qemu_mutex_lock(dest->mutex);
+>  
+> -    assert(bdrv_dirty_bitmap_enabled(dest));
+
+Slight behavior change by removing this, but it makes sense.
+
+> -    assert(!bdrv_dirty_bitmap_readonly(dest));
+> -
+> -    if (!hbitmap_merge(dest->bitmap, src->bitmap)) {
+> -        error_setg(errp, "Bitmaps are incompatible and can't be merged");
+> +    if (bdrv_can_merge_dirty_bitmap(dest, src, errp)) {
+> +        bool ret = hbitmap_merge(dest->bitmap, src->bitmap);
+> +        assert(ret);
+
+Might as well just assert(hbitmap_merge(...));
+
+>      }
+>  
+>      qemu_mutex_unlock(dest->mutex);
+> diff --git a/blockdev.c b/blockdev.c
+> index 58d7570932..63c4d33124 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2955,16 +2955,6 @@ void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
+>          return;
+>      }
+>  
+> -    if (bdrv_dirty_bitmap_frozen(dst)) {
+> -        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
+> -                   dst_name);
+> -        return;
+> -    } else if (bdrv_dirty_bitmap_readonly(dst)) {
+> -        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
+> -                   dst_name);
+> -        return;
+> -    }
+> -
+>      src = bdrv_find_dirty_bitmap(bs, src_name);
+>      if (!src) {
+>          error_setg(errp, "Dirty bitmap '%s' not found", src_name);
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index bcd304041a..b56377b043 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -723,6 +723,10 @@ void hbitmap_truncate(HBitmap *hb, uint64_t size)
+>      }
+>  }
+>  
+> +bool hbitmap_can_merge(HBitmap *a, const HBitmap *b)
+> +{
+> +    return (a->size == b->size) && (a->granularity == b->granularity);
+> +}
+>  
+>  /**
+>   * Given HBitmaps A and B, let A := A (BITOR) B.
+> @@ -736,7 +740,7 @@ bool hbitmap_merge(HBitmap *a, const HBitmap *b)
+>      int i;
+>      uint64_t j;
+>  
+> -    if ((a->size != b->size) || (a->granularity != b->granularity)) {
+> +    if (!hbitmap_can_merge(a, b)) {
+>          return false;
+>      }
+>  
+> 
+
+Reviewed-by: John Snow <jsnow@redhat.com>
