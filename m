@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6kH-0000mo-RL
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:04:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fb6kR-0000vT-6E
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:04:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6kE-0008RM-OM
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:04:37 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:53360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fb6kE-0008R2-Gz
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:04:34 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id b188-v6so12146574wme.3
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:04:34 -0700 (PDT)
-References: <20180704090642.3469-1-alex.bennee@linaro.org>
-	<CAFEAcA-PoR6FBpnyodwTqSh5Y24euirBDGa_d=doUYgyUHn1yw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-PoR6FBpnyodwTqSh5Y24euirBDGa_d=doUYgyUHn1yw@mail.gmail.com>
-Date: Thu, 05 Jul 2018 17:04:32 +0100
-Message-ID: <87muv58y9b.fsf@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fb6kQ-000075-Dg
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:04:47 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180704150229.9948-1-f4bug@amsat.org>
+	<20180705102022.GE3309@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b7b181c1-7383-c76b-efd4-002f928707ac@amsat.org>
+Date: Thu, 5 Jul 2018 13:04:37 -0300
 MIME-Version: 1.0
+In-Reply-To: <20180705102022.GE3309@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/20] Travis,
- Code Coverage and Cross Build updates
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] block/crypto: Simplify
+ block_crypto_co_create_opts_luks to avoid a memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
+On 07/05/2018 07:20 AM, Kevin Wolf wrote:
+> Am 04.07.2018 um 17:02 hat Philippe Mathieu-Daudé geschrieben:
+>> After 1ec4f4160a1 Coverity reported:
+>>
+>>   Variable cryptoopts going out of scope leaks the storage it points to.
+>>
+>> Fixes: Coverity CID 1393782 (Resource leak)
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> I already sent a much simpler fix:
+> [PATCH] block/crypto: Fix memory leak in create error path
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Oh OK I searched a bit but missed it.
 
-> On 4 July 2018 at 10:06, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->> The following changes since commit 2a018f6e98782a4931b936a3087404ed81685=
-bac:
->>
->>   Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-=
-request' into staging (2018-07-03 23:06:18 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/stsquad/qemu.git tags/pull-code-coverage-and-build-=
-tweaks-040718-2
->>
->> for you to fetch changes up to a785003b11220afebae929b5c52f3b69bbfc4a40:
->>
->>   docker: add linux-user powered cross builder for QEMU (2018-07-04 09:3=
-0:33 +0100)
->>
->> ----------------------------------------------------------------
->> Code coverage and other build tweaks
->>
->>   - revert 208ecb3e (and drop filter for mingw)
->>   - some travis speed-ups
->>   - modernise code coverage support
->>   - docker image cleanups
->>   - clean-up binfmt_misc docker infrastructure
->>   - add debian-powerpc-user-cross image for ppc32 build
->>
->
-> Alex said on IRC there's some sort of problem with this; dropping
-> and waiting for a v3.
+> The only thing that is needed is replacing the return with a goto.
+> Splitting it in three different error paths is unnecessary because the
+> cleanup function handle NULL values just fine.
 
-I've just posted v3 to you. Sorry about the pull-churn... the result
-will be worth it though ;-)
+OK, good to know.
 
---
-Alex Benn=C3=A9e
+>> I think this check is superfluous but I respected the previous code:
+>>
+>>      ret = block_crypto_co_create_generic(bs, size, create_opts, errp);
+>>      if (ret > 0) {
+>>          ret = 0;
+>>      }
+> 
+> It is wrong, too. The old code keep the error code, goto fail skipped
+> the ret = 0.
+
+So this is not particularly wrong but as superfluous as the current use :)
+
+ret = 0 is only useful if block_crypto_co_create_generic() returned a
+value > 0, which seems unlikely.
+
+Regards,
+
+Phil.
