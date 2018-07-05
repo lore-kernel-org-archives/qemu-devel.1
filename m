@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb70E-0006AA-Nk
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:21:07 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fb73k-0000Tb-Ku
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb70D-0005CY-Ly
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:21:06 -0400
-Date: Thu, 5 Jul 2018 18:21:00 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180705162100.GO3309@localhost.localdomain>
-References: <20180704150229.9948-1-f4bug@amsat.org>
-	<20180705102022.GE3309@localhost.localdomain>
-	<b7b181c1-7383-c76b-efd4-002f928707ac@amsat.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fb73j-0007sb-Ok
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:24:44 -0400
+References: <20180704112859.20146-1-kraxel@redhat.com>
+	<20180704185321.GZ7451@localhost.localdomain>
+	<6a0aba7b46b168360fb291eaec769eb0@sebastianbauer.info>
+	<20180704205206.GG7451@localhost.localdomain>
+	<20180704210459.GH7451@localhost.localdomain>
+	<e60e8b1220bd00040b5ae08f93095e28@sebastianbauer.info>
+	<20180705131211.GJ7451@localhost.localdomain>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <cf24174f-04c0-6044-546c-5ff1d83761d2@ilande.co.uk>
+Date: Thu, 5 Jul 2018 17:24:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <b7b181c1-7383-c76b-efd4-002f928707ac@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] block/crypto: Simplify
- block_crypto_co_create_opts_luks to avoid a memory leak
+In-Reply-To: <20180705131211.GJ7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] vga: make stdvga the global
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>
+Cc: Aleksandar Markovic <aleksandar.markovic@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-Am 05.07.2018 um 18:04 hat Philippe Mathieu-Daud=E9 geschrieben:
-> On 07/05/2018 07:20 AM, Kevin Wolf wrote:
-> > Am 04.07.2018 um 17:02 hat Philippe Mathieu-Daud=E9 geschrieben:
-> >> After 1ec4f4160a1 Coverity reported:
-> >>
-> >>   Variable cryptoopts going out of scope leaks the storage it points=
- to.
-> >>
-> >> Fixes: Coverity CID 1393782 (Resource leak)
-> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> >=20
-> > I already sent a much simpler fix:
-> > [PATCH] block/crypto: Fix memory leak in create error path
->=20
-> Oh OK I searched a bit but missed it.
->=20
-> > The only thing that is needed is replacing the return with a goto.
-> > Splitting it in three different error paths is unnecessary because th=
-e
-> > cleanup function handle NULL values just fine.
->=20
-> OK, good to know.
->=20
-> >> I think this check is superfluous but I respected the previous code:
-> >>
-> >>      ret =3D block_crypto_co_create_generic(bs, size, create_opts, e=
-rrp);
-> >>      if (ret > 0) {
-> >>          ret =3D 0;
-> >>      }
-> >=20
-> > It is wrong, too. The old code keep the error code, goto fail skipped
-> > the ret =3D 0.
->=20
-> So this is not particularly wrong but as superfluous as the current use=
- :)
->=20
-> ret =3D 0 is only useful if block_crypto_co_create_generic() returned a
-> value > 0, which seems unlikely.
+On 05/07/18 14:12, Eduardo Habkost wrote:
 
-Sorry, yes, you're right. I read 'if (ret < 0)' in your patch.
+>> I also checked the code, default values are used also for other fields in
+>> that struct (e.g., default_cpus). If default values are considered fragile,
+>> they must be changed as well in the middle term. However, given a solid
+>> documentation (which is currently missing for these fields) I still think
+>> that default values are acceptable.
+>>
+>> Note that there seems also be the possibility to set != NULL default values
+>> in the machine_class_init() function.
+> 
+> I don't mind if the default value is defined at
+> machine_class_init() or main().  What bothers me is a default
+> value that depends on vga_interface_available(), because it can
+> be easily broken by a build config change (as demonstrated by the
+> bug fixed by this patch).
 
-The reason for the seemingly superfluous error path is that you can add
-new code behind it without having to modify the existing code.
+I've already sent David a for-3.0 patch to set stdvga for the PPC Mac 
+machines, but should I also do the same for PReP too?
 
-Kevin
+Is it also worth explicitly adding this for sun4u? And what about 
+non-ISA/PCI cards such as sun4m's TCX/CG3?
+
+
+ATB,
+
+Mark.
