@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6sr-0008Os-Bl
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6sr-0008Ox-CT
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fb6so-0007W4-Pp
+	(envelope-from <alex.bennee@linaro.org>) id 1fb6sn-0007Ve-UK
 	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:29 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:33516)
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:34001)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fb6so-0007Vj-JA
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:26 -0400
-Received: by mail-wm0-x236.google.com with SMTP id z6-v6so3223880wma.0
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:13:26 -0700 (PDT)
+	id 1fb6sn-0007VF-N4
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:13:25 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id c13-v6so1451837wrt.1
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 09:13:25 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  5 Jul 2018 17:03:27 +0100
-Message-Id: <20180705160329.30386-19-alex.bennee@linaro.org>
+Date: Thu,  5 Jul 2018 17:03:23 +0100
+Message-Id: <20180705160329.30386-15-alex.bennee@linaro.org>
 In-Reply-To: <20180705160329.30386-1-alex.bennee@linaro.org>
 References: <20180705160329.30386-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v3 18/20] docker: add special handling for
- FROM:debian-%-user targets
+Subject: [Qemu-devel] [PULL v3 14/20] docker: Clean the MXE base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +30,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
-These will have been build with debootstrap so we need to check
-against the debian-bootstrap dockerfile. This does mean sticking to
-debian-FOO-user as the naming conventions for boot-strapped images.
-The actual cross image is built on top.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+Using the duplicated same package is confusing.
+
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index b279836154..69e7130db7 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -113,6 +113,10 @@ def _copy_binary_with_libs(src, dest_dir):
-             _copy_with_mkdir(l , dest_dir, so_path)
+diff --git a/tests/docker/dockerfiles/debian8-mxe.docker b/tests/docker/dockerfiles/debian8-mxe.docker
+index 9b8e577b03..2df4cc8c5c 100644
+--- a/tests/docker/dockerfiles/debian8-mxe.docker
++++ b/tests/docker/dockerfiles/debian8-mxe.docker
+@@ -14,6 +14,6 @@ RUN apt-get update
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+         libpython2.7-stdlib \
+-        $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
++        $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
  
- def _read_qemu_dockerfile(img_name):
-+    # special case for Debian linux-user images
-+    if img_name.startswith("debian") and img_name.endswith("user"):
-+        img_name = "debian-bootstrap"
-+
-     df = os.path.join(os.path.dirname(__file__), "dockerfiles",
-                       img_name + ".docker")
-     return open(df, "r").read()
+ ENV PATH $PATH:/usr/lib/mxe/usr/bin/ 
 -- 
 2.17.1
