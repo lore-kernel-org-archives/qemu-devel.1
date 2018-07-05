@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1T2-00071M-VH
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fb1T3-00072F-PP
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fb1T1-0004zq-S0
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fb1T2-00050d-7T
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 06:26:29 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  5 Jul 2018 12:26:02 +0200
-Message-Id: <20180705102604.4986-11-kwolf@redhat.com>
+Date: Thu,  5 Jul 2018 12:26:01 +0200
+Message-Id: <20180705102604.4986-10-kwolf@redhat.com>
 In-Reply-To: <20180705102604.4986-1-kwolf@redhat.com>
 References: <20180705102604.4986-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v2 10/12] block/blklogwrites: Add an option for
- the update interval of the log superblock
+Subject: [Qemu-devel] [PULL v2 09/12] block/blklogwrites: Add an option for
+ appending to an old log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +25,223 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Ari Sundholm <ari@tuxera.com>
 
-This is a way to ensure that the log superblock is periodically
-updated. Before, this was only done on flush requests, which may
-not be enough if the VM exits abnormally, omitting the final flush.
-
-The default interval is 4096 write requests.
+Suggested by Kevin Wolf. May be useful when testing multiple batches
+of writes or doing long-term testing involving restarts of the VM.
 
 Signed-off-by: Ari Sundholm <ari@tuxera.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json |  6 +++++-
- block/blklogwrites.c | 20 ++++++++++++++++++--
- 2 files changed, 23 insertions(+), 3 deletions(-)
+ qapi/block-core.json |   3 +-
+ block/blklogwrites.c | 147 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 135 insertions(+), 15 deletions(-)
 
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d1753a2ae7..38b31250f9 100644
+index a9eab8cab8..d1753a2ae7 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -3057,13 +3057,17 @@
- # @log-sector-size: sector size used in logging writes to @file, determines
- #                   granularity of offsets and sizes of writes (default: 512)
- #
-+# @log-super-update-interval: interval of write requests after which the log
-+#                             super block is updated to disk (default: 4096)
-+#
- # Since: 3.0
- ##
+@@ -3062,7 +3062,8 @@
  { 'struct': 'BlockdevOptionsBlklogwrites',
    'data': { 'file': 'BlockdevRef',
              'log': 'BlockdevRef',
-             '*log-sector-size': 'uint32',
--            '*log-append': 'bool' } }
-+            '*log-append': 'bool',
-+            '*log-super-update-interval': 'uint64' } }
+-            '*log-sector-size': 'uint32' } }
++            '*log-sector-size': 'uint32',
++            '*log-append': 'bool' } }
  
  ##
  # @BlockdevOptionsBlkverify:
 diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 56154e7325..63bf6b34a9 100644
+index 272e11a021..56154e7325 100644
 --- a/block/blklogwrites.c
 +++ b/block/blklogwrites.c
-@@ -55,6 +55,7 @@ typedef struct {
-     uint32_t sectorbits;
-     uint64_t cur_log_sector;
-     uint64_t nr_entries;
-+    uint64_t update_interval;
- } BDRVBlkLogWritesState;
+@@ -24,6 +24,10 @@
+ #define LOG_FUA_FLAG     (1 << 1)
+ #define LOG_DISCARD_FLAG (1 << 2)
+ #define LOG_MARK_FLAG    (1 << 3)
++#define LOG_FLAG_MASK    (LOG_FLUSH_FLAG \
++                         | LOG_FUA_FLAG \
++                         | LOG_DISCARD_FLAG \
++                         | LOG_MARK_FLAG)
  
- static QemuOptsList runtime_opts = {
-@@ -71,6 +72,11 @@ static QemuOptsList runtime_opts = {
+ #define WRITE_LOG_VERSION 1ULL
+ #define WRITE_LOG_MAGIC 0x6a736677736872ULL
+@@ -58,6 +62,11 @@ static QemuOptsList runtime_opts = {
+     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+     .desc = {
+         {
++            .name = "log-append",
++            .type = QEMU_OPT_BOOL,
++            .help = "Append to an existing log",
++        },
++        {
+             .name = "log-sector-size",
              .type = QEMU_OPT_SIZE,
              .help = "Log sector size",
-         },
-+        {
-+            .name = "log-super-update-interval",
-+            .type = QEMU_OPT_NUMBER,
-+            .help = "Log superblock update interval (# of write requests)",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -234,6 +240,14 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+@@ -72,6 +81,53 @@ static inline uint32_t blk_log_writes_log2(uint32_t value)
+     return 31 - clz32(value);
+ }
  
-     s->sectorsize = log_sector_size;
-     s->sectorbits = blk_log_writes_log2(log_sector_size);
-+    s->update_interval = qemu_opt_get_number(opts, "log-super-update-interval",
-+                                             4096);
-+    if (!s->update_interval) {
-+        ret = -EINVAL;
-+        error_setg(errp, "Invalid log superblock update interval %"PRIu64,
-+                   s->update_interval);
-+        goto fail_log;
++static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
++{
++    return sector_size < (1ull << 24) && is_power_of_2(sector_size);
++}
++
++static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
++                                                   uint32_t sector_size,
++                                                   uint64_t nr_entries,
++                                                   Error **errp)
++{
++    uint64_t cur_sector = 1;
++    uint64_t cur_idx = 0;
++    uint32_t sector_bits = blk_log_writes_log2(sector_size);
++    struct log_write_entry cur_entry;
++
++    while (cur_idx < nr_entries) {
++        int read_ret = bdrv_pread(log, cur_sector << sector_bits, &cur_entry,
++                                  sizeof(cur_entry));
++        if (read_ret < 0) {
++            error_setg_errno(errp, -read_ret,
++                             "Failed to read log entry %"PRIu64, cur_idx);
++            return (uint64_t)-1ull;
++        }
++
++        if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
++            error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %"PRIu64,
++                       le64_to_cpu(cur_entry.flags), cur_idx);
++            return (uint64_t)-1ull;
++        }
++
++        /* Account for the sector of the entry itself */
++        ++cur_sector;
++
++        /*
++         * Account for the data of the write.
++         * For discards, this data is not present.
++         */
++        if (!(cur_entry.flags & cpu_to_le64(LOG_DISCARD_FLAG))) {
++            cur_sector += le64_to_cpu(cur_entry.nr_sectors);
++        }
++
++        ++cur_idx;
 +    }
++
++    return cur_sector;
++}
++
+ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+                                Error **errp)
+ {
+@@ -80,6 +136,7 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+     Error *local_err = NULL;
+     int ret;
+     uint64_t log_sector_size;
++    bool log_append;
  
-     ret = 0;
- fail_log:
-@@ -360,8 +374,10 @@ static void coroutine_fn blk_log_writes_co_do_log(BlkLogWritesLogReq *lr)
-                                             lr->zero_size, 0);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+@@ -98,20 +155,6 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
      }
  
--    /* Update super block on flush */
--    if (lr->log_ret == 0 && lr->entry.flags & LOG_FLUSH_FLAG) {
-+    /* Update super block on flush or every update interval */
-+    if (lr->log_ret == 0 && ((lr->entry.flags & LOG_FLUSH_FLAG)
-+        || (s->nr_entries % s->update_interval == 0)))
-+    {
-         struct log_write_super super = {
-             .magic      = cpu_to_le64(WRITE_LOG_MAGIC),
-             .version    = cpu_to_le64(WRITE_LOG_VERSION),
+-    log_sector_size = qemu_opt_get_size(opts, "log-sector-size",
+-                                        BDRV_SECTOR_SIZE);
+-
+-    if (log_sector_size > (1ull << 23) || !is_power_of_2(log_sector_size)) {
+-        ret = -EINVAL;
+-        error_setg(errp, "Invalid log sector size %"PRIu64, log_sector_size);
+-        goto fail;
+-    }
+-
+-    s->sectorsize = log_sector_size;
+-    s->sectorbits = blk_log_writes_log2(log_sector_size);
+-    s->cur_log_sector = 1;
+-    s->nr_entries = 0;
+-
+     /* Open the log file */
+     s->log_file = bdrv_open_child(NULL, options, "log", bs, &child_file, false,
+                                   &local_err);
+@@ -121,7 +164,83 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
++    log_append = qemu_opt_get_bool(opts, "log-append", false);
++
++    if (log_append) {
++        struct log_write_super log_sb = { 0, 0, 0, 0 };
++
++        if (qemu_opt_find(opts, "log-sector-size")) {
++            ret = -EINVAL;
++            error_setg(errp, "log-append and log-sector-size are mutually "
++                       "exclusive");
++            goto fail_log;
++        }
++
++        /* Read log superblock or fake one for an empty log */
++        if (!bdrv_getlength(s->log_file->bs)) {
++            log_sb.magic      = cpu_to_le64(WRITE_LOG_MAGIC);
++            log_sb.version    = cpu_to_le64(WRITE_LOG_VERSION);
++            log_sb.nr_entries = cpu_to_le64(0);
++            log_sb.sectorsize = cpu_to_le32(BDRV_SECTOR_SIZE);
++        } else {
++            ret = bdrv_pread(s->log_file, 0, &log_sb, sizeof(log_sb));
++            if (ret < 0) {
++                error_setg_errno(errp, -ret, "Could not read log superblock");
++                goto fail_log;
++            }
++        }
++
++        if (log_sb.magic != cpu_to_le64(WRITE_LOG_MAGIC)) {
++            ret = -EINVAL;
++            error_setg(errp, "Invalid log superblock magic");
++            goto fail_log;
++        }
++
++        if (log_sb.version != cpu_to_le64(WRITE_LOG_VERSION)) {
++            ret = -EINVAL;
++            error_setg(errp, "Unsupported log version %"PRIu64,
++                       le64_to_cpu(log_sb.version));
++            goto fail_log;
++        }
++
++        log_sector_size = le32_to_cpu(log_sb.sectorsize);
++        s->cur_log_sector = 1;
++        s->nr_entries = 0;
++
++        if (blk_log_writes_sector_size_valid(log_sector_size)) {
++            s->cur_log_sector =
++                blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
++                                    le64_to_cpu(log_sb.nr_entries), &local_err);
++            if (local_err) {
++                ret = -EINVAL;
++                error_propagate(errp, local_err);
++                goto fail_log;
++            }
++
++            s->nr_entries = le64_to_cpu(log_sb.nr_entries);
++        }
++    } else {
++        log_sector_size = qemu_opt_get_size(opts, "log-sector-size",
++                                            BDRV_SECTOR_SIZE);
++        s->cur_log_sector = 1;
++        s->nr_entries = 0;
++    }
++
++    if (!blk_log_writes_sector_size_valid(log_sector_size)) {
++        ret = -EINVAL;
++        error_setg(errp, "Invalid log sector size %"PRIu64, log_sector_size);
++        goto fail_log;
++    }
++
++    s->sectorsize = log_sector_size;
++    s->sectorbits = blk_log_writes_log2(log_sector_size);
++
+     ret = 0;
++fail_log:
++    if (ret < 0) {
++        bdrv_unref_child(bs, s->log_file);
++        s->log_file = NULL;
++    }
+ fail:
+     if (ret < 0) {
+         bdrv_unref_child(bs, bs->file);
 -- 
 2.13.6
