@@ -1,14 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fb5xC-0005pF-6U
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:13:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fb5ye-0006yJ-1y
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fb5x7-0003oC-UN
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:13:54 -0400
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Thu,  5 Jul 2018 11:13:34 -0400
-Message-Id: <20180705151334.12271-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [RFC] fix setting FPSCR[FR] bit
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fb5yZ-0004FU-Hr
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 11:15:24 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  5 Jul 2018 18:15:15 +0300
+Message-Id: <20180705151515.779173-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4] qcow2: add overlap check for bitmap
+ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,97 +18,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au, richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-https://www.pdfdrive.net/powerpc-microprocessor-family-the-programming-environments-for-32-e3087633.html
-Page 63 in table 2-4 is where the description of this bit can be found.
-
-It is described as:
-
-Floating-point fraction rounded. The last arithmetic or rounding and conversion instruction that rounded the intermediate result incremented the fraction. This bit is NOT sticky.
-
-What I think this means is when the softfloat.c:round_canonical() function adds the inc variable to the frac variable, the floating point fraction rounded bit should be set. It also means that every time a floating point operation takes place, this bit needs to be updated since it isn't a sticky bit. My testing has produced mixed results with this patch. Some of my floating point tests are fixed by this patch, and others are broken by this patch. I'm not clear if this is the right way to implement setting the FPSCR[FR] bit. Feedback would be great.
-
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- fpu/softfloat.c               | 6 +++++-
- include/fpu/softfloat-types.h | 1 +
- target/ppc/fpu_helper.c       | 8 ++++++++
- 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 8cd2400081..b2b2c61cff 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -382,11 +382,12 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-     const uint64_t roundeven_mask = parm->roundeven_mask;
-     const int exp_max = parm->exp_max;
-     const int frac_shift = parm->frac_shift;
--    uint64_t frac, inc;
-+    uint64_t frac, inc, old_frac;
-     int exp, flags = 0;
-     bool overflow_norm;
+If it appropriate for 3.0, let's push it. If not - then for 3.1
+with fixed "since". Should I cc stable?
+
+v4: - fix indentation
+
+v3: - update Qcow2OverlapCheckFlags in qapi/block-core.json [Max]
+
+v2: - squash 02 (indentation fix) to 01
+    - drop comment from qcow2_check_metadata_overlap()
+    - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in-place case in
+      bitmap_list_store. I don't think non-inplace case should be changed,
+      as it don't touch active bitmap directory.
+
+ qapi/block-core.json   | 21 ++++++++++++---------
+ block/qcow2.h          | 45 ++++++++++++++++++++++++---------------------
+ block/qcow2-bitmap.c   |  7 ++++++-
+ block/qcow2-refcount.c | 10 ++++++++++
+ block/qcow2.c          | 22 ++++++++++++++--------
+ 5 files changed, 66 insertions(+), 39 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 90e554ed0f..30f7714674 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2695,18 +2695,21 @@
+ # @template: Specifies a template mode which can be adjusted using the other
+ #            flags, defaults to 'cached'
+ #
++# @bitmap-directory: since 3.0
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'Qcow2OverlapCheckFlags',
+-  'data': { '*template':       'Qcow2OverlapCheckMode',
+-            '*main-header':    'bool',
+-            '*active-l1':      'bool',
+-            '*active-l2':      'bool',
+-            '*refcount-table': 'bool',
+-            '*refcount-block': 'bool',
+-            '*snapshot-table': 'bool',
+-            '*inactive-l1':    'bool',
+-            '*inactive-l2':    'bool' } }
++  'data': { '*template':         'Qcow2OverlapCheckMode',
++            '*main-header':      'bool',
++            '*active-l1':        'bool',
++            '*active-l2':        'bool',
++            '*refcount-table':   'bool',
++            '*refcount-block':   'bool',
++            '*snapshot-table':   'bool',
++            '*inactive-l1':      'bool',
++            '*inactive-l2':      'bool',
++            '*bitmap-directory': 'bool' } }
  
-     frac = p.frac;
-+    old_frac = frac; /* Used to determine if the fraction was rounded */
-     exp = p.exp;
+ ##
+ # @Qcow2OverlapChecks:
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1c9c0d3631..f90e6e2de2 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -94,6 +94,7 @@
+ #define QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE "overlap-check.snapshot-table"
+ #define QCOW2_OPT_OVERLAP_INACTIVE_L1 "overlap-check.inactive-l1"
+ #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-l2"
++#define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY "overlap-check.bitmap-directory"
+ #define QCOW2_OPT_CACHE_SIZE "cache-size"
+ #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
+ #define QCOW2_OPT_L2_CACHE_ENTRY_SIZE "l2-cache-entry-size"
+@@ -397,34 +398,36 @@ typedef enum QCow2ClusterType {
+ } QCow2ClusterType;
  
-     switch (p.cls) {
-@@ -503,6 +504,9 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-         g_assert_not_reached();
+ typedef enum QCow2MetadataOverlap {
+-    QCOW2_OL_MAIN_HEADER_BITNR    = 0,
+-    QCOW2_OL_ACTIVE_L1_BITNR      = 1,
+-    QCOW2_OL_ACTIVE_L2_BITNR      = 2,
+-    QCOW2_OL_REFCOUNT_TABLE_BITNR = 3,
+-    QCOW2_OL_REFCOUNT_BLOCK_BITNR = 4,
+-    QCOW2_OL_SNAPSHOT_TABLE_BITNR = 5,
+-    QCOW2_OL_INACTIVE_L1_BITNR    = 6,
+-    QCOW2_OL_INACTIVE_L2_BITNR    = 7,
+-
+-    QCOW2_OL_MAX_BITNR            = 8,
+-
+-    QCOW2_OL_NONE           = 0,
+-    QCOW2_OL_MAIN_HEADER    = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
+-    QCOW2_OL_ACTIVE_L1      = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
+-    QCOW2_OL_ACTIVE_L2      = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
+-    QCOW2_OL_REFCOUNT_TABLE = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
+-    QCOW2_OL_REFCOUNT_BLOCK = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
+-    QCOW2_OL_SNAPSHOT_TABLE = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
+-    QCOW2_OL_INACTIVE_L1    = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
++    QCOW2_OL_MAIN_HEADER_BITNR      = 0,
++    QCOW2_OL_ACTIVE_L1_BITNR        = 1,
++    QCOW2_OL_ACTIVE_L2_BITNR        = 2,
++    QCOW2_OL_REFCOUNT_TABLE_BITNR   = 3,
++    QCOW2_OL_REFCOUNT_BLOCK_BITNR   = 4,
++    QCOW2_OL_SNAPSHOT_TABLE_BITNR   = 5,
++    QCOW2_OL_INACTIVE_L1_BITNR      = 6,
++    QCOW2_OL_INACTIVE_L2_BITNR      = 7,
++    QCOW2_OL_BITMAP_DIRECTORY_BITNR = 8,
++
++    QCOW2_OL_MAX_BITNR              = 9,
++
++    QCOW2_OL_NONE             = 0,
++    QCOW2_OL_MAIN_HEADER      = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
++    QCOW2_OL_ACTIVE_L1        = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
++    QCOW2_OL_ACTIVE_L2        = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
++    QCOW2_OL_REFCOUNT_TABLE   = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
++    QCOW2_OL_REFCOUNT_BLOCK   = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
++    QCOW2_OL_SNAPSHOT_TABLE   = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
++    QCOW2_OL_INACTIVE_L1      = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
+     /* NOTE: Checking overlaps with inactive L2 tables will result in bdrv
+      * reads. */
+-    QCOW2_OL_INACTIVE_L2    = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
++    QCOW2_OL_INACTIVE_L2      = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
++    QCOW2_OL_BITMAP_DIRECTORY = (1 << QCOW2_OL_BITMAP_DIRECTORY_BITNR),
+ } QCow2MetadataOverlap;
+ 
+ /* Perform all overlap checks which can be done in constant time */
+ #define QCOW2_OL_CONSTANT \
+     (QCOW2_OL_MAIN_HEADER | QCOW2_OL_ACTIVE_L1 | QCOW2_OL_REFCOUNT_TABLE | \
+-     QCOW2_OL_SNAPSHOT_TABLE)
++     QCOW2_OL_SNAPSHOT_TABLE | QCOW2_OL_BITMAP_DIRECTORY)
+ 
+ /* Perform all overlap checks which don't require disk access */
+ #define QCOW2_OL_CACHED \
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 69485aa1de..ba978ad2aa 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -775,7 +775,12 @@ static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm_list,
+         }
      }
  
-+    if (frac != old_frac) {
-+        flags |= float_flag_round;
-+    }
-     float_raise(flags, s);
-     p.exp = exp;
-     p.frac = frac;
-diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
-index 2aae6a89b1..1d124e659c 100644
---- a/include/fpu/softfloat-types.h
-+++ b/include/fpu/softfloat-types.h
-@@ -147,6 +147,7 @@ enum {
- 
- enum {
-     float_flag_invalid   =  1,
-+    float_flag_round     =  2,
-     float_flag_divbyzero =  4,
-     float_flag_overflow  =  8,
-     float_flag_underflow = 16,
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index cb82e6e842..ba57ea7cfe 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -581,6 +581,7 @@ static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
-     CPUState *cs = CPU(ppc_env_get_cpu(env));
-     int status = get_float_exception_flags(&env->fp_status);
-     bool inexact_happened = false;
-+    bool round_happened = false;
- 
-     if (status & float_flag_overflow) {
-         float_overflow_excp(env);
-@@ -589,6 +590,8 @@ static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
-     } else if (status & float_flag_inexact) {
-         float_inexact_excp(env);
-         inexact_happened = true;
-+    } else if (status & float_flag_round) {
-+        round_happened = true;
+-    ret = qcow2_pre_write_overlap_check(bs, 0, dir_offset, dir_size);
++    /* Actually, even in in-place case ignoring QCOW2_OL_BITMAP_DIRECTORY is not
++     * necessary, because we drop QCOW2_AUTOCLEAR_BITMAPS when updating bitmap
++     * directory in-place (actually, turn-off the extension), which is checked
++     * in qcow2_check_metadata_overlap() */
++    ret = qcow2_pre_write_overlap_check(
++            bs, in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0, dir_offset, dir_size);
+     if (ret < 0) {
+         goto fail;
+     }
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 18c729aa27..1b9ecb1ca0 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2705,6 +2705,16 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+         }
      }
  
-     /* if the inexact flag was not set */
-@@ -596,6 +599,11 @@ static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
-         env->fpscr &= ~(1 << FPSCR_FI); /* clear the FPSCR[FI] bit */
-     }
- 
-+    /* if the floating-point fraction rounded bit was not set */
-+    if (round_happened == false) {
-+        env->fpscr &= ~(1 << FPSCR_FR); /* clear the FPSCR[FR] bit */
++    if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
++        (s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS))
++    {
++        if (overlaps_with(s->bitmap_directory_offset,
++                          s->bitmap_directory_size))
++        {
++            return QCOW2_OL_BITMAP_DIRECTORY;
++        }
 +    }
 +
-     if (cs->exception_index == POWERPC_EXCP_PROGRAM &&
-         (env->error_code & POWERPC_EXCP_FP)) {
-         /* Differred floating-point exception after target FPR update */
+     return 0;
+ }
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2f9e58e0c4..af51220499 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -676,6 +676,11 @@ static QemuOptsList qcow2_runtime_opts = {
+             .help = "Check for unintended writes into an inactive L2 table",
+         },
+         {
++            .name = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
++            .type = QEMU_OPT_BOOL,
++            .help = "Check for unintended writes into the bitmap directory",
++        },
++        {
+             .name = QCOW2_OPT_CACHE_SIZE,
+             .type = QEMU_OPT_SIZE,
+             .help = "Maximum combined metadata (L2 tables and refcount blocks) "
+@@ -708,14 +713,15 @@ static QemuOptsList qcow2_runtime_opts = {
+ };
+ 
+ static const char *overlap_bool_option_names[QCOW2_OL_MAX_BITNR] = {
+-    [QCOW2_OL_MAIN_HEADER_BITNR]    = QCOW2_OPT_OVERLAP_MAIN_HEADER,
+-    [QCOW2_OL_ACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L1,
+-    [QCOW2_OL_ACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L2,
+-    [QCOW2_OL_REFCOUNT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
+-    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
+-    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
+-    [QCOW2_OL_INACTIVE_L1_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L1,
+-    [QCOW2_OL_INACTIVE_L2_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L2,
++    [QCOW2_OL_MAIN_HEADER_BITNR]      = QCOW2_OPT_OVERLAP_MAIN_HEADER,
++    [QCOW2_OL_ACTIVE_L1_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L1,
++    [QCOW2_OL_ACTIVE_L2_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L2,
++    [QCOW2_OL_REFCOUNT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
++    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
++    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
++    [QCOW2_OL_INACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L1,
++    [QCOW2_OL_INACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L2,
++    [QCOW2_OL_BITMAP_DIRECTORY_BITNR] = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
+ };
+ 
+ static void cache_clean_timer_cb(void *opaque)
 -- 
-2.14.3 (Apple Git-98)
+2.11.1
