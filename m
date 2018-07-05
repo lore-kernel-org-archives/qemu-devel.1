@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fbB3Q-0003uw-3B
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:40:41 -0400
+	(envelope-from <rjones@redhat.com>) id 1fbBLh-0000as-DC
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fbB3O-0001XE-Fe
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:40:40 -0400
-References: <20180703105305.45398-1-vsementsov@virtuozzo.com>
-	<20180703105305.45398-3-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <79b1dc41-b230-3958-8057-4061c18a7814@redhat.com>
-Date: Thu, 5 Jul 2018 16:40:29 -0400
+	(envelope-from <rjones@redhat.com>) id 1fbBLd-0001Mm-FD
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:59:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36272)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1fbBLd-0001MO-AH
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 16:59:29 -0400
+Date: Thu, 5 Jul 2018 21:59:24 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180705205924.GQ1455@redhat.com>
+References: <20180705123929.GB16293@redhat.com>
+	<20180705125231.GD16293@redhat.com>
+	<d154245b-46c0-58b0-b6f9-1f1313634c80@redhat.com>
+	<20180705164343.GE16293@redhat.com>
+	<20180705200659-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180703105305.45398-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: add transaction support for
- x-block-dirty-bitmap-merge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705200659-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,179 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, "eb >> Eric Blake" <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, berrange@redhat.com, jferlan@redhat.com, ben@skyportsystems.com
 
-
-
-On 07/03/2018 06:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/transaction.json |  2 ++
->  blockdev.c            | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 54 insertions(+), 1 deletion(-)
+On Thu, Jul 05, 2018 at 08:10:15PM +0300, Michael S. Tsirkin wrote:
+> On Thu, Jul 05, 2018 at 05:43:43PM +0100, Richard W.M. Jones wrote:
+> > On Thu, Jul 05, 2018 at 04:20:33PM +0200, Laszlo Ersek wrote:
+> > > QEMU does the right thing. If other hypervisors don't do this -- while
+> > > still taking and displaying the value in UUID / GUID textual format --,
+> > > they are wrong. The VMGENID spec from Microsoft
+> > > <http://go.microsoft.com/fwlink/?LinkId=260709> specifically mentions
+> > > "GUID".
+> > 
+> > The MSFT spec does mention GUID, but it seems to me that it's only
+> > using GUID as an incidental example -- ie. that you might use the VM
+> > Generation ID to generate a GUID.  Outside that example it
+> > consistently refers to the VM Gen ID as a 128-bit integer.  It also
+> > says that it could be used as a "high entropy random data source",
+> > which is not in fact true if it's a UUID.
+> > 
+> > It has to be said that after reading the spec again [the MSFT spec,
+> > not qemu's spec] and what other hypervisors are doing, I'm not sure
+> > qemu is doing the right thing here.
+> > 
+> > Rich.
 > 
-> diff --git a/qapi/transaction.json b/qapi/transaction.json
-> index d7e4274550..f9da6ad47f 100644
-> --- a/qapi/transaction.json
-> +++ b/qapi/transaction.json
-> @@ -48,6 +48,7 @@
->  # - @block-dirty-bitmap-clear: since 2.5
->  # - @x-block-dirty-bitmap-enable: since 3.0
->  # - @x-block-dirty-bitmap-disable: since 3.0
-> +# - @x-block-dirty-bitmap-merge: since 3.0
->  # - @blockdev-backup: since 2.3
->  # - @blockdev-snapshot: since 2.5
->  # - @blockdev-snapshot-internal-sync: since 1.7
-> @@ -63,6 +64,7 @@
->         'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
->         'x-block-dirty-bitmap-enable': 'BlockDirtyBitmap',
->         'x-block-dirty-bitmap-disable': 'BlockDirtyBitmap',
-> +       'x-block-dirty-bitmap-merge': 'BlockDirtyBitmapMerge',
->         'blockdev-backup': 'BlockdevBackup',
->         'blockdev-snapshot': 'BlockdevSnapshot',
->         'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
-> diff --git a/blockdev.c b/blockdev.c
-> index 63c4d33124..d0f2d1a4e9 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -1946,6 +1946,13 @@ typedef struct BlockDirtyBitmapState {
->      bool was_enabled;
->  } BlockDirtyBitmapState;
->  
-> +typedef struct BlockDirtyBitmapMergeState {
-> +    BlkActionState common;
-> +    BlockDriverState *bs;
-> +    BdrvDirtyBitmap *dst;
-> +    BdrvDirtyBitmap *src;
-> +} BlockDirtyBitmapMergeState;
-> +
->  static void block_dirty_bitmap_add_prepare(BlkActionState *common,
->                                             Error **errp)
->  {
-> @@ -2112,6 +2119,45 @@ static void block_dirty_bitmap_disable_abort(BlkActionState *common)
->      }
->  }
->  
-> +static void block_dirty_bitmap_merge_prepare(BlkActionState *common,
-> +                                             Error **errp)
-> +{
-> +    BlockDirtyBitmapMerge *action;
-> +    BlockDirtyBitmapMergeState *state = DO_UPCAST(BlockDirtyBitmapMergeState,
-> +                                                  common, common);
-> +
-> +    if (action_check_completion_mode(common, errp) < 0) {
-> +        return;
-> +    }
-> +
-> +    action = common->action->u.x_block_dirty_bitmap_merge.data;
-> +    state->dst = block_dirty_bitmap_lookup(action->node,
-> +                                           action->dst_name,
-> +                                           &state->bs,
-> +                                           errp);
-> +    if (!state->dst) {
-> +        return;
-> +    }
-> +
-> +    state->src = bdrv_find_dirty_bitmap(state->bs, action->src_name);
-> +    if (!state->src) {
-> +        return;
-> +    }
-> +
-> +    if (!bdrv_can_merge_dirty_bitmap(state->dst, state->src, errp)) {
-> +        return;
-> +    }
-> +}
-> +
-> +static void block_dirty_bitmap_merge_commit(BlkActionState *common)
-> +{
-> +    BlockDirtyBitmapMergeState *state = DO_UPCAST(BlockDirtyBitmapMergeState,
-> +                                                  common, common);
-> +
-> +    /* success is guaranteed by bdrv_can_merge_dirty_bitmap() */
-> +    bdrv_merge_dirty_bitmap(state->dst, state->src, &error_abort);
-> +}
-> +
->  static void abort_prepare(BlkActionState *common, Error **errp)
->  {
->      error_setg(errp, "Transaction aborted using Abort action");
-> @@ -2182,7 +2228,12 @@ static const BlkActionOps actions[] = {
->          .instance_size = sizeof(BlockDirtyBitmapState),
->          .prepare = block_dirty_bitmap_disable_prepare,
->          .abort = block_dirty_bitmap_disable_abort,
-> -     }
-> +    },
-> +    [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_MERGE] = {
-> +        .instance_size = sizeof(BlockDirtyBitmapMergeState),
-> +        .prepare = block_dirty_bitmap_merge_prepare,
-> +        .commit = block_dirty_bitmap_merge_commit,
-> +    }
->  };
->  
->  /**
-> 
+> So right now we have a "GUID" property.
+> We could always add an alternative property for people who want
+> to treat the ID as an integer. Would that address the issue?
 
-It's not easy to tell, and we've had this discussion a few times on-list
-now to no clear conclusion, but the ordering of bitmap manipulation in
-transactions matters.
+TBH I'm fairly relaxed about this and I don't want to put in any
+effort to change anything.  As Dan says later in the thread, no data
+is ever lost in the transformation.
 
-I believe it matters because drive-backup and blockdev-backup both will
-create a job (but not "start" it) during the .prepare phase, but this
-job creation itself takes ownership of the bitmap (freezing it, for
-instance.)
+I have now written a "128 bit int" -> "GUID" mangler for virt-v2v's
+VM Generation ID handling code, so I'm happy enough.
 
-If you modify a bitmap in a transaction:
+Rich.
 
-[bitmap-command-x
- action-job-y]
-
-you may expect that "bitmap-command-x" will apply to "action-job-y", but
-if we were to delay the bitmap modification to .commit(), the
-"action-job-y" might take ownership of the bitmap FIRST, and then the
-bitmap modification command would fail. I think that's unexpected behavior.
-
-For the same reasons, I think "merge" ought to act early and unwind if
-necessary -- at least as the transaction system exists now.
-
-Further, all of the existing bitmap modification commands are
-"undo-on-abort" semantics, including add, clear, enable and disable.
-
-We discussed this once in 2015:
-https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg01229.html
-
-"
-These semantics don't work in this example:
-
-[block-dirty-bitmap-clear,
- drive-backup]
-
-Since drive-backup starts the blockjob in .prepare() but
-block-dirty-bitmap-clear only clears the bitmap in .commit() the order
-is wrong.
-
-.prepare() has to do something non-destructive, like stashing away the
-HBitmap and replacing it with an empty one.  Then .commit() can discard
-the old bitmap while .abort() can move the old bitmap back to undo the
-operation.
-"
-
-Although we no longer START the blockjob in .prepare(), we're still
-creating it -- and that creation does freeze the bitmap, so we are still
-beholden to this ordering.
-
-...unless, perhaps, we modify the way in which other job actions consume
-and utilize bitmaps. They ought not "use" them until they actually
-"start" but this might leave us open to failures on .start unless we're
-particularly very careful.
-
-
-I think for now, the best policy is:
-
-- Assume that the actions of transactions are strictly ordered
-- Any action that can effect a subsequent action must be visible by
-subsequent actions
-- Since blockdev/drive-backup use bitmaps in .prepare(), all bitmap
-modification commands must take effect in .prepare() as well.
-
-
-Thoughts?
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-df lists disk usage of guests without needing to install any
+software inside the virtual machine.  Supports Linux and Windows.
+http://people.redhat.com/~rjones/virt-df/
