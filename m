@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fb6vz-0002sf-Ms
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:16:44 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fb6xF-0003nU-Ef
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fb6vu-0002J5-Oc
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:16:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53682 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fb6vu-0002Ic-Ju
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:16:38 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  5 Jul 2018 18:16:29 +0200
-Message-Id: <20180705161629.13734-1-marcandre.lureau@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fb6xA-000315-Eb
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 12:18:01 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180705155811.20366-1-f4bug@amsat.org>
+	<20180705155811.20366-5-f4bug@amsat.org>
+	<af8abd7f-d72d-0445-298c-4ff91fccdb5e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f83286cc-e70e-596d-58ce-4b3f4e715d8e@amsat.org>
+Date: Thu, 5 Jul 2018 13:17:51 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qga: fix 'driver' leak in guest-get-fsinfo
+In-Reply-To: <af8abd7f-d72d-0445-298c-4ff91fccdb5e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] tests/bios-tables-test: Remove an
+ useless cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-'driver' is leaked when the loop is not broken.
+On 07/05/2018 01:13 PM, Eric Blake wrote:
+> On 07/05/2018 10:58 AM, Philippe Mathieu-Daudé wrote:
+>> Patch created mechanically by rerunning:
+> 
+> In the subject: s/an useless/a useless/
+> 
+> (English is weird; we use "a" when the 'u' is pronounced hard as in
+> "unicorn", and "an" when the 'u' is soft as in "umbrella")
 
-Leak introduced by commit 743c71d03c20d64f2bae5fba6f26cdf5e4b1bda6,
-spotted by ASAN.
+TIL, thanks for catching/correcting this Eric :)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qga/commands-posix.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 233f78a406..c46767b0dd 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -890,6 +890,7 @@ static void build_guest_fsinfo_for_real_device(char c=
-onst *syspath,
-             break;
-         }
-=20
-+        g_free(driver);
-         if (sscanf(p, "/%x:%x:%x.%x%n",
-                           pci, pci + 1, pci + 2, pci + 3, &pcilen) =3D=3D=
- 4) {
-             p +=3D pcilen;
---=20
-2.18.0.rc1
+>>
+>>    $  spatch --sp-file scripts/coccinelle/typecast.cocci \
+>>              --macro-file scripts/cocci-macro-file.h \
+>>              --dir . --in-place
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>> ---
