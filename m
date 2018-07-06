@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fbTXj-0000cP-6b
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:25:14 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fbTZZ-0001PB-Rw
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fbTXi-0001gf-EQ
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:25:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60742 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fbTXi-0001eq-3q
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:25:10 -0400
-Date: Fri, 6 Jul 2018 19:25:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180706192326-mutt-send-email-mst@kernel.org>
-References: <20180705181148.26871-1-clg@kaod.org>
-	<20180705133044.634ede43@t450s.home>
-	<b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
-	<20180706015113.GC23001@xz-mi>
-	<9ae66133-86a6-72d8-cd66-f27592caffe9@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fbTZU-0003Ra-Us
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:27:05 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180706155127.7483-1-f4bug@amsat.org>
+	<20180706155127.7483-3-f4bug@amsat.org>
+	<CAFEAcA_rKe5MrPt36EAYjxB5TDREb9Ea+vj8u4kVPgamLDFiog@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c5000a69-8309-cb26-feeb-a70d1d9107ee@amsat.org>
+Date: Fri, 6 Jul 2018 13:26:56 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9ae66133-86a6-72d8-cd66-f27592caffe9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+In-Reply-To: <CAFEAcA_rKe5MrPt36EAYjxB5TDREb9Ea+vj8u4kVPgamLDFiog@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 2/3] linux-user: Do not report
+ "syscall not implemented" by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jul 06, 2018 at 05:55:23PM +0200, Paolo Bonzini wrote:
-> On 06/07/2018 03:51, Peter Xu wrote:
-> > 
-> > A question about memory region auto destruction (which might not
-> > related to this patch): I see that we have object_property_add_child()
-> > in memory_region_do_init() to achieve the auto destruction but only if
-> > the "name" of memory region is specified.  Could we just do that
-> > unconditionally (though we might of course need to generate some of
-> > the names), or is there a reason not to do so?
+On 07/06/2018 01:08 PM, Peter Maydell wrote:
+> On 6 July 2018 at 16:51, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> This can still be reported using the "-d unimp" command line option.
+>>
+>> Code change produced with:
+>>
+>>   git ls-files linux-user | \
+>>   xargs sed -i -E 's/fprintf\(stderr,\s?(".*not implemented\\n")\);/qemu_log_mask(LOG_UNIMP, \1);/g'
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  linux-user/cris/signal.c       | 4 ++--
+>>  linux-user/microblaze/signal.c | 4 ++--
+>>  linux-user/nios2/signal.c      | 2 +-
+>>  linux-user/sparc/signal.c      | 4 ++--
+>>  4 files changed, 7 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
+>> index 0b405247cf..1e02194377 100644
+>> --- a/linux-user/cris/signal.c
+>> +++ b/linux-user/cris/signal.c
+>> @@ -146,7 +146,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+>>                      target_siginfo_t *info,
+>>                       target_sigset_t *set, CPUCRISState *env)
+>>  {
+>> -    fprintf(stderr, "CRIS setup_rt_frame: not implemented\n");
+>> +    qemu_log_mask(LOG_UNIMP, "setup_rt_frame: not implemented\n");
 > 
-> I'm not sure actually if there are still regions without a name...
-> 
-> Paolo
+> Your regex seems to have gone a bit awry here, because it's lost
+> the "CRIS" part of the string (similarly below).
 
-Answer to Peter's question would be a yes then?
+Oh I deliberately dropped it when using 'git add -p' after the regex
+because I noticed neither nios2 nor sparc arch were using it, and I
+don't think this is a relevant information.
 
-With all the autodestruct I'm unsure when is calling vmstate_unregister_ram appropriate.
-Is it necessary to invoke that from pci any longer?
+Do you prefer I restore them, I reword the commit message, or even add
+similar description for the nios2/sparc?
 
--- 
-MST
+Thanks,
+
+Phil.
