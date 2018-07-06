@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fbPnl-0007Xd-Og
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:25:48 -0400
+	(envelope-from <ari@tuxera.com>) id 1fbPol-0008Mj-IC
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fbPnD-0001cT-A1
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:25:29 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45999 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fbPnC-0001as-TM
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:24:55 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri,  6 Jul 2018 13:48:47 +0200
-Message-Id: <1530877732-26557-4-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <ari@tuxera.com>) id 1fbPok-0002Oj-Mx
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:26:31 -0400
+References: <20180705102604.4986-1-kwolf@redhat.com>
+	<20180705102604.4986-10-kwolf@redhat.com>
+	<baf76d34-88bf-5ac6-cce0-b63a15e0bbe5@redhat.com>
+From: Ari Sundholm <ari@tuxera.com>
+Message-ID: <404987c8-6979-18aa-ac3f-ed5ae6b08b72@tuxera.com>
+Date: Fri, 6 Jul 2018 15:26:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <baf76d34-88bf-5ac6-cce0-b63a15e0bbe5@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 3/8] target/mips: Update some CP0 registers
- bit definitions
+Subject: Re: [Qemu-devel] [PULL v2 09/12] block/blklogwrites: Add an option
+ for appending to an old log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 07/05/2018 07:06 PM, Eric Blake wrote:
+> On 07/05/2018 05:26 AM, Kevin Wolf wrote:
+>> From: Ari Sundholm <ari@tuxera.com>
+>>
+>> Suggested by Kevin Wolf. May be useful when testing multiple batches
+>> of writes or doing long-term testing involving restarts of the VM.
+>>
+>> Signed-off-by: Ari Sundholm <ari@tuxera.com>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>> =C2=A0 qapi/block-core.json |=C2=A0=C2=A0 3 +-
+>> =C2=A0 block/blklogwrites.c | 147=20
+>> ++++++++++++++++++++++++++++++++++++++++++++++-----
+>> =C2=A0 2 files changed, 135 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index a9eab8cab8..d1753a2ae7 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -3062,7 +3062,8 @@
+>> =C2=A0 { 'struct': 'BlockdevOptionsBlklogwrites',
+>> =C2=A0=C2=A0=C2=A0 'data': { 'file': 'BlockdevRef',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 'log': 'BlockdevRef',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
+log-sector-size': 'uint32' } }
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
+log-sector-size': 'uint32',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
+log-append': 'bool' } }
+>=20
+> Missing documentation (including the default value) of the new member.=20
+> Since this is already pulled, please submit a followup patch.
+>=20
 
-Update CP0 registers Config0, Config1, and Config5 bit definitions.
+I somehow missed your message. Sorry.
 
-Some of these bits will be utilized by upcoming nanoMIPS changes.
+Thanks for spotting this. I just sent a patch to add the missing=20
+documentation.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- target/mips/cpu.h | 38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
-
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index cfe1735..100b5f4 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -388,26 +388,27 @@ struct CPUMIPSState {
-     target_ulong CP0_CMGCRBase;
-     int32_t CP0_Config0;
- #define CP0C0_M    31
--#define CP0C0_K23  28
--#define CP0C0_KU   25
-+#define CP0C0_K23  28    /* 30..28 */
-+#define CP0C0_KU   25    /* 27..25 */
- #define CP0C0_MDU  20
- #define CP0C0_MM   18
- #define CP0C0_BM   16
-+#define CP0C0_Impl 16    /* 24..16 */
- #define CP0C0_BE   15
--#define CP0C0_AT   13
--#define CP0C0_AR   10
--#define CP0C0_MT   7
-+#define CP0C0_AT   13    /* 14..13 */
-+#define CP0C0_AR   10    /* 12..10 */
-+#define CP0C0_MT   7     /*  9..7  */
- #define CP0C0_VI   3
--#define CP0C0_K0   0
-+#define CP0C0_K0   0     /*  2..0  */
-     int32_t CP0_Config1;
- #define CP0C1_M    31
--#define CP0C1_MMU  25
--#define CP0C1_IS   22
--#define CP0C1_IL   19
--#define CP0C1_IA   16
--#define CP0C1_DS   13
--#define CP0C1_DL   10
--#define CP0C1_DA   7
-+#define CP0C1_MMU  25    /* 30..25 */
-+#define CP0C1_IS   22    /* 24..22 */
-+#define CP0C1_IL   19    /* 21..19 */
-+#define CP0C1_IA   16    /* 18..16 */
-+#define CP0C1_DS   13    /* 15..13 */
-+#define CP0C1_DL   10    /* 12..10 */
-+#define CP0C1_DA   7     /*  9..7  */
- #define CP0C1_C2   6
- #define CP0C1_MD   5
- #define CP0C1_PC   4
-@@ -468,7 +469,18 @@ struct CPUMIPSState {
- #define CP0C5_CV         29
- #define CP0C5_EVA        28
- #define CP0C5_MSAEn      27
-+#define CP0C5_PMJ        23    /* 25..23 */
-+#define CP0C5_WR2        22
-+#define CP0C5_NMS        21
-+#define CP0C5_ULS        20
-+#define CP0C5_XPA        19
-+#define CP0C5_CRCP       18
-+#define CP0C5_MI         17
-+#define CP0C5_GI         15    /* 16..15 */
-+#define CP0C5_CA2        14
- #define CP0C5_XNP        13
-+#define CP0C5_DEC        11
-+#define CP0C5_L2C        10
- #define CP0C5_UFE        9
- #define CP0C5_FRE        8
- #define CP0C5_VP         7
---=20
-2.7.4
+Thanks,
+Ari Sundholm
+ari@tuxera.com
