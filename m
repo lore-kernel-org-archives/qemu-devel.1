@@ -1,34 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbQC4-0001vd-OT
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:50:37 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fbQMq-0002K9-PU
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbQC0-0003WG-8G
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:50:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fbQBz-0003Us-UL
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:50:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fbQBy-00009D-QD
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 12:50:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 960E42E819C
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 12:50:30 +0000 (UTC)
+	(envelope-from <pasic@linux.ibm.com>) id 1fbQMi-0001Ns-U4
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:01:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fbQMi-0001Nd-K9
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:01:36 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w66Bcugd110472
+	for <qemu-devel@nongnu.org>; Fri, 6 Jul 2018 07:42:32 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k2524pjxb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 07:42:32 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 6 Jul 2018 12:42:30 +0100
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
+	<20180706100346.3dda6b10.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Fri, 6 Jul 2018 13:42:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jul 2018 12:40:49 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1777226 <1777226@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152914430206.1773.1773906291047084265.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153088084960.29798.12397489008872355828.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777226] Re: qemu-user warnings confuse userland
- applications
+In-Reply-To: <20180706100346.3dda6b10.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <81699814-1e9a-7031-ca3f-4d4d5c58906a@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 10/15] s390-bios: Support for
+ running format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +43,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Yes, we should probably move these "unimplemented syscall" warnings to
-the LOG_UNIMP logging level (which you can then turn on if you want
-them).
+To: Cornelia Huck <cohuck@redhat.com>, "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: bjsdjshi@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
 
-** Tags added: linux-user
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+On 07/06/2018 10:03 AM, Cornelia Huck wrote:
+> On Thu,  5 Jul 2018 13:25:38 -0400
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> 
+>> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+>>
+>> Add struct for format-0 ccws. Support executing format-0 channel
+> 
+>> +     */
+>> +    if (irb->scsw.cstat != 0x00 && irb->scsw.cstat != 0x40) {
+>> +        return true;
+>> +    }
+>> +    return irb->scsw.dstat != 0xc;
+>> +}
+>> +
+>> +/* Executes a channel program at a given subchannel. The request to run the
+>> + * channel program is sent to the subchannel, we then wait for the interrupt
+>> + * singaling completion of the I/O operation(s) perfomed by the channel
+>> + * program. Lastly we verify that the i/o operation completed without error and
+>> + * that the interrupt we received was for the subchannel used to run the
+>> + * channel program.
+> 
+> Finally, real interrupts instead of polling in the s390-ccw bios,
+> nice :)
+> 
+>> + *
+>> + * Note: This function assumes it is running in an environment where no other
+>> + * cpus are generating or receiving I/O interrupts. So either run it in a
+>> + * single-cpu environment or make sure all other cpus are not doing I/O and
+>> + * have I/O interrupts masked off.
+>> + */
+>> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+>> +{
+>> +    Ccw0 *this_ccw, *prev_ccw;
+>> +    CmdOrb orb = {};
+>> +    Irb irb = {};
+>> +    int rc;
+>> +
+>> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
+>> +
+>> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
+>> +    if (fmt == 0) {
+>> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
+>> +    }
+>> +
+>> +    orb.fmt = fmt ;
+>> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
+>> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
+>> +    orb.lpm = 0xFF; /* All paths allowed */
+>> +    orb.cpa = ccw_addr;
+>> +
+>> +    rc = ssch(schid, &orb);
+>> +    if (rc) {
+>> +        print_int("ssch failed with rc=", rc);
+>> +        return rc;
+> 
+> Are you doing anything like retrying on cc 1/2? It's probably fine to
+> give up on cc 3.
+> 
 
--- =
+We are in IPL context. We should have exclusive access to the DASD
+we are IPL-ing from, or not? My understanding was that if the layers
+below us don't violate the rules, we should never observe cc 1 or 2
+here. Or am I wrong?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777226
-
-Title:
-  qemu-user warnings confuse userland applications
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  I recently observed that warning messages emitted by qemu-user can
-  confuse applications when reading from stdout/stderr. This was
-  observed with the configure script of OpenJDK-11 on qemu-sh4:
-
-  configure: Found potential Boot JDK using configure arguments
-  configure: Potential Boot JDK found at /usr/lib/jvm/java-10-openjdk-sh4 i=
-s incorrect JDK version (qemu: Unsupported syscall: 318); ignoring
-  configure: (Your Boot JDK version must be one of: 10 11)
-  configure: error: The path given by --with-boot-jdk does not contain a va=
-lid Boot JDK
-  configure exiting with result code 1
-
-  See:
-  https://buildd.debian.org/status/fetch.php?pkg=3Dopenjdk-11&arch=3Dsh4&ve=
-r=3D11%7E18-1&stamp=3D1529119043&raw=3D0
-
-  Commenting out the line of code which emits the warning fixes the
-  problem for me and the configure script finishes without problems.
-
-  Thus, qemu should be modified to avoid cluttering stdout or stderr
-  with its own messages and rather send those warnings to a log file or
-  similar.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777226/+subscriptions
+Regards,
+Halil
