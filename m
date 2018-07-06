@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fbOQE-0007aB-FP
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:57:07 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbOR5-00080F-0w
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fbOQB-0002n0-BI
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:57:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40894 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbOR2-0006fS-Uc
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:57:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39252 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fbOQB-0002la-5n
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:57:03 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fbOR2-0006e6-Px
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:57:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53AB54078098
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:57:02 +0000 (UTC)
-Date: Fri, 6 Jul 2018 11:56:59 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180706105658.GB2661@work-vm>
-References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180706091716.GA9761@work-vm>
+	by mx1.redhat.com (Postfix) with ESMTPS id 5620881A4EA9
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:57:56 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  6 Jul 2018 12:57:27 +0200
+Message-Id: <20180706105753.26700-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180706105753.26700-1-marcandre.lureau@redhat.com>
+References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180706091716.GA9761@work-vm>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 0/9] migration: postcopy recovery
- unit test, bug fixes
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 01/27] qmp-shell: learn to send commands
+ with quoted arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Based-on: <20180627132246.5576-1-peterx@redhat.com>
-> > 
-> > Based on the series to unbreak postcopy:
-> >   Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
-> >   Message-Id: <20180627132246.5576-1-peterx@redhat.com>
-> > 
-> > This series introduce a new postcopy recovery test.  The new test
-> > actually helped me to identify two bugs there so fix them as well
-> > before 3.0 release.
-> > 
-> > Patch 1: a trivial cleanup for existing postcopy ram load, which I
-> >          found a bit confusing during debugging the problem.
-> > 
-> > Patch 2-3: two bug fixes that address different issues.  Please see
-> >            the commit log for more information.
-> > 
-> > Patch 4-9: add the postcopy recovery unit test.
-> > 
-> > Please review.  Thanks,
-> 
-> Queued
+Use shlex to split the CLI command, respecting quoted arguments, and
+also comments. This allows to call for ex:
 
-Hi Peter,
-  There's a problem in there somewhere;  I'm getting
-an intermittent failure of the test if I run a make check -j 8    on my
-laptop.  Just running two copies of tests/migration-test in parallel
-sometimes triggers it (but not if I turn on QTEST_LOG!).
-But it's always failing with:
+(QEMU) human-monitor-command command-line=3D"screendump /dev/null"
+{"execute": "human-monitor-command", "arguments": {"command-line": "scree=
+ndump /dev/null"}}
 
-  ERROR:/home/dgilbert/git/migpull/tests/migration-test.c:373:migrate_recover: assertion failed: (qdict_haskey(rsp, "return"))
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180326150916.9602-3-marcandre.lureau@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qmp/qmp-shell | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Dave
-
-> > Peter Xu (9):
-> >   migration: simplify check to use qemu file buffer
-> >   migration: loosen recovery check when load vm
-> >   migration: fix incorrect bitmap size calculation
-> >   tests: introduce migrate_postcopy_* helpers
-> >   tests: allow migrate() to take extra flags
-> >   tests: introduce migrate_query*() helpers
-> >   tests: introduce wait_for_migration_status()
-> >   tests: add postcopy recovery test
-> >   tests: hide stderr for postcopy recovery test
-> > 
-> >  migration/ram.c        |  21 +++--
-> >  migration/savevm.c     |  16 ++--
-> >  tests/migration-test.c | 198 ++++++++++++++++++++++++++++++++---------
-> >  3 files changed, 176 insertions(+), 59 deletions(-)
-> > 
-> > -- 
-> > 2.17.1
-> > 
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+index a42306dd89..770140772d 100755
+--- a/scripts/qmp/qmp-shell
++++ b/scripts/qmp/qmp-shell
+@@ -74,6 +74,7 @@ import sys
+ import os
+ import errno
+ import atexit
++import shlex
+=20
+ class QMPCompleter(list):
+     def complete(self, text, state):
+@@ -219,7 +220,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+=20
+             < command-name > [ arg-name1=3Darg1 ] ... [ arg-nameN=3DargN=
+ ]
+         """
+-        cmdargs =3D cmdline.split()
++        cmdargs =3D shlex.split(cmdline)
+=20
+         # Transactional CLI entry/exit:
+         if cmdargs[0] =3D=3D 'transaction(':
+--=20
+2.18.0.rc1
