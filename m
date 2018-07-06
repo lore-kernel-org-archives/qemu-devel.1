@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbQz8-0006t6-TL
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:41:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQzu-0007LL-C3
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbQz4-0002pM-Pf
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:41:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44702)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fbQz4-0002oq-JL
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:41:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fbQz2-0006l7-Hw
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 13:41:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B25E22E81B0
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 13:41:10 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQzt-00038f-Cv
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:42:06 -0400
+References: <20180705074638.770905-1-vsementsov@virtuozzo.com>
+	<20180706071754.GB9946@lemon.usersys.redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <7747e176-6d75-c640-4f48-0482b8c7c401@virtuozzo.com>
+Date: Fri, 6 Jul 2018 16:41:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180706071754.GB9946@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jul 2018 13:30:51 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1751674 <1751674@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151960470707.11772.10064243852456470443.malonedeb@gac.canonical.com>
-Message-Id: <153088385317.30182.7657749343641251392.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1751674] Re: qemu-system-arm segmentation fault
- trying to dump VM memory
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] fix image fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+06.07.2018 10:17, Fam Zheng wrote:
+> On Thu, 07/05 10:46, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all.
+>>
+>> This fixes image fleecing scheme for 3.0, details are in 04 patch.
+> Looks like this breaks 'test-replication':
+>
+> http://patchew.org/QEMU/20180705074638.770905-1-vsementsov@virtuozzo.com/
+>
+> test-replication: /stor/work/qemu/block/io.c:725: wait_serialising_reques=
+ts: Assertion `qemu_coroutine_self() !=3D req->co' failed.
+> GTester: last random seed: R02Se49967625f19c5be9918a2503fb2fff5
+> test-replication: /stor/work/qemu/block/io.c:725: wait_serialising_reques=
+ts: Assertion `qemu_coroutine_self() !=3D req->co' failed.
+>    GTESTER tests/test-qht-par
+> GTester: last random seed: R02S8fad2bb2daddc51eb51623bb7c86cb67
+> test-replication: /stor/work/qemu/block/io.c:725: wait_serialising_reques=
+ts: Assertion `qemu_coroutine_self() !=3D req->co' failed.
+> GTester: last random seed: R02S024718e9b1e2b1facafe254c43e1430b
+>
+> Fam
 
-** Summary changed:
+interesting.
 
-- qemu-system-arm segmentation fault trying to dump VM memory
-+ qemu-system-arm segmentation fault using pmemsave on the interrupt contro=
-ller registers
+in gdb I see, that both requests are identical (i.e. their=20
+BdrvTrackedRequeststructs, except list filed)writes (self and req)...
 
--- =
+and it's actually the same request, duplicated in the ist, first it is=20
+created in bdrv_co_copy_range_internal,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1751674
+and than again,
+#0=C2=A0 tracked_request_begin (req=3D0x7fffe8f9e7d0, bs=3D0x555555a43040,=
+=20
+offset=3D33554432, bytes=3D33554432, type=3D
+ =C2=A0=C2=A0=C2=A0 BDRV_TRACKED_WRITE) at block/io.c:598
+#1=C2=A0 0x00005555555f76bc in bdrv_co_copy_range_internal=20
+(src=3D0x55555597ef80, src_offset=3D33882112,
+ =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D33=
+554432,=20
+read_flags=3DBDRV_REQ_NO_SERIALISING,
+ =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING, recurse_src=3Dtrue)=
+ at block/io.c:2949
+#2=C2=A0 0x00005555555f78e9 in bdrv_co_copy_range_from (src=3D0x55555597ef8=
+0,=20
+src_offset=3D33882112,
+ =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D33=
+554432,=20
+read_flags=3DBDRV_REQ_NO_SERIALISING,
+ =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING) at block/io.c:2995
+#3=C2=A0 0x00005555555ae931 in qcow2_co_copy_range_from (bs=3D0x555555977ff=
+0,=20
+src=3D0x5555559f14d0,
+ =C2=A0=C2=A0=C2=A0 src_offset=3D33554432, dst=3D0x5555559f1d30, dst_offset=
+=3D33554432,=20
+bytes=3D33554432,
+ =C2=A0=C2=A0=C2=A0 read_flags=3DBDRV_REQ_NO_SERIALISING,=20
+write_flags=3DBDRV_REQ_SERIALISING) at block/qcow2.c:3311
+#4=C2=A0 0x00005555555f77cf in bdrv_co_copy_range_internal=20
+(src=3D0x5555559f14d0, src_offset=3D33554432,
+ =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D33=
+554432,=20
+read_flags=3DBDRV_REQ_NO_SERIALISING,
+ =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING, recurse_src=3Dtrue)=
+ at block/io.c:2966
 
-Title:
-  qemu-system-arm segmentation fault using pmemsave on the interrupt
-  controller registers
 
-Status in QEMU:
-  Confirmed
+so, it's actually bug in copy_range architecture.
 
-Bug description:
-  Qemu segfaults trying to generate a VM memory dump:
-
-  $ QEMU_AUDIO_DRV=3Dnone qemu-git-src/arm-softmmu/qemu-system-arm -M vexpr=
-ess-a9 -smp 4 -m 1024 -machine secure=3Doff,dump-guest-core=3Don -kernel li=
-nux-4.9.75/arch/arm/boot/zImage -append "root=3D/dev/mmcblk0 rw rootfstype=
-=3Dext4 mem=3D1024M net.ifnames=3D0 console=3DttyAMA0" -dtb vexpress-v2p-ca=
-9.dtb -sd armv7-hd.qcow2 -netdev tap,ifname=3Dtap_armv7,script=3Dno,downscr=
-ipt=3Dno,id=3Dnet0 -device virtio-net-device,mac=3D00:AA:AD:BB:FF:02,netdev=
-=3Dnet0  -monitor stdio -serial vc  -loadvm SS0
-  QEMU 2.11.50 monitor - type 'help' for more information
-  (qemu) pmemsave 0 0x3FFFFFFF memory.dmp
-  Segmentation fault (core dumped)
-
-  $ git rev-parse HEAD
-  b384cd95eb9c6f73ad84ed1bb0717a26e29cc78f
-
-  It's the second time I try to submit this bug, I think last time it
-  failed because the attached core dump size (400M compressed). Have a
-  look if you can get that file, otherwise I will try to update this
-  ticket once it's created:
-
-  (Error ID: OOPS-65553b72bc14be693eb1e37814ff9267)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1751674/+subscriptions
+--=20
+Best regards,
+Vladimir
