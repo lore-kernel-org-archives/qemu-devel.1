@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fbTZZ-0001PB-Rw
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:27:06 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbTaR-0001tZ-JO
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fbTZU-0003Ra-Us
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:27:05 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180706155127.7483-1-f4bug@amsat.org>
-	<20180706155127.7483-3-f4bug@amsat.org>
-	<CAFEAcA_rKe5MrPt36EAYjxB5TDREb9Ea+vj8u4kVPgamLDFiog@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c5000a69-8309-cb26-feeb-a70d1d9107ee@amsat.org>
-Date: Fri, 6 Jul 2018 13:26:56 -0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbTaQ-0003fK-EW
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:27:59 -0400
+References: <20180703105305.45398-1-vsementsov@virtuozzo.com>
+	<20180703105305.45398-3-vsementsov@virtuozzo.com>
+	<79b1dc41-b230-3958-8057-4061c18a7814@redhat.com>
+	<63c582e8-4646-ad59-3d89-ce07f78e390c@virtuozzo.com>
+	<43e22b35-39c3-f596-5a0a-f899376911ad@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9a571e89-ba87-0d32-198d-ff952e07b5aa@virtuozzo.com>
+Date: Fri, 6 Jul 2018 19:27:39 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_rKe5MrPt36EAYjxB5TDREb9Ea+vj8u4kVPgamLDFiog@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <43e22b35-39c3-f596-5a0a-f899376911ad@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0 2/3] linux-user: Do not report
- "syscall not implemented" by default
+Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: add transaction support for
+ x-block-dirty-bitmap-merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +28,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 07/06/2018 01:08 PM, Peter Maydell wrote:
-> On 6 July 2018 at 16:51, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> This can still be reported using the "-d unimp" command line option.
+06.07.2018 18:38, John Snow wrote:
+>
+> On 07/06/2018 06:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Ok, let's go this way for now, I'll rewrite it.
 >>
->> Code change produced with:
+>> Last requirement looks a bit strange for me in transaction context. We
+>> should not assume that action is done before commit.
+>> What is main idea of transaction action, do everything which will not
+>> fail in commit, or do everything which may be undone in prepare? Is
+>> there more formal way to manage dependencies between actions in one
+>> transaction?
+> Honestly, that's what I was wondering -- is there some formal model
+> people would be familiar with to help explain inter-dependencies between
+> transactional actions?
+>
+> I don't know of one, presently, so I'm making it up as I go along.
+>
+> I think this statement is intuitively true, though:
+>
+> "For actions that are affected by other actions, the order of those two
+> actions matter, with the first action having an effect on the second."
+>
+> We process actions in a linear order, first .prepare and then .commit --
+> so actions that come first in the list do have their callbacks executed
+> first. There's no way to express priority otherwise unless we give
+> certain actions a priority score, which we don't have right now.
+>
+> Next, backup actions take ownership of the bitmap in .prepare()... so in
+> order for bitmap manipulation commands to affect these actions, they
+> also need to modify the bitmap in .prepare().
+>
+> This may feel counter-intuitive to how transactions appear to be
+> designed to work, but on this subject Stefan said (May 2015):
+>
+>> The ambiguity is whether "commit the changes" for .commit() means
+>> "changes take effect" or "discard stashed state, making undo
+>> impossible".
 >>
->>   git ls-files linux-user | \
->>   xargs sed -i -E 's/fprintf\(stderr,\s?(".*not implemented\\n")\);/qemu_log_mask(LOG_UNIMP, \1);/g'
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  linux-user/cris/signal.c       | 4 ++--
->>  linux-user/microblaze/signal.c | 4 ++--
->>  linux-user/nios2/signal.c      | 2 +-
->>  linux-user/sparc/signal.c      | 4 ++--
->>  4 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
->> index 0b405247cf..1e02194377 100644
->> --- a/linux-user/cris/signal.c
->> +++ b/linux-user/cris/signal.c
->> @@ -146,7 +146,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
->>                      target_siginfo_t *info,
->>                       target_sigset_t *set, CPUCRISState *env)
->>  {
->> -    fprintf(stderr, "CRIS setup_rt_frame: not implemented\n");
->> +    qemu_log_mask(LOG_UNIMP, "setup_rt_frame: not implemented\n");
-> 
-> Your regex seems to have gone a bit awry here, because it's lost
-> the "CRIS" part of the string (similarly below).
+>> I think the "discard stashed state, making undo impossible"
+>> interpretation is good because .commit() is not allowed to fail.  That
+>> function should only do things that never fail.
+> I think this is probably the correct way to proceed, and we ought to
+> formalize this model. I think it's actually nearly impossible to do it
+> the other way around, too.
+>
+> Let's say we've got two actions that both do error-checking in .prepare,
+> but perform their actual stateful changes in .commit, but are
+> interdependent.
+>
+> { a, b }
+>
+> - a.prepare() checks state and confirms we will be able to proceed, but
+> changes no state.
+> - b.prepare() checks state and confirms it will be able to proceed, but
+> can't see what a is planning to do.
+> - a.commit() succeeds as expected.
+> - b.commit() does not fail as it is not allowed to, but the effects are
+> undetermined because we have not checked the state change from a.commit()
+>
+> In general we can get around this, but the more actions we add, the
+> harder it is to do proper error checking while considering the
+> hypothetical state after some actions have committed.
+>
+> I think the model where we take effect in .prepare() and undo it if
+> necessary in .abort() is actually easier to model in your head, because
+> error checking is simpler. That's probably the right model, then.
+>
+>
+>
+> At the very least, I think that's correct for 3.0 and the immediate
+> future. If you disagree, please speak up because I've long been
+> particularly uncertain about this aspect.
+>
+> --John
 
-Oh I deliberately dropped it when using 'git add -p' after the regex
-because I noticed neither nios2 nor sparc arch were using it, and I
-don't think this is a relevant information.
+Ok.
 
-Do you prefer I restore them, I reword the commit message, or even add
-similar description for the nios2/sparc?
+But a question about some formalization mechanism or at least writing 
+corresponding documentation still exists.
 
-Thanks,
+The simplest formalization may be to allow only one action with .commit 
+in transaction. In this case, ordering is enough to satisfy 
+dependencies. (all operations with dirty bitmaps are actually operations 
+without .commit, freeing temporary HBitmap may be done in .clean not in 
+.commit, as it don't change external state)
 
-Phil.
+-- 
+Best regards,
+Vladimir
