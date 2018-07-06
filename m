@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fbKBv-00017J-Q9
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:26:05 -0400
+	(envelope-from <clg@kaod.org>) id 1fbKF8-0001pg-SL
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fbKBu-0000cF-SW
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:26:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55478 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fbKF5-0003oA-Ne
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:29:22 -0400
+Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:51858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fbKBu-0000bQ-Lr
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:26:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3FBF414B38B
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 06:26:02 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180705164201.9853-1-marcandre.lureau@redhat.com>
-	<20180706040612.GF23001@xz-mi>
-Date: Fri, 06 Jul 2018 08:25:57 +0200
-In-Reply-To: <20180706040612.GF23001@xz-mi> (Peter Xu's message of "Fri, 6 Jul
-	2018 12:06:12 +0800")
-Message-ID: <87va9s3moa.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fbKF5-0003PR-HB
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:29:19 -0400
+Received: from player711.ha.ovh.net (unknown [10.109.120.54])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id B734210DC84
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 08:29:10 +0200 (CEST)
+References: <20180619140729.21949-1-clg@kaod.org>
+	<20180619140729.21949-2-clg@kaod.org>
+	<eb1ad8ca-89f7-b059-3a3c-412375871113@kaod.org>
+	<bc3ec7a5-a6c5-2a0d-7ac1-6583a182807b@kaod.org>
+	<dc0f292f-6f1f-791b-4073-88f347495d2c@kaod.org>
+	<20180706054458.GQ3450@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <07d32ac8-09ad-a2c8-f6bf-4675952c2b82@kaod.org>
+Date: Fri, 6 Jul 2018 08:29:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180706054458.GQ3450@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: fix double-free of request error
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-Peter Xu <peterx@redhat.com> writes:
+On 07/06/2018 07:44 AM, David Gibson wrote:
+> On Tue, Jul 03, 2018 at 05:19:56PM +0200, C=E9dric Le Goater wrote:
+>> On 07/02/2018 01:11 PM, C=E9dric Le Goater wrote:
+>>> On 07/02/2018 12:03 PM, C=E9dric Le Goater wrote:
+>>>>> --- a/hw/ppc/spapr_vio.c
+>>>>> +++ b/hw/ppc/spapr_vio.c
+>>>>> @@ -436,6 +436,9 @@ static void spapr_vio_busdev_reset(DeviceState =
+*qdev)
+>>>>>      }
+>>>>>  }
+>>>>> =20
+>>>>> +/* TODO : poor VIO device indexing ... */
+>>>>> +static uint32_t vio_index;
+>>>>
+>>>> I think we could also use (dev->reg & 0xff) as an index for=20
+>>>> the VIO devices.
+>>>>
+>>>> The unit address of the virtual IOA is simply allocated using=20
+>>>> an increment of bus->next_reg, next_reg being initialized at
+>>>> 0x71000000.
+>>>>
+>>>> I did not see any restrictions in the PAPR specs or in QEMU=20
+>>>> that would break the above.
+>>>
+>>> That was until I discovered this macro :=20
+>>>
+>>>   #define DEFINE_SPAPR_PROPERTIES(type, field)           \
+>>>         DEFINE_PROP_UINT32("reg", type, field.reg, -1)
+>>> =20
+>>> so 'reg' could have any value. We can not use it ...
+>>
+>> Would moving vio_index under the bus and incrementing it each time
+>> a VIO device is created be acceptable ?=20
+>=20
+> Not really, no.
+>=20
+>> It does look like an allocator but I really don't know what else to=20
+>> propose :/ See below.
+>=20
+> Not only is it a stealth allocator, it also means we have two
+> different unique ids for VIO devices - the 'reg' and this new index.
+> That sounds like a recipe for confusion.
 
-> On Thu, Jul 05, 2018 at 06:42:01PM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> qmp_error_response() will free the given error. Fix double-free in
->> later qmp_request_free().
->>=20
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->
-> And not related to current patch...
->
->> ---
->>  monitor.c | 1 +
->>  1 file changed, 1 insertion(+)
->>=20
->> diff --git a/monitor.c b/monitor.c
->> index 3c9c97b73f..7af1f18d13 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -4186,6 +4186,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
->>      } else {
->>          assert(req_obj->err);
->>          rsp =3D qmp_error_response(req_obj->err);
->> +        req_obj->err =3D NULL;
->>          monitor_qmp_respond(req_obj->mon, rsp, NULL);
->
-> ... here not sure whether we should just pass in req_obj->id instead
-> of NULL, or maybe we can do some more assertions like:
->
-> diff --git a/monitor.c b/monitor.c
-> index 9eb9f06599..04d2c50f4e 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4215,10 +4215,12 @@ static void monitor_qmp_bh_dispatcher(void *data)
->=20=20
->      mon =3D req_obj->mon;
->      if (req_obj->req) {
-> +        assert(!req_obj->err);
+I agree.
 
-Makes sense.
+> I think we can do better.  I had a look at how these are allocated and
+> it seems to be this:
+>=20
+> In qemu:
+> 	VIO devices start at reg=3D0x71000000, and just increment by one
+> 	from there.
+>=20
+> In libvirt:
+> 	VIO net devices start at reg=3D0x1000
+> 	VIO scsi devices start at reg=3D0x2000
+> 	VIO nvram devices start at reg=3D0x3000
+> 	VIO vty devices start at reg=3D0x30000000
+> 	    and increment by 0x1000 each type
+>=20
+> So we could go for say:
+> 	irq =3D (reg & 0xf) ^ ((reg >> 12) & 0xf);
 
->          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
-: "");
->          monitor_qmp_dispatch(mon, req_obj->req, req_obj->id);
->      } else {
->          assert(req_obj->err);
-> +        assert(!req_obj->id);
+We should use 0xff in the formula above to cover 256 devices. So we are=20
+looking for an index in the bit ranges [0-7] or [12-19]. Ok, I didn't=20
+dare to do that but let's go that way. I will send a v4 before going.
 
-I'd simply pass req_obj->id to monitor_qmp_respond().  Yes, it'll always
-be null, but the code would do the right thing if that should ever
-change.
+> Obviously it's easily to construct cases where that will result in
+> collisions, but I don't think it'll happen for anyone not going out of
+> there way to make it happen.
 
->          rsp =3D qmp_error_response(req_obj->err);
->          monitor_qmp_respond(mon, rsp, NULL);
->          qobject_unref(rsp);
->
-> Thanks,
+We should also deprecate the "reg" property in 3.1.
 
-Perhaps even reorder to put the error case first:
-
-    if (req_obj->err) {
-        assert(!req_obj->req);
-        rsp =3D qmp_error_response(req_obj->err);
-        req_obj->err =3D NULL;
-        monitor_qmp_respond(req_obj->mon, rsp, req_obj->id);
-        qobject_unref(rsp);
-    } else if (req_obj->req) {
-        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "=
-");
-        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
-    }
-
-Matter of taste.
+C.
+=20
