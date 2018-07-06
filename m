@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbPxX-00075s-TS
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:35:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fbQ3G-00034K-RX
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:41:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbPxS-0006JT-KL
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:35:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fbPxS-0006JI-DY
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:35:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fbPxR-0006gd-H7
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 12:35:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7ED632E806F
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 12:35:29 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1fbQ3C-00056W-Vl
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:41:30 -0400
+References: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
+	<eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
+	<20180706011849.GK3450@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <afa973b5-f32e-c88e-ad2b-9edb864f6477@redhat.com>
+Date: Fri, 6 Jul 2018 14:41:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jul 2018 12:26:51 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1779017 <1779017@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153014968219.17704.367188786620032253.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153088001221.13000.13764121298961085367.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1779017] Re: qemu-system-arm: crashes raspian
- kernels with divide-by-zero
+In-Reply-To: <20180706011849.GK3450@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC"
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Add comment explaining ignored
+ errors from fdt operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,89 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Guenter Roeck <linux@roeck-us.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?Q?Pilippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-** Tags added: arm
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Guenter Roeck <linux@roeck-us.net>, Alexander Graf <agraf@suse.de>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?Q?Pilippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>
+Message-ID: <afa973b5-f32e-c88e-ad2b-9edb864f6477@redhat.com>
+Subject: Re: [PATCH] sam460ex: Add comment explaining ignored errors from fdt
+ operations
+References: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
+ <eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
+ <20180706011849.GK3450@umbus.fritz.box>
+In-Reply-To: <20180706011849.GK3450@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 06/07/2018 03:18, David Gibson wrote:
+>> Ok, but why would it even fail?  Maybe it's not this case, but even if=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1779017
+>> it's not fatal for the OS, generating different device trees silently
+>> seems like a recipe for Heisenbugs.
+> Yes, quite.  Especially since the most likely errors I can see here
+> would actually indicate something has already gone horribly wrong with
+> the device tree construction, so a missing clock-frequency is the
+> least of our troubles.
+>=20
+> I think using _FDT() here would be a better approach.
 
-Title:
-  qemu-system-arm: crashes raspian kernels with divide-by-zero
+Or qemu_fdt_setprop_cell, which is there exactly for this reason.
+Volunteers needed to report it in checkpatch! :)
 
-Status in QEMU:
-  New
+Paolo
 
-Bug description:
-  While trying to boot a arm kernel for a raspi2 machine (kernel7-4.9.41-st=
-retch.img in my case, but applies to other versions, too) the kernel crash =
-with a division by zero. The output on the sreial console is:
-  [   10.022377] [<8011d344>] (__warn) from [<8011d42c>] (warn_slowpath_nul=
-l+0x30/0x38)
-  [   10.024726] [<8011d42c>] (warn_slowpath_null) from [<804da378>] (uart_=
-get_baud_rate+0xf8/0x160)
 
-  ...
+--ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  [   10.094933] Hardware name: BCM2835
-  [   10.101507] [<8010fb3c>] (unwind_backtrace) from [<8010c058>] (show_st=
-ack+0x20/0x24)
-  [   10.105413] [<8010c058>] (show_stack) from [<80455f84>] (dump_stack+0x=
-d4/0x118)
-  [   10.140268] [<80455f84>] (dump_stack) from [<8010bed4>] (__div0+0x24/0=
-x28)
-  [   10.143065] [<8010bed4>] (__div0) from [<8045498c>] (Ldiv0+0x8/0x14)
-  [   10.145553] [<8045498c>] (Ldiv0) from [<804e5538>] (pl011_set_termios+=
-0x9c/0x37c)
-  [   10.148017] [<804e5538>] (pl011_set_termios) from [<804da954>] (uart_c=
-hange_speed+0x40/0xfc)
-  [   10.185887] [<804da954>] (uart_change_speed) from [<804ddedc>] (uart_s=
-tartup.part.3+0xa4/0x13c)
-  [   10.222187] [<804ddedc>] (uart_startup.part.3) from [<804ddfcc>] (uart=
-_port_activate+0x58/0x64)
-  [   10.226014] [<804ddfcc>] (uart_port_activate) from [<804c93b8>] (tty_p=
-ort_open+0xa0/0xe0)
-  [   10.228398] [<804c93b8>] (tty_port_open) from [<804dce64>] (uart_open+=
-0x40/0x48)
-  [   10.264254] [<804dce64>] (uart_open) from [<804c1d70>] (tty_open+0xc0/=
-0x678)
-  [   10.266697] [<804c1d70>] (tty_open) from [<802753f0>] (chrdev_open+0xe=
-0/0x1a0)
-  [   10.269049] [<802753f0>] (chrdev_open) from [<8026d964>] (do_dentry_op=
-en+0x1f4/0x314)
-  [   10.271620] [<8026d964>] (do_dentry_open) from [<8026ec00>] (vfs_open+=
-0x60/0x8c)
-  [   10.275245] [<8026ec00>] (vfs_open) from [<8027f39c>] (path_openat+0x2=
-bc/0x1040)
-  [   10.312827] [<8027f39c>] (path_openat) from [<80281040>] (do_filp_open=
-+0x70/0xd4)
-  [   10.317860] [<80281040>] (do_filp_open) from [<8026efd8>] (do_sys_open=
-+0x120/0x1d0)
-  [   10.320370] [<8026efd8>] (do_sys_open) from [<8026f0b4>] (SyS_open+0x2=
-c/0x30)
-  [   10.357033] [<8026f0b4>] (SyS_open) from [<801080c0>] (ret_fast_syscal=
-l+0x0/0x1c)
+-----BEGIN PGP SIGNATURE-----
 
-  Tracking that down in the linux kernel source, it looks like somehow
-  uart_get_baud_rate() returns 0.
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAls/Y24ACgkQv/vSX3jH
+roOwDQgAlzpKpkLEMfl4OA6KcTte/dpdeKru763iRdsJUTTqwsZdlC4+HSmGfUyQ
+Z6fF0Ag9KIdEAaH89FHV5PIZRvCRLA8hnlwWgddqlG0lPvpaUScJSMAhDYO/QKW9
+PaldvA4ri2h4tzbaEd9G/k80DeEdCmnuyQzBe6AwIT3xQTs5guF/DJOV+ZgrHQNl
+35wfOjXllC8xFR+UmMjQHoaoj3PxwG7wlwWkmdSnMmb8/vJFaTbsAFxtkHaL8cjN
+AmagByzcg9sFYzNdDz+PZQ4vrMUmpFdd9vbs0nBxr4Fx2c9RbMSEOm/of3Hb4CWS
+mw3NnDm6Z58S7zXVKlfrZ1kLc9glbw==
+=z/r+
+-----END PGP SIGNATURE-----
 
-  The same kernel could be booted without problem with qemu version 2.11.
-  Trying to bisecting the issue revealed commit @d9f8bbd8eb4e95db97cf02bd03=
-af86a3d606f4f1 as the culprit.
-
-  Commandline to run was:
-  qemu-system-arm -M raspi2 \
-  	-kernel "$KERNEL" \
-  	-m 1024 \
-  	-d guest_errors,unimp \
-  	-dtb bcm2709-rpi-2-b.dtb \
-  	-drive file=3D"$IMG,if=3Dsd,format=3Draw"
-
-  Distribution is SuSE tumbleweed (x86_64, kernel 4.17.2), but same
-  problem also happens with a freshly compiled qemu from git repository.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1779017/+subscriptions
+--ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC--
