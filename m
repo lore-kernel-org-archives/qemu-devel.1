@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fbGgw-00015d-Tm
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:41:52 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fbGsp-000398-OE
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fbGgw-00010y-18
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:41:50 -0400
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-Id: <6E19EBEF-B31C-473C-8279-49A28D571F61@gmail.com>
-Date: Thu, 5 Jul 2018 22:41:43 -0400
-Subject: [Qemu-devel] VGA cirrus patch prevents video output
+	(envelope-from <programmingkidx@gmail.com>) id 1fbGsk-0006U9-Tn
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:54:07 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:46985)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1fbGsk-0006Tn-Oz
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:54:02 -0400
+Received: by mail-io0-x241.google.com with SMTP id p7-v6so9575956ioh.13
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 19:54:02 -0700 (PDT)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Thu,  5 Jul 2018 22:53:52 -0400
+Message-Id: <20180706025352.42643-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] ui/cocoa.m: replace scrollingDeltaY with
+ deltaY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mail@sebastianbauer.info
-Cc: "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-I noticed that the video in QEMU stopped working. When I start =
-qemu-system-ppc all I see is a black window. Not even OpenBIOS displays =
-anything. After some bisecting I found out it was this patch that causes =
-the problem:=20
+The NSEvent class method scrollingDeltaY is available
+for Mac OS 10.7 and newer. Since QEMU supports Mac OS
+10.5 and up, we need to be using a method that is
+available on these version of Mac OS X. The deltaY
+method is a method that does the same thing as
+scrollingDeltaY and is available on Mac OS 10.5 and
+up. So we simply replace scrollingDeltaY with deltaY.
 
-Commit 29f9cef39eb1ae55e82c6763eb22d7a1bdff7276
-Author: Sebastian Bauer <mail@sebastianbauer.info>
-Date:   Mon Jul 2 21:13:45 2018 +0200
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+v2 changes:
+- Added a condition that drops scroll events that have a deltaY value of zero.
 
-    ppc: Include vga cirrus card into the compiling process
-   =20
-    Drivers for this card exists on PPC-based AmigaOS guests so it is =
-useful to
-    allow users to emulate the graphics card for PPC machines.
-   =20
-    As cirrus vga is currently preferred over std(vga) in absence of any =
-user
-    choice, this change also sets the default display of spapr machines =
-to
-    std as otherwise qemu refuses to start these machines. Not =
-specifying an
-    explicit graphics mode is for instance done by 'make check'.
-   =20
-    Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
-    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+ ui/cocoa.m | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-
-I think a solution to this problem might be to have the mac99 machine =
-use "-vga std" as default. When I use -vga std, video works again.=
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 2991ed4..f371469 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -802,14 +802,15 @@ QemuCocoaView *cocoaView;
+              * This is in-line with standard Mac OS X UI behaviour.
+              */
+ 
++            if ([event deltaY] != 0) {
+             /* Determine if this is a scroll up or scroll down event */
+-            buttons = ([event scrollingDeltaY] > 0) ?
+-                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
+-            qemu_input_queue_btn(dcl->con, buttons, true);
+-            qemu_input_event_sync();
+-            qemu_input_queue_btn(dcl->con, buttons, false);
+-            qemu_input_event_sync();
+-
++                buttons = ([event deltaY] > 0) ?
++                    INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
++                qemu_input_queue_btn(dcl->con, buttons, true);
++                qemu_input_event_sync();
++                qemu_input_queue_btn(dcl->con, buttons, false);
++                qemu_input_event_sync();
++            }
+             /*
+              * Since deltaY also reports scroll wheel events we prevent mouse
+              * movement code from executing.
+-- 
+2.7.2
