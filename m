@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fbN0D-0006gS-CR
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:26:10 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fbN5c-0000oU-Vj
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fbN0C-0002Wt-ET
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:26:09 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:51111)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fbN0C-0002RS-7O
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:26:08 -0400
-Received: by mail-wm0-x230.google.com with SMTP id v25-v6so14231440wmc.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 02:26:08 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1fbN5Z-0004jY-RB
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:31:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51676 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fbN5Z-0004gG-Ld
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:31:41 -0400
+References: <1530710466-88309-1-git-send-email-jingqi.liu@intel.com>
+	<20180704194327.GJ914@localhost.localdomain>
+	<20180706084313.GB28022@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a6bac7b6-58b5-6cad-d4c8-01a104465e29@redhat.com>
+Date: Fri, 6 Jul 2018 11:31:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180706080615.25974-1-alex.bennee@linaro.org>
-References: <20180706080615.25974-1-alex.bennee@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 6 Jul 2018 11:26:06 +0200
-Message-ID: <CAJ+F1CLrc5d2f17brVydEjzV1zLUBZb4CV37Grb2Ab4T_1qRNw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180706084313.GB28022@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for 3.0] tests/tpm-emu: double the timeout
+Subject: Re: [Qemu-devel] [PATCH] i386: Add support to get/set/migrate MSR
+ (33H)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, wei.w.wang@intel.com, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
 
-Hi
+On 06/07/2018 10:43, Daniel P. Berrang=C3=A9 wrote:
+>> Based on the Linux patch at [1], guests may try to detect the
+>> feature by writing to the MSR unconditionally.
+>>
+>> If this happens, KVM needs to provide a mechanism to
+>> enable/disable the MSR emulation.  Otherwise users will end up
+>> with VMs that can't be migrated to older hosts even if they are
+>> using older machine-types.
+> Is there really no CPUID flag that can be used to detect the feature ?
+> Unconditionally probing for existance of arbitrary MSRs seems to be
+> just re-inventing CPUID feature detection, but worse because as you
+> say we need to now invent a way to control existance of individual
+> MSRs too :-(
 
-On Fri, Jul 6, 2018 at 10:06 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
-> We see various failures on Travis so lets just double the timeout and
-> see if that makes them go away.
+Now that I know that no silicon exists for this feature, the solution is
+simple.  The feature will be rejected until a CPUID bit exists.
 
-This is just waiting for the thread to start and open a socket. It
-shouldn't be a problem to wait longer, but do you have a Travis error
-log?
-
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  tests/tpm-emu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
-> index 8c2bd53cad..308f1884f6 100644
-> --- a/tests/tpm-emu.c
-> +++ b/tests/tpm-emu.c
-> @@ -20,7 +20,7 @@
->
->  void tpm_emu_test_wait_cond(TestState *s)
->  {
-> -    gint64 end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
-> +    gint64 end_time =3D g_get_monotonic_time() + 10 * G_TIME_SPAN_SECOND=
-;
->
->      g_mutex_lock(&s->data_mutex);
->      if (!g_cond_wait_until(&s->data_cond, &s->data_mutex, end_time)) {
-> --
-> 2.17.1
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Paolo
