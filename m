@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORJ-0008Fx-4r
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:15 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORL-0008Hr-05
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORH-0007go-6J
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49412 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORJ-0007rL-RE
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36388 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fbORG-0007eN-Vb
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fbORJ-0007qR-Lo
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 716CD72651
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:58:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 34A27E9002
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:58:13 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  6 Jul 2018 12:57:35 +0200
-Message-Id: <20180706105753.26700-10-marcandre.lureau@redhat.com>
+Date: Fri,  6 Jul 2018 12:57:37 +0200
+Message-Id: <20180706105753.26700-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 09/27] tests: print enum type members more
- like object type members
+Subject: [Qemu-devel] [PATCH v6 11/27] qapi: improve reporting of unknown or
+ missing keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,410 +37,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Commit 93bda4dd461 changed the internal representation of enum type
-members from str to QAPISchemaMember, but we still print only a
-string.  Has been good enough, as the name is the member's only
-attribute of interest, but that's about to change.  To prepare, print
-them more like object type members.
+Report the set of missing or unknown keys. And give a hint about the
+accepted keys.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/qapi-schema/comments.out           | 14 ++++++-
- tests/qapi-schema/doc-bad-section.out    | 13 +++++-
- tests/qapi-schema/doc-good.out           | 17 ++++++--
- tests/qapi-schema/empty.out              |  9 ++++-
- tests/qapi-schema/event-case.out         |  9 ++++-
- tests/qapi-schema/ident-with-escape.out  |  9 ++++-
- tests/qapi-schema/include-relpath.out    | 14 ++++++-
- tests/qapi-schema/include-repetition.out | 14 ++++++-
- tests/qapi-schema/include-simple.out     | 14 ++++++-
- tests/qapi-schema/indented-expr.out      |  9 ++++-
- tests/qapi-schema/qapi-schema-test.out   | 50 +++++++++++++++++++-----
- tests/qapi-schema/test-qapi.py           |  4 +-
- 12 files changed, 149 insertions(+), 27 deletions(-)
+ scripts/qapi/common.py                  | 23 +++++++++++++++--------
+ tests/qapi-schema/alternate-base.err    |  1 +
+ tests/qapi-schema/double-type.err       |  1 +
+ tests/qapi-schema/unknown-expr-key.err  |  3 ++-
+ tests/qapi-schema/unknown-expr-key.json |  2 +-
+ 5 files changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
-out
-index 8d2f1ce8a2..d1abc4b5a1 100644
---- a/tests/qapi-schema/comments.out
-+++ b/tests/qapi-schema/comments.out
-@@ -1,5 +1,15 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module comments.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
-diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
-c-bad-section.out
-index cd28721568..db8014eed0 100644
---- a/tests/qapi-schema/doc-bad-section.out
-+++ b/tests/qapi-schema/doc-bad-section.out
-@@ -1,8 +1,17 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module doc-bad-section.json
--enum Enum ['one', 'two']
-+enum Enum
-+    member one
-+    member two
- doc symbol=3DEnum
-     body=3D
- =3D=3D Produces *invalid* texinfo
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-index 35f3f1164c..c2fc5c774a 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -1,8 +1,17 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module doc-good.json
--enum Enum ['one', 'two']
-+enum Enum
-+    member one
-+    member two
-     if ['defined(IFCOND)']
- object Base
-     member base1: Enum optional=3DFalse
-@@ -18,7 +27,9 @@ object q_obj_Variant1-wrapper
-     member data: Variant1 optional=3DFalse
- object q_obj_Variant2-wrapper
-     member data: Variant2 optional=3DFalse
--enum SugaredUnionKind ['one', 'two']
-+enum SugaredUnionKind
-+    member one
-+    member two
- object SugaredUnion
-     member type: SugaredUnionKind optional=3DFalse
-     tag type
-diff --git a/tests/qapi-schema/empty.out b/tests/qapi-schema/empty.out
-index 0ec234eec4..5483cb7bc6 100644
---- a/tests/qapi-schema/empty.out
-+++ b/tests/qapi-schema/empty.out
-@@ -1,3 +1,10 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
-diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
-ase.out
-index 88c0964917..f69d4ffe4e 100644
---- a/tests/qapi-schema/event-case.out
-+++ b/tests/qapi-schema/event-case.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module event-case.json
- event oops None
-    boxed=3DFalse
-diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
-ident-with-escape.out
-index 24c976f473..7f891f7e90 100644
---- a/tests/qapi-schema/ident-with-escape.out
-+++ b/tests/qapi-schema/ident-with-escape.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module ident-with-escape.json
- object q_obj_fooA-arg
-     member bar1: str optional=3DFalse
-diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
-clude-relpath.out
-index ebbabd7a18..783ccfc855 100644
---- a/tests/qapi-schema/include-relpath.out
-+++ b/tests/qapi-schema/include-relpath.out
-@@ -1,9 +1,19 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module include-relpath.json
- include include/relpath.json
- module include/relpath.json
- include include-relpath-sub.json
- module include-relpath-sub.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
-diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
-/include-repetition.out
-index 7235e055bc..d45977ee56 100644
---- a/tests/qapi-schema/include-repetition.out
-+++ b/tests/qapi-schema/include-repetition.out
-@@ -1,10 +1,20 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module include-repetition.json
- include comments.json
- module comments.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
- module include-repetition.json
- include include-repetition-sub.json
- module include-repetition-sub.json
-diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
-lude-simple.out
-index 006f723eeb..1afe20802a 100644
---- a/tests/qapi-schema/include-simple.out
-+++ b/tests/qapi-schema/include-simple.out
-@@ -1,7 +1,17 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module include-simple.json
- include include-simple-sub.json
- module include-simple-sub.json
--enum Status ['good', 'bad', 'ugly']
-+enum Status
-+    member good
-+    member bad
-+    member ugly
-diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
-nted-expr.out
-index bd8a48630e..c0cf3243f3 100644
---- a/tests/qapi-schema/indented-expr.out
-+++ b/tests/qapi-schema/indented-expr.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module indented-expr.json
- command eins None -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 0da92455da..edd22bc306 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -1,6 +1,13 @@
- object q_empty
--enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+enum QType
-     prefix QTYPE
-+    member none
-+    member qnull
-+    member qnum
-+    member qstring
-+    member qdict
-+    member qlist
-+    member qbool
- module qapi-schema-test.json
- object TestStruct
-     member integer: int optional=3DFalse
-@@ -11,19 +18,25 @@ object NestedEnumsOne
-     member enum2: EnumOne optional=3DTrue
-     member enum3: EnumOne optional=3DFalse
-     member enum4: EnumOne optional=3DTrue
--enum MyEnum []
-+enum MyEnum
- object Empty1
- object Empty2
-     base Empty1
- command user_def_cmd0 Empty2 -> Empty2
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
--enum QEnumTwo ['value1', 'value2']
-+enum QEnumTwo
-     prefix QENUM_TWO
-+    member value1
-+    member value2
- object UserDefOne
-     base UserDefZero
-     member string: str optional=3DFalse
-     member enum1: EnumOne optional=3DTrue
--enum EnumOne ['value1', 'value2', 'value3', 'value4']
-+enum EnumOne
-+    member value1
-+    member value2
-+    member value3
-+    member value4
- object UserDefZero
-     member integer: int optional=3DFalse
- object UserDefTwoDictDict
-@@ -127,7 +140,21 @@ object q_obj_sizeList-wrapper
-     member data: sizeList optional=3DFalse
- object q_obj_anyList-wrapper
-     member data: anyList optional=3DFalse
--enum UserDefNativeListUnionKind ['integer', 's8', 's16', 's32', 's64', '=
-u8', 'u16', 'u32', 'u64', 'number', 'boolean', 'string', 'sizes', 'any']
-+enum UserDefNativeListUnionKind
-+    member integer
-+    member s8
-+    member s16
-+    member s32
-+    member s64
-+    member u8
-+    member u16
-+    member u32
-+    member u64
-+    member number
-+    member boolean
-+    member string
-+    member sizes
-+    member any
- object UserDefNativeListUnion
-     member type: UserDefNativeListUnionKind optional=3DFalse
-     tag type
-@@ -202,7 +229,8 @@ event EVENT_E UserDefZero
-    boxed=3DTrue
- event EVENT_F UserDefAlternate
-    boxed=3DTrue
--enum __org.qemu_x-Enum ['__org.qemu_x-value']
-+enum __org.qemu_x-Enum
-+    member __org.qemu_x-value
- object __org.qemu_x-Base
-     member __org.qemu_x-member1: __org.qemu_x-Enum optional=3DFalse
- object __org.qemu_x-Struct
-@@ -211,7 +239,8 @@ object __org.qemu_x-Struct
-     member wchar-t: int optional=3DTrue
- object q_obj_str-wrapper
-     member data: str optional=3DFalse
--enum __org.qemu_x-Union1Kind ['__org.qemu_x-branch']
-+enum __org.qemu_x-Union1Kind
-+    member __org.qemu_x-branch
- object __org.qemu_x-Union1
-     member type: __org.qemu_x-Union1Kind optional=3DFalse
-     tag type
-@@ -238,11 +267,14 @@ command __org.qemu_x-command q_obj___org.qemu_x-com=
-mand-arg -> __org.qemu_x-Unio
- object TestIfStruct
-     member foo: int optional=3DFalse
-     if ['defined(TEST_IF_STRUCT)']
--enum TestIfEnum ['foo', 'bar']
-+enum TestIfEnum
-+    member foo
-+    member bar
-     if ['defined(TEST_IF_ENUM)']
- object q_obj_TestStruct-wrapper
-     member data: TestStruct optional=3DFalse
--enum TestIfUnionKind ['foo']
-+enum TestIfUnionKind
-+    member foo
-     if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
- object TestIfUnion
-     member type: TestIfUnionKind optional=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index 27f776693e..641a18f06d 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -24,9 +24,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         print('include %s' % name)
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 8313c478c4..cf8dab2866 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -874,14 +874,21 @@ def check_struct(expr, info):
 =20
-     def visit_enum_type(self, name, info, ifcond, members, prefix):
--        print('enum %s %s' % (name, [m.name for m in members]))
-+        print('enum %s' % name)
-         if prefix:
-             print('    prefix %s' % prefix)
-+        for m in members:
-+            print('    member %s' % m.name)
-         self._print_if(ifcond)
 =20
-     def visit_object_type(self, name, info, ifcond, base, members, varia=
-nts):
+ def check_known_keys(info, source, keys, required, optional):
+-    for key in keys:
+-        if key not in required and key not in optional:
+-            raise QAPISemError(info, "Unknown key '%s' in %s" % (key, so=
+urce))
+-
+-    for key in required:
+-        if key not in keys:
+-            raise QAPISemError(info, "Key '%s' is missing from %s"
+-                               % (key, source))
++
++    def pprint(elems):
++        return ', '.join("'" + e + "'" for e in sorted(elems))
++
++    missing =3D set(required) - set(keys)
++    if missing:
++        raise QAPISemError(info, "Key%s %s %s missing from %s"
++                           % ('s' if len(missing) > 1 else '', pprint(mi=
+ssing),
++                              'are' if len(missing) > 1 else 'is', sourc=
+e))
++    allowed =3D set(required + optional)
++    unknown =3D set(keys) - allowed
++    if unknown:
++        raise QAPISemError(info, "Unknown key%s %s in %s\nValid keys are=
+ %s."
++                           % ('s' if len(unknown) > 1 else '', pprint(un=
+known),
++                              source, pprint(allowed)))
+=20
+=20
+ def check_keys(expr_elem, meta, required, optional=3D[]):
+diff --git a/tests/qapi-schema/alternate-base.err b/tests/qapi-schema/alt=
+ernate-base.err
+index 30d8a34373..ebe05bc898 100644
+--- a/tests/qapi-schema/alternate-base.err
++++ b/tests/qapi-schema/alternate-base.err
+@@ -1 +1,2 @@
+ tests/qapi-schema/alternate-base.json:4: Unknown key 'base' in alternate=
+ 'Alt'
++Valid keys are 'alternate', 'data', 'if'.
+diff --git a/tests/qapi-schema/double-type.err b/tests/qapi-schema/double=
+-type.err
+index f9613c6d6b..799193dba1 100644
+--- a/tests/qapi-schema/double-type.err
++++ b/tests/qapi-schema/double-type.err
+@@ -1 +1,2 @@
+ tests/qapi-schema/double-type.json:2: Unknown key 'command' in struct 'b=
+ar'
++Valid keys are 'base', 'data', 'if', 'struct'.
+diff --git a/tests/qapi-schema/unknown-expr-key.err b/tests/qapi-schema/u=
+nknown-expr-key.err
+index 12f5ed5b43..83b83121e0 100644
+--- a/tests/qapi-schema/unknown-expr-key.err
++++ b/tests/qapi-schema/unknown-expr-key.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/unknown-expr-key.json:2: Unknown key 'bogus' in struct=
+ 'bar'
++tests/qapi-schema/unknown-expr-key.json:2: Unknown keys 'bogus', 'foo' i=
+n struct 'bar'
++Valid keys are 'base', 'data', 'if', 'struct'.
+diff --git a/tests/qapi-schema/unknown-expr-key.json b/tests/qapi-schema/=
+unknown-expr-key.json
+index 3b2be00cc4..5bcb8efd1d 100644
+--- a/tests/qapi-schema/unknown-expr-key.json
++++ b/tests/qapi-schema/unknown-expr-key.json
+@@ -1,2 +1,2 @@
+ # we reject an expression with unknown top-level keys
+-{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { } }
++{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { }, 'foo': { } =
+}
 --=20
 2.18.0.rc1
