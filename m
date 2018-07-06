@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fbTmh-00075e-7M
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:40:40 -0400
+	(envelope-from <clg@kaod.org>) id 1fbTpF-0008S2-Qe
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fbTma-0005qf-6o
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:40:39 -0400
-Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:45630)
+	(envelope-from <clg@kaod.org>) id 1fbTpB-0000HI-Tr
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:43:17 -0400
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:44412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fbTmZ-0005lZ-HH
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:40:32 -0400
-Received: from player696.ha.ovh.net (unknown [10.109.120.118])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id CFDF9188058
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 18:40:29 +0200 (CEST)
-References: <20180705181148.26871-1-clg@kaod.org>
-	<20180705133044.634ede43@t450s.home>
-	<b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
-	<20180706015113.GC23001@xz-mi>
-	<9ae66133-86a6-72d8-cd66-f27592caffe9@redhat.com>
-	<20180706192326-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fbTpB-0000GN-Lh
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:43:13 -0400
+Received: from player798.ha.ovh.net (unknown [10.109.120.28])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 1BDDBC8CFE
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 18:43:11 +0200 (CEST)
+References: <20180706090713.15712-1-clg@kaod.org>
+	<20180706090713.15712-2-clg@kaod.org>
+	<28391e09-2e15-6050-e452-0493172a73a4@kaod.org>
+	<20180706161638.07032b4f@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <910d2d44-7fb4-dcd5-6440-b3a93acde900@kaod.org>
-Date: Fri, 6 Jul 2018 18:40:23 +0200
+Message-ID: <9c171d4c-32e1-73da-561d-cc0aa44b42fb@kaod.org>
+Date: Fri, 6 Jul 2018 18:43:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180706192326-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180706161638.07032b4f@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 07/06/2018 06:25 PM, Michael S. Tsirkin wrote:
-> On Fri, Jul 06, 2018 at 05:55:23PM +0200, Paolo Bonzini wrote:
->> On 06/07/2018 03:51, Peter Xu wrote:
->>>
->>> A question about memory region auto destruction (which might not
->>> related to this patch): I see that we have object_property_add_child()
->>> in memory_region_do_init() to achieve the auto destruction but only if
->>> the "name" of memory region is specified.  Could we just do that
->>> unconditionally (though we might of course need to generate some of
->>> the names), or is there a reason not to do so?
+On 07/06/2018 04:16 PM, Greg Kurz wrote:
+> On Fri, 6 Jul 2018 15:27:17 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>>   > +/*
+>>> + * The register property of a VIO device is defined in livirt using =
+a
+>>> + * base number + 0x1000 increment and in QEMU by incrementing the ba=
+se
+>>> + * register number 0x71000000.
+>>> + *
+>>> + * The formula below tries to compute a unique index number from the
+>>> + * register value that will be used to define the IRQ number of the
+>>> + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
+>>> + *
+>>> + * To minimize collisions, we define two distinct ranges depending o=
+n
+>>> + * the "reg" value definition:
+>>> + *
+>>> + *     [0x00 - 0x7f]    user/libvirt
+>>> + *     [0x80 - 0xff]    QEMU VIO model
+>>> + *
+>>> + * Collisions will be detected when the IRQ is claimed.
+>>> + */
+>>> +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
+>>> +{
+>>> +    if (reg >=3D SPAPR_VIO_REG_BASE) {
+>>> +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
+>>> +    } else {
+>>> +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f))=
+; =20
 >>
->> I'm not sure actually if there are still regions without a name...
+>> This is not good enough for the VIO devices with a user defined "reg".
 >>
->> Paolo
-> 
-> Answer to Peter's question would be a yes then?
-> 
-> With all the autodestruct I'm unsure when is calling vmstate_unregister_ram appropriate.
-> Is it necessary to invoke that from pci any longer?
+>> I propose to extract bits [29-28] and [16-12] to compose a 7bit index =
+:
+>>
+>> 	(((reg >> 28) & 0x3) << 5) | ((reg >> 12) & 0x1f)
+>>
+>=20
+> Looks good.
 
-That could be another patch though. This is trying to fix vfio-pci 
-unplug.
+Thanks for the investigation you made in libvirt and the tests.=20
 
-C.
+C.=20
+
+>=20
+>> That would give us a mapping :
+>>
+>> 	0x00000000  -> 0
+>> 	0x00001000  -> 1
+>> 		...
+>> 	0x0001F000  -> 31
+>> 	0x10000000  -> 32
+>> 	0x10001000  -> 33
+>> 		...
+>> 	0x1001F000  -> 63
+>> 	0x20000000  -> 64
+>> 	0x20001000  -> 65
+>> 		...
+>> 	0x2001F000  -> 95
+>> 	0x30000000  -> 96
+>> 	0x30001000  -> 97
+>> 		...
+>> 	0x3001F000  -> 127
+>>
+>> C.
+>>
+>>
+>=20
