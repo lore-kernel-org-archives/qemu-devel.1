@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbRIS-0005n3-VN
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:01:18 -0400
+	(envelope-from <groug@kaod.org>) id 1fbRQY-0008FO-9j
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbRIN-0001mh-7N
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:01:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51238)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fbRIN-0001lP-0F
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:01:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fbRIK-0001UJ-KV
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 14:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 45A9C2E81A5
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 14:01:07 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1fbRQV-00077T-1z
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:09:38 -0400
+Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:43496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fbRQU-000760-PC
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:09:34 -0400
+Received: from player770.ha.ovh.net (unknown [10.109.122.50])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 2227EB6BBC
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 16:09:33 +0200 (CEST)
+Date: Fri, 6 Jul 2018 16:09:26 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180706160926.471a1930@bahia.lan>
+In-Reply-To: <20180706153624.77494d28@bahia.lan>
+References: <20180706090713.15712-1-clg@kaod.org>
+	<20180706090713.15712-2-clg@kaod.org>
+	<20180706153624.77494d28@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jul 2018 13:46:46 -0000
-From: Andreas Gustafsson <gson@gson.org>
-Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
-Message-Id: <153088480656.18097.564505779601965111.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 1/3] spapr: introduce a fixed
+ IRQ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,63 +32,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-A couple of comments...  First, the problem is not limited to Linux
-guests.  In fact, I originally ran across it with a NetBSD guest, but
-then reproduced it with a Linux guest for the bug report, because in my
-experience, qemu bug reports involving non-Linux guests tend to be
-ignored.
+On Fri, 6 Jul 2018 15:36:24 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-Second, the qemu man page says that "With sleep=3Don|off, the virtual time
-will jump to the next timer deadline instantly whenever the virtual cpu
-goes to sleep mode".  Although the text is confusing (see bug 1774412),
-to me it suggests that when the mode in case is selected, qemu should
-execute the guest as fast as possible and only provide it with an
-illusion of the passage of time, and there should be no reason for qemu
-itself to ever sleep.  Yet, regardless of whether I specify "sleep=3Don"
-or "sleep=3Doff", qemu sleeps.
+[...]
 
--- =
+> Hmm... if you put a VIO net and two VIO vty in the domain XML, libvirt
+> will generate reg == 0x1000 for the VIO net and reg == 0x30001000 for the
+> second VIO vty... this will necessarily collide, won't it ?
+> 
+> With a 256 VIO devices limit, libvirt can only add 255 devices since
+> the nvram is created by QEMU by default (libvirt can only change its
+> reg using -global).
+> 
+> As David mentioned in another mail:
+> 
+> 	VIO net devices start at reg=0x1000
+> 	VIO scsi devices start at reg=0x2000
+> 	VIO nvram devices start at reg=0x3000
+> 	VIO vty devices start at reg=0x30000000
+> 	    and increment by 0x1000 each type
+> 
+> 
+> The values for net, scsi and nvram overlap... which makes me wonder why
+> do we even care to have per-type base value !?! Anyway, I don't think
+> it's important for what you're trying to achieve.
+> 
+> Basically libvirt can generate regs in two distinct ranges:
+> 
+> - one for scsi/net/nvram:
+> 
+> smallest possible reg: 0x1000
+> largest possible reg: 0x2000 + 254 * 0x1000 = 0x100000
+> 
+> ie, 254 scsi devices starting at 0x2000 and 1 nvram
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774677
+Oops, it is 255 scsi devices plus 1 nvram so the largest
+reg in this range is 0x101000
 
-Title:
-  -icount increases boot time by >10x
+> - one for vty 
+> 
+> smallest possible reg: 0x30000000
+> largest possible reg: 0x30000000 + 253 * 0x1000 = 0x300fd000
+> 
+> ie, 254 vty devices
+> 
 
-Status in QEMU:
-  Confirmed
+and 255 vty devices, ie, largest reg is 0x300fe000.
 
-Bug description:
-  When I specify the -icount option, some guest operations such as
-  booting a Linux kernel take more than 10 times longer than otherwise.
-  For example, the following will boot Aboriginal Linux to the login
-  prompt about 6 seconds on my system (using TCG, not KVM):
-
-  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
-age-i686.tar.gz
-  gunzip <system-image-i686.tar.gz | tar xfv -
-  cd system-image-i686
-  sh run-emulator.sh
-
-  If I replace the last line with
-
-  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
-
-  booting to the login prompt takes about 1 minute 20 seconds.
-
-  I have tried different values for "shift" other than the "auto" used
-  above, but have not been able to find one that gives reasonable
-  performance.  Specifying "sleep=3Doff" also did not help.
-
-  During the slow boots, qemu appears to spend most of its time
-  sleeping, not using the host CPU.
-
-  I see this with multiple versions of qemu, including current git
-  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
-  host OSes, including Debian 9 on x86_64.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
+> Thinking about the bit shifting magic that is needed to convert
+> reg into a usable index makes my brain hurt, but I'll happily
+> review anything you propose :)
+> 
+> > +    }
+> > +}
+> > +
+> >  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+> >  {
+> >      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> > @@ -485,10 +512,18 @@ static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+> >      }
+> >  
+> >      if (!dev->irq) {
+> > -        dev->irq = spapr_irq_findone(spapr, &local_err);
+> > -        if (local_err) {
+> > -            error_propagate(errp, local_err);
+> > -            return;
+> > +        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> > +            dev->irq = spapr_irq_findone(spapr, &local_err);
+> > +            if (local_err) {
+> > +                error_propagate(errp, local_err);
+> > +                return;
+> > +            }
+> > +        } else {
+> > +            dev->irq = spapr_vio_reg_to_irq(dev->reg);
+> > +            if (dev->irq == SPAPR_IRQ_PCI_LSI) {
+> > +                error_setg(errp, "Too many VIO devices");
+> > +                return;
+> > +            }
+> >          }
+> >      }
+> >  
+> > @@ -557,7 +592,7 @@ VIOsPAPRBus *spapr_vio_bus_init(void)
+> >      /* Create bus on bridge device */
+> >      qbus = qbus_create(TYPE_SPAPR_VIO_BUS, dev, "spapr-vio");
+> >      bus = SPAPR_VIO_BUS(qbus);
+> > -    bus->next_reg = 0x71000000;
+> > +    bus->next_reg = SPAPR_VIO_REG_BASE;
+> >  
+> >      /* hcall-vio */
+> >      spapr_register_hypercall(H_VIO_SIGNAL, h_vio_signal);
+> > diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> > index bcab6323b7ed..4ab556467289 100644
+> > --- a/hw/ppc/Makefile.objs
+> > +++ b/hw/ppc/Makefile.objs
+> > @@ -4,7 +4,7 @@ obj-y += ppc.o ppc_booke.o fdt.o
+> >  obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
+> >  obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
+> >  obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng.o
+> > -obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o
+> > +obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+> >  # IBM PowerNV
+> >  obj-$(CONFIG_POWERNV) += pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_psi.o pnv_occ.o pnv_bmc.o
+> >  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)  
+> 
+> 
