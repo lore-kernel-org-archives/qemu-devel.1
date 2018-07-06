@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQ7A-0006T6-Of
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:45:34 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQ7C-0006V1-Qt
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:45:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQ79-0000Da-3Y
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:45:32 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQ7A-0000FJ-Ta
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:45:34 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  6 Jul 2018 14:36:29 +0300
-Message-Id: <20180706113630.25222-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20180706113630.25222-1-vsementsov@virtuozzo.com>
-References: <20180706113630.25222-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] blockdev: rename
- block-dirty-bitmap-clear transaction handlers
+Date: Fri,  6 Jul 2018 14:36:26 +0300
+Message-Id: <20180706113630.25222-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] transaction support for bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +20,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Rename block-dirty-bitmap-clear transaction handlers to reuse them for
-x-block-dirty-bitmap-merge transaction in the following patch.
+This is a last brick, necessary to play with nbd bitmap export in
+conjunction with image fleecing.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- blockdev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+v2: don't compare with v1, it is changed a lot, to do the whole thing
+    in .prepare instead of .commit. It is needed to be compatible with
+    backup block job transaction actions [John]
 
-diff --git a/blockdev.c b/blockdev.c
-index 9cb29ca63e..5348e8ba9b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2026,7 +2026,7 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
-     bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
- }
- 
--static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-+static void block_dirty_bitmap_restore(BlkActionState *common)
- {
-     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-                                              common, common);
-@@ -2036,7 +2036,7 @@ static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-     }
- }
- 
--static void block_dirty_bitmap_clear_commit(BlkActionState *common)
-+static void block_dirty_bitmap_free_backup(BlkActionState *common)
- {
-     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-                                              common, common);
-@@ -2170,8 +2170,8 @@ static const BlkActionOps actions[] = {
-     [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_CLEAR] = {
-         .instance_size = sizeof(BlockDirtyBitmapState),
-         .prepare = block_dirty_bitmap_clear_prepare,
--        .commit = block_dirty_bitmap_clear_commit,
--        .abort = block_dirty_bitmap_clear_abort,
-+        .commit = block_dirty_bitmap_free_backup,
-+        .abort = block_dirty_bitmap_restore,
-     },
-     [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_ENABLE] = {
-         .instance_size = sizeof(BlockDirtyBitmapState),
+Vladimir Sementsov-Ogievskiy (4):
+  drity-bitmap: switch assert-fails to errors in bdrv_merge_dirty_bitmap
+  dirty-bitmap: restore bitmap after merge
+  blockdev: rename block-dirty-bitmap-clear transaction handlers
+  qapi: add transaction support for x-block-dirty-bitmap-merge
+
+ qapi/transaction.json        |  2 ++
+ include/block/block_int.h    |  2 +-
+ include/block/dirty-bitmap.h |  2 +-
+ include/qemu/hbitmap.h       | 25 +++++++++++-------
+ block/dirty-bitmap.c         | 36 ++++++++++++++++++++------
+ blockdev.c                   | 60 +++++++++++++++++++++++++++++++-------------
+ util/hbitmap.c               | 11 +++++---
+ 7 files changed, 100 insertions(+), 38 deletions(-)
+
 -- 
 2.11.1
