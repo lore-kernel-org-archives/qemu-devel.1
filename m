@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbUC1-0007Hw-Qz
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:06:50 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fbUGJ-0008MR-B8
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbUBy-0003nm-JS
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:06:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35674 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fbUBy-0003nL-Do
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:06:46 -0400
-References: <20180705181148.26871-1-clg@kaod.org>
-	<20180705133044.634ede43@t450s.home>
-	<b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
-	<20180706015113.GC23001@xz-mi>
-	<9ae66133-86a6-72d8-cd66-f27592caffe9@redhat.com>
-	<20180706192326-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <81e79024-b1db-6616-04cd-d2a1f2eb3ef4@redhat.com>
-Date: Fri, 6 Jul 2018 19:06:36 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180706192326-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fbUGE-00077F-8e
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:11:15 -0400
+Received: from mail-bn3nam01on071a.outbound.protection.outlook.com
+	([2a01:111:f400:fe41::71a]:45037
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fbUGD-00075x-R1
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:11:10 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 6 Jul 2018 17:11:04 +0000
+Message-ID: <BN7PR08MB4868C97BD24DBF4A18874A5DC6470@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1530877732-26557-3-git-send-email-aleksandar.markovic@rt-rk.com>
+	<BN7PR08MB4868AC9B85699C8293579F63C6470@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<e2782023-f98c-c425-1897-07595f5ba1fb@amsat.org>
+In-Reply-To: <e2782023-f98c-c425-1897-07595f5ba1fb@amsat.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/8] target/mips: Workaround for
+ checkpatch.pl hanging on msa_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 06/07/2018 18:25, Michael S. Tsirkin wrote:
-> On Fri, Jul 06, 2018 at 05:55:23PM +0200, Paolo Bonzini wrote:
->> On 06/07/2018 03:51, Peter Xu wrote:
->>>
->>> A question about memory region auto destruction (which might not
->>> related to this patch): I see that we have object_property_add_child()
->>> in memory_region_do_init() to achieve the auto destruction but only if
->>> the "name" of memory region is specified.  Could we just do that
->>> unconditionally (though we might of course need to generate some of
->>> the names), or is there a reason not to do so?
->>
->> I'm not sure actually if there are still regions without a name...
->>
->> Paolo
-> 
-> Answer to Peter's question would be a yes then?
-> 
-> With all the autodestruct I'm unsure when is calling vmstate_unregister_ram appropriate.
-> Is it necessary to invoke that from pci any longer?
-> 
+> I'm not sure it's worth having this but you are the maintainer so your
+> choice :)
 
-I think vmstate_unregister_ram is not necessary at all.  This patch, or
-Alex's suggestion, are smaller changes in that direction---more suitable
-as we're closer to the release.
+If someone in future peruses an older version of this file (let's say, whil=
+e working on an older version of QEMU), and comes across this problem with =
+checkpatch.pl, by checking the full history of the file, they would be able=
+ to see what the problem is. Without this patch, they wouldn't.
 
-Paolo
+> What is unclear to me is, while changing this, why only fix
+> the suffix and not also the prefix? That is:
+>
+>            uint<space>## BITS ##<space>_t S =3D _S, T =3D _T;
+
+It wouldn't be clear what characters caused the problem (or triggered the b=
+ug, if you wish).
+
+Regards,
+Aleksandar
