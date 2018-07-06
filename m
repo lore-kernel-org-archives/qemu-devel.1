@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fbMmW-0002ov-Hx
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:12:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fbMrl-0004Zc-3x
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fbMmV-0005ms-Cu
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:12:00 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fbMmV-0005lP-8c
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:11:59 -0400
-Received: by mail-oi0-x243.google.com with SMTP id r16-v6so22215069oie.3
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 02:11:59 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fbMrh-0000Hd-2R
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:17:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46120 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fbMrg-0000D0-Tc
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:17:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A95EF72647
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 09:17:19 +0000 (UTC)
+Date: Fri, 6 Jul 2018 10:17:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180706091716.GA9761@work-vm>
+References: <20180705031755.3254-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180706025352.42643-1-programmingkidx@gmail.com>
-References: <20180706025352.42643-1-programmingkidx@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jul 2018 10:11:38 +0100
-Message-ID: <CAFEAcA-6p5TP=yedqYMY+kaW6qTLMPrXTXdF9YeK0eU78vwLjA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] ui/cocoa.m: replace scrollingDeltaY
- with deltaY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705031755.3254-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/9] migration: postcopy recovery
+ unit test, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 6 July 2018 at 03:53, John Arbuckle <programmingkidx@gmail.com> wrote:
-> The NSEvent class method scrollingDeltaY is available
-> for Mac OS 10.7 and newer. Since QEMU supports Mac OS
-> 10.5 and up, we need to be using a method that is
-> available on these version of Mac OS X. The deltaY
-> method is a method that does the same thing as
-> scrollingDeltaY and is available on Mac OS 10.5 and
-> up. So we simply replace scrollingDeltaY with deltaY.
+* Peter Xu (peterx@redhat.com) wrote:
+> Based-on: <20180627132246.5576-1-peterx@redhat.com>
+> 
+> Based on the series to unbreak postcopy:
+>   Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
+>   Message-Id: <20180627132246.5576-1-peterx@redhat.com>
+> 
+> This series introduce a new postcopy recovery test.  The new test
+> actually helped me to identify two bugs there so fix them as well
+> before 3.0 release.
+> 
+> Patch 1: a trivial cleanup for existing postcopy ram load, which I
+>          found a bit confusing during debugging the problem.
+> 
+> Patch 2-3: two bug fixes that address different issues.  Please see
+>            the commit log for more information.
+> 
+> Patch 4-9: add the postcopy recovery unit test.
+> 
+> Please review.  Thanks,
 
-Commit message doesn't match code change.
+Queued
 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
-> v2 changes:
-> - Added a condition that drops scroll events that have a deltaY value of zero.
->
->  ui/cocoa.m | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 2991ed4..f371469 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -802,14 +802,15 @@ QemuCocoaView *cocoaView;
->               * This is in-line with standard Mac OS X UI behaviour.
->               */
->
-> +            if ([event deltaY] != 0) {
-
-This could use a comment about why we need to check it.
-
->              /* Determine if this is a scroll up or scroll down event */
-> -            buttons = ([event scrollingDeltaY] > 0) ?
-> -                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
-> -            qemu_input_queue_btn(dcl->con, buttons, true);
-> -            qemu_input_event_sync();
-> -            qemu_input_queue_btn(dcl->con, buttons, false);
-> -            qemu_input_event_sync();
-> -
-> +                buttons = ([event deltaY] > 0) ?
-> +                    INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
-> +                qemu_input_queue_btn(dcl->con, buttons, true);
-> +                qemu_input_event_sync();
-> +                qemu_input_queue_btn(dcl->con, buttons, false);
-> +                qemu_input_event_sync();
-> +            }
->              /*
->               * Since deltaY also reports scroll wheel events we prevent mouse
->               * movement code from executing.
-> --
-> 2.7.2
-
-thanks
--- PMM
+> Peter Xu (9):
+>   migration: simplify check to use qemu file buffer
+>   migration: loosen recovery check when load vm
+>   migration: fix incorrect bitmap size calculation
+>   tests: introduce migrate_postcopy_* helpers
+>   tests: allow migrate() to take extra flags
+>   tests: introduce migrate_query*() helpers
+>   tests: introduce wait_for_migration_status()
+>   tests: add postcopy recovery test
+>   tests: hide stderr for postcopy recovery test
+> 
+>  migration/ram.c        |  21 +++--
+>  migration/savevm.c     |  16 ++--
+>  tests/migration-test.c | 198 ++++++++++++++++++++++++++++++++---------
+>  3 files changed, 176 insertions(+), 59 deletions(-)
+> 
+> -- 
+> 2.17.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
