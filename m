@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fbI0p-0004P9-Fe
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 00:06:28 -0400
+	(envelope-from <mdavidsaver@gmail.com>) id 1fbITU-0007ce-HF
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 00:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fbI0m-00067X-Ax
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 00:06:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43476 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fbI0m-00066a-5a
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 00:06:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AE884075386
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 04:06:23 +0000 (UTC)
-Date: Fri, 6 Jul 2018 12:06:12 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180706040612.GF23001@xz-mi>
-References: <20180705164201.9853-1-marcandre.lureau@redhat.com>
+	(envelope-from <mdavidsaver@gmail.com>) id 1fbITQ-0007sY-Hm
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 00:36:04 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:33448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mdavidsaver@gmail.com>)
+	id 1fbITQ-0007qE-6s
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 00:36:00 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id b17-v6so7299497pfi.0
+	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 21:36:00 -0700 (PDT)
+References: <20180705182001.16537-1-mdavidsaver@gmail.com>
+	<20180705182001.16537-4-mdavidsaver@gmail.com>
+	<20180706033942.GN3450@umbus.fritz.box>
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Message-ID: <b7dfce5a-ee0e-b796-fbb6-236c8cf5ee9b@gmail.com>
+Date: Thu, 5 Jul 2018 21:35:50 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180705164201.9853-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: fix double-free of request error
+In-Reply-To: <20180706033942.GN3450@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="330zF1RZwihy9mmwbTQ6CEunepZFHF1g9"
+Subject: Re: [Qemu-devel] [PATCH 03/14] timer: ds1338 persist 12-hour mode
+ selection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +33,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, qemu-devel@nongnu.org
 
-On Thu, Jul 05, 2018 at 06:42:01PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> qmp_error_response() will free the given error. Fix double-free in
-> later qmp_request_free().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--330zF1RZwihy9mmwbTQ6CEunepZFHF1g9
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Antoine Mathys <barsamin@gmail.com>, qemu-devel@nongnu.org
+Message-ID: <b7dfce5a-ee0e-b796-fbb6-236c8cf5ee9b@gmail.com>
+Subject: Re: [PATCH 03/14] timer: ds1338 persist 12-hour mode selection
+References: <20180705182001.16537-1-mdavidsaver@gmail.com>
+ <20180705182001.16537-4-mdavidsaver@gmail.com>
+ <20180706033942.GN3450@umbus.fritz.box>
+In-Reply-To: <20180706033942.GN3450@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+On 07/05/2018 08:39 PM, David Gibson wrote:
+> On Thu, Jul 05, 2018 at 11:19:50AM -0700, Michael Davidsaver wrote:
+> 11;rgb:ffff/ffff/ffff> Need to save HOUR[HOUR12] bit to keep
+>> track of guest selection of 12-hour mode.
+>> Write through current time registers to
+>> achieve this.  Will be overwritten
+>> by the next read/latch.
+>>
+>> This was only being done in two of three
+>> arms of this conditional block.
+>>
+>> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> This looks dubious to me, or at least the explanation of it does.  The
+> other branch of the conditional is covering different registers in the
+> device, which are part of the RTC component, rather than the NVRAM
+> area.  I wouldn't necessarily expect them to persist data as a rule
+> the way the rest of the block does, even if this specific bit does
+> need to be preserved.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+The fact that the above capture_current_time() included the line
 
-And not related to current patch...
+>     if (s->nvram[2] & HOURS_12) {
 
-> ---
->  monitor.c | 1 +
->  1 file changed, 1 insertion(+)
+was enough to convince me that the original author intended to persist
+the 12/24 hour mode in this way.  There are certainly other ways to
+accomplish this, but they would involved adding to the vmstate,
+which I've tried to avoid in this iteration.
+
+
+Also, I though I had test coverage of this bug.  That's actually how I
+noticed it to begin with.  But it seems my later change to allow for a
+slow test runner also stopped testing readback of the 12/24 hour mode bit=
+=2E
+It just silently uses whichever it reads.  I'll be re-issuing an updated
+version which restores this check.  Then you will be able to easily
+see the effect of reverting 'timer: ds1338 persist 12-hour mode selection=
+'.
+
+
+
+>> ---
+>>  hw/timer/ds1338.c | 4 +---
+>>  1 file changed, 1 insertion(+), 3 deletions(-)
+>>
+>> diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
+>> index 7298c5af43..b56db5852e 100644
+>> --- a/hw/timer/ds1338.c
+>> +++ b/hw/timer/ds1338.c
+>> @@ -220,10 +220,8 @@ static int ds1338_send(I2CSlave *i2c, uint8_t dat=
+a)
+>>             value unchanged. */
+>>          data =3D (data & ~CTRL_OSF) | (data & s->nvram[s->ptr] & CTRL=
+_OSF);
+>> =20
+>> -        s->nvram[s->ptr] =3D data;
+>> -    } else {
+>> -        s->nvram[s->ptr] =3D data;
+>>      }
+>> +    s->nvram[s->ptr] =3D data;
+>>      inc_regptr(s);
+>>      return 0;
+>>  }
 >=20
-> diff --git a/monitor.c b/monitor.c
-> index 3c9c97b73f..7af1f18d13 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4186,6 +4186,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
->      } else {
->          assert(req_obj->err);
->          rsp =3D qmp_error_response(req_obj->err);
-> +        req_obj->err =3D NULL;
->          monitor_qmp_respond(req_obj->mon, rsp, NULL);
 
-... here not sure whether we should just pass in req_obj->id instead
-of NULL, or maybe we can do some more assertions like:
 
-diff --git a/monitor.c b/monitor.c
-index 9eb9f06599..04d2c50f4e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4215,10 +4215,12 @@ static void monitor_qmp_bh_dispatcher(void *data)
-=20
-     mon =3D req_obj->mon;
-     if (req_obj->req) {
-+        assert(!req_obj->err);
-         trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
-: "");
-         monitor_qmp_dispatch(mon, req_obj->req, req_obj->id);
-     } else {
-         assert(req_obj->err);
-+        assert(!req_obj->id);
-         rsp =3D qmp_error_response(req_obj->err);
-         monitor_qmp_respond(mon, rsp, NULL);
-         qobject_unref(rsp);
 
-Thanks,
+--330zF1RZwihy9mmwbTQ6CEunepZFHF1g9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---=20
-Peter Xu
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEYyRdrpxuENu06SOrlAHmyz1/GOoFAls+8aoACgkQlAHmyz1/
+GOq5Rw/9EVwod4An8V+pwgVVMLTr21qQrRj1vXEQLwZq4tvUXxKkCJ5/V8vnaYZQ
+xCatP9rL58FA8/Yf6hrR0TEyCuepdoiS6IMvOI9ioCHWwZlQY6XUPI0tkFDRYOTg
+FEMo5Q7lercH3qkmV1EyHh5qk4xDG+edtAZpX1v9VBfxshxa4KYZRzSHnWVhDdXD
+80CSb4xsVxpayBoO7AIDNQ2xbrjeDHf5H5/v7DXxIdMYInPWZF0cmki7g7ECqYuY
+P6x6zFboM+V1TLuMvL73nwwUQhQylpVc1GmCS3Fi/Y7W1KXbMrLCgH8t0SJ38/Q4
+ufEmaSQFJx68xeq2iFALx/H3s/MdDuHlvxPOhCxCaSOBErqCRIK5Jwok7AA/JpLm
+pAKvrACv7YSa5lcHfajnf3pyciSzqiZGhjyKFtTQe4UDI/WE9rAQ7ssQHacBrO5Y
+m1gCKiV0iUlLHTaXsZHXhR4PkqcZqeTHu8ZMjGTkbpvMWvBHoccR0bN1ShvJOdMX
+w1/JwulFMeOU1Xx4kHRPpvEniNh41R0Nk4clRXNTM0qfA3qO9sWwAsVOImekkfi7
+l8s6XcxDtx13BEi8r3bEIAeR7VrqxUoGZ3yjhYZhD4NW2uuggolrZTM39zqenxDe
+Lr6NsAgIAQKtW3Gi81raVYwdAPCgL+deYiHs0cXRzrCW4lDwHRw=
+=UHDi
+-----END PGP SIGNATURE-----
+
+--330zF1RZwihy9mmwbTQ6CEunepZFHF1g9--
