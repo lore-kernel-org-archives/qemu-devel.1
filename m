@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fbRWM-0001v3-PC
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:15:39 -0400
+	(envelope-from <groug@kaod.org>) id 1fbRXa-0002Yz-AI
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:16:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fbRWL-0002Td-9J
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:15:38 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fbRWK-0002TD-PR
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:15:37 -0400
-Received: by mail-oi0-x242.google.com with SMTP id d189-v6so23720877oib.6
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 07:15:36 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fbRXV-0002yd-9J
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:16:54 -0400
+Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:55256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fbRXV-0002xz-3L
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:16:49 -0400
+Received: from player734.ha.ovh.net (unknown [10.109.105.107])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6BE711C2122
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 16:16:47 +0200 (CEST)
+Date: Fri, 6 Jul 2018 16:16:38 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180706161638.07032b4f@bahia.lan>
+In-Reply-To: <28391e09-2e15-6050-e452-0493172a73a4@kaod.org>
+References: <20180706090713.15712-1-clg@kaod.org>
+	<20180706090713.15712-2-clg@kaod.org>
+	<28391e09-2e15-6050-e452-0493172a73a4@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20180705222622.17139-1-jusual@mail.ru>
-References: <20180705222622.17139-1-jusual@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jul 2018 15:15:15 +0100
-Message-ID: <CAFEAcA91Cng7EGEvi38SWjQN5juCRKO9pU2C_HjLANazbcRvTQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] target/arm: Forbid unprivileged mode
- for M Baseline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 5 July 2018 at 23:26, Julia Suvorova <jusual@mail.ru> wrote:
-> MSR handling is the only place where CONTROL.nPRIV is modified.
->
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
-> v2:
->     * Add the check in the CONTROL_NS case
->
->  target/arm/helper.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+On Fri, 6 Jul 2018 15:27:17 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>   > +/*
+> > + * The register property of a VIO device is defined in livirt using a
+> > + * base number + 0x1000 increment and in QEMU by incrementing the base
+> > + * register number 0x71000000.
+> > + *
+> > + * The formula below tries to compute a unique index number from the
+> > + * register value that will be used to define the IRQ number of the
+> > + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
+> > + *
+> > + * To minimize collisions, we define two distinct ranges depending on
+> > + * the "reg" value definition:
+> > + *
+> > + *     [0x00 - 0x7f]    user/libvirt
+> > + *     [0x80 - 0xff]    QEMU VIO model
+> > + *
+> > + * Collisions will be detected when the IRQ is claimed.
+> > + */
+> > +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
+> > +{
+> > +    if (reg >=3D SPAPR_VIO_REG_BASE) {
+> > +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
+> > +    } else {
+> > +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f)); =
+=20
+>=20
+> This is not good enough for the VIO devices with a user defined "reg".
+>=20
+> I propose to extract bits [29-28] and [16-12] to compose a 7bit index :
+>=20
+> 	(((reg >> 28) & 0x3) << 5) | ((reg >> 12) & 0x1f)
+>=20
 
-As we're now in freeze for the QEMU 3.0 release, I've added this
-patch to a branch I'm keeping with arm-related patches intended
-to go into 3.1. You can find it at
-https://git.linaro.org/people/peter.maydell/qemu-arm.git target-arm.for-3.1
-but note that it will be rebased in future so be careful
-if you base anything on it. (You might find it easier to just
-ignore it ;-))
+Looks good.
 
-thanks
--- PMM
+> That would give us a mapping :
+>=20
+> 	0x00000000  -> 0
+> 	0x00001000  -> 1
+> 		...
+> 	0x0001F000  -> 31
+> 	0x10000000  -> 32
+> 	0x10001000  -> 33
+> 		...
+> 	0x1001F000  -> 63
+> 	0x20000000  -> 64
+> 	0x20001000  -> 65
+> 		...
+> 	0x2001F000  -> 95
+> 	0x30000000  -> 96
+> 	0x30001000  -> 97
+> 		...
+> 	0x3001F000  -> 127
+>=20
+> C.
+>=20
+>=20
