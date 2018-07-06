@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fbLfb-0006Fx-NP
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:00:53 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fbLic-0006zK-4n
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:03:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fbLfU-0000VL-Pr
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:00:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58464 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fbLfU-0000Q8-CQ
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:00:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 98B4FE9000
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 08:00:39 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180704084507.14560-1-peterx@redhat.com>
-	<20180704084507.14560-6-peterx@redhat.com>
-	<46055729-f81c-e687-4a97-b2b242b0b063@redhat.com>
-	<20180706034939.GE23001@xz-mi>
-Date: Fri, 06 Jul 2018 10:00:34 +0200
-In-Reply-To: <20180706034939.GE23001@xz-mi> (Peter Xu's message of "Fri, 6 Jul
-	2018 11:49:39 +0800")
-Message-ID: <87tvpc23q5.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1fbLiZ-0004cT-0L
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:03:54 -0400
+Date: Fri, 6 Jul 2018 10:03:46 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180706100346.3dda6b10.cohuck@redhat.com>
+In-Reply-To: <1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 5/9] monitor: suspend monitor instead of
- send CMD_DROP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,140 +24,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan
-	Gilbert" <dgilbert@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-Peter Xu <peterx@redhat.com> writes:
+On Thu,  5 Jul 2018 13:25:38 -0400
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-> On Thu, Jul 05, 2018 at 11:47:30AM -0500, Eric Blake wrote:
->> On 07/04/2018 03:45 AM, Peter Xu wrote:
->> > When we received too many qmp commands, previously we'll send
->> > COMMAND_DROPPED events to monitors, then we'll drop the requests.  It
->> > can only solve the flow control of the request queue, however it'll not
->> > really work since we might queue unlimited events in the response queue
->> > which is a potential risk.
->
-> [1]
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+> 
+> Add struct for format-0 ccws. Support executing format-0 channel
+> programs and waiting for their completion before continuing execution.
+> This will be used for real dasd ipl.
+> 
+> Add cu_type() to channel io library. This will be used to query control
+> unit type which is used to determine if we are booting a virtio device or a
+> real dasd device.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/cio.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/cio.h |  25 +++++++++-
+>  2 files changed, 151 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> index 095f79b..f440380 100644
+> --- a/pc-bios/s390-ccw/cio.c
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -10,6 +10,7 @@
+>  
+>  #include "libc.h"
+>  #include "s390-ccw.h"
+> +#include "s390-arch.h"
+>  #include "cio.h"
+>  
+>  static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+> @@ -39,3 +40,129 @@ void enable_subchannel(SubChannelId schid)
+>      schib.pmcw.ena = 1;
+>      msch(schid, &schib);
+>  }
+> +
+> +__u16 cu_type(SubChannelId schid)
 
-Let's ignore events other than COMMAND_DROPPED for a minute.
+Make this return uint16_t?
 
-The issue COMMAND_DROPPED tries to address is flow control: QMP client
-sends commands faster than they can be processed, or accepts responses
-slower than they're produced.  Buffers grow without bounds.
+> +{
+> +    Ccw1 senseIdCcw;
+> +    SenseId senseData;
 
-Either is unlikely to happen with a well-behaved QMP client, but
-software being software, it's better not to let a misbehaving QMP client
-make QEMU eat unbounded amounts of memory.  We limit memory consumption
-elsewhere in QMP, e.g. the JSON parser.
+I'd prefer the variables to be sense_id_ccw and sense_data instead of
+CamelCasing.
 
-COMMAND_DROPPED works fine for the input half: if the client sends
-commands too quickly, the request queue gets full, and we start dropping
-commands.
+> +
+> +    senseIdCcw.cmd_code = CCW_CMD_SENSE_ID;
+> +    senseIdCcw.cda = ptr2u32(&senseData);
 
-However, if the client accepts responses too slowly (or not at all)
-without *also* sending commands too quickly, the output buffer still
-grows without bounds.
+Are we sure that this is always under 2G?
 
-We could detect this and drop commands.  Replaces swamping the output
-buffer with responses by swamping it with COMMAND_DROPPED events.
+> +    senseIdCcw.count = sizeof(senseData);
+> +
+> +    if (do_cio(schid, ptr2u32(&senseIdCcw), CCW_FMT1)) {
+> +        panic("Failed to run SenseID CCw\n");
+> +    }
+> +
+> +    return senseData.cu_type;
+> +}
+> +
+> +static bool irb_error(Irb *irb)
+> +{
+> +    /* We have to ignore Incorrect Length (cstat == 0x40) indicators because
+> +     * real devices expect a 24 byte SenseID  buffer, and virtio devices expect
+> +     * a much larger buffer. Neither device type can tolerate a buffer size
+> +     * different from what they expect so they set this indicator.
 
-We could change the meaning of COMMAND_DROPPED from "command with this
-ID dropped" to "commands are being dropped, first one has this ID".
-Since only in-band commands are dropped, and their responses are sent in
-issue order, the next in-band reply tells us which commands were
-dropped.
+Hm... do you have details? Is that basic vs. extended SenseID
+information?
 
-The simplest solution is to cork input by suspending the monitor (this
-patch).  Reuses the non-OOB code.  Doesn't drop commands.  Sacrifices
-monitor availability for OOB commands.
+(If the code in QEMU is making incorrect assumptions, I'd like to fix
+that.)
 
-Done ignoring events other than COMMAND_DROPPED.
+> +     */
+> +    if (irb->scsw.cstat != 0x00 && irb->scsw.cstat != 0x40) {
+> +        return true;
+> +    }
+> +    return irb->scsw.dstat != 0xc;
+> +}
+> +
+> +/* Executes a channel program at a given subchannel. The request to run the
+> + * channel program is sent to the subchannel, we then wait for the interrupt
+> + * singaling completion of the I/O operation(s) perfomed by the channel
+> + * program. Lastly we verify that the i/o operation completed without error and
+> + * that the interrupt we received was for the subchannel used to run the
+> + * channel program.
 
->> > Now instead of sending such an event, we stop consuming the client input
->> > when we noticed that the queue is reaching its limitation before hand.
->> > Then after we handled commands, we'll try to resume the monitor when
->> > needed.
->> 
->> Is this the right thing to be doing?
->> 
->> If there is some event that we forgot to rate limit, and the client isn't
->> consuming the output queue fast enough to keep up with events, we are making
->> it so the client can't even send an OOB command that might otherwise stop
->> the flood of events.
+Finally, real interrupts instead of polling in the s390-ccw bios,
+nice :)
 
-True.  This is yet another flow control scenario, only this time, it's
-QEMU misbehaving.  
+> + *
+> + * Note: This function assumes it is running in an environment where no other
+> + * cpus are generating or receiving I/O interrupts. So either run it in a
+> + * single-cpu environment or make sure all other cpus are not doing I/O and
+> + * have I/O interrupts masked off.
+> + */
+> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+> +{
+> +    Ccw0 *this_ccw, *prev_ccw;
+> +    CmdOrb orb = {};
+> +    Irb irb = {};
+> +    int rc;
+> +
+> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
+> +
+> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
+> +    if (fmt == 0) {
+> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
+> +    }
+> +
+> +    orb.fmt = fmt ;
+> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
+> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
+> +    orb.lpm = 0xFF; /* All paths allowed */
+> +    orb.cpa = ccw_addr;
+> +
+> +    rc = ssch(schid, &orb);
+> +    if (rc) {
+> +        print_int("ssch failed with rc=", rc);
+> +        return rc;
 
-How much good the ability to issue commands will do in such a situation
-is unclear.  We may not have a command to stop a flood, let alone an OOB
-command.  But that's no excuse for ignoring the issue in our design.
+Are you doing anything like retrying on cc 1/2? It's probably fine to
+give up on cc 3.
 
->>                       Refusing to parse input when the client isn't parsing
->> output makes sense when the output is a result of the input, but when the
->> output is the result of events unrelated to the input, it might still be
->> nice to be responsive (even if with COMMAND_DROPPED events) to OOB input.
+> +    }
+> +
+> +    await_io_int(schid.sch_no);
+> +
+> +    /* Clear read */
+> +    rc = tsch(schid, &irb);
+> +    if (rc) {
+> +        print_int("tsch failed with rc=", rc);
+> +        return rc;
 
-You're right, we should at least try find a way to keep the monitor
-available when events beyond the client's control swamp the output
-buffer.
+If you get a cc 1 here (no status pending), that's probably an internal
+error (as you just did a successful ssch and assume you got an I/O
+interrupt). If you get a cc 3, it's probably a good idea to give up on
+this subchannel.
 
->> Then again, if events are not being parsed quickly by the client, it's
->> debatable whether the client will parse COMMAND_DROPPED any sooner (even if
->> COMMAND_DROPPED jumps the queue ahead of other events).
-
-The current code doesn't really support response queue jumping.  The
-response queue gets drained quickly into the output buffer.  The
-response queue therefore stays small (as long as bottom halves run as
-they should).  It's the output buffer that grows without bound.  Jumping
-there isn't as trivial as inserting at the front end of the response
-queue, and probably should not be done.  If we want to jump, we should
-reconsider how we drain the response queue.
-
->> So I don't have a strong opinion on whether this patch is right or wrong, so
->> much as voicing a potential concern to make sure I'm not overlooking
->> something.
->
-> I can't say current solution is ideal, but AFAIU at least we can avoid
-> one potential risk to consume all the memories of QEMU which I
-> mentioned at [1], which might be triggered by a problematic client.
-> So I would at least think this a better approach than before, and
-> which we might consider to have for QEMU 3.0.
->
-> One question that we haven't yet solved is that, what if QEMU
-> generates some events internally very quickly and without stopping,
-> even without any interference from client?  What should we do with
-> that?  That's not yet covered by this patch.  For now, the limitation
-> will not apply to those events (please see monitor_qapi_event_emit()),
-> and my understanding is that we should trust QEMU that it won't do
-> such thing (and also we have event rate limiting framework to ease the
-> problem a bit).  However I'm not sure of that.  If we want to solve
-> this finally, IMHO we might need a separate patch (or patchset),
-> though that should be for internal events only, not really related to
-> the clients any more.
-
-monitor_qapi_event_queue() implements event rate limiting.  It's
-controlled by monitor_qapi_event_conf[].  monitor_qapi_event_emit() is
-the helper for monitor_qapi_event_queue() & friends that that does the
-actual emission, without a rate limit.
-
-Rate limiting assumes we can safely drop excess events.  Care has to be
-taken not to lump events together that should remain separate.  For an
-example, see commit 6d425eb94d3.
-
-Any event an untrusted source (the guest, basically) can trigger must be
-rate limited.
-
-Trusted sources must not cause event floods.  Rate limiting is one way
-to prevent floods.  We currently don't use it for that.  Instead, we put
-the burden on the trusted sources.
-
-We can talk about a second line of defense against event floods from
-trusted sources.  We haven't felt enough of a need so far.
-
-The question remains how to design for QMP OOB availability.  Perhaps we
-can ignore events (other than COMMAND_DROPPED, if we keep that) when
-deciding whether a QMP connection has exceeded its buffer allowance.
-That way, OOB doesn't create a new way to eat memory without bounds.
-The existing way "QMP client can't keep up with an event flood" remains
-unaddressed.
+> +    }
+> +
+> +    if (irb_error(&irb)) {
+> +        this_ccw = u32toptr(irb.scsw.cpa);
+> +        prev_ccw = u32toptr(irb.scsw.cpa - 8);
+> +
+> +        print_int("irb_error: cstat=", irb.scsw.cstat);
+> +        print_int("           dstat=", irb.scsw.dstat);
+> +        print_int("           cpa=", irb.scsw.cpa);
+> +        print_int("           prev_ccw=", *((uint64_t *)prev_ccw));
+> +        print_int("           this_ccw=", *((uint64_t *)this_ccw));
+> +    }
+> +
+> +    return 0;
+> +}
