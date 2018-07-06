@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fbLEu-0007Br-A0
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:33:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fbLEz-0007Db-3z
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fbLEp-0000dX-C0
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:33:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34208 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fbLEp-0000Zp-5r
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:33:07 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62CF881A4EA9
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 07:33:06 +0000 (UTC)
-Date: Fri, 6 Jul 2018 15:33:01 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180706073301.GH23001@xz-mi>
-References: <20180705164201.9853-1-marcandre.lureau@redhat.com>
-	<20180706040612.GF23001@xz-mi> <87va9s3moa.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1fbLEy-0001Uj-5n
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:33:17 -0400
+Date: Fri, 6 Jul 2018 09:33:11 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180706093311.726797f2.cohuck@redhat.com>
+In-Reply-To: <1530811543-6881-2-git-send-email-jjherne@linux.ibm.com>
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-2-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87va9s3moa.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: fix double-free of request error
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 01/15] s390 vfio-ccw: Add bootindex property
+ and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,93 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-On Fri, Jul 06, 2018 at 08:25:57AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
->=20
-> > On Thu, Jul 05, 2018 at 06:42:01PM +0200, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> >> qmp_error_response() will free the given error. Fix double-free in
-> >> later qmp_request_free().
-> >>=20
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> >
-> > And not related to current patch...
-> >
-> >> ---
-> >>  monitor.c | 1 +
-> >>  1 file changed, 1 insertion(+)
-> >>=20
-> >> diff --git a/monitor.c b/monitor.c
-> >> index 3c9c97b73f..7af1f18d13 100644
-> >> --- a/monitor.c
-> >> +++ b/monitor.c
-> >> @@ -4186,6 +4186,7 @@ static void monitor_qmp_bh_dispatcher(void *da=
-ta)
-> >>      } else {
-> >>          assert(req_obj->err);
-> >>          rsp =3D qmp_error_response(req_obj->err);
-> >> +        req_obj->err =3D NULL;
-> >>          monitor_qmp_respond(req_obj->mon, rsp, NULL);
-> >
-> > ... here not sure whether we should just pass in req_obj->id instead
-> > of NULL, or maybe we can do some more assertions like:
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index 9eb9f06599..04d2c50f4e 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -4215,10 +4215,12 @@ static void monitor_qmp_bh_dispatcher(void *d=
-ata)
-> > =20
-> >      mon =3D req_obj->mon;
-> >      if (req_obj->req) {
-> > +        assert(!req_obj->err);
->=20
-> Makes sense.
->=20
-> >          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->i=
-d) ?: "");
-> >          monitor_qmp_dispatch(mon, req_obj->req, req_obj->id);
-> >      } else {
-> >          assert(req_obj->err);
-> > +        assert(!req_obj->id);
->=20
-> I'd simply pass req_obj->id to monitor_qmp_respond().  Yes, it'll alway=
-s
-> be null, but the code would do the right thing if that should ever
-> change.
+On Thu,  5 Jul 2018 13:25:29 -0400
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-Agreed.
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+> 
+> Add bootindex property and iplb data for vfio-ccw devices. This allows us to
+> forward boot information into the bios for vfio-ccw devices.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  hw/s390x/ipl.c              | 15 +++++++++++++++
+>  hw/s390x/s390-ccw.c         |  9 +++++++++
+>  hw/vfio/ccw.c               | 13 +------------
+>  hw/vfio/ccw.h               | 38 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/s390x/s390-ccw.h |  1 +
+>  5 files changed, 64 insertions(+), 12 deletions(-)
+>  create mode 100644 hw/vfio/ccw.h
 
->=20
-> >          rsp =3D qmp_error_response(req_obj->err);
-> >          monitor_qmp_respond(mon, rsp, NULL);
-> >          qobject_unref(rsp);
-> >
-> > Thanks,
->=20
-> Perhaps even reorder to put the error case first:
->=20
->     if (req_obj->err) {
->         assert(!req_obj->req);
->         rsp =3D qmp_error_response(req_obj->err);
->         req_obj->err =3D NULL;
->         monitor_qmp_respond(req_obj->mon, rsp, req_obj->id);
->         qobject_unref(rsp);
->     } else if (req_obj->req) {
->         trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) =
-?: "");
->         monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
->     }
->=20
-> Matter of taste.
+> diff --git a/hw/vfio/ccw.h b/hw/vfio/ccw.h
+> new file mode 100644
+> index 0000000..a7d699d
+> --- /dev/null
+> +++ b/hw/vfio/ccw.h
 
-Looks good to me.  Thanks,
+Put this under include/hw/s390x/ ?
 
---=20
-Peter Xu
+> @@ -0,0 +1,38 @@
+> +/*
+> + * vfio based subchannel assignment support
+> + *
+> + * Copyright 2018 IBM Corp.
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#ifndef HW_VFIO_CCW_H
+> +#define HW_VFIO_CCW_H
+> +
+> +#include "hw/vfio/vfio-common.h"
+> +#include "hw/s390x/s390-ccw.h"
+> +#include "hw/s390x/ccw-device.h"
+> +
+> +#define TYPE_VFIO_CCW "vfio-ccw"
+> +#define VFIO_CCW(obj) \
+> +        OBJECT_CHECK(VFIOCCWDevice, (obj), TYPE_VFIO_CCW)
+> +
+> +
+> +#define TYPE_VFIO_CCW "vfio-ccw"
+> +typedef struct VFIOCCWDevice {
+> +    S390CCWDevice cdev;
+> +    VFIODevice vdev;
+> +    uint64_t io_region_size;
+> +    uint64_t io_region_offset;
+> +    struct ccw_io_region *io_region;
+> +    EventNotifier io_notifier;
+> +    bool force_orb_pfch;
+> +    bool warned_orb_pfch;
+> +} VFIOCCWDevice;
+> +
+> +#endif
