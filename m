@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK3-0001D0-Ek
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:08 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK4-0001D6-7n
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUJz-0000kU-1m
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:07 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:45123)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK2-0000lo-Lb
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:08 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fbUJy-0000k7-Qp
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:02 -0400
-Received: by mail-wr1-x433.google.com with SMTP id u7-v6so4868805wrn.12
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:02 -0700 (PDT)
-Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
-	h40-v6sm13784683wrf.40.2018.07.06.10.15.00
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 06 Jul 2018 10:15:00 -0700 (PDT)
+	id 1fbUK2-0000lZ-DK
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:06 -0400
+Received: by mail-wm0-x244.google.com with SMTP id v3-v6so11526944wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:06 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Jul 2018 19:14:20 +0200
-Message-Id: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/8] Bug fixes for 2018-07-06
+Date: Fri,  6 Jul 2018 19:14:24 +0200
+Message-Id: <1530897268-22932-5-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
+References: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 4/8] i386: fix '-cpu ?' output for host cpu type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +28,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
-The following changes since commit 2a018f6e98782a4931b936a3087404ed81685bac:
+From: Greg Kurz <groug@kaod.org>
 
-  Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-request' into staging (2018-07-03 23:06:18 +0100)
+Since commit d6dcc5583e7, '-cpu ?' shows the description of the
+X86_CPU_TYPE_NAME("max") for the host CPU model:
 
-are available in the git repository at:
+Enables all features supported by the accelerator in the current host
 
+instead of the expected:
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+KVM processor with all supported host features
 
-for you to fetch changes up to e20122ff0faf07cb701d35e39e106d1783c07725:
+or
 
-  checkpatch: handle token pasting better (2018-07-06 18:39:19 +0200)
+HVF processor with all supported host features
 
-----------------------------------------------------------------
-Bug fixes.
+This is caused by the early use of kvm_enabled() and hvf_enabled() in
+a class_init function. Since the accelerator isn't configured yet, both
+helpers return false unconditionally.
 
-----------------------------------------------------------------
-Greg Kurz (1):
-      i386: fix '-cpu ?' output for host cpu type
+A QEMU binary will only be compiled with one of these accelerators, not
+both. The appropriate description can thus be decided at build time.
 
-Julia Suvorova (1):
-      qtest: Use cpu address space instead of system memory
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/cpu.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Michal Privoznik (1):
-      pr-helper: Rework socket path handling
-
-Paolo Bonzini (4):
-      pr-helper: avoid error on PR IN command with zero request size
-      pr-manager-helper: fix memory leak on event
-      ioapic: remove useless lower bounds check
-      checkpatch: handle token pasting better
-
-xinhua.Cao (1):
-      qemu-char: check errno together with ret < 0
-
- chardev/char-socket.c    |  7 +++-
- hw/intc/ioapic.c         |  2 +-
- qtest.c                  | 39 ++++++++++++-------
- scripts/checkpatch.pl    |  9 ++---
- scsi/pr-manager-helper.c |  1 +
- scsi/qemu-pr-helper.c    | 99 +++++++++++++++++++-----------------------------
- target/i386/cpu.c        | 14 +++----
- 7 files changed, 84 insertions(+), 87 deletions(-)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b0b87c3..e0e2f2e 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2836,13 +2836,13 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+     xcc->host_cpuid_required = true;
+     xcc->ordering = 8;
+ 
+-    if (kvm_enabled()) {
+-        xcc->model_description =
+-            "KVM processor with all supported host features ";
+-    } else if (hvf_enabled()) {
+-        xcc->model_description =
+-            "HVF processor with all supported host features ";
+-    }
++#if defined(CONFIG_KVM)
++    xcc->model_description =
++        "KVM processor with all supported host features ";
++#elif defined(CONFIG_HVF)
++    xcc->model_description =
++        "HVF processor with all supported host features ";
++#endif
+ }
+ 
+ static const TypeInfo host_x86_cpu_type_info = {
 -- 
 1.8.3.1
