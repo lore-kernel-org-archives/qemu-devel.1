@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbOR9-00083S-1j
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:04 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbOR8-00075C-3o
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbOR7-00082D-TA
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40920 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbOR7-0006zs-1T
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53610 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fbOR7-00074I-WF
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	id 1fbOR6-0006xc-KZ
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 888574078098
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:58:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23CA2401DE6F
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:58:00 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  6 Jul 2018 12:57:29 +0200
-Message-Id: <20180706105753.26700-4-marcandre.lureau@redhat.com>
+Date: Fri,  6 Jul 2018 12:57:28 +0200
+Message-Id: <20180706105753.26700-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 03/27] tests: change /0.15/* tests to /qmp/*
+Subject: [Qemu-devel] [PATCH v6 02/27] json: remove useless return value
+ from lexer/parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +37,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Presumably 0.15 was the version it was first introduced, but
-qmp keeps evolving. There is no point in having that version
-as test prefix, 'qmp' makes more sense here.
+The lexer always returns 0 when char feeding. Furthermore, none of the
+caller care about the return value.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180326150916.9602-12-marcandre.lureau@redhat.com>
+Message-Id: <20180326150916.9602-10-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-qmp-cmds.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/qapi/qmp/json-lexer.h    |  4 ++--
+ include/qapi/qmp/json-streamer.h |  4 ++--
+ qobject/json-lexer.c             | 23 ++++++++---------------
+ qobject/json-streamer.c          |  8 ++++----
+ 4 files changed, 16 insertions(+), 23 deletions(-)
 
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index ba41a6161e..ab414fa0c9 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -286,11 +286,11 @@ int main(int argc, char **argv)
+diff --git a/include/qapi/qmp/json-lexer.h b/include/qapi/qmp/json-lexer.=
+h
+index afee7828cd..66ccf0357c 100644
+--- a/include/qapi/qmp/json-lexer.h
++++ b/include/qapi/qmp/json-lexer.h
+@@ -47,9 +47,9 @@ struct JSONLexer
+=20
+ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitter func);
+=20
+-int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
++void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size);
+=20
+-int json_lexer_flush(JSONLexer *lexer);
++void json_lexer_flush(JSONLexer *lexer);
+=20
+ void json_lexer_destroy(JSONLexer *lexer);
+=20
+diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-str=
+eamer.h
+index 00d8a23af8..cb808cf27d 100644
+--- a/include/qapi/qmp/json-streamer.h
++++ b/include/qapi/qmp/json-streamer.h
+@@ -36,10 +36,10 @@ typedef struct JSONMessageParser
+ void json_message_parser_init(JSONMessageParser *parser,
+                               void (*func)(JSONMessageParser *, GQueue *=
+));
+=20
+-int json_message_parser_feed(JSONMessageParser *parser,
++void json_message_parser_feed(JSONMessageParser *parser,
+                              const char *buffer, size_t size);
+=20
+-int json_message_parser_flush(JSONMessageParser *parser);
++void json_message_parser_flush(JSONMessageParser *parser);
+=20
+ void json_message_parser_destroy(JSONMessageParser *parser);
+=20
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 980ba159d6..df9b674322 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -290,7 +290,7 @@ void json_lexer_init(JSONLexer *lexer, JSONLexerEmitt=
+er func)
+     lexer->x =3D lexer->y =3D 0;
+ }
+=20
+-static int json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
++static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
  {
-     g_test_init(&argc, &argv, NULL);
+     int char_consumed, new_state;
 =20
--    g_test_add_func("/0.15/dispatch_cmd", test_dispatch_cmd);
--    g_test_add_func("/0.15/dispatch_cmd_failure", test_dispatch_cmd_fail=
-ure);
--    g_test_add_func("/0.15/dispatch_cmd_io", test_dispatch_cmd_io);
--    g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
--    g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
-+    g_test_add_func("/qmp/dispatch_cmd", test_dispatch_cmd);
-+    g_test_add_func("/qmp/dispatch_cmd_failure", test_dispatch_cmd_failu=
-re);
-+    g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
-+    g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
-+    g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
+@@ -344,7 +344,7 @@ static int json_lexer_feed_char(JSONLexer *lexer, cha=
+r ch, bool flush)
+             g_string_truncate(lexer->token, 0);
+             new_state =3D IN_START;
+             lexer->state =3D new_state;
+-            return 0;
++            return;
+         default:
+             break;
+         }
+@@ -359,29 +359,22 @@ static int json_lexer_feed_char(JSONLexer *lexer, c=
+har ch, bool flush)
+         g_string_truncate(lexer->token, 0);
+         lexer->state =3D IN_START;
+     }
+-
+-    return 0;
+ }
 =20
-     test_qmp_init_marshal(&qmp_commands);
-     g_test_run();
+-int json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
++void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
+ {
+     size_t i;
+=20
+     for (i =3D 0; i < size; i++) {
+-        int err;
+-
+-        err =3D json_lexer_feed_char(lexer, buffer[i], false);
+-        if (err < 0) {
+-            return err;
+-        }
++        json_lexer_feed_char(lexer, buffer[i], false);
+     }
+-
+-    return 0;
+ }
+=20
+-int json_lexer_flush(JSONLexer *lexer)
++void json_lexer_flush(JSONLexer *lexer)
+ {
+-    return lexer->state =3D=3D IN_START ? 0 : json_lexer_feed_char(lexer=
+, 0, true);
++    if (lexer->state !=3D IN_START) {
++        json_lexer_feed_char(lexer, 0, true);
++    }
+ }
+=20
+ void json_lexer_destroy(JSONLexer *lexer)
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index c51c2021f9..78dfff2aa0 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -118,15 +118,15 @@ void json_message_parser_init(JSONMessageParser *pa=
+rser,
+     json_lexer_init(&parser->lexer, json_message_process_token);
+ }
+=20
+-int json_message_parser_feed(JSONMessageParser *parser,
++void json_message_parser_feed(JSONMessageParser *parser,
+                              const char *buffer, size_t size)
+ {
+-    return json_lexer_feed(&parser->lexer, buffer, size);
++    json_lexer_feed(&parser->lexer, buffer, size);
+ }
+=20
+-int json_message_parser_flush(JSONMessageParser *parser)
++void json_message_parser_flush(JSONMessageParser *parser)
+ {
+-    return json_lexer_flush(&parser->lexer);
++    json_lexer_flush(&parser->lexer);
+ }
+=20
+ void json_message_parser_destroy(JSONMessageParser *parser)
 --=20
 2.18.0.rc1
