@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbT5G-0005rx-Ua
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:55:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fbTIO-0001S2-P3
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:09:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbT5A-0002c3-IC
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:55:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49150 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fbT5A-0002bk-CR
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:55:40 -0400
-References: <20180705181148.26871-1-clg@kaod.org>
-	<20180705133044.634ede43@t450s.home>
-	<b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
-	<20180706015113.GC23001@xz-mi>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9ae66133-86a6-72d8-cd66-f27592caffe9@redhat.com>
-Date: Fri, 6 Jul 2018 17:55:23 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fbTIN-0001Pa-Rr
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:09:20 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fbTIN-0001P3-Ml
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 12:09:19 -0400
+Received: by mail-oi0-x242.google.com with SMTP id i12-v6so24413372oik.2
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 09:09:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180706015113.GC23001@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180706155127.7483-3-f4bug@amsat.org>
+References: <20180706155127.7483-1-f4bug@amsat.org>
+	<20180706155127.7483-3-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jul 2018 17:08:58 +0100
+Message-ID: <CAFEAcA_rKe5MrPt36EAYjxB5TDREb9Ea+vj8u4kVPgamLDFiog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+Subject: Re: [Qemu-devel] [PATCH for-3.0 2/3] linux-user: Do not report
+ "syscall not implemented" by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,18 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 06/07/2018 03:51, Peter Xu wrote:
->=20
-> A question about memory region auto destruction (which might not
-> related to this patch): I see that we have object_property_add_child()
-> in memory_region_do_init() to achieve the auto destruction but only if
-> the "name" of memory region is specified.  Could we just do that
-> unconditionally (though we might of course need to generate some of
-> the names), or is there a reason not to do so?
+On 6 July 2018 at 16:51, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
+e:
+> This can still be reported using the "-d unimp" command line option.
+>
+> Code change produced with:
+>
+>   git ls-files linux-user | \
+>   xargs sed -i -E 's/fprintf\(stderr,\s?(".*not implemented\\n")\);/qemu_=
+log_mask(LOG_UNIMP, \1);/g'
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  linux-user/cris/signal.c       | 4 ++--
+>  linux-user/microblaze/signal.c | 4 ++--
+>  linux-user/nios2/signal.c      | 2 +-
+>  linux-user/sparc/signal.c      | 4 ++--
+>  4 files changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
+> index 0b405247cf..1e02194377 100644
+> --- a/linux-user/cris/signal.c
+> +++ b/linux-user/cris/signal.c
+> @@ -146,7 +146,7 @@ void setup_rt_frame(int sig, struct target_sigaction =
+*ka,
+>                      target_siginfo_t *info,
+>                       target_sigset_t *set, CPUCRISState *env)
+>  {
+> -    fprintf(stderr, "CRIS setup_rt_frame: not implemented\n");
+> +    qemu_log_mask(LOG_UNIMP, "setup_rt_frame: not implemented\n");
 
-I'm not sure actually if there are still regions without a name...
+Your regex seems to have gone a bit awry here, because it's lost
+the "CRIS" part of the string (similarly below).
 
-Paolo
+thanks
+-- PMM
