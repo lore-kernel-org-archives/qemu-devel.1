@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suzuki.Poulose@arm.com>) id 1fbR7E-00018P-Db
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:49:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1fbR9A-0002Bo-0w
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Suzuki.Poulose@arm.com>) id 1fbR7A-00009m-G7
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:49:40 -0400
-Received: from foss.arm.com ([217.140.101.70]:44592)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suzuki.Poulose@arm.com>) id 1fbR7A-00006v-7p
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:49:36 -0400
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
-	<20180704155104.GN4828@arm.com>
-	<12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Message-ID: <fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
-Date: Fri, 6 Jul 2018 14:49:30 +0100
+	(envelope-from <bounces@canonical.com>) id 1fbR96-0001tH-5z
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:51:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fbR95-0001rs-Uq
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:51:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fbR92-0007qA-LG
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 13:51:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 12F0D2E81D3
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 13:51:30 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the
- physical address size for VM
+Date: Fri, 06 Jul 2018 13:38:45 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1738771 <1738771@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151359763741.17869.16981904276472670605.malonedeb@soybean.canonical.com>
+Message-Id: <153088432560.30182.6743537825495070325.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738771] Re: qemu user does not provide AT_SECURE
+ auxiliary vector entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Peter Maydel <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 04/07/18 23:03, Suzuki K Poulose wrote:
-> On 07/04/2018 04:51 PM, Will Deacon wrote:
->> Hi Suzuki,
->>
->> On Fri, Jun 29, 2018 at 12:15:35PM +0100, Suzuki K Poulose wrote:
->>> Allow specifying the physical address size for a new VM via
->>> the kvm_type argument for KVM_CREATE_VM ioctl. This allows
->>> us to finalise the stage2 page table format as early as possible
->>> and hence perform the right checks on the memory slots without
->>> complication. The size is encoded as Log2(PA_Size) in the bits[7:0]
->>> of the type field and can encode more information in the future if
->>> required. The IPA size is still capped at 40bits.
->>>
->>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>> Cc: Christoffer Dall <cdall@kernel.org>
->>> Cc: Peter Maydel <peter.maydell@linaro.org>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> ---
->>> =C2=A0 arch/arm/include/asm/kvm_mmu.h=C2=A0=C2=A0 |=C2=A0 2 ++
->>> =C2=A0 arch/arm64/include/asm/kvm_arm.h | 10 +++-------
->>> =C2=A0 arch/arm64/include/asm/kvm_mmu.h |=C2=A0 2 ++
->>> =C2=A0 include/uapi/linux/kvm.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 10 ++++++++++
->>> =C2=A0 virt/kvm/arm/arm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 24 ++++++++++++++++++++++--
->>> =C2=A0 5 files changed, 39 insertions(+), 9 deletions(-)
->>
->> [...]
->>
->>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>> index 4df9bb6..fa4cab0 100644
->>> --- a/include/uapi/linux/kvm.h
->>> +++ b/include/uapi/linux/kvm.h
->>> @@ -751,6 +751,16 @@ struct kvm_ppc_resize_hpt {
->>> =C2=A0 #define KVM_S390_SIE_PAGE_OFFSET 1
->>> =C2=A0 /*
->>> + * On arm/arm64, machine type can be used to request the physical
->>> + * address size for the VM. Bits [7-0] have been reserved for the
->>> + * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
->>> + * value 0 implies the default IPA size, which is 40bits.
->>> + */
->>> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK=C2=A0=C2=A0=C2=A0 0xff
->>> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 \
->>> +=C2=A0=C2=A0=C2=A0 ((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
->>
->> This seems like you're allocating quite a lot of bits in a non-extensi=
-ble
->> interface to a fairly esoteric parameter. Would it be better to add an=
-other
->> ioctl, or condense the number of sizes you support instead?
->=20
-> As I explained in the other thread, we need the size as soon as the VM
-> is created. The major challenge is keeping the backward compatibility b=
-y
-> mapping 0 to 40bits. I will give it a thought.
+A patch to add AT_SECURE went in and was released in QEMU 2.12.
 
-Here is one option. We could re-use the {V}TCR_ELx.{I}PS field format, wh=
-ich
-occupies 3 bits and has the following definitions. (ID_AA64MMFR0_EL1:PARa=
-nge
-also has the field definitions, except that the field is 4bits wide, but
-only 3bits are used)
 
-000 32 bits, 4GB.
-001 36 bits, 64GB.
-010 40 bits, 1TB.
-011 42 bits, 4TB.
-100 44 bits, 16TB.
-101 48 bits, 256TB.
-110 52 bits, 4PB
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-But we need to map 0 =3D> 40bits IPA to make our ABI backward compatible.=
- So
-we could use the additional one bit to indicate that IPA size is requeste=
-d
-in the 3 bits.
+-- =
 
-i.e,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738771
 
-machine_type:
+Title:
+  qemu user does not provide AT_SECURE auxiliary vector entry
 
-Bit [2:0]	- Requested IPA size. Values follow VTCR_EL2.PS format.
+Status in QEMU:
+  Fix Released
 
-Bit [3]		- 1 =3D> IPA Size bits (Bits[2:0]) requested.
-		0 =3D> Not requested
+Bug description:
+  When executing an android native binary using qemu in user mode, the
+  program fail with the message
 
-The only minor down side is restricting to the predefined values above,
-which is not a real issue for a VM.
+  FATAL: kernel did not supply AT_SECURE
 
-Thoughts ?
+  Android uses bionic libc.The linker requires that AT_SECURE is
+  provided in the auxiliary vector, but qemu does not provide the entry.
 
-Suzuki
+  The issue can be reproduced using the commands:
+
+  mkdir -p /tmp/android/system
+  cd /tmp/android
+  curl -O https://dl.google.com/android/repository/sys-img/google_apis/sysi=
+mg_x86-21_r15.zip
+  unzip sysimg_x86-21_r15.zip
+  mount -o loop x86/system.img system
+  qemu-i386 -L /tmp/android/ system/bin/ls
+
+  =
+
+  I've provided a patch (https://lists.gnu.org/archive/html/qemu-devel/2017=
+-10/msg03667.html) to fix the issue, but it was not reviewed yet.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738771/+subscriptions
