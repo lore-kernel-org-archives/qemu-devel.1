@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fbPs7-0002xF-BJ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fbPs7-0002x9-6J
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fbPs2-0003qf-Re
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fbPs3-0003qq-0H
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:29:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:59231 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:59230 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fbPs2-0003p0-IM
+	id 1fbPs2-0003p1-Ke
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:29:54 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri,  6 Jul 2018 13:48:52 +0200
-Message-Id: <1530877732-26557-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  6 Jul 2018 13:48:51 +0200
+Message-Id: <1530877732-26557-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v4 8/8] target/mips: Check ELPA flag only in
- some cases of MFHC0 and MTHC0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 7/8] target/mips: Don't update BadVAddr
+ register in Debug Mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +33,93 @@ Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@li
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
-and placing ELPA flag checks befor switch statement were technically
-correct. However, after adding handling more registers, these checks
-should be moved to act only in cases of handling EntryLo0 and
-EntryLo1.
+BadVAddr should not be updated if (env->hflags & MIPS_HFLAG_DM) is
+set.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- target/mips/translate.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/mips/helper.c    |  4 +++-
+ target/mips/op_helper.c | 12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 7721ed7..d4cb6fe 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4885,12 +4885,11 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
- {
-     const char *rn = "invalid";
- 
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
-             rn = "EntryLo0";
-             break;
-@@ -4901,6 +4900,7 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             gen_mfhc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
-             rn = "EntryLo1";
-             break;
-@@ -4965,12 +4965,11 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     const char *rn = "invalid";
-     uint64_t mask = ctx->PAMask >> 36;
- 
--    CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
--
-     switch (reg) {
-     case 2:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo0));
-             rn = "EntryLo0";
-@@ -4982,6 +4981,7 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-     case 3:
-         switch (sel) {
-         case 0:
-+            CP0_CHECK(ctx->hflags & MIPS_HFLAG_ELPA);
-             tcg_gen_andi_tl(arg, arg, mask);
-             gen_mthc0_entrylo(arg, offsetof(CPUMIPSState, CP0_EntryLo1));
-             rn = "EntryLo1";
--- 
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 8cf91ce..e215af9 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, ta=
+rget_ulong address,
+         break;
+     }
+     /* Raise exception */
+-    env->CP0_BadVAddr =3D address;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D address;
++    }
+     env->CP0_Context =3D (env->CP0_Context & ~0x007fffff) |
+                        ((address >> 9) & 0x007ffff0);
+     env->CP0_EntryHi =3D (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask)=
+ |
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 0b8ec7d..a6a57bd 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSStat=
+e *env,
+ target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_=
+idx)  \
+ {                                                                       =
+      \
+     if (arg & almask) {                                                 =
+      \
+-        env->CP0_BadVAddr =3D arg;                                      =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg;                                  =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdEL, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     env->lladdr =3D do_translate_address(env, arg, 0, GETPC());         =
+        \
+@@ -291,7 +293,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_=
+ulong arg1,              \
+     target_long tmp;                                                    =
+      \
+                                                                         =
+      \
+     if (arg2 & almask) {                                                =
+      \
+-        env->CP0_BadVAddr =3D arg2;                                     =
+        \
++        if (!(env->hflags & MIPS_HFLAG_DM)) {                           =
+      \
++            env->CP0_BadVAddr =3D arg2;                                 =
+        \
++        }                                                               =
+      \
+         do_raise_exception(env, EXCP_AdES, GETPC());                    =
+      \
+     }                                                                   =
+      \
+     if (do_translate_address(env, arg2, 1, GETPC()) =3D=3D env->lladdr) =
+{         \
+@@ -2456,7 +2460,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vad=
+dr addr,
+     int error_code =3D 0;
+     int excp;
+=20
+-    env->CP0_BadVAddr =3D addr;
++    if (!(env->hflags & MIPS_HFLAG_DM)) {
++        env->CP0_BadVAddr =3D addr;
++    }
+=20
+     if (access_type =3D=3D MMU_DATA_STORE) {
+         excp =3D EXCP_AdES;
+--=20
 2.7.4
