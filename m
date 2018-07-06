@@ -1,22 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fbRp7-0000G3-HZ
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:35:02 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1fbRpP-0000Wx-RC
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fbRp6-0006Qa-GJ
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:35:01 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180705074638.770905-1-vsementsov@virtuozzo.com>
-	<20180706071754.GB9946@lemon.usersys.redhat.com>
-	<7747e176-6d75-c640-4f48-0482b8c7c401@virtuozzo.com>
-Message-ID: <da2a1cb0-31c1-c863-9f12-eae29d821ed4@virtuozzo.com>
-Date: Fri, 6 Jul 2018 17:34:47 +0300
+	(envelope-from <jjherne@linux.ibm.com>) id 1fbRpL-0006bQ-Km
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:35:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1fbRpL-0006ax-Cc
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:35:15 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w66ETD0b082395
+	for <qemu-devel@nongnu.org>; Fri, 6 Jul 2018 10:35:14 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k29wuh1rd-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:35:13 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Fri, 6 Jul 2018 08:35:13 -0600
+Reply-To: jjherne@linux.ibm.com
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
+	<20180706100346.3dda6b10.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Fri, 6 Jul 2018 10:35:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <7747e176-6d75-c640-4f48-0482b8c7c401@virtuozzo.com>
+In-Reply-To: <20180706100346.3dda6b10.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] fix image fleecing
+Content-Transfer-Encoding: 7bit
+Message-Id: <6d312b22-5af2-bed5-c920-9b5133598515@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +45,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-06.07.2018 16:41, Vladimir Sementsov-Ogievskiy wrote:
-> 06.07.2018 10:17, Fam Zheng wrote:
->> On Thu, 07/05 10:46, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all.
->>>
->>> This fixes image fleecing scheme for 3.0, details are in 04 patch.
->> Looks like this breaks 'test-replication':
->>
->> http://patchew.org/QEMU/20180705074638.770905-1-vsementsov@virtuozzo.com=
-/=20
->>
->>
->> test-replication: /stor/work/qemu/block/io.c:725:=20
->> wait_serialising_requests: Assertion `qemu_coroutine_self() !=3D=20
->> req->co' failed.
->> GTester: last random seed: R02Se49967625f19c5be9918a2503fb2fff5
->> test-replication: /stor/work/qemu/block/io.c:725:=20
->> wait_serialising_requests: Assertion `qemu_coroutine_self() !=3D=20
->> req->co' failed.
->> =C2=A0=C2=A0 GTESTER tests/test-qht-par
->> GTester: last random seed: R02S8fad2bb2daddc51eb51623bb7c86cb67
->> test-replication: /stor/work/qemu/block/io.c:725:=20
->> wait_serialising_requests: Assertion `qemu_coroutine_self() !=3D=20
->> req->co' failed.
->> GTester: last random seed: R02S024718e9b1e2b1facafe254c43e1430b
->>
->> Fam
->
-> interesting.
->
-> in gdb I see, that both requests are identical (i.e. their=20
-> BdrvTrackedRequeststructs, except list filed)writes (self and req)...
->
-> and it's actually the same request, duplicated in the ist, first it is=20
-> created in bdrv_co_copy_range_internal,
->
-> and than again,
-> #0=C2=A0 tracked_request_begin (req=3D0x7fffe8f9e7d0, bs=3D0x555555a43040=
-,=20
-> offset=3D33554432, bytes=3D33554432, type=3D
-> =C2=A0=C2=A0=C2=A0 BDRV_TRACKED_WRITE) at block/io.c:598
-> #1=C2=A0 0x00005555555f76bc in bdrv_co_copy_range_internal=20
-> (src=3D0x55555597ef80, src_offset=3D33882112,
-> =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D3=
-3554432,=20
-> read_flags=3DBDRV_REQ_NO_SERIALISING,
-> =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING, recurse_src=3Dtrue=
-) at=20
-> block/io.c:2949
-> #2=C2=A0 0x00005555555f78e9 in bdrv_co_copy_range_from (src=3D0x55555597e=
-f80,=20
-> src_offset=3D33882112,
-> =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D3=
-3554432,=20
-> read_flags=3DBDRV_REQ_NO_SERIALISING,
-> =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING) at block/io.c:2995
-> #3=C2=A0 0x00005555555ae931 in qcow2_co_copy_range_from (bs=3D0x555555977=
-ff0,=20
-> src=3D0x5555559f14d0,
-> =C2=A0=C2=A0=C2=A0 src_offset=3D33554432, dst=3D0x5555559f1d30, dst_offse=
-t=3D33554432,=20
-> bytes=3D33554432,
-> =C2=A0=C2=A0=C2=A0 read_flags=3DBDRV_REQ_NO_SERIALISING,=20
-> write_flags=3DBDRV_REQ_SERIALISING) at block/qcow2.c:3311
-> #4=C2=A0 0x00005555555f77cf in bdrv_co_copy_range_internal=20
-> (src=3D0x5555559f14d0, src_offset=3D33554432,
-> =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D3=
-3554432,=20
-> read_flags=3DBDRV_REQ_NO_SERIALISING,
-> =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING, recurse_src=3Dtrue=
-) at=20
-> block/io.c:2966
->
->
-> so, it's actually bug in copy_range architecture.
->
+On 07/06/2018 04:03 AM, Cornelia Huck wrote:
+> On Thu,  5 Jul 2018 13:25:38 -0400
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> ...
+>> +
+>> +    senseIdCcw.cmd_code = CCW_CMD_SENSE_ID;
+>> +    senseIdCcw.cda = ptr2u32(&senseData);
+> 
+> Are we sure that this is always under 2G?
+> 
 
-will fix with the next resend..
+I thought I saw somewhere that Qemu always loads the bios at the high 
+end of guest memory or right under the 2 GB line if guest memory is 
+greater than 2 GB... I cannot remember the source of this information 
+but I do use it when calculating where to find the bios code for 
+debugging with GDB. Here is the formula used:
 
---=20
-Best regards,
-Vladimir
+let "FW_BASE=RAM_SIZE > 0x80000000 ? 0x80000000 : RAM_SIZE"
+let "FW_BASE=(FW_BASE - 0x200000)  & (~0xffff)"
+
+So 2GB - 2MB is where we seem to load the bios.
+Can anyone provide more concrete info?
+
+FWIW I've tried booting a 6 GB guest and it works :).
+
+>> +    senseIdCcw.count = sizeof(senseData);
+>> +
+>> +    if (do_cio(schid, ptr2u32(&senseIdCcw), CCW_FMT1)) {
+>> +        panic("Failed to run SenseID CCw\n");
+>> +    }
+>> +
+>> +    return senseData.cu_type;
+>> +}
+>> +
+>> +static bool irb_error(Irb *irb)
+>> +{
+>> +    /* We have to ignore Incorrect Length (cstat == 0x40) indicators because
+>> +     * real devices expect a 24 byte SenseID  buffer, and virtio devices expect
+>> +     * a much larger buffer. Neither device type can tolerate a buffer size
+>> +     * different from what they expect so they set this indicator.
+> 
+> Hm... do you have details? Is that basic vs. extended SenseID
+> information?
+> 
+> (If the code in QEMU is making incorrect assumptions, I'd like to fix
+> that.)
+
+I really have no idea and was hoping someone who knows virtio ccw better 
+than myself would have some ideas. This comment simply documents what I 
+discovered in testing. I can look into it more if no one else has any 
+information on this. FWIW, it has been working without issue in my testing.
+
+>> +     */
+>> +    if (irb->scsw.cstat != 0x00 && irb->scsw.cstat != 0x40) {
+>> +        return true;
+>> +    }
+>> +    return irb->scsw.dstat != 0xc;
+>> +}
+>> +
+>> +/* Executes a channel program at a given subchannel. The request to run the
+>> + * channel program is sent to the subchannel, we then wait for the interrupt
+>> + * singaling completion of the I/O operation(s) perfomed by the channel
+>> + * program. Lastly we verify that the i/o operation completed without error and
+>> + * that the interrupt we received was for the subchannel used to run the
+>> + * channel program.
+> 
+> Finally, real interrupts instead of polling in the s390-ccw bios,
+> nice :)
+> 
+
+Yep, I was happy to replace the polling. This probably needs wider 
+testing however as it is tricky enough to hide some really weird side 
+effects as I discovered a few times during development.
+
+>> + *
+>> + * Note: This function assumes it is running in an environment where no other
+>> + * cpus are generating or receiving I/O interrupts. So either run it in a
+>> + * single-cpu environment or make sure all other cpus are not doing I/O and
+>> + * have I/O interrupts masked off.
+>> + */
+>> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+>> +{
+>> +    Ccw0 *this_ccw, *prev_ccw;
+>> +    CmdOrb orb = {};
+>> +    Irb irb = {};
+>> +    int rc;
+>> +
+>> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
+>> +
+>> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
+>> +    if (fmt == 0) {
+>> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
+>> +    }
+>> +
+>> +    orb.fmt = fmt ;
+>> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
+>> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
+>> +    orb.lpm = 0xFF; /* All paths allowed */
+>> +    orb.cpa = ccw_addr;
+>> +
+>> +    rc = ssch(schid, &orb);
+>> +    if (rc) {
+>> +        print_int("ssch failed with rc=", rc);
+>> +        return rc;
+> 
+> Are you doing anything like retrying on cc 1/2? It's probably fine to
+> give up on cc 3.
+> 
+>> +    }
+>> +
+>> +    await_io_int(schid.sch_no);
+>> +
+>> +    /* Clear read */
+>> +    rc = tsch(schid, &irb);
+>> +    if (rc) {
+>> +        print_int("tsch failed with rc=", rc);
+>> +        return rc;
+> 
+> If you get a cc 1 here (no status pending), that's probably an internal
+> error (as you just did a successful ssch and assume you got an I/O
+> interrupt). If you get a cc 3, it's probably a good idea to give up on
+> this subchannel.
+
+At the moment the code treats any non-zero CC as an error and returns it 
+to the caller.
+
+
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
