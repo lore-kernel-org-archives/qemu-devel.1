@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fbMfk-0006ve-RF
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:05:01 -0400
+	(envelope-from <clg@kaod.org>) id 1fbMiB-00082I-2J
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fbMff-00076v-OL
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:05:00 -0400
-Received: from mail-eopbgr680132.outbound.protection.outlook.com
-	([40.107.68.132]:36231
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fbMff-000725-GQ
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:04:55 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 6 Jul 2018 09:04:48 +0000
-Message-ID: <BN7PR08MB48686506B4081A5E5554DE24C6470@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1530732637-28606-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1530732637-28606-5-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<20f56ce2-9998-75c1-a15f-80633a70bd5e@linaro.org>
-In-Reply-To: <20f56ce2-9998-75c1-a15f-80633a70bd5e@linaro.org>
-Content-Language: en-US
+	(envelope-from <clg@kaod.org>) id 1fbMi5-0002IE-Vw
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:07:31 -0400
+Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:37856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fbMi5-0002Cd-Op
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 05:07:25 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.122.124])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 24C71C8B4D
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 11:07:24 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri,  6 Jul 2018 11:07:10 +0200
+Message-Id: <20180706090713.15712-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] target/mips: Avoid case statements
- formulated by ranges
+Subject: [Qemu-devel] [PATCH v4 0/3] spapr: introduce a fixed IRQ number
+ space and an IRQ controller backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Paul Burton <pburton@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-> >      case 18:
-> >          switch (sel) {
-> > -        case 0 ... 7:
-> > +        case 0:
-> > +        case 1:
-> > +        case 2:
-> > +        case 3:
-> > +        case 4:
-> > +        case 5:
-> > +        case 6:
-> > +        case 7:
->
-> I don't see the point in this.  It is clear what 0 ... 7 means.
+Here is a proposal for a new IRQ number space layout using static
+numbers and a bitmap allocator for the MSIs. The previous layout is
+kept for compatibly in machines raising the 'legacy_irq_allocation' flag.
 
-The point is to avoid using ranges altogether, regardless of the clarity of=
- a particular instance.
+The patchset also introduces a sPAPR IRQ interface which offers the
+possibility to provide different IRQ controller backend to the sPAPR
+machine. This is preparing ground for the new XIVE controller.
 
-Let me further explain the reason: Consider this: Let's say we plan to repl=
-ace 0, 1, 2, 3, 4, 5, 6, 7 with some preprocessor constants, appropriate fo=
-r the particular context. If we keep "0 ... 7" notation, that line will loo=
-k like "case ABC_KLM ... ABC_RST:" and will suddenly become much less clear=
-.
+The new XICS layout will only be activated when a new pseries-3.1
+machine is introduced.
 
-As a mattter of fact, there is a plan to switch from hardcoded numbers to p=
-reprocessor constants in this instance, but it is a low priority task.
+Thanks,
 
-Regards,
-Aleksandar
+C.
+
+Changes since v3 :
+
+ - introduced a reg to irq conversion routine for the VIO devices
+
+Changes since v2 :
+
+ - renamed 'xics_legacy' to 'legacy_irq_allocation'
+ - introduced the sPAPR IRQ backend interface
+ - increase the size of the IRQ number space for newer machines
+
+Changes since v1 :
+
+ - removed block allocation
+ - spaced the IRQ offsets=20
+ - check for overlaps when allocating VIO irqs
+ - removed 'Error *' arg from spapr_irq_msi_init()=20
+
+
+C=C3=A9dric Le Goater (3):
+  spapr: introduce a fixed IRQ number space
+  spapr: introduce a IRQ controller backend to the machine
+  spapr: increase the size of the IRQ number space
+
+ include/hw/ppc/spapr.h     |  16 +-
+ include/hw/ppc/spapr_irq.h |  55 +++++++
+ hw/ppc/spapr.c             | 203 ++++---------------------
+ hw/ppc/spapr_cpu_core.c    |   1 +
+ hw/ppc/spapr_events.c      |  12 +-
+ hw/ppc/spapr_irq.c         | 296 +++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_pci.c         |  29 +++-
+ hw/ppc/spapr_vio.c         |  47 +++++-
+ hw/ppc/Makefile.objs       |   2 +-
+ 9 files changed, 465 insertions(+), 196 deletions(-)
+ create mode 100644 include/hw/ppc/spapr_irq.h
+ create mode 100644 hw/ppc/spapr_irq.c
+
+--=20
+2.17.1
