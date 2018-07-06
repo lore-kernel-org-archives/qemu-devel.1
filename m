@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fbKGp-0002ro-Sr
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:31:08 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fbKRy-0004kL-69
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fbKGm-0001Qb-R7
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:31:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55628 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fbKGm-0001PU-MN
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:31:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3B81DE9002
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 06:31:04 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180705091402.26244-1-armbru@redhat.com>
-	<20180705091402.26244-3-armbru@redhat.com>
-	<d8ff142e-34f8-65c8-fa3e-2509a85fa06e@redhat.com>
-Date: Fri, 06 Jul 2018 08:31:02 +0200
-In-Reply-To: <d8ff142e-34f8-65c8-fa3e-2509a85fa06e@redhat.com> (Eric Blake's
-	message of "Thu, 5 Jul 2018 11:39:02 -0500")
-Message-ID: <87r2kg3mft.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1fbKRv-0006nm-2S
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:42:38 -0400
+Date: Fri, 6 Jul 2018 08:42:29 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180706084229.7b3d63db.cohuck@redhat.com>
+In-Reply-To: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] cli qmp: Mark --preconfig,
- exit-preconfig experimental
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +22,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com, pkrempa@redhat.com, ehabkost@redhat.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-Eric Blake <eblake@redhat.com> writes:
+On Thu,  5 Jul 2018 13:25:28 -0400
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-> On 07/05/2018 04:14 AM, Markus Armbruster wrote:
->> Committing to the current --preconfig / exit-preconfig interface
->> before it has seen any use is premature.  Mark both as experimental,
->> the former in documentation, the latter by renaming it to
->> x-exit-preconfig.
->>
->> See the previous commit for more detailed rationale.
->
-> Should the CLI be spelled --x-preconfig?
+> This is to support booting from vfio-ccw dasd devices. We basically implement
+> the real hardware ipl procedure. This allows for booting Linux guests on
+> vfio-ccw devices.
 
-Would be the first use of x- with option names.
+Wow :)
 
-Since you have to pair --preconfig with x-exit-preconfig, I figure
-slapping x- onto the latter suffices.  But I'm not opposed to slapping
-it onto the former as well.
+> 
+> vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
+> channel programs dynamically modify themselves. Details on the ipl process and
+> how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
-> Other than the potential for a spelling change,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+Yes, that must have been a challenge.
 
-Thanks!
+Does this work with any dasd? Or did you concentrate on ECKD?
+
+(yeah, I'll also read what you sent :)
+
+> 
+> Jason J. Herne (15):
+>   s390 vfio-ccw: Add bootindex property and IPLB data
+>   s390-bios: decouple cio setup from virtio
+>   s390-bios: decouple common boot logic from virtio
+>   s390-bios: Extend find_dev() for non-virtio devices
+>   s390-bios: Factor finding boot device out of virtio code path
+>   s390-bios: Clean up cio.h
+>   s390-bios: Decouple channel i/o logic from virtio
+>   s390-bios: Map low core memory
+>   s390-bios: ptr2u32 and u32toptr
+>   s390-bios: Support for running format-0/1 channel programs
+>   s390-bios: Refactor virtio to run channel programs via cio
+>   s390-bios: Use control unit type to determine boot method
+>   s390-bios: Add channel command codes/structs needed for dasd-ipl
+>   s390-bios: Support booting from real dasd device
+>   s390-bios: Use sense ccw to ensure consistent device state at boot
+>     time
+> 
+>  docs/devel/s390-dasd-ipl.txt     | 132 +++++++++++++++++++++
+>  hw/s390x/ipl.c                   |  15 +++
+>  hw/s390x/s390-ccw.c              |   9 ++
+>  hw/vfio/ccw.c                    |  13 +-
+>  hw/vfio/ccw.h                    |  38 ++++++
+>  include/hw/s390x/s390-ccw.h      |   1 +
+>  pc-bios/s390-ccw/Makefile        |   2 +-
+>  pc-bios/s390-ccw/cio.c           | 181 ++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/cio.h           | 150 ++++++++++++++++-------
+>  pc-bios/s390-ccw/dasd-ipl.c      | 249 +++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/dasd-ipl.h      |  16 +++
+>  pc-bios/s390-ccw/libc.h          |  12 ++
+>  pc-bios/s390-ccw/main.c          | 162 ++++++++++++++++---------
+>  pc-bios/s390-ccw/netmain.c       |   1 +
+>  pc-bios/s390-ccw/s390-arch.h     | 113 ++++++++++++++++++
+>  pc-bios/s390-ccw/s390-ccw.h      |   9 --
+>  pc-bios/s390-ccw/virtio-blkdev.c |   1 +
+>  pc-bios/s390-ccw/virtio.c        |  46 +-------
+>  18 files changed, 986 insertions(+), 164 deletions(-)
+>  create mode 100644 docs/devel/s390-dasd-ipl.txt
+>  create mode 100644 hw/vfio/ccw.h
+>  create mode 100644 pc-bios/s390-ccw/cio.c
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+>  create mode 100644 pc-bios/s390-ccw/s390-arch.h
+> 
