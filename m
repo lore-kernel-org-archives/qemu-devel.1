@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fbQQN-0004M4-2F
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:05:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fbQQr-0004ZU-1R
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:05:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fbQQH-0003bW-BK
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:05:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55558)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fbQQG-0003ac-Uv
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:05:17 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w66D5Bvt009931
-	for <qemu-devel@nongnu.org>; Fri, 6 Jul 2018 09:05:15 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k286da66s-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 09:05:13 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 6 Jul 2018 14:03:54 +0100
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
-	<20180706100346.3dda6b10.cohuck@redhat.com>
-	<81699814-1e9a-7031-ca3f-4d4d5c58906a@linux.ibm.com>
-	<20180706142631.664474ec.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Fri, 6 Jul 2018 15:03:49 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fbQQp-0004PM-Ti
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:05:53 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:46218)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fbQQp-0004OE-N5
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:05:51 -0400
+Received: by mail-oi0-x244.google.com with SMTP id y207-v6so23301939oie.13
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 06:05:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180706142631.664474ec.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <a33b6f31-cd56-4ceb-2130-862a07611eb6@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 10/15] s390-bios: Support for
- running format-0/1 channel programs
+In-Reply-To: <1530806837-5416-1-git-send-email-cota@braap.org>
+References: <1530806837-5416-1-git-send-email-cota@braap.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jul 2018 14:05:30 +0100
+Message-ID: <CAFEAcA902f9nRM6FysuEKd8AZNsYXM4BVVVN8KfxyHOBYgaLRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] translate-all: honour CF_NOCACHE in
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,40 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, bjsdjshi@linux.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Richard Henderson <richard.henderson@linaro.org>
 
+On 5 July 2018 at 17:07, Emilio G. Cota <cota@braap.org> wrote:
+> This fixes a record-replay regression introduced by 95590e2
+> ("translate-all: discard TB when tb_link_page returns an existing
+> matching TB", 2018-06-15). The problem is that code using CF_NOCACHE
+> assumes that the TB returned from tb_gen_code is always a
+> newly-generated one. This assumption, however, was broken in
+> the aforementioned commit.
+>
+> Fix it by honouring CF_NOCACHE, so that tb_gen_code always
+> returns a newly-generated TB when CF_NOCACHE is passed to it.
+> Do this by avoiding the TB hash table if CF_NOCACHE is set.
+>
+> Reported-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Tested-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
+This bug can also cause crashes when using -icount, without
+record-replay; I hit it looking at a test case in LP:1774677.
+This patch seems to fix the crash.
 
-On 07/06/2018 02:26 PM, Cornelia Huck wrote:
-> On Fri, 6 Jul 2018 13:42:25 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
->> On 07/06/2018 10:03 AM, Cornelia Huck wrote:
->>> On Thu,  5 Jul 2018 13:25:38 -0400
->>> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
->>>> +    rc = ssch(schid, &orb);
->>>> +    if (rc) {
->>>> +        print_int("ssch failed with rc=", rc);
->>>> +        return rc;
->>>
->>> Are you doing anything like retrying on cc 1/2? It's probably fine to
->>> give up on cc 3.
->>>    
->>
->> We are in IPL context. We should have exclusive access to the DASD
->> we are IPL-ing from, or not? My understanding was that if the layers
->> below us don't violate the rules, we should never observe cc 1 or 2
->> here. Or am I wrong?
-> 
-> cc 2 probably not (nobody should be doing a halt or a clear), but cc 1
-> if there's some unsolicited status pending?
-> 
-
-AFAIK we are supposed to give up then. The status was supposed to be
-cleared away on the reset which precedes IPL. If the device presented
-an unsolicited status between reset and starting the IPL IO on the
-channel I think the IPL should fail.
-
-Regards,
-Halil
+thanks
+-- PMM
