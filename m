@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fbRBf-00039e-Ps
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:54:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1fbRIS-0005n3-VN
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fbRBb-0004AT-SJ
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:54:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58484 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fbRBb-00048o-MM
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:54:11 -0400
-Date: Fri, 6 Jul 2018 15:54:06 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180706155406.0587733c.cohuck@redhat.com>
-In-Reply-To: <CADGSJ206U4x0UNTEKu0Lt9K9qA025ajtmnj6ym4PDz4Q-c8RKA@mail.gmail.com>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-	<20180702161404.GA2339@rkaganb.sw.ru>
-	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
-	<20180703095825.GC30904@rkaganb.sw.ru>
-	<20180703142817.GA3088@vbusired-vm>
-	<20180703165200.180c93bb.cohuck@redhat.com>
-	<CADGSJ23+sZiMCx=n=DytZ=TT2z7i0sMhrmnPuFYtuZhSc=qA+Q@mail.gmail.com>
-	<20180704141523.377cb66d.cohuck@redhat.com>
-	<CADGSJ206U4x0UNTEKu0Lt9K9qA025ajtmnj6ym4PDz4Q-c8RKA@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1fbRIN-0001mh-7N
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:01:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51238)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fbRIN-0001lP-0F
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 10:01:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fbRIK-0001UJ-KV
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 14:01:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 45A9C2E81A5
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 14:01:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Jul 2018 13:46:46 -0000
+From: Andreas Gustafsson <gson@gson.org>
+Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
+Message-Id: <153088480656.18097.564505779601965111.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +36,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Siwei Liu <loseweigh@gmail.com>
-Cc: Venu Busireddy <venu.busireddy@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, si-wei liu <si-wei.liu@oracle.com>, "Michael S .
-	Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Thu, 5 Jul 2018 17:49:10 -0700
-Siwei Liu <loseweigh@gmail.com> wrote:
+A couple of comments...  First, the problem is not limited to Linux
+guests.  In fact, I originally ran across it with a NetBSD guest, but
+then reproduced it with a Linux guest for the bug report, because in my
+experience, qemu bug reports involving non-Linux guests tend to be
+ignored.
 
-> On Wed, Jul 4, 2018 at 5:15 AM, Cornelia Huck <cohuck@redhat.com> wrote:
-> > On Tue, 3 Jul 2018 16:31:03 -0700
-> > Siwei Liu <loseweigh@gmail.com> wrote:
-> >  
-> >> On Tue, Jul 3, 2018 at 7:52 AM, Cornelia Huck <cohuck@redhat.com> wrote:  
-> >> > From my point of view, there are several concerns:
-> >> > - This approach assumes a homogeneous pairing (same transport), and
-> >> >   even more, it assumes that this transport is pci.  
-> >>
-> >> Not really.
-> >>
-> >> There could be some other place to define a generic (transport
-> >> independent) virtio feature, whereas the data (group ID) can be stored
-> >> in transport specific way. That generic virtio feature and the way to
-> >> specify target transport to group with is yet to be defined. I don't
-> >> see this patch is in conflict with that direction.  
-> >
-> > Sorry, but I really do not see how this is not pci-specific.
-> >
-> > - One of your components is a bridge. A transport does not necessarily
-> >   have that concept, at least not in a way meaningful for this approach
-> >   to work.  
-> 
-> Assuming we have a transport agnostic high-level virtio feature to
-> indicate that the target type for the to-be-paired device is PCI, then
-> we have to use the data stored in a PC bridge to pair the device. It
-> does not associate transport of virtio itself with the type of target
-> device, right. The introduction of PCI bridge is just for storing the
-> group ID data for the PCI passthrough device case, while one may
-> define and introduce other means to retrieve the info if target device
-> type is not PCI e.g. a special instruction to get group ID on s390x
-> zPCI.
+Second, the qemu man page says that "With sleep=3Don|off, the virtual time
+will jump to the next timer deadline instantly whenever the virtual cpu
+goes to sleep mode".  Although the text is confusing (see bug 1774412),
+to me it suggests that when the mode in case is selected, qemu should
+execute the guest as fast as possible and only provide it with an
+illusion of the passage of time, and there should be no reason for qemu
+itself to ever sleep.  Yet, regardless of whether I specify "sleep=3Don"
+or "sleep=3Doff", qemu sleeps.
 
-Well, zPCI *is* PCI, just a very quirky one. I'm not sure how upper
-layers are supposed to distinguish that.
+-- =
 
-Is there really no existing PCI identifier that (a) the host admin
-already knows and (b) the guest can retrieve easily?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1774677
 
-> 
-> > - Even if we can introduce transport-specific ways for other
-> >   transports, the bridge concept still means that the pairing cannot be
-> >   cross-transport.  
-> 
-> Sorry, I did not get this. A bridge is PCI specific concept indeed,
-> but the virtio iteself can be of other transport. Why it matters? I
-> guess a higher-level feature is needed to define the target transport
-> for the to-be-paired device. The group ID info can reside on the
-> transport specific area on virtio itself though. E.g. for virtio-pci,
-> get it on the vendor specific capability in the PCI configuration
-> space.
-> For virtio-ccw, you may come up with CCW specific way to get the group
-> ID data. Is this not what you had in mind?
+Title:
+  -icount increases boot time by >10x
 
-No, my idea was it to add it as a field in the virtio-net config space,
-making it transport-agnostic. (And making this a typed value, depending
-on the vfio device we want to pair the virtio device with.)
+Status in QEMU:
+  Confirmed
 
-If we want to extend that to other device types, we can add the field
-in their config space; but I'd rather prefer a more generic "host
-relays config metainformation" approach.
+Bug description:
+  When I specify the -icount option, some guest operations such as
+  booting a Linux kernel take more than 10 times longer than otherwise.
+  For example, the following will boot Aboriginal Linux to the login
+  prompt about 6 seconds on my system (using TCG, not KVM):
 
-> 
-> >
-> > I think we should be clear what we want from a generic
-> > (transport-agnostic) virtio feature first. Probably some way to relay
-> > an identifier of the to-be-paired device (transport-specific +
-> > information what the transport is?)
-> >  
-> Are we talking about the transport of the virtio itself or the target
-> device? Note the virtio feature must always be retrieved using
-> transport specific way, although the semantics of the feauture can be
-> transport independent/agnostic. Once a virtio driver instace gets to
-> the point to read feature bits from the device, the transport of that
-> virtio device is determined and cannot be changed later.
+  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
+age-i686.tar.gz
+  gunzip <system-image-i686.tar.gz | tar xfv -
+  cd system-image-i686
+  sh run-emulator.sh
 
-No, I don't want to introduce a new, per-transport mechanism, but
-rather put it into the config space.
+  If I replace the last line with
 
-> 
-> 
-> >> > - It won't work for zPCI (although zPCI is really strange) -- this
-> >> >   means it will be completely unusable on s390x.  
-> >> I still need more information about this use case. First off, does
-> >> zPCI support all the hot plug semantics or functionality the same way
-> >> as PCI? Or there has to be some platform or firmeware support like
-> >> ACPI hotplug? Does QEMU have all the pieces ready for s390 zPCI
-> >> hotplug?  
-> >
-> > zPCI is a strange beast, so first a pointer to a writeup I did:
-> > https://virtualpenguins.blogspot.de/2018/02/notes-on-pci-on-s390x.html
-> >
-> > It does support hotplug, within the s390 architectural context, but
-> > that should be fine for our needs here.
-> >
-> > My concern comes from the 'no topology' issue. We build a fake topology
-> > in QEMU (to use the generic pci infrastructure), but the guest does not
-> > see any of this. It issues an instruction and gets a list of functions.
-> > This means any bridge information is not accessible to the guest.  
-> 
-> That is the reason why I prefer leaving it to specific transport
-> (zPCI) to define its own means to present and retrieve the group ID
-> information. The high-level feature bit just provides the indirection
-> to the target transport (for the to-be-paired device), while seperate
-> transport can have a way of its own to present/retrieve the group ID
-> data.
-> 
-> I don't know where to present that group ID data on s390 zPCI though
-> to be honest. But I doubt we can come up with a very general
-> transport-agnostic way to present the data for both (and pontentially
-> ALL) bus architectures.
+  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
 
-I don't want to establish zPCI as a different transport than 'normal'
-PCI; that would just make life difficult for everyone. The 'put it into
-virtio config space' approach would mean a second feature bit, but
-should just work.
+  booting to the login prompt takes about 1 minute 20 seconds.
+
+  I have tried different values for "shift" other than the "auto" used
+  above, but have not been able to find one that gives reasonable
+  performance.  Specifying "sleep=3Doff" also did not help.
+
+  During the slow boots, qemu appears to spend most of its time
+  sleeping, not using the host CPU.
+
+  I see this with multiple versions of qemu, including current git
+  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
+  host OSes, including Debian 9 on x86_64.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
