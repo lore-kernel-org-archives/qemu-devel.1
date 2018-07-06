@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fbKY0-0007RH-Tm
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:48:53 -0400
+	(envelope-from <famz@redhat.com>) id 1fbKaf-0008Ld-Ba
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fbKXx-0003f8-SB
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:48:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58318
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fbKXx-0003e4-NP
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:48:49 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w666mfR3104982
-	for <qemu-devel@nongnu.org>; Fri, 6 Jul 2018 02:48:49 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2k23fs0058-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 02:48:48 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 6 Jul 2018 07:48:47 +0100
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<1530811543-6881-8-git-send-email-jjherne@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 6 Jul 2018 08:48:42 +0200
+	(envelope-from <famz@redhat.com>) id 1fbKae-0004pI-Dy
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:51:37 -0400
+Date: Fri, 6 Jul 2018 14:51:29 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180706065129.GA9946@lemon.usersys.redhat.com>
+References: <20180705073701.10558-1-famz@redhat.com>
+	<20180705073701.10558-7-famz@redhat.com>
+	<20180705124406.GL3309@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <1530811543-6881-8-git-send-email-jjherne@linux.ibm.com>
-Content-Language: en-US
-Message-Id: <542cbdbb-9a60-713f-0b7b-e8812828cee4@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 07/15] s390-bios: Decouple channel i/o logic
- from virtio
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180705124406.GL3309@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] block: Use common req handling for
+ discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,22 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-
-On 07/05/2018 07:25 PM, Jason J. Herne wrote:
-> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+On Thu, 07/05 14:44, Kevin Wolf wrote:
+> Am 05.07.2018 um 09:36 hat Fam Zheng geschrieben:
+> > Reuse the new bdrv_co_write_req_prepare/finish helpers. The variation
+> > here is that discard requests don't affect bs->wr_highest_offset.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  block/io.c | 21 ++++++++++++++-------
+> >  1 file changed, 14 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/block/io.c b/block/io.c
+> > index f06978dda0..912fcb962a 100644
+> > --- a/block/io.c
+> > +++ b/block/io.c
+> > @@ -1582,7 +1582,18 @@ bdrv_co_write_req_finish(BdrvChild *child, BdrvTrackedRequest *req, int ret)
+> >          bdrv_parent_cb_resize(bs);
+> >          bdrv_dirty_bitmap_truncate(bs, end_sector << BDRV_SECTOR_BITS);
+> >      }
+> > -    bdrv_set_dirty(bs, req->offset, req->bytes);
+> > +    if (req->bytes) {
+> > +        switch (req->type) {
+> > +        case BDRV_TRACKED_WRITE:
+> > +            stat64_max(&bs->wr_highest_offset, req->offset + req->bytes);
 > 
-> Create a separate library for channel i/o related code. This decouples
-> channel i/o operations from virtio and allows us to make use of them for
-> the real dasd boot path.
+> You forgot to remove this line above, so now this one is redundant and
+> we still execute it always.
 > 
-> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/Makefile        |  2 +-
->  pc-bios/s390-ccw/cio.c           | 41 ++++++++++++++++++++++++++++++++++++++++
+> Apart from that, why shouldn't discard be included in
+> bs->wr_highest_offset? It's an access to an area in the image that must
+> be present, so it indicates a larger file size, doesn't it?
 
-you must also touch netboot.mak to get the necessary things into the netboot image
-(it is only build when you do the git submodule thing)
+I'm not sure. wr_highest_offset is used for management to allocate disk space. A
+discard request is on the contrary for releasing disk space. Since guest is
+allowed to discard unallocated sectors even though it should be nop in the
+backend, such an operation shouldn't cause a user visible change in
+@wr_highest_offset in QMP.
+
+Fam
+
+> 
+> > +            /* fall through, to set dirty bits */
+> > +        case BDRV_TRACKED_DISCARD:
+> > +            bdrv_set_dirty(bs, req->offset, req->bytes);
+> > +            break;
+> > +        default:
+> > +            break;
+> > +        }
+> > +    }
+> >  }
+> 
+> Kevin
