@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fbOBd-0002r1-SF
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:42:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fbOD3-0003ql-M7
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fbOBZ-0006oj-DI
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:42:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48956 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fbOBZ-0006lM-8a
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:41:57 -0400
-Date: Fri, 6 Jul 2018 11:41:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180706104152.GA2661@work-vm>
-References: <1528106113-32692-1-git-send-email-lidongchen@tencent.com>
-	<20180706095318.GB9761@work-vm>
+	(envelope-from <peter.maydell@linaro.org>) id 1fbOD2-0005hK-Kr
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:43:29 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:44642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fbOD2-0005bh-5v
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:43:28 -0400
+Received: by mail-oi0-x243.google.com with SMTP id s198-v6so22593973oih.11
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 03:43:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180706095318.GB9761@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] migration: release MigrationIncomingState
- in migration_object_finalize
+In-Reply-To: <CAFEAcA_bjPEchF6FFa4DHi69rS8-WjpnR4E_2HZgNwqAF8CGYw@mail.gmail.com>
+References: <20180705180403.11928-1-richard.henderson@linaro.org>
+	<CAFEAcA_bjPEchF6FFa4DHi69rS8-WjpnR4E_2HZgNwqAF8CGYw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jul 2018 11:43:06 +0100
+Message-ID: <CAFEAcA8kKVWndN9+_nT81O=gnt3c3X0+Jm4B-Z_87mXBX55q3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] target/arm: Suppress Coverity warning for PRF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
-> > Qemu initialize the MigrationIncomingState structure in migration_object_init,
-> > but not release it. this patch release it in migration_object_finalize.
-> > 
-> > Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> 
-> Queued
+On 5 July 2018 at 19:07, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 5 July 2018 at 19:04, Richard Henderson <richard.henderson@linaro.org> wrote:
+>> These instructions must perform the sve_access_check, but
+>> since they are implemented as NOPs there is no generated
+>> code to elide when the access check fails.
+>>
+>> Fixes: Coverity issues 1393780 & 1393779.
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>
+>> Does anyone know if this actually works for Coverity?
+>> I'd hate to churn the code without knowing.
+>
+> Googling suggests that cast-to-void works. I tend to just mark
+> them as false-positive in the Coverity GUI, though...
 
-I've had to unqueue this, see below:
+In this case, since you've written the patch we may as well
+use it -- it works for human readers too.
 
-> 
-> > ---
-> >  migration/migration.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 05aec2c..e009a05 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -156,6 +156,13 @@ void migration_object_init(void)
-> >  void migration_object_finalize(void)
-> >  {
-> >      object_unref(OBJECT(current_migration));
-> > +
-> > +    qemu_sem_destroy(&current_incoming->postcopy_pause_sem_fault);
-> > +    qemu_sem_destroy(&current_incoming->postcopy_pause_sem_dst);
-> > +    qemu_event_destroy(&current_incoming->main_thread_load_event);
-> > +    qemu_mutex_destroy(&current_incoming->rp_mutex);
-> > +    g_array_free(current_incoming->postcopy_remote_fds, true);
+Applied to target-arm.next, thanks.
 
-That array is already free'd in migration_incoming_state_destroy,
-so I see reliable glib assert's from this array free.
-
-Dave
-
-> > +    g_free(current_incoming);
-> >  }
-> >  
-> >  /* For outgoing */
-> > -- 
-> > 1.8.3.1
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
