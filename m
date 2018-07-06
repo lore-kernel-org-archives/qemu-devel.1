@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbZPb-0002Vg-Bp
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:41:12 -0400
+	(envelope-from <shorne@gmail.com>) id 1fbZkU-0005nY-3K
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 19:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbZPY-0001Us-8R
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:41:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36186)
+	(envelope-from <shorne@gmail.com>) id 1fbZkP-0003WQ-6u
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 19:02:46 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35219)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fbZPY-0001UY-0V
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:41:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fbZPV-0002qn-QQ
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 22:41:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 892312E819B
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 22:41:05 +0000 (UTC)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fbZkO-0003VT-V0
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 19:02:41 -0400
+Received: by mail-pf0-x243.google.com with SMTP id q7-v6so8397986pff.2
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 16:02:39 -0700 (PDT)
+Date: Sat, 7 Jul 2018 08:02:36 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20180706230236.GV24595@lianli.shorne-pla.net>
+References: <20180702151023.24532-1-shorne@gmail.com>
+	<20180702151023.24532-23-shorne@gmail.com>
+	<feef2195-8fd8-f9e1-da85-f3286a9e2b1d@amsat.org>
+	<CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
+	<43d6bc18-440a-31e9-f055-8d0b14cbc74e@linaro.org>
+	<b31d8ace-fb05-0748-ba21-9daf97350af6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jul 2018 22:30:59 -0000
-From: Waldemar Kozaczuk <1776920@bugs.launchpad.net>
-Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
-Message-Id: <153091625926.30275.601765805471577037.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
- corrupt images
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b31d8ace-fb05-0748-ba21-9daf97350af6@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v2 22/25] linux-user: Implement signals for
+ openrisc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-Bingo! Adding '-S 0' makes convert work. But it is not perfect as the
-end result is fully allocated image.
+On Fri, Jul 06, 2018 at 05:22:15PM -0500, Eric Blake wrote:
+> On 07/04/2018 03:54 PM, Richard Henderson wrote:
+> > On 07/03/2018 04:51 PM, Stafford Horne wrote:
+> > > Richard, how do you usually remove these before your pr?  I suppose you have
+> > > some kind of script?
+> > 
+> > No, I just edit the things by hand.
+> 
+> I do it by always using 'git am' to suck in patches from the mailing list,
+> including my own patches, and even if I already have the patch locally.
+> That is, my workflow for PR bypasses my local work tree to ensure I don't
+> leave local artifacts around in the PR.
 
-So with qcow2 like this:
+Hi Eric,
 
-image: mysql-example.qemu
-file format: qcow2
-virtual size: 10G (10737418240 bytes)
-disk size: 50M
-cluster_size: 65536
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
+How do you carry the Change list for each patch brought in with 'git am' i.e.
+v2,v3 when you have updates that need respin?  Do you just update that manually
+on the .patch files after 'git format-patch'?
 
-and do this:
+I found and tried `git notes` recently which seems to be meant for this.
 
-qemu-img convert mysql-example.qemu -S 0 -O vmdk mysql-example.vbox
+>From 'git help notes'
 
-I get 10G vmdk file:
-10738794496 Jul  6 18:27 mysql-example.vbox
+   Notes can also be added to patches prepared with git format-patch by
+   using the --notes option. Such notes are added as a patch commentary
+   after a three dash separator line.
 
--- =
+However, I found the notes get lots pretty easily during rebases and would not
+survive a 'git am'.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776920
+I am sure many have their own methods that work.  So far I have been doing
+manually just updating the .patch files after 'format-patch'.
 
-Title:
-  qemu-img convert on Mac OSX creates corrupt images
-
-Status in QEMU:
-  New
-
-Bug description:
-  An image created by qemu-img create, then modified by another program
-  is converted to bad/corrupt image when using convert sub command on
-  Mac OSX. The same convert works on Linux. The version of qemu-img is
-  2.12.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
+-Stafford
