@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fbULU-0002M8-Eg
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:16:41 -0400
+	(envelope-from <mst@redhat.com>) id 1fbUM5-0002ns-VY
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fbULP-0001h3-Qh
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:16:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58938)
+	(envelope-from <mst@redhat.com>) id 1fbUM0-00029p-MG
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:17:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52138 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fbULP-0001gp-HW
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:16:31 -0400
-Date: Fri, 6 Jul 2018 11:16:26 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180706111626.0a55d77b@t450s.home>
-In-Reply-To: <20180706163614.23993-1-clg@kaod.org>
-References: <20180706163614.23993-1-clg@kaod.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fbUM0-00029e-H9
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:17:08 -0400
+Date: Fri, 6 Jul 2018 20:17:02 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180706201506-mutt-send-email-mst@kernel.org>
+References: <20180705181148.26871-1-clg@kaod.org>
+	<20180705133044.634ede43@t450s.home>
+	<b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
+	<20180706015113.GC23001@xz-mi>
+	<9ae66133-86a6-72d8-cd66-f27592caffe9@redhat.com>
+	<20180706192326-mutt-send-email-mst@kernel.org>
+	<81e79024-b1db-6616-04cd-d2a1f2eb3ef4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <81e79024-b1db-6616-04cd-d2a1f2eb3ef4@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci: do not set the PCIDevice
- 'has_rom' attribute
+Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On Fri,  6 Jul 2018 18:36:14 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Fri, Jul 06, 2018 at 07:06:36PM +0200, Paolo Bonzini wrote:
+> On 06/07/2018 18:25, Michael S. Tsirkin wrote:
+> > On Fri, Jul 06, 2018 at 05:55:23PM +0200, Paolo Bonzini wrote:
+> >> On 06/07/2018 03:51, Peter Xu wrote:
+> >>>
+> >>> A question about memory region auto destruction (which might not
+> >>> related to this patch): I see that we have object_property_add_chil=
+d()
+> >>> in memory_region_do_init() to achieve the auto destruction but only=
+ if
+> >>> the "name" of memory region is specified.  Could we just do that
+> >>> unconditionally (though we might of course need to generate some of
+> >>> the names), or is there a reason not to do so?
+> >>
+> >> I'm not sure actually if there are still regions without a name...
+> >>
+> >> Paolo
+> >=20
+> > Answer to Peter's question would be a yes then?
+> >=20
+> > With all the autodestruct I'm unsure when is calling vmstate_unregist=
+er_ram appropriate.
+> > Is it necessary to invoke that from pci any longer?
+> >=20
+>=20
+> I think vmstate_unregister_ram is not necessary at all.  This patch, or
+> Alex's suggestion, are smaller changes in that direction---more suitabl=
+e
+> as we're closer to the release.
+>=20
+> Paolo
 
-> PCI devices needing a ROM allocate an optional MemoryRegion with
-> pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
-> device is destroyed. The only action taken by this routine is to call
-> vmstate_unregister_ram() which clears the id string of the optional
-> ROM RAMBlock and now, also flags the RAMBlock as non-migratable. This
-> was recently added by commit b895de502717 ("migration: discard
-> non-migratable RAMBlocks"), .
->=20
-> VFIO devices do their own loading of the PCI option ROM in
-> vfio_pci_size_rom(). The memory region is switched to an I/O region
-> and the PCI attribute 'has_rom' is set but the RAMBlock of the ROM
-> region is not allocated. When the associated PCI device is deleted,
-> pci_del_option_rom() calls vmstate_unregister_ram() which tries to
-> flag a NULL RAMBlock, leading to a SEGV.
->=20
-> It seems that 'has_rom' was set to have memory_region_destroy()
-> called, but since commit 469b046ead06 ("memory: remove
-> memory_region_destroy") this is not necessary anymore as the
-> MemoryRegion is freed automagically.
->=20
-> Remove the PCIDevice 'has_rom' attribute setting in vfio.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Oh absolutely. I was just wandering what am I missing.
+C=E9dric would you be interested in posting a patch removing
+vmstate_unregister_ram after release?
+You can do a series starting with this one.
 
-I think the segfault can be attributed to:
-
-fa53a0e53efd ("memory: drop find_ram_block()")
-
-Prior to that vmstate_unregister_ram() called
-memory_region_get_ram_addr() which would have resulted in
-RAM_ADDR_INVALID.  This would have been passed to
-qemu_ram_unset_idstr() which would have used find_ram_block() to lookup
-the RAMBlock, which would be NULL for the invalid address, safely
-avoiding any sort of segfault.
-
-TL;DR, I'll add the above commit with a Fixes: tag for stable and
-downstream releases, looks good otherwise.  Thanks,
-
-Alex
-
-> ---
->=20
->  Tested on a KVM POWER9 pseries machine and a Mellanox MT27710
->  Ethernet controller. Performed a couple of plug/unplug, migrated, and
->  did a couple more unplug/plug before powering off.
->=20
->  The same tests were done with the previous patches which were
->  addressing the issue at a different level :=20
->=20
->    1. [PATCH] exec.c: check RAMBlock validity before changing its flag
->       https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00009.html
->=20
->    2. [PATCH] pci: remove pci_del_option_rom()
->       https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg01651.html
->=20
->  Do we still want to remove pci_del_option_rom() ?
->=20
->  I caught this bug while deleting a passthrough device from a pseries
->  machine. Here is the stack:
->   =20
->    #0  qemu_ram_unset_migratable (rb=3D0x0) at /home/legoater/work/qemu/q=
-emu-xive-3.0.git/exec.c:1994
->    #1  0x000000010072def0 in vmstate_unregister_ram (mr=3D0x101796af0, de=
-v=3D<optimized out>)
->    #2  0x0000000100694e5c in pci_del_option_rom (pdev=3D0x101796330)
->    #3  pci_qdev_unrealize (dev=3D<optimized out>, errp=3D<optimized out>)
->    #4  0x00000001005ff910 in device_set_realized (obj=3D0x101796330, valu=
-e=3D<optimized out>, errp=3D0x0)
->    #5  0x00000001007a487c in property_set_bool (obj=3D0x101796330, v=3D<o=
-ptimized out>, name=3D<optimized out>,=20
->    #6  0x00000001007a7878 in object_property_set (obj=3D0x101796330, v=3D=
-0x7fff70033110,=20
->    #7  0x00000001007aaf1c in object_property_set_qobject (obj=3D0x1017963=
-30, value=3D<optimized out>,=20
->    #8  0x00000001007a7b90 in object_property_set_bool (obj=3D0x101796330,=
- value=3D<optimized out>,=20
->    #9  0x00000001005fcdd8 in device_unparent (obj=3D0x101796330)
->    #10 0x00000001007a6dd0 in object_finalize_child_property (obj=3D<optim=
-ized out>, name=3D<optimized out>,=20
->    #11 0x00000001007a50c0 in object_property_del_child (obj=3D0x10111f800=
-, child=3D0x101796330,=20
->    #12 0x0000000100425cc0 in spapr_phb_remove_pci_device_cb (dev=3D0x1017=
-96330)
->    #13 0x0000000100427974 in spapr_drc_release (drc=3D0x1017e2df0)
->    #14 0x0000000100429098 in spapr_drc_detach (drc=3D0x1017e2df0)
->    #15 0x00000001004294e0 in drc_isolate_physical (drc=3D0x1017e2df0)
->    #16 0x000000010042a50c in rtas_set_isolation_state (state=3D0, idx=3D<=
-optimized out>)
-> =20
->  hw/vfio/pci.c |    1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index a1577dea7fdb..6cbb8fa0549d 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -990,7 +990,6 @@ static void vfio_pci_size_rom(VFIOPCIDevice *vdev)
->      pci_register_bar(&vdev->pdev, PCI_ROM_SLOT,
->                       PCI_BASE_ADDRESS_SPACE_MEMORY, &vdev->pdev.rom);
-> =20
-> -    vdev->pdev.has_rom =3D true;
->      vdev->rom_read_failed =3D false;
->  }
-> =20
+--=20
+MST
