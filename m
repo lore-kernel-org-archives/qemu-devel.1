@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fbGsp-000398-OE
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:54:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fbHVu-0007x5-9I
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 23:34:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fbGsk-0006U9-Tn
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:54:07 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:46985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1fbGsk-0006Tn-Oz
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:54:02 -0400
-Received: by mail-io0-x241.google.com with SMTP id p7-v6so9575956ioh.13
-	for <qemu-devel@nongnu.org>; Thu, 05 Jul 2018 19:54:02 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Thu,  5 Jul 2018 22:53:52 -0400
-Message-Id: <20180706025352.42643-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] ui/cocoa.m: replace scrollingDeltaY with
- deltaY
+	(envelope-from <dgibson@ozlabs.org>) id 1fbHVt-0000RL-5i
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 23:34:30 -0400
+Date: Fri, 6 Jul 2018 13:18:49 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180706031849.GM3450@umbus.fritz.box>
+References: <6E19EBEF-B31C-473C-8279-49A28D571F61@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="8m/hfNLtAhX2NvnO"
+Content-Disposition: inline
+In-Reply-To: <6E19EBEF-B31C-473C-8279-49A28D571F61@gmail.com>
+Subject: Re: [Qemu-devel] VGA cirrus patch prevents video output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +23,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: mail@sebastianbauer.info, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The NSEvent class method scrollingDeltaY is available
-for Mac OS 10.7 and newer. Since QEMU supports Mac OS
-10.5 and up, we need to be using a method that is
-available on these version of Mac OS X. The deltaY
-method is a method that does the same thing as
-scrollingDeltaY and is available on Mac OS 10.5 and
-up. So we simply replace scrollingDeltaY with deltaY.
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
-v2 changes:
-- Added a condition that drops scroll events that have a deltaY value of zero.
+--8m/hfNLtAhX2NvnO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- ui/cocoa.m | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+On Thu, Jul 05, 2018 at 10:41:43PM -0400, Programmingkid wrote:
+> I noticed that the video in QEMU stopped working. When I start qemu-syste=
+m-ppc all I see is a black window. Not even OpenBIOS displays anything. Aft=
+er some bisecting I found out it was this patch that causes the problem:=20
+>=20
+> Commit 29f9cef39eb1ae55e82c6763eb22d7a1bdff7276
+> Author: Sebastian Bauer <mail@sebastianbauer.info>
+> Date:   Mon Jul 2 21:13:45 2018 +0200
+>=20
+>     ppc: Include vga cirrus card into the compiling process
+>    =20
+>     Drivers for this card exists on PPC-based AmigaOS guests so it is use=
+ful to
+>     allow users to emulate the graphics card for PPC machines.
+>    =20
+>     As cirrus vga is currently preferred over std(vga) in absence of any =
+user
+>     choice, this change also sets the default display of spapr machines to
+>     std as otherwise qemu refuses to start these machines. Not specifying=
+ an
+>     explicit graphics mode is for instance done by 'make check'.
+>    =20
+>     Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+>=20
+> I think a solution to this problem might be to have the mac99
+> machine use "-vga std" as default. When I use -vga std, video works
+> again.
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 2991ed4..f371469 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -802,14 +802,15 @@ QemuCocoaView *cocoaView;
-              * This is in-line with standard Mac OS X UI behaviour.
-              */
- 
-+            if ([event deltaY] != 0) {
-             /* Determine if this is a scroll up or scroll down event */
--            buttons = ([event scrollingDeltaY] > 0) ?
--                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
--            qemu_input_queue_btn(dcl->con, buttons, true);
--            qemu_input_event_sync();
--            qemu_input_queue_btn(dcl->con, buttons, false);
--            qemu_input_event_sync();
--
-+                buttons = ([event deltaY] > 0) ?
-+                    INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
-+                qemu_input_queue_btn(dcl->con, buttons, true);
-+                qemu_input_event_sync();
-+                qemu_input_queue_btn(dcl->con, buttons, false);
-+                qemu_input_event_sync();
-+            }
-             /*
-              * Since deltaY also reports scroll wheel events we prevent mouse
-              * movement code from executing.
--- 
-2.7.2
+There are already patches in the works to fix this.
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--8m/hfNLtAhX2NvnO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls+35cACgkQbDjKyiDZ
+s5L9ng//X9Mne0LubJFqpoN1IXOaGYO0TPJNRh4dtpzHlByPaDHVmEBx8GlSG6CF
+bAoAq0b6zgcg+7PubXY96kp1mrlMeyH29caWcq0I0XtaY43ptp1HAlTokA70oWlF
+VQo8mxQh14W9Mc6Izn8EDoV5S1mOk/XGrc2aokbuuQhNJRS+rtd5i0+U+j/BNvyx
+13m9AVVDSXwUkQ//5tPXs/WMYrFaGALl5SxFMI8/fjLpACHFYizWqcmO7VCtMWfy
+hjL3At9LMzKIGZVggusmJ4huBQRrSXrIS89GXk9Ki9GhfVwNO7bPIUQWQNBkD43y
+eNKGEoL9HZAGOUzpImSEoSPeCxA2MTdRMVpdSKDig5KnovHzHgK7E7GYBCDoRoc3
+/P+0DCMBBQhhFRXZWhacOQYP64rYkJihp793gK2ky5DjJSXNFtAkgDKhVBxoSiY7
+3syIPnFFjJEAp8tgzgWs5Lmpb+dwrdPGEXai/zuYajrzsp0Il5zmeHguNVCcSwL0
+qIDnQ8A14vKEr7n1qwEatsPG+ddkBgRv5DXiVUifoVV98fs6ji89eu7v31OWqzZa
+5NzJUwxyhxYtFsSA38Aaz1c9ifLoR5vl7z12Vt17qPqo3fCQdF9QUXZ5ioKGjuP9
+6ZSTKZNy2x44blYLPKyLk2fg40U1nYmXxXtGqr2/omVd7YkRiYk=
+=54VP
+-----END PGP SIGNATURE-----
+
+--8m/hfNLtAhX2NvnO--
