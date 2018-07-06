@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbYZ1-0004dn-2B
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:46:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fbYef-0006bh-1X
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbYZ0-0007ao-4O
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:46:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1fbYee-0003y5-51
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:52:41 -0400
 References: <20180705074638.770905-1-vsementsov@virtuozzo.com>
-	<20180705074638.770905-2-vsementsov@virtuozzo.com>
-	<2da7c234-6157-18d5-139b-2d4d5480c6b9@redhat.com>
+	<20180705074638.770905-4-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <7707136c-2b10-9882-6cf1-69aff3226bcd@redhat.com>
-Date: Fri, 6 Jul 2018 16:46:38 -0500
+Message-ID: <435d60d6-bf7e-1ec0-7d2e-89d267359f15@redhat.com>
+Date: Fri, 6 Jul 2018 16:52:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <2da7c234-6157-18d5-139b-2d4d5480c6b9@redhat.com>
+In-Reply-To: <20180705074638.770905-4-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] block: disallow
- BDRV_REQ_NO_SERIALISING for write
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] block: add BDRV_REQ_SERIALISING flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +25,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, stefanha@redhat.com, jcody@redhat.com, pl@kamp.de, mreitz@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: kwolf@redhat.com, famz@redhat.com, ronniesahlberg@gmail.com, jcody@redhat.com, pl@kamp.de, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-On 07/06/2018 04:32 PM, Eric Blake wrote:
-> On 07/05/2018 02:46 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Before commit 9ded4a01149 "backup: Use copy offloading",
->> BDRV_REQ_NO_SERIALISING was used for only one case: read in
->> copy-on-write operation during backup. Also, the flag was handled only
->> on read path (in bdrv_co_preadv and bdrv_aligned_preadv).
->>
->> After 9ded4a01149, flag is used for not waiting serializing operations
->> on backup target (in same case of copy-on-write operation). This
->> behavior change is unsubstantiated and potentially dangerous, let's
->> drop it.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> =C2=A0 include/block/block.h | 13 +++++++++++++
->> =C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 7 ++++++-
->> =C2=A0 2 files changed, 19 insertions(+), 1 deletion(-)
->>
->=20
-> Commenting only on the grammar:
->=20
->> diff --git a/include/block/block.h b/include/block/block.h
->> index e5c7759a0c..a06a4d27de 100644
->> --- a/include/block/block.h
->> +++ b/include/block/block.h
->> @@ -50,6 +50,19 @@ typedef enum {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * opened with BDRV_O_UNMAP.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_MAY_UNMAP=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x4,
->> +
->> +=C2=A0=C2=A0=C2=A0 /* The BDRV_REQ_NO_SERIALISING means that we don't=
- want to
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * wait_serialising_requests(), when reading.
->=20
-> Either:
->=20
-> /* BDRV_REQ_NO_SERALISING means that...
->=20
-> or
->=20
-> /* The BDRV_REQ_NO_SERIALISING flag means that...
->=20
-> s/want to/want/
+On 07/05/2018 02:46 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Serialized writes should be used in copy-on-write of backup(sync=none)
+> for image fleecing scheme.
+> 
+> We need to change an assert in bdrv_aligned_pwritev, added in
+> 28de2dcd88de. The assert may fail now, because call to
+> wait_serialising_requests here may become first call to it for this
+> request with serializing flag set. It occurs if the request is aligned
+> (otherwise, we should already set serializing flag before calling
+> bdrv_aligned_pwritev and correspondingly waited for all intersecting
+> requests). However, for aligned requests, we should not care about
+> outdating of previously read data, as there no such data. Therefore,
+> let's just update an assert to not care about aligned requests.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   include/block/block.h | 15 ++++++++++++++-
+>   block/io.c            | 26 +++++++++++++++++++++++++-
+>   2 files changed, 39 insertions(+), 2 deletions(-)
+> 
 
-Or, after reading patch 3/4,
+Again just grammar suggestions:
 
-BDRV_REQ_NO_SERAILISING bypasses request serialisation during reads.
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 478ebc6c6c..fded1b7657 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -71,8 +71,21 @@ typedef enum {
+>        * content. */
+>       BDRV_REQ_WRITE_UNCHANGED    = 0x40,
+>   
+> +    /* BDRV_REQ_SERIALISING forces request serializing. Only for writes. 
 
-(where the counterpart starts:
+After comparison with patch 1/4, I'd suggest:
 
-BDRV_REQ_SERIALISING forces request serialisation during writes.
-)
+BDRV_REQ_SERIALISING forces request serialisation for writes.
 
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0 *
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * This flag is used for backup copy on write=
- operation, when we=20
->> need to
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * read old data before write (write notifier=
- triggered). It is=20
->> ok, due to
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * we already waited for serializing requests=
- in initiative write=20
->> (see
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * bdrv_aligned_pwritev), and it is necessary=
- for the case when=20
->> initiative
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * write is serializing itself (we'll dead lo=
-ck waiting it).
->=20
-> It is okay since we already waited for other serializing requests in th=
-e=20
-> initiating write (see bdrv_aligned_pwritev), and it is necessary since=20
-> the initiating write is already serializing (without the flag, the read=
-=20
-> would deadlock waiting for the write to complete).
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0 *
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * The described case is the only usage for t=
-he flag for now, so,=20
->> it is
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * supported only for read operation and rest=
-ricted for write.
->=20
-> This last sentence is rather wordy; I'm fine with just:
->=20
-> The flag is only valid during read operations.
+>  Used
+> +     * to serialize writes to target in backup process, when source is in
+> +     * backing chain of target (image fleecing scheme is example) to avoid a
+> +     * possibility for a client, reading from target during backup to read
+> +     * updated data from source in case of unhappy race of client-read and
+> +     * backup-cow-write.
 
-Or even just drop this last paragraph, since the first sentence of the=20
-comment already stated it was only for reads.
+It is used to ensure that writes to the backing file of a backup process 
+target cannot race with a read of the backup target that defers to the 
+backing file.
 
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_NO_SERIALISING=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D 0x8,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_FUA=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x10,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_WRITE_COMPRESSED=C2=A0=C2=A0 =3D=
- 0x20,
->=20
-> We're inconsistent on which flags we document; it might be nice to have=
-=20
-> a comment for each of them.=C2=A0 But not necessarily this patch's prob=
-lem.
->=20
 
---=20
+> +     *
+> +     * Note, that BDRV_REQ_SERIALISING is _not_ opposite in meaning to
+> +     * BDRV_REQ_NO_SERIALISING. May be, better name for the latter is
+> +     * _DO_NOT_WAIT_FOR_SERIALISING, but it is too long.
+
+The longer rationale on naming might fit better in the commit comment; 
+I'd probably drop this paragraph from the code, But if you keep it, the 
+second sentence reads better as:
+
+A more descriptive name for the latter might be 
+_DO_NOT_WAIT_FOR_SERIALISING, except that is too long.
+
+-- 
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
