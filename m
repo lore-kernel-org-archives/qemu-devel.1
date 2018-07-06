@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbQaV-0003B2-5k
+	(envelope-from <bounces@canonical.com>) id 1fbQaV-0003B3-5k
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fbQaS-0003BI-1M
+	(envelope-from <bounces@canonical.com>) id 1fbQaS-0003BR-2o
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:15:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38338)
+Received: from indium.canonical.com ([91.189.90.7]:38352)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fbQaR-0003Ak-RP
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:15:47 -0400
+	id 1fbQaR-0003As-TM
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:15:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fbQaQ-0003Jy-9O
+	id 1fbQaQ-0003K9-Lv
 	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 13:15:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 45F1C2E819D
+	by loganberry.canonical.com (Postfix) with ESMTP id 9FA632E819C
 	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 13:15:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jul 2018 13:04:33 -0000
+Date: Fri, 06 Jul 2018 13:08:12 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
-Message-Id: <153088227346.17935.14094674972674838552.malone@chaenomeles.canonical.com>
+Message-Id: <153088249214.13000.10590988662490939474.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
 List-Id: <qemu-devel.nongnu.org>
@@ -38,8 +38,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-...ah, that's the bug fixed by this patch:
-https://patchwork.ozlabs.org/patch/940058/
+The stalls in the test kernel seem to happen at and after the guest
+prints
+
+tsc: Refined TSC clocksource calibration: 1000.022 MHz
+clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0xe6a2bd9634, max_id=
+le_ns: 440795211s
+hdc: QEMU DVD-ROM, ATAPI CD/DVD-ROM drive
+clocksource: Switched to clocksource tsc
+
+so I suspect a bad interaction between what icount is doing and in
+particular our emulation of the x86 timestamp counter and what Linux
+does with it.
 
 -- =
 
