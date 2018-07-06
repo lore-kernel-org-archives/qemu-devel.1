@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fbQfj-00074c-69
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:21:16 -0400
+	(envelope-from <clg@kaod.org>) id 1fbQlo-0000Wo-T1
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fbQfi-0006Q8-8f
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:21:15 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:32799)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1fbQfi-0006Pq-41
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:21:14 -0400
-Received: by mail-yw0-x242.google.com with SMTP id c135-v6so4166196ywa.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 06:21:13 -0700 (PDT)
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <clg@kaod.org>) id 1fbQlj-0000et-Vu
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:27:32 -0400
+Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:52898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fbQlj-0000eT-Ov
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:27:27 -0400
+Received: from player739.ha.ovh.net (unknown [10.109.105.97])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 05A2510B5F9
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 15:27:25 +0200 (CEST)
+References: <20180706090713.15712-1-clg@kaod.org>
+	<20180706090713.15712-2-clg@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <28391e09-2e15-6050-e452-0493172a73a4@kaod.org>
+Date: Fri, 6 Jul 2018 15:27:17 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180705161629.13734-1-marcandre.lureau@redhat.com>
-References: <20180705161629.13734-1-marcandre.lureau@redhat.com>
-Message-ID: <153088326737.8870.11485147711961793106@sif>
-Date: Fri, 06 Jul 2018 08:21:07 -0500
-Subject: Re: [Qemu-devel] [PATCH] qga: fix 'driver' leak in guest-get-fsinfo
+In-Reply-To: <20180706090713.15712-2-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: lersek@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-Quoting Marc-Andr=C3=A9 Lureau (2018-07-05 11:16:29)
-> 'driver' is leaked when the loop is not broken.
-> =
+  > +/*
+> + * The register property of a VIO device is defined in livirt using a
+> + * base number + 0x1000 increment and in QEMU by incrementing the base
+> + * register number 0x71000000.
+> + *
+> + * The formula below tries to compute a unique index number from the
+> + * register value that will be used to define the IRQ number of the
+> + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
+> + *
+> + * To minimize collisions, we define two distinct ranges depending on
+> + * the "reg" value definition:
+> + *
+> + *     [0x00 - 0x7f]    user/libvirt
+> + *     [0x80 - 0xff]    QEMU VIO model
+> + *
+> + * Collisions will be detected when the IRQ is claimed.
+> + */
+> +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
+> +{
+> +    if (reg >= SPAPR_VIO_REG_BASE) {
+> +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
+> +    } else {
+> +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f));
 
-> Leak introduced by commit 743c71d03c20d64f2bae5fba6f26cdf5e4b1bda6,
-> spotted by ASAN.
-> =
+This is not good enough for the VIO devices with a user defined "reg".
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+I propose to extract bits [29-28] and [16-12] to compose a 7bit index :
 
-Thanks, applied to qga tree:
-  https://github.com/mdroth/qemu/commits/qga
+	(((reg >> 28) & 0x3) << 5) | ((reg >> 12) & 0x1f)
 
-> ---
->  qga/commands-posix.c | 1 +
->  1 file changed, 1 insertion(+)
-> =
+That would give us a mapping :
 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 233f78a406..c46767b0dd 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -890,6 +890,7 @@ static void build_guest_fsinfo_for_real_device(char c=
-onst *syspath,
->              break;
->          }
-> =
+	0x00000000  -> 0
+	0x00001000  -> 1
+		...
+	0x0001F000  -> 31
+	0x10000000  -> 32
+	0x10001000  -> 33
+		...
+	0x1001F000  -> 63
+	0x20000000  -> 64
+	0x20001000  -> 65
+		...
+	0x2001F000  -> 95
+	0x30000000  -> 96
+	0x30001000  -> 97
+		...
+	0x3001F000  -> 127
 
-> +        g_free(driver);
->          if (sscanf(p, "/%x:%x:%x.%x%n",
->                            pci, pci + 1, pci + 2, pci + 3, &pcilen) =3D=
-=3D 4) {
->              p +=3D pcilen;
-> -- =
-
-> 2.18.0.rc1
->=20
+C.
