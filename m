@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbY9T-0006a6-Mk
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:20:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1fbYLo-00015O-Ep
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbY9S-00030E-Mq
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:20:27 -0400
-References: <20180706164542.9476-1-kwolf@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fbYLn-0005CV-CR
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:33:12 -0400
+References: <20180705074638.770905-1-vsementsov@virtuozzo.com>
+	<20180705074638.770905-2-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <be1b9d41-1eb3-c24c-c459-cc6d6599de22@redhat.com>
-Date: Fri, 6 Jul 2018 16:20:17 -0500
+Message-ID: <2da7c234-6157-18d5-139b-2d4d5480c6b9@redhat.com>
+Date: Fri, 6 Jul 2018 16:32:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180706164542.9476-1-kwolf@redhat.com>
+In-Reply-To: <20180705074638.770905-2-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: Fix copy-on-read crash with partial
- final cluster
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] block: disallow
+ BDRV_REQ_NO_SERIALISING for write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, ronniesahlberg@gmail.com, jcody@redhat.com, pl@kamp.de, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-On 07/06/2018 11:45 AM, Kevin Wolf wrote:
-> If the virtual disk size isn't aligned to full clusters,
-> bdrv_co_do_copy_on_readv() may get pnum == 0 before having the full
-> cluster completed, which will let it run into an assertion failure:
+On 07/05/2018 02:46 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Before commit 9ded4a01149 "backup: Use copy offloading",
+> BDRV_REQ_NO_SERIALISING was used for only one case: read in
+> copy-on-write operation during backup. Also, the flag was handled only
+> on read path (in bdrv_co_preadv and bdrv_aligned_preadv).
 > 
-> qemu-io: block/io.c:1203: bdrv_co_do_copy_on_readv: Assertion `skip_bytes < pnum' failed.
+> After 9ded4a01149, flag is used for not waiting serializing operations
+> on backup target (in same case of copy-on-write operation). This
+> behavior change is unsubstantiated and potentially dangerous, let's
+> drop it.
 > 
-> Check for EOF, assert that we read at least as much as the read request
-> originally wanted to have (which is true at EOF because otherwise
-> bdrv_check_byte_request() would already have returned an error) and
-> return success early even though we couldn't copy the full cluster.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->   block/io.c                 | 6 ++++++
->   tests/qemu-iotests/197     | 9 +++++++++
->   tests/qemu-iotests/197.out | 8 ++++++++
->   3 files changed, 23 insertions(+)
+>   include/block/block.h | 13 +++++++++++++
+>   block/io.c            |  7 ++++++-
+>   2 files changed, 19 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block/io.c b/block/io.c
-> index 038449f81f..4c0831149c 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1200,6 +1200,12 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
->               pnum = MIN(cluster_bytes, max_transfer);
->           }
->   
-> +        /* Stop at EOF if the image ends in the middle of the cluster */
-> +        if (ret == 0 && pnum == 0) {
 
-Is it any smarter to check for 'ret & BDRV_BLOCK_EOF' instead of pnum == 0?
+Commenting only on the grammar:
 
-But as far as I can tell, right now those two conditions are synonymous.
-
->   
-> +echo
-> +echo '=== Partial final cluster ==='
-> +echo
+> diff --git a/include/block/block.h b/include/block/block.h
+> index e5c7759a0c..a06a4d27de 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -50,6 +50,19 @@ typedef enum {
+>        * opened with BDRV_O_UNMAP.
+>        */
+>       BDRV_REQ_MAY_UNMAP          = 0x4,
 > +
-> +_make_test_img 1024
-> +$QEMU_IO -f $IMGFMT -C -c 'read 0 1024' "$TEST_IMG" | _filter_qemu_io
+> +    /* The BDRV_REQ_NO_SERIALISING means that we don't want to
+> +     * wait_serialising_requests(), when reading.
 
-Here, $TEST_IMG has no backing file, and does not have the final cluster 
-allocated; all we have to do is properly read all zeroes.  Is it worth 
-also explicitly testing reading of allocated data under COR, and/or the 
-case of one image with another backing image (with same or differing 
-partial cluster sizes), where COR actually has to write the partial 
-cluster?  However, the logic in the code appears to cover all of those, 
-whether or not the testsuite does as well.
+Either:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+/* BDRV_REQ_NO_SERALISING means that...
+
+or
+
+/* The BDRV_REQ_NO_SERIALISING flag means that...
+
+s/want to/want/
+
+> +     *
+> +     * This flag is used for backup copy on write operation, when we need to
+> +     * read old data before write (write notifier triggered). It is ok, due to
+> +     * we already waited for serializing requests in initiative write (see
+> +     * bdrv_aligned_pwritev), and it is necessary for the case when initiative
+> +     * write is serializing itself (we'll dead lock waiting it).
+
+It is okay since we already waited for other serializing requests in the 
+initiating write (see bdrv_aligned_pwritev), and it is necessary since 
+the initiating write is already serializing (without the flag, the read 
+would deadlock waiting for the write to complete).
+
+> +     *
+> +     * The described case is the only usage for the flag for now, so, it is
+> +     * supported only for read operation and restricted for write.
+
+This last sentence is rather wordy; I'm fine with just:
+
+The flag is only valid during read operations.
+
+> +     */
+>       BDRV_REQ_NO_SERIALISING     = 0x8,
+>       BDRV_REQ_FUA                = 0x10,
+>       BDRV_REQ_WRITE_COMPRESSED   = 0x20,
+
+We're inconsistent on which flags we document; it might be nice to have 
+a comment for each of them.  But not necessarily this patch's problem.
 
 -- 
 Eric Blake, Principal Software Engineer
