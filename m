@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fbZ65-0006OD-EP
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:21:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1fbZ7M-00074u-V0
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fbZ62-0005F5-9O
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:21:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51348)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fbZ61-0005Bp-Vv
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:20:58 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w66MJR8V108719
-	for <qemu-devel@nongnu.org>; Fri, 6 Jul 2018 18:20:56 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k2f483ku1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 18:20:56 -0400
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 6 Jul 2018 23:20:54 +0100
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<1530811543-6881-16-git-send-email-jjherne@linux.ibm.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Sat, 7 Jul 2018 00:20:47 +0200
+	(envelope-from <eblake@redhat.com>) id 1fbZ7J-0006m8-QQ
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:22:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34996 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fbZ7J-0006lQ-Ls
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 18:22:17 -0400
+References: <20180702151023.24532-1-shorne@gmail.com>
+	<20180702151023.24532-23-shorne@gmail.com>
+	<feef2195-8fd8-f9e1-da85-f3286a9e2b1d@amsat.org>
+	<CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
+	<43d6bc18-440a-31e9-f055-8d0b14cbc74e@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b31d8ace-fb05-0748-ba21-9daf97350af6@redhat.com>
+Date: Fri, 6 Jul 2018 17:22:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <1530811543-6881-16-git-send-email-jjherne@linux.ibm.com>
+In-Reply-To: <43d6bc18-440a-31e9-f055-8d0b14cbc74e@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <68af3ea7-9d3b-d0b4-0738-dda4f62588db@linux.ibm.com>
-Subject: Re: [Qemu-devel] [RFC 15/15] s390-bios: Use sense ccw to ensure
- consistent device state at boot time
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 22/25] linux-user: Implement signals for
+ openrisc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,39 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: Richard Henderson <richard.henderson@linaro.org>, Stafford Horne <shorne@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
+On 07/04/2018 03:54 PM, Richard Henderson wrote:
+> On 07/03/2018 04:51 PM, Stafford Horne wrote:
+>> Richard, how do you usually remove these before your pr?=C2=A0 I suppo=
+se you have
+>> some kind of script?
+>=20
+> No, I just edit the things by hand.
 
+I do it by always using 'git am' to suck in patches from the mailing=20
+list, including my own patches, and even if I already have the patch=20
+locally.  That is, my workflow for PR bypasses my local work tree to=20
+ensure I don't leave local artifacts around in the PR.
 
-On 07/05/2018 07:25 PM, Jason J. Herne wrote:
-> If a vfio-ccw device is left in an error state (example: pending unit
-> check) then it is possible for that state to persist for a vfio-ccw device even
-> after the enable subchannel that we do to bring the device online. If this state
-> is allowed to persist then even simple I/O operations will needlessly fail. A
-> basic sense ccw is used to clear this error state for the boot device.
-> 
-> Signed-off-by: Jason J. Herne<jjherne@linux.ibm.com>
-
-I don't like this. AFAIK an IPL is preceded by and subsystem reset. If
-it weren't the IPL-ed OS (program) would have to take care any potential
-mess left by the previous one -- and pray it gets control. A subsystem
-reset should clear any device error state, so it is not supposed to
-persist across subsystem resets. If the error re-emerges (unsolicited)
-after the reset, it's likely something is really broken and needs investigation.
-Generally IPL is supposed to fail in such cases (except for corner cases
-which are not really handled by this patch).
-
-AFAIU this patch works around a broken reset. While our bios is not guest and
-one could try to argue that it's firmware -- part of 'the machine', a believe
-handling the reset in the bios is wrong. AFAIR the qemu emulator is in charge,
-and if needed makes kvm do what it has to.
-
-If the reset is broken for vfio-ccw (which is very possible, but I would have
-to check), I think we should fix it in the right place. A workaround may be
-still justified (if kernel changes  like clear support are needed). But we
-should indicate that clearly in the commit message and in the code.
-
-Regards,
-Halil
-
-  
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
