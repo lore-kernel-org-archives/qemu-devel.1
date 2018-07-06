@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fbKcn-0000bu-Ea
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:53:50 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fbKnT-0002WO-GS
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fbKck-00049C-DW
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 02:53:49 -0400
-Date: Fri, 6 Jul 2018 08:53:42 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180706065342.pggd2qgd4nyv35ys@sirius.home.kraxel.org>
-References: <20180705064348.3162-1-kraxel@redhat.com>
-	<20180705064348.3162-3-kraxel@redhat.com>
-	<20180705163501.GN7451@localhost.localdomain>
+	(envelope-from <borntraeger@de.ibm.com>) id 1fbKnQ-0003EU-7N
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:04:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fbKnP-0003BP-V5
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 03:04:48 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6674UeG122517
+	for <qemu-devel@nongnu.org>; Fri, 6 Jul 2018 03:04:46 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k21h3ccfd-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 03:04:46 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 6 Jul 2018 08:04:44 +0100
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 6 Jul 2018 09:04:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180705163501.GN7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vga: don't pick cirrus by default
+In-Reply-To: <1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
+Content-Language: en-US
+Message-Id: <398b3770-75a4-8880-4cb9-a75770fb974b@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC 10/15] s390-bios: Support for running
+ format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +43,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Sebastian Bauer <mail@sebastianbauer.info>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com
 
-On Thu, Jul 05, 2018 at 01:35:01PM -0300, Eduardo Habkost wrote:
-> Do we have a list of all machine-types with default_display==NULL
-> that would be affected by this?
 
-There are not many which use the default vga thing in the first place.
-Workflow is this:
 
- (1) vl.c calls select_vgahw(vga_model) after setting vga_model.
- (2) select_hw() sets vga_interface_type.
- (3) isa_vga_init() and pci_vga_init() look at vga_interface_type.
+On 07/05/2018 07:25 PM, Jason J. Herne wrote:
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+> 
+> Add struct for format-0 ccws. Support executing format-0 channel
+> programs and waiting for their completion before continuing execution.
+> This will be used for real dasd ipl.
+> 
+> Add cu_type() to channel io library. This will be used to query control
+> unit type which is used to determine if we are booting a virtio device or a
+> real dasd device.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/cio.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/cio.h |  25 +++++++++-
+>  2 files changed, 151 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> index 095f79b..f440380 100644
+> --- a/pc-bios/s390-ccw/cio.c
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -10,6 +10,7 @@
+>  
+>  #include "libc.h"
+>  #include "s390-ccw.h"
+> +#include "s390-arch.h"
+>  #include "cio.h"
+>  
+>  static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+> @@ -39,3 +40,129 @@ void enable_subchannel(SubChannelId schid)
+>      schib.pmcw.ena = 1;
+>      msch(schid, &schib);
+>  }
+> +
+> +__u16 cu_type(SubChannelId schid)
+> +{
+> +    Ccw1 senseIdCcw;
+> +    SenseId senseData;
+> +
+> +    senseIdCcw.cmd_code = CCW_CMD_SENSE_ID;
+> +    senseIdCcw.cda = ptr2u32(&senseData);
+> +    senseIdCcw.count = sizeof(senseData);
+> +
+> +    if (do_cio(schid, ptr2u32(&senseIdCcw), CCW_FMT1)) {
+> +        panic("Failed to run SenseID CCw\n");
+> +    }
+> +
+> +    return senseData.cu_type;
+> +}
+> +
+> +static bool irb_error(Irb *irb)
+> +{
+> +    /* We have to ignore Incorrect Length (cstat == 0x40) indicators because
+> +     * real devices expect a 24 byte SenseID  buffer, and virtio devices expect
+> +     * a much larger buffer. Neither device type can tolerate a buffer size
+> +     * different from what they expect so they set this indicator.
+> +     */
+> +    if (irb->scsw.cstat != 0x00 && irb->scsw.cstat != 0x40) {
+> +        return true;
+> +    }
+> +    return irb->scsw.dstat != 0xc;
+> +}
+> +
+> +/* Executes a channel program at a given subchannel. The request to run the
+> + * channel program is sent to the subchannel, we then wait for the interrupt
+> + * singaling completion of the I/O operation(s) perfomed by the channel
+> + * program. Lastly we verify that the i/o operation completed without error and
+> + * that the interrupt we received was for the subchannel used to run the
+> + * channel program.
+> + *
+> + * Note: This function assumes it is running in an environment where no other
+> + * cpus are generating or receiving I/O interrupts. So either run it in a
+> + * single-cpu environment or make sure all other cpus are not doing I/O and
+> + * have I/O interrupts masked off.
+> + */
+> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
+> +{
+> +    Ccw0 *this_ccw, *prev_ccw;
+> +    CmdOrb orb = {};
+> +    Irb irb = {};
+> +    int rc;
+> +
+> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
+> +
+> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
+> +    if (fmt == 0) {
+> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
+> +    }
+> +
+> +    orb.fmt = fmt ;
+> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
+> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
+> +    orb.lpm = 0xFF; /* All paths allowed */
+> +    orb.cpa = ccw_addr;
+> +
+> +    rc = ssch(schid, &orb);
+> +    if (rc) {
+> +        print_int("ssch failed with rc=", rc);
+> +        return rc;
+> +    }
+> +
+> +    await_io_int(schid.sch_no);
+> +
+> +    /* Clear read */
+> +    rc = tsch(schid, &irb);
+> +    if (rc) {
+> +        print_int("tsch failed with rc=", rc);
+> +        return rc;
+> +    }
+> +
+> +    if (irb_error(&irb)) {
+> +        this_ccw = u32toptr(irb.scsw.cpa);
+> +        prev_ccw = u32toptr(irb.scsw.cpa - 8);
+> +
+> +        print_int("irb_error: cstat=", irb.scsw.cstat);
+> +        print_int("           dstat=", irb.scsw.dstat);
+> +        print_int("           cpa=", irb.scsw.cpa);
+> +        print_int("           prev_ccw=", *((uint64_t *)prev_ccw));
+> +        print_int("           this_ccw=", *((uint64_t *)this_ccw));
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +void await_io_int(uint16_t sch_no)
+> +{
+> +    /*
+> +     * wait_psw and ctl6 must be static to avoid stack allocation as gcc cannot
+> +     * align stack variables. The stctg, lctlg and lpswe instructions require
+> +     * that their operands be aligned on an 8-byte boundary.
+> +    */
+> +    static uint64_t ctl6 __attribute__((__aligned__(8)));
+> +    static PSW wait_psw;
+> +
+> +    /* PSW to load when I/O interrupt happens */
+> +    lowcore->io_new_psw.mask = PSW_MASK_ZMODE;
+> +    lowcore->io_new_psw.addr = (uint64_t)&&IOIntWakeup; /* Wake-up address */
+> +
+> +    /* Enable io interrupts subclass mask */
+> +    asm volatile("stctg 6,6,%0" : "=S" (ctl6) : : "memory");
 
-Checking where either vga_interface_type or *_vga_init() is used doesn't
-yield many places:
-
-# find -name "*.[ch]" | xargs egrep '((isa|pci)_vga_init|vga_interface_type)'
-./hw/alpha/dp264.c:    pci_vga_init(pci_bus);
-./hw/i386/pc.c:        PCIDevice *pcidev = pci_vga_init(pci_bus);
-./hw/i386/pc.c:        ISADevice *isadev = isa_vga_init(isa_bus);
-./hw/isa/isa-bus.c:ISADevice *isa_vga_init(ISABus *bus)
-./hw/isa/isa-bus.c:    switch (vga_interface_type) {
-./hw/mips/mips_malta.c:    pci_vga_init(pci_bus);
-./hw/mips/mips_r4k.c:    isa_vga_init(isa_bus);
-./hw/pci/pci.c:PCIDevice *pci_vga_init(PCIBus *bus)
-./hw/pci/pci.c:    switch (vga_interface_type) {
-./hw/ppc/mac_newworld.c:    pci_vga_init(pci_bus);
-./hw/ppc/mac_oldworld.c:    pci_vga_init(pci_bus);
-./hw/ppc/spapr.c:    switch (vga_interface_type) {
-./hw/ppc/spapr.c:        return pci_vga_init(pci_bus) != NULL;
-./hw/ppc/prep.c:    pci_vga_init(pci_bus);
-./hw/ppc/prep.c:        pci_vga_init(pci_bus);
-./hw/sparc/sun4m.c:        if (vga_interface_type == VGA_CG3) {
-./include/hw/isa/isa.h:ISADevice *isa_vga_init(ISABus *bus);
-./include/hw/pci/pci.h:PCIDevice *pci_vga_init(PCIBus *bus);
-./include/sysemu/sysemu.h:extern int vga_interface_type;
-./include/sysemu/sysemu.h:#define xenfb_enabled (vga_interface_type == VGA_XENFB)
-./vl.c:int vga_interface_type = VGA_NONE;
-./vl.c:    assert(vga_interface_type == VGA_NONE);
-./vl.c:            vga_interface_type = t;
-./vl.c:        vga_interface_type = VGA_DEVICE;
-
-So it is alpha, mips, i386, ppc.
-
-Also some hits vl.c, headers and isa/pci code.
-Xen and sparc check for something which is never picked as default,
-so no worries here.
-
-cheers,
-  Gerd
+For some reason the sles12 gcc does not like this. Can you use the "Q" constraint 
+everywhere instead of "S".
