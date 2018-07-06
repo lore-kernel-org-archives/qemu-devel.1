@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbPjG-0003TR-8v
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:20:51 -0400
+	(envelope-from <ari@tuxera.com>) id 1fbPjr-000445-4G
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbPjD-0008Vq-8B
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:20:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39270 helo=mx1.redhat.com)
+	(envelope-from <ari@tuxera.com>) id 1fbPjo-0000Oo-0f
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:21:27 -0400
+Received: from mx2.mpynet.fi ([82.197.21.85]:39104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fbPjC-0008Ux-RS
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:20:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1058E9009
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 12:14:04 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  6 Jul 2018 14:13:45 +0200
-Message-Id: <20180706121354.2021-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20180706121354.2021-1-marcandre.lureau@redhat.com>
-References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <ari@tuxera.com>) id 1fbPjn-0000OV-Q0
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:21:23 -0400
+From: Ari Sundholm <ari@tuxera.com>
+Date: Fri, 6 Jul 2018 15:21:18 +0300
+Message-ID: <1530879678-20487-1-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/12] qmp: constify qmp_is_oob()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] qapi/block-core.json: Add missing
+ documentation for blklogwrites log-append option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +25,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Ari Sundholm <ari@tuxera.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This was accidentally omitted. Thanks to Eric Blake for spotting this.
+
+Signed-off-by: Ari Sundholm <ari@tuxera.com>
 ---
- include/qapi/qmp/dispatch.h | 2 +-
- qapi/qmp-dispatch.c         | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ qapi/block-core.json | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 4e2e749faf..68a528a9aa 100644
---- a/include/qapi/qmp/dispatch.h
-+++ b/include/qapi/qmp/dispatch.h
-@@ -50,7 +50,7 @@ bool qmp_has_success_response(const QmpCommand *cmd);
- QDict *qmp_error_response(Error *err);
- QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
-                     bool allow_oob);
--bool qmp_is_oob(QDict *dict);
-+bool qmp_is_oob(const QDict *dict);
-=20
- typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
-=20
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 6f2d466596..90ba5e3074 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -156,7 +156,7 @@ QDict *qmp_error_response(Error *err)
- /*
-  * Does @qdict look like a command to be run out-of-band?
-  */
--bool qmp_is_oob(QDict *dict)
-+bool qmp_is_oob(const QDict *dict)
- {
-     return qdict_haskey(dict, "exec-oob")
-         && !qdict_haskey(dict, "execute");
---=20
-2.18.0.rc1
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 38b3125..62a92fa 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3057,6 +3057,8 @@
+ # @log-sector-size: sector size used in logging writes to @file, determines
+ #                   granularity of offsets and sizes of writes (default: 512)
+ #
++# @log-append:      append to an existing log (default: false)
++#
+ # @log-super-update-interval: interval of write requests after which the log
+ #                             super block is updated to disk (default: 4096)
+ #
+-- 
+2.7.4
