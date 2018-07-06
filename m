@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK4-0001D6-7n
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK4-0001D4-66
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK2-0000lo-Lb
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUJz-0000kr-UN
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:08 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35354)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44932)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fbUK2-0000lZ-DK
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:06 -0400
-Received: by mail-wm0-x244.google.com with SMTP id v3-v6so11526944wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:06 -0700 (PDT)
+	id 1fbUJz-0000kN-G3
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:03 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r16-v6so4873020wrt.11
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:03 -0700 (PDT)
+Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
+	h40-v6sm13784683wrf.40.2018.07.06.10.15.01
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 06 Jul 2018 10:15:01 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Jul 2018 19:14:24 +0200
-Message-Id: <1530897268-22932-5-git-send-email-pbonzini@redhat.com>
+Date: Fri,  6 Jul 2018 19:14:21 +0200
+Message-Id: <1530897268-22932-2-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
 References: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 4/8] i386: fix '-cpu ?' output for host cpu type
+Subject: [Qemu-devel] [PULL 1/8] pr-helper: avoid error on PR IN command
+ with zero request size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +34,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
 
-From: Greg Kurz <groug@kaod.org>
+After reading a PR IN command with zero request size in prh_read_request,
+the resp->result field will be uninitialized and the resp.sz field will
+be also uninitialized when returning to prh_co_entry.
 
-Since commit d6dcc5583e7, '-cpu ?' shows the description of the
-X86_CPU_TYPE_NAME("max") for the host CPU model:
+If resp->result == GOOD (from a previous successful reply or just luck),
+then the assert in prh_write_response might not be triggered and
+uninitialized response will be sent.
 
-Enables all features supported by the accelerator in the current host
+The fix is to remove the whole handling of sz == 0 in prh_co_entry.
+Those errors apply only to PR OUT commands and it's perfectly okay to
+catch them later in do_pr_out and multipath_pr_out; the check for
+too-short parameters in fact doesn't apply in the easy SG_IO case, as
+it can be left to the target firmware even.
 
-instead of the expected:
+The result is that prh_read_request does not fail requests anymore and
+prh_co_entry becomes simpler.
 
-KVM processor with all supported host features
-
-or
-
-HVF processor with all supported host features
-
-This is caused by the early use of kvm_enabled() and hvf_enabled() in
-a class_init function. Since the accelerator isn't configured yet, both
-helpers return false unconditionally.
-
-A QEMU binary will only be compiled with one of these accelerators, not
-both. The appropriate description can thus be decided at build time.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <153055056654.212317.4697363278304826913.stgit@bahia.lan>
+Reported-by: Dima Stepanov <dimastep@yandex-team.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ scsi/qemu-pr-helper.c | 63 ++++++++++++++++++++++++---------------------------
+ 1 file changed, 30 insertions(+), 33 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b0b87c3..e0e2f2e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2836,13 +2836,13 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
-     xcc->host_cpuid_required = true;
-     xcc->ordering = 8;
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 0218d65..c89a446 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -455,6 +455,14 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+     char transportids[PR_HELPER_DATA_SIZE];
+     int r;
  
--    if (kvm_enabled()) {
--        xcc->model_description =
--            "KVM processor with all supported host features ";
--    } else if (hvf_enabled()) {
--        xcc->model_description =
--            "HVF processor with all supported host features ";
--    }
-+#if defined(CONFIG_KVM)
-+    xcc->model_description =
-+        "KVM processor with all supported host features ";
-+#elif defined(CONFIG_HVF)
-+    xcc->model_description =
-+        "HVF processor with all supported host features ";
-+#endif
- }
++    if (sz < PR_OUT_FIXED_PARAM_SIZE) {
++        /* Illegal request, Parameter list length error.  This isn't fatal;
++         * we have read the data, send an error without closing the socket.
++         */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM_LEN));
++        return CHECK_CONDITION;
++    }
++
+     switch (rq_servact) {
+     case MPATH_PROUT_REG_SA:
+     case MPATH_PROUT_RES_SA:
+@@ -574,6 +582,12 @@ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                      const uint8_t *param, int sz)
+ {
+     int resp_sz;
++
++    if ((fcntl(fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
++        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++        return CHECK_CONDITION;
++    }
++
+ #ifdef CONFIG_MPATH
+     if (is_mpath(fd)) {
+         return multipath_pr_out(fd, cdb, sense, param, sz);
+@@ -690,21 +704,6 @@ static int coroutine_fn prh_read_request(PRHelperClient *client,
+                                  errp) < 0) {
+             goto out_close;
+         }
+-        if ((fcntl(client->fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
+-            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_OPCODE));
+-            sz = 0;
+-        } else if (sz < PR_OUT_FIXED_PARAM_SIZE) {
+-            /* Illegal request, Parameter list length error.  This isn't fatal;
+-             * we have read the data, send an error without closing the socket.
+-             */
+-            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_PARAM_LEN));
+-            sz = 0;
+-        }
+-        if (sz == 0) {
+-            resp->result = CHECK_CONDITION;
+-            close(client->fd);
+-            client->fd = -1;
+-        }
+     }
  
- static const TypeInfo host_x86_cpu_type_info = {
+     req->fd = client->fd;
+@@ -785,25 +784,23 @@ static void coroutine_fn prh_co_entry(void *opaque)
+             break;
+         }
+ 
+-        if (sz > 0) {
+-            num_active_sockets++;
+-            if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
+-                r = do_pr_out(req.fd, req.cdb, resp.sense,
+-                              client->data, sz);
+-                resp.sz = 0;
+-            } else {
+-                resp.sz = sizeof(client->data);
+-                r = do_pr_in(req.fd, req.cdb, resp.sense,
+-                             client->data, &resp.sz);
+-                resp.sz = MIN(resp.sz, sz);
+-            }
+-            num_active_sockets--;
+-            close(req.fd);
+-            if (r == -1) {
+-                break;
+-            }
+-            resp.result = r;
++        num_active_sockets++;
++        if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
++            r = do_pr_out(req.fd, req.cdb, resp.sense,
++                          client->data, sz);
++            resp.sz = 0;
++        } else {
++            resp.sz = sizeof(client->data);
++            r = do_pr_in(req.fd, req.cdb, resp.sense,
++                         client->data, &resp.sz);
++            resp.sz = MIN(resp.sz, sz);
++        }
++        num_active_sockets--;
++        close(req.fd);
++        if (r == -1) {
++            break;
+         }
++        resp.result = r;
+ 
+         if (prh_write_response(client, &req, &resp, &local_err) < 0) {
+             break;
 -- 
 1.8.3.1
