@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQzu-0007LL-C3
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:42:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fbR65-0000Yp-Gk
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQzt-00038f-Cv
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:42:06 -0400
-References: <20180705074638.770905-1-vsementsov@virtuozzo.com>
-	<20180706071754.GB9946@lemon.usersys.redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7747e176-6d75-c640-4f48-0482b8c7c401@virtuozzo.com>
-Date: Fri, 6 Jul 2018 16:41:50 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1fbR64-0007Vd-JB
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:48:29 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42363)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fbR64-0007V3-60
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:48:28 -0400
+Received: by mail-oi0-x244.google.com with SMTP id n84-v6so23552173oib.9
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 06:48:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180706071754.GB9946@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] fix image fleecing
+In-Reply-To: <CAHmQWvBxTaX9f+xH3zue5w5s-eiLo00jmHq2OZ4gXTAJg0XLjA@mail.gmail.com>
+References: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA8Bx7b_0zUxbdxFgtANFycVkUiSiemAwHpr0wpyxuLKmw@mail.gmail.com>
+	<CAHmQWvCczwh0Yto=9s2j7d00ULokZ0=VrxykAyXBvvHzQaUEMA@mail.gmail.com>
+	<CAFEAcA90hDS17L64YZ5H_B-kYkMaMV+ofBtdD=TEKgsnT+wUqA@mail.gmail.com>
+	<CAHmQWvBxTaX9f+xH3zue5w5s-eiLo00jmHq2OZ4gXTAJg0XLjA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jul 2018 14:48:06 +0100
+Message-ID: <CAFEAcA-+rATXynVRkFsgz58kvz+Vpfi-uE_NHf9PagdDO8pe+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when
+ el3 enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-06.07.2018 10:17, Fam Zheng wrote:
-> On Thu, 07/05 10:46, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all.
+On 25 June 2018 at 10:56, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> On 25 June 2018 at 17:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 25 June 2018 at 05:06, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>>> Hi Peter,
+>>> Yes, your considerations reasonable.
+>>> But in practice of hardware platforms, programmer checks that Arm TF
+>>> is using SMC for PSCI call conduit, then fix it manually in the ACPI
+>>> table, reason may be that Arm TF is lack of ACPI support, if device
+>>> tree used, there should be no such thing because Arm TF can support
+>>> it.
+>>> On QEMU, I just mimic the situation, if a complete reasonable
+>>> solution, further efforts are needed to figure it out.
 >>
->> This fixes image fleecing scheme for 3.0, details are in 04 patch.
-> Looks like this breaks 'test-replication':
+>> I'm afraid I don't really understand what you're saying
+>> here. Could you try rephrasing it?
+>>
+> Sorry, I say in the real hardware platforms, in practice programmer
+> has to write a fixed PSCI conduit value in ACPI. then on the qemu
+> platform, I did the similar thing -- write a fixed value too.
+> I know it is not a perfect solution for it, I have no better one for now.
 >
-> http://patchew.org/QEMU/20180705074638.770905-1-vsementsov@virtuozzo.com/
+>> If we're running at EL3 and booting firmware, then QEMU doesn't
+>> provide PSCI. The firmware we're booting is the only thing that
+>> can know if that firmware has implemented PSCI. So only it can
+>> decide whether the ACPI tables and DTB should say that PSCI is
+>> present.
 >
-> test-replication: /stor/work/qemu/block/io.c:725: wait_serialising_reques=
-ts: Assertion `qemu_coroutine_self() !=3D req->co' failed.
-> GTester: last random seed: R02Se49967625f19c5be9918a2503fb2fff5
-> test-replication: /stor/work/qemu/block/io.c:725: wait_serialising_reques=
-ts: Assertion `qemu_coroutine_self() !=3D req->co' failed.
->    GTESTER tests/test-qht-par
-> GTester: last random seed: R02S8fad2bb2daddc51eb51623bb7c86cb67
-> test-replication: /stor/work/qemu/block/io.c:725: wait_serialising_reques=
-ts: Assertion `qemu_coroutine_self() !=3D req->co' failed.
-> GTester: last random seed: R02S024718e9b1e2b1facafe254c43e1430b
+> Agree with your comments, I hope ACPI's psci conduit node can reflect
+> firmware's implementation, even when firmware PSCI conduit changes,
+> ACPI node changes accordingly.
+> But for ACPI and DTB, there are different situations now.
 >
-> Fam
+> If DTB is used, firmware(with psci implementation) can generate DTB
+> nodes, saying which PSCI conduit is used - smc or hvc, then uboot or
+> uefi can get this DTB add more DTB nodes before transfer it to kernel.
+> That is, using DTB, we can achieve the goal.
+>
+> But when ACPI used, there is no codes in firmware to generate ACPI
+> node to show which PSCI conduit is used, then uefi or later stage
+> cannot get this info dynamically from any codes as far as I know.
+> (this is why programmer manually check that firmware is using smc,
+> then write a fixed value in ACPI FADT).
+> So, if we want to fix this neatly, adding ACPI support in Arm trusted
+> firmware may be the solution, but it should be a big feature for
+> firmware, not QEMU.
 
-interesting.
+I think my view here remains the same. QEMU does not and cannot
+know what the EL3 firmware is providing for a PSCI conduit. So
+it can't put anything in the ACPI table fragments. It has to be
+up to the guest code at EL3 to determine the right answer and
+put it in the ACPI table or DT that gets used at EL1 or EL2.
 
-in gdb I see, that both requests are identical (i.e. their=20
-BdrvTrackedRequeststructs, except list filed)writes (self and req)...
-
-and it's actually the same request, duplicated in the ist, first it is=20
-created in bdrv_co_copy_range_internal,
-
-and than again,
-#0=C2=A0 tracked_request_begin (req=3D0x7fffe8f9e7d0, bs=3D0x555555a43040,=
-=20
-offset=3D33554432, bytes=3D33554432, type=3D
- =C2=A0=C2=A0=C2=A0 BDRV_TRACKED_WRITE) at block/io.c:598
-#1=C2=A0 0x00005555555f76bc in bdrv_co_copy_range_internal=20
-(src=3D0x55555597ef80, src_offset=3D33882112,
- =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D33=
-554432,=20
-read_flags=3DBDRV_REQ_NO_SERIALISING,
- =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING, recurse_src=3Dtrue)=
- at block/io.c:2949
-#2=C2=A0 0x00005555555f78e9 in bdrv_co_copy_range_from (src=3D0x55555597ef8=
-0,=20
-src_offset=3D33882112,
- =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D33=
-554432,=20
-read_flags=3DBDRV_REQ_NO_SERIALISING,
- =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING) at block/io.c:2995
-#3=C2=A0 0x00005555555ae931 in qcow2_co_copy_range_from (bs=3D0x555555977ff=
-0,=20
-src=3D0x5555559f14d0,
- =C2=A0=C2=A0=C2=A0 src_offset=3D33554432, dst=3D0x5555559f1d30, dst_offset=
-=3D33554432,=20
-bytes=3D33554432,
- =C2=A0=C2=A0=C2=A0 read_flags=3DBDRV_REQ_NO_SERIALISING,=20
-write_flags=3DBDRV_REQ_SERIALISING) at block/qcow2.c:3311
-#4=C2=A0 0x00005555555f77cf in bdrv_co_copy_range_internal=20
-(src=3D0x5555559f14d0, src_offset=3D33554432,
- =C2=A0=C2=A0=C2=A0 dst=3D0x5555559f1d30, dst_offset=3D33554432, bytes=3D33=
-554432,=20
-read_flags=3DBDRV_REQ_NO_SERIALISING,
- =C2=A0=C2=A0=C2=A0 write_flags=3DBDRV_REQ_SERIALISING, recurse_src=3Dtrue)=
- at block/io.c:2966
-
-
-so, it's actually bug in copy_range architecture.
-
---=20
-Best regards,
-Vladimir
+thanks
+-- PMM
