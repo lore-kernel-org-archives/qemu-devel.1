@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fbQlo-0000Wo-T1
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:27:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1fbQp9-0001Uk-U9
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fbQlj-0000et-Vu
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:27:32 -0400
-Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:52898)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fbQlj-0000eT-Ov
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:27:27 -0400
-Received: from player739.ha.ovh.net (unknown [10.109.105.97])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 05A2510B5F9
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 15:27:25 +0200 (CEST)
-References: <20180706090713.15712-1-clg@kaod.org>
-	<20180706090713.15712-2-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <28391e09-2e15-6050-e452-0493172a73a4@kaod.org>
-Date: Fri, 6 Jul 2018 15:27:17 +0200
+	(envelope-from <bounces@canonical.com>) id 1fbQp4-0004sS-R3
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fbQp4-0004s4-Ju
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 09:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fbQp1-0004tA-EP
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 13:30:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0CDB12E81A7
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 13:30:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180706090713.15712-2-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] spapr: introduce a fixed IRQ number
- space
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Jul 2018 13:23:03 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1772075 <1772075@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152666493053.16686.5820944431341933507.malonedeb@wampee.canonical.com>
+Message-Id: <153088338370.29603.1547095724317821644.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1772075] Re: Segmentation fault on aarch64 vm at
+ powerdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
 
-  > +/*
-> + * The register property of a VIO device is defined in livirt using a
-> + * base number + 0x1000 increment and in QEMU by incrementing the base
-> + * register number 0x71000000.
-> + *
-> + * The formula below tries to compute a unique index number from the
-> + * register value that will be used to define the IRQ number of the
-> + * VIO device. A maximum of 256 (0x100) VIO devices is covered.
-> + *
-> + * To minimize collisions, we define two distinct ranges depending on
-> + * the "reg" value definition:
-> + *
-> + *     [0x00 - 0x7f]    user/libvirt
-> + *     [0x80 - 0xff]    QEMU VIO model
-> + *
-> + * Collisions will be detected when the IRQ is claimed.
-> + */
-> +static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
-> +{
-> +    if (reg >= SPAPR_VIO_REG_BASE) {
-> +        return SPAPR_IRQ_VIO | (reg & 0x7f) | 0x80;
-> +    } else {
-> +        return SPAPR_IRQ_VIO | ((reg & 0x7f) ^ ((reg >> 12) & 0x7f));
+Could you just provide the files for the sd card and the initrd, please.
+I don't want to spend a bunch of time trying to recreate them when you
+already have them...
 
-This is not good enough for the VIO devices with a user defined "reg".
+-- =
 
-I propose to extract bits [29-28] and [16-12] to compose a 7bit index :
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772075
 
-	(((reg >> 28) & 0x3) << 5) | ((reg >> 12) & 0x1f)
+Title:
+  Segmentation fault on aarch64 vm at powerdown
 
-That would give us a mapping :
+Status in QEMU:
+  New
 
-	0x00000000  -> 0
-	0x00001000  -> 1
-		...
-	0x0001F000  -> 31
-	0x10000000  -> 32
-	0x10001000  -> 33
-		...
-	0x1001F000  -> 63
-	0x20000000  -> 64
-	0x20001000  -> 65
-		...
-	0x2001F000  -> 95
-	0x30000000  -> 96
-	0x30001000  -> 97
-		...
-	0x3001F000  -> 127
+Bug description:
+  OS Arch Linux
+  x86_64
+  qemu version: 2.12
 
-C.
+  cmdline:
+  qemu-system-aarch64 -nographic -cpu cortex-a57 -m 2048 -M virt,gic_versio=
+n=3D3 -machine virtualization=3Dtrue -bios /usr/share/ovmf/AARCH64/QEMU_EFI=
+.fd -drive file=3Dfat:rw:/opt/simonpiemu/kernels/rpi-3,if=3Dnone,format=3Dr=
+aw,cache=3Dnone,id=3Dhd0 -device virtio-blk-device,drive=3Dhd0 -drive file=
+=3D/home/morfeo/.simonpi/sd-arch-rpi-3-qemu.img,if=3Dnone,format=3Draw,cach=
+e=3Dnone,id=3Dhd1 -device virtio-blk-device,drive=3Dhd1 -kernel /opt/simonp=
+iemu/kernels/rpi-3/Image -append "root=3D/dev/vda2 fstab=3Dno rootfstype=3D=
+ext4 rw console=3DttyAMA0" -initrd /home/morfeo/.simonpi/rpi-3/boot/initram=
+fs-linux.img -device virtio-net-device,mac=3D52:54:26:11:72:9b,netdev=3Dnet=
+0 -netdev tap,id=3Dnet0,ifname=3Drasp-tap0,script=3Dno,downscript=3Dno
+
+  error:
+
+  qemu-system-aarch64: /build/qemu/src/qemu-2.12.0/block.c:3375:
+  bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772075/+subscriptions
