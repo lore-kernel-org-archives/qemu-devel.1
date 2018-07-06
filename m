@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fbLnG-000060-2U
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:08:46 -0400
+	(envelope-from <armbru@redhat.com>) id 1fbLoi-0000qg-9Y
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:10:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fbLnC-0005sI-RK
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:08:41 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40799)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fbLnC-0005oS-Jn
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:08:38 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t6-v6so3248187wrn.7
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 01:08:38 -0700 (PDT)
-References: <20180705191929.30773-1-richard.henderson@linaro.org>
-	<20180705191929.30773-2-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180705191929.30773-2-richard.henderson@linaro.org>
-Date: Fri, 06 Jul 2018 09:08:36 +0100
-Message-ID: <87k1q8946z.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1fbLod-0003Bx-Aw
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:10:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49212 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fbLod-000391-3C
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 04:10:07 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8376A407049A
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 08:10:06 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180704084507.14560-1-peterx@redhat.com>
+	<20180704084507.14560-6-peterx@redhat.com>
+Date: Fri, 06 Jul 2018 10:09:58 +0200
+In-Reply-To: <20180704084507.14560-6-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 4 Jul 2018 16:45:03 +0800")
+Message-ID: <87po0023ah.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] tcg: Restrict check_size_impl to
- multiples of the line size
+Subject: Re: [Qemu-devel] [PATCH 5/9] monitor: suspend monitor instead of
+ send CMD_DROP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +35,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+Peter Xu <peterx@redhat.com> writes:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Normally this is automatic in the size restrictions that are placed
-> on vector sizes coming from the implementation.  However, for the
-> legitimate size tuple [oprsz=3D8, maxsz=3D32], we need to clear the final
-> 24 bytes of the vector register.  Without this check, do_dup selects
-> TCG_TYPE_V128 and clears only 16 bytes.
+> When we received too many qmp commands, previously we'll send
+> COMMAND_DROPPED events to monitors, then we'll drop the requests.  It
+> can only solve the flow control of the request queue, however it'll not
+> really work since we might queue unlimited events in the response queue
+> which is a potential risk.
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+> Now instead of sending such an event, we stop consuming the client input
+> when we noticed that the queue is reaching its limitation before hand.
+> Then after we handled commands, we'll try to resume the monitor when
+> needed.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  tcg/tcg-op-gvec.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  monitor.c | 46 ++++++++++++++++++++++++++++++----------------
+>  1 file changed, 30 insertions(+), 16 deletions(-)
 >
-> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index 22db1590d5..61c25f5784 100644
-> --- a/tcg/tcg-op-gvec.c
-> +++ b/tcg/tcg-op-gvec.c
-> @@ -287,8 +287,11 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs=
-, uint32_t bofs,
->     in units of LNSZ.  This limits the expansion of inline code.  */
->  static inline bool check_size_impl(uint32_t oprsz, uint32_t lnsz)
+> diff --git a/monitor.c b/monitor.c
+> index 215029bc22..ebf862914f 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -164,6 +164,8 @@ struct MonFdset {
+>      QLIST_ENTRY(MonFdset) next;
+>  };
+>=20=20
+> +#define  QMP_REQ_QUEUE_LEN_MAX  (8)
+> +
+>  typedef struct {
+>      JSONMessageParser parser;
+>      /*
+> @@ -396,10 +398,21 @@ static void monitor_qmp_try_resume(Monitor *mon)
 >  {
-> -    uint32_t lnct =3D oprsz / lnsz;
-> -    return lnct >=3D 1 && lnct <=3D MAX_UNROLL;
-> +    if (oprsz % lnsz =3D=3D 0) {
-> +        uint32_t lnct =3D oprsz / lnsz;
-> +        return lnct >=3D 1 && lnct <=3D MAX_UNROLL;
+>      assert(monitor_is_qmp(mon));
+>      qemu_mutex_lock(&mon->qmp.qmp_lock);
+> +
+> +    if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
+> +        /*
+> +         * This should not happen, but in case if it happens, we
+> +         * should still keep the monitor in suspend state
+> +         */
+> +        qemu_mutex_unlock(&mon->qmp.qmp_lock);
+> +        return;
 > +    }
-> +    return false;
+> +
+>      if (mon->qmp.need_resume) {
+>          monitor_resume(mon);
+>          mon->qmp.need_resume =3D false;
+>      }
+> +
+>      qemu_mutex_unlock(&mon->qmp.qmp_lock);
 >  }
->
->  static void expand_clr(uint32_t dofs, uint32_t maxsz);
+>=20=20
+> @@ -4213,7 +4226,14 @@ static void monitor_qmp_bh_dispatcher(void *data)
+>      qemu_bh_schedule(qmp_dispatcher_bh);
+>  }
+>=20=20
+> -#define  QMP_REQ_QUEUE_LEN_MAX  (8)
+> +/* Called with Monitor.qmp.qmp_lock held. */
+> +static void monitor_qmp_suspend_locked(Monitor *mon)
+> +{
+> +    assert(monitor_is_qmp(mon));
+> +    assert(mon->qmp.need_resume =3D=3D false);
+> +    monitor_suspend(mon);
+> +    mon->qmp.need_resume =3D true;
+> +}
+>=20=20
+>  static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+>  {
+> @@ -4266,22 +4286,16 @@ static void handle_qmp_command(JSONMessageParser =
+*parser, GQueue *tokens)
+>       * OOB is not enabled, the server will never drop any command.
+>       */
+>      if (!qmp_oob_enabled(mon)) {
+> -        monitor_suspend(mon);
+> -        mon->qmp.need_resume =3D true;
+> +        monitor_qmp_suspend_locked(mon);
+>      } else {
+> -        /* Drop the request if queue is full. */
+> -        if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
+> -            qemu_mutex_unlock(&mon->qmp.qmp_lock);
+> -            /*
+> -             * FIXME @id's scope is just @mon, and broadcasting it is
+> -             * wrong.  If another monitor's client has a command with
+> -             * the same ID in flight, the event will incorrectly claim
+> -             * that command was dropped.
+> -             */
+> -            qapi_event_send_command_dropped(id,
+> -                                            COMMAND_DROP_REASON_QUEUE_FU=
+LL);
+> -            qmp_request_free(req_obj);
+> -            return;
+> +        /*
+> +         * If the queue is reaching the length limitation, we queue
+> +         * this command, meanwhile we suspend the monitor to block new
+> +         * commands.  We'll resume ourselves until the queue has more
+> +         * space.
+> +         */
+> +        if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX - 1=
+) {
+> +            monitor_qmp_suspend_locked(mon);
+>          }
+>      }
 
+If I understand the code correctly, the response queue
+mon->qmp..qmp_requests gets drained into the output buffer mon->outbuf
+by bottom half monitor_qmp_bh_responder().  The response queue remains
+small, it's the output buffer that grows without bounds.  Your test for
+"limit exceeded" measures the response queue.  It needs to measure the
+output buffer instead.
 
---
-Alex Benn=C3=A9e
+We could drain the response queue only when the output buffer isn't too
+full.  I think that makes sense only if we have a compelling use for
+keeping responses in QDict form for a longer time.
+
+Marc-Andr=C3=A9 has a patch to cut out the response queue.  Whether it still
+makes sense I don't know.
+[PATCH v3 03/38] Revert "qmp: isolate responses into io thread"
