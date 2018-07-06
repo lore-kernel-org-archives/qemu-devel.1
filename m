@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbQ3G-00034K-RX
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:41:31 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQ7A-0006T6-Of
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fbQ3C-00056W-Vl
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:41:30 -0400
-References: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
-	<eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
-	<20180706011849.GK3450@umbus.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <afa973b5-f32e-c88e-ad2b-9edb864f6477@redhat.com>
-Date: Fri, 6 Jul 2018 14:41:18 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180706011849.GK3450@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC"
-Subject: Re: [Qemu-devel] [PATCH] sam460ex: Add comment explaining ignored
- errors from fdt operations
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fbQ79-0000Da-3Y
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:45:32 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri,  6 Jul 2018 14:36:29 +0300
+Message-Id: <20180706113630.25222-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20180706113630.25222-1-vsementsov@virtuozzo.com>
+References: <20180706113630.25222-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 3/4] blockdev: rename
+ block-dirty-bitmap-clear transaction handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +20,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Guenter Roeck <linux@roeck-us.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?Q?Pilippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Guenter Roeck <linux@roeck-us.net>, Alexander Graf <agraf@suse.de>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?Q?Pilippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-Message-ID: <afa973b5-f32e-c88e-ad2b-9edb864f6477@redhat.com>
-Subject: Re: [PATCH] sam460ex: Add comment explaining ignored errors from fdt
- operations
-References: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
- <eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
- <20180706011849.GK3450@umbus.fritz.box>
-In-Reply-To: <20180706011849.GK3450@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Rename block-dirty-bitmap-clear transaction handlers to reuse them for
+x-block-dirty-bitmap-merge transaction in the following patch.
 
-On 06/07/2018 03:18, David Gibson wrote:
->> Ok, but why would it even fail?  Maybe it's not this case, but even if=
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ blockdev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
->> it's not fatal for the OS, generating different device trees silently
->> seems like a recipe for Heisenbugs.
-> Yes, quite.  Especially since the most likely errors I can see here
-> would actually indicate something has already gone horribly wrong with
-> the device tree construction, so a missing clock-frequency is the
-> least of our troubles.
->=20
-> I think using _FDT() here would be a better approach.
-
-Or qemu_fdt_setprop_cell, which is there exactly for this reason.
-Volunteers needed to report it in checkpatch! :)
-
-Paolo
-
-
---ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAls/Y24ACgkQv/vSX3jH
-roOwDQgAlzpKpkLEMfl4OA6KcTte/dpdeKru763iRdsJUTTqwsZdlC4+HSmGfUyQ
-Z6fF0Ag9KIdEAaH89FHV5PIZRvCRLA8hnlwWgddqlG0lPvpaUScJSMAhDYO/QKW9
-PaldvA4ri2h4tzbaEd9G/k80DeEdCmnuyQzBe6AwIT3xQTs5guF/DJOV+ZgrHQNl
-35wfOjXllC8xFR+UmMjQHoaoj3PxwG7wlwWkmdSnMmb8/vJFaTbsAFxtkHaL8cjN
-AmagByzcg9sFYzNdDz+PZQ4vrMUmpFdd9vbs0nBxr4Fx2c9RbMSEOm/of3Hb4CWS
-mw3NnDm6Z58S7zXVKlfrZ1kLc9glbw==
-=z/r+
------END PGP SIGNATURE-----
-
---ckYzEOjlqbS96d6sQOvA6iEmveyv0GwgC--
+diff --git a/blockdev.c b/blockdev.c
+index 9cb29ca63e..5348e8ba9b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2026,7 +2026,7 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
+     bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
+ }
+ 
+-static void block_dirty_bitmap_clear_abort(BlkActionState *common)
++static void block_dirty_bitmap_restore(BlkActionState *common)
+ {
+     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+                                              common, common);
+@@ -2036,7 +2036,7 @@ static void block_dirty_bitmap_clear_abort(BlkActionState *common)
+     }
+ }
+ 
+-static void block_dirty_bitmap_clear_commit(BlkActionState *common)
++static void block_dirty_bitmap_free_backup(BlkActionState *common)
+ {
+     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+                                              common, common);
+@@ -2170,8 +2170,8 @@ static const BlkActionOps actions[] = {
+     [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_CLEAR] = {
+         .instance_size = sizeof(BlockDirtyBitmapState),
+         .prepare = block_dirty_bitmap_clear_prepare,
+-        .commit = block_dirty_bitmap_clear_commit,
+-        .abort = block_dirty_bitmap_clear_abort,
++        .commit = block_dirty_bitmap_free_backup,
++        .abort = block_dirty_bitmap_restore,
+     },
+     [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_ENABLE] = {
+         .instance_size = sizeof(BlockDirtyBitmapState),
+-- 
+2.11.1
