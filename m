@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fbFuC-0003TI-Lj
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:51:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1fbGLo-0006t2-1g
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fbFu8-0000J6-4d
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:51:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46298 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fbGLk-00081v-Se
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:20:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33280 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fbFu7-0000Gn-Ul
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:51:24 -0400
-Date: Fri, 6 Jul 2018 09:51:13 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fbGLk-00081I-Nz
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 22:19:56 -0400
+Date: Fri, 6 Jul 2018 10:19:51 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180706015113.GC23001@xz-mi>
-References: <20180705181148.26871-1-clg@kaod.org>
-	<20180705133044.634ede43@t450s.home>
-	<b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
+Message-ID: <20180706021951.GD23001@xz-mi>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180705031755.3254-5-peterx@redhat.com>
+	<20180705093144.GA22608@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b5322979-6114-6334-d1f5-ccc6abc049bb@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] pci: remove pci_del_option_rom()
+In-Reply-To: <20180705093144.GA22608@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 4/9] tests: introduce
+ migrate_postcopy_* helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Jul 05, 2018 at 11:44:44PM +0200, Paolo Bonzini wrote:
-> On 05/07/2018 21:30, Alex Williamson wrote:
-> > On Thu,  5 Jul 2018 20:11:48 +0200
-> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >=20
-> >> PCI devices needing a ROM allocate an optional MemoryRegion with
-> >> pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
-> >> device is destroyed. The only action taken by this routine is to cal=
-l
-> >> vmstate_unregister_ram() which clears the id string of the optional
-> >> ROM RAMBlock and now, also flags the RAMBlock as non-migratable. Thi=
-s
-> >> was recently added by commit b895de502717 ("migration: discard
-> >> non-migratable RAMBlocks"), .
-> >>
-> >> VFIO devices do their own allocation of the PCI ROM region. It is
-> >> initialized in vfio_pci_size_rom() in which the PCI attribute
-> >> 'has_rom' is set to true but the RAMBlock of the ROM region is not
-> >> allocated. When the associated PCI device is deleted,
-> >> pci_del_option_rom() calls vmstate_unregister_ram() which tries to
-> >> flag a NULL RAMBlock because 'has_rom' is set, leading to a SEGV .
-> >>
-> >> The use of vmstate_unregister_ram() in the PCI device was added in
-> >> commit b0e56e0b63f350691b52d3e75e89bb64143fbeff ("unset RAMBlock ids=
-tr
-> >> when unregister MemoryRegion") and from the archive in
-> >> http://lists.gnu.org/archive/html/qemu-devel/2014-04/msg00282.html, =
-it
-> >> seems that it was trying to fix a reference count issue.
-> >>
-> >> vmstate_unregister_ram() being a work around, let's remove it to fix
-> >> the current SEGV issue and let's try to find a fix for the initial r=
-ef
-> >> count issue if we can reproduce.
-> >>
-> >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  hw/pci/pci.c | 11 -----------
-> >>  1 file changed, 11 deletions(-)
-> >=20
-> > Looking back through git history, I think vfio sets PCIDevice.has_rom
-> > because we needed that to have memory_region_destroy() called, but th=
-at
-> > changed with Paolo's:
-> >=20
-> > 469b046ead06 ("memory: remove memory_region_destroy")
-> >=20
-> > Now the MemoryRegion gets freed automagically, so maybe the better
-> > option is that vfio-pci should not set has_rom to keep it out of this
-> > path.  I don't see that has_rom serves any other purpose.  Thanks,
->=20
-> That would work for me too!
+On Thu, Jul 05, 2018 at 03:01:44PM +0530, Balamuruhan S wrote:
+> On Thu, Jul 05, 2018 at 11:17:50AM +0800, Peter Xu wrote:
+> > Separate the old postcopy UNIX socket test into three steps, provide a
+> > helper for each step.  With these helpers, we can do more compliated
+> > tests like postcopy recovery, while keep the codes shared.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  tests/migration-test.c | 38 +++++++++++++++++++++++++++-----------
+> >  1 file changed, 27 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/tests/migration-test.c b/tests/migration-test.c
+> > index 3a85446f95..2155869b96 100644
+> > --- a/tests/migration-test.c
+> > +++ b/tests/migration-test.c
+> > @@ -351,13 +351,19 @@ static void migrate(QTestState *who, const char *uri)
+> >      qobject_unref(rsp);
+> >  }
+> > 
+> > -static void migrate_start_postcopy(QTestState *who)
+> > +static void migrate_postcopy_start(QTestState *from, QTestState *to)
+> >  {
+> >      QDict *rsp;
+> > 
+> > -    rsp = wait_command(who, "{ 'execute': 'migrate-start-postcopy' }");
+> > +    rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
+> >      g_assert(qdict_haskey(rsp, "return"));
+> >      qobject_unref(rsp);
+> > +
+> > +    if (!got_stop) {
+> > +        qtest_qmp_eventwait(from, "STOP");
+> > +    }
+> > +
+> > +    qtest_qmp_eventwait(to, "RESUME");
+> >  }
+> > 
+> >  static void test_migrate_start(QTestState **from, QTestState **to,
+> > @@ -505,7 +511,8 @@ static void test_deprecated(void)
+> >      qtest_quit(from);
+> >  }
+> > 
+> > -static void test_postcopy(void)
+> > +static void migrate_postcopy_prepare(QTestState **from_ptr,
+> > +                                     QTestState **to_ptr)
+> 
+> if we have uri as one of the configurable argument, it would be still
+> better, so that in future we can call migrate_postcopy_prepare() with
+> any different uri.
 
-Paolo,
+Yes, though we'd better have a first user of it.  Now postcopy only
+covers unix socket test.  We don't have a large matrix yet.
 
-A question about memory region auto destruction (which might not
-related to this patch): I see that we have object_property_add_child()
-in memory_region_do_init() to achieve the auto destruction but only if
-the "name" of memory region is specified.  Could we just do that
-unconditionally (though we might of course need to generate some of
-the names), or is there a reason not to do so?
+We can add that when we start to add more complicated tests for
+postcopy.  Thanks,
 
-Also, not sure whether it's good we add some more comments to
-memory_region_do_init() to mention about its auto destruction
-capability, and if the "name" check is needed, possibly we comment
-that as well (I can do that after I understand it well, if you like)?
-
-Thanks,
-
---=20
+-- 
 Peter Xu
