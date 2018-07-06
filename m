@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fbUGJ-0008MR-B8
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:11:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK3-0001D0-Ek
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fbUGE-00077F-8e
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:11:15 -0400
-Received: from mail-bn3nam01on071a.outbound.protection.outlook.com
-	([2a01:111:f400:fe41::71a]:45037
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fbUGD-00075x-R1
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:11:10 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 6 Jul 2018 17:11:04 +0000
-Message-ID: <BN7PR08MB4868C97BD24DBF4A18874A5DC6470@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1530877732-26557-3-git-send-email-aleksandar.markovic@rt-rk.com>
-	<BN7PR08MB4868AC9B85699C8293579F63C6470@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<e2782023-f98c-c425-1897-07595f5ba1fb@amsat.org>
-In-Reply-To: <e2782023-f98c-c425-1897-07595f5ba1fb@amsat.org>
-Content-Language: en-US
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUJz-0000kU-1m
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:07 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:45123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fbUJy-0000k7-Qp
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:02 -0400
+Received: by mail-wr1-x433.google.com with SMTP id u7-v6so4868805wrn.12
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:02 -0700 (PDT)
+Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
+	h40-v6sm13784683wrf.40.2018.07.06.10.15.00
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 06 Jul 2018 10:15:00 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  6 Jul 2018 19:14:20 +0200
+Message-Id: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/8] target/mips: Workaround for
- checkpatch.pl hanging on msa_helper.c
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/8] Bug fixes for 2018-07-06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: qemu-devel@nongnu.org
 
-> I'm not sure it's worth having this but you are the maintainer so your
-> choice :)
+The following changes since commit 2a018f6e98782a4931b936a3087404ed81685bac:
 
-If someone in future peruses an older version of this file (let's say, whil=
-e working on an older version of QEMU), and comes across this problem with =
-checkpatch.pl, by checking the full history of the file, they would be able=
- to see what the problem is. Without this patch, they wouldn't.
+  Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-request' into staging (2018-07-03 23:06:18 +0100)
 
-> What is unclear to me is, while changing this, why only fix
-> the suffix and not also the prefix? That is:
->
->            uint<space>## BITS ##<space>_t S =3D _S, T =3D _T;
+are available in the git repository at:
 
-It wouldn't be clear what characters caused the problem (or triggered the b=
-ug, if you wish).
 
-Regards,
-Aleksandar
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to e20122ff0faf07cb701d35e39e106d1783c07725:
+
+  checkpatch: handle token pasting better (2018-07-06 18:39:19 +0200)
+
+----------------------------------------------------------------
+Bug fixes.
+
+----------------------------------------------------------------
+Greg Kurz (1):
+      i386: fix '-cpu ?' output for host cpu type
+
+Julia Suvorova (1):
+      qtest: Use cpu address space instead of system memory
+
+Michal Privoznik (1):
+      pr-helper: Rework socket path handling
+
+Paolo Bonzini (4):
+      pr-helper: avoid error on PR IN command with zero request size
+      pr-manager-helper: fix memory leak on event
+      ioapic: remove useless lower bounds check
+      checkpatch: handle token pasting better
+
+xinhua.Cao (1):
+      qemu-char: check errno together with ret < 0
+
+ chardev/char-socket.c    |  7 +++-
+ hw/intc/ioapic.c         |  2 +-
+ qtest.c                  | 39 ++++++++++++-------
+ scripts/checkpatch.pl    |  9 ++---
+ scsi/pr-manager-helper.c |  1 +
+ scsi/qemu-pr-helper.c    | 99 +++++++++++++++++++-----------------------------
+ target/i386/cpu.c        | 14 +++----
+ 7 files changed, 84 insertions(+), 87 deletions(-)
+-- 
+1.8.3.1
