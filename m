@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORE-00088d-55
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:09 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORE-00089M-SQ
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORC-0007MB-GR
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fbORD-0007Si-Uc
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36380 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49410 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fbORC-0007Kd-9e
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	id 1fbORD-0007RX-Pz
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 06:58:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D4A76E9007
-	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:58:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 509EB3467F
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 10:58:07 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  6 Jul 2018 12:57:32 +0200
-Message-Id: <20180706105753.26700-7-marcandre.lureau@redhat.com>
+Date: Fri,  6 Jul 2018 12:57:33 +0200
+Message-Id: <20180706105753.26700-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 06/27] qapi: do not define enumeration value
- explicitly
+Subject: [Qemu-devel] [PATCH v6 07/27] qapi: rename
+ QAPISchemaEnumType.values to .members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +37,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The C standard has the initial value at 0 and the subsequent values
-incremented by 1. No need to set this explicitely.
-
-This will prevent from artificial "gaps" when compiling out some enum
-values and having unnecessarily large MAX values & enums arrays, or
-simplifying iterating over valid enum values.
-
-Whenever config-host.h is changed, all the enum/types are recompiled.
-
-(a subsequent patch will split the schema. Target-specific poisoined
-conditionals will be added. They cannot be mixed with the common
-schema: it is not possible to end up with enums of different values in
-common and target builds)
+Rename QAPISchemaEnumType.values and related variables to members.
+Makes sense ever since commit 93bda4dd4 changed .values from list of
+string to list of QAPISchemaMember. Obvious no-op.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/common.py | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ scripts/qapi/common.py | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 02c5c6767a..6f9498566e 100644
+index 6f9498566e..7020b88abc 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -2045,14 +2045,11 @@ typedef enum %(c_name)s {
- ''',
-                 c_name=3Dc_name(name))
+@@ -1161,22 +1161,22 @@ class QAPISchemaBuiltinType(QAPISchemaType):
 =20
--    i =3D 0
-     for value in enum_values:
-         ret +=3D mcgen('''
--    %(c_enum)s =3D %(i)d,
-+    %(c_enum)s,
- ''',
--                     c_enum=3Dc_enum_const(name, value, prefix),
--                     i=3Di)
--        i +=3D 1
-+                     c_enum=3Dc_enum_const(name, value, prefix))
 =20
-     ret +=3D mcgen('''
- } %(c_name)s;
+ class QAPISchemaEnumType(QAPISchemaType):
+-    def __init__(self, name, info, doc, ifcond, values, prefix):
++    def __init__(self, name, info, doc, ifcond, members, prefix):
+         QAPISchemaType.__init__(self, name, info, doc, ifcond)
+-        for v in values:
+-            assert isinstance(v, QAPISchemaMember)
+-            v.set_owner(name)
++        for m in members:
++            assert isinstance(m, QAPISchemaMember)
++            m.set_owner(name)
+         assert prefix is None or isinstance(prefix, str)
+-        self.values =3D values
++        self.members =3D members
+         self.prefix =3D prefix
+=20
+     def check(self, schema):
+         QAPISchemaType.check(self, schema)
+         seen =3D {}
+-        for v in self.values:
+-            v.check_clash(self.info, seen)
++        for m in self.members:
++            m.check_clash(self.info, seen)
+             if self.doc:
+-                self.doc.connect_member(v)
++                self.doc.connect_member(m)
+=20
+     def is_implicit(self):
+         # See QAPISchema._make_implicit_enum_type() and ._def_predefined=
+s()
+@@ -1186,7 +1186,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+         return c_name(self.name)
+=20
+     def member_names(self):
+-        return [v.name for v in self.values]
++        return [m.name for m in self.members]
+=20
+     def json_type(self):
+         return 'string'
+@@ -1403,9 +1403,9 @@ class QAPISchemaObjectTypeVariants(object):
+         if self._tag_name:    # flat union
+             # branches that are not explicitly covered get an empty type
+             cases =3D set([v.name for v in self.variants])
+-            for val in self.tag_member.type.values:
+-                if val.name not in cases:
+-                    v =3D QAPISchemaObjectTypeVariant(val.name, 'q_empty=
+')
++            for m in self.tag_member.type.members:
++                if m.name not in cases:
++                    v =3D QAPISchemaObjectTypeVariant(m.name, 'q_empty')
+                     v.set_owner(self.tag_member.owner)
+                     self.variants.append(v)
+         for v in self.variants:
 --=20
 2.18.0.rc1
