@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fbQB1-00016Y-4d
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:49:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1fbQC4-0001vd-OT
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fbQAx-0002Nh-7V
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:49:31 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:40111)
+	(envelope-from <bounces@canonical.com>) id 1fbQC0-0003WG-8G
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:50:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60820)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fbQAw-0002Ly-UU
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:49:27 -0400
-Received: by mail-wr1-x435.google.com with SMTP id t6-v6so4091247wrn.7
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 05:49:26 -0700 (PDT)
-References: <20180706080615.25974-1-alex.bennee@linaro.org>
-	<CAJ+F1CLrc5d2f17brVydEjzV1zLUBZb4CV37Grb2Ab4T_1qRNw@mail.gmail.com>
-	<874lhc8y5d.fsf@linaro.org>
-	<CAJ+F1C+1PP61u9DcEqFoP6yuK2QPaUK-dhyeesmW_u5UhBT+tw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAJ+F1C+1PP61u9DcEqFoP6yuK2QPaUK-dhyeesmW_u5UhBT+tw@mail.gmail.com>
-Date: Fri, 06 Jul 2018 12:07:14 +0100
-Message-ID: <871scg8vx9.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fbQBz-0003Us-UL
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 08:50:32 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fbQBy-00009D-QD
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 12:50:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 960E42E819C
+	for <qemu-devel@nongnu.org>; Fri,  6 Jul 2018 12:50:30 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for 3.0] tests/tpm-emu: double the timeout
+Date: Fri, 06 Jul 2018 12:40:49 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1777226 <1777226@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152914430206.1773.1773906291047084265.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153088084960.29798.12397489008872355828.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777226] Re: qemu-user warnings confuse userland
+ applications
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+
+Yes, we should probably move these "unimplemented syscall" warnings to
+the LOG_UNIMP logging level (which you can then turn on if you want
+them).
 
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+** Tags added: linux-user
 
-> On Fri, Jul 6, 2018 at 12:19 PM, Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->>
->>> Hi
->>>
->>> On Fri, Jul 6, 2018 at 10:06 AM, Alex Benn=C3=A9e <alex.bennee@linaro.o=
-rg> wrote:
->>>> We see various failures on Travis so lets just double the timeout and
->>>> see if that makes them go away.
->>>
->>> This is just waiting for the thread to start and open a socket. It
->>> shouldn't be a problem to wait longer, but do you have a Travis error
->>> log?
->>
->> For example:
->>
->> https://travis-ci.org/qemu/qemu/jobs/400436724#L8971
->>
->>   GTESTER check-qtest-i386
->> **
->> ERROR:tests/tpm-emu.c:27:tpm_emu_test_wait_cond: code should not be reac=
-hed
->>
->
-> thanks, what about increasing the timeout to 30s ? I am afraid x2
-> might not be enough for such overloaded systems.
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
-Sure - the Travis servers are certainly hammered most of the time.
+-- =
 
->
->>>>
->>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>> ---
->>>>  tests/tpm-emu.c | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
->>>> index 8c2bd53cad..308f1884f6 100644
->>>> --- a/tests/tpm-emu.c
->>>> +++ b/tests/tpm-emu.c
->>>> @@ -20,7 +20,7 @@
->>>>
->>>>  void tpm_emu_test_wait_cond(TestState *s)
->>>>  {
->>>> -    gint64 end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECO=
-ND;
->>>> +    gint64 end_time =3D g_get_monotonic_time() + 10 * G_TIME_SPAN_SEC=
-OND;
->>>>
->>>>      g_mutex_lock(&s->data_mutex);
->>>>      if (!g_cond_wait_until(&s->data_cond, &s->data_mutex, end_time)) {
->>>> --
->>>> 2.17.1
->>>>
->>>>
->>
->>
->> --
->> Alex Benn=C3=A9e
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777226
 
+Title:
+  qemu-user warnings confuse userland applications
 
---
-Alex Benn=C3=A9e
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  I recently observed that warning messages emitted by qemu-user can
+  confuse applications when reading from stdout/stderr. This was
+  observed with the configure script of OpenJDK-11 on qemu-sh4:
+
+  configure: Found potential Boot JDK using configure arguments
+  configure: Potential Boot JDK found at /usr/lib/jvm/java-10-openjdk-sh4 i=
+s incorrect JDK version (qemu: Unsupported syscall: 318); ignoring
+  configure: (Your Boot JDK version must be one of: 10 11)
+  configure: error: The path given by --with-boot-jdk does not contain a va=
+lid Boot JDK
+  configure exiting with result code 1
+
+  See:
+  https://buildd.debian.org/status/fetch.php?pkg=3Dopenjdk-11&arch=3Dsh4&ve=
+r=3D11%7E18-1&stamp=3D1529119043&raw=3D0
+
+  Commenting out the line of code which emits the warning fixes the
+  problem for me and the configure script finishes without problems.
+
+  Thus, qemu should be modified to avoid cluttering stdout or stderr
+  with its own messages and rather send those warnings to a log file or
+  similar.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777226/+subscriptions
