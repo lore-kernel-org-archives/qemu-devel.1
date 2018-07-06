@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fbFLj-0001Qc-BS
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:15:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fbFOo-0002Ak-KA
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fbFLi-0000QK-56
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:15:51 -0400
-Date: Fri, 6 Jul 2018 11:03:15 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fbFOk-0003RB-Ln
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:19:02 -0400
+Date: Fri, 6 Jul 2018 11:18:49 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180706010315.GI3450@umbus.fritz.box>
-References: <20180703151732.29843-1-richard.henderson@linaro.org>
-	<20180703151732.29843-8-richard.henderson@linaro.org>
-	<B9095EFA-A3D5-4EEE-A5DA-E4284FD8881E@gmail.com>
-	<128b92a6-7b0e-5e27-2bad-63da14bb3a6a@linaro.org>
-	<1106207A-1C28-4146-9F94-F9747BF8B345@gmail.com>
+Message-ID: <20180706011849.GK3450@umbus.fritz.box>
+References: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
+	<eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WHz+neNWvhIGAO8A"
+	protocol="application/pgp-signature"; boundary="g4MvFqI7wmANiPDo"
 Content-Disposition: inline
-In-Reply-To: <1106207A-1C28-4146-9F94-F9747BF8B345@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 7/7] target/ppc: Use non-arithmetic
- conversions for fp load/store
+In-Reply-To: <eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] sam460ex: Add comment explaining ignored
+ errors from fdt operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Guenter Roeck <linux@roeck-us.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Pilippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
 
---WHz+neNWvhIGAO8A
+--g4MvFqI7wmANiPDo
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 05, 2018 at 12:51:00PM -0400, Programmingkid wrote:
+On Thu, Jul 05, 2018 at 04:06:28PM +0200, Paolo Bonzini wrote:
+> On 05/07/2018 15:51, Guenter Roeck wrote:
+> > +        /* Failure to set serial port clocks is not fatal, so just ign=
+ore
+> > +         * errors when trying to do so.
+> > +         */
+> > +        (void)fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FR=
+EQ);
+> >          offset =3D fdt_node_offset_by_compatible(fdt, offset, "ns16550=
+");
 >=20
-> > On Jul 5, 2018, at 12:48 PM, Richard Henderson <richard.henderson@linar=
-o.org> wrote:
-> >=20
-> > On 07/05/2018 09:31 AM, Programmingkid wrote:
-> >>> On Jul 3, 2018, at 11:17 AM, Richard Henderson <richard.henderson@lin=
-aro.org> wrote:
-> >>>=20
-> >>> Memory operations have no side effects on fp state.
-> >>> The use of a "real" conversions between float64 and float32
-> >>> would raise exceptions for SNaN and out-of-range inputs.
-> >>=20
-> >> Would you have any documentation that tells us about converting
-> >> between 64 bit and 32 bit floating points?
-> >=20
-> > Spelled out right at the beginning of sections 4.6 (load) and 4.7 (stor=
-e) of
-> > Book 1 of the Power ISA manual (version 3.0B) [0].
-> >=20
-> > I've double-checked vs RISU[1] testing of LFS and STFS, with master tra=
-ces
-> > generated on Power 8 ppc64le, so I don't see anything immediately wrong=
- with
-> > the patch.  But I haven't had time to look further than that.
-> >=20
-> >=20
-> > r~
-> >=20
-> >=20
-> > [0] https://openpowerfoundation.org/?resource_lib=3Dpower-isa-version-3=
--0
-> > [1] https://git.linaro.org/people/peter.maydell/risu.git
->=20
-> Thank you for the documentation. My guess is there are differences
-> between the PowerPC and Power 8 implementations.
+> Ok, but why would it even fail?  Maybe it's not this case, but even if
+> it's not fatal for the OS, generating different device trees silently
+> seems like a recipe for Heisenbugs.
 
-That seems very, very unlikely to me.
+Yes, quite.  Especially since the most likely errors I can see here
+would actually indicate something has already gone horribly wrong with
+the device tree construction, so a missing clock-frequency is the
+least of our troubles.
 
-> PowerPC is big
-> endian. Would you be able to do your testing again with your Power 8
-> CPU in big endian mode?
->=20
->=20
+I think using _FDT() here would be a better approach.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -88,24 +62,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---WHz+neNWvhIGAO8A
+--g4MvFqI7wmANiPDo
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls+v9EACgkQbDjKyiDZ
-s5Jwqw//U+65dZ2+DHx6/4nlAAT5Dp2vopAP1wYgqp8juUuP3ouoCesitcqSQaEi
-8GhdmckGWgQjDp0E800hhyFDBg7ypxyvN7zIlKwQRvvCxj0mTmKUyLjKABEhz3nk
-YqdyfkuoKVR2Tnyx4lO7xHD4mRGaS9uvxgbZhjIltmV41WVtHUJcV0fFjIT58lHF
-mN81YuZm8kYgkSHst5AFGndFn6ewsRQCKAuyqUp0ALL8iGJAtRUWhv6UkP3/pXkt
-j0w8ok1yYKVC1/QlZHkSP1oiRSsdbIqYylXz2WdGHULOYsH1WoQBLUoWOBAA26lD
-756GAT/U0vZctFj1zmbSL/sP7zLxRMLEVDcmJE6mVxF+2tvz1vPSyVWvwc2QH6qY
-WkUtAcxO/BsQLeXQEN6lVS1FXlYWFlgKzk/jdB/xRCc89ueukzEY4pJQtVwieBXS
-mYE8YzL4D+B94o0KdFIz6c6UM5L2yh3mZchH6y1YULKWJlgnZ9JTJoowqCoYUeGq
-pqAE/djjDofLiJIt54+YsloUX5assmWMWXgxRvrTwrE3dOjtrUKpSmhZrmdSCJBN
-C/xnWHR/KnyB+jY4X9sAoG+SyctF+5L1U/m0Jc5EHuY1WA4HSjmVz7p044rdY4Bp
-LEkmT1/asx/y8N9AIh9uv0+nrMFpd5OSoh+MLbdlJRXIR8xCyh0=
-=zh7W
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls+w3kACgkQbDjKyiDZ
+s5KwnA/+PCwZQK5KLxw0KxXsBkH4+IPTo9NkpAVnxrZqB8cgxWIMXlSfmB180Svt
+Mw9Ot2BSJQupJ2bkDoeu0vugwLhhm6+qlmBQ0LaXmCZW43TvYU2dFuyPqScjRg1l
+i6sPscTvFY/n2+orPmsR7Gin4jHsQxsKvegs5M9gNl2sgQo8Kk0tYq721SE59EJD
+j5GNOnWeZEh1wUFmNc9KCLg/O4yAWY90fzirmk24MdTk0pxmKolPA+NOzVu6dDll
+FT52QvPJUDbR0RlPWzVkhzJqb3vdZNcE/WYmxsgZ9TFZS8bQz/pN9lKy1HidETQj
+72b5OskM2hAx8utGa7T8oPt8UUlkHtNEVZ4iNaWUJsgp7cxgzh3/S5N2c80Gz9JN
+7cF2U6FTnafKMC94oYiO7ieTIpTr0Vm6D8bucMKgxJMarGcLOMT9pIuiabUwZPEK
+6gaWyOFyPXy41hdE8xuVxzsl6mq15df0/tj2qW6Qj94wund9pxgkzOSnEGl4YL2f
+p9WGxJvMwobnS9dijKj5GJLVJiS0xXp4mz6l3vflglLSkUt7dM8N+tt8+v1dIEqT
+/ZFwhlCiQljTWPS4/aCSvFzoTW59SwOaG4zev48rkY/Alk/l3mO+wV7g04Vqw7a1
+BhdpQe3NaECcDPafDnAk/z6SC45cZuEpEKMPihm67Bxp5A6N0Xs=
+=tWeS
 -----END PGP SIGNATURE-----
 
---WHz+neNWvhIGAO8A--
+--g4MvFqI7wmANiPDo--
