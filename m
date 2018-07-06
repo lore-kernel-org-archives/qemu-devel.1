@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK4-0001D4-66
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK4-0001D3-5l
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUJz-0000kr-UN
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fbUK1-0000ld-Si
 	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:08 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44932)
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:44159)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fbUJz-0000kN-G3
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:03 -0400
-Received: by mail-wr1-x444.google.com with SMTP id r16-v6so4873020wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:03 -0700 (PDT)
-Received: from 640k.lan ([82.84.124.111]) by smtp.gmail.com with ESMTPSA id
-	h40-v6sm13784683wrf.40.2018.07.06.10.15.01
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 06 Jul 2018 10:15:01 -0700 (PDT)
+	id 1fbUK1-0000lO-IC
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 13:15:05 -0400
+Received: by mail-wr1-x433.google.com with SMTP id r16-v6so4873105wrt.11
+	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 10:15:05 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  6 Jul 2018 19:14:21 +0200
-Message-Id: <1530897268-22932-2-git-send-email-pbonzini@redhat.com>
+Date: Fri,  6 Jul 2018 19:14:23 +0200
+Message-Id: <1530897268-22932-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
 References: <1530897268-22932-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 1/8] pr-helper: avoid error on PR IN command
- with zero request size
+Subject: [Qemu-devel] [PULL 3/8] qtest: Use cpu address space instead of
+ system memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,125 +29,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Julia Suvorova <jusual@mail.ru>
 
-After reading a PR IN command with zero request size in prh_read_request,
-the resp->result field will be uninitialized and the resp.sz field will
-be also uninitialized when returning to prh_co_entry.
+From: Julia Suvorova <jusual@mail.ru>
 
-If resp->result == GOOD (from a previous successful reply or just luck),
-then the assert in prh_write_response might not be triggered and
-uninitialized response will be sent.
+Some devices (like nvic in armv7m) are not accessable through
+address_space_memory, therefore can not be tested with qtest.
 
-The fix is to remove the whole handling of sz == 0 in prh_co_entry.
-Those errors apply only to PR OUT commands and it's perfectly okay to
-catch them later in do_pr_out and multipath_pr_out; the check for
-too-short parameters in fact doesn't apply in the easy SG_IO case, as
-it can be left to the target firmware even.
-
-The result is that prh_read_request does not fail requests anymore and
-prh_co_entry becomes simpler.
-
-Reported-by: Dima Stepanov <dimastep@yandex-team.ru>
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+Message-Id: <20180702065237.27899-1-jusual@mail.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scsi/qemu-pr-helper.c | 63 ++++++++++++++++++++++++---------------------------
- 1 file changed, 30 insertions(+), 33 deletions(-)
+ qtest.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-index 0218d65..c89a446 100644
---- a/scsi/qemu-pr-helper.c
-+++ b/scsi/qemu-pr-helper.c
-@@ -455,6 +455,14 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
-     char transportids[PR_HELPER_DATA_SIZE];
-     int r;
+diff --git a/qtest.c b/qtest.c
+index cbbfb71..69b9e99 100644
+--- a/qtest.c
++++ b/qtest.c
+@@ -387,19 +387,23 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
  
-+    if (sz < PR_OUT_FIXED_PARAM_SIZE) {
-+        /* Illegal request, Parameter list length error.  This isn't fatal;
-+         * we have read the data, send an error without closing the socket.
-+         */
-+        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM_LEN));
-+        return CHECK_CONDITION;
-+    }
-+
-     switch (rq_servact) {
-     case MPATH_PROUT_REG_SA:
-     case MPATH_PROUT_RES_SA:
-@@ -574,6 +582,12 @@ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
-                      const uint8_t *param, int sz)
- {
-     int resp_sz;
-+
-+    if ((fcntl(fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
-+        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
-+        return CHECK_CONDITION;
-+    }
-+
- #ifdef CONFIG_MPATH
-     if (is_mpath(fd)) {
-         return multipath_pr_out(fd, cdb, sense, param, sz);
-@@ -690,21 +704,6 @@ static int coroutine_fn prh_read_request(PRHelperClient *client,
-                                  errp) < 0) {
-             goto out_close;
+         if (words[0][5] == 'b') {
+             uint8_t data = value;
+-            cpu_physical_memory_write(addr, &data, 1);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             &data, 1, true);
+         } else if (words[0][5] == 'w') {
+             uint16_t data = value;
+             tswap16s(&data);
+-            cpu_physical_memory_write(addr, &data, 2);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             (uint8_t *) &data, 2, true);
+         } else if (words[0][5] == 'l') {
+             uint32_t data = value;
+             tswap32s(&data);
+-            cpu_physical_memory_write(addr, &data, 4);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             (uint8_t *) &data, 4, true);
+         } else if (words[0][5] == 'q') {
+             uint64_t data = value;
+             tswap64s(&data);
+-            cpu_physical_memory_write(addr, &data, 8);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             (uint8_t *) &data, 8, true);
          }
--        if ((fcntl(client->fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
--            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_OPCODE));
--            sz = 0;
--        } else if (sz < PR_OUT_FIXED_PARAM_SIZE) {
--            /* Illegal request, Parameter list length error.  This isn't fatal;
--             * we have read the data, send an error without closing the socket.
--             */
--            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_PARAM_LEN));
--            sz = 0;
--        }
--        if (sz == 0) {
--            resp->result = CHECK_CONDITION;
--            close(client->fd);
--            client->fd = -1;
--        }
-     }
+         qtest_send_prefix(chr);
+         qtest_send(chr, "OK\n");
+@@ -417,18 +421,22 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
  
-     req->fd = client->fd;
-@@ -785,25 +784,23 @@ static void coroutine_fn prh_co_entry(void *opaque)
-             break;
+         if (words[0][4] == 'b') {
+             uint8_t data;
+-            cpu_physical_memory_read(addr, &data, 1);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             &data, 1, false);
+             value = data;
+         } else if (words[0][4] == 'w') {
+             uint16_t data;
+-            cpu_physical_memory_read(addr, &data, 2);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             (uint8_t *) &data, 2, false);
+             value = tswap16(data);
+         } else if (words[0][4] == 'l') {
+             uint32_t data;
+-            cpu_physical_memory_read(addr, &data, 4);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             (uint8_t *) &data, 4, false);
+             value = tswap32(data);
+         } else if (words[0][4] == 'q') {
+-            cpu_physical_memory_read(addr, &value, 8);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             (uint8_t *) &value, 8, false);
+             tswap64s(&value);
+         }
+         qtest_send_prefix(chr);
+@@ -448,7 +456,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         g_assert(len);
+ 
+         data = g_malloc(len);
+-        cpu_physical_memory_read(addr, data, len);
++        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                         data, len, false);
+ 
+         enc = g_malloc(2 * len + 1);
+         for (i = 0; i < len; i++) {
+@@ -473,7 +482,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         g_assert(ret == 0);
+ 
+         data = g_malloc(len);
+-        cpu_physical_memory_read(addr, data, len);
++        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                         data, len, false);
+         b64_data = g_base64_encode(data, len);
+         qtest_send_prefix(chr);
+         qtest_sendf(chr, "OK %s\n", b64_data);
+@@ -507,7 +517,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+                 data[i] = 0;
+             }
+         }
+-        cpu_physical_memory_write(addr, data, len);
++        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                         data, len, true);
+         g_free(data);
+ 
+         qtest_send_prefix(chr);
+@@ -529,7 +540,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         if (len) {
+             data = g_malloc(len);
+             memset(data, pattern, len);
+-            cpu_physical_memory_write(addr, data, len);
++            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                             data, len, true);
+             g_free(data);
          }
  
--        if (sz > 0) {
--            num_active_sockets++;
--            if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
--                r = do_pr_out(req.fd, req.cdb, resp.sense,
--                              client->data, sz);
--                resp.sz = 0;
--            } else {
--                resp.sz = sizeof(client->data);
--                r = do_pr_in(req.fd, req.cdb, resp.sense,
--                             client->data, &resp.sz);
--                resp.sz = MIN(resp.sz, sz);
--            }
--            num_active_sockets--;
--            close(req.fd);
--            if (r == -1) {
--                break;
--            }
--            resp.result = r;
-+        num_active_sockets++;
-+        if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
-+            r = do_pr_out(req.fd, req.cdb, resp.sense,
-+                          client->data, sz);
-+            resp.sz = 0;
-+        } else {
-+            resp.sz = sizeof(client->data);
-+            r = do_pr_in(req.fd, req.cdb, resp.sense,
-+                         client->data, &resp.sz);
-+            resp.sz = MIN(resp.sz, sz);
-+        }
-+        num_active_sockets--;
-+        close(req.fd);
-+        if (r == -1) {
-+            break;
+@@ -562,7 +574,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+             out_len = MIN(out_len, len);
          }
-+        resp.result = r;
  
-         if (prh_write_response(client, &req, &resp, &local_err) < 0) {
-             break;
+-        cpu_physical_memory_write(addr, data, out_len);
++        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
++                         data, len, true);
+ 
+         qtest_send_prefix(chr);
+         qtest_send(chr, "OK\n");
 -- 
 1.8.3.1
