@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fbSO5-0002OG-Sb
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:11:10 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fbSX1-0004Lq-Bw
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fbSO5-00078L-1J
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:11:09 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:36660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fbSO4-00078B-SY
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:11:08 -0400
-Received: by mail-oi0-x232.google.com with SMTP id r16-v6so24091534oie.3
-	for <qemu-devel@nongnu.org>; Fri, 06 Jul 2018 08:11:08 -0700 (PDT)
+	(envelope-from <amarkovic@wavecomp.com>) id 1fbSWx-0004kG-5j
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:20:23 -0400
+Received: from mail-co1nam03on0133.outbound.protection.outlook.com
+	([104.47.40.133]:35120
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fbSWw-0004hy-Pd
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:20:19 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 6 Jul 2018 15:20:13 +0000
+Message-ID: <BN7PR08MB4868957D4C3531332A504D5AC6470@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1530877732-26557-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1530877732-26557-7-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<04dc592b-90e5-46be-7ce9-1447642234a0@linaro.org>
+In-Reply-To: <04dc592b-90e5-46be-7ce9-1447642234a0@linaro.org>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <20180706145645.GB3939@localhost.localdomain>
-References: <20180625114106.GJ5024@localhost.localdomain>
-	<20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-	<20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
-	<20180704150256.408d4a07.cohuck@redhat.com>
-	<20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jul 2018 16:10:47 +0100
-Message-ID: <CAFEAcA9J=Jmd=+9vEo4LLdk0LcL42fchHcAp3fp_+9q1tsCoNg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 6/8] target/mips: Amend CP0 WatchHi
+ register implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,26 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 6 July 2018 at 15:56, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 06.07.2018 um 13:11 hat Cornelia Huck geschrieben:
->> That way, we can still easily remove old cruft (case (a)), but still
->> accommodate cases like this (case (c)). The obvious drawback is that
->> we'd need someone to curate the deprecation watchlist, to poke the
->> users we're waiting for, and probably remove anyway after some time if
->> they don't get their act together.
+> > +++ b/target/mips/op_helper.c
+> > @@ -893,7 +893,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env=
+, > uint32_t sel)
+> >
+> >  target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
+> >  {
+> > -    return env->CP0_WatchHi[sel];
+> > +    return (int32_t) env->CP0_WatchHi[sel];
+> > +}
+> > +
+> > +target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
+> > +{
+> > +    return env->CP0_WatchHi[sel] >> 32;
+> >  }
 >
-> The problem is that things are only starting to move after two releases
-> have passed.
+> Did you in fact want the high-part sign-extended as well?
+> It might be more obvious to write
+>
+>     return sextract64(env->CP0_WatchHi[sel], 32, 32);
+>
+> in that case.
+>
+> > +void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32=
+_t sel)
+> > +{
+> > +    env->CP0_WatchHi[sel] =3D ((uint64_t) (arg1) << 32) |
+> > +                            (env->CP0_WatchHi[sel] & 0x00000000fffffff=
+fULL);
+>
+> Cleaner as
+>
+>     env->CP0_WatchHi[sel] =3D deposit64(env->CP0_WatchHi[sel], 32, 32, ar=
+g1);
+>
+>
+> For future cleanup, there is nothing in this (or several other) that requ=
+ires
+> writing helper code.  This could just as easily be expanded inline with o=
+ne
+> single load or store operation.
+>
+>
+> r~>
 
-Right, so clearly just "put a note in the documentation" isn't
-sufficient advertisement/prodding of things going away. (Also, two
-releases is pretty fast. Many of our users will be using distro
-packaged versions of QEMU which will lag further behind than
-bleeding-edge users. The system version of QEMU on my desktop
-machine is 2.5...)
+If this all is the case, I am going to remove this patch from this series. =
+There is no hurry. This patch just needs to be thought over a little bit mo=
+re. It will be sent in some future series.
 
-thanks
--- PMM
+Regards,
+Aleksandar
