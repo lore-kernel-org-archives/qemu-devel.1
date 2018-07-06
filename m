@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fbSzP-0001td-Pi
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:49:44 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fbT1S-0002bp-AZ
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fbSzM-0007bY-Ic
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:49:43 -0400
-Received: from mail-by2nam05on071e.outbound.protection.outlook.com
-	([2a01:111:f400:fe52::71e]:6144
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fbSzM-0007bD-5N
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:49:40 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 6 Jul 2018 15:49:21 +0000
-Message-ID: <BN7PR08MB4868C170426CD454B5AE8871C6470@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1530728238-5608-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1530728238-5608-9-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1530728238-5608-9-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fbT1R-0000aT-DM
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 11:51:50 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri,  6 Jul 2018 12:51:25 -0300
+Message-Id: <20180706155127.7483-2-f4bug@amsat.org>
+In-Reply-To: <20180706155127.7483-1-f4bug@amsat.org>
+References: <20180706155127.7483-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] target/mips: Check ELPA flag only
- in some cases of MFHC0 and MTHC0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.0 1/3] linux-user: Do not report
+ "Unsupported syscall" by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,12 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org
 
-> MFHC0 and MTHC0 used to handle EntryLo0 and EntryLo1 registers only,
-> and placing ELPA flag checks befor switch statement were technically
+This can still be reported using the "-d unimp" command line option.
 
-befor -> before
+Fixes: https://bugs.launchpad.net/qemu/+bug/1777226
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-this will be fixed in v5
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 5822e03e28..e4b1b7d7da 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -12757,7 +12757,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ 
+     default:
+     unimplemented:
+-        gemu_log("qemu: Unsupported syscall: %d\n", num);
++        qemu_log_mask(LOG_UNIMP, "Unsupported syscall: %d\n", num);
+ #if defined(TARGET_NR_setxattr) || defined(TARGET_NR_get_thread_area) || defined(TARGET_NR_getdomainname) || defined(TARGET_NR_set_robust_list)
+     unimplemented_nowarn:
+ #endif
+-- 
+2.18.0
