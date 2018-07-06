@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fbFOo-0002Ak-KA
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:19:03 -0400
+	(envelope-from <prvs=718ae7c5e=Alistair.Francis@wdc.com>)
+	id 1fbFSF-0003CH-GX
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fbFOk-0003RB-Ln
-	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:19:02 -0400
-Date: Fri, 6 Jul 2018 11:18:49 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180706011849.GK3450@umbus.fritz.box>
-References: <1530798684-23009-1-git-send-email-linux@roeck-us.net>
-	<eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
+	(envelope-from <prvs=718ae7c5e=Alistair.Francis@wdc.com>)
+	id 1fbFSC-0007b3-AJ
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:22:35 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:17069)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=718ae7c5e=Alistair.Francis@wdc.com>)
+	id 1fbFSB-0007YF-5l
+	for qemu-devel@nongnu.org; Thu, 05 Jul 2018 21:22:32 -0400
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Thu,  5 Jul 2018 18:22:08 -0700
+Message-Id: <20180706012215.21714-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="g4MvFqI7wmANiPDo"
-Content-Disposition: inline
-In-Reply-To: <eb53939b-4a90-2e7b-32df-3dbe75169d3b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] sam460ex: Add comment explaining ignored
- errors from fdt operations
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v4 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Guenter Roeck <linux@roeck-us.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Pilippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mjc@sifive.com
+Cc: f4bug@amsat.org, alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
 
+The following changes since commit cee35138b59c6d6b0808c5fa644e3f063832860f:
 
---g4MvFqI7wmANiPDo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-code-coverage-and-build-tweaks-050718-3' into staging (2018-07-05 18:24:28 +0100)
 
-On Thu, Jul 05, 2018 at 04:06:28PM +0200, Paolo Bonzini wrote:
-> On 05/07/2018 15:51, Guenter Roeck wrote:
-> > +        /* Failure to set serial port clocks is not fatal, so just ign=
-ore
-> > +         * errors when trying to do so.
-> > +         */
-> > +        (void)fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FR=
-EQ);
-> >          offset =3D fdt_node_offset_by_compatible(fdt, offset, "ns16550=
-");
->=20
-> Ok, but why would it even fail?  Maybe it's not this case, but even if
-> it's not fatal for the OS, generating different device trees silently
-> seems like a recipe for Heisenbugs.
+are available in the Git repository at:
 
-Yes, quite.  Especially since the most likely errors I can see here
-would actually indicate something has already gone horribly wrong with
-the device tree construction, so a missing clock-frequency is the
-least of our troubles.
+  git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180705
 
-I think using _FDT() here would be a better approach.
+for you to fetch changes up to 5a7f76a3d47a75290868968682c0585d380764a4:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+  hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device (2018-07-05 15:24:25 -0700)
 
---g4MvFqI7wmANiPDo
-Content-Type: application/pgp-signature; name="signature.asc"
+----------------------------------------------------------------
+RISC-V: SoCify SiFive boards and connect GEM
 
------BEGIN PGP SIGNATURE-----
+This series has three tasks:
+ 1. To convert the SiFive U and E machines into SoCs and boards
+ 2. To connect the Cadence GEM device to the SiFive U board
+ 3. Fix some device tree problems with the SiFive U board
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAls+w3kACgkQbDjKyiDZ
-s5KwnA/+PCwZQK5KLxw0KxXsBkH4+IPTo9NkpAVnxrZqB8cgxWIMXlSfmB180Svt
-Mw9Ot2BSJQupJ2bkDoeu0vugwLhhm6+qlmBQ0LaXmCZW43TvYU2dFuyPqScjRg1l
-i6sPscTvFY/n2+orPmsR7Gin4jHsQxsKvegs5M9gNl2sgQo8Kk0tYq721SE59EJD
-j5GNOnWeZEh1wUFmNc9KCLg/O4yAWY90fzirmk24MdTk0pxmKolPA+NOzVu6dDll
-FT52QvPJUDbR0RlPWzVkhzJqb3vdZNcE/WYmxsgZ9TFZS8bQz/pN9lKy1HidETQj
-72b5OskM2hAx8utGa7T8oPt8UUlkHtNEVZ4iNaWUJsgp7cxgzh3/S5N2c80Gz9JN
-7cF2U6FTnafKMC94oYiO7ieTIpTr0Vm6D8bucMKgxJMarGcLOMT9pIuiabUwZPEK
-6gaWyOFyPXy41hdE8xuVxzsl6mq15df0/tj2qW6Qj94wund9pxgkzOSnEGl4YL2f
-p9WGxJvMwobnS9dijKj5GJLVJiS0xXp4mz6l3vflglLSkUt7dM8N+tt8+v1dIEqT
-/ZFwhlCiQljTWPS4/aCSvFzoTW59SwOaG4zev48rkY/Alk/l3mO+wV7g04Vqw7a1
-BhdpQe3NaECcDPafDnAk/z6SC45cZuEpEKMPihm67Bxp5A6N0Xs=
-=tWeS
------END PGP SIGNATURE-----
+After this series the SiFive E and U boards have their SoCs split into
+seperate QEMU objects, which can be used on future boards if desired.
 
---g4MvFqI7wmANiPDo--
+The RISC-V Virt and Spike boards have not been converted. They haven't
+been converted as they aren't physical boards, so it doesn't make a
+whole lot of sense to split them into an SoC and board. The only
+disadvantage with this is that they now differ to the SiFive boards.
+
+This series also connect the Cadence GEM device to the SiFive U board.
+There are some interrupt line changes requried before this is possible.
+
+----------------------------------------------------------------
+Alistair Francis (7):
+      hw/riscv/sifive_u: Create a SiFive U SoC object
+      hw/riscv/sifive_e: Create a SiFive E SoC object
+      hw/riscv/sifive_plic: Use gpios instead of irqs
+      hw/riscv/sifive_u: Set the soc device tree node as a simple-bus
+      hw/riscv/sifive_u: Set the interrupt controller number of interrupts
+      hw/riscv/sifive_u: Move the uart device tree node under /soc/
+      hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device
+
+ default-configs/riscv32-softmmu.mak |   2 +
+ default-configs/riscv64-softmmu.mak |   2 +
+ hw/riscv/sifive_e.c                 |  99 +++++++++++++++++-------
+ hw/riscv/sifive_plic.c              |   6 +-
+ hw/riscv/sifive_u.c                 | 148 +++++++++++++++++++++++++++++-------
+ hw/riscv/virt.c                     |   4 +-
+ include/hw/riscv/sifive_e.h         |  16 +++-
+ include/hw/riscv/sifive_plic.h      |   1 -
+ include/hw/riscv/sifive_u.h         |  25 +++++-
+ 9 files changed, 235 insertions(+), 68 deletions(-)
