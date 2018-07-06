@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbXNV-0006G6-0u
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 16:30:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fbY9T-0006a6-Mk
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbXNT-0002nb-Up
-	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 16:30:53 -0400
-References: <20180703105305.45398-1-vsementsov@virtuozzo.com>
-	<20180703105305.45398-3-vsementsov@virtuozzo.com>
-	<79b1dc41-b230-3958-8057-4061c18a7814@redhat.com>
-	<63c582e8-4646-ad59-3d89-ce07f78e390c@virtuozzo.com>
-	<43e22b35-39c3-f596-5a0a-f899376911ad@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fbY9S-00030E-Mq
+	for qemu-devel@nongnu.org; Fri, 06 Jul 2018 17:20:27 -0400
+References: <20180706164542.9476-1-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <74c5daf1-cef1-e2b0-4107-eab3f24778d2@redhat.com>
-Date: Fri, 6 Jul 2018 15:30:37 -0500
+Message-ID: <be1b9d41-1eb3-c24c-c459-cc6d6599de22@redhat.com>
+Date: Fri, 6 Jul 2018 16:20:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <43e22b35-39c3-f596-5a0a-f899376911ad@redhat.com>
+In-Reply-To: <20180706164542.9476-1-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: add transaction support for
- x-block-dirty-bitmap-merge
+Subject: Re: [Qemu-devel] [PATCH] block: Fix copy-on-read crash with partial
+ final cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 07/06/2018 10:38 AM, John Snow wrote:
+On 07/06/2018 11:45 AM, Kevin Wolf wrote:
+> If the virtual disk size isn't aligned to full clusters,
+> bdrv_co_do_copy_on_readv() may get pnum == 0 before having the full
+> cluster completed, which will let it run into an assertion failure:
+> 
+> qemu-io: block/io.c:1203: bdrv_co_do_copy_on_readv: Assertion `skip_bytes < pnum' failed.
+> 
+> Check for EOF, assert that we read at least as much as the read request
+> originally wanted to have (which is true at EOF because otherwise
+> bdrv_check_byte_request() would already have returned an error) and
+> return success early even though we couldn't copy the full cluster.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/io.c                 | 6 ++++++
+>   tests/qemu-iotests/197     | 9 +++++++++
+>   tests/qemu-iotests/197.out | 8 ++++++++
+>   3 files changed, 23 insertions(+)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 038449f81f..4c0831149c 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1200,6 +1200,12 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+>               pnum = MIN(cluster_bytes, max_transfer);
+>           }
+>   
+> +        /* Stop at EOF if the image ends in the middle of the cluster */
+> +        if (ret == 0 && pnum == 0) {
 
->> I think the "discard stashed state, making undo impossible"
->> interpretation is good because .commit() is not allowed to fail.  That
->> function should only do things that never fail.
-> 
-> I think this is probably the correct way to proceed, and we ought to
-> formalize this model. I think it's actually nearly impossible to do it
-> the other way around, too.
-> 
-> Let's say we've got two actions that both do error-checking in .prepare,
-> but perform their actual stateful changes in .commit, but are
-> interdependent.
-> 
-> { a, b }
-> 
-> - a.prepare() checks state and confirms we will be able to proceed, but
-> changes no state.
-> - b.prepare() checks state and confirms it will be able to proceed, but
-> can't see what a is planning to do.
-> - a.commit() succeeds as expected.
-> - b.commit() does not fail as it is not allowed to, but the effects are
-> undetermined because we have not checked the state change from a.commit()
+Is it any smarter to check for 'ret & BDRV_BLOCK_EOF' instead of pnum == 0?
 
-I'm also trying to figure out if we guarantee that .abort is always 
-called in reverse order of .prepare.  If we have { a, b, c }, where 
-'a'.prepare makes one change, 'b'.prepare makes another that 'a' cannot 
-directly undo, then 'c' fails, we're still okay if 'b'.abort can roll 
-back to the state it had during prepare, so that 'a'.abort can then undo 
-state cleanly.  And for consistency, I'd argue that .commit should have 
-the same ordering as .abort (that is, every .prepare - .abort/.commit 
-pair is a nested stack to track for unwinding purposes, and should be 
-unwound in reverse order of setting aside resources up front).
+But as far as I can tell, right now those two conditions are synonymous.
 
-> 
-> In general we can get around this, but the more actions we add, the
-> harder it is to do proper error checking while considering the
-> hypothetical state after some actions have committed.
-> 
-> I think the model where we take effect in .prepare() and undo it if
-> necessary in .abort() is actually easier to model in your head, because
-> error checking is simpler. That's probably the right model, then.
-> 
+>   
+> +echo
+> +echo '=== Partial final cluster ==='
+> +echo
+> +
+> +_make_test_img 1024
+> +$QEMU_IO -f $IMGFMT -C -c 'read 0 1024' "$TEST_IMG" | _filter_qemu_io
 
-Yes, I'm also leaning heavily towards strong guarantees.  In addition to 
-our examples of which operations depend on which bitmaps, we have this 
-additional case:
+Here, $TEST_IMG has no backing file, and does not have the final cluster 
+allocated; all we have to do is properly read all zeroes.  Is it worth 
+also explicitly testing reading of allocated data under COR, and/or the 
+case of one image with another backing image (with same or differing 
+partial cluster sizes), where COR actually has to write the partial 
+cluster?  However, the logic in the code appears to cover all of those, 
+whether or not the testsuite does as well.
 
-{ blockdev-snapshot, blockdev-snapshot-internal-sync }
-
-vs.
-
-{ blockdev-snapshot-internal-sync, blockdev-snapshot }
-
-Yes, I know that mixing internal and external snapshots is currently 
-VERY dangerous 
-(https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00865.html) if 
-you aren't careful - but there are two plausible outcomes that can be 
-chosen, where the order matters.  In the first instance, we want to 
-create a new external snapshot (going from 'A' to 'A <- B') and THEN 
-create an internal snapshot (image 'B' gets an internal snapshot); in 
-the second instance we want to create an internal snapshot (image 'A' 
-gets an internal snapshot) and THEN create an external snapshot (going 
-from 'A' to 'A <- B').  Since the file where the internal snapshot is 
-created is indeterminate unless we strictly process the transaction in 
-the order that it was given, that argues that we want the strong order 
-guarantees.
-
-> 
-> 
-> At the very least, I think that's correct for 3.0 and the immediate
-> future. If you disagree, please speak up because I've long been
-> particularly uncertain about this aspect.
-> 
-> --John
-> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
