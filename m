@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fberj-0004tS-6d
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 00:30:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1fberj-0004tU-74
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 00:30:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fberh-0006K9-Km
+	(envelope-from <bounces@canonical.com>) id 1fberf-0006JV-Vc
 	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 00:30:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47382)
+Received: from indium.canonical.com ([91.189.90.7]:47334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fberh-0006Jm-Ab
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 00:30:33 -0400
+	id 1fberf-0006Iw-Ik
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 00:30:31 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fberg-0006AH-Fp
-	for <qemu-devel@nongnu.org>; Sat, 07 Jul 2018 04:30:32 +0000
+	id 1fbere-00068u-PR
+	for <qemu-devel@nongnu.org>; Sat, 07 Jul 2018 04:30:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7494F2E8197
-	for <qemu-devel@nongnu.org>; Sat,  7 Jul 2018 04:30:32 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BCCFF2E8197
+	for <qemu-devel@nongnu.org>; Sat,  7 Jul 2018 04:30:30 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Jul 2018 04:17:44 -0000
-From: Launchpad Bug Tracker <1405385@bugs.launchpad.net>
-Reply-To: Bug 1405385 <1405385@bugs.launchpad.net>
+Date: Sat, 07 Jul 2018 04:17:43 -0000
+From: Launchpad Bug Tracker <1452904@bugs.launchpad.net>
+Reply-To: Bug 1452904 <1452904@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20141224102108.30804.4332.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153093706457.30384.10743917142286854065.malone@loganberry.canonical.com>
+References: <20150507210730.16647.32355.malonedeb@gac.canonical.com>
+Message-Id: <153093706395.30384.13646095208197561493.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1405385] Re: QEMU crashes when virtio network
- cards are used together with e1000 network cards
+Subject: [Qemu-devel] [Bug 1452904] Re: High CPU in idle Windows guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,160 +47,310 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1405385
+https://bugs.launchpad.net/bugs/1452904
 
 Title:
-  QEMU crashes when virtio network cards are used together with e1000
-  network cards
+  High CPU in idle Windows guest
 
 Status in QEMU:
   Expired
 
 Bug description:
-  QEMU version: QEMU emulator version 2.2.50, Copyright (c) 2003-2008 Fabri=
-ce Bellard
-  QEMU GIT version: ab0302ee764fd702465aef6d88612cdff4302809
-  Configure flags: ./configure --enable-kvm --prefix=3D/opt/qemu-devel
-  Linux version: Ubuntu 14.04.1 LTS
-  Kernel version: 3.13.0-43-generic #72-Ubuntu SMP Mon Dec 8 19:35:06 UTC 2=
-014 x86_64 x86_64 x86_64 GNU/Linux
+  Hi,
 
-  Problem:
+  I'm running a freshly installed Windows 7 domU on an up-to-date Debian
+  jessie machine running Xen 4.4.1-9.  When the Windows machine is idle,
+  I'm seeing upwards of 10% CPU usage from the qemu-system-i386 instance.
+  Other Linux and FreeBSD machines register negligable CPU usage (<0.5%).
+  The server is an HP Proliant DL360 G7.
 
-          QEMU crashes when using one (or more) virtio network cards
-  together with one (or more) e1000 (and possibly others) network cards
-  when those cards are bound to a linux bridge. When the cards are *not*
-  bound to a bridge QEMU does not crash.
+  Data from perf attacthed to the process might give the best clues.
 
-  Bridge configuration:
+  Any information as to why this processes is comsuming so much CPU would
+  be much appreciated.
 
-  	iface bridge0 inet dhcp
-  	bridge_ports eth1
-  	bridge_stp off
-  	bridge_fd 0
+  Regards,
+  Terry.
 
-  Start-up command (including binding the network cards to the bridge +
-  strace logging):
+  # uname -a
+  Linux xen 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt9-3~deb8u1 (2015-04-24) =
+x86_64 GNU/Linux
 
-  ./qemu-system-x86_64 -daemonize -smp 1 -m 128 -vnc 0.0.0.0:0 \
-  -netdev tap,id=3Dtap_1,script=3Dno,downscript=3Dno,ifname=3Dnet_1_1,vhost=
-=3Don \
-  -device virtio-net-pci,bootindex=3D1,id=3Dnic_1,netdev=3Dtap_1,mac=3D02:1=
-6:3F:00:00:FA \
-  -netdev tap,id=3Dtap_2,script=3Dno,downscript=3Dno,ifname=3Dnet_1_2 \
-  -device e1000,bootindex=3D2,id=3Dnic_2,netdev=3Dtap_2,mac=3D02:16:3F:00:0=
-0:FB; \
-  brctl addif bridge0 net_1_1; \
-  brctl addif bridge0 net_1_2; \
-  ifconfig net_1_1 0.0.0.0 up; \
-  ifconfig net_1_2 0.0.0.0 up; \
-  sleep 2; \
-  strace -p `ps x |grep qemu-system-x86_64 |grep -v grep|awk '{print $1}'` =
--o /tmp/qemu-devel-trace.txt =
+  # lsb_release -a
+  No LSB modules are available.
+  Distributor ID: Debian
+  Description:    Debian GNU/Linux 8.0 (jessie)
+  Release:        8.0
+  Codename:       jessie
+
+  # qemu-system-i386 --version
+  QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-11), Copyright (c) 2003-20=
+08 Fabrice Bellard
+
+  # cat win7.cfg
+  name        =3D 'win7'
+  vcpus       =3D '1'
+  memory      =3D '4096'
+  builder     =3D 'hvm'
+  disk        =3D [ '/vms/xen/domains/desk_win7/disk1.img,qcow2,hda,rw',
+                  '/vms/xen/domains/desk_win7/disk2.img,qcow2,hdb,rw' ]
+  vfb         =3D [ 'vnc=3D1,vnclisten=3D"0.0.0.0",sdl=3D0' ]
+  vif         =3D [ 'mac=3D00:16:3E:FB:FC:39,bridge=3Dxenbr0' ]
+  serial      =3D 'pty'
+  vnc         =3D 1
+  vnclisten   =3D '0.0.0.0'
+  sdl         =3D 0
+  usbdevice   =3D 'mouse'
+  audio       =3D 1
+  soundhw     =3D 'sb16,es1370'
+  on_poweroff =3D 'destroy'
+  on_reboot   =3D 'restart'
+  on_crash    =3D 'restart'
+
+  # /usr/bin/qemu-system-i386 -nodefaults -name desk_win7 -boot
+  order=3Dcda -usb -usbdevice mouse -device
+  rtl8139,id=3Dnic0,netdev=3Dnet0,mac=3D00:16:3e:fb:fc:39 -netdev
+  type=3Dtap,id=3Dnet0,ifname=3Dvif12.0-emu,script=3Dno,downscript=3Dno -m =
+4088
+  -drive
+  file=3D/vms/xen/domains/desk_win7/disk1.img,if=3Dide,index=3D0,media=3Ddi=
+sk,format=3Dqcow2,cache=3Dwriteback
+  -drive
+  file=3D/vms/xen/domains/desk_win7/disk2.img,if=3Dide,index=3D1,media=3Ddi=
+sk,format=3Dqcow2,cache=3Dwriteback
+  -vnc 0.0.0.0:0,to=3D99 -display none -device cirrus-vga  -global
+  vga.vram_size_mb=3D8
+
+  # top
+  Tasks: 134 total,   1 running, 133 sleeping,   0 stopped,   0 zombie
+  %Cpu(s): 16.6 us,  5.5 sy,  0.0 ni,  0.0 id, 77.9 wa,  0.0 hi,  0.0 si,  =
+0.0 st
+  KiB Mem:    354420 total,   348884 used,     5536 free,      184 buffers
+  KiB Swap: 17575932 total,  2642868 used, 14933064 free.     4132 cached M=
+em
+
+    PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAN=
+D     =
+
+  12297 root      20   0 6683864 192944   1140 S 20.6 54.4   2:25.51 qemu-s=
+yste+ =
 
 
-  Kernel log:
+  # xen dmesg
+  (XEN) Xen version 4.4.1 (Debian 4.4.1-9) (waldi@debian.org) (gcc (Debian =
+4.9.2-10) 4.9.2) debug=3Dn Mon Apr  6 18:24:28 UTC 2015
+  (XEN) Bootloader: GRUB 2.02~beta2-22
+  (XEN) Command line: placeholder dom0_mem=3D512M dom0_max_vcpus=3D1 dom0_v=
+cpus_pin radeon.modeset=3D0 iommu=3Dno-intremap
+  (XEN) Video information:
+  (XEN)  VGA is text mode 80x25, font 8x16
+  (XEN)  VBE/DDC methods: none; EDID transfer time: 2 seconds
+  (XEN)  EDID info not retrieved because no DDC retrieval method detected
+  (XEN) Disc information:
+  (XEN)  Found 1 MBR signatures
+  (XEN)  Found 1 EDD information structures
+  (XEN) Xen-e820 RAM map:
+  (XEN)  0000000000000000 - 000000000009f400 (usable)
+  (XEN)  000000000009f400 - 00000000000a0000 (reserved)
+  (XEN)  00000000000f0000 - 0000000000100000 (reserved)
+  (XEN)  0000000000100000 - 00000000cf62f000 (usable)
+  (XEN)  00000000cf62f000 - 00000000cf63c000 (ACPI data)
+  (XEN)  00000000cf63c000 - 00000000cf63d000 (usable)
+  (XEN)  00000000cf63d000 - 00000000d4000000 (reserved)
+  (XEN)  00000000fec00000 - 00000000fee10000 (reserved)
+  (XEN)  00000000ff800000 - 0000000100000000 (reserved)
+  (XEN)  0000000100000000 - 00000004affff000 (usable)
+  (XEN) ACPI: RSDP 000F4F00, 0024 (r2 HP    )
+  (XEN) ACPI: XSDT CF630140, 00B4 (r1 HP     ProLiant        2   =C3=92=04 =
+    162E)
+  (XEN) ACPI: FACP CF630240, 00F4 (r3 HP     ProLiant        2   =C3=92=04 =
+    162E)
+  (XEN) ACPI: DSDT CF630340, 20BD (r1 HP         DSDT        1 INTL 2003022=
+8)
+  (XEN) ACPI: FACS CF62F100, 0040
+  (XEN) ACPI: SPCR CF62F140, 0050 (r1 HP     SPCRRBSU        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: MCFG CF62F1C0, 003C (r1 HP     ProLiant        1             =
+0)
+  (XEN) ACPI: HPET CF62F200, 0038 (r1 HP     ProLiant        2   =C3=92=04 =
+    162E)
+  (XEN) ACPI: FFFF CF62F240, 0064 (r2 HP     ProLiant        2   =C3=92=04 =
+    162E)
+  (XEN) ACPI: SPMI CF62F2C0, 0040 (r5 HP     ProLiant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: ERST CF62F300, 01D0 (r1 HP     ProLiant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: APIC CF62F500, 015E (r1 HP     ProLiant        2             =
+0)
+  (XEN) ACPI: SRAT CF62F680, 0570 (r1 HP     Proliant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: FFFF CF62FC00, 0176 (r1 HP     ProLiant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: BERT CF62FD80, 0030 (r1 HP     ProLiant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: HEST CF62FDC0, 00BC (r1 HP     ProLiant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: DMAR CF62FE80, 0150 (r1 HP     ProLiant        1   =C3=92=04 =
+    162E)
+  (XEN) ACPI: SSDT CF632400, 0125 (r3     HP  CRSPCI0        2   HP        =
+1)
+  (XEN) ACPI: SSDT CF632540, 01CF (r3     HP  riser1a        2 INTL 2006110=
+9)
+  (XEN) ACPI: SSDT CF632740, 03BB (r1     HP      pcc        1 INTL 2009062=
+5)
+  (XEN) ACPI: SSDT CF632B00, 0377 (r1     HP     pmab        1 INTL 2009062=
+5)
+  (XEN) ACPI: SSDT CF632E80, 2094 (r1  INTEL PPM RCM         1 INTL 2006110=
+9)
+  (XEN) System RAM: 18421MB (18863928kB)
+  (XEN) Domain heap initialised
+  (XEN) Processor #0 6:12 APIC version 21
+  (XEN) Processor #16 6:12 APIC version 21
+  (XEN) Processor #4 6:12 APIC version 21
+  (XEN) Processor #20 6:12 APIC version 21
+  (XEN) Processor #2 6:12 APIC version 21
+  (XEN) Processor #18 6:12 APIC version 21
+  (XEN) Processor #1 6:12 APIC version 21
+  (XEN) Processor #17 6:12 APIC version 21
+  (XEN) Processor #5 6:12 APIC version 21
+  (XEN) Processor #21 6:12 APIC version 21
+  (XEN) Processor #3 6:12 APIC version 21
+  (XEN) Processor #19 6:12 APIC version 21
+  (XEN) IOAPIC[0]: apic_id 8, version 32, address 0xfec00000, GSI 0-23
+  (XEN) IOAPIC[1]: apic_id 0, version 32, address 0xfec80000, GSI 24-47
+  (XEN) Enabling APIC mode:  Phys.  Using 2 I/O APICs
+  (XEN) Failed to get Error Log Address Range.
+  (XEN) Using scheduler: SMP Credit Scheduler (credit)
+  (XEN) Detected 2533.485 MHz processor.
+  (XEN) Initing memory sharing.
+  (XEN) Intel VT-d iommu 0 supported page sizes: 4kB.
+  (XEN) Intel VT-d Snoop Control not enabled.
+  (XEN) Intel VT-d Dom0 DMA Passthrough not enabled.
+  (XEN) Intel VT-d Queued Invalidation enabled.
+  (XEN) Intel VT-d Interrupt Remapping not enabled.
+  (XEN) Intel VT-d Shared EPT tables not enabled.
+  (XEN) I/O virtualisation enabled
+  (XEN)  - Dom0 mode: Relaxed
+  (XEN) Interrupt remapping disabled
+  (XEN) Enabled directed EOI with ioapic_ack_old on!
+  (XEN) ENABLING IO-APIC IRQs
+  (XEN)  -> Using old ACK method
+  (XEN) Platform timer is 14.318MHz HPET
+  (XEN) Allocated console ring of 32 KiB.
+  (XEN) VMX: Supported advanced features:
+  (XEN)  - APIC MMIO access virtualisation
+  (XEN)  - APIC TPR shadow
+  (XEN)  - Extended Page Tables (EPT)
+  (XEN)  - Virtual-Processor Identifiers (VPID)
+  (XEN)  - Virtual NMI
+  (XEN)  - MSR direct-access bitmap
+  (XEN)  - Unrestricted Guest
+  (XEN) HVM: ASIDs enabled.
+  (XEN) HVM: VMX enabled
+  (XEN) HVM: Hardware Assisted Paging (HAP) detected
+  (XEN) HVM: HAP page sizes: 4kB, 2MB, 1GB
+  (XEN) Brought up 12 CPUs
+  (XEN) *** LOADING DOMAIN 0 ***
+  (XEN)  Xen  kernel: 64-bit, lsb, compat32
+  (XEN)  Dom0 kernel: 64-bit, PAE, lsb, paddr 0x1000000 -> 0x1f18000
+  (XEN) PHYSICAL MEMORY ARRANGEMENT:
+  (XEN)  Dom0 alloc.:   000000049c000000->00000004a0000000 (110661 pages to=
+ be allocated)
+  (XEN)  Init. ramdisk: 00000004aee45000->00000004afdff7d5
+  (XEN) VIRTUAL MEMORY ARRANGEMENT:
+  (XEN)  Loaded kernel: ffffffff81000000->ffffffff81f18000
+  (XEN)  Init. ramdisk: ffffffff81f18000->ffffffff82ed27d5
+  (XEN)  Phys-Mach map: ffffffff82ed3000->ffffffff82fd3000
+  (XEN)  Start info:    ffffffff82fd3000->ffffffff82fd34b4
+  (XEN)  Page tables:   ffffffff82fd4000->ffffffff82ff1000
+  (XEN)  Boot stack:    ffffffff82ff1000->ffffffff82ff2000
+  (XEN)  TOTAL:         ffffffff80000000->ffffffff83400000
+  (XEN)  ENTRY ADDRESS: ffffffff819021f0
+  (XEN) Dom0 has maximum 1 VCPUs
+  (XEN) Scrubbing Free RAM: ...............................................=
+...........................................................................=
+.......................................................done.
+  (XEN) Initial low memory virq threshold set at 0x4000 pages.
+  (XEN) Std. Loglevel: Errors and warnings
+  (XEN) Guest Loglevel: Nothing (Rate-limited: Errors and warnings)
+  (XEN) Xen is relinquishing VGA console.
+  (XEN) *** Serial input -> DOM0 (type 'CTRL-a' three times to switch input=
+ to Xen)
+  (XEN) Freed 284kB init memory.
 
-  Dec 24 11:12:08 bramws kernel: [12466.885581] device net_1_1 entered prom=
-iscuous mode
-  Dec 24 11:12:08 bramws kernel: [12466.886238] device net_1_2 entered prom=
-iscuous mode
-  Dec 24 11:12:08 bramws kernel: [12466.887084] bridge0: port 2(net_1_1) en=
-tered forwarding state
-  Dec 24 11:12:08 bramws kernel: [12466.887089] bridge0: port 2(net_1_1) en=
-tered forwarding state
-  Dec 24 11:12:08 bramws kernel: [12466.888940] bridge0: port 3(net_1_2) en=
-tered forwarding state
-  Dec 24 11:12:08 bramws kernel: [12466.888947] bridge0: port 3(net_1_2) en=
-tered forwarding state
-  Dec 24 11:12:29 bramws kernel: [12488.026376] bridge0: port 2(net_1_1) en=
-tered disabled state
-  Dec 24 11:12:29 bramws kernel: [12488.026820] device net_1_1 left promisc=
-uous mode
-  Dec 24 11:12:29 bramws kernel: [12488.026832] bridge0: port 2(net_1_1) en=
-tered disabled state
-  Dec 24 11:12:29 bramws kernel: [12488.049636] bridge0: port 3(net_1_2) en=
-tered disabled state
-  Dec 24 11:12:29 bramws kernel: [12488.050058] device net_1_2 left promisc=
-uous mode
-  Dec 24 11:12:29 bramws kernel: [12488.050074] bridge0: port 3(net_1_2) en=
-tered disabled state
+  # perf report
+  # To display the perf.data header info, please use --header/--header-only=
+ options.
+  #
+  # Samples: 6K of event 'cpu-clock'
+  # Event count (approx.): 1744250000
+  #
+  # Overhead          Command            Shared Object                     =
+           Symbol
+  # ........  ...............  .......................  ...................=
+.................
+  #
+       8.69%  qemu-system-i38  [kernel.kallsyms]        [k] xen_hypercall_x=
+en_version       =
 
-  Strace log: (full log attached)
+       2.29%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+ac8              =
 
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 28646613}, NULL, 8) =3D 0 (Timeout)
-  write(5, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 10899760}, NULL, 8) =3D 1 ([{fd=3D5, revents=3DPOLLIN}]=
-, left {0, 10895457})
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  read(5, "\1\0\0\0\0\0\0\0", 512)        =3D 8
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  read(6, "\2\0\0\0\0\0\0\0", 16)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
-  read(6, 0x7fff697320e0, 16)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 9570429}, NULL, 8) =3D 0 (Timeout)
-  futex(0x7f011c8ef094, FUTEX_CMP_REQUEUE_PRIVATE, 1, 2147483647, 0x7f011aa=
-a0860, 224) =3D 1
-  write(5, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  write(5, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  futex(0x7f011aaa0860, FUTEX_WAKE_PRIVATE, 1) =3D 1
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 54463396}, NULL, 8) =3D 1 ([{fd=3D5, revents=3DPOLLIN}]=
-, left {0, 54459649})
-  tgkill(7779, 7784, SIGUSR1)             =3D 0
-  futex(0x7f011aaa0824, FUTEX_CMP_REQUEUE_PRIVATE, 1, 2147483647, 0x7f011aa=
-a0860, 1650) =3D 1
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  read(5, "\2\0\0\0\0\0\0\0", 512)        =3D 8
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  read(6, "\2\0\0\0\0\0\0\0", 16)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
-  read(6, 0x7fff697320e0, 16)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  futex(0x7f011aaa0860, FUTEX_WAKE_PRIVATE, 1) =3D 1
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 53843633}, NULL, 8 <unfinished ...>
-  +++ killed by SIGABRT +++
+       2.01%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+ad9              =
+
+       1.53%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+978              =
+
+       1.33%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+989              =
+
+       1.02%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+aa4              =
+
+       0.93%  qemu-system-i38  libc-2.19.so             [.] memset         =
+                 =
+
+       0.70%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000e2=
+814              =
+
+       0.69%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000e3=
+7f4              =
+
+       0.67%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+a40              =
+
+       0.66%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+adf              =
+
+       0.60%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000ac=
+ad7              =
+
+       0.59%  qemu-system-i38  [vdso]                   [.] __vdso_clock_ge=
+ttime            =
+
+       0.59%  qemu-system-i38  qemu-system-i386         [.] 0x0000000000342=
+b88              =
+
+       0.57%  qemu-system-i38  [vdso]                   [.] __vdso_gettimeo=
+fday             =
+
+       0.52%  qemu-system-i38  [kernel.kallsyms]        [k] pvclock_clockso=
+urce_read        =
+
+       0.49%  qemu-system-i38  qemu-system-i386         [.] 0x00000000000a9=
+e45              =
+
+       0.46%  qemu-system-i38  [kernel.kallsyms]        [k] do_sys_poll    =
+                 =
+
+       0.37%  qemu-system-i38  [kernel.kallsyms]        [k] hrtimer_init   =
+                 =
+
+       0.36%  qemu-system-i38  [kernel.kallsyms]        [k] __fget         =
+                 =
+
+       0.34%  qemu-system-i38  [kernel.kallsyms]        [k] ktime_get_ts
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1405385/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1452904/+subscriptions
