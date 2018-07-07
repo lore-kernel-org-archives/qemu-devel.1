@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fbiIn-000676-1r
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:10:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1fbivQ-0003hY-KE
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fbiIj-0001wP-T2
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:10:45 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:51417)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fbiIj-0001vZ-AL
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:10:41 -0400
-References: <20180702151023.24532-1-shorne@gmail.com>
-	<20180702151023.24532-23-shorne@gmail.com>
-	<feef2195-8fd8-f9e1-da85-f3286a9e2b1d@amsat.org>
-	<CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
-	<43d6bc18-440a-31e9-f055-8d0b14cbc74e@linaro.org>
-	<b31d8ace-fb05-0748-ba21-9daf97350af6@redhat.com>
-	<20180706230236.GV24595@lianli.shorne-pla.net>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <55935a1a-8f01-2411-18ec-70a537e69bea@vivier.eu>
-Date: Sat, 7 Jul 2018 10:10:20 +0200
+	(envelope-from <bounces@canonical.com>) id 1fbivN-0007bN-FE
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fbivN-0007az-7s
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:50:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fbivL-0005XO-3L
+	for <qemu-devel@nongnu.org>; Sat, 07 Jul 2018 08:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 161EF2E819F
+	for <qemu-devel@nongnu.org>; Sat,  7 Jul 2018 08:50:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180706230236.GV24595@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL v2 22/25] linux-user: Implement signals for
- openrisc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 07 Jul 2018 08:41:09 -0000
+From: Apport retracing service <1755912@bugs.launchpad.net>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153095287040.13494.16887077850944886234.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +37,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>, Eric Blake <eblake@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Le 07/07/2018 à 01:02, Stafford Horne a écrit :
-> On Fri, Jul 06, 2018 at 05:22:15PM -0500, Eric Blake wrote:
->> On 07/04/2018 03:54 PM, Richard Henderson wrote:
->>> On 07/03/2018 04:51 PM, Stafford Horne wrote:
->>>> Richard, how do you usually remove these before your pr?  I suppose you have
->>>> some kind of script?
->>>
->>> No, I just edit the things by hand.
->>
->> I do it by always using 'git am' to suck in patches from the mailing list,
->> including my own patches, and even if I already have the patch locally.
->> That is, my workflow for PR bypasses my local work tree to ensure I don't
->> leave local artifacts around in the PR.
-> 
-> Hi Eric,
-> 
-> How do you carry the Change list for each patch brought in with 'git am' i.e.
-> v2,v3 when you have updates that need respin?  Do you just update that manually
-> on the .patch files after 'git format-patch'?
-> 
-> I found and tried `git notes` recently which seems to be meant for this.
-> 
-> From 'git help notes'
-> 
->    Notes can also be added to patches prepared with git format-patch by
->    using the --notes option. Such notes are added as a patch commentary
->    after a three dash separator line.
-> 
-> However, I found the notes get lots pretty easily during rebases and would not
-> survive a 'git am'.
+** Tags added: cosmic
 
-You need to set notes.rewriteref=refs/notes/commits
+-- =
 
-Thanks,
-Laurent
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
+
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
+  The easiest way to crash it is by trying to change the guest's
+  resolution. However, the system may randomly crash too, not happening
+  only when changing resolution. Here is the terminal output of one of
+  these random crashes:
+
+  --------
+
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
+
+  =
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
+isplay_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
