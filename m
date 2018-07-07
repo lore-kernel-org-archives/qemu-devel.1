@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fbhGW-0008Jo-52
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 03:04:21 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fbiIn-000676-1r
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fbhGT-0001bO-1M
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 03:04:20 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45596)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fbhGS-0001b3-OR
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 03:04:16 -0400
-Received: by mail-wr1-x443.google.com with SMTP id u7-v6so6029432wrn.12
-	for <qemu-devel@nongnu.org>; Sat, 07 Jul 2018 00:04:16 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1fbiIj-0001wP-T2
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:10:45 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:51417)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fbiIj-0001vZ-AL
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 04:10:41 -0400
 References: <20180702151023.24532-1-shorne@gmail.com>
 	<20180702151023.24532-23-shorne@gmail.com>
 	<feef2195-8fd8-f9e1-da85-f3286a9e2b1d@amsat.org>
 	<CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAAfxs77LqYG2gGT3Y0xs=SYMdQ9GoO0hymdwF-UGZcjXyrQUMg@mail.gmail.com>
-Date: Sat, 07 Jul 2018 08:04:13 +0100
-Message-ID: <87sh4v8r2q.fsf@linaro.org>
+	<43d6bc18-440a-31e9-f055-8d0b14cbc74e@linaro.org>
+	<b31d8ace-fb05-0748-ba21-9daf97350af6@redhat.com>
+	<20180706230236.GV24595@lianli.shorne-pla.net>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <55935a1a-8f01-2411-18ec-70a537e69bea@vivier.eu>
+Date: Sat, 7 Jul 2018 10:10:20 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180706230236.GV24595@lianli.shorne-pla.net>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PULL v2 22/25] linux-user: Implement signals for
  openrisc
 List-Id: <qemu-devel.nongnu.org>
@@ -33,82 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: Stafford Horne <shorne@gmail.com>, Eric Blake <eblake@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-
-Stafford Horne <shorne@gmail.com> writes:
-
-> Hello,
->
-> On Wed, Jul 4, 2018, 7:34 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
->> Hi Stafford,
+Le 07/07/2018 à 01:02, Stafford Horne a écrit :
+> On Fri, Jul 06, 2018 at 05:22:15PM -0500, Eric Blake wrote:
+>> On 07/04/2018 03:54 PM, Richard Henderson wrote:
+>>> On 07/03/2018 04:51 PM, Stafford Horne wrote:
+>>>> Richard, how do you usually remove these before your pr?  I suppose you have
+>>>> some kind of script?
+>>>
+>>> No, I just edit the things by hand.
 >>
->> On 07/02/2018 12:10 PM, Stafford Horne wrote:
->> > From: Richard Henderson <richard.henderson@linaro.org>
-<snip>
->
-> Sorry, I brought these in from Richards tree and saw them but thought it
-> was fine to keep the annotations.
->
-> I'll remove them from patches in the future.
->
-> Richard, how do you usually remove these before your pr?  I suppose you
-> have some kind of script?
->
+>> I do it by always using 'git am' to suck in patches from the mailing list,
+>> including my own patches, and even if I already have the patch locally.
+>> That is, my workflow for PR bypasses my local work tree to ensure I don't
+>> leave local artifacts around in the PR.
+> 
+> Hi Eric,
+> 
+> How do you carry the Change list for each patch brought in with 'git am' i.e.
+> v2,v3 when you have updates that need respin?  Do you just update that manually
+> on the .patch files after 'git format-patch'?
+> 
+> I found and tried `git notes` recently which seems to be meant for this.
+> 
+> From 'git help notes'
+> 
+>    Notes can also be added to patches prepared with git format-patch by
+>    using the --notes option. Such notes are added as a patch commentary
+>    after a three dash separator line.
+> 
+> However, I found the notes get lots pretty easily during rebases and would not
+> survive a 'git am'.
 
-For reference these are my exact-steps:
+You need to set notes.rewriteref=refs/notes/commits
 
-  We need to ensure we have added our signoff and there is no ---
-  ephemera left from commit history.
-
-  ,----
-  | errors=3D0
-  | commits=3D0
-  | while read rev; do
-  |     author=3D$(git show -s --format=3D'%an <%ae>' $rev)
-  |     body=3D$(git show -s --format=3D'%B' $rev)
-  |
-  |     # Check for Author signoff
-  |     if ! grep -q "^Signed-off-by: $author" <<< "$body"; then
-  |         errors=3D$((errors+1))
-  |         echo "$rev missing signoff by $author"
-  |     fi
-  |
-  |     # Check for my signoff
-  |     if ! grep -q "^Signed-off-by: $signoff" <<< "$body"; then
-  |         errors=3D$((errors+1))
-  |         echo "$rev missing your signoff ($signoff)"
-  |     fi
-  |
-  |     # Check for stray history
-  |     if grep -q "^--" <<< "$body"; then
-  |         errors=3D$((errors+1))
-  |         echo "$rev may have history in it"
-  |     fi
-  |
-  |     commits=3D$((commits+1))
-  | done < <(git rev-list "origin/master..HEAD")
-  |
-  | echo "Found $errors errors over $commits commits"
-  `----
-
-  If we want to strip history we can run the following:
-
-  ,----
-  | current=3D$(git rev-parse --abbrev-ref HEAD)
-  | if [ -d "${series}.pull" ]; then
-  |   rm -rf ${series}.pull
-  | fi
-  | git format-patch origin/master..${current} -p -o ${series}.pull
-  | prb=3D${current}-pr
-  | echo ${prb}
-  | git checkout -b ${prb} origin/master
-  | git am ${series}.pull/*
-  | rm -rf ${series}.pull
-  `----
-
---
-Alex Benn=C3=A9e
+Thanks,
+Laurent
