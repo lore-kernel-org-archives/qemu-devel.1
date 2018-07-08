@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fcI1z-0001gR-Ht
-	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 18:19:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fcIrl-0002FT-HI
+	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 19:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fcI1u-0000vf-03
-	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 18:19:45 -0400
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 9 Jul 2018 00:01:46 +0200
-Message-Id: <20180708221932.E95CC74569D@zero.eik.bme.hu>
-Subject: [Qemu-devel] [PATCH for-3.0] sam460ex: Update u-boot-sam460ex
- firmware
+	(envelope-from <laurent@vivier.eu>) id 1fcIrk-0003Uc-K9
+	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 19:13:17 -0400
+References: <20180706155127.7483-1-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <091df2fb-b3a0-ef4f-f401-ec5a4e58fab8@vivier.eu>
+Date: Mon, 9 Jul 2018 01:12:47 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180706155127.7483-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/3] Sanitize linux-user stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,37 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Sebastian Bauer <mail@sebastianbauer.info>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org
 
-Update the submodule and u-boot-sam460-20100605.bin to include
-following fixes from Sebastian Bauer:
-- Fix build with newer gcc
-- Decrease unnecessary delay which fixes slow booting from CD
+Le 06/07/2018 à 17:51, Philippe Mathieu-Daudé a écrit :
+> Hi Laurent,
+> 
+> Here 3 trivial patches, the first one resolves this launchpad issue:
+> https://bugs.launchpad.net/qemu/+bug/1777226, then the following two
+> sanitize a bit further.
+> 
+> Regards,
+> 
+> Phil.
+> 
+> Philippe Mathieu-Daudé (3):
+>   linux-user: Do not report "Unsupported syscall" by default
+>   linux-user: Do not report "syscall not implemented" by default
+>   linux-user: Report error message on stderr, rather than stdout
+> 
+>  linux-user/alpha/cpu_loop.c      | 2 +-
+>  linux-user/cris/cpu_loop.c       | 2 +-
+>  linux-user/cris/signal.c         | 4 ++--
+>  linux-user/microblaze/cpu_loop.c | 6 +++---
+>  linux-user/microblaze/signal.c   | 4 ++--
+>  linux-user/nios2/signal.c        | 2 +-
+>  linux-user/sh4/cpu_loop.c        | 2 +-
+>  linux-user/sparc/cpu_loop.c      | 2 +-
+>  linux-user/sparc/signal.c        | 4 ++--
+>  linux-user/syscall.c             | 2 +-
+>  10 files changed, 15 insertions(+), 15 deletions(-)
+> 
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- pc-bios/u-boot-sam460-20100605.bin | Bin 524288 -> 524288 bytes
- roms/u-boot-sam460ex               |   2 +-
- 2 files changed, 1 insertion(+), 1 deletion(-)
+I have queued the series for the next pull request.
 
-diff --git a/pc-bios/u-boot-sam460-20100605.bin b/pc-bios/u-boot-sam460-20100605.bin
-index 99408f8e957b26e735e5befa98fa3d51a90d95f6..e17de77c1974382144625632c709c29a1a86edef 100755
-GIT binary patch
-delta 84
-zcmZo@P-tjSm>@3hRhpw<V4+}SU}&MBt6*egWnyY&Y^*tXBiE%S#%+v@Tql?qjHdIP
-gWSj-0+gF@q1Y#y2W(HywAZ7((w(ToUvPYN!05~lj7ytkO
+I think you can also replace the gemu_log("Unknown QEMU_IFLA..."),
+qemu_log("Unknown host ..") and qemu_log("Unknown target ...") from the
+netlink part in syscall.c with qemu_log_mask(LOG_UNIMP, ...).
 
-delta 84
-zcmZo@P-tjSm>@3hpIo9~WTaqZU}&zOt6*quWny4uV5B*DBiE%S#%+v@Tql@>JErrT
-gWSj-0+gF@q1Y#y2W(HywAZ7((w(ToUvPYN!08um@+W-In
-
-diff --git a/roms/u-boot-sam460ex b/roms/u-boot-sam460ex
-index 8ee007c..60b3916 160000
---- a/roms/u-boot-sam460ex
-+++ b/roms/u-boot-sam460ex
-@@ -1 +1 @@
--Subproject commit 8ee007c4216fd6a0d760589e8405ce4494497aa0
-+Subproject commit 60b3916f33e617a815973c5a6df77055b2e3a588
--- 
-2.7.6
+Thanks,
+Laurent
