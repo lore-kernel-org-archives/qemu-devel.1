@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbyvj-0000Jq-OM
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 21:56:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1fbyvl-0000LI-OD
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 21:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fbyve-00055x-Oq
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 21:56:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39742 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fbyve-00055d-KD
-	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 21:55:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E81D881A4EBA
-	for <qemu-devel@nongnu.org>; Sun,  8 Jul 2018 01:55:57 +0000 (UTC)
-Received: from red.redhat.com (ovpn-123-105.rdu2.redhat.com [10.10.123.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AB9D5111E411
-	for <qemu-devel@nongnu.org>; Sun,  8 Jul 2018 01:55:57 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1fbyvk-00059D-VM
+	for qemu-devel@nongnu.org; Sat, 07 Jul 2018 21:56:05 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Sat,  7 Jul 2018 20:55:53 -0500
-Message-Id: <20180708015554.297823-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] NBD patches for 3.0
+Date: Sat,  7 Jul 2018 20:55:54 -0500
+Message-Id: <20180708015554.297823-2-eblake@redhat.com>
+In-Reply-To: <20180708015554.297823-1-eblake@redhat.com>
+References: <20180708015554.297823-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] nbd/server: fix nbd_co_send_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +20,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The following changes since commit 43a473993fd9378bf850dcafa68eb6dee8c300f8:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-07-06 18:18:08 +0100)
+Call nbd_co_send_extents() with correct length parameter
+(extent.length may be smaller than original length).
 
-are available in the Git repository at:
+Also, switch length parameter type to uint32_t, to correspond with
+request->len and similar nbd_co_send_bitmap().
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-07-07
-
-for you to fetch changes up to 0c0eaed14721f8a9db334deb35316411c512059a:
-
-  nbd/server: fix nbd_co_send_block_status (2018-07-07 20:30:09 -0500)
-
-Not much since my last pull request, but since I will be offline until
-after rc1, I thought I'd get this one in now.
-
-----------------------------------------------------------------
-nbd patches for 2018-07-07
-
-Minor improvement for tracing of NBD block status
-
-- Vladimir Sementsov-Ogievskiy: nbd/server: fix nbd_co_send_block_status
-
-----------------------------------------------------------------
-Vladimir Sementsov-Ogievskiy (1):
-      nbd/server: fix nbd_co_send_block_status
-
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20180704112302.471456-2-vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
  nbd/server.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index e52b76bd1a4..ea5fe0eb336 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1910,7 +1910,7 @@ static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
+ /* Get block status from the exported device and send it to the client */
+ static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
+                                     BlockDriverState *bs, uint64_t offset,
+-                                    uint64_t length, bool last,
++                                    uint32_t length, bool last,
+                                     uint32_t context_id, Error **errp)
+ {
+     int ret;
+@@ -1922,7 +1922,8 @@ static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
+                 client, handle, -ret, "can't get block status", errp);
+     }
+
+-    return nbd_co_send_extents(client, handle, &extent, 1, length, last,
++    return nbd_co_send_extents(client, handle, &extent, 1,
++                               be32_to_cpu(extent.length), last,
+                                context_id, errp);
+ }
 
 -- 
 2.14.4
