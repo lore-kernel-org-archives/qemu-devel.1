@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fcXye-0000lm-Rr
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fcXyi-0000pH-8m
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fcXyd-0005VW-T3
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:24 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38564)
+	(envelope-from <alex.bennee@linaro.org>) id 1fcXyh-0005Xh-Bp
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:28 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:43166)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fcXyd-0005VI-MS
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:23 -0400
-Received: by mail-wm0-x234.google.com with SMTP id 69-v6so21053857wmf.3
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 08:21:23 -0700 (PDT)
+	id 1fcXyh-0005XN-4i
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:27 -0400
+Received: by mail-wr1-x431.google.com with SMTP id b15-v6so11419664wrv.10
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 08:21:27 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  9 Jul 2018 16:21:11 +0100
-Message-Id: <20180709152117.21585-5-alex.bennee@linaro.org>
+Date: Mon,  9 Jul 2018 16:21:14 +0100
+Message-Id: <20180709152117.21585-8-alex.bennee@linaro.org>
 In-Reply-To: <20180709152117.21585-1-alex.bennee@linaro.org>
 References: <20180709152117.21585-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 3.0 04/10] docker: split configure_qemu
- from build_qemu
+Subject: [Qemu-devel] [PATCH for 3.0 07/10] docker: Makefile.include don't
+ include partial images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This allows some tests that just want to configure QEMU's source tree
-to do so.
+Rename DOCKER_INTERMEDIATE_IMAGES to DOCKER_PARTIAL_IMAGES and add the
+incomplete cross compiler images that can build tests but can't build
+QEMU itself. We also add debian, debian-bootstrap and the tricode
+images to the list.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/common.rc | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/docker/Makefile.include | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-index 046f8a5921..ba1f942328 100755
---- a/tests/docker/common.rc
-+++ b/tests/docker/common.rc
-@@ -21,7 +21,7 @@ requires()
-     done
- }
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index b2a7e761cc..09fb7db7fa 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -6,7 +6,7 @@ DOCKER_SUFFIX := .docker
+ DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+ DOCKER_DEPRECATED_IMAGES := debian
+ # we don't run tests on intermediate images (used as base by another image)
+-DOCKER_INTERMEDIATE_IMAGES := debian8 debian9 debian8-mxe debian-ports debian-sid
++DOCKER_PARTIAL_IMAGES := debian debian8 debian9 debian8-mxe debian-ports debian-sid debian-bootstrap
+ DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+ DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+ # Use a global constant ccache directory to speed up repetitive builds
+@@ -121,6 +121,11 @@ docker-image-travis: NOUSER=1
+ # Specialist build images, sometimes very limited tools
+ docker-image-tricore-cross: docker-image-debian9
  
--build_qemu()
-+configure_qemu()
- {
-     config_opts="--enable-werror \
-                  ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
-@@ -32,6 +32,11 @@ build_qemu()
-     echo $config_opts
-     $QEMU_SRC/configure $config_opts || \
-         { cat config.log && test_fail "Failed to run 'configure'"; }
-+}
++# These images may be good enough for building tests but not for test builds
++DOCKER_PARTIAL_IMAGES += debian-alpha-cross debian-hppa-cross debian-m68k-cross debian-sh4-cross
++DOCKER_PARTIAL_IMAGES += debian-sparc64-cross debian-mips64-cross debian-riscv64-cross
++DOCKER_PARTIAL_IMAGES += debian-tricore-cross debian-powerpc-cross fedora-i386-cross
 +
-+build_qemu()
-+{
-+    configure_qemu $@
-     make $MAKEFLAGS
- }
+ # Rules for building linux-user powered images
+ #
+ # These are slower than using native cross compiler setups but can
+@@ -137,7 +142,7 @@ docker-image-debian-powerpc-user-cross: docker-binfmt-image-debian-powerpc-user
+ DOCKER_USER_IMAGES += debian-powerpc-user
  
+ # Expand all the pre-requistes for each docker image and test combination
+-$(foreach i,$(filter-out $(DOCKER_INTERMEDIATE_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES)), \
++$(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES)), \
+ 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+ 		$(eval .PHONY: docker-$t@$i) \
+ 		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
 -- 
 2.17.1
