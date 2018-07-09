@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1fcUGW-0001VM-R3
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:23:38 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fcUHz-0002Ni-DH
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1fcUGT-0006py-Ge
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:23:36 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:36522
-	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1fcUGT-0006pJ-7W
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:23:33 -0400
-Date: Mon, 9 Jul 2018 12:23:26 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-Message-ID: <20180709112326.GD9486@e103592.cambridge.arm.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-	<1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
-	<20180704155104.GN4828@arm.com>
-	<12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
-	<fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
-	<9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
-	<f3463d0a-c6a3-c34d-acb3-13c99fc61c5a@arm.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1fcUHt-0007Wb-Lw
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:25:07 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:35892)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fcUHt-0007Vp-8W
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:25:01 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180703085250.28380.33220.stgit@pasha-VirtualBox>
+In-Reply-To: <20180703085250.28380.33220.stgit@pasha-VirtualBox>
+Date: Mon, 9 Jul 2018 14:24:59 +0300
+Message-ID: <004001d41777$78daa890$6a8ff9b0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f3463d0a-c6a3-c34d-acb3-13c99fc61c5a@arm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the
- physical address size for VM
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH] replay: wake up vCPU when replaying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,179 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, cdall@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, pbonzini@redhat.com, maria.klimushenkova@ispras.ru
 
-On Fri, Jul 06, 2018 at 05:39:00PM +0100, Suzuki K Poulose wrote:
-> On 07/06/2018 04:09 PM, Marc Zyngier wrote:
-> >On 06/07/18 14:49, Suzuki K Poulose wrote:
-> >>On 04/07/18 23:03, Suzuki K Poulose wrote:
-> >>>On 07/04/2018 04:51 PM, Will Deacon wrote:
-> >>>>Hi Suzuki,
-> >>>>
-> >>>>On Fri, Jun 29, 2018 at 12:15:35PM +0100, Suzuki K Poulose wrote:
-> >>>>>Allow specifying the physical address size for a new VM via
-> >>>>>the kvm_type argument for KVM_CREATE_VM ioctl. This allows
-> >>>>>us to finalise the stage2 page table format as early as possible
-> >>>>>and hence perform the right checks on the memory slots without
-> >>>>>complication. The size is encoded as Log2(PA_Size) in the bits[7:0=
-]
-> >>>>>of the type field and can encode more information in the future if
-> >>>>>required. The IPA size is still capped at 40bits.
-> >>>>>
-> >>>>>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>>>>Cc: Christoffer Dall <cdall@kernel.org>
-> >>>>>Cc: Peter Maydel <peter.maydell@linaro.org>
-> >>>>>Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >>>>>Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> >>>>>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>>>>---
-> >>>>> =C2=A0 arch/arm/include/asm/kvm_mmu.h=C2=A0=C2=A0 |=C2=A0 2 ++
-> >>>>> =C2=A0 arch/arm64/include/asm/kvm_arm.h | 10 +++-------
-> >>>>> =C2=A0 arch/arm64/include/asm/kvm_mmu.h |=C2=A0 2 ++
-> >>>>> =C2=A0 include/uapi/linux/kvm.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 10 ++++++++++
-> >>>>> =C2=A0 virt/kvm/arm/arm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 24 ++++++++++++++++++++++--
-> >>>>> =C2=A0 5 files changed, 39 insertions(+), 9 deletions(-)
-> >>>>
-> >>>>[...]
-> >>>>
-> >>>>>diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >>>>>index 4df9bb6..fa4cab0 100644
-> >>>>>--- a/include/uapi/linux/kvm.h
-> >>>>>+++ b/include/uapi/linux/kvm.h
-> >>>>>@@ -751,6 +751,16 @@ struct kvm_ppc_resize_hpt {
-> >>>>> =C2=A0 #define KVM_S390_SIE_PAGE_OFFSET 1
-> >>>>> =C2=A0 /*
-> >>>>>+ * On arm/arm64, machine type can be used to request the physical
-> >>>>>+ * address size for the VM. Bits [7-0] have been reserved for the
-> >>>>>+ * PA size shift (i.e, log2(PA_Size)). For backward compatibility=
-,
-> >>>>>+ * value 0 implies the default IPA size, which is 40bits.
-> >>>>>+ */
-> >>>>>+#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK=C2=A0=C2=A0=C2=A0 0xff
-> >>>>>+#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 \
-> >>>>>+=C2=A0=C2=A0=C2=A0 ((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
-> >>>>
-> >>>>This seems like you're allocating quite a lot of bits in a non-exte=
-nsible
-> >>>>interface to a fairly esoteric parameter. Would it be better to add=
- another
-> >>>>ioctl, or condense the number of sizes you support instead?
-> >>>
-> >>>As I explained in the other thread, we need the size as soon as the =
-VM
-> >>>is created. The major challenge is keeping the backward compatibilit=
-y by
-> >>>mapping 0 to 40bits. I will give it a thought.
-> >>
-> >>Here is one option. We could re-use the {V}TCR_ELx.{I}PS field format=
-, which
-> >>occupies 3 bits and has the following definitions. (ID_AA64MMFR0_EL1:=
-PARange
-> >>also has the field definitions, except that the field is 4bits wide, =
-but
-> >>only 3bits are used)
-> >>
-> >>000 32 bits, 4GB.
-> >>001 36 bits, 64GB.
-> >>010 40 bits, 1TB.
-> >>011 42 bits, 4TB.
-> >>100 44 bits, 16TB.
-> >>101 48 bits, 256TB.
-> >>110 52 bits, 4PB
-> >>
-> >>But we need to map 0 =3D> 40bits IPA to make our ABI backward compati=
-ble. So
-> >>we could use the additional one bit to indicate that IPA size is requ=
-ested
-> >>in the 3 bits.
-> >>
-> >>i.e,
-> >>
-> >>machine_type:
-> >>
-> >>Bit [2:0]	- Requested IPA size. Values follow VTCR_EL2.PS format.
-> >>
-> >>Bit [3]		- 1 =3D> IPA Size bits (Bits[2:0]) requested.
-> >>		0 =3D> Not requested
-> >>
-> >>The only minor down side is restricting to the predefined values abov=
-e,
-> >>which is not a real issue for a VM.
-> >>
-> >>Thoughts ?
-> >
-> >I'd be very wary of using that 4th bit to do something that is not in
-> >the architecture. We have only a single value left to be used (0b111),
-> >and then your scheme clashes with the architecture definition.
->=20
-> I agree. However, if we ever go beyond the 3bits in PARange, we have an
-> issue with {V}TCR counter part. But lets not take that chance.
->=20
-> >
-> >I'd rather encode things in a way that is independent from the
-> >architecture, and be done with it. You can map 0 to 40bits, and we hav=
-e
-> >the ability to express all values the architecture has (just in a
-> >different order).
->=20
-> The other option I can think of is encoding a signed number which is th=
-e
-> difference of the IPA from 40. But that would need 5 bits if we were to
-> encode it as it is. And if we want to squeeze it in 4bit, we could stor=
-e
-> half the difference (limiting the IPA limit to even numbers).
->=20
-> i.e IPA =3D 40 + 2 * sign_extend(bits[3:0);
+There are some situations when this patch still doesn't help.
+I think this happens due to the race condition in qemu_tcg_rr_wait_io_event
 
-I came across similar issues when trying to work out how to enable
-SVE for KVM.  In the end I reduced this to a per-vcpu feature, but
-it means that there is no global opt-in for the SVE-specific KVM
-API extensions:
+static void qemu_tcg_rr_wait_io_event(CPUState *cpu)
+{
+    while (all_cpu_threads_idle()) {
+        stop_tcg_kick_timer();
+        qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+    }
 
-That's a bit gross, because SVE may require a change to the way
-vcpus are initialised.  The set of supported SVE vector lengths needs
-to be set somehow before the vcpu is set running, but it's tricky do
-do that without a new ioctl -- which would mean that if SVE is enabled
-for a vcpu then the vcpu is not considered runnable until the new
-magic ioctl is called.
+    start_tcg_kick_timer();
 
-Opting into that semantic change globally at VM creation time might
-be preferable.  On the SVE side, this is still very much subject to
-review/change.
+    qemu_wait_io_event_common(cpu);
+}
 
+all_cpu_threads_idle() returns true when there is no queued work.
+But between this call and qemu_cond_wait() iothread may add queued work
+and the vCPU thread will sleep infinitely.
 
-Here:
+Does anyone have an idea how to fix this?
 
-The KVM_CREATE_VM init argument seems undefined by the KVM core code and
-is available for arches to abuse in creative ways.  x86 and arm have
-nothing here and reject non-zero values with -EINVAL; s390 treats it as
-a bitmask, and defines a sincle feature-like bit here; powerpc treats it
-as an enumeration of VM types.
+Pavel Dovgalyuk
 
-If we want to be extensible, we could
-
- a) Pass a pointer in type, and come up with some extensible VM parameter
-    struct for it to point to (which then wouldn't need a cryptic
-    compressed encoding), or
-
- b) Introduce a new "KVM_CREATE_VM2" variant that either takes such
-    an argument, or mandates a parameter negotiation phase involving
-    additional ioctls before marking the VM as ready for vcpu and
-    device creation.
-
-(a) feels like an easy backwards-compatible approach, but cannot be
-readily adopted by other arches (maybe not an issue).
-
-(b) might be considered overengineered, so it would need a bit of
-thought.
-
-Wedging arguments into a few bits in the type argument feels awkward,
-and may be regretted later if we run out of bits, or something can't be
-represented in the chosen encoding.
-
-Cheers
----Dave
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:Pavel.Dovgaluk@ispras.ru]
+> Sent: Tuesday, July 03, 2018 11:53 AM
+> To: qemu-devel@nongnu.org
+> Cc: alex.bennee@linaro.org; pbonzini@redhat.com; maria.klimushenkova@ispras.ru;
+> dovgaluk@ispras.ru; pavel.dovgaluk@ispras.ru
+> Subject: [PATCH] replay: wake up vCPU when replaying
+> 
+> In record/replay icount mode vCPU thread and iothread synchronize
+> the execution using the checkpoints.
+> vCPU thread processes the virtual timers and iothread processes all others.
+> When iothread wants to wake up sleeping vCPU thread, it sends dummy queued
+> work. Therefore it could be the following sequence of the events in
+> record mode:
+>  - IO: sending dummy work
+>  - IO: processing timers
+>  - CPU: wakeup
+>  - CPU: clearing dummy work
+>  - CPU: processing virtual timers
+> 
+> But due to the races in replay mode the sequence may change:
+>  - IO: sending dummy work
+>  - CPU: wakeup
+>  - CPU: clearing dummy work
+>  - CPU: sleeping again because nothing to do
+>  - IO: Processing timers
+>  - CPU: zzzz
+> 
+> In this case vCPU will not wake up, because dummy work is not to be set up
+> again.
+> 
+> This patch tries to wake up the vCPU when it sleeps and the icount warp
+> checkpoint isn't met. It means that vCPU has something to do, because
+> there are no other reasons of non-matching warp checkpoint.
+> 
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> ---
+>  cpus.c |   15 ++++++++++-----
+>  1 file changed, 10 insertions(+), 5 deletions(-)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index 181ce33..bad6a33 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -539,11 +539,6 @@ void qemu_start_warp_timer(void)
+>          return;
+>      }
+> 
+> -    /* warp clock deterministically in record/replay mode */
+> -    if (!replay_checkpoint(CHECKPOINT_CLOCK_WARP_START)) {
+> -        return;
+> -    }
+> -
+>      if (!all_cpu_threads_idle()) {
+>          return;
+>      }
+> @@ -553,6 +548,16 @@ void qemu_start_warp_timer(void)
+>          return;
+>      }
+> 
+> +    /* warp clock deterministically in record/replay mode */
+> +    if (!replay_checkpoint(CHECKPOINT_CLOCK_WARP_START)) {
+> +        /* vCPU is sleeping and warp can't be started.
+> +           It is probably a race condition: notification sent
+> +           to vCPU was processed in advance and vCPU went to sleep.
+> +           Therefore we have to wake it up for doing someting. */
+> +        qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
+> +        return;
+> +    }
+> +
+>      /* We want to use the earliest deadline from ALL vm_clocks */
+>      clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
+>      deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
