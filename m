@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9R-0006Dm-E9
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:52:54 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9d-0006M6-Aj
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9O-0006Ze-CP
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:52:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33404 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9c-0006eG-3P
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:05 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34299 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fcd9O-0006ZD-0D
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:52:50 -0400
+	id 1fcd9b-0006e0-RT
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:04 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  9 Jul 2018 22:50:14 +0200
-Message-Id: <1531169431-10772-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  9 Jul 2018 22:50:16 +0200
+Message-Id: <1531169431-10772-19-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 16/33] target/mips: Implement MT ASE support
- for nanoMIPS
+Subject: [Qemu-devel] [PATCH v2 18/33] target/mips: Add handling of branch
+ delay slots for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +28,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: f4bug@amsat.org, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Matthew Fortune <matthew.fortune@mips.com>
 
-Add emulation of MT ASE instructions for nanoMIPS.
+ISA mode bit (LSB of address) is no longer required but is also
+masked to allow for tools transition. The flag has_isa_mode has the
+key role in the implementation.
 
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 83 insertions(+), 2 deletions(-)
+ target/mips/translate.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e18e279..c55d809 100644
+index 564d459..c9087d2 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16463,7 +16463,7 @@ static void gen_pool16c_nanomips_insn(DisasContext *ctx)
-     }
- }
+@@ -1458,6 +1458,7 @@ typedef struct DisasContext {
+     bool mrp;
+     bool nan2008;
+     bool abs2008;
++    bool has_isa_mode;
+ } DisasContext;
  
--static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
-+static void gen_pool32a0_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
- {
-     int rt = (ctx->opcode >> 21) & 0x1f;
-     int rs = (ctx->opcode >> 16) & 0x1f;
-@@ -16636,6 +16636,87 @@ static void gen_pool32a0_nanomips_insn(DisasContext *ctx)
-             tcg_temp_free(t0);
-         }
-         break;
-+    case NM_D_E_MT_VPE:
-+        {
-+            uint8_t sc = (ctx->opcode >> 10) & 1;
-+            TCGv t0 = tcg_temp_new();
-+
-+            switch (sc) {
-+            case 0:
-+                if (rs == 1) {
-+                    /* DMT */
-+                    check_insn(ctx, ASE_MT);
-+                    gen_helper_dmt(t0);
-+                    gen_store_gpr(t0, rt);
-+                } else if (rs == 0) {
-+                    /* DVPE */
-+                    check_insn(ctx, ASE_MT);
-+                    gen_helper_dvpe(t0, cpu_env);
-+                    gen_store_gpr(t0, rt);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            case 1:
-+                if (rs == 1) {
-+                    /* EMT */
-+                    check_insn(ctx, ASE_MT);
-+                    gen_helper_emt(t0);
-+                    gen_store_gpr(t0, rt);
-+                } else if (rs == 0) {
-+                    /* EVPE */
-+                    check_insn(ctx, ASE_MT);
-+                    gen_helper_evpe(t0, cpu_env);
-+                    gen_store_gpr(t0, rt);
-+                } else {
-+                    generate_exception_end(ctx, EXCP_RI);
-+                }
-+                break;
-+            }
-+
-+            tcg_temp_free(t0);
-+        }
-+    break;
-+    case NM_FORK:
-+        check_insn(ctx, ASE_MT);
-+        {
-+            TCGv t0 = tcg_temp_new();
-+            TCGv t1 = tcg_temp_new();
-+
-+            gen_load_gpr(t0, rt);
-+            gen_load_gpr(t1, rs);
-+            gen_helper_fork(t0, t1);
-+            tcg_temp_free(t0);
-+            tcg_temp_free(t1);
-+        }
-+        break;
-+    case NM_MFTR:
-+    case NM_MFHTR:
-+        check_insn(ctx, ASE_MT);
-+        if (rd == 0) {
-+            /* Treat as NOP. */
-+            return;
-+        }
-+        gen_mftr(env, ctx, rs, rt, (ctx->opcode >> 10) & 1,
-+                 (ctx->opcode >> 11) & 0x1f, (ctx->opcode >> 3) & 1);
-+        break;
-+    case NM_MTTR:
-+    case NM_MTHTR:
-+        check_insn(ctx, ASE_MT);
-+        gen_mttr(env, ctx, rs, rt, (ctx->opcode >> 10) & 1,
-+                 (ctx->opcode >> 11) & 0x1f, (ctx->opcode >> 3) & 1);
-+        break;
-+    case NM_YIELD:
-+        check_insn(ctx, ASE_MT);
-+        {
-+            TCGv t0 = tcg_temp_new();
-+
-+            gen_load_gpr(t0, rs);
-+            gen_helper_yield(t0, cpu_env, t0);
-+            gen_store_gpr(t0, rt);
-+            tcg_temp_free(t0);
-+        }
-+        break;
- #endif
-     default:
-         generate_exception_end(ctx, EXCP_RI);
-@@ -17385,7 +17466,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_POOL32A:
-         switch (ctx->opcode & 0x07) {
-         case NM_POOL32A0:
--            gen_pool32a0_nanomips_insn(ctx);
-+            gen_pool32a0_nanomips_insn(env, ctx);
+ #define DISAS_STOP       DISAS_TARGET_0
+@@ -4538,7 +4539,7 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
+ 
+     if (blink > 0) {
+         int post_delay = insn_bytes + delayslot_size;
+-        int lowbit = !!(ctx->hflags & MIPS_HFLAG_M16);
++        int lowbit = ctx->has_isa_mode && !!(ctx->hflags & MIPS_HFLAG_M16);
+ 
+         tcg_gen_movi_tl(cpu_gpr[blink],
+                         ctx->base.pc_next + post_delay + lowbit);
+@@ -10991,7 +10992,8 @@ static void gen_branch(DisasContext *ctx, int insn_bytes)
              break;
-         case NM_POOL32A7:
-         {
+         case MIPS_HFLAG_BR:
+             /* unconditional branch to register */
+-            if (ctx->insn_flags & (ASE_MIPS16 | ASE_MICROMIPS)) {
++            if (ctx->has_isa_mode &&
++                    (ctx->insn_flags & (ASE_MIPS16 | ASE_MICROMIPS))) {
+                 TCGv t0 = tcg_temp_new();
+                 TCGv_i32 t1 = tcg_temp_new_i32();
+ 
+@@ -11027,7 +11029,7 @@ static void gen_compute_compact_branch(DisasContext *ctx, uint32_t opc,
+     int bcond_compute = 0;
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
+-    int m16_lowbit = (ctx->hflags & MIPS_HFLAG_M16) != 0;
++    int m16_lowbit = ctx->has_isa_mode && ((ctx->hflags & MIPS_HFLAG_M16) != 0);
+ 
+     if (ctx->hflags & MIPS_HFLAG_BMASK) {
+ #ifdef MIPS_DEBUG_DISAS
+@@ -24749,6 +24751,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
+     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
+     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
++    ctx->has_isa_mode = ((env->CP0_Config3 >> CP0C3_MMAR) & 0x7) != 3;
+     restore_cpu_state(env, ctx);
+ #ifdef CONFIG_USER_ONLY
+         ctx->mem_idx = MIPS_HFLAG_UM;
 -- 
 2.7.4
