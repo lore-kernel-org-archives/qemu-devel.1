@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fcfDA-0003fG-9c
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:04:54 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fcfMj-0006l2-1M
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fcfD8-0003tt-Eq
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:04:52 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:37819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fcfD8-0003td-5q
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:04:50 -0400
-Received: by mail-oi0-x234.google.com with SMTP id k81-v6so39062337oib.4
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 16:04:49 -0700 (PDT)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fcfMe-0008Le-Tf
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:14:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47722)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1fcfMe-0008L2-JQ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:14:40 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w69NE3Ls105129
+	for <qemu-devel@nongnu.org>; Mon, 9 Jul 2018 19:14:38 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k4c3natgm-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 19:14:38 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 9 Jul 2018 19:14:36 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNx9M6rLGcrv-ZuCtf5q5QyjrdpNr5d+q=tAdqZSXvJRQ@mail.gmail.com>
-References: <20180706012215.21714-1-alistair.francis@wdc.com>
-	<mvm36ws7mq7.fsf@suse.de>
-	<CAKmqyKNx9M6rLGcrv-ZuCtf5q5QyjrdpNr5d+q=tAdqZSXvJRQ@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Tue, 10 Jul 2018 11:04:48 +1200
-Message-ID: <CAHNT7Nt4m-6wAtHNtArGFV0PP0f5se5R9U=KCHHv65kw7oqHcw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 0/7] riscv-pull queue
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <CAKPgXcGQGqfwAw132jKq5UaFhaPR8PnfGf4NiXgYGoo7FwR5Cw@mail.gmail.com>
+References: <20180626151038.24771-1-sameeh@daynix.com>
+	<20180626151038.24771-2-sameeh@daynix.com>
+	<5e9b9ca6-b493-d10b-be98-9b9eb480c685@redhat.com>
+	<CAKPgXcGQGqfwAw132jKq5UaFhaPR8PnfGf4NiXgYGoo7FwR5Cw@mail.gmail.com>
+Date: Mon, 09 Jul 2018 17:58:45 -0500
+Message-Id: <153117712510.13022.10479965239208861799@sif>
+Subject: Re: [Qemu-devel] [PATCH 1/2] qga-win: prevent crash when executing
+ fsinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +44,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Andreas Schwab <schwab@suse.de>, Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Eric Blake <eblake@redhat.com>, Sameeh Jubran <sameeh@daynix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jul 10, 2018 at 9:52 AM, Alistair Francis <alistair23@gmail.com>
-wrote:
+Quoting Sameeh Jubran (2018-06-28 18:33:58)
+> =
 
-> On Mon, Jul 9, 2018 at 3:00 AM, Andreas Schwab <schwab@suse.de> wrote:
-> > What is the state of the sifive_u emulation?  When I tried to boot a bbl
-> > with an included kernel I get these errors:
-> >
-> > qemu-system-riscv64: plic: invalid register write: 00002090
-> > qemu-system-riscv64: plic: invalid register write: 00002094
-> > qemu-system-riscv64: plic: invalid register write: 00002098
-> > qemu-system-riscv64: plic: invalid register write: 0000209c
-> > qemu-system-riscv64: plic: invalid register write: 000020a0
-> > qemu-system-riscv64: plic: invalid register write: 000020a4
-> > qemu-system-riscv64: plic: invalid register write: 000020a8
-> > qemu-system-riscv64: plic: invalid register write: 000020ac
-> > qemu-system-riscv64: plic: invalid register write: 000020b0
-> > qemu-system-riscv64: plic: invalid register write: 000020b4
->
-> I see those as well. I haven't investigated but I assume we are just
-> not completely modelling the PLIC. In saying that it should still
-> boot. Do you not see the kernel booting?
+> =
 
+> On Fri, Jun 29, 2018 at 12:44 AM, Eric Blake <eblake@redhat.com> wrote:
+> =
 
-It could be a PLIC bug or it could be a Linux interrupt controller driver
-bug. We can see from the memory map docs for the U54 whether these memory
-addresses are in bounds based on the number of configured interrupt
-sources. I'm not sure how many sources we have configured on sifive_u. Last
-time I booted Linux on sifive_u I did not see these errors. I'd need your
-kernel config and to know what tree and branch you are building from. I
-will be able to look when I get time... The PLIC however seems stable in
-the 'virt' board at least...
+>     On 06/26/2018 10:10 AM, Sameeh Jubran wrote:
+> =
 
-Sorry I've been incommunicado for several weeks. I have been working on a
-CLIC model (Core Local Interrupt Controller) which replaces the CLINT and
-has a CLINT backwards compatibility mode. It is a Core Local vs the PLIC
-which is the Platform Level router. Here is the "draft" spec. It will be a
-candidate proposed to the RISC-V Fast Interrupts working group for
-potential standardisation, however in any case it will be available from
-SiFive so we may eventuall want to include our implementation in QEMU:
+>         From: Sameeh Jubran <sjubran@redhat.com>
+> =
 
-- https://github.com/sifive/clic-spec/blob/master/clic.adoc
+>         The fsinfo command is currently implemented for Windows only and =
+it's
+>         disk
+>         parameter can be enabled by adding the define "CONFIG_QGA_NTDDSCS=
+I" to
+>         the qga
+>         code. When enabled and executed the qemu-ga crashed with the foll=
+owing
+>         message:
+> =
 
-When i'm done with modelling the first iteration of the CLIC I'll go
-through my pending patch queue and make a PR for the Reviewed patches. I'll
-also do some testing on master to make sure we have not regressed anything
-in RISC-V QEMU given QEMU 2.12 and the riscv-qemu trees are both stable.
+>         ------------------------------------------------
+>         File qapi/qapi-visit-core.c, Line 49
+> =
 
-BTW - with respect to 'sifive_e' and 'sifive_u' SOC changes, we'll have to
-see how the model matches SiFive's plans for these virtual machines. We
-want to avoid a proliferation of boards, and as I've mentioned before we
-want to be able to model the HiFive1, HiFiveU and other SiFive E Series and
-U Series Coreplex configurations. There are many permutations from SiFive's
-SOC generator so our goal is to avoid hardcoding all of the different SOC
-combinations (hence the removal of model numbers in my initial review of
-your patches). How we achieve this I do not know. We obviously want to
-invest our time in something that is acceptable to upstream, while also
-meeting the goal of modelling SiFive's many hardware configurations, given
-these boards also model softcore IP such as the e31 arty and u54 on Xilinx
-VC707. i.e. they are SiFive models.
+>         Expression: !(v->type & VISITOR_OUTPUT) || *obj)
+>         ------------------------------------------------
+> =
 
-I'm not too concerned with the SOC changes assuming we don't regress any
-function, as we can always evolve the code in the future to match
-configurations from SiFive's SOC generator. At present the models are like
-a union of a subset of the real hardware as we are still missing many
-emulation models for various parts of the SOCs. After i've finished up this
-CLIC work, I'll go back through the list of things we still need to model.
+>         After some digging, turns out that the GuestPCIAddress is null an=
+d the
+>         qapi visitor doesn't like that, so we can always allocate it inst=
+ead
+>         and
+>         initiate all it's members to -1.
+> =
 
-Adding the Cadence GEM to the SiFive U Series is really nice, and so is
-adding Xilinx PCI to the SiFive U and GPEX to virt (as discussed, given
-virt is generic, we want to use GPEX there).
+> =
 
-Thanks,
-Michael.
+>     Adding Markus for a qapi back-compat question.
+> =
 
->
-> > Andreas.
-> >
-> > --
-> > Andreas Schwab, SUSE Labs, schwab@suse.de
-> > GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-> > "And now for something completely different."
->
+>     Is faking an invalid address better than making the output optional
+>     instead?
+> =
+
+> =
+
+>         +++ b/qga/commands-win32.c
+>         @@ -485,6 +485,11 @@ static GuestPCIAddress *get_pci_info(char *g=
+uid,
+>         Error **errp)
+>         =C2=A0 =C2=A0 =C2=A0 char *buffer =3D NULL;
+>         =C2=A0 =C2=A0 =C2=A0 GuestPCIAddress *pci =3D NULL;
+>         =C2=A0 =C2=A0 =C2=A0 char *name =3D g_strdup(&guid[4]);
+>         +=C2=A0 =C2=A0 pci =3D g_malloc0(sizeof(*pci));
+>         +=C2=A0 =C2=A0 pci->domain =3D -1;
+>         +=C2=A0 =C2=A0 pci->slot =3D -1;
+>         +=C2=A0 =C2=A0 pci->function =3D -1;
+>         +=C2=A0 =C2=A0 pci->bus =3D -1;
+> =
+
+> =
+
+>     Right now, we have:
+> =
+
+>     ##
+>     # @GuestDiskAddress:
+>     #
+>     # @pci-controller: controller's PCI address
+>     # @bus-type: bus type
+>     # @bus: bus id
+>     # @target: target id
+>     # @unit: unit id
+>     #
+>     # Since: 2.2
+>     ##
+>     { 'struct': 'GuestDiskAddress',
+>     =C2=A0 'data': {'pci-controller': 'GuestPCIAddress',
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0'bus-type': 'GuestDiskBusTyp=
+e',
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0'bus': 'int', 'target': 'int=
+', 'unit': 'int'} }
+> =
+
+>     and the problem you ran into is that under certain conditions, we hav=
+e no
+>     idea what to populate in GuestPCIAddress.=C2=A0 Your patch populates =
+garbage
+>     instead; but I'm wondering if it would be better to instead mark
+>     pci-controller as optional, where code that CAN populate it would set
+>     has_pci_controller=3Dtrue, and the code that crashed will now work by=
+ leaving
+>     the struct NULL (and has_pci_controller=3Dfalse).=C2=A0 But that remo=
+ves output
+>     that the client may expect to be present, hence, this is a back-compat
+>     question of the best way to approach this.
+> =
+
+> Since all of the fields are ints, I believe that "-1" is very informative=
+ even
+> though I don't like this approach but it does preserve backward compatibi=
+lity=C2=A0
+> as you've already clarified.
+> =
+
+> I don't want to assume anything but this bug has been laying around for q=
+uite a
+> while and no one complained, moreover,=C2=A0=C2=A0the disk option is not =
+enabled by
+> default in upstream code so I don't think that backward compatibility is
+> actually disturbed but then again this is just an assumption.
+> =
+
+> One more thing to consider is the second patch of this series which actua=
+lly
+> was the root cause of why we didn't allocate the " GuestDiskAddress" stru=
+ct
+> which is some registry keys being absent for the specific device which wo=
+uld
+> leave us with two options:
+> 1. Don not return anything for all of the fields (leave it null)
+> 2. Return partial information
+> I think that the second option is preferable for obvious reasons.
+> =
+
+> I am not that familiar with schema files, but it is possible to make int =
+fields
+> optional too?
+> =
+
+> I can live with either approaches, maintainers, it's your call :)
+
+IMO both approaches potentially break clients, but making the field
+optional in this case would be likely to trigger a segfault for any code
+that relies on GuestPCIAddress being populated, whereas -1 would likely
+just propagate through the stack as a signed integer as the schema calls
+for. Lack of -1/undefined handling further up the stack could still
+cause breakage but the severity seems lesser. I'm inclined to go this
+route for 2.13. If there are no objections I plan to include this in a
+pull for 2.13-rc1.
+
+> =
+
+> Thanks for the review!
+> =
+
+>    =
+
+>     --
+>     Eric Blake, Principal Software Engineer
+>     Red Hat, Inc.=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0+1-919-301-3266
+>     Virtualization:=C2=A0 qemu.org | libvirt.org
+> =
+
+> =
+
+> =
+
+> =
+
+> --
+> Respectfully,
+> Sameeh Jubran
+> Linkedin
+> Software Engineer @ Daynix.
