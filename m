@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcdB1-0007Ur-4S
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:54:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1fcdJT-0005p1-Sl
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcdB0-0007BQ-2B
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:54:31 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34670 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fcdAz-0007Ay-Qk
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:54:29 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  9 Jul 2018 22:50:31 +0200
-Message-Id: <1531169431-10772-34-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 33/33] target/mips: Add definition of
- nanoMIPS I7200 CPU
+	(envelope-from <thuth@redhat.com>) id 1fcdJS-0003kr-M6
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:03:15 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  9 Jul 2018 23:03:00 +0200
+Message-Id: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +18,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: f4bug@amsat.org, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+When trying to "device_add bcm2837" on a machine that is not suitable for
+this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
 
-Add definition of the first nanoMIPS processor in QEMU.
+echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
+ "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
+ "'arguments': {'command-line': 'info qtree'}}" | \
+ aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+{"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
+ "package": "build-all"}, "capabilities": []}}
+{"return": {}}
+{"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
+ hotplugged on this machine"}}
+Segmentation fault (core dumped)
+
+The problem is that qdev_set_parent_bus() from instance_init adds a link
+to the child devices which is not valid anymore after the device init
+failed. Thus the qdev_set_parent_bus() must rather be done in the realize
+function instead.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/mips/translate_init.inc.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ hw/arm/bcm2835_peripherals.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index c7ba6ee..262ff29 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -449,6 +449,43 @@ const mips_def_t mips_defs[] =
-         .insn_flags = CPU_MIPS32R6 | ASE_MICROMIPS,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-+    {
-+        .name = "I7200",
-+        .CP0_PRid = 0x00010000,
-+        .CP0_Config0 = MIPS_CONFIG0 | (1 << CP0C0_MM) | (0x2 << CP0C0_AR) |
-+                        (MMU_TYPE_R4000 << CP0C0_MT),
-+        .CP0_Config1 = MIPS_CONFIG1 | (15 << CP0C1_MMU) | (2 << CP0C1_IS) |
-+                       (4 << CP0C1_IL) | (3 << CP0C1_IA) | (2 << CP0C1_DS) |
-+                       (4 << CP0C1_DL) | (3 << CP0C1_DA) | (1 << CP0C1_PC) |
-+                       (1 << CP0C1_WR) | (1 << CP0C1_EP),
-+        .CP0_Config2 = MIPS_CONFIG2,
-+        .CP0_Config3 = MIPS_CONFIG3 | (1 << CP0C3_CMGCR) | (1 << CP0C3_BI) |
-+                       (3 << CP0C3_MMAR) | (1 << CP0C3_ISA_ON_EXC) |
-+                       (1 << CP0C3_ISA) | (1 << CP0C3_ULRI) |
-+                       (1 << CP0C3_RXI) |
-+                       (1 << CP0C3_VInt) | (1U << CP0C3_M) | (1 << CP0C3_MT),
-+        .CP0_Config4 = MIPS_CONFIG4 | (0xfc << CP0C4_KScrExist) |
-+                       (2 << CP0C4_IE) | (1U << CP0C4_M),
-+        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_MVH) | (1 << CP0C5_LLB),
-+        .CP0_Config5_rw_bitmask = (1 << CP0C5_SBRI) | (1 << CP0C5_FRE) |
-+                                  (1 << CP0C5_UFE),
-+        .CP0_LLAddr_rw_bitmask = 0,
-+        .CP0_LLAddr_shift = 0,
-+        .SYNCI_Step = 32,
-+        .CCRes = 2,
-+        .CP0_Status_rw_bitmask = 0x3058FF1F,
-+        .CP0_PageGrain = (1 << CP0PG_IEC) | (1 << CP0PG_XIE) |
-+                         (1U << CP0PG_RIE),
-+        .CP0_PageGrain_rw_bitmask = 0,
-+        .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_HAS2008) | (1 << FCR0_F64) |
-+                    (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
-+                    (1 << FCR0_S) | (0x02 << FCR0_PRID) | (0x0 << FCR0_REV),
-+        .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
-+        .SEGBITS = 32,
-+        .PABITS = 32,
-+        .insn_flags = CPU_NANOMIPS32 | ASE_MICROMIPS,
-+        .mmu_type = MMU_TYPE_R4000,
-+    },
- #if defined(TARGET_MIPS64)
-     {
-         .name = "R4000",
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 6be7660..4724a29 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -43,22 +43,18 @@ static void bcm2835_peripherals_init(Object *obj)
+     /* Interrupt Controller */
+     object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
+     object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
+ 
+     /* UART0 */
+     s->uart0 = SYS_BUS_DEVICE(object_new("pl011"));
+     object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
+-    qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
+ 
+     /* AUX / UART1 */
+     object_initialize(&s->aux, sizeof(s->aux), TYPE_BCM2835_AUX);
+     object_property_add_child(obj, "aux", OBJECT(&s->aux), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->aux), sysbus_get_default());
+ 
+     /* Mailboxes */
+     object_initialize(&s->mboxes, sizeof(s->mboxes), TYPE_BCM2835_MBOX);
+     object_property_add_child(obj, "mbox", OBJECT(&s->mboxes), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->mboxes), sysbus_get_default());
+ 
+     object_property_add_const_link(OBJECT(&s->mboxes), "mbox-mr",
+                                    OBJECT(&s->mbox_mr), &error_abort);
+@@ -68,7 +64,6 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_child(obj, "fb", OBJECT(&s->fb), NULL);
+     object_property_add_alias(obj, "vcram-size", OBJECT(&s->fb), "vcram-size",
+                               &error_abort);
+-    qdev_set_parent_bus(DEVICE(&s->fb), sysbus_get_default());
+ 
+     object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr), &error_abort);
+@@ -78,7 +73,6 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_child(obj, "property", OBJECT(&s->property), NULL);
+     object_property_add_alias(obj, "board-rev", OBJECT(&s->property),
+                               "board-rev", &error_abort);
+-    qdev_set_parent_bus(DEVICE(&s->property), sysbus_get_default());
+ 
+     object_property_add_const_link(OBJECT(&s->property), "fb",
+                                    OBJECT(&s->fb), &error_abort);
+@@ -88,22 +82,18 @@ static void bcm2835_peripherals_init(Object *obj)
+     /* Random Number Generator */
+     object_initialize(&s->rng, sizeof(s->rng), TYPE_BCM2835_RNG);
+     object_property_add_child(obj, "rng", OBJECT(&s->rng), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->rng), sysbus_get_default());
+ 
+     /* Extended Mass Media Controller */
+     object_initialize(&s->sdhci, sizeof(s->sdhci), TYPE_SYSBUS_SDHCI);
+     object_property_add_child(obj, "sdhci", OBJECT(&s->sdhci), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->sdhci), sysbus_get_default());
+ 
+     /* SDHOST */
+     object_initialize(&s->sdhost, sizeof(s->sdhost), TYPE_BCM2835_SDHOST);
+     object_property_add_child(obj, "sdhost", OBJECT(&s->sdhost), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->sdhost), sysbus_get_default());
+ 
+     /* DMA Channels */
+     object_initialize(&s->dma, sizeof(s->dma), TYPE_BCM2835_DMA);
+     object_property_add_child(obj, "dma", OBJECT(&s->dma), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->dma), sysbus_get_default());
+ 
+     object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr), &error_abort);
+@@ -111,7 +101,6 @@ static void bcm2835_peripherals_init(Object *obj)
+     /* GPIO */
+     object_initialize(&s->gpio, sizeof(s->gpio), TYPE_BCM2835_GPIO);
+     object_property_add_child(obj, "gpio", OBJECT(&s->gpio), NULL);
+-    qdev_set_parent_bus(DEVICE(&s->gpio), sysbus_get_default());
+ 
+     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhci",
+                                    OBJECT(&s->sdhci.sdbus), &error_abort);
+@@ -126,8 +115,22 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     MemoryRegion *ram;
+     Error *err = NULL;
+     uint64_t ram_size, vcram_size;
++    BusState *sysbus;
+     int n;
+ 
++    sysbus = sysbus_get_default();
++    qdev_set_parent_bus(DEVICE(&s->ic), sysbus);
++    qdev_set_parent_bus(DEVICE(s->uart0), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->aux), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->mboxes), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->fb), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->property), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->rng), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->sdhci), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->sdhost), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->dma), sysbus);
++    qdev_set_parent_bus(DEVICE(&s->gpio), sysbus);
++
+     obj = object_property_get_link(OBJECT(dev), "ram", &err);
+     if (obj == NULL) {
+         error_setg(errp, "%s: required ram link not found: %s",
 -- 
-2.7.4
+1.8.3.1
