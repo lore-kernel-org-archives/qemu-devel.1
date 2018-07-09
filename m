@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcOQV-00073G-2s
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 01:09:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fcOTI-0007zG-L6
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 01:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcOQR-0000lP-2a
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 01:09:31 -0400
-Received: from ozlabs.org ([203.11.71.1]:49803)
+	(envelope-from <dgibson@ozlabs.org>) id 1fcOTH-0002Ef-Iw
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 01:12:24 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:45459)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fcOQP-0000kB-NY
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 01:09:27 -0400
-Date: Mon, 9 Jul 2018 15:09:00 +1000
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fcOTG-0002E1-Qz
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 01:12:23 -0400
+Date: Mon, 9 Jul 2018 15:12:14 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180709050900.GF22363@umbus.fritz.box>
+Message-ID: <20180709051214.GG22363@umbus.fritz.box>
 References: <20180705182001.16537-1-mdavidsaver@gmail.com>
-	<20180705182001.16537-4-mdavidsaver@gmail.com>
-	<20180706033942.GN3450@umbus.fritz.box>
-	<b7dfce5a-ee0e-b796-fbb6-236c8cf5ee9b@gmail.com>
+	<20180705182001.16537-5-mdavidsaver@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FoLtEtfbNGMjfgrs"
+	protocol="application/pgp-signature"; boundary="lQSB8Tqijvu1+4Ba"
 Content-Disposition: inline
-In-Reply-To: <b7dfce5a-ee0e-b796-fbb6-236c8cf5ee9b@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 03/14] timer: ds1338 persist 12-hour mode
- selection
+In-Reply-To: <20180705182001.16537-5-mdavidsaver@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 04/14] timer: ds1338 clarify HOUR handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +32,57 @@ To: Michael Davidsaver <mdavidsaver@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, qemu-devel@nongnu.org
 
 
---FoLtEtfbNGMjfgrs
+--lQSB8Tqijvu1+4Ba
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 05, 2018 at 09:35:50PM -0700, Michael Davidsaver wrote:
-> On 07/05/2018 08:39 PM, David Gibson wrote:
-> > On Thu, Jul 05, 2018 at 11:19:50AM -0700, Michael Davidsaver wrote:
-> > 11;rgb:ffff/ffff/ffff> Need to save HOUR[HOUR12] bit to keep
-> >> track of guest selection of 12-hour mode.
-> >> Write through current time registers to
-> >> achieve this.  Will be overwritten
-> >> by the next read/latch.
-> >>
-> >> This was only being done in two of three
-> >> arms of this conditional block.
-> >>
-> >> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-> >=20
-> > This looks dubious to me, or at least the explanation of it does.  The
-> > other branch of the conditional is covering different registers in the
-> > device, which are part of the RTC component, rather than the NVRAM
-> > area.  I wouldn't necessarily expect them to persist data as a rule
-> > the way the rest of the block does, even if this specific bit does
-> > need to be preserved.
+On Thu, Jul 05, 2018 at 11:19:51AM -0700, Michael Davidsaver wrote:
+> Simplify and comment the translation between
+> registers and struct tm.
 >=20
-> The fact that the above capture_current_time() included the line
->=20
-> >     if (s->nvram[2] & HOURS_12) {
->=20
-> was enough to convince me that the original author intended to persist
-> the 12/24 hour mode in this way.  There are certainly other ways to
-> accomplish this, but they would involved adding to the vmstate,
-> which I've tried to avoid in this iteration.
-
-Ah, yes, I see your point.  I was more unsure about whether it was
-safe to also persist the other early bytes of the region, which this
-patch also does.  But I can't really see how it would do any harm, so:
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
->=20
->=20
-> Also, I though I had test coverage of this bug.  That's actually how I
-> noticed it to begin with.  But it seems my later change to allow for a
-> slow test runner also stopped testing readback of the 12/24 hour mode bit.
-> It just silently uses whichever it reads.  I'll be re-issuing an updated
-> version which restores this check.  Then you will be able to easily
-> see the effect of reverting 'timer: ds1338 persist 12-hour mode selection=
-'.
->=20
->=20
->=20
-> >> ---
-> >>  hw/timer/ds1338.c | 4 +---
-> >>  1 file changed, 1 insertion(+), 3 deletions(-)
-> >>
-> >> diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
-> >> index 7298c5af43..b56db5852e 100644
-> >> --- a/hw/timer/ds1338.c
-> >> +++ b/hw/timer/ds1338.c
-> >> @@ -220,10 +220,8 @@ static int ds1338_send(I2CSlave *i2c, uint8_t dat=
-a)
-> >>             value unchanged. */
-> >>          data =3D (data & ~CTRL_OSF) | (data & s->nvram[s->ptr] & CTRL=
-_OSF);
-> >> =20
-> >> -        s->nvram[s->ptr] =3D data;
-> >> -    } else {
-> >> -        s->nvram[s->ptr] =3D data;
-> >>      }
-> >> +    s->nvram[s->ptr] =3D data;
-> >>      inc_regptr(s);
-> >>      return 0;
-> >>  }
-> >=20
->=20
->=20
+although..
 
+[snip]
+> @@ -101,7 +105,9 @@ static void capture_current_time(DS1338State *s)
+>          } else {
+>              s->nvram[R_HOUR] =3D R_HOUR_SET12_MASK | R_HOUR_AMPM_MASK | =
+to_bcd(tmp - 12);
+>          }
+> +
+>      } else {
 
+I'm not real fond of blank lines before the ends of blocks.
 
+> +        /* 24 hour mode. */
+>          s->nvram[R_HOUR] =3D to_bcd(now.tm_hour);
+>      }
+>      s->nvram[R_WDAY] =3D (now.tm_wday + s->wday_offset) % 7 + 1;
+> @@ -178,14 +184,13 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
+>              break;
+>          case R_HOUR:
+>              if (FIELD_EX32(data, HOUR, SET12)) {
+> -                int tmp =3D from_bcd(FIELD_EX32(data, HOUR, HOUR12));
+> +                /* 12 hour (1-12) */
+> +                /* read and wrap 1-12 -> 0-11 */
+> +                now.tm_hour =3D from_bcd(FIELD_EX32(data, HOUR, HOUR12))=
+ % 12u;
+>                  if (FIELD_EX32(data, HOUR, AMPM)) {
+> -                    tmp +=3D 12;
+> +                    now.tm_hour +=3D 12;
+>                  }
+> -                if (tmp % 12 =3D=3D 0) {
+> -                    tmp -=3D 12;
+> -                }
+> -                now.tm_hour =3D tmp;
+> +
+>              } else {
+>                  now.tm_hour =3D from_bcd(FIELD_EX32(data, HOUR, HOUR24));
+>              }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -123,24 +90,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---FoLtEtfbNGMjfgrs
+--lQSB8Tqijvu1+4Ba
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltC7ewACgkQbDjKyiDZ
-s5Lqkw/9HvfgPS53CZ2Ew8FkgY0cqnLm5rl6T258TD7YnQqsS3hSwQfYNyu/gKEL
-R51f6W8HDRbNi491v7lPxlMgxw1bze+kJWYph/fqnionSZWKz8LNPiCyt/IXyKxX
-W9f03qKMeyOqOIhB0F6wwapn/98U6NuXaIrqLZuLGpKZMKxCswcd/eS9JDUSVl6G
-6lcanEdlGWNGO4C6albJS6dmFNWGH/Pgv8GcP5pCnQ/kL6y34bapIncRybZqbBdR
-C5L4fou6p8LjSCL6MiJJRDE7lbJgfy9EVOoAe0uKY9hvbdXD57Op7WnY8kJ2j92F
-ZLN8vCkHXBkCrYoxOea5f0Lt0l+FmiTo4RAE1ape15X2R9ZhKucox8PCI+miOt7a
-5kWM69BjBK1+5E6nkn6iza9nygZmQT4p7GOKYhdLLD8nwzXAnL+XHVyG+m8qJJ3Y
-8WRgihvC0Sn3ErR9OK1TbAxv7vDJDKCsbtFUVFUuCSwEqD03uG/80vlN+HF9ly6y
-LMF0gUX33O0g692uKrzn7dgQ9cEkJ2bMFe4Fc3fNTG3hhypc2y+U7hjIS6PnJKwn
-SqRFetkmeydPaoNMN0om/4zCqWtYgwzlN4v+7BAtzPM11hMumXmcOgLxztJXfEzd
-uJIsWmwTvb3J8zmUroklF/6uq82p157BS4uDjWaRixaa/Ks5WM8=
-=f+pR
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltC7q4ACgkQbDjKyiDZ
+s5IiXw//Vfz2sbCQiak+NRoMprL4Nx0r3KfrPiXURUWB5fsbErzYgAGDpLf+uylK
+P8fjYRIzZ8DZ+j6kvHkso4RYpQ88ZvZJqqHO5Oyv6MnL00AnwstzxAd3hA7AVDqN
+k0aVv5BZ14ZunqESKNajV176BtbnJEwpzq8J7y5LOfh+jWMxrSG5w29Q3eFsVh/8
+ArvHXeNMwKCwLhq0kwyDcFj3ttNqPF9vo464IF/WZdiWb8WeIVZwgccqBJmgOzfG
+NJFWmSu1xs7TX9DJlvPwbTYFahNgyEUVwc4+1HYn7wnQDkL7OZGna8ZPOOUqGhcF
+mx+GOkUXZBwhw2ydotIlzeD36BeIvHJFtNFgsyPEoafyCz79xGu0uBjtom7ENbtg
+ylymYXFbs/86h/MeTmE0XCfx3lZRPcyVwIJrlmRipuByQQruOD9H79NdQlqWcUA0
+zR4bdI/1m+RvbfWUA4Gw1zF9b76/W5bpnCdz/15IPSDV7Rip9DFcShUMdYv0JgaT
+sXC78l4/CYtQZ50Ga2psA98WVVn6wwufrWc9PBQlXaUqcn6p4Fbtbl7zajwwIjUH
+h+Tp+lIr376CE25FunYJKpwbbpEHTd0DqWabMWSetwrS9lLD/w4sxwZdGh0UvAQc
+RFOjL+k0ANDPRXzQRdxFaR9rYmhXs9OrIew3SxQ65zP5lSB4XpU=
+=nWtm
 -----END PGP SIGNATURE-----
 
---FoLtEtfbNGMjfgrs--
+--lQSB8Tqijvu1+4Ba--
