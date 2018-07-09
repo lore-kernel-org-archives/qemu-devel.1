@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fcbdI-0008Nz-Di
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 15:15:37 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fcc9v-0007UM-6Q
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 15:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fcbdF-0004ZO-6z
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 15:15:36 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:39665)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fcbdE-0004Xt-Qq
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 15:15:33 -0400
-Received: by mail-pl0-x243.google.com with SMTP id s24-v6so6464891plq.6
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 12:15:32 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  9 Jul 2018 12:15:29 -0700
-Message-Id: <20180709191529.13080-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: Fix shmat emulation by honoring
- host SHMLBA
+	(envelope-from <no-reply@patchew.org>) id 1fcc9s-0001Sd-3o
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 15:49:19 -0400
+Resent-Message-Id: <E1fcc9s-0001Sd-3o@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fcc9r-0001Rt-UW
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 15:49:16 -0400
+In-Reply-To: <20180709174154.9470-1-ehabkost@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153115852067.1482.5805823591216680658@946cad8fd14e>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Jul 2018 10:48:42 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/2] Machine/NUMA fixes for -rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,288 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com, mst@redhat.com
 
-For those hosts with SHMLBA > getpagesize, we don't automatically
-select a guest address that is compatible with the host.  We can
-achieve this by boosting the alignment of guest_base and by adding
-an extra alignment argument to mmap_find_vma.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-
-Found by running check-tcg on an arm32 host, which defines (host) SHMLBA
-as 16K, executing the "native" or "non-cross-compiled" linux-test.
-Pushing that back to x86 snuffled out more fixes required for mips, which
-defines (guest) SHMLBA as 256k.
-
-While this is newly exposed by check-tcg, the problem has been latent
-for quite a while.  It probably doesn't warrent rushing in for 3.0.
-
-
-r~
-
----
- linux-user/qemu.h    |  2 +-
- linux-user/elfload.c | 17 +++++-----
- linux-user/mmap.c    | 74 +++++++++++++++++++++++---------------------
- linux-user/syscall.c |  3 +-
- 4 files changed, 52 insertions(+), 44 deletions(-)
-
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index bb85c81aa4..b79ac8bd01 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -436,7 +436,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-                        abi_ulong new_addr);
- extern unsigned long last_brk;
- extern abi_ulong mmap_next_start;
--abi_ulong mmap_find_vma(abi_ulong, abi_ulong);
-+abi_ulong mmap_find_vma(abi_ulong, abi_ulong, abi_ulong);
- void mmap_fork_start(void);
- void mmap_fork_end(int child);
- 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 942a1b661f..3467e3512e 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -3,6 +3,7 @@
- #include <sys/param.h>
- 
- #include <sys/resource.h>
-+#include <sys/shm.h>
- 
- #include "qemu.h"
- #include "disas/disas.h"
-@@ -1929,6 +1930,8 @@ unsigned long init_guest_space(unsigned long host_start,
-                                unsigned long guest_start,
-                                bool fixed)
- {
-+    /* In order to use host shmat, we must be able to honor SHMLBA.  */
-+    unsigned long align = MAX(SHMLBA, qemu_host_page_size);
-     unsigned long current_start, aligned_start;
-     int flags;
- 
-@@ -1946,7 +1949,7 @@ unsigned long init_guest_space(unsigned long host_start,
-     }
- 
-     /* Setup the initial flags and start address.  */
--    current_start = host_start & qemu_host_page_mask;
-+    current_start = host_start & -align;
-     flags = MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE;
-     if (fixed) {
-         flags |= MAP_FIXED;
-@@ -1982,8 +1985,8 @@ unsigned long init_guest_space(unsigned long host_start,
-             return (unsigned long)-1;
-         }
-         munmap((void *)real_start, host_full_size);
--        if (real_start & ~qemu_host_page_mask) {
--            /* The same thing again, but with an extra qemu_host_page_size
-+        if (real_start & (align - 1)) {
-+            /* The same thing again, but with extra
-              * so that we can shift around alignment.
-              */
-             unsigned long real_size = host_full_size + qemu_host_page_size;
-@@ -1996,7 +1999,7 @@ unsigned long init_guest_space(unsigned long host_start,
-                 return (unsigned long)-1;
-             }
-             munmap((void *)real_start, real_size);
--            real_start = HOST_PAGE_ALIGN(real_start);
-+            real_start = ROUND_UP(real_start, align);
-         }
-         current_start = real_start;
-     }
-@@ -2023,7 +2026,7 @@ unsigned long init_guest_space(unsigned long host_start,
-         }
- 
-         /* Ensure the address is properly aligned.  */
--        if (real_start & ~qemu_host_page_mask) {
-+        if (real_start & (align - 1)) {
-             /* Ideally, we adjust like
-              *
-              *    pages: [  ][  ][  ][  ][  ]
-@@ -2051,7 +2054,7 @@ unsigned long init_guest_space(unsigned long host_start,
-             if (real_start == (unsigned long)-1) {
-                 return (unsigned long)-1;
-             }
--            aligned_start = HOST_PAGE_ALIGN(real_start);
-+            aligned_start = ROUND_UP(real_start, align);
-         } else {
-             aligned_start = real_start;
-         }
-@@ -2088,7 +2091,7 @@ unsigned long init_guest_space(unsigned long host_start,
-          * because of trouble with ARM commpage setup.
-          */
-         munmap((void *)real_start, real_size);
--        current_start += qemu_host_page_size;
-+        current_start += align;
-         if (host_start == current_start) {
-             /* Theoretically possible if host doesn't have any suitably
-              * aligned areas.  Normally the first mmap will fail.
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index d0c50e4888..c800c9ab82 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -202,49 +202,52 @@ unsigned long last_brk;
- 
- /* Subroutine of mmap_find_vma, used when we have pre-allocated a chunk
-    of guest address space.  */
--static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size)
-+static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size,
-+                                        abi_ulong align)
- {
--    abi_ulong addr;
--    abi_ulong end_addr;
-+    abi_ulong addr, end_addr, incr = qemu_host_page_size;
-     int prot;
--    int looped = 0;
-+    bool looped = false;
- 
-     if (size > reserved_va) {
-         return (abi_ulong)-1;
-     }
- 
--    size = HOST_PAGE_ALIGN(size);
--    end_addr = start + size;
--    if (end_addr > reserved_va) {
--        end_addr = reserved_va;
--    }
--    addr = end_addr - qemu_host_page_size;
-+    /* Note that start and size have already been aligned by mmap_find_vma. */
- 
-+    end_addr = start + size;
-+    if (start > reserved_va - size) {
-+        /* Start at the top of the address space.  */
-+        end_addr = ((reserved_va - size) & -align) + size;
-+        looped = true;
-+    }
-+
-+    /* Search downward from END_ADDR, checking to see if a page is in use.  */
-+    addr = end_addr;
-     while (1) {
-+        addr -= incr;
-         if (addr > end_addr) {
-             if (looped) {
-+                /* Failure.  The entire address space has been searched.  */
-                 return (abi_ulong)-1;
-             }
--            end_addr = reserved_va;
--            addr = end_addr - qemu_host_page_size;
--            looped = 1;
--            continue;
-+            /* Re-start at the top of the address space.  */
-+            addr = end_addr = ((reserved_va - size) & -align) + size;
-+            looped = true;
-+        } else {
-+            prot = page_get_flags(addr);
-+            if (prot) {
-+                /* Page in use.  Restart below this page.  */
-+                addr = end_addr = ((addr - size) & -align) + size;
-+            } else if (addr && addr + size == end_addr) {
-+                /* Success!  All pages between ADDR and END_ADDR are free.  */
-+                if (start == mmap_next_start) {
-+                    mmap_next_start = addr;
-+                }
-+                return addr;
-+            }
-         }
--        prot = page_get_flags(addr);
--        if (prot) {
--            end_addr = addr;
--        }
--        if (addr && addr + size == end_addr) {
--            break;
--        }
--        addr -= qemu_host_page_size;
-     }
--
--    if (start == mmap_next_start) {
--        mmap_next_start = addr;
--    }
--
--    return addr;
- }
- 
- /*
-@@ -253,7 +256,7 @@ static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size)
-  * It must be called with mmap_lock() held.
-  * Return -1 if error.
-  */
--abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
-+abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size, abi_ulong align)
- {
-     void *ptr, *prev;
-     abi_ulong addr;
-@@ -265,11 +268,12 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
-     } else {
-         start &= qemu_host_page_mask;
-     }
-+    start = ROUND_UP(start, align);
- 
-     size = HOST_PAGE_ALIGN(size);
- 
-     if (reserved_va) {
--        return mmap_find_vma_reserved(start, size);
-+        return mmap_find_vma_reserved(start, size, align);
-     }
- 
-     addr = start;
-@@ -299,7 +303,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
-         if (h2g_valid(ptr + size - 1)) {
-             addr = h2g(ptr);
- 
--            if ((addr & ~TARGET_PAGE_MASK) == 0) {
-+            if ((addr & (align - 1)) == 0) {
-                 /* Success.  */
-                 if (start == mmap_next_start && addr >= TASK_UNMAPPED_BASE) {
-                     mmap_next_start = addr + size;
-@@ -313,12 +317,12 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
-                 /* Assume the result that the kernel gave us is the
-                    first with enough free space, so start again at the
-                    next higher target page.  */
--                addr = TARGET_PAGE_ALIGN(addr);
-+                addr = ROUND_UP(addr, align);
-                 break;
-             case 1:
-                 /* Sometimes the kernel decides to perform the allocation
-                    at the top end of memory instead.  */
--                addr &= TARGET_PAGE_MASK;
-+                addr &= align - 1;
-                 break;
-             case 2:
-                 /* Start over at low memory.  */
-@@ -407,7 +411,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
-     if (!(flags & MAP_FIXED)) {
-         host_len = len + offset - host_offset;
-         host_len = HOST_PAGE_ALIGN(host_len);
--        start = mmap_find_vma(real_start, host_len);
-+        start = mmap_find_vma(real_start, host_len, TARGET_PAGE_SIZE);
-         if (start == (abi_ulong)-1) {
-             errno = ENOMEM;
-             goto fail;
-@@ -701,7 +705,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-     } else if (flags & MREMAP_MAYMOVE) {
-         abi_ulong mmap_start;
- 
--        mmap_start = mmap_find_vma(0, new_size);
-+        mmap_start = mmap_find_vma(0, new_size, TARGET_PAGE_SIZE);
- 
-         if (mmap_start == -1) {
-             errno = ENOMEM;
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5822e03e28..b6c37cbb97 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5000,7 +5000,8 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
-     else {
-         abi_ulong mmap_start;
- 
--        mmap_start = mmap_find_vma(0, shm_info.shm_segsz);
-+        /* In order to use the host shmat, we need to honor host SHMLBA.  */
-+        mmap_start = mmap_find_vma(0, shm_info.shm_segsz, MAX(SHMLBA, shmlba));
- 
-         if (mmap_start == -1) {
-             errno = ENOMEM;
--- 
-2.17.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNzA5MTc0MTU0Ljk0NzAtMS1laGFia29zdEByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzJdIE1hY2hpbmUvTlVNQSBmaXhlcyBmb3IgLXJjMAoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
+bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
+ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
+b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
+PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
+ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
+ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
+dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDcw
+OTE3NDE1NC45NDcwLTEtZWhhYmtvc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNzA5MTc0
+MTU0Ljk0NzAtMS1laGFia29zdEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKNDk1NmFiNDdiZSBody9tYWNoaW5lOiBSZW1vdmUgdGhlIFplcm8gY2hlY2sgb2YgbmJf
+bnVtYV9ub2RlcyBmb3IgbnVtYV9jb21wbGV0ZV9jb25maWd1cmF0aW9uKCkKZGFhYWNkZmQ0YiBt
+YWNoaW5lOiBwcm9wZXJseSBmcmVlIGRldmljZV9tZW1vcnkKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvMjogbWFjaGluZTogcHJvcGVybHkgZnJlZSBkZXZpY2VfbWVtb3J5
+Li4uCkNoZWNraW5nIFBBVENIIDIvMjogaHcvbWFjaGluZTogUmVtb3ZlIHRoZSBaZXJvIGNoZWNr
+IG9mIG5iX251bWFfbm9kZXMgZm9yIG51bWFfY29tcGxldGVfY29uZmlndXJhdGlvbigpLi4uCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzM0OiBGSUxFOiBody9jb3JlL21hY2hpbmUuYzo3OTY6CisgICAgaWYgKG5iX251bWFfbm9k
+ZXMpClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyIGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
