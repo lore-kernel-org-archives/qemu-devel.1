@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcWcm-0007hO-NF
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:45 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fcWco-0007jh-Q2
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcWcl-00053a-VA
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:44 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43342)
+	(envelope-from <pm215@archaic.org.uk>) id 1fcWcn-00054o-W9
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:46 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43346)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fcWcl-00052E-OF
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:43 -0400
+	id 1fcWcn-00054N-Pk
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:45 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcWck-0000js-Hp
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 14:54:42 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fcWcm-0000lW-O0
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 14:54:44 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jul 2018 14:54:32 +0100
-Message-Id: <20180709135435.836-9-peter.maydell@linaro.org>
+Date: Mon,  9 Jul 2018 14:54:35 +0100
+Message-Id: <20180709135435.836-12-peter.maydell@linaro.org>
 In-Reply-To: <20180709135435.836-1-peter.maydell@linaro.org>
 References: <20180709135435.836-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/11] target/arm: Fix do_predset for large VL
+Subject: [Qemu-devel] [PULL 11/11] hw/net/dp8393x: don't make prom region
+ 'nomigrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +30,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Currently we use memory_region_init_rom_nomigrate() to create
+the "dp3893x-prom" memory region, and we don't manually register
+it with vmstate_register_ram(). This currently means that its
+contents are migrated but as a ram block whose name is the empty
+string; in future it may mean they are not migrated at all. Use
+memory_region_init_ram() instead.
 
-Use MAKE_64BIT_MASK instead of open-coding.  Remove an odd
-vector size check that is unlikely to be more profitable
-than 3 64-bit integer stores.  Correct the iteration for WORD
-to avoid writing too much data.
+Note that this is a a cross-version migration compatibility break
+for the MIPS "magnum" and "pica61" machines.
 
-Fixes RISU tests of PTRUE for VL 256.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20180705191929.30773-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
+Message-id: 20180706174309.27110-1-peter.maydell@linaro.org
 ---
- target/arm/translate-sve.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ hw/net/dp8393x.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index d41f1155f91..374051cd20a 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -1438,7 +1438,7 @@ static bool do_predset(DisasContext *s, int esz, int rd, int pat, bool setflag)
-         setsz = numelem << esz;
-         lastword = word = pred_esz_masks[esz];
-         if (setsz % 64) {
--            lastword &= ~(-1ull << (setsz % 64));
-+            lastword &= MAKE_64BIT_MASK(0, setsz % 64);
-         }
-     }
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index f2d2ce344cc..b53fcaa8bc3 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -887,7 +887,7 @@ static void dp8393x_realize(DeviceState *dev, Error **errp)
+     s->watchdog = timer_new_ns(QEMU_CLOCK_VIRTUAL, dp8393x_watchdog, s);
+     s->regs[SONIC_SR] = 0x0004; /* only revision recognized by Linux */
  
-@@ -1457,19 +1457,13 @@ static bool do_predset(DisasContext *s, int esz, int rd, int pat, bool setflag)
-             tcg_gen_gvec_dup64i(ofs, oprsz, maxsz, word);
-             goto done;
-         }
--        if (oprsz * 8 == setsz + 8) {
--            tcg_gen_gvec_dup64i(ofs, oprsz, maxsz, word);
--            tcg_gen_movi_i64(t, 0);
--            tcg_gen_st_i64(t, cpu_env, ofs + oprsz - 8);
--            goto done;
--        }
-     }
- 
-     setsz /= 8;
-     fullsz /= 8;
- 
-     tcg_gen_movi_i64(t, word);
--    for (i = 0; i < setsz; i += 8) {
-+    for (i = 0; i < QEMU_ALIGN_DOWN(setsz, 8); i += 8) {
-         tcg_gen_st_i64(t, cpu_env, ofs + i);
-     }
-     if (lastword != word) {
+-    memory_region_init_ram_nomigrate(&s->prom, OBJECT(dev),
++    memory_region_init_ram(&s->prom, OBJECT(dev),
+                            "dp8393x-prom", SONIC_PROM_SIZE, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
 -- 
 2.17.1
