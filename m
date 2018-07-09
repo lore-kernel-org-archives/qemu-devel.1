@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcUQx-0004YF-Uf
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:34:24 -0400
+	(envelope-from <bounces@canonical.com>) id 1fcUgs-0007mo-C5
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcUQx-0003bw-6G
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:34:23 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39435)
+	(envelope-from <bounces@canonical.com>) id 1fcUgn-0004JH-Hg
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:50:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcUQx-0003aF-15
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:34:23 -0400
-Received: by mail-oi0-x244.google.com with SMTP id d189-v6so35210575oib.6
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 04:34:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fcUgn-0004J0-Ad
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:50:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fcUgk-00013p-HY
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 11:50:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C88252E8078
+	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 11:50:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jul 2018 12:34:01 +0100
-Message-ID: <CAFEAcA9xtsCpHmEuNO3bRaCHe_U7kWWCJuOK_nd6wrEgdc7u2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/16] ppc-for-3.0 queue 20180709
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Jul 2018 11:41:13 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
+Message-Id: <153113647351.29762.17411981188544903441.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, BALATON Zoltan <balaton@eik.bme.hu>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 9 July 2018 at 08:43, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 43a473993fd9378bf850dcafa68eb6dee8c300f8:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-07-06 18:18:08 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180709
->
-> for you to fetch changes up to 51b0d834c414f494410cc94e56886b6584ae3c54:
->
->   sam460ex: Make sam460ex_load_device_tree() handle all errors internally (2018-07-09 14:38:45 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-07-09
->
-> Here's a final pull request before tomorrow's hard freeze.
->
-> There are a number of fixes and improvements to the sm501 display
-> driver (not strictly ppc related, but used only on ppc and SH).
-> There's also a handful of unrelated fixes.
->
-> Whether all the sm501 changes are bugfixes is somewhat debatable, but
-> Peter has indicated he's ok with merging those for 3.0.
->
-> ----------------------------------------------------------------
-Applied, thanks.
+Does reverting the commit fix it? It was just a cleanup I think.
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1774677
+
+Title:
+  -icount increases boot time by >10x
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When I specify the -icount option, some guest operations such as
+  booting a Linux kernel take more than 10 times longer than otherwise.
+  For example, the following will boot Aboriginal Linux to the login
+  prompt about 6 seconds on my system (using TCG, not KVM):
+
+  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
+age-i686.tar.gz
+  gunzip <system-image-i686.tar.gz | tar xfv -
+  cd system-image-i686
+  sh run-emulator.sh
+
+  If I replace the last line with
+
+  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
+
+  booting to the login prompt takes about 1 minute 20 seconds.
+
+  I have tried different values for "shift" other than the "auto" used
+  above, but have not been able to find one that gives reasonable
+  performance.  Specifying "sleep=3Doff" also did not help.
+
+  During the slow boots, qemu appears to spend most of its time
+  sleeping, not using the host CPU.
+
+  I see this with multiple versions of qemu, including current git
+  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
+  host OSes, including Debian 9 on x86_64.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
