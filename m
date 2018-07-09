@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9p-0006Xq-Ti
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:18 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9z-0006ec-Pn
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9p-0006i8-0t
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:17 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34344 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcd9u-0006kw-Lg
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:25 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34348 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fcd9o-0006hY-Oj
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:16 -0400
+	id 1fcd9u-0006kV-Du
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 16:53:22 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  9 Jul 2018 22:50:18 +0200
-Message-Id: <1531169431-10772-21-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  9 Jul 2018 22:50:19 +0200
+Message-Id: <1531169431-10772-22-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 20/33] target/mips: Add updating BadInstr
- and BadInstrP registers for nanoMIPS
+Subject: [Qemu-devel] [PATCH v2 21/33] target/mips: Add updating CP0
+ BadInstrX register for nanoMIPs only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +28,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: f4bug@amsat.org, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
-
-Updating BadInstr and BadInstrP registers was addded for nanoMIPS.
-BadInstr and BadInstrP support for pre-nanoMIPS remains
-unimplemented.
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/helper.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ target/mips/helper.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/target/mips/helper.c b/target/mips/helper.c
-index e215af9..5299f21 100644
+index 5299f21..9535131 100644
 --- a/target/mips/helper.c
 +++ b/target/mips/helper.c
-@@ -683,7 +683,28 @@ static void set_hflags_for_handler (CPUMIPSState *env)
- static inline void set_badinstr_registers(CPUMIPSState *env)
- {
-     if (env->hflags & MIPS_HFLAG_M16) {
--        /* TODO: add BadInstr support for microMIPS */
-+        uint32_t instr;
-+        if (!(env->insn_flags & ISA_NANOMIPS32)) {
-+            /* TODO: add BadInstr support for pre-nanoMIPS */
-+             return;
-+        }
-+        if (env->CP0_Config3 & (1 << CP0C3_BI)) {
-+            instr = (cpu_lduw_code(env, env->active_tc.PC)) << 16;
+@@ -695,6 +695,12 @@ static inline void set_badinstr_registers(CPUMIPSState *env)
+                 instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
+             }
+             env->CP0_BadInstr = instr;
++
 +            if ((env->insn_flags & ISA_NANOMIPS32) &&
-+                ((instr & 0x10000000) == 0)) {
-+                instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
++                ((instr & 0xFC000000) == 0x60000000)) {
++                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
++                env->CP0_BadInstrX = instr;
 +            }
-+            env->CP0_BadInstr = instr;
-+        }
-+        if ((env->CP0_Config3 & (1 << CP0C3_BP)) &&
-+            (env->hflags & MIPS_HFLAG_BMASK)) {
-+            if (!(env->hflags & MIPS_HFLAG_B16)) {
-+                env->CP0_BadInstrP = cpu_ldl_code(env, env->active_tc.PC - 4);
-+            } else {
-+                env->CP0_BadInstrP =
-+                    (cpu_lduw_code(env, env->active_tc.PC - 2)) << 16;
-+            }
-+        }
-         return;
-     }
-     if (env->CP0_Config3 & (1 << CP0C3_BI)) {
+         }
+         if ((env->CP0_Config3 & (1 << CP0C3_BP)) &&
+             (env->hflags & MIPS_HFLAG_BMASK)) {
 -- 
 2.7.4
