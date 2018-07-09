@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAG-0002bi-7P
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:29 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAH-0002bq-7J
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAB-0002cy-Aq
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:28 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAB-0002cr-AP
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:29 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  9 Jul 2018 19:37:18 +0300
-Message-Id: <20180709163719.87107-4-vsementsov@virtuozzo.com>
+Date: Mon,  9 Jul 2018 19:37:16 +0300
+Message-Id: <20180709163719.87107-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20180709163719.87107-1-vsementsov@virtuozzo.com>
 References: <20180709163719.87107-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 3/4] block: add BDRV_REQ_SERIALISING flag
+Subject: [Qemu-devel] [PATCH v5 1/4] block/io: fix copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,115 +22,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Serialized writes should be used in copy-on-write of backup(sync=none)
-for image fleecing scheme.
+Here two things are fixed:
 
-We need to change an assert in bdrv_aligned_pwritev, added in
-28de2dcd88de. The assert may fail now, because call to
-wait_serialising_requests here may become first call to it for this
-request with serializing flag set. It occurs if the request is aligned
-(otherwise, we should already set serializing flag before calling
-bdrv_aligned_pwritev and correspondingly waited for all intersecting
-requests). However, for aligned requests, we should not care about
-outdating of previously read data, as there no such data. Therefore,
-let's just update an assert to not care about aligned requests.
+1. Architecture
+
+On each recursion step, we go to the child of src or dst, only for one
+of them. So, it's wrong to create tracked requests for both on each
+step. It leads to tracked requests duplication.
+
+2. Wait for serializing requests on write path independently of
+   BDRV_REQ_NO_SERIALISING
+
+Before commit 9ded4a01149 "backup: Use copy offloading",
+BDRV_REQ_NO_SERIALISING was used for only one case: read in
+copy-on-write operation during backup. Also, the flag was handled only
+on read path (in bdrv_co_preadv and bdrv_aligned_preadv).
+
+After 9ded4a01149, flag is used for not waiting serializing operations
+on backup target (in same case of copy-on-write operation). This
+behavior change is unsubstantiated and potentially dangerous, let's
+drop it and add additional asserts and documentation.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block.h | 13 ++++++++++++-
- block/io.c            | 26 +++++++++++++++++++++++++-
- 2 files changed, 37 insertions(+), 2 deletions(-)
+ include/block/block.h | 11 +++++++++++
+ block/io.c            | 42 +++++++++++++++++++++++++++---------------
+ 2 files changed, 38 insertions(+), 15 deletions(-)
 
 diff --git a/include/block/block.h b/include/block/block.h
-index 57a96d4988..6623d15432 100644
+index bc76b1e59f..5320f82ac9 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -69,8 +69,19 @@ typedef enum {
-      * content. */
-     BDRV_REQ_WRITE_UNCHANGED    = 0x40,
- 
-+    /* BDRV_REQ_SERIALISING forces request serialisation for writes.
-+     * It is used to ensure that writes to the backing file of a backup process
-+     * target cannot race with a read of the backup target that defers to the
-+     * backing file.
-+     *
-+     * Note, that BDRV_REQ_SERIALISING is _not_ opposite in meaning to
-+     * BDRV_REQ_NO_SERIALISING. A more descriptive name for the latter might be
-+     * _DO_NOT_WAIT_FOR_SERIALISING, except that is too long.
-+     */
-+    BDRV_REQ_SERIALISING        = 0x80,
+@@ -50,6 +50,17 @@ typedef enum {
+      * opened with BDRV_O_UNMAP.
+      */
+     BDRV_REQ_MAY_UNMAP          = 0x4,
 +
-     /* Mask of valid flags */
--    BDRV_REQ_MASK               = 0x7f,
-+    BDRV_REQ_MASK               = 0xff,
- } BdrvRequestFlags;
- 
- typedef struct BlockSizes {
++    /* The BDRV_REQ_NO_SERIALISING flag is only valid for reads and means that
++     * we don't want wait_serialising_requests() during read operation.
++     *
++     * This flag is used for backup copy on write operation, when we need to
++     * read old data before write (write notifier triggered). It is okay since
++     * we already waited for other serializing requests in the initiating write
++     * (see bdrv_aligned_pwritev), and it is necessary if the initiating write
++     * is already serializing (without the flag, the read would deadlock
++     * waiting for the serialising write to complete).
++     */
+     BDRV_REQ_NO_SERIALISING     = 0x8,
+     BDRV_REQ_FUA                = 0x10,
+     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
 diff --git a/block/io.c b/block/io.c
-index 5d5651ad84..102cb0e1ba 100644
+index 1a2272fad3..94b6ec94e2 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -623,6 +623,16 @@ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
-     req->overlap_bytes = MAX(req->overlap_bytes, overlap_bytes);
+@@ -1572,6 +1572,8 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
+                                    align);
+ 
++    /* BDRV_REQ_NO_SERIALISING is only for read operation */
++    assert(!(flags & BDRV_REQ_NO_SERIALISING));
+     waited = wait_serialising_requests(req);
+     assert(!waited || !req->serialising);
+     assert(req->overlap_offset <= offset);
+@@ -2896,7 +2898,7 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
+                                                     BdrvRequestFlags flags,
+                                                     bool recurse_src)
+ {
+-    BdrvTrackedRequest src_req, dst_req;
++    BdrvTrackedRequest req;
+     int ret;
+ 
+     if (!dst || !dst->bs) {
+@@ -2923,32 +2925,42 @@ static int coroutine_fn bdrv_co_copy_range_internal(BdrvChild *src,
+         || src->bs->encrypted || dst->bs->encrypted) {
+         return -ENOTSUP;
+     }
+-    bdrv_inc_in_flight(src->bs);
+-    bdrv_inc_in_flight(dst->bs);
+-    tracked_request_begin(&src_req, src->bs, src_offset,
+-                          bytes, BDRV_TRACKED_READ);
+-    tracked_request_begin(&dst_req, dst->bs, dst_offset,
+-                          bytes, BDRV_TRACKED_WRITE);
+ 
+-    if (!(flags & BDRV_REQ_NO_SERIALISING)) {
+-        wait_serialising_requests(&src_req);
+-        wait_serialising_requests(&dst_req);
+-    }
+     if (recurse_src) {
++        bdrv_inc_in_flight(src->bs);
++        tracked_request_begin(&req, src->bs, src_offset, bytes,
++                              BDRV_TRACKED_READ);
++
++        if (!(flags & BDRV_REQ_NO_SERIALISING)) {
++            wait_serialising_requests(&req);
++        }
++
+         ret = src->bs->drv->bdrv_co_copy_range_from(src->bs,
+                                                     src, src_offset,
+                                                     dst, dst_offset,
+                                                     bytes, flags);
++
++        tracked_request_end(&req);
++        bdrv_dec_in_flight(src->bs);
+     } else {
++        bdrv_inc_in_flight(dst->bs);
++        tracked_request_begin(&req, dst->bs, dst_offset, bytes,
++                              BDRV_TRACKED_WRITE);
++
++        /* BDRV_REQ_NO_SERIALISING is only for read operation,
++         * so we ignore it in flags.
++         */
++        wait_serialising_requests(&req);
++
+         ret = dst->bs->drv->bdrv_co_copy_range_to(dst->bs,
+                                                   src, src_offset,
+                                                   dst, dst_offset,
+                                                   bytes, flags);
++
++        tracked_request_end(&req);
++        bdrv_dec_in_flight(dst->bs);
+     }
+-    tracked_request_end(&src_req);
+-    tracked_request_end(&dst_req);
+-    bdrv_dec_in_flight(src->bs);
+-    bdrv_dec_in_flight(dst->bs);
++
+     return ret;
  }
  
-+static bool is_request_serialising_and_aligned(BdrvTrackedRequest *req)
-+{
-+    /* if request is serialising, overlap_offset and overlap_bytes are set, so
-+     * we can check is request aligned. Otherwise don't care and return false
-+     */
-+
-+    return req->serialising && (req->offset == req->overlap_offset) &&
-+           (req->bytes == req->overlap_bytes);
-+}
-+
- /**
-  * Round a region to cluster boundaries
-  */
-@@ -1291,6 +1301,9 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-         mark_request_serialising(req, bdrv_get_cluster_size(bs));
-     }
- 
-+    /* BDRV_REQ_SERIALISING is only for write operation */
-+    assert(!(flags & BDRV_REQ_SERIALISING));
-+
-     if (!(flags & BDRV_REQ_NO_SERIALISING)) {
-         wait_serialising_requests(req);
-     }
-@@ -1574,8 +1587,14 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
- 
-     /* BDRV_REQ_NO_SERIALISING is only for read operation */
-     assert(!(flags & BDRV_REQ_NO_SERIALISING));
-+
-+    if (flags & BDRV_REQ_SERIALISING) {
-+        mark_request_serialising(req, bdrv_get_cluster_size(bs));
-+    }
-+
-     waited = wait_serialising_requests(req);
--    assert(!waited || !req->serialising);
-+    assert(!waited || !req->serialising ||
-+           is_request_serialising_and_aligned(req));
-     assert(req->overlap_offset <= offset);
-     assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
-     if (flags & BDRV_REQ_WRITE_UNCHANGED) {
-@@ -2929,6 +2948,8 @@ static int coroutine_fn bdrv_co_copy_range_internal(
-         tracked_request_begin(&req, src->bs, src_offset, bytes,
-                               BDRV_TRACKED_READ);
- 
-+        /* BDRV_REQ_SERIALISING is only for write operation */
-+        assert(!(read_flags & BDRV_REQ_SERIALISING));
-         if (!(read_flags & BDRV_REQ_NO_SERIALISING)) {
-             wait_serialising_requests(&req);
-         }
-@@ -2948,6 +2969,9 @@ static int coroutine_fn bdrv_co_copy_range_internal(
- 
-         /* BDRV_REQ_NO_SERIALISING is only for read operation */
-         assert(!(write_flags & BDRV_REQ_NO_SERIALISING));
-+        if (write_flags & BDRV_REQ_SERIALISING) {
-+            mark_request_serialising(&req, bdrv_get_cluster_size(dst->bs));
-+        }
-         wait_serialising_requests(&req);
- 
-         ret = dst->bs->drv->bdrv_co_copy_range_to(dst->bs,
 -- 
 2.11.1
