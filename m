@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fcL3F-00045E-Mp
-	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 21:33:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fcLJR-0007gU-Oi
+	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 21:50:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fcL3E-0004On-TH
-	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 21:33:17 -0400
-Date: Mon, 9 Jul 2018 09:33:03 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180709013303.GB14487@lemon.usersys.redhat.com>
-References: <20180705073701.10558-1-famz@redhat.com>
-	<20180705073701.10558-10-famz@redhat.com>
-	<88257975-71f6-ebe9-4888-9134e786d040@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88257975-71f6-ebe9-4888-9134e786d040@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] block: Use common write req
- handling in truncate
+	(envelope-from <richard.henderson@linaro.org>) id 1fcLJN-0005Az-HX
+	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 21:50:01 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37379)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fcLJN-00059H-A0
+	for qemu-devel@nongnu.org; Sun, 08 Jul 2018 21:49:57 -0400
+Received: by mail-pg1-x544.google.com with SMTP id n15-v6so924719pgv.4
+	for <qemu-devel@nongnu.org>; Sun, 08 Jul 2018 18:49:56 -0700 (PDT)
+Received: from cloudburst.twiddle.net (97-126-112-211.tukw.qwest.net.
+	[97.126.112.211]) by smtp.gmail.com with ESMTPSA id
+	i17-v6sm26399965pfj.95.2018.07.08.18.49.54
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sun, 08 Jul 2018 18:49:54 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sun,  8 Jul 2018 18:49:53 -0700
+Message-Id: <20180709014953.26230-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] tests/tcg/multiarch/linux-test: Fix error
+ check for shmat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,17 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, 07/06 17:12, Eric Blake wrote:
-> On 07/05/2018 02:37 AM, Fam Zheng wrote:
-> > Truncation is the last to convert from open coded req handling to
-> > reusing helpers. This time the permission check in prepare has to adapt
-> > to the new caller: it checks a different permission bit, and don't
-> 
-> did you mean "won't" or "doesn't"?
+The error indicator for this syscall is -1, not 0.
 
-Yeah, "doesn't'. Thanks!
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tests/tcg/multiarch/linux-test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Fam
+diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+index e80eccc0ce..6d2c02c5c0 100644
+--- a/tests/tcg/multiarch/linux-test.c
++++ b/tests/tcg/multiarch/linux-test.c
+@@ -503,8 +503,9 @@ static void test_shm(void)
+ 
+     shmid = chk_error(shmget(IPC_PRIVATE, SHM_SIZE, IPC_CREAT | 0777));
+     ptr = shmat(shmid, NULL, 0);
+-    if (!ptr)
++    if (ptr == (void *)-1) {
+         error("shmat");
++    }
+ 
+     memset(ptr, 0, SHM_SIZE);
+ 
+-- 
+2.17.1
