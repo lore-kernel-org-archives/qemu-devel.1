@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcZVV-0001th-Er
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:59:26 -0400
+	(envelope-from <juterry@microsoft.com>) id 1fcZYI-0003BP-Hn
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcZVU-0003C9-8t
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:59:25 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:44553)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcZVU-0003B6-2M
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:59:24 -0400
-Received: by mail-oi0-x244.google.com with SMTP id s198-v6so37169465oih.11
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 09:59:23 -0700 (PDT)
+	(envelope-from <juterry@microsoft.com>) id 1fcZYD-0004XU-Mh
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:02:18 -0400
+Received: from mail-bn3nam01on0101.outbound.protection.outlook.com
+	([104.47.33.101]:1408
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
+	id 1fcZYD-0004XI-8c
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:02:13 -0400
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+Date: Mon, 9 Jul 2018 17:02:10 +0000
+Message-ID: <MWHPR21MB07650D2B61CA11DE684CC551B6440@MWHPR21MB0765.namprd21.prod.outlook.com>
+References: <CABi5iw=FM2yFzji4HKhAxG0fYmsGb+h5wYp5wJo-DYNgMHuihg@mail.gmail.com>
+In-Reply-To: <CABi5iw=FM2yFzji4HKhAxG0fYmsGb+h5wYp5wJo-DYNgMHuihg@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <1530806837-5416-1-git-send-email-cota@braap.org>
-References: <1530806837-5416-1-git-send-email-cota@braap.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jul 2018 17:59:02 +0100
-Message-ID: <CAFEAcA9otSLZzz++GJ1vVLa4k+5c7Xcdj6goSuSJ-dH+7ckwog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] translate-all: honour CF_NOCACHE in
- tb_gen_code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] Problem building QEMU with whpx support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Richard Henderson <richard.henderson@linaro.org>
+To: Umang Kakaiya <umangkk5@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 5 July 2018 at 17:07, Emilio G. Cota <cota@braap.org> wrote:
-> This fixes a record-replay regression introduced by 95590e2
-> ("translate-all: discard TB when tb_link_page returns an existing
-> matching TB", 2018-06-15). The problem is that code using CF_NOCACHE
-> assumes that the TB returned from tb_gen_code is always a
-> newly-generated one. This assumption, however, was broken in
-> the aforementioned commit.
->
-> Fix it by honouring CF_NOCACHE, so that tb_gen_code always
-> returns a newly-generated TB when CF_NOCACHE is passed to it.
-> Do this by avoiding the TB hash table if CF_NOCACHE is set.
->
-> Reported-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> Tested-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-> @@ -1604,8 +1605,6 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
->  {
->      PageDesc *p;
->      PageDesc *p2 = NULL;
-> -    void *existing_tb = NULL;
-> -    uint32_t h;
->
->      assert_memory_lock();
->
-> @@ -1625,20 +1624,25 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
->          tb->page_addr[1] = -1;
->      }
->
-> -    /* add in the hash table */
-> -    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
-> -                     tb->trace_vcpu_dstate);
-> -    qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
-> +    if (!(tb->cflags & CF_NOCACHE)) {
-> +        void *existing_tb = NULL;
-> +        uint32_t h;
->
-> -    /* remove TB from the page(s) if we couldn't insert it */
-> -    if (unlikely(existing_tb)) {
-> -        tb_page_remove(p, tb);
-> -        invalidate_page_bitmap(p);
-> -        if (p2) {
-> -            tb_page_remove(p2, tb);
-> -            invalidate_page_bitmap(p2);
-> +        /* add in the hash table */
-> +        h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
-> +                         tb->trace_vcpu_dstate);
-> +        qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
-> +
-> +        /* remove TB from the page(s) if we couldn't insert it */
-> +        if (unlikely(existing_tb)) {
-> +            tb_page_remove(p, tb);
-> +            invalidate_page_bitmap(p);
-> +            if (p2) {
-> +                tb_page_remove(p2, tb);
-> +                invalidate_page_bitmap(p2);
-> +            }
-> +            tb = existing_tb;
->          }
-> -        tb = existing_tb;
->      }
->
->      if (p2 && p2 != p) {
-
-Hi -- I've been having a look at getting QEMU to support execution
-from MMIO regions by doing a "generate a single-insn CF_NOCACHE TB".
-As part of that, rth and I ran into a question about this change:
-why does tb_link_page() still add a CF_NOCACHE TB to the page lists?
-That is, why does this patch guard the "add to the hash table" part
-of the function, rather than just saying "return doing nothing
-if CF_NOCACHE"?
-
-I'm pretty clueless about this bit of the code, so I'm quite
-probably missing something.
-
-thanks
--- PMM
+SGV5IFVtYW5nLA0KDQpTb3JyeSBJIG1pc3NlZCB0aGlzLiBUaGVyZSBpcyBubyBvZmZpY2lhbCBk
+b2N1bWVudGF0aW9uIGZvciBidWlsZGluZyBRRU1VIG9uIFdIUCBhcyB0aGVyZSBpcyByZWFsbHkg
+bm8gZGlmZmVyZW5jZSB0byBjcm9zcyBjb21waWxpbmcgUUVNVSBpbiBnZW5lcmFsLiBIb3dldmVy
+LCB5ZXMgeW91IGNhbiBjcm9zcyBjb21waWxlIHRoaXMgb24gMTguMDQgKGFuZCBvdGhlciBkaXN0
+cm9zKS4gQWZ0ZXIgaW5zdGFsbGluZyB0aGUgY29ycmVjdCBwYWNrYWdlcyAobWluZ3ctdzY0KSB5
+b3Ugd2lsbCBlbmQgdXAgd2l0aCBhIHBhdGggb24geW91ciBMaW51eCBtYWNoaW5lIOKAnC91c3Iv
+eDg2XzY0LXc2NC1taW5ndzMyL2luY2x1ZGUv4oCdIGZvbGRlci4gSWYgeW91IGNvcHkgV2luSHZF
+bXVsYXRpb24uaCwgV2luSHZQbGF0Zm9ybURlZnMuaCwgV2luSHZQbGF0Zm9ybS5oIGZyb20gYW55
+IOKAnEM6XFByb2dyYW0gRmlsZXMgKHg4NilcV2luZG93cyBLaXRzXDEwXEluY2x1ZGVcPHZlcnNp
+b24+XHVtXFdpbkh2Ki5o4oCdIGluc3RhbGxlZCBpbnNpZGVyIFNESyB5b3UgY2FuIHRoZW4gcnVu
+IOKAnC4vY29uZmlndXJlIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUgLS1jcm9zcy1wcmVm
+aXg9eDg2XzY0X3c2NC1taW5ndzMyLSAtLWVuYWJsZS13aHB44oCdIOKApiAoRXRjKS4gVGhpcyB3
+aWxsIG91dHB1dCBhIHFlbXUgYmluYXJ5IHRoYXQgY2FuIGJlIHJ1biBvbiB0aGUgV2luZG93cyBo
+b3N0Lg0KDQpOb3RlLCBteSBwZXJzb25hbCB3YXkgb2YgZG9pbmcgdGhpcyAobm90IGEgcmVxdWly
+ZW1lbnQpIGlzIHRvIHVzZSBXU0wgb24gdGhlIHNhbWUgbWFjaGluZSBJIGFtIHRlc3Rpbmcgd2l0
+aC4gU28gSSBoYXZlIGVuYWJsZWQgdGhlIFdpbmRvd3MgU3Vic3lzdGVtIGZvciBMaW51eCwgaW5z
+dGFsbGVkIGEgZGlzdHJvIG9mIG15IGNob29zaW5nLCBjb3BpZWQgdGhlIGhlYWRlcnMgZnJvbSB0
+aGUgaW5zdGFsbGVkIFNESywgYW5kIHJ1biAuL2NvbmZpZ3VyZS4gSSB0aGVuIGhhdmUgdGhlIG91
+dHB1dCBvZiBtYWtlIG9uIGEgc2hhcmVkIGRyaXZlLCBzbyBJIGNhbiBvcGVuIGNtZC5leGUgbGF1
+bmNoIHRoZSBxZW11IGV4ZSB3aXRoIHdoYXRldmVyIG9wdGlvbnMgYW5kIHRlc3Qgb3V0IG15IGNo
+YW5nZXMuIEhvcGUgdGhpcyBoZWxwcyENCg0KLUp1c3Rpbg0KDQpGcm9tOiBVbWFuZyBLYWthaXlh
+IDx1bWFuZ2trNUBnbWFpbC5jb20+DQpTZW50OiBUaHVyc2RheSwgSnVuZSAyMSwgMjAxOCAyOjQ0
+IFBNDQpUbzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBKdXN0aW4gVGVycnkgKFZNKSA8anV0ZXJy
+eUBtaWNyb3NvZnQuY29tPg0KU3ViamVjdDogUHJvYmxlbSBidWlsZGluZyBRRU1VIHdpdGggd2hw
+eCBzdXBwb3J0DQoNCkhpIEp1c3RpbiwNCg0KV2UgYXJlIHRyeWluZyB0byB1c2UgUUVNVSBvbiBX
+aW5kb3dzIEh5cGVyLVYgZW52aXJvbm1lbnQgd2l0aCB3aHB4IGVuYWJsZWQgZm9yIGJldHRlciBw
+ZXJmb3JtYW5jZS4gV2Ugd2VyZSB1bmFibGUgdG8gYnVpbGQgUUVNVSB3aXRoIFdIUFggc3VwcG9y
+dC4gV2UgdXNlZCBVYnVudHUgMTguMDQgc2VydmVyIFZNIHdpdGggdHdvIGxpYnJhcmllcyAoV2lu
+SHYqLmxpYikgZnJvbSB0aGUgbGF0ZXN0IFdpbmRvd3MgMTAgU0RLIHRvIGJ1aWxkIFFFTVUgYW5k
+IGFkZGVkICctLWVuYWJsZS13aHB4JyBwYXJhbWV0ZXIgaW4gY29uZmlnLiBCdXQgYnVpbGRpbmcg
+aXMgZmFpbGluZyBnaXZpbmcgdGhlIGZvbGxvd2luZyBtZXNzYWdlOg0KVGhlIGNvbW1hbmQgdG8g
+bGF1bmNoIFFFTVUgaXMgYXMgYmVsb3csDQoNCiQgLi9jb25maWd1cmUgLS1lbmFibGUtd2hweCAt
+LWVuYWJsZS1kZWJ1Zw0KDQpUaGUgZm9sbG93aW5nIGVycm9yIHdhcyBvdXRwdXQgZnJvbSB0aGUg
+Y29tbWFuZCBsaW5lLA0KRXJyb3I6IFVzZXIgcmVxdWVzdGVkIGZlYXR1cmUgV2luSHZQbGF0Zm9y
+bQ0KICAgICAgIGNvbmZpZ3VyZSB3YXMgbm90IGFibGUgdG8gZmluZCBpdC4NCiAgICAgICBXaW5I
+dkVtdWxhdGlvbiBpcyBub3QgaW5zdGFsbGVkLg0KDQpXZSBhbmFseXplZCB0aGUgaXNzdWUgYW5k
+IGZvdW5kIHRoYXQgY29uZmlndXJlIGlzIHVuYWJsZSB0byBsb2NhdGUgdGhlIFdpbkh2UGxhdGZv
+cm0uaCBmaWxlLg0KQXMgZm9yIHByb3ZpZGluZyBXaW5IVioubGliIGZpbGVzIHdlIHRyaWVkIGZv
+bGxvd2luZyBzdGVwczoNCjEuIFdlIHNldCBMRF9MSUJfUEFUSCB0byBwb2ludCB0byB0aGUgV2lu
+SFYqLmxpYiBmaWxlcy4NCjIuIFdlIHVzZWQgLS1wYXRoX3dpbl9zZGsgb3B0aW9uIGluIGNvbmZp
+Z3VyZSB0byBhZGQgdGhlIHBhdGggdG8gV2luZG93cyBpbnNpZGVyIFNESy4NCjMuIFdlIG1vdmVk
+IHRvIFdpbmRvd3MgRW52aXJvbm1lbnQgYW5kIHRyaWVkIGJ1aWxkaW5nIFFFTVUgd2l0aCBNU1lT
+MiBidWlsZCBvcHRpb25zIGFjY29yZGluZyB0byBzdGVwcyBtZW50aW9uZWQgaW4gUUVNVSBibG9n
+IChMaW5rPGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJs
+PWh0dHBzJTNBJTJGJTJGd2lraS5xZW11Lm9yZyUyRmluZGV4LnBocCUyRkhvc3RzJTJGVzMyJTIz
+TmF0aXZlX2J1aWxkc193aXRoX01TWVMyJmRhdGE9MDIlN0MwMSU3Q2p1dGVycnklNDBtaWNyb3Nv
+ZnQuY29tJTdDN2NiNWFmNjFlNjhmNGFkYjcyM2MwOGQ1ZDdjMDI1MmMlN0M3MmY5ODhiZjg2ZjE0
+MWFmOTFhYjJkN2NkMDExZGI0NyU3QzElN0MxJTdDNjM2NjUyMTQyNjIwMDQ0MDQ3JnNkYXRhPVZo
+cWJqdnp2UWJqSW44V1ltQXFPR2FVMlFNN0NuaENWcEU0VnJWNHNlcEklM0QmcmVzZXJ2ZWQ9MD4p
+DQpCdXQgaXQgZGlkbid0IHdvcmsgYmVjYXVzZSBiYXNlIHFlbXUgYnVpbGQgaXRzZWxmIGZhaWxz
+LiBXZSB0aGVuICAgICAgdHJpZWQgTWluZ1c2NCB0byBidWlsZCBRRU1VIGJ1dCBnb3QgdGhlIHNh
+bWUgZXJyb3IgYWJvdmUgd2l0aCAtLWVuYWJsZS13aHB4Lg0KDQoNCldlIHRyaWVkIHRvIGZpbmQg
+YW55IGRvY3VtZW50YXRpb24gdG8gcHJvdmlkZSBleGFjdCBzdGVwcyBpbiBidWlsZGluZyBRRU1V
+IHdpdGggd2hweCBzdXBwb3J0IGJ1dCBkaWRuJ3QgbWFrZSBhbnkgcHJvZ3Jlc3MuIFNvIHRoZXJl
+IGFyZSB0aHJlZSBxdWVzdGlvbnM6DQoNCjEuIENhbiB3ZSBidWlsZCBRRU1VIHdpdGggd2hweCBw
+YWNrYWdlcyBvbiBVYnVudHUgMTguMDQgb3IgZG8gd2UgbmVlZCB0byB1c2UgUUVNVSBuYXRpdmUg
+YnVpbGQgb24gV2luZG93cyBtYWNoaW5lIHVzaW5nIE1TWVMyLg0KMi4gV2hlcmUgdG8ga2VlcCB0
+aGUgV2luSFYqLmxpYiBmaWxlcyBpbiBRRU1VIHNvdXJjZSBkaXJlY3RvcmllcyBzbyB0aGF0IGNv
+bmZpZ3VyZSBjYW4gbG9jYXRlIHRoZSBmaWxlcyBmb3IgYnVpbGQuDQozLiBDYW4geW91IHByb3Zp
+ZGUgYW55IGxpbmtzIG9yIHJlZmVyZW5jZSB0byBkb2N1bWVudGF0aW9uIG9uIGJ1aWxkaW5nIFFF
+TVUgd2l0aCB3aHB4IHN1cHBvcnQgd2l0aCBhbGwgZGVwZW5kZW5jeSBwYWNrYWdlcyByZXF1aXJl
+ZC4NCg0KQmVsb3cgaXMgdGhlIGNvbmZpZ3VyYXRpb24gb2YgdGhlIEh5cGVyLVYgbWFjaGluZSB1
+c2VkIGZvciB0aGlzIGV4cGVyaW1lbnQsDQoNCldpbmRvd3MgT1M6IFdpbmRvd3MgU2VydmVyIERh
+dGFjZW50ZXIgMjAxNg0KV2luZG93cyBlZGl0aW9uOiBTZXJ2ZXINCldpbmRvd3MgdmVyc2lvbjog
+MTgwMyAoT1MgYnVpbGQgMTc2NDUuMTA0MikNClNESyB2ZXJzaW9uOiAxMC4wLjE3Njg2LjANCg0K
+DQpCZXN0IFJlZ2FyZHMsDQpVbWFuZw0K
