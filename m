@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcdOp-0001sL-8M
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:08:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1fcdVS-000862-9C
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:15:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcdOk-0006Zm-B6
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:08:47 -0400
-Date: Mon, 9 Jul 2018 18:08:33 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180709210833.GC7451@localhost.localdomain>
-References: <20180705064348.3162-1-kraxel@redhat.com>
-	<20180705064348.3162-3-kraxel@redhat.com>
-	<20180705163501.GN7451@localhost.localdomain>
-	<20180706065342.pggd2qgd4nyv35ys@sirius.home.kraxel.org>
+	(envelope-from <thuth@redhat.com>) id 1fcdVN-00025z-CG
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:15:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35314 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fcdVN-00025Y-6n
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:15:33 -0400
+References: <20180706143105.93472-1-dgilbert@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <43caff66-b806-cef7-3b4a-0ca1d875f8ec@redhat.com>
+Date: Mon, 9 Jul 2018 23:15:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180706065342.pggd2qgd4nyv35ys@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vga: don't pick cirrus by default
+In-Reply-To: <20180706143105.93472-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] tests/migration: Skip tests for ppc
+ tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, lvivier@redhat.com
 
-On Fri, Jul 06, 2018 at 08:53:42AM +0200, Gerd Hoffmann wrote:
-> On Thu, Jul 05, 2018 at 01:35:01PM -0300, Eduardo Habkost wrote:
-> > Do we have a list of all machine-types with default_display==NULL
-> > that would be affected by this?
+On 06.07.2018 16:31, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> There are not many which use the default vga thing in the first place.
-> Workflow is this:
+> PPC tcg seems to be failing migration tests quite regularly;
+> we believe this is TCG bugs in dirty bit updating; it's
+> not clear why PPC fails more but lets skip for the moment.
 > 
->  (1) vl.c calls select_vgahw(vga_model) after setting vga_model.
->  (2) select_hw() sets vga_interface_type.
->  (3) isa_vga_init() and pci_vga_init() look at vga_interface_type.
+> $ ./tests/migration-test
+> /ppc64/migration/deprecated: OK
+> /ppc64/migration/bad_dest: Skipping test: kvm_hv not available OK
+> /ppc64/migration/postcopy/unix: Skipping test: kvm_hv not available OK
+> /ppc64/migration/precopy/unix: Skipping test: kvm_hv not available OK
 > 
-> Checking where either vga_interface_type or *_vga_init() is used doesn't
-> yield many places:
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  tests/migration-test.c | 23 +++++++++++++++++------
+>  1 file changed, 17 insertions(+), 6 deletions(-)
 > 
-> # find -name "*.[ch]" | xargs egrep '((isa|pci)_vga_init|vga_interface_type)'
-> ./hw/alpha/dp264.c:    pci_vga_init(pci_bus);
-> ./hw/i386/pc.c:        PCIDevice *pcidev = pci_vga_init(pci_bus);
-> ./hw/i386/pc.c:        ISADevice *isadev = isa_vga_init(isa_bus);
-> ./hw/isa/isa-bus.c:ISADevice *isa_vga_init(ISABus *bus)
-> ./hw/isa/isa-bus.c:    switch (vga_interface_type) {
-> ./hw/mips/mips_malta.c:    pci_vga_init(pci_bus);
-> ./hw/mips/mips_r4k.c:    isa_vga_init(isa_bus);
-> ./hw/pci/pci.c:PCIDevice *pci_vga_init(PCIBus *bus)
-> ./hw/pci/pci.c:    switch (vga_interface_type) {
-> ./hw/ppc/mac_newworld.c:    pci_vga_init(pci_bus);
-> ./hw/ppc/mac_oldworld.c:    pci_vga_init(pci_bus);
-> ./hw/ppc/spapr.c:    switch (vga_interface_type) {
-> ./hw/ppc/spapr.c:        return pci_vga_init(pci_bus) != NULL;
-> ./hw/ppc/prep.c:    pci_vga_init(pci_bus);
-> ./hw/ppc/prep.c:        pci_vga_init(pci_bus);
-> ./hw/sparc/sun4m.c:        if (vga_interface_type == VGA_CG3) {
-> ./include/hw/isa/isa.h:ISADevice *isa_vga_init(ISABus *bus);
-> ./include/hw/pci/pci.h:PCIDevice *pci_vga_init(PCIBus *bus);
-> ./include/sysemu/sysemu.h:extern int vga_interface_type;
-> ./include/sysemu/sysemu.h:#define xenfb_enabled (vga_interface_type == VGA_XENFB)
-> ./vl.c:int vga_interface_type = VGA_NONE;
-> ./vl.c:    assert(vga_interface_type == VGA_NONE);
-> ./vl.c:            vga_interface_type = t;
-> ./vl.c:        vga_interface_type = VGA_DEVICE;
+> v2
+>   use a print rather than g_test_skip since gtester is broken in
+> some version
 > 
-> So it is alpha, mips, i386, ppc.
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 3a85446f95..331efb0fe5 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -360,7 +360,7 @@ static void migrate_start_postcopy(QTestState *who)
+>      qobject_unref(rsp);
+>  }
+>  
+> -static void test_migrate_start(QTestState **from, QTestState **to,
+> +static int test_migrate_start(QTestState **from, QTestState **to,
+>                                 const char *uri, bool hide_stderr)
+>  {
+>      gchar *cmd_src, *cmd_dst;
+> @@ -385,9 +385,13 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>                                    accel, tmpfs, bootpath, uri);
+>      } else if (strcmp(arch, "ppc64") == 0) {
+>  
+> -        /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
+> +        /* On ppc64, the test only works with kvm-hv, but not with kvm-pr
+> +         * and TCG is touchy due to race conditions on dirty bits
+> +         * (especially on PPC for some reason)
+> +         */
+>          if (access("/sys/module/kvm_hv", F_OK)) {
+> -            accel = "tcg";
+> +            g_print("Skipping test: kvm_hv not available ");
+> +            return -1;
 
-Right, and all of them have both CONFIG_VGA_CIRRUS and
-CONFIG_VGA_PCI enabled.  This means all of them will be affected
-by this patch if they have any machines with
-default_display==NULL.
+That "Skipping test: ..." message is now popping up a couple of times
+during "make check-qtest" here on my x86 laptop. That's kind of ugly.
+Could you maybe turn that into a g_debug() instead?
 
-At least on x86 we still have a few machines with
-default_display==NULL: isapc, xenpv, xenfv.  We need to fix them
-before we apply this patch.
-
-I didn't check alpha/mips/ppc yet.
-
--- 
-Eduardo
+ Thomas
