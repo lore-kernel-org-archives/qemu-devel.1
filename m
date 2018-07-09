@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcVzY-0008UA-VD
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:14 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fcVzz-0000Qz-Te
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcVzY-0001Z2-2C
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:12 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34945)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcVzX-0001Yr-RK
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:11 -0400
-Received: by mail-oi0-x243.google.com with SMTP id i12-v6so35770775oik.2
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 06:14:11 -0700 (PDT)
+	(envelope-from <rkagan@virtuozzo.com>) id 1fcVzv-0001h3-SW
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:39 -0400
+Received: from mail-ve1eur03hn0208.outbound.protection.outlook.com
+	([104.47.9.208]:45472
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1fcVzv-0001gh-35
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:35 -0400
+Date: Mon, 9 Jul 2018 16:14:19 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180709131419.GB6271@rkaganb.sw.ru>
+References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	<20180702161404.GA2339@rkaganb.sw.ru>
+	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
+	<20180703095825.GC30904@rkaganb.sw.ru>
+	<20180703142817.GA3088@vbusired-vm>
+	<20180703165200.180c93bb.cohuck@redhat.com>
+	<CADGSJ23+sZiMCx=n=DytZ=TT2z7i0sMhrmnPuFYtuZhSc=qA+Q@mail.gmail.com>
+	<20180704141523.377cb66d.cohuck@redhat.com>
+	<CADGSJ206U4x0UNTEKu0Lt9K9qA025ajtmnj6ym4PDz4Q-c8RKA@mail.gmail.com>
+	<20180706155406.0587733c.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180706162155.8432-1-f4bug@amsat.org>
-References: <20180706162155.8432-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jul 2018 14:13:50 +0100
-Message-ID: <CAFEAcA_ZyBRy9S2zg+P5VbYR5NDYacX5NCGO26MkdFfTeS4SZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0 0/1] Fix the Nokia N810 tablet MMC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180706155406.0587733c.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
+ identifier for pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +39,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Andrzej Zaborowski <balrogg@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, Venu Busireddy <venu.busireddy@oracle.com>, si-wei liu <si-wei.liu@oracle.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 6 July 2018 at 17:21, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
-e:
-> Hi Peter,
->
-> This bug was previously reported here:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01824.html
->
-> Diff before/after ecd219f7abb using -append "console=3DttyS1 printk.time=
-=3D0"
-> option to boot http://people.linaro.org/~peter.maydell/n8x0-images.tgz
->
->  mmci-omap mmci-omap.0: command timeout (CMD5)
->  mmc0: host does not support reading read-only switch. assuming
-> write-enable.
->  mmc0: new SDHC card at address 4567
-> -Waiting for root device /dev/mmcblk0p1...
->  mmcblk0: mmc0:4567 QEMU! 1.81 GiB
->   mmcblk0: p1 p2
-> -EXT3-fs: barriers not enabled
-> -EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
-> -VFS: Mounted root (ext3 filesystem) readonly on device 179:1.
-> -kjournald starting.  Commit interval 5 seconds
-> -devtmpfs: mounted
-> -Freeing init memory: 132K
-> -mmci-omap mmci-omap.0: command timeout (CMD52)
-> -mmci-omap mmci-omap.0: command timeout (CMD52)
-> -mmci-omap mmci-omap.0: command timeout (CMD8)
-> -mmci-omap mmci-omap.0: command timeout (CMD5)
-> -mmci-omap mmci-omap.0: command timeout (CMD5)
-> -mmci-omap mmci-omap.0: command timeout (CMD5)
-> -mmci-omap mmci-omap.0: command timeout (CMD5)
-> -mmci-omap mmci-omap.0: command timeout (CMD55)
-> -mmci-omap mmci-omap.0: command timeout (CMD55)
-> -mmci-omap mmci-omap.0: command timeout (CMD55)
-> -mmci-omap mmci-omap.0: command timeout (CMD55)
-> -mmci-omap mmci-omap.0: command timeout (CMD1)
+On Fri, Jul 06, 2018 at 03:54:06PM +0200, Cornelia Huck wrote:
+> If we want to extend that to other device types, we can add the field
+> in their config space; but I'd rather prefer a more generic "host
+> relays config metainformation" approach.
 
-FWIW my n8x0 image still produces these command timeout complaints
-even with your patch (and it doesn't oops either way). Probably
-just a different kernel version.
+The problem with this approach is that it's too generic and poorly
+scoped.  As a result I guess it's likely to take ages to converge.
 
-thanks
--- PMM
+See for instance the discussion on including vm config metadata in qcow2
+images: I think it's similar in scope (or the absense thereof).
+
+Roman.
