@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fceGA-0008Ae-4D
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 18:03:55 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fcece-0003es-JE
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 18:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fceG9-0000pm-30
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 18:03:54 -0400
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-Date: Tue, 10 Jul 2018 00:03:39 +0200
+	(envelope-from <mail@sebastianbauer.info>) id 1fceca-0000JG-HY
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 18:27:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 10 Jul 2018 00:26:52 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <20180709212319.GB22336@localhost.localdomain>
+References: <20180705064348.3162-1-kraxel@redhat.com>
+	<20180705064348.3162-3-kraxel@redhat.com>
+	<20180705163501.GN7451@localhost.localdomain>
+	<20180706065342.pggd2qgd4nyv35ys@sirius.home.kraxel.org>
+	<20180709210833.GC7451@localhost.localdomain>
+	<20180709212319.GB22336@localhost.localdomain>
+Message-ID: <11c6f7d4364062c42df990364bf2c2de@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vga: don't pick cirrus by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On 09.07.2018 23:42, Peter Maydell wrote:
-> On 9 July 2018 at 22:03, Thomas Huth <thuth@redhat.com> wrote:
->> When trying to "device_add bcm2837" on a machine that is not suitable =
-for
->> this device, you can quickly crash QEMU afterwards, e.g. with "info qt=
-ree":
->>
->> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
->>  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command=
-', " \
->>  "'arguments': {'command-line': 'info qtree'}}" | \
->>  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=3Dqtest -S =
--qmp stdio
->>
->> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
->>  "package": "build-all"}, "capabilities": []}}
->> {"return": {}}
->> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not =
-be
->>  hotplugged on this machine"}}
->> Segmentation fault (core dumped)
->>
->> The problem is that qdev_set_parent_bus() from instance_init adds a li=
-nk
->> to the child devices which is not valid anymore after the device init
->> failed. Thus the qdev_set_parent_bus() must rather be done in the real=
-ize
->> function instead.
->=20
-> Yuck. The real problem here is that we're still requiring the
-> code that creates these QOM devices to manually set the parent
-> in the first place. It's not surprising that we don't get it right
-> (either parenting in the wrong place or not at all). I'd much
-> rather see us fix that properly than keep papering over places
-> where we get it wrong.
+Hi,
 
-Sorry, I'm still not an expert in all this QOM stuff yet ... so what do
-you exactly recommend to do instead?
+Am 2018-07-09 23:23, schrieb Eduardo Habkost:
+> List of machines with default_display==NULL on those
+> architectures:
+> 
+> alpha:
+> none                 empty machine
+> 
+> mips:
+> mipssim              MIPS MIPSsim platform
+> none                 empty machine
+> 
+> ppc*:
+> bamboo               bamboo
+> mpc8544ds            mpc8544ds
+> none                 empty machine
+> powernv              IBM PowerNV (Non-Virtualized)
+> ppce500              generic paravirt e500 platform
+> ref405ep             ref405ep
+> sam460ex             aCube Sam460ex
+> taihu                taihu
+> virtex-ml507         Xilinx Virtex ML507 reference design
+> 
+> x86_64:
+> isapc                ISA-only PC
+> none                 empty machine
+> xenfv                Xen Fully-virtualized PC
+> xenpv                Xen Para-virtualized PC
 
-> Also, "device_add bcm2837" is just nonsensical: there's no
-> way to create an SoC device like this with device_add.
-> We should not allow it (for this and all the other
-> devices that device_add will never work with)...
+Which of these machines really require the Cirrus? The xen ones look 
+like that they can deal with std. The isapc is should probably stay at 
+the Cirrus.
 
-I'm fine if we additionally add a user_creatable =3D false here, but the
-problem then still persists, e.g. with :
+Also the "none" seems to be a false-positive. I suppose they mean 
+"empty", i.e., no graphics card at all?
 
-echo "{'execute':'qmp_capabilities'} " \
- "{'execute':'device-list-properties', 'arguments': " \
- "{'typename':'bcm2837'}} {'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}"   | valgrind -q \
-  aarch64-softmmu/qemu-system-aarch64 -M integratorcp -S -qmp stdio
+And at least the ppc ones can be canceled out, they should work with 
+std, the new default (expect the sam460ex which goes an own route for 
+now).
 
-The same problem also exists for some other devices which have already
-been marked with user_creatable =3D false, e.g.:
+What is the indented target release for the patch?
 
-echo "{'execute':'qmp_capabilities'} " \
- "{'execute':'device-list-properties', " \
- "'arguments':{'typename':'macio-newworld'}} " \
- "{'execute': 'human-monitor-command', 'arguments': " \
- "{'command-line': 'info qtree'}}" | valgrind -q \
- ppc64-softmmu/qemu-system-ppc64 -M mac99 -S -qmp stdio
+If the patch is applied to 3.1 then I think there is enough time to fix 
+issues caused by the patch. Additionally, a warning could be put in the 
+ChangeLog for 3.0 that in 3.1 that the default mode will be std unless 
+machines define an own default. This is should be enough time for people 
+to complain or to fix things.
 
-Hmm, maybe we need a qtest that first executes "info qtree", then runs
-'device-list-properties' for all devices and finally checks "info qtree"
-again ... since 'device-list-properties' should not change the qtree,
-the output of the "info qtree" should be the same. Currently this is not
-the case :-/
+If the patch is to be applied to 3.0 then all non-ppc ones need to be 
+reconsidered.
 
- Thomas
+The "important" ppc machines have been fixed already. I can do the 
+remaining if this is wanted.
+
+Bye
+Sebastian
