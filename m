@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQqC-00057Y-AH
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fcQuc-0000IA-8L
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQqA-0002I9-SD
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:12 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  9 Jul 2018 17:43:48 +1000
-Message-Id: <20180709074350.27086-15-david@gibson.dropbear.id.au>
-In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/16] sam460ex: Check for errors from libfdt
- functions
+	(envelope-from <bounces@canonical.com>) id 1fcQuZ-0004FI-5C
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:48:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50372)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fcQuY-0004FC-V3
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:48:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fcQuV-0006jU-WE
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 07:48:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0B2852E844A
+	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 07:41:13 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Jul 2018 07:26:05 -0000
+From: Pavel Dovgalyuk <1774677@bugs.launchpad.net>
+Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
+Message-Id: <153112116544.13151.11897599981224940816.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,48 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-In a couple of places sam460ex_load_device_tree() calls "raw" libfdt
-functions which can fail, but doesn't check for error codes.  At best,
-if these fail the guest will be silently started in a non-standard state,
-or it could fail entirely.
+I can reproduce it. But there is one interesting thing.
+When I replace "-nographic" with "-serial stdio" everything is ok,
+icount works normally.
 
-Fix this by using the _FDT() helper macro which aborts on a libfdt failure.
+But "-nographic" runs are very slow in icount mode.
+It seems that GUI produces some events that force main loop to iterate.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/sam460ex.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+-- =
 
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 7eed2ec601..1661e036f3 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -36,6 +36,7 @@
- #include "hw/i2c/ppc4xx_i2c.h"
- #include "hw/i2c/smbus.h"
- #include "hw/usb/hcd-ehci.h"
-+#include "hw/ppc/fdt.h"
- 
- #include <libfdt.h>
- 
-@@ -318,13 +319,13 @@ static int sam460ex_load_device_tree(hwaddr addr,
-     /* Remove cpm node if it exists (it is not emulated) */
-     offset = fdt_path_offset(fdt, "/cpm");
-     if (offset >= 0) {
--        fdt_nop_node(fdt, offset);
-+        _FDT(fdt_nop_node(fdt, offset));
-     }
- 
-     /* set serial port clocks */
-     offset = fdt_node_offset_by_compatible(fdt, -1, "ns16550");
-     while (offset >= 0) {
--        fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FREQ);
-+        _FDT(fdt_setprop_cell(fdt, offset, "clock-frequency", UART_FREQ));
-         offset = fdt_node_offset_by_compatible(fdt, offset, "ns16550");
-     }
- 
--- 
-2.17.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1774677
+
+Title:
+  -icount increases boot time by >10x
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When I specify the -icount option, some guest operations such as
+  booting a Linux kernel take more than 10 times longer than otherwise.
+  For example, the following will boot Aboriginal Linux to the login
+  prompt about 6 seconds on my system (using TCG, not KVM):
+
+  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
+age-i686.tar.gz
+  gunzip <system-image-i686.tar.gz | tar xfv -
+  cd system-image-i686
+  sh run-emulator.sh
+
+  If I replace the last line with
+
+  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
+
+  booting to the login prompt takes about 1 minute 20 seconds.
+
+  I have tried different values for "shift" other than the "auto" used
+  above, but have not been able to find one that gives reasonable
+  performance.  Specifying "sleep=3Doff" also did not help.
+
+  During the slow boots, qemu appears to spend most of its time
+  sleeping, not using the host CPU.
+
+  I see this with multiple versions of qemu, including current git
+  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
+  host OSes, including Debian 9 on x86_64.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
