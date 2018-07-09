@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fcXgh-0004wT-GQ
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:02:52 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fcXws-0007vI-A5
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:19:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fcXgc-0005Me-Ht
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:02:51 -0400
-Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:38386)
+	(envelope-from <richard.henderson@linaro.org>) id 1fcXwn-0004Q7-UY
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:19:34 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34369)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1fcXgc-0005M2-Cr
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:02:46 -0400
-Received: by mail-io0-x232.google.com with SMTP id v26-v6so17335160iog.5
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 08:02:46 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Mon,  9 Jul 2018 11:02:35 -0400
-Message-Id: <20180709150235.7573-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH v3] ui/cocoa.m: replace scrollingDeltaY with
- deltaY
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fcXwn-0004Pt-NE
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:19:29 -0400
+Received: by mail-pg1-x542.google.com with SMTP id y5-v6so1326354pgv.1
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 08:19:29 -0700 (PDT)
+References: <1531137463-28014-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1531137463-28014-6-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ffec5782-bc11-fc0b-717f-f5be5ef63ef1@linaro.org>
+Date: Mon, 9 Jul 2018 08:19:26 -0700
+MIME-Version: 1.0
+In-Reply-To: <1531137463-28014-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 5/7] target/mips: Add CP0 BadInstrX
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: pburton@wavecomp.com, smarkovic@wavecomp.com, philippe.mathieu.daude@gmail.com, amarkovic@wavecomp.com, pjovanovic@wavecomp.com, aurelien@aurel32.net
 
-The NSEvent class method scrollingDeltaY is available
-for Mac OS 10.7 and newer. Since QEMU supports Mac OS
-10.5 and up, we need to be using a method that is
-available on these version of Mac OS X. The deltaY
-method is a method that does the same thing as
-scrollingDeltaY and is available on Mac OS 10.5 and
-up. So we replace scrollingDeltaY with deltaY. 
+On 07/09/2018 04:57 AM, Aleksandar Markovic wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+> 
+> Add CP0 BadInstrX register. This register will be used in nanoMIPS.
+> 
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  target/mips/cpu.h       |  1 +
+>  target/mips/machine.c   |  5 +++--
+>  target/mips/translate.c | 22 +++++++++++++++++++++-
+>  3 files changed, 25 insertions(+), 3 deletions(-)
 
-We only check deltaY's value if it is not zero
-because zero means no scrolling took place.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
-v3 changes:
-- Added a comment explaining why we drop scrolling events in both the code and
-the patch comment.
 
-v2 changes:
-- Added a condition that drops scroll events that have a deltaY value of zero.
-
- ui/cocoa.m | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
-
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 2991ed4f19..3bae090101 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -802,14 +802,19 @@ - (void) handleEvent:(NSEvent *)event
-              * This is in-line with standard Mac OS X UI behaviour.
-              */
- 
-+            /*
-+             * When deltaY is zero, it means the scrolling device did not move
-+             * for this event. So we drop the event.
-+             */
-+            if ([event deltaY] != 0) {
-             /* Determine if this is a scroll up or scroll down event */
--            buttons = ([event scrollingDeltaY] > 0) ?
--                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
--            qemu_input_queue_btn(dcl->con, buttons, true);
--            qemu_input_event_sync();
--            qemu_input_queue_btn(dcl->con, buttons, false);
--            qemu_input_event_sync();
--
-+                buttons = ([event deltaY] > 0) ?
-+                    INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
-+                qemu_input_queue_btn(dcl->con, buttons, true);
-+                qemu_input_event_sync();
-+                qemu_input_queue_btn(dcl->con, buttons, false);
-+                qemu_input_event_sync();
-+            }
-             /*
-              * Since deltaY also reports scroll wheel events we prevent mouse
-              * movement code from executing.
--- 
-2.14.3 (Apple Git-98)
+r~
