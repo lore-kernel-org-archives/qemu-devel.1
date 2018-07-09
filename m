@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq8-000537-E4
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQq8-00053C-IG
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq7-0002DN-EQ
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQq7-0002Da-JE
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:08 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  9 Jul 2018 17:43:45 +1000
-Message-Id: <20180709074350.27086-12-david@gibson.dropbear.id.au>
+Date: Mon,  9 Jul 2018 17:43:39 +1000
+Message-Id: <20180709074350.27086-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
 References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/16] target/ppc: fix build on ppc64 host
+Subject: [Qemu-devel] [PULL 05/16] sm501: Use values from the pitch register
+ for 2D operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,44 +21,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sebastian Bauer <mail@sebastianbauer.info>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <laurent@vivier.eu>
+From: Sebastian Bauer <mail@sebastianbauer.info>
 
-When I try to build a ppc64 target on a ppc64 host (gcc 8.1.1), I have:
+Before, crt_h_total was used for src_width and dst_width. This is a
+property of the current display setting and not relevant for the 2D
+operation that also can be done off-screen. The pitch register's purpose
+is to describe line pitch relevant of the 2D operation.
 
-.../target/ppc/int_helper.c: In function 'helper_vinsertb':
-.../target/ppc/int_helper.c:1954:32: error: array subscript 18446744073709551608 is above array bounds of 'uint8_t[16]' {aka 'unsigned char[16]'} [-Werror=array-bounds]
-         memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],              \
-                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.../target/ppc/int_helper.c:1965:1: note: in expansion of macro 'VINSERT'
-
-If we compare with the macro for ppc64le, we can see
-sizeof(r->element[0]) should be used instead of sizeof(r->element).
-
-And VINSERT uses only u8, u16, u32 and u64, so the maximum value
-of sizeof(r->element[0]) is 8
-
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/int_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/display/sm501.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 03d37da79f..d52338ed71 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1951,7 +1951,7 @@ VSPLT(w, u32)
- #define VINSERT(suffix, element)                                            \
-     void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t index) \
-     {                                                                       \
--        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],              \
-+        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element[0])],           \
-                sizeof(r->element[0]));                                      \
-     }
- #else
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index b095134d6f..d4878f01c0 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -709,8 +709,8 @@ static void sm501_2d_operation(SM501State *s)
+     /* get frame buffer info */
+     uint8_t *src = s->local_mem + (s->twoD_source_base & 0x03FFFFFF);
+     uint8_t *dst = s->local_mem + (s->twoD_destination_base & 0x03FFFFFF);
+-    int src_width = (s->dc_crt_h_total & 0x00000FFF) + 1;
+-    int dst_width = (s->dc_crt_h_total & 0x00000FFF) + 1;
++    int src_width = s->twoD_pitch & 0x1FFF;
++    int dst_width = (s->twoD_pitch >> 16) & 0x1FFF;
+ 
+     if (addressing != 0x0) {
+         printf("%s: only XY addressing is supported.\n", __func__);
 -- 
 2.17.1
