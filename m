@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fcSE4-0005Uc-Ql
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:13:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcSWt-0004Ky-TM
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fcSE3-0007LP-3E
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:12:56 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:44033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fcSE2-0007Ko-PV
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:12:55 -0400
-Received: by mail-ed1-x541.google.com with SMTP id d17-v6so1280454eds.11
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 02:12:54 -0700 (PDT)
-From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Date: Mon,  9 Jul 2018 11:11:36 +0200
-Message-Id: <20180709091136.28849-8-e.emanuelegiuseppe@gmail.com>
-In-Reply-To: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
-References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
-Subject: [Qemu-devel] [PATCH 7/7] tests/qgraph: sdhci test node
+	(envelope-from <kwolf@redhat.com>) id 1fcSWs-0007vD-Ms
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:32:23 -0400
+Date: Mon, 9 Jul 2018 11:32:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180709093214.GA3511@localhost.localdomain>
+References: <20180706164542.9476-1-kwolf@redhat.com>
+	<be1b9d41-1eb3-c24c-c459-cc6d6599de22@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <be1b9d41-1eb3-c24c-c459-cc6d6599de22@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Fix copy-on-read crash with partial
+ final cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,365 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Convert tests/sdhci-test in first qgraph test node, sdhci-test. This test
-consumes an sdhci interface and checks that its function return the
-expected values.
+Am 06.07.2018 um 23:20 hat Eric Blake geschrieben:
+> On 07/06/2018 11:45 AM, Kevin Wolf wrote:
+> > If the virtual disk size isn't aligned to full clusters,
+> > bdrv_co_do_copy_on_readv() may get pnum == 0 before having the full
+> > cluster completed, which will let it run into an assertion failure:
+> > 
+> > qemu-io: block/io.c:1203: bdrv_co_do_copy_on_readv: Assertion `skip_bytes < pnum' failed.
+> > 
+> > Check for EOF, assert that we read at least as much as the read request
+> > originally wanted to have (which is true at EOF because otherwise
+> > bdrv_check_byte_request() would already have returned an error) and
+> > return success early even though we couldn't copy the full cluster.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   block/io.c                 | 6 ++++++
+> >   tests/qemu-iotests/197     | 9 +++++++++
+> >   tests/qemu-iotests/197.out | 8 ++++++++
+> >   3 files changed, 23 insertions(+)
+> > 
+> > diff --git a/block/io.c b/block/io.c
+> > index 038449f81f..4c0831149c 100644
+> > --- a/block/io.c
+> > +++ b/block/io.c
+> > @@ -1200,6 +1200,12 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+> >               pnum = MIN(cluster_bytes, max_transfer);
+> >           }
+> > +        /* Stop at EOF if the image ends in the middle of the cluster */
+> > +        if (ret == 0 && pnum == 0) {
+> 
+> Is it any smarter to check for 'ret & BDRV_BLOCK_EOF' instead of pnum == 0?
+> 
+> But as far as I can tell, right now those two conditions are synonymous.
 
-Note that this test does not allocate any sdhci structure, it's all done by the
-qtest walking graph mechanism
+You removed the context from your quote, which contains the assertion
+that the commit message mentions:
 
-Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
----
- tests/Makefile.include |   8 +-
- tests/sdhci-test.c     | 222 ++++++++++++-----------------------------
- 2 files changed, 67 insertions(+), 163 deletions(-)
+    assert(skip_bytes < pnum);
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e2db3e9d09..790abe8c6e 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -311,7 +311,6 @@ check-qtest-i386-y += tests/migration-test$(EXESUF)
- check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
--check-qtest-x86_64-y += tests/sdhci-test$(EXESUF)
- gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
- gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y))
- 
-@@ -385,10 +384,8 @@ gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- gcov-files-arm-y += hw/timer/arm_mptimer.c
- check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
--check-qtest-arm-y += tests/sdhci-test$(EXESUF)
- 
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
--check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
- check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
- 
- check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
-@@ -773,11 +770,13 @@ libqgraph-obj-y = tests/libqos/qgraph.o
- libqgraph-pc-obj-y = $(libqos-pc-obj-y) $(libqgraph-obj-y) tests/libqos/sdhci.o
- libqgraph-pc-obj-y += tests/libqos/raspi2-machine.o tests/libqos/x86_64_pc-machine.o
- 
-+libqgraph-tests-obj-y = $(libqgraph-pc-obj-y) tests/sdhci-test.o
-+
- check-unit-y += tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
- 
- check-qtest-pci-y += tests/qos-test$(EXESUF)
--tests/qos-test$(EXESUF): tests/qos-test.o $(libqgraph-pc-obj-y)
-+tests/qos-test$(EXESUF): tests/qos-test.o $(libqgraph-tests-obj-y)
- 
- tests/qmp-test$(EXESUF): tests/qmp-test.o
- tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
-@@ -863,7 +862,6 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
- tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
--tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
- tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
- 
- tests/migration/stress$(EXESUF): tests/migration/stress.o
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 1d825eb010..3e16c036f4 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -12,6 +12,8 @@
- #include "libqtest.h"
- #include "libqos/pci-pc.h"
- #include "hw/pci/pci.h"
-+#include "libqos/qgraph.h"
-+#include "libqos/sdhci.h"
- 
- #define SDHC_CAPAB                      0x40
- FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
-@@ -20,99 +22,60 @@ FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
- FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
- #define SDHC_HCVER                      0xFE
- 
--static const struct sdhci_t {
--    const char *arch, *machine;
--    struct {
--        uintptr_t addr;
--        uint8_t version;
--        uint8_t baseclock;
-+/**
-+ * Old sdhci_t structure:
-+ *
-+    struct sdhci_t {
-+        const char *arch, *machine;
-         struct {
--            bool sdma;
--            uint64_t reg;
--        } capab;
--    } sdhci;
--    struct {
--        uint16_t vendor_id, device_id;
--    } pci;
--} models[] = {
--    /* PC via PCI */
--    { "x86_64", "pc",
--        {-1,         2, 0,  {1, 0x057834b4} },
--        .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
--
--    /* Exynos4210 */
--    { "arm",    "smdkc210",
--        {0x12510000, 2, 0,  {1, 0x5e80080} } },
--
--    /* i.MX 6 */
--    { "arm",    "sabrelite",
--        {0x02190000, 3, 0,  {1, 0x057834b4} } },
--
--    /* BCM2835 */
--    { "arm",    "raspi2",
--        {0x3f300000, 3, 52, {0, 0x052134b4} } },
--
--    /* Zynq-7000 */
--    { "arm",    "xilinx-zynq-a9",   /* Datasheet: UG585 (v1.12.1) */
--        {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
--
--    /* ZynqMP */
--    { "aarch64", "xlnx-zcu102",     /* Datasheet: UG1085 (v1.7) */
--        {0xff160000, 3, 0,  {1, 0x280737ec6481} } },
--
--};
--
--typedef struct QSDHCI {
--    struct {
--        QPCIBus *bus;
--        QPCIDevice *dev;
--    } pci;
--    union {
--        QPCIBar mem_bar;
--        uint64_t addr;
--    };
--} QSDHCI;
--
--static uint16_t sdhci_readw(QSDHCI *s, uint32_t reg)
--{
--    uint16_t val;
--
--    if (s->pci.dev) {
--        val = qpci_io_readw(s->pci.dev, s->mem_bar, reg);
--    } else {
--        val = qtest_readw(global_qtest, s->addr + reg);
-+            uintptr_t addr;
-+            uint8_t version;
-+            uint8_t baseclock;
-+            struct {
-+                bool sdma;
-+                uint64_t reg;
-+            } capab;
-+        } sdhci;
-+        struct {
-+            uint16_t vendor_id, device_id;
-+        } pci;
-     }
-+ *
-+ * implemented drivers:
-+ *
-+    PC via PCI
-+        { "x86_64", "pc",
-+            {-1,         2, 0,  {1, 0x057834b4} },
-+            .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
-+
-+    BCM2835
-+        { "arm",    "raspi2",
-+            {0x3f300000, 3, 52, {0, 0x052134b4} } },
-+ *
-+ * FIXME: the following drivers are missing:
-+ *
-+    Exynos4210
-+        { "arm",    "smdkc210",
-+            {0x12510000, 2, 0,  {1, 0x5e80080} } },
- 
--    return val;
--}
--
--static uint64_t sdhci_readq(QSDHCI *s, uint32_t reg)
--{
--    uint64_t val;
--
--    if (s->pci.dev) {
--        val = qpci_io_readq(s->pci.dev, s->mem_bar, reg);
--    } else {
--        val = qtest_readq(global_qtest, s->addr + reg);
--    }
-+    i.MX 6
-+        { "arm",    "sabrelite",
-+            {0x02190000, 3, 0,  {1, 0x057834b4} } },
- 
--    return val;
--}
-+    Zynq-7000
-+        { "arm",    "xilinx-zynq-a9",   Datasheet: UG585 (v1.12.1)
-+            {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
- 
--static void sdhci_writeq(QSDHCI *s, uint32_t reg, uint64_t val)
--{
--    if (s->pci.dev) {
--        qpci_io_writeq(s->pci.dev, s->mem_bar, reg, val);
--    } else {
--        qtest_writeq(global_qtest, s->addr + reg, val);
--    }
--}
-+    ZynqMP
-+        { "aarch64", "xlnx-zcu102",     Datasheet: UG1085 (v1.7)
-+            {0xff160000, 3, 0,  {1, 0x280737ec6481} } },
-+ */
- 
- static void check_specs_version(QSDHCI *s, uint8_t version)
- {
-     uint32_t v;
- 
--    v = sdhci_readw(s, SDHC_HCVER);
-+    v = s->sdhci_readw(s, SDHC_HCVER);
-     v &= 0xff;
-     v += 1;
-     g_assert_cmpuint(v, ==, version);
-@@ -122,7 +85,7 @@ static void check_capab_capareg(QSDHCI *s, uint64_t expec_capab)
- {
-     uint64_t capab;
- 
--    capab = sdhci_readq(s, SDHC_CAPAB);
-+    capab = s->sdhci_readq(s, SDHC_CAPAB);
-     g_assert_cmphex(capab, ==, expec_capab);
- }
- 
-@@ -131,11 +94,11 @@ static void check_capab_readonly(QSDHCI *s)
-     const uint64_t vrand = 0x123456789abcdef;
-     uint64_t capab0, capab1;
- 
--    capab0 = sdhci_readq(s, SDHC_CAPAB);
-+    capab0 = s->sdhci_readq(s, SDHC_CAPAB);
-     g_assert_cmpuint(capab0, !=, vrand);
- 
--    sdhci_writeq(s, SDHC_CAPAB, vrand);
--    capab1 = sdhci_readq(s, SDHC_CAPAB);
-+    s->sdhci_writeq(s, SDHC_CAPAB, vrand);
-+    capab1 = s->sdhci_readq(s, SDHC_CAPAB);
-     g_assert_cmpuint(capab1, !=, vrand);
-     g_assert_cmpuint(capab1, ==, capab0);
- }
-@@ -147,7 +110,7 @@ static void check_capab_baseclock(QSDHCI *s, uint8_t expec_freq)
-     if (!expec_freq) {
-         return;
-     }
--    capab = sdhci_readq(s, SDHC_CAPAB);
-+    capab = s->sdhci_readq(s, SDHC_CAPAB);
-     capab_freq = FIELD_EX64(capab, SDHC_CAPAB, BASECLKFREQ);
-     g_assert_cmpuint(capab_freq, ==, expec_freq);
- }
-@@ -156,7 +119,7 @@ static void check_capab_sdma(QSDHCI *s, bool supported)
- {
-     uint64_t capab, capab_sdma;
- 
--    capab = sdhci_readq(s, SDHC_CAPAB);
-+    capab = s->sdhci_readq(s, SDHC_CAPAB);
-     capab_sdma = FIELD_EX64(capab, SDHC_CAPAB, SDMA);
-     g_assert_cmpuint(capab_sdma, ==, supported);
- }
-@@ -167,7 +130,7 @@ static void check_capab_v3(QSDHCI *s, uint8_t version)
- 
-     if (version < 3) {
-         /* before v3 those fields are RESERVED */
--        capab = sdhci_readq(s, SDHC_CAPAB);
-+        capab = s->sdhci_readq(s, SDHC_CAPAB);
-         capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
-         g_assert_cmpuint(capab_v3, ==, 0);
-         capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
-@@ -175,78 +138,21 @@ static void check_capab_v3(QSDHCI *s, uint8_t version)
-     }
- }
- 
--static QSDHCI *machine_start(const struct sdhci_t *test)
--{
--    QSDHCI *s = g_new0(QSDHCI, 1);
--
--    if (test->pci.vendor_id) {
--        /* PCI */
--        uint16_t vendor_id, device_id;
--        uint64_t barsize;
--
--        global_qtest = qtest_startf("-machine %s -device sdhci-pci",
--                                    test->machine);
--
--        s->pci.bus = qpci_init_pc(global_qtest, NULL);
--
--        /* Find PCI device and verify it's the right one */
--        s->pci.dev = qpci_device_find(s->pci.bus, QPCI_DEVFN(4, 0));
--        g_assert_nonnull(s->pci.dev);
--        vendor_id = qpci_config_readw(s->pci.dev, PCI_VENDOR_ID);
--        device_id = qpci_config_readw(s->pci.dev, PCI_DEVICE_ID);
--        g_assert(vendor_id == test->pci.vendor_id);
--        g_assert(device_id == test->pci.device_id);
--        s->mem_bar = qpci_iomap(s->pci.dev, 0, &barsize);
--        qpci_device_enable(s->pci.dev);
--    } else {
--        /* SysBus */
--        global_qtest = qtest_startf("-machine %s", test->machine);
--        s->addr = test->sdhci.addr;
--    }
--
--    return s;
--}
--
--static void machine_stop(QSDHCI *s)
-+static void test_machine(void *obj, void *data)
- {
--    qpci_free_pc(s->pci.bus);
--    g_free(s->pci.dev);
--    qtest_quit(global_qtest);
--    g_free(s);
--}
-+    QSDHCI *s = (QSDHCI *)obj;
- 
--static void test_machine(const void *data)
--{
--    const struct sdhci_t *test = data;
--    QSDHCI *s;
--
--    s = machine_start(test);
--
--    check_specs_version(s, test->sdhci.version);
--    check_capab_capareg(s, test->sdhci.capab.reg);
-+    check_specs_version(s, s->props.version);
-+    check_capab_capareg(s, s->props.capab.reg);
-     check_capab_readonly(s);
--    check_capab_v3(s, test->sdhci.version);
--    check_capab_sdma(s, test->sdhci.capab.sdma);
--    check_capab_baseclock(s, test->sdhci.baseclock);
--
--    machine_stop(s);
-+    check_capab_v3(s, s->props.version);
-+    check_capab_sdma(s, s->props.capab.sdma);
-+    check_capab_baseclock(s, s->props.baseclock);
- }
- 
--int main(int argc, char *argv[])
-+static void sdhci_test(void)
- {
--    const char *arch = qtest_get_arch();
--    char *name;
--    int i;
--
--    g_test_init(&argc, &argv, NULL);
--    for (i = 0; i < ARRAY_SIZE(models); i++) {
--        if (strcmp(arch, models[i].arch)) {
--            continue;
--        }
--        name = g_strdup_printf("sdhci/%s", models[i].machine);
--        qtest_add_data_func(name, &models[i], test_machine);
--        g_free(name);
--    }
--
--    return g_test_run();
-+    qos_add_test("sdhci-test", "sdhci", test_machine);
- }
-+
-+libqos_init(sdhci_test);
--- 
-2.17.1
+So I think it makes more sense to check pnum, because it's the short
+pnum and not the BDRV_BLOCK_EOF flag that would make the following code
+fail.
+
+> > +echo
+> > +echo '=== Partial final cluster ==='
+> > +echo
+> > +
+> > +_make_test_img 1024
+> > +$QEMU_IO -f $IMGFMT -C -c 'read 0 1024' "$TEST_IMG" | _filter_qemu_io
+> 
+> Here, $TEST_IMG has no backing file, and does not have the final
+> cluster allocated; all we have to do is properly read all zeroes.
+
+And write them back, we test that it's allocated afterwards.
+
+> Is it worth also explicitly testing reading of allocated data under
+> COR
+
+I could add a second read of the same area, which would not only test
+reading of allocated data, but also test whether the allocating COR
+wrote the correct data (all zeros).
+
+Do you think that would be a worthwhile addition?
+
+> and/or the case of one image with another backing image (with
+> same or differing partial cluster sizes), where COR actually has to
+> write the partial cluster?  However, the logic in the code appears to
+> cover all of those, whether or not the testsuite does as well.
+
+Having a backing file is a different code path for non-zero data, but I
+think we already test normal write/write_zeroes extensively. For zero
+data, it doesn't make a difference whether it comes from the backing
+file or from not having a backing file (as far as the COR logic is
+concerned, anyway).
+
+I didn't want to use a backing file because the test is 'generic', but
+it already uses qcow2 in other cases, so if we really think this is
+important to have, I guess I can have another case with qcow2 over
+$IMGFMT and non-zero data.
+
+Kevin
