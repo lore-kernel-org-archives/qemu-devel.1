@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq9-00053a-8C
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQqB-00056D-AJ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq7-0002Dv-Qv
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQqA-0002HP-8Z
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:11 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  9 Jul 2018 17:43:42 +1000
-Message-Id: <20180709074350.27086-9-david@gibson.dropbear.id.au>
+Date: Mon,  9 Jul 2018 17:43:50 +1000
+Message-Id: <20180709074350.27086-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
 References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/16] sm501: Fix support for non-zero frame
- buffer start address
+Subject: [Qemu-devel] [PULL 16/16] sam460ex: Make
+ sam460ex_load_device_tree() handle all errors internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,88 +21,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sebastian Bauer <mail@sebastianbauer.info>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+sam460ex_load_device_tree() handles nearly all possible errors by simply
+exiting (within helper functions and macros).  It handles two early error
+cases by returning an error.
 
-Display updates and drawing hardware cursor did not work when frame
-buffer address was non-zero. Fix this by taking the frame buffer
-address into account in these cases. This fixes screen dragging on
-AmigaOS. Based on patch by Sebastian Bauer.
+There's no particular point to this, so make it handle those directly as
+well, removing the need for the caller to handle a failure.  As a bonus it
+gives us more specific error messages.
 
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/display/sm501.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ hw/ppc/sam460ex.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index ebd139006e..10ee008eb2 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -586,6 +586,11 @@ static uint32_t get_local_mem_size_index(uint32_t size)
-     return index;
- }
- 
-+static ram_addr_t get_fb_addr(SM501State *s, int crt)
-+{
-+    return (crt ? s->dc_crt_fb_addr : s->dc_panel_fb_addr) & 0x3FFFFF0;
-+}
-+
- static inline int get_width(SM501State *s, int crt)
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 8194f32cd3..e2b7028843 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -255,7 +255,6 @@ static int sam460ex_load_device_tree(hwaddr addr,
+                                      hwaddr initrd_size,
+                                      const char *kernel_cmdline)
  {
-     int width = crt ? s->dc_crt_h_total : s->dc_panel_h_total;
-@@ -688,7 +693,8 @@ static inline void hwc_invalidate(SM501State *s, int crt)
-     start *= w * bpp;
-     end *= w * bpp;
+-    int ret = -1;
+     uint32_t mem_reg_property[] = { 0, 0, cpu_to_be32(ramsize) };
+     char *filename;
+     int fdt_size;
+@@ -266,12 +265,14 @@ static int sam460ex_load_device_tree(hwaddr addr,
  
--    memory_region_set_dirty(&s->local_mem_region, start, end - start);
-+    memory_region_set_dirty(&s->local_mem_region,
-+                            get_fb_addr(s, crt) + start, end - start);
- }
- 
- static void sm501_2d_operation(SM501State *s)
-@@ -1213,6 +1219,9 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         break;
-     case SM501_DC_PANEL_FB_ADDR:
-         s->dc_panel_fb_addr = value & 0x8FFFFFF0;
-+        if (value & 0x8000000) {
-+            qemu_log_mask(LOG_UNIMP, "Panel external memory not supported\n");
-+        }
-         break;
-     case SM501_DC_PANEL_FB_OFFSET:
-         s->dc_panel_fb_offset = value & 0x3FF03FF0;
-@@ -1273,6 +1282,9 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         break;
-     case SM501_DC_CRT_FB_ADDR:
-         s->dc_crt_fb_addr = value & 0x8FFFFFF0;
-+        if (value & 0x8000000) {
-+            qemu_log_mask(LOG_UNIMP, "CRT external memory not supported\n");
-+        }
-         break;
-     case SM501_DC_CRT_FB_OFFSET:
-         s->dc_crt_fb_offset = value & 0x3FF03FF0;
-@@ -1615,7 +1627,7 @@ static void sm501_update_display(void *opaque)
-     draw_hwc_line_func *draw_hwc_line = NULL;
-     int full_update = 0;
-     int y_start = -1;
--    ram_addr_t offset = 0;
-+    ram_addr_t offset;
-     uint32_t *palette;
-     uint8_t hwc_palette[3 * 3];
-     uint8_t *hwc_src = NULL;
-@@ -1672,9 +1684,10 @@ static void sm501_update_display(void *opaque)
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
+     if (!filename) {
+-        goto out;
++        error_report("Couldn't find dtb file `%s'", BINARY_DEVICE_TREE_FILE);
++        exit(1);
+     }
+     fdt = load_device_tree(filename, &fdt_size);
+     g_free(filename);
+-    if (fdt == NULL) {
+-        goto out;
++    if (!fdt) {
++        error_report("Couldn't load dtb file `%s'", filename);
++        exit(1);
      }
  
-     /* draw each line according to conditions */
-+    offset = get_fb_addr(s, crt);
-     snap = memory_region_snapshot_and_clear_dirty(&s->local_mem_region,
-               offset, width * height * src_bpp, DIRTY_MEMORY_VGA);
--    for (y = 0, offset = 0; y < height; y++, offset += width * src_bpp) {
-+    for (y = 0; y < height; y++, offset += width * src_bpp) {
-         int update, update_hwc;
+     /* Manipulate device tree in memory. */
+@@ -325,11 +326,8 @@ static int sam460ex_load_device_tree(hwaddr addr,
  
-         /* check if hardware cursor is enabled and we're within its range */
+     rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
+     g_free(fdt);
+-    ret = fdt_size;
+-
+-out:
+ 
+-    return ret;
++    return fdt_size;
+ }
+ 
+ /* Create reset TLB entries for BookE, mapping only the flash memory.  */
+@@ -599,10 +597,6 @@ static void sam460ex_init(MachineState *machine)
+         dt_size = sam460ex_load_device_tree(FDT_ADDR, machine->ram_size,
+                                     RAMDISK_ADDR, initrd_size,
+                                     machine->kernel_cmdline);
+-        if (dt_size < 0) {
+-            error_report("couldn't load device tree");
+-            exit(1);
+-        }
+ 
+         boot_info->dt_base = FDT_ADDR;
+         boot_info->dt_size = dt_size;
 -- 
 2.17.1
