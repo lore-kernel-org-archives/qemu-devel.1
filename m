@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fcZYI-0003BP-Hn
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:02:20 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fcZZU-0003hX-QU
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fcZYD-0004XU-Mh
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:02:18 -0400
-Received: from mail-bn3nam01on0101.outbound.protection.outlook.com
-	([104.47.33.101]:1408
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1fcZYD-0004XI-8c
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:02:13 -0400
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Mon, 9 Jul 2018 17:02:10 +0000
-Message-ID: <MWHPR21MB07650D2B61CA11DE684CC551B6440@MWHPR21MB0765.namprd21.prod.outlook.com>
-References: <CABi5iw=FM2yFzji4HKhAxG0fYmsGb+h5wYp5wJo-DYNgMHuihg@mail.gmail.com>
-In-Reply-To: <CABi5iw=FM2yFzji4HKhAxG0fYmsGb+h5wYp5wJo-DYNgMHuihg@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <th.huth@gmail.com>) id 1fcZZT-0004qS-OH
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:03:32 -0400
+References: <20180627232951.14725-1-laurent@vivier.eu>
+	<20180627232951.14725-5-laurent@vivier.eu>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <8d1c30eb-1dc7-4ea9-08ea-660991044e5c@tuxfamily.org>
+Date: Mon, 9 Jul 2018 19:03:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Problem building QEMU with whpx support
+In-Reply-To: <20180627232951.14725-5-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 04/10] hw/m68k: add video card
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +24,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Umang Kakaiya <umangkk5@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-SGV5IFVtYW5nLA0KDQpTb3JyeSBJIG1pc3NlZCB0aGlzLiBUaGVyZSBpcyBubyBvZmZpY2lhbCBk
-b2N1bWVudGF0aW9uIGZvciBidWlsZGluZyBRRU1VIG9uIFdIUCBhcyB0aGVyZSBpcyByZWFsbHkg
-bm8gZGlmZmVyZW5jZSB0byBjcm9zcyBjb21waWxpbmcgUUVNVSBpbiBnZW5lcmFsLiBIb3dldmVy
-LCB5ZXMgeW91IGNhbiBjcm9zcyBjb21waWxlIHRoaXMgb24gMTguMDQgKGFuZCBvdGhlciBkaXN0
-cm9zKS4gQWZ0ZXIgaW5zdGFsbGluZyB0aGUgY29ycmVjdCBwYWNrYWdlcyAobWluZ3ctdzY0KSB5
-b3Ugd2lsbCBlbmQgdXAgd2l0aCBhIHBhdGggb24geW91ciBMaW51eCBtYWNoaW5lIOKAnC91c3Iv
-eDg2XzY0LXc2NC1taW5ndzMyL2luY2x1ZGUv4oCdIGZvbGRlci4gSWYgeW91IGNvcHkgV2luSHZF
-bXVsYXRpb24uaCwgV2luSHZQbGF0Zm9ybURlZnMuaCwgV2luSHZQbGF0Zm9ybS5oIGZyb20gYW55
-IOKAnEM6XFByb2dyYW0gRmlsZXMgKHg4NilcV2luZG93cyBLaXRzXDEwXEluY2x1ZGVcPHZlcnNp
-b24+XHVtXFdpbkh2Ki5o4oCdIGluc3RhbGxlZCBpbnNpZGVyIFNESyB5b3UgY2FuIHRoZW4gcnVu
-IOKAnC4vY29uZmlndXJlIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUgLS1jcm9zcy1wcmVm
-aXg9eDg2XzY0X3c2NC1taW5ndzMyLSAtLWVuYWJsZS13aHB44oCdIOKApiAoRXRjKS4gVGhpcyB3
-aWxsIG91dHB1dCBhIHFlbXUgYmluYXJ5IHRoYXQgY2FuIGJlIHJ1biBvbiB0aGUgV2luZG93cyBo
-b3N0Lg0KDQpOb3RlLCBteSBwZXJzb25hbCB3YXkgb2YgZG9pbmcgdGhpcyAobm90IGEgcmVxdWly
-ZW1lbnQpIGlzIHRvIHVzZSBXU0wgb24gdGhlIHNhbWUgbWFjaGluZSBJIGFtIHRlc3Rpbmcgd2l0
-aC4gU28gSSBoYXZlIGVuYWJsZWQgdGhlIFdpbmRvd3MgU3Vic3lzdGVtIGZvciBMaW51eCwgaW5z
-dGFsbGVkIGEgZGlzdHJvIG9mIG15IGNob29zaW5nLCBjb3BpZWQgdGhlIGhlYWRlcnMgZnJvbSB0
-aGUgaW5zdGFsbGVkIFNESywgYW5kIHJ1biAuL2NvbmZpZ3VyZS4gSSB0aGVuIGhhdmUgdGhlIG91
-dHB1dCBvZiBtYWtlIG9uIGEgc2hhcmVkIGRyaXZlLCBzbyBJIGNhbiBvcGVuIGNtZC5leGUgbGF1
-bmNoIHRoZSBxZW11IGV4ZSB3aXRoIHdoYXRldmVyIG9wdGlvbnMgYW5kIHRlc3Qgb3V0IG15IGNo
-YW5nZXMuIEhvcGUgdGhpcyBoZWxwcyENCg0KLUp1c3Rpbg0KDQpGcm9tOiBVbWFuZyBLYWthaXlh
-IDx1bWFuZ2trNUBnbWFpbC5jb20+DQpTZW50OiBUaHVyc2RheSwgSnVuZSAyMSwgMjAxOCAyOjQ0
-IFBNDQpUbzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBKdXN0aW4gVGVycnkgKFZNKSA8anV0ZXJy
-eUBtaWNyb3NvZnQuY29tPg0KU3ViamVjdDogUHJvYmxlbSBidWlsZGluZyBRRU1VIHdpdGggd2hw
-eCBzdXBwb3J0DQoNCkhpIEp1c3RpbiwNCg0KV2UgYXJlIHRyeWluZyB0byB1c2UgUUVNVSBvbiBX
-aW5kb3dzIEh5cGVyLVYgZW52aXJvbm1lbnQgd2l0aCB3aHB4IGVuYWJsZWQgZm9yIGJldHRlciBw
-ZXJmb3JtYW5jZS4gV2Ugd2VyZSB1bmFibGUgdG8gYnVpbGQgUUVNVSB3aXRoIFdIUFggc3VwcG9y
-dC4gV2UgdXNlZCBVYnVudHUgMTguMDQgc2VydmVyIFZNIHdpdGggdHdvIGxpYnJhcmllcyAoV2lu
-SHYqLmxpYikgZnJvbSB0aGUgbGF0ZXN0IFdpbmRvd3MgMTAgU0RLIHRvIGJ1aWxkIFFFTVUgYW5k
-IGFkZGVkICctLWVuYWJsZS13aHB4JyBwYXJhbWV0ZXIgaW4gY29uZmlnLiBCdXQgYnVpbGRpbmcg
-aXMgZmFpbGluZyBnaXZpbmcgdGhlIGZvbGxvd2luZyBtZXNzYWdlOg0KVGhlIGNvbW1hbmQgdG8g
-bGF1bmNoIFFFTVUgaXMgYXMgYmVsb3csDQoNCiQgLi9jb25maWd1cmUgLS1lbmFibGUtd2hweCAt
-LWVuYWJsZS1kZWJ1Zw0KDQpUaGUgZm9sbG93aW5nIGVycm9yIHdhcyBvdXRwdXQgZnJvbSB0aGUg
-Y29tbWFuZCBsaW5lLA0KRXJyb3I6IFVzZXIgcmVxdWVzdGVkIGZlYXR1cmUgV2luSHZQbGF0Zm9y
-bQ0KICAgICAgIGNvbmZpZ3VyZSB3YXMgbm90IGFibGUgdG8gZmluZCBpdC4NCiAgICAgICBXaW5I
-dkVtdWxhdGlvbiBpcyBub3QgaW5zdGFsbGVkLg0KDQpXZSBhbmFseXplZCB0aGUgaXNzdWUgYW5k
-IGZvdW5kIHRoYXQgY29uZmlndXJlIGlzIHVuYWJsZSB0byBsb2NhdGUgdGhlIFdpbkh2UGxhdGZv
-cm0uaCBmaWxlLg0KQXMgZm9yIHByb3ZpZGluZyBXaW5IVioubGliIGZpbGVzIHdlIHRyaWVkIGZv
-bGxvd2luZyBzdGVwczoNCjEuIFdlIHNldCBMRF9MSUJfUEFUSCB0byBwb2ludCB0byB0aGUgV2lu
-SFYqLmxpYiBmaWxlcy4NCjIuIFdlIHVzZWQgLS1wYXRoX3dpbl9zZGsgb3B0aW9uIGluIGNvbmZp
-Z3VyZSB0byBhZGQgdGhlIHBhdGggdG8gV2luZG93cyBpbnNpZGVyIFNESy4NCjMuIFdlIG1vdmVk
-IHRvIFdpbmRvd3MgRW52aXJvbm1lbnQgYW5kIHRyaWVkIGJ1aWxkaW5nIFFFTVUgd2l0aCBNU1lT
-MiBidWlsZCBvcHRpb25zIGFjY29yZGluZyB0byBzdGVwcyBtZW50aW9uZWQgaW4gUUVNVSBibG9n
-IChMaW5rPGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJs
-PWh0dHBzJTNBJTJGJTJGd2lraS5xZW11Lm9yZyUyRmluZGV4LnBocCUyRkhvc3RzJTJGVzMyJTIz
-TmF0aXZlX2J1aWxkc193aXRoX01TWVMyJmRhdGE9MDIlN0MwMSU3Q2p1dGVycnklNDBtaWNyb3Nv
-ZnQuY29tJTdDN2NiNWFmNjFlNjhmNGFkYjcyM2MwOGQ1ZDdjMDI1MmMlN0M3MmY5ODhiZjg2ZjE0
-MWFmOTFhYjJkN2NkMDExZGI0NyU3QzElN0MxJTdDNjM2NjUyMTQyNjIwMDQ0MDQ3JnNkYXRhPVZo
-cWJqdnp2UWJqSW44V1ltQXFPR2FVMlFNN0NuaENWcEU0VnJWNHNlcEklM0QmcmVzZXJ2ZWQ9MD4p
-DQpCdXQgaXQgZGlkbid0IHdvcmsgYmVjYXVzZSBiYXNlIHFlbXUgYnVpbGQgaXRzZWxmIGZhaWxz
-LiBXZSB0aGVuICAgICAgdHJpZWQgTWluZ1c2NCB0byBidWlsZCBRRU1VIGJ1dCBnb3QgdGhlIHNh
-bWUgZXJyb3IgYWJvdmUgd2l0aCAtLWVuYWJsZS13aHB4Lg0KDQoNCldlIHRyaWVkIHRvIGZpbmQg
-YW55IGRvY3VtZW50YXRpb24gdG8gcHJvdmlkZSBleGFjdCBzdGVwcyBpbiBidWlsZGluZyBRRU1V
-IHdpdGggd2hweCBzdXBwb3J0IGJ1dCBkaWRuJ3QgbWFrZSBhbnkgcHJvZ3Jlc3MuIFNvIHRoZXJl
-IGFyZSB0aHJlZSBxdWVzdGlvbnM6DQoNCjEuIENhbiB3ZSBidWlsZCBRRU1VIHdpdGggd2hweCBw
-YWNrYWdlcyBvbiBVYnVudHUgMTguMDQgb3IgZG8gd2UgbmVlZCB0byB1c2UgUUVNVSBuYXRpdmUg
-YnVpbGQgb24gV2luZG93cyBtYWNoaW5lIHVzaW5nIE1TWVMyLg0KMi4gV2hlcmUgdG8ga2VlcCB0
-aGUgV2luSFYqLmxpYiBmaWxlcyBpbiBRRU1VIHNvdXJjZSBkaXJlY3RvcmllcyBzbyB0aGF0IGNv
-bmZpZ3VyZSBjYW4gbG9jYXRlIHRoZSBmaWxlcyBmb3IgYnVpbGQuDQozLiBDYW4geW91IHByb3Zp
-ZGUgYW55IGxpbmtzIG9yIHJlZmVyZW5jZSB0byBkb2N1bWVudGF0aW9uIG9uIGJ1aWxkaW5nIFFF
-TVUgd2l0aCB3aHB4IHN1cHBvcnQgd2l0aCBhbGwgZGVwZW5kZW5jeSBwYWNrYWdlcyByZXF1aXJl
-ZC4NCg0KQmVsb3cgaXMgdGhlIGNvbmZpZ3VyYXRpb24gb2YgdGhlIEh5cGVyLVYgbWFjaGluZSB1
-c2VkIGZvciB0aGlzIGV4cGVyaW1lbnQsDQoNCldpbmRvd3MgT1M6IFdpbmRvd3MgU2VydmVyIERh
-dGFjZW50ZXIgMjAxNg0KV2luZG93cyBlZGl0aW9uOiBTZXJ2ZXINCldpbmRvd3MgdmVyc2lvbjog
-MTgwMyAoT1MgYnVpbGQgMTc2NDUuMTA0MikNClNESyB2ZXJzaW9uOiAxMC4wLjE3Njg2LjANCg0K
-DQpCZXN0IFJlZ2FyZHMsDQpVbWFuZw0K
+On 28.06.2018 01:29, Laurent Vivier wrote:
+> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+[...]
+> diff --git a/hw/display/macfb-template.h b/hw/display/macfb-template.h
+> new file mode 100644
+> index 0000000000..b6ae5d728f
+> --- /dev/null
+> +++ b/hw/display/macfb-template.h
+> @@ -0,0 +1,158 @@
+> +#if defined(READ_BITS)
+> +#define PALETTE(i, r, g, b)                        \
+> +    do {                                           \
+> +        r =  s->color_palette[i * 3];              \
+> +        g =  s->color_palette[i * 3 + 1];          \
+> +        b =  s->color_palette[i * 3 + 2];          \
+> +    } while (0)
+> +
+> +#if READ_BITS == 1
+> +#define READ_PIXEL(from, x, r, g, b)               \
+> +    do {                                           \
+> +        int bit = x & 7;                           \
+> +        int idx = (*from >> (7 - bit)) & 1;        \
+> +        r = g = b  = ((1 - idx) << 7);             \
+> +        from += (bit == 7);                        \
+> +    } while (0)
+> +#elif READ_BITS == 2
+> +#define READ_PIXEL(from, x, r, g, b)               \
+> +    do {                                           \
+> +        int bit = (x & 3);                         \
+> +        int idx = (*from >> ((3 - bit) << 1)) & 3; \
+> +        PALETTE(idx, r, g, b);                     \
+> +        from += (bit == 3);                        \
+> +    } while (0)
+> +#elif READ_BITS == 4
+> +#define READ_PIXEL(from, x, r, g, b)               \
+> +    do {                                           \
+> +        int bit = x & 1;                           \
+> +        int idx = (*from >> ((1 - bit) << 2)) & 15; \
+> +        PALETTE(idx, r, g, b);                     \
+> +        from += (bit == 1);                        \
+> +    } while (0)
+> +#elif READ_BITS == 8
+> +#define READ_PIXEL(from, x, r, g, b)               \
+> +    do {                                           \
+> +        PALETTE(*from, r, g, b);                   \
+> +        from++;                                    \
+> +    } while (0)
+> +#elif READ_BITS == 16
+> +#define READ_PIXEL(from, x, r, g, b)               \
+> +    do {                                           \
+> +        uint16_t pixel;                            \
+> +        pixel = (from[0] << 8) | from[1];          \
+> +        r = ((pixel >> 10) & 0x1f) << 3;           \
+> +        g = ((pixel >> 5) & 0x1f) << 3;            \
+> +        b = (pixel & 0x1f) << 3;                   \
+> +        from += 2;                                 \
+> +    } while (0)
+> +#elif READ_BITS == 24
+> +#define READ_PIXEL(from, x, r, g, b)               \
+> +    do {                                           \
+> +        r = *from++;                               \
+> +        g = *from++;                               \
+> +        b = *from++;                               \
+> +    } while (0)
+> +#else
+> +#error unknown bit depth
+> +#endif
+> +
+> +#if WRITE_BITS == 8
+> +#define WRITE_PIXEL(to, r, g, b)                   \
+> +    do {                                           \
+> +        *to = rgb_to_pixel8(r, g, b);              \
+> +        to += 1;                                   \
+> +    } while (0)
+> +#elif WRITE_BITS == 15
+> +#define WRITE_PIXEL(to, r, g, b)                   \
+> +    do {                                           \
+> +        *(uint16_t *)to = rgb_to_pixel15(r, g, b); \
+> +        to += 2;                                   \
+> +    } while (0)
+> +#elif WRITE_BITS == 16
+> +#define WRITE_PIXEL(to, r, g, b)                   \
+> +    do {                                           \
+> +        *(uint16_t *)to = rgb_to_pixel16(r, g, b); \
+> +        to += 2;                                   \
+> +    } while (0)
+> +#elif WRITE_BITS == 24
+> +#define WRITE_PIXEL(to, r, g, b)                   \
+> +    do {                                           \
+> +        uint32_t tmp = rgb_to_pixel24(r, g, b);    \
+> +        *(to++) =         tmp & 0xff;              \
+> +        *(to++) =  (tmp >> 8) & 0xff;              \
+> +        *(to++) = (tmp >> 16) & 0xff;              \
+> +    } while (0)
+> +#elif WRITE_BITS == 32
+> +#define WRITE_PIXEL(to, r, g, b)                   \
+> +    do {                                           \
+> +        *(uint32_t *)to = rgb_to_pixel32(r, g, b); \
+> +        to += 4;                                   \
+> +    } while (0)
+> +#else
+> +#error unknown bit depth
+> +#endif
+> +
+> +static void glue(glue(glue(draw_line, READ_BITS), _), WRITE_BITS)
+> +                          (MacfbState *s, uint8_t *to, uint8_t *from, int width)
+> +{
+> +    uint8_t r, g, b;
+> +    int x;
+> +    for (x = 0; x < width; x++) {
+> +        READ_PIXEL(from, x, r, g, b);
+> +        WRITE_PIXEL(to, r, g, b);
+> +    }
+> +}
+> +#undef READ_BITS
+> +#undef READ_PIXEL
+> +#undef WRITE_PIXEL
+> +
+> +#elif defined(WRITE_BITS)
+> +
+> +#undef MACFB_RECLEVEL
+> +#define MACFB_RECLEVEL 2
+> +#define READ_BITS 1
+> +#include "macfb-template.h"
+> +#define READ_BITS 2
+> +#include "macfb-template.h"
+> +#define READ_BITS 4
+> +#include "macfb-template.h"
+> +#define READ_BITS 8
+> +#include "macfb-template.h"
+> +#define READ_BITS 16
+> +#include "macfb-template.h"
+> +#define READ_BITS 24
+> +#include "macfb-template.h"
+> +#undef WRITE_BITS
+> +
+> +#else
+> +
+> +#define WRITE_BITS 8
+> +#include "macfb-template.h"
+> +
+> +#define WRITE_BITS 16
+> +#include "macfb-template.h"
+> +
+> +#define WRITE_BITS 24
+> +#include "macfb-template.h"
+> +
+> +#define WRITE_BITS 32
+> +#include "macfb-template.h"
+
+Not sure, but do we still need all these "destination" bit depth
+nowadays? I thought QEMU only supports 32 bit depths these days?
+
+ Thomas
