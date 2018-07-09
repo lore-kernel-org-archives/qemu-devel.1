@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcPbw-0004nm-9T
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 02:25:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fcPjY-0005wc-Mc
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 02:33:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcPbv-00063E-BW
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 02:25:24 -0400
-Date: Mon, 9 Jul 2018 16:25:09 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180709062509.GH22363@umbus.fritz.box>
-References: <ec95e71d-3d96-489d-6939-cdbef4d8c34e@gmail.com>
-	<0e2e02a3-1737-abd8-e102-ebe22af549ec@kaod.org>
+	(envelope-from <armbru@redhat.com>) id 1fcPjX-0008Tr-QC
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 02:33:16 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180625114106.GJ5024@localhost.localdomain>
+	<20180625114528.GL16514@angien.pipo.sk>
+	<20180702080411.GA4299@localhost.localdomain>
+	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
+	<20180703111949.GB24516@redhat.com>
+	<20180703113229.GD3812@localhost.localdomain>
+	<20180704150256.408d4a07.cohuck@redhat.com>
+	<20180704133440.GE4334@localhost.localdomain>
+	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
+	<20180706131103.4e713911.cohuck@redhat.com>
+	<20180706145645.GB3939@localhost.localdomain>
+	<CAFEAcA9J=Jmd=+9vEo4LLdk0LcL42fchHcAp3fp_+9q1tsCoNg@mail.gmail.com>
+Date: Mon, 09 Jul 2018 08:33:05 +0200
+In-Reply-To: <CAFEAcA9J=Jmd=+9vEo4LLdk0LcL42fchHcAp3fp_+9q1tsCoNg@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 6 Jul 2018 16:10:47 +0100")
+Message-ID: <87tvp8or4u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HuscSE0D68UGttcd"
-Content-Disposition: inline
-In-Reply-To: <0e2e02a3-1737-abd8-e102-ebe22af549ec@kaod.org>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] etsec: fix IRQ (un)masking
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Michael Davidsaver <mdavidsaver@gmail.com>, Alexander Graf <agraf@suse.de>, Jason Wang <jasowang@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
---HuscSE0D68UGttcd
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 6 July 2018 at 15:56, Kevin Wolf <kwolf@redhat.com> wrote:
+>> Am 06.07.2018 um 13:11 hat Cornelia Huck geschrieben:
+>>> That way, we can still easily remove old cruft (case (a)), but still
+>>> accommodate cases like this (case (c)). The obvious drawback is that
+>>> we'd need someone to curate the deprecation watchlist, to poke the
+>>> users we're waiting for, and probably remove anyway after some time if
+>>> they don't get their act together.
+>>
+>> The problem is that things are only starting to move after two releases
+>> have passed.
+>
+> Right, so clearly just "put a note in the documentation" isn't
+> sufficient advertisement/prodding of things going away.
 
-On Mon, Jul 09, 2018 at 08:20:03AM +0200, C=E9dric Le Goater wrote:
-11;rgb:ffff/ffff/ffff> On 11/28/2017 03:42 AM, Michael Davidsaver wrote:
-> > Interrupt conditions occurring while masked are not being
-> > signaled when later unmasked.
-> > The fix is to raise/lower IRQs when IMASK is changed.
-> >=20
-> > To avoid problems like this in future, consolidate
-> > IRQ pin update logic in one function.
->=20
-> it makes sense.
-> =20
-> > Also fix probable typo "IEVENT_TXF | IEVENT_TXF",
-> > and update IRQ pins on reset.
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+Yes.  Ideas on more forceful notification have been tossed around, we
+just have to act on them.
 
-Thanks for the review C=E9dric.  Unfortunately, I've mislaid the
-original patch.
+>                                                         (Also, two
+> releases is pretty fast. Many of our users will be using distro
+> packaged versions of QEMU which will lag further behind than
+> bleeding-edge users. The system version of QEMU on my desktop
+> machine is 2.5...)
 
-Michael, can you resend with C=E9dric's R-b included, please.
+If you consume QEMU in a way that's impacted by the changes the
+deprecation policy guards, you have two sane options:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+* Track upstream deprecation, either continuously, or at least right
+  after a QEMU release.  Since 2.10, they're collected in qemu-doc
+  appendix "Deprecated features".
 
---HuscSE0D68UGttcd
-Content-Type: application/pgp-signature; name="signature.asc"
+* Batch that work before you switch QEMU versions.  Make sure to
+  allocate enough time.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltC/8IACgkQbDjKyiDZ
-s5KidQ/9G4CO8jTiSmwU1r2jqk9fdG+IjhZtqavJqyakuBN4Y3dOTVlPyynFR0q/
-n0HPNcEKbVJ7RhlhvKKYBK18erViQzRSMJMzFZ96QXwilixTNa8z5FFunfoxmZgQ
-32H80yRIPmQZ39WHul/3hwZn/SUxRA9beupt8Bl3rbf/x1pLL4R4QlPhShuA8gdm
-M0WTZGq1R8J9Tfx7U+VvCZjhMuObJ5nOgSralQCIJHHl+b67F9hA7GsA2U1boaFL
-YNOXKNrfT1w9EQCiGxqAjsPEfNO0SLRiwY6Ofk28jPYb1O+EUievyOzYIZDPRQRb
-y/DYUaZsQj80Q5xWL4p8ZFnSJ3RhSijytk5OCyhgpOG3EhRfeCn5+4TBdMivfQVf
-c2sASFol3AlC95sZP1IrRF+mPYhdezE3LAIOl1qxbR6JiuHMKWZ82gB45Ss+LVlL
-l0vFNo+fjCeDwDhLzL/tY46pM1IONPnYi1RLH+VcnrgouKPi2qRtEYl7Gy+s35OT
-8vnMjZu/BRuIswJIqW2TS3Viagw1Mh5Ka+XGx6hPwmNClLgeCeMIqZ+fKB+jd8eB
-n0I0oKC9eJkVQRQ42kIersbmUfZN8OopPWmT2wBWsuRqH7JQjNVztVi8/8u1v971
-N1TR5O4qrfcTwXrXeEEGr2ilJW+4PHwuP2o3xXfGo181w/6iGpE=
-=A2fU
------END PGP SIGNATURE-----
-
---HuscSE0D68UGttcd--
+If you consume only downstream versions of QEMU, and don't want to track
+upstream, go ahead and pick the second option.  It should do even if you
+leap from 2.5 (December 2015) all the way to 3.0.
