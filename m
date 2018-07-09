@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq5-00052f-Ej
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQq5-00052g-Eq
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq4-0002Ac-Ef
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQq4-0002AQ-Bs
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:05 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  9 Jul 2018 17:43:38 +1000
-Message-Id: <20180709074350.27086-5-david@gibson.dropbear.id.au>
-In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/16] sm501: Perform a full update after
- palette change
+Date: Mon,  9 Jul 2018 17:43:34 +1000
+Message-Id: <20180709074350.27086-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/16] ppc-for-3.0 queue 20180709
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,54 +21,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sebastian Bauer <mail@sebastianbauer.info>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sebastian Bauer <mail@sebastianbauer.info>
+The following changes since commit 43a473993fd9378bf850dcafa68eb6dee8c300=
+f8:
 
-Changing the palette of a color index has as an immediate effect on
-all pixels with the corresponding index on real hardware. Performing a
-full update after a palette change is a simple way to emulate this
-effect.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-07-06 18:18:08 +0100)
 
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/display/sm501.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+are available in the Git repository at:
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 05c964bea1..b095134d6f 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -487,6 +487,7 @@ typedef struct SM501State {
-     MemoryRegion twoD_engine_region;
-     uint32_t last_width;
-     uint32_t last_height;
-+    bool do_full_update; /* perform a full update next time */
-     I2CBus *i2c_bus;
- 
-     /* mmio registers */
-@@ -1042,6 +1043,7 @@ static void sm501_palette_write(void *opaque, hwaddr addr,
- 
-     assert(range_covers_byte(0, 0x400 * 3, addr));
-     *(uint32_t *)&s->dc_palette[addr] = value;
-+    s->do_full_update = true;
- }
- 
- static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
-@@ -1630,6 +1632,12 @@ static void sm501_update_display(void *opaque)
-         full_update = 1;
-     }
- 
-+    /* someone else requested a full update */
-+    if (s->do_full_update) {
-+        s->do_full_update = false;
-+        full_update = 1;
-+    }
-+
-     /* draw each line according to conditions */
-     snap = memory_region_snapshot_and_clear_dirty(&s->local_mem_region,
-               offset, width * height * src_bpp, DIRTY_MEMORY_VGA);
--- 
-2.17.1
+  git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180709
+
+for you to fetch changes up to 51b0d834c414f494410cc94e56886b6584ae3c54:
+
+  sam460ex: Make sam460ex_load_device_tree() handle all errors internally=
+ (2018-07-09 14:38:45 +1000)
+
+----------------------------------------------------------------
+ppc patch queue 2018-07-09
+
+Here's a final pull request before tomorrow's hard freeze.
+
+There are a number of fixes and improvements to the sm501 display
+driver (not strictly ppc related, but used only on ppc and SH).
+There's also a handful of unrelated fixes.
+
+Whether all the sm501 changes are bugfixes is somewhat debatable, but
+Peter has indicated he's ok with merging those for 3.0.
+
+----------------------------------------------------------------
+BALATON Zoltan (4):
+      sm501: Implement i2c part for reading monitor EDID
+      sm501: Fix support for non-zero frame buffer start address
+      sm501: Set updated region dirty after 2D operation
+      sam460ex: Update u-boot-sam460ex firmware
+
+C=C3=A9dric Le Goater (1):
+      spapr/vio: quiet down the "irq" property accessors
+
+David Gibson (3):
+      sam460ex: Check for errors from libfdt functions
+      sam460ex: Don't check for errors from qemu_fdt_*()
+      sam460ex: Make sam460ex_load_device_tree() handle all errors intern=
+ally
+
+Laurent Vivier (1):
+      target/ppc: fix build on ppc64 host
+
+Mark Cave-Ayland (2):
+      ppc: fix default VGA display for Mac machines
+      ppc: fix default VGA display for PReP machines
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      ppc440_uc: Fix a copy/paste error
+
+Sebastian Bauer (4):
+      sm501: Perform a full update after palette change
+      sm501: Use values from the pitch register for 2D operations
+      sm501: Implement negated destination raster operation mode
+      sm501: Log unimplemented raster operation modes
+
+ default-configs/ppc-softmmu.mak    |   1 +
+ default-configs/ppcemb-softmmu.mak |   1 +
+ default-configs/sh4-softmmu.mak    |   2 +
+ default-configs/sh4eb-softmmu.mak  |   2 +
+ hw/display/sm501.c                 | 230 +++++++++++++++++++++++++++++++=
+++++--
+ hw/ppc/mac_newworld.c              |   1 +
+ hw/ppc/mac_oldworld.c              |   1 +
+ hw/ppc/ppc440_uc.c                 |   2 +-
+ hw/ppc/prep.c                      |   2 +
+ hw/ppc/sam460ex.c                  |  49 +++-----
+ hw/ppc/spapr_vio.c                 |  15 ++-
+ pc-bios/u-boot-sam460-20100605.bin | Bin 524288 -> 524288 bytes
+ roms/u-boot-sam460ex               |   2 +-
+ target/ppc/int_helper.c            |   2 +-
+ 14 files changed, 258 insertions(+), 52 deletions(-)
