@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcaAr-0005Ri-Ek
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:42:13 -0400
+	(envelope-from <mst@redhat.com>) id 1fcaGV-00018a-9m
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcaAq-0006sF-NG
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:42:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44482)
+	(envelope-from <mst@redhat.com>) id 1fcaGS-0000fR-4F
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:47:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54968 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fcaAq-0006s6-Gr
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:42:08 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  9 Jul 2018 14:41:54 -0300
-Message-Id: <20180709174154.9470-3-ehabkost@redhat.com>
-In-Reply-To: <20180709174154.9470-1-ehabkost@redhat.com>
-References: <20180709174154.9470-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] hw/machine: Remove the Zero check of
- nb_numa_nodes for numa_complete_configuration()
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fcaGR-0000f9-U0
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:47:56 -0400
+Date: Mon, 9 Jul 2018 20:47:52 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180709204747-mutt-send-email-mst@kernel.org>
+References: <20180709151947.940759-1-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180709151947.940759-1-arnd@arndb.de>
+Subject: Re: [Qemu-devel] [PATCH] headers: fix linux/mod_devicetable.h
+ inclusions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +27,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gabriel Somlo <somlo@cmu.edu>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Jean-Christophe Trotin <jean-christophe.trotin@st.com>, Zha Qipeng <qipeng.zha@intel.com>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org, platform-driver-x86@vger.kernel.org
 
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+On Mon, Jul 09, 2018 at 05:19:02PM +0200, Arnd Bergmann wrote:
+> A couple of drivers produced build errors after the mod_devicetable.h
+> header was split out from the platform_device one, e.g.
+> 
+> drivers/media/platform/davinci/vpbe_osd.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
+> drivers/media/platform/davinci/vpbe_venc.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
+> 
+> This adds the inclusion where needed.
+> 
+> Fixes: ac3167257b9f ("headers: separate linux/mod_devicetable.h from linux/platform_device.h")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Commit 7a3099fc9c5c("numa: postpone options post-processing till machine_run_board_init()")
-broke the commit 7b8be49d36fc("NUMA: Enable adding NUMA node implicitly").
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-The machine_run_board_init() doesn't do NUMA setup if nb_numa_nodes=0,
-but the numa_complete_configuration need add a new node if memory hotplug
-is enabled (slots > 0) even nb_numa_nodes=0.
-
-So, Remove the check for numa_complete_configuration() to fix this.
-
-Fixes 7a3099fc9c5c("numa: postpone options post-processing till machine_run_board_init()")
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-Id: <20180704132239.6506-1-douly.fnst@cn.fujitsu.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/core/machine.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 3fad6f8801..a9aeb22f03 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -792,10 +792,9 @@ void machine_run_board_init(MachineState *machine)
- {
-     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
- 
--    if (nb_numa_nodes) {
--        numa_complete_configuration(machine);
-+    numa_complete_configuration(machine);
-+    if (nb_numa_nodes)
-         machine_numa_finish_cpu_init(machine);
--    }
- 
-     /* If the machine supports the valid_cpu_types check and the user
-      * specified a CPU with -cpu check here that the user CPU is supported.
--- 
-2.18.0.rc1.1.g3f1ff2140
+> ---
+>  drivers/firmware/qemu_fw_cfg.c             | 1 +
+>  drivers/media/platform/davinci/vpbe_osd.c  | 1 +
+>  drivers/media/platform/davinci/vpbe_venc.c | 1 +
+>  drivers/media/platform/qcom/venus/vdec.c   | 1 +
+>  drivers/media/platform/qcom/venus/venc.c   | 1 +
+>  drivers/media/platform/sti/hva/hva-v4l2.c  | 1 +
+>  drivers/platform/x86/intel_punit_ipc.c     | 1 +
+>  7 files changed, 7 insertions(+)
+> 
+> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+> index 14fedbeca724..039e0f91dba8 100644
+> --- a/drivers/firmware/qemu_fw_cfg.c
+> +++ b/drivers/firmware/qemu_fw_cfg.c
+> @@ -28,6 +28,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/acpi.h>
+>  #include <linux/slab.h>
+> diff --git a/drivers/media/platform/davinci/vpbe_osd.c b/drivers/media/platform/davinci/vpbe_osd.c
+> index 7f610320426d..c551a25d90d9 100644
+> --- a/drivers/media/platform/davinci/vpbe_osd.c
+> +++ b/drivers/media/platform/davinci/vpbe_osd.c
+> @@ -18,6 +18,7 @@
+>   *
+>   */
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/kernel.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/platform_device.h>
+> diff --git a/drivers/media/platform/davinci/vpbe_venc.c b/drivers/media/platform/davinci/vpbe_venc.c
+> index ba157827192c..ddcad7b3e76c 100644
+> --- a/drivers/media/platform/davinci/vpbe_venc.c
+> +++ b/drivers/media/platform/davinci/vpbe_venc.c
+> @@ -11,6 +11,7 @@
+>   * GNU General Public License for more details.
+>   */
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/kernel.h>
+>  #include <linux/init.h>
+>  #include <linux/ctype.h>
+> diff --git a/drivers/media/platform/qcom/venus/vdec.c b/drivers/media/platform/qcom/venus/vdec.c
+> index f89a91d43cc9..d4e23c7df347 100644
+> --- a/drivers/media/platform/qcom/venus/vdec.c
+> +++ b/drivers/media/platform/qcom/venus/vdec.c
+> @@ -14,6 +14,7 @@
+>   */
+>  #include <linux/clk.h>
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/slab.h>
+> diff --git a/drivers/media/platform/qcom/venus/venc.c b/drivers/media/platform/qcom/venus/venc.c
+> index f7a87a3dbb46..0522cf202b75 100644
+> --- a/drivers/media/platform/qcom/venus/venc.c
+> +++ b/drivers/media/platform/qcom/venus/venc.c
+> @@ -14,6 +14,7 @@
+>   */
+>  #include <linux/clk.h>
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/slab.h>
+> diff --git a/drivers/media/platform/sti/hva/hva-v4l2.c b/drivers/media/platform/sti/hva/hva-v4l2.c
+> index 15080cb00fa7..5a807c7c5e79 100644
+> --- a/drivers/media/platform/sti/hva/hva-v4l2.c
+> +++ b/drivers/media/platform/sti/hva/hva-v4l2.c
+> @@ -6,6 +6,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/slab.h>
+>  #include <media/v4l2-event.h>
+> diff --git a/drivers/platform/x86/intel_punit_ipc.c b/drivers/platform/x86/intel_punit_ipc.c
+> index b5b890127479..f1afc0ebbc68 100644
+> --- a/drivers/platform/x86/intel_punit_ipc.c
+> +++ b/drivers/platform/x86/intel_punit_ipc.c
+> @@ -12,6 +12,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/acpi.h>
+>  #include <linux/delay.h>
+>  #include <linux/bitops.h>
+> -- 
+> 2.9.0
