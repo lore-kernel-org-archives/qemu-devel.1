@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcWcn-0007i8-KA
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fcWne-0007Bn-SU
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 10:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcWcm-000543-Jy
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:45 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fcWcm-00053K-Bs
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:54:44 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcWcl-0000kZ-9C
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 14:54:43 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jul 2018 14:54:33 +0100
-Message-Id: <20180709135435.836-10-peter.maydell@linaro.org>
-In-Reply-To: <20180709135435.836-1-peter.maydell@linaro.org>
-References: <20180709135435.836-1-peter.maydell@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1fcWnb-0004O9-OJ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 10:05:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45104 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fcWnb-0004Ng-Jn
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 10:05:55 -0400
+Date: Mon, 9 Jul 2018 16:05:51 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180709160551.26d07849@redhat.com>
+In-Reply-To: <aa7d4472-195d-0d40-4447-494cd4f537c4@linux.vnet.ibm.com>
+References: <20180628172657.11646-1-marcandre.lureau@redhat.com>
+	<89c2a128-3679-8b44-f00a-7f94bd3bdf0d@linux.vnet.ibm.com>
+	<20180702135746.717e668d@redhat.com>
+	<aa7d4472-195d-0d40-4447-494cd4f537c4@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/11] hw/sd/omap_mmc: Split 'pseudo-reset' from
- 'power-on-reset'
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Mon, 2 Jul 2018 10:54:13 -0400
+Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
 
-DeviceClass::reset models a "cold power-on" reset which can
-also be used to powercycle a device; but there is no "hot reset"
-(a.k.a. soft-reset) method available.
-
-The OMAP MMC Power-Up Control bit is not designed to powercycle
-a card, but to disable it without powering it off (pseudo-reset):
-
-  Multimedia Card (MMC/SD/SDIO) Interface [SPRU765A]
-
-  MMC_CON[11] Power-Up Control (POW)
-  This bit must be set to 1 before any valid transaction to either
-  MMC/SD or SPI memory cards.
-  When 1, the card is considered powered-up and the controller core
-  is enabled.
-  When 0, the card is considered powered-down (system dependent),
-  and the controller core logic is in pseudo-reset state. This is,
-  the MMC_STAT flags and the FIFO pointers are reset, any access to
-  MMC_DATA[DATA] has no effect, a write into the MMC.CMD register
-  is ignored, and a setting of MMC_SPI[STR] to 1 is ignored.
-
-By splitting the 'pseudo-reset' code out of the 'power-on' reset
-function, this patch fixes a latent bug in omap_mmc_write(MMC_CON)i
-recently exposed by ecd219f7abb.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180706162155.8432-2-f4bug@amsat.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/sd/omap_mmc.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
-index 671264b6500..d0c98ca0214 100644
---- a/hw/sd/omap_mmc.c
-+++ b/hw/sd/omap_mmc.c
-@@ -1,6 +1,8 @@
- /*
-  * OMAP on-chip MMC/SD host emulation.
-  *
-+ * Datasheet: TI Multimedia Card (MMC/SD/SDIO) Interface (SPRU765A)
-+ *
-  * Copyright (C) 2006-2007 Andrzej Zaborowski  <balrog@zabor.org>
-  *
-  * This program is free software; you can redistribute it and/or
-@@ -278,6 +280,12 @@ static void omap_mmc_update(void *opaque)
-     omap_mmc_interrupts_update(s);
- }
- 
-+static void omap_mmc_pseudo_reset(struct omap_mmc_s *host)
-+{
-+    host->status = 0;
-+    host->fifo_len = 0;
-+}
-+
- void omap_mmc_reset(struct omap_mmc_s *host)
- {
-     host->last_cmd = 0;
-@@ -286,11 +294,9 @@ void omap_mmc_reset(struct omap_mmc_s *host)
-     host->dw = 0;
-     host->mode = 0;
-     host->enable = 0;
--    host->status = 0;
-     host->mask = 0;
-     host->cto = 0;
-     host->dto = 0;
--    host->fifo_len = 0;
-     host->blen = 0;
-     host->blen_counter = 0;
-     host->nblk = 0;
-@@ -305,6 +311,8 @@ void omap_mmc_reset(struct omap_mmc_s *host)
-     qemu_set_irq(host->coverswitch, host->cdet_state);
-     host->clkdiv = 0;
- 
-+    omap_mmc_pseudo_reset(host);
-+
-     /* Since we're still using the legacy SD API the card is not plugged
-      * into any bus, and we must reset it manually. When omap_mmc is
-      * QOMified this must move into the QOM reset function.
-@@ -459,7 +467,7 @@ static void omap_mmc_write(void *opaque, hwaddr offset,
-         if (s->dw != 0 && s->lines < 4)
-             printf("4-bit SD bus enabled\n");
-         if (!s->enable)
--            omap_mmc_reset(s);
-+            omap_mmc_pseudo_reset(s);
-         break;
- 
-     case 0x10:	/* MMC_STAT */
--- 
-2.17.1
+> On 07/02/2018 07:57 AM, Igor Mammedov wrote:
+> > On Fri, 29 Jun 2018 08:20:38 -0400
+> > Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+> > =20
+> >> On 06/28/2018 01:26 PM, Marc-Andr=C3=A9 Lureau wrote: =20
+> >>> Hi,
+> >>>
+> >>> The following patches implement the TPM Physical Presence Interface
+> >>> that allows a user to set a command via ACPI (sysfs entry in Linux)
+> >>> that, upon the next reboot, the firmware looks for and acts upon by
+> >>> sending sequences of commands to the TPM.
+> >>>
+> >>> A dedicated memory region is added to the TPM CRB & TIS devices, at
+> >>> address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+> >>> holds the location for that PPI region and some version details, to
+> >>> allow for future flexibility.
+> >>>
+> >>> With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+> >>> now runs successfully.
+> >>>
+> >>> It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+> >>> Implement Physical Presence interface for TPM 1.2 and 2")
+> >>>
+> >>> The edk2 support is merged upstream. =20
+> >> The least I could do now is test this... So, I tested this now with the
+> >> SeaBIOS support I have for this series. It's here:
+> >>
+> >> https://github.com/stefanberger/seabios-tpm/tree/qemu-ppi.v6
+> >>
+> >> It works fine with at least an attached TPM 1.2. I haven't tried TPM 2
+> >> yet but would not expect complications from QEMU level. A operation
+> >> request value put into Linux's PPI interface can be read back also aft=
+er
+> >> a VM suspend / resume operation. The list of supported operations is
+> >> shown correctly (needs Linux extensions for TPM 2 operation values
+> >> beyond a certain number iirc). The request operation is executed
+> >> correctly and the response shows the last operation and its result. So
+> >> it seems to work fine.
+> >>
+> >>
+> >>   =C2=A0=C2=A0 Stefan
+> >> =20
+> > Are there any instructions how to test it?
+> > =20
+> 1) You need to get swtpm running on a machine.
+>=20
+> Build libtpms from the 'TPM 2 preview' branch here:
+>=20
+> https://github.com/stefanberger/libtpms/tree/tpm2-preview.rev146.v2
+>=20
+> Instructions are here: https://github.com/stefanberger/libtpms/wiki
+>=20
+>=20
+> Build swtpm from the TPM 2 preview branch here:
+>=20
+> https://github.com/stefanberger/swtpm/tree/tpm2-preview.v2
+>=20
+> Instructions are here: https://github.com/stefanberger/swtpm/wiki
+>=20
+>=20
+> 2) Compile and install my branch of SeaBIOS with the PPI support:
+>=20
+> branch is here: https://github.com/stefanberger/seabios-tpm/tree/qemu-ppi=
+.v6
+it looks like repo is gone, is it merged upstream?
