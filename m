@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcZ3p-0008N5-7H
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:30:50 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAG-0002bj-7j
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcZ3m-0008NZ-3p
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:30:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fcZ3l-0008N5-UP
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:30:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fcZ3k-0003Lh-Kv
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 16:30:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9A3C12E8199
-	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 16:30:44 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Jul 2018 16:23:47 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1780814 <1780814@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153115132054.17859.168324292889810627.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153115342783.6872.7332561350718462000.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780814] Re: lib/raid6/neon4.c:118:1: internal
- compiler error
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAB-0002cm-9i
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:28 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon,  9 Jul 2018 19:37:19 +0300
+Message-Id: <20180709163719.87107-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20180709163719.87107-1-vsementsov@virtuozzo.com>
+References: <20180709163719.87107-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v5 4/4] block/backup: fix fleecing scheme: use
+ serialized writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +20,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Hi -- this is an internal compiler error reported by your compiler. It's
-not a QEMU bug. The message suggests that you report it as a GCC bug:
-"See <https://bugs.launchpad.net/gcc-linaro> for instructions".
+Fleecing scheme works as follows: we want a kind of temporary snapshot
+of active drive A. We create temporary image B, with B->backing = A.
+Then we start backup(sync=none) from A to B. From this point, B reads
+as point-in-time snapshot of A (A continues to be active drive,
+accepting guest IO).
 
+This scheme needs some additional synchronization between reads from B
+and backup COW operations, otherwise, the following situation is
+theoretically possible:
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+(assume B is qcow2, client is NBD client, reading from B)
 
--- =
+1. client starts reading and take qcow2 mutex in qcow2_co_preadv, and
+   goes up to l2 table loading (assume cache miss)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780814
+2) guest write => backup COW => qcow2 write =>
+   try to take qcow2 mutex => waiting
 
-Title:
-  lib/raid6/neon4.c:118:1: internal compiler error
+3. l2 table loaded, we see that cluster is UNALLOCATED, go to
+   "case QCOW2_CLUSTER_UNALLOCATED" and unlock mutex before
+   bdrv_co_preadv(bs->backing, ...)
 
-Status in QEMU:
-  Invalid
+4) aha, mutex unlocked, backup COW continues, and we finally finish
+   guest write and change cluster in our active disk A
 
-Bug description:
-  I am facing below issue when i am trying to cross compile kernel for rasp=
-berry pi 3.
-  please give solution .
+5. actually, do bdrv_co_preadv(bs->backing, ...) and read
+   _new updated_ data.
 
-  =
+To avoid this, let's make backup writes serializing, to not intersect
+with reads from B.
 
-  Below is log
+Note: we expand range of handled cases from (sync=none and
+B->backing = A) to just (A in backing chain of B), to finally allow
+safe reading from B during backup for all cases when A in backing chain
+of B, i.e. B formally looks like point-in-time snapshot of A.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/backup.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-  CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
-    CHK     include/generated/utsrelease.h
-    CHK     include/generated/bounds.h
-    CHK     include/generated/timeconst.h
-    CHK     include/generated/asm-offsets.h
-    CALL    scripts/checksyscalls.sh
-    CHK     scripts/mod/devicetable-offsets.h
-    CHK     include/generated/compile.h
-    CHK     kernel/config_data.h
-    CC [M]  lib/raid6/neon4.o
-  lib/raid6/neon4.c: In function =E2=80=98raid6_neon4_gen_syndrome_real=E2=
-=80=99:
-  lib/raid6/neon4.c:118:1: internal compiler error: in dwarf2out_frame_debu=
-g_adjust_cfa, at dwarf2cfi.c:1078
-   }
-   ^
-  Please submit a full bug report,
-  with preprocessed source if appropriate.
-  See <https://bugs.launchpad.net/gcc-linaro> for instructions.
-  scripts/Makefile.build:328: recipe for target 'lib/raid6/neon4.o' failed
-  make[2]: *** [lib/raid6/neon4.o] Error 1
-  scripts/Makefile.build:587: recipe for target 'lib/raid6' failed
-  make[1]: *** [lib/raid6] Error 2
-  Makefile:1034: recipe for target 'lib' failed
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780814/+subscriptions
+diff --git a/block/backup.c b/block/backup.c
+index f3e4e814b6..319fc922e8 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -47,6 +47,8 @@ typedef struct BackupBlockJob {
+     HBitmap *copy_bitmap;
+     bool use_copy_range;
+     int64_t copy_range_size;
++
++    bool serialize_target_writes;
+ } BackupBlockJob;
+ 
+ static const BlockJobDriver backup_job_driver;
+@@ -102,6 +104,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+     QEMUIOVector qiov;
+     BlockBackend *blk = job->common.blk;
+     int nbytes;
++    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
+ 
+     hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
+     nbytes = MIN(job->cluster_size, job->len - start);
+@@ -112,8 +116,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+     iov.iov_len = nbytes;
+     qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+-    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
+-                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
++    ret = blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
+     if (ret < 0) {
+         trace_backup_do_cow_read_fail(job, start, ret);
+         if (error_is_read) {
+@@ -124,11 +127,11 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+ 
+     if (qemu_iovec_is_zero(&qiov)) {
+         ret = blk_co_pwrite_zeroes(job->target, start,
+-                                   qiov.size, BDRV_REQ_MAY_UNMAP);
++                                   qiov.size, write_flags | BDRV_REQ_MAY_UNMAP);
+     } else {
+         ret = blk_co_pwritev(job->target, start,
+-                             qiov.size, &qiov,
+-                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
++                             qiov.size, &qiov, write_flags |
++                             (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
+     }
+     if (ret < 0) {
+         trace_backup_do_cow_write_fail(job, start, ret);
+@@ -156,6 +159,8 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+     int nr_clusters;
+     BlockBackend *blk = job->common.blk;
+     int nbytes;
++    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
+ 
+     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
+     nbytes = MIN(job->copy_range_size, end - start);
+@@ -163,7 +168,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+     hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
+                   nr_clusters);
+     ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
+-                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0, 0);
++                            read_flags, write_flags);
+     if (ret < 0) {
+         trace_backup_do_cow_copy_range_fail(job, start, ret);
+         hbitmap_set(job->copy_bitmap, start / job->cluster_size,
+@@ -701,6 +706,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+                        sync_bitmap : NULL;
+     job->compress = compress;
+ 
++    /* Detect image-fleecing (and similar) schemes */
++    job->serialize_target_writes = bdrv_chain_contains(target, bs);
++
+     /* If there is no backing file on the target, we cannot rely on COW if our
+      * backup cluster size is smaller than the target cluster size. Even for
+      * targets with a backing file, try to avoid COW if possible. */
+-- 
+2.11.1
