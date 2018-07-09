@@ -1,40 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fcTm3-0003D0-Ji
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 06:52:08 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fcU2F-00064J-Q0
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fcTlz-0001sy-Kj
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 06:52:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fcTlz-0001ro-C5
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 06:52:03 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w69AiOCb112622
-	for <qemu-devel@nongnu.org>; Mon, 9 Jul 2018 06:52:02 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k446dqg0w-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 06:52:01 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 9 Jul 2018 11:51:58 +0100
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 9 Jul 2018 12:51:52 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fcU2E-00009l-Hi
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:08:51 -0400
+Date: Mon, 9 Jul 2018 13:08:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180709130838.16f011a4.cohuck@redhat.com>
+In-Reply-To: <87tvp8or4u.fsf@dusky.pond.sub.org>
+References: <20180625114106.GJ5024@localhost.localdomain>
+	<20180625114528.GL16514@angien.pipo.sk>
+	<20180702080411.GA4299@localhost.localdomain>
+	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
+	<20180703111949.GB24516@redhat.com>
+	<20180703113229.GD3812@localhost.localdomain>
+	<20180704150256.408d4a07.cohuck@redhat.com>
+	<20180704133440.GE4334@localhost.localdomain>
+	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
+	<20180706131103.4e713911.cohuck@redhat.com>
+	<20180706145645.GB3939@localhost.localdomain>
+	<CAFEAcA9J=Jmd=+9vEo4LLdk0LcL42fchHcAp3fp_+9q1tsCoNg@mail.gmail.com>
+	<87tvp8or4u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1530811543-6881-11-git-send-email-jjherne@linux.ibm.com>
-Content-Language: en-US
-Message-Id: <55ec62d3-6d68-4bbe-4de3-283283b36c01@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 10/15] s390-bios: Support for running
- format-0/1 channel programs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,50 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
 
+On Mon, 09 Jul 2018 08:33:05 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+> > On 6 July 2018 at 15:56, Kevin Wolf <kwolf@redhat.com> wrote:  
+> >> Am 06.07.2018 um 13:11 hat Cornelia Huck geschrieben:  
+> >>> That way, we can still easily remove old cruft (case (a)), but still
+> >>> accommodate cases like this (case (c)). The obvious drawback is that
+> >>> we'd need someone to curate the deprecation watchlist, to poke the
+> >>> users we're waiting for, and probably remove anyway after some time if
+> >>> they don't get their act together.  
+> >>
+> >> The problem is that things are only starting to move after two releases
+> >> have passed.  
+> >
+> > Right, so clearly just "put a note in the documentation" isn't
+> > sufficient advertisement/prodding of things going away.  
+> 
+> Yes.  Ideas on more forceful notification have been tossed around, we
+> just have to act on them.
+> 
+> >                                                         (Also, two
+> > releases is pretty fast. Many of our users will be using distro
+> > packaged versions of QEMU which will lag further behind than
+> > bleeding-edge users. The system version of QEMU on my desktop
+> > machine is 2.5...)  
+> 
+> If you consume QEMU in a way that's impacted by the changes the
+> deprecation policy guards, you have two sane options:
+> 
+> * Track upstream deprecation, either continuously, or at least right
+>   after a QEMU release.  Since 2.10, they're collected in qemu-doc
+>   appendix "Deprecated features".
 
-On 07/05/2018 07:25 PM, Jason J. Herne wrote:
-Instead of doing this
-> +void await_io_int(uint16_t sch_no)
-> +{
-> +    /*
-> +     * wait_psw and ctl6 must be static to avoid stack allocation as gcc cannot
-> +     * align stack variables. The stctg, lctlg and lpswe instructions require
-> +     * that their operands be aligned on an 8-byte boundary.
-> +    */
-> +    static uint64_t ctl6 __attribute__((__aligned__(8)));
-> +    static PSW wait_psw;
-> +
-> +    /* PSW to load when I/O interrupt happens */
-> +    lowcore->io_new_psw.mask = PSW_MASK_ZMODE;
-> +    lowcore->io_new_psw.addr = (uint64_t)&&IOIntWakeup; /* Wake-up address */
-> +
-> +    /* Enable io interrupts subclass mask */
-> +    asm volatile("stctg 6,6,%0" : "=S" (ctl6) : : "memory");
-> +    ctl6 |= 0x00000000FF000000;
-> +    asm volatile("lctlg 6,6,%0" : : "S" (ctl6));
-> +
-> +    /* Set wait psw enabled for io interrupt */
-> +    wait_psw.mask = (PSW_MASK_ZMODE | PSW_MASK_IOINT | PSW_MASK_WAIT);
-> +    asm volatile("lpswe %0" : : "Q" (wait_psw) : "cc");
-> +
-> +    panic("await_io_int: lpswe failed!!\n");
-> +
-> +IOIntWakeup:
-> +    /* Should never happen - all other subchannels are disabled by default */
-> +    IPL_assert(lowcore->subchannel_nr == sch_no,
-> +               "Interrupt from unexpected device");
-> +
-> +    /* Disable all subclasses of I/O interrupts for this cpu */
-> +    asm volatile("stctg 6,6,%0" : "=S" (ctl6) : : "memory");
-> +    ctl6 &= ~(0x00000000FF000000);
-> +    asm volatile("lctlg 6,6,%0" : : "S" (ctl6));
-> +}
+Can we draw more attention to this in any way? Point it out prominently
+in the release notes? Send a list to known consumers (e.g. libvirt) on
+release time?
 
-Can you please add something like consume_sclp_interrupt in start.S?
-Jumping inside a function from an interrupt can mess up the stack
-and possibly other things as gcc does not expect this. (you do a
-longjmp without doing any precaution)
-This might explain why you needed the static hack for the variables.
+> 
+> * Batch that work before you switch QEMU versions.  Make sure to
+>   allocate enough time.
+> 
+> If you consume only downstream versions of QEMU, and don't want to track
+> upstream, go ahead and pick the second option.  It should do even if you
+> leap from 2.5 (December 2015) all the way to 3.0.
+
+If you are a direct user of QEMU, you really need to follow development
+more closely, or you won't be able to complain about removal of a
+useful feature until it has already been gone for some time.
+
+If you only use QEMU through libvirt, you should be fine as long as
+libvirt (and distro packagers) do not mess up.
+
+Do we have any idea about how many end users using libvirt or other
+tooling vs. QEMU directly? Of those not going via libvirt, are they
+more likely to follow development or use a distro package?
