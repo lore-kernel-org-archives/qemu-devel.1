@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fcYQk-00063c-Mp
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:50:27 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fcYSx-0007D4-Ek
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fcYQh-0008IV-Cg
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:50:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1fcYQg-0008Hd-PE
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:50:23 -0400
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.phx2.redhat.com
-	[10.5.11.25])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B429030820EC
-	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 15:50:21 +0000 (UTC)
-Date: Mon, 9 Jul 2018 16:50:17 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180709155017.GG16293@redhat.com>
-References: <20180705123929.GB16293@redhat.com>
-	<20180705125231.GD16293@redhat.com>
-	<20180705165348-mutt-send-email-mst@kernel.org>
-	<20180705141132.GM1455@redhat.com>
-	<20180709073647.GF16293@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fcYSw-0000cw-2B
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:52:43 -0400
+Date: Mon, 9 Jul 2018 17:52:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180709175232.5e768dfb@redhat.com>
+In-Reply-To: <20180705235305.124423-1-mst@redhat.com>
+References: <20180705235305.124423-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180709073647.GF16293@redhat.com>
-Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi: generalize aml_package /
+ aml_varpackage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +24,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jferlan@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, mxie@redhat.com
+Cc: qemu-devel@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-On Mon, Jul 09, 2018 at 08:36:47AM +0100, Richard W.M. Jones wrote:
-> On Thu, Jul 05, 2018 at 03:11:32PM +0100, Richard W.M. Jones wrote:
-> > VMware represents these internally as two signed 64 bit integers, eg:
-> > 
-> >   vm.genid = "-570734802784577186"
-> >   vm.genidx = "-5042519231342505152"
-> > 
-> > I am still trying to get verification, but I believe the first is the
-> > low 64 bit word and the second is the high 64 bit word.
+On Fri, 6 Jul 2018 02:53:09 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> VarPackage can accept an expression evaluating to int, not just an int.
+> Change the API to make it more generic.
+> Further, rather than have users call the correct API depending on
+> value passed, use either PackageOp or VarPackageOp automatically.
 > 
-> I have now been able to verify how this works using a real VMware
-> hypervisor (thanks to help from Ming Xie).  For the record, here is
-> how it maps, since I could not find any documentation about this.
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/hw/acpi/aml-build.h |  4 ++--
+>  hw/acpi/aml-build.c         | 18 ++++++++++++++----
+>  hw/acpi/cpu_hotplug.c       | 11 ++---------
+>  hw/arm/virt-acpi-build.c    |  2 +-
+>  4 files changed, 19 insertions(+), 16 deletions(-)
 > 
-> VMX file contains:
-> 
->   vm.genid = "7344585841658099715"
->   vm.genidX = "-8483171368186442967"
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 10c7946028..7cf2cf64bf 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -360,7 +360,7 @@ Aml *aml_method(const char *name, int arg_count, AmlSerializeFlag sflag);
+>  Aml *aml_if(Aml *predicate);
+>  Aml *aml_else(void);
+>  Aml *aml_while(Aml *predicate);
+> -Aml *aml_package(uint8_t num_elements);
+> +Aml *aml_package(uint64_t num_elements);
+>  Aml *aml_buffer(int buffer_size, uint8_t *byte_list);
+>  Aml *aml_resource_template(void);
+>  Aml *aml_field(const char *name, AmlAccessType type, AmlLockRule lock,
+> @@ -373,7 +373,7 @@ Aml *aml_create_field(Aml *srcbuf, Aml *bit_index, Aml *num_bits,
+>                        const char *name);
+>  Aml *aml_create_dword_field(Aml *srcbuf, Aml *index, const char *name);
+>  Aml *aml_create_qword_field(Aml *srcbuf, Aml *index, const char *name);
+> -Aml *aml_varpackage(uint32_t num_elements);
+> +Aml *aml_varpackage(Aml *num_elements);
+maybe drop it from header and make static so only aml_package() would be
+left as public API like in spec?
 
-As a follow-on, here is some code which can convert VMware's VMX
-numbers into a qemu-style UUID.  Note for both of these I mean the
-textual representation, not the in-memory representation.
 
-  https://github.com/libguestfs/libguestfs/blob/b11b870166b7ae27f728dbb58b6498788bf97329/v2v/input_vmx.ml#L430-L449
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+>  Aml *aml_touuid(const char *uuid);
+>  Aml *aml_unicode(const char *str);
+>  Aml *aml_refof(Aml *arg);
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index def62b3112..1996768b40 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1016,9 +1016,19 @@ Aml *aml_buffer(int buffer_size, uint8_t *byte_list)
+>  }
+>  
+>  /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefPackage */
+> -Aml *aml_package(uint8_t num_elements)
+> +/* Note: The ability to create variable-sized packages was first
+> + * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
+> + * with up to 255 elements. Windows guests up to win2k8 fail when
+> + * VarPackageOp is used.
+> + */
+> +Aml *aml_package(uint64_t num_elements)
+>  {
+> -    Aml *var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
+> +    Aml *var;
+> +
+> +    if (num_elements > 0xFF)
+> +        return aml_varpackage(aml_int(num_elements));
+> +
+> +    var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
+>      build_append_byte(var->buf, num_elements);
+>      return var;
+>  }
+> @@ -1136,10 +1146,10 @@ Aml *aml_local(int num)
+>  }
+>  
+>  /* ACPI 2.0a: 17.2.2 Data Objects Encoding: DefVarPackage */
+> -Aml *aml_varpackage(uint32_t num_elements)
+> +Aml *aml_varpackage(Aml *num_elements)
+>  {
+>      Aml *var = aml_bundle(0x13 /* VarPackageOp */, AML_PACKAGE);
+> -    build_append_int(var->buf, num_elements);
+> +    aml_append(var, num_elements);
+>      return var;
+>  }
+>  
+> diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
+> index 5243918125..f8246fca6f 100644
+> --- a/hw/acpi/cpu_hotplug.c
+> +++ b/hw/acpi/cpu_hotplug.c
+> @@ -309,15 +309,8 @@ void build_legacy_cpu_hotplug_aml(Aml *ctx, MachineState *machine,
+>      }
+>      aml_append(sb_scope, method);
+>  
+> -    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })"
+> -     *
+> -     * Note: The ability to create variable-sized packages was first
+> -     * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
+> -     * ith up to 255 elements. Windows guests up to win2k8 fail when
+> -     * VarPackageOp is used.
+> -     */
+> -    pkg = pcms->apic_id_limit <= 255 ? aml_package(pcms->apic_id_limit) :
+> -                                       aml_varpackage(pcms->apic_id_limit);
+> +    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })" */
+> +    pkg = aml_package(pcms->apic_id_limit);
+>  
+>      for (i = 0, apic_idx = 0; i < apic_ids->len; i++) {
+>          int apic_id = apic_ids->cpus[i].arch_id;
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 6ea47e2588..2adb1de378 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -174,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+>  
+>      /* Declare the PCI Routing Table. */
+> -    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
+> +    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
+>      for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
+>          for (i = 0; i < PCI_NUM_PINS; i++) {
+>              int gsi = (i + bus_no) % PCI_NUM_PINS;
