@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephane.duverger@gmail.com>) id 1fcVhB-0003xw-Bm
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 08:55:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fcWSe-0003GE-Ik
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephane.duverger@gmail.com>) id 1fcVh6-00021b-GG
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 08:55:13 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stephane.duverger@gmail.com>)
-	id 1fcVh6-00021J-9F
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 08:55:08 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c13-v6so10839659wrt.1
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 05:55:07 -0700 (PDT)
-Received: from vm.localdomain (71.208.159.77.rev.sfr.net. [77.159.208.71])
-	by smtp.gmail.com with ESMTPSA id
-	x6-v6sm17986569wrd.57.2018.07.09.05.55.05 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 09 Jul 2018 05:55:06 -0700 (PDT)
-Date: Mon, 9 Jul 2018 14:54:59 +0200
-From: stephane duverger <stephane.duverger@gmail.com>
-Message-ID: <20180709125452.7utyomtsxr6xaxdi@vm.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1fcWSb-0007vx-Fy
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:44:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37268 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fcWSb-0007vJ-AS
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:44:13 -0400
+References: <1528185295-14199-1-git-send-email-slp@redhat.com>
+	<4e35ea24-147d-1b51-fa1b-0f1cc32966e0@redhat.com>
+	<CAJ+F1CLjAXcdkUS2cj_6x2UnE1jTcFAfy88yDWfomp6+Mt7v+g@mail.gmail.com>
+	<CAFEAcA8WN1K-r0u6ZDBFRwRa1WZAMBf2MQhkhg-WDRazfVjQzw@mail.gmail.com>
+	<CAJ+F1CKk=3amSNTSusbPj1MUM+ksTse2YVddLyTf5jqr6RDyFQ@mail.gmail.com>
+	<01f5d4ef-cea1-ff81-82cc-30a617a3c648@redhat.com>
+	<CAFEAcA8J40JyvMgtNjscVsPYaGxavEctC+pk6eqPXoUjZMhpyQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <005419af-3739-af1b-6cde-fbbebec4bc81@redhat.com>
+Date: Mon, 9 Jul 2018 15:44:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] fix gdbserver_state pointer validation
+In-Reply-To: <CAFEAcA8J40JyvMgtNjscVsPYaGxavEctC+pk6eqPXoUjZMhpyQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/char/serial: Only retry if
+ qemu_chr_fe_write returns 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Hi,
+On 09/07/2018 15:21, Peter Maydell wrote:
+>>
+>> However, indeed it seems to me that the logic of the patch is backward=
+s:
+>>
+>> - -1/EAGAIN should retry
+>>
+>> - 0 should *not* retry, because it means the other side has hung up
+> This seems weird, because it doesn't follow the usual pattern
+> for non-blocking functions, where 0 just means "nothing was
+> written" and actual error conditions like the other side having
+> gone away are reported via -1 and some errno.
+>=20
 
-This is a small patch to gdbstub rather insignificant at first sight:
-fix null pointer dereference. It actually allows to take benefit of
-gdb features (breakpoints/sstep) internally (ie. special purpose
-board) without connecting a gdb client to the Qemu instance gdbserver
-stub.
+Ah no, that's read(2).  write(2) is as you say, so the patch should
+check for EAGAIN.
 
-Regards,
-
-Signed-off-by: Stephane Duverger <stephane.duverger@gmail.com>
----
- gdbstub.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index d6ab95006c..788fd625ab 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1412,6 +1412,9 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
- 
- void gdb_set_stop_cpu(CPUState *cpu)
- {
-+    if (!gdbserver_state) {
-+        return;
-+    }
-     gdbserver_state->c_cpu = cpu;
-     gdbserver_state->g_cpu = cpu;
- }
--- 
-2.14.1
+Paolo
