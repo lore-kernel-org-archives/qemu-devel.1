@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcYXM-0001Fx-Ex
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:57:17 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fcYYa-00024M-Ea
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcYXJ-0003HE-EL
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:57:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51560 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fcYXJ-0003HA-92
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:57:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1F1F4001388
-	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 15:57:12 +0000 (UTC)
-Date: Mon, 9 Jul 2018 17:57:11 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180709175711.19f079ea@redhat.com>
-In-Reply-To: <20180705091402.26244-1-armbru@redhat.com>
-References: <20180705091402.26244-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] Let's not chisel --preconfig in stone
- without a user
+	(envelope-from <pm215@archaic.org.uk>) id 1fcYYZ-0003XT-BH
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:58:32 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43348)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fcYYZ-0003XD-3D
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:58:31 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  9 Jul 2018 16:58:26 +0100
+Message-Id: <20180709155826.18993-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] exec.c: Replace memory_region_is_unassigned()
+ with memory_region_is_ram_backed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu,  5 Jul 2018 11:14:00 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+The function memory_region_is_unassigned() is rather misnamed, because
+what it is actually testing is whether the memory region is backed
+by host RAM, and so whether get_page_addr_code() can find a ram_addr_t
+corresponding to the guest address.
 
-> Please refer to PATCH 1 for rationale.
-> 
-> Markus Armbruster (2):
->   qapi: Do not expose "allow-preconfig" in query-qmp-schema
->   cli qmp: Mark --preconfig, exit-preconfig experimental
-> 
->  hmp.c                      |  2 +-
->  qapi/introspect.json       |  5 +----
->  qapi/misc.json             |  6 +++---
->  qemu-options.hx            |  9 +++++----
->  qemu-tech.texi             | 11 ++++-------
->  qmp.c                      |  2 +-
->  scripts/qapi/introspect.py |  3 +--
->  tests/numa-test.c          |  2 +-
->  tests/qmp-test.c           |  6 +++---
->  9 files changed, 20 insertions(+), 26 deletions(-)
-> 
+Replace it with memory_region_is_ram_backed(), which has a name
+better matching its actual semantics.  (We invert the sense of the
+return value to avoid having a _not_ in the function name.)
 
-Acked-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+The difference between this and memory_region_is_ram() is pretty
+subtle, to the extent I'm not completely sure exactly what it is;
+io_mem_notdirty and io_mem_watch at least won't be considered as
+"ram" by memory_region_is_ram(), though. Somebody with a better
+grasp of the various different kinds of memory regions might be
+able to suggest better documentation and/or a way to avoid this
+oddball TCG-only function?
+
+ include/exec/exec-all.h | 9 ++++++++-
+ accel/tcg/cputlb.c      | 2 +-
+ exec.c                  | 6 +++---
+ 3 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index da73e3bfed2..7de4e4646f6 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -502,7 +502,14 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+                                        hwaddr paddr, hwaddr xlat,
+                                        int prot,
+                                        target_ulong *address);
+-bool memory_region_is_unassigned(MemoryRegion *mr);
++/**
++ * memory_region_is_ram_backed:
++ * @mr: Memory region
++ *
++ * Return true if this memory region is backed by host RAM that we
++ * can directly execute guest code from.
++ */
++bool memory_region_is_ram_backed(MemoryRegion *mr);
+ 
+ #endif
+ 
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 20c147d6554..e5e3bf76298 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -1001,7 +1001,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     iotlbentry = &env->iotlb[mmu_idx][index];
+     section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
+     mr = section->mr;
+-    if (memory_region_is_unassigned(mr)) {
++    if (!memory_region_is_ram_backed(mr)) {
+         qemu_mutex_lock_iothread();
+         if (memory_region_request_mmio_ptr(mr, addr)) {
+             qemu_mutex_unlock_iothread();
+diff --git a/exec.c b/exec.c
+index 4f5df07b6a2..6aea975c266 100644
+--- a/exec.c
++++ b/exec.c
+@@ -402,10 +402,10 @@ static MemoryRegionSection *phys_page_find(AddressSpaceDispatch *d, hwaddr addr)
+     }
+ }
+ 
+-bool memory_region_is_unassigned(MemoryRegion *mr)
++bool memory_region_is_ram_backed(MemoryRegion *mr)
+ {
+-    return mr != &io_mem_rom && mr != &io_mem_notdirty && !mr->rom_device
+-        && mr != &io_mem_watch;
++    return !(mr != &io_mem_rom && mr != &io_mem_notdirty && !mr->rom_device
++             && mr != &io_mem_watch);
+ }
+ 
+ /* Called from RCU critical section */
+-- 
+2.17.1
