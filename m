@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fcfck-0003Sg-TW
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:31:20 -0400
+	(envelope-from <mst@redhat.com>) id 1fcfyy-0007Ip-U9
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:54:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fcfcj-0007Af-9l
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:31:18 -0400
-From: John Snow <jsnow@redhat.com>
-References: <3a5a035f-5997-b87f-0dde-c69fdcabee0f@redhat.com>
-Message-ID: <1353f0a8-1837-7502-83b1-27c2573906e5@redhat.com>
-Date: Mon, 9 Jul 2018 19:31:11 -0400
+	(envelope-from <mst@redhat.com>) id 1fcfyv-0007Zo-Pz
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:54:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40744 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fcfyv-0007Z1-KX
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 19:54:13 -0400
+Date: Tue, 10 Jul 2018 02:54:12 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180710025155-mutt-send-email-mst@kernel.org>
+References: <20180709203731.19865-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3a5a035f-5997-b87f-0dde-c69fdcabee0f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [Qemu-block] 2018-07-09 Incremental Backup Status
- Report
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180709203731.19865-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0] pc: Use "3.0+" constant as default
+ SMBIOS version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,189 +27,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: "Denis V. Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel <qemu-devel@nongnu.org>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
 
+On Mon, Jul 09, 2018 at 05:37:31PM -0300, Eduardo Habkost wrote:
+> Every time we create new PC machine-types in QEMU, the defaults
+> for SMBIOS fields change unnecessarily because the version field
+> defaults to MachineClass::name.
+> 
+> This can cause unexpected side-effects, like triggering license
+> reactivation on guest software, or changing the VM memory layout
+> because of BIOS table size changes.
+> 
+> Change the SMBIOS version string for pc-*-3.0 to "3.0+" to avoid
+> doing this on every QEMU release, and keep compatible version
+> strings on older machine-types using a new
+> MachineClass::smbios_version field.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> I just noticed that we started using mc->name on arm/virt since
+> commit dfadc3bfb458efefb72e13a57b62f138c464a577.
+> Should arm/virt start using "3.0+" too?
+> ---
+>  include/hw/i386/pc.h | 3 +++
+>  hw/i386/pc.c         | 1 +
+>  hw/i386/pc_piix.c    | 5 +++--
+>  hw/i386/pc_q35.c     | 3 ++-
+>  4 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 4d99d69681..aea0fcaadb 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -134,6 +134,9 @@ struct PCMachineClass {
+>  
+>      /* use DMA capable linuxboot option rom */
+>      bool linuxboot_dma_enabled;
+> +
+> +    /* Version field for SMBIOS Type 1, Type 2, Type 3, and Type 4 structs */
+> +    const char *smbios_version;
+>  };
+>  
+>  #define TYPE_PC_MACHINE "generic-pc-machine"
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 50d5553991..47877e7071 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2379,6 +2379,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      pcmc->acpi_data_size = 0x20000 + 0x8000;
+>      pcmc->save_tsc_khz = true;
+>      pcmc->linuxboot_dma_enabled = true;
+> +    pcmc->smbios_version = "3.0+";
+>      assert(!mc->get_hotplug_handler);
+>      mc->get_hotplug_handler = pc_get_hotpug_handler;
+>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
 
+I suspect 3.00 is cleaner for tools that happen to
+parse the version as a numeral as it always was in the past,
+even if it's not exact.
 
-On 07/02/2018 07:47 PM, John Snow wrote:
-> I'm tracking the following series for Incremental Backup right now; if
-> it's not on this list, I don't know about it:
->=20
-> [Qemu-devel] [PATCH v4 0/2] block: formalize and test fleecing=E2=80=8B
-
-Merged.
-
-> [Qemu-devel] [PATCH v2 0/3] image fleecing
-
-Dropped in favor of the above, but we've then added:
-
-[Qemu-devel] [PATCH v5 0/4] fix image fleecing
-
-Which should have the same effect as preventing race conditions between
-serializations that exist across two nodes.
-
-> [Qemu-devel] [PATCH] migration: Appease coverity, skip empty block tree=
-s
-
-I need to spin a v2.
-
-> [Qemu-devel] [PATCH v2 0/2] test NBD bitmap export
-
-Merged.
-
-> [Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic=E2=80=8B
-
-Needs review.
-
-> [Qemu-devel] [PATCH 0/2] dirty bitmap fixes=E2=80=8B
-
-Merged.
-
-> [Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap directory
-
-Merged.
-
-> [Qemu-devel] [PATCH 0/1] blockdev: implement n-ary bitmap merge
-
-Needs review; it's not essential but I suspect it's likely nice to have
-for libvirt.
-
-> [Qemu-devel] [PATCH v2 00/10] qemu-img: add bitmap info output=E2=80=8B
->=20
-
-On hold pending "fix persistent bitmaps migration logic."
-
-
-New series:
-- [PATCH v2 0/4] transaction support for bitmap merge
-
-
-
-New status list looks like this, then:
-
-[Qemu-devel] [PATCH] migration: Appease coverity, skip empty block trees
-[Qemu-devel] [PATCH v5 0/4] fix image fleecing
-[Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic=E2=80=8B
-[Qemu-devel] [PATCH 0/1] blockdev: implement n-ary bitmap merge
-[Qemu-devel] [PATCH v2 00/10] qemu-img: add bitmap info output=E2=80=8B
-[Qemu-devel] [PATCH v2 0/4] transaction support for bitmap merge
-
-I'll be looking at #3, #6 and #1 tomorrow.
-
-Thanks,
---js
-
-
->=20
-> Now, in a little more detail below;
->=20
->=20
-> # Image fleecing:
->=20
-> In order to support pull-model semantics for incremental backup, we nee=
-d
-> working point in time NBD export of live disk images. This was thought
-> supported/finished for quite some time, but we've had no iotests.
->=20
-> There are two series in flight here:
->=20
-> - [Qemu-devel] [PATCH v4 0/2] block: formalize and test fleecing=E2=80=8B
-> - [Qemu-devel] [PATCH v2 0/3] image fleecing
->=20
-> The first listed there simply loosens restrictions on blockdev-backup
-> and adds an iotest that this approach works in the simple case.
->=20
-> The second series adds a fleecing filter to combat deficiencies in the
-> IO serialization that may allow the fleecing node to sometimes see new,
-> live data instead of the PIT data. See
-> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00150.html for
-> details.
->=20
-> Our current plan is to merge the first series and to continue looking
-> into the fleecing filter during freeze as a potential bugfix.
->=20
->=20
-> # NBD:
->=20
-> - [Qemu-devel] [PATCH v2 0/2] test NBD bitmap export
->=20
-> Eric's series that adds a quick hack to our NBD client and an iotest 22=
-3
-> that demos that the bitmap support in our NBD server is working
-> correctly. Notably, we don't have an iotest that combines this with the
-> image fleecing workflow, so there's discussion there that I've started
-> for how to combine the two, comments appreciated:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg00476.html
->=20
->=20
-> # Migration/Persistence:
->=20
-> - [Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic=E2=80=
-=8B
->=20
-> Needs review, but can go in after freeze as a fix.
->=20
->=20
-> # Bitmap manipulation:
->=20
-> - [Qemu-devel] [PATCH 0/1] blockdev: implement n-ary bitmap merge=E2=80=
-=8B
->=20
-> Possibly important to have if we wish to add merge into transactions, a=
-s
-> this will greatly simplify the commands needed to be issued to QEMU. No=
-t
-> yet reviewed, but I might submit a PR for this tomorrow in anticipation
-> of its usefulness over the 1-bitmap version.
->=20
-> - [Qemu-devel] [PATCH v2 00/10] qemu-img: add bitmap info output=E2=80=8B
->=20
-> On hold until persistence is settled, due to interactions with
-> attempting to cache the bitmap metadata. "offline" bitmap manipulation
-> will need to occur via QMP on QEMU with no running guest in the
-> meantime. We will still need a patch for `qemu-img check -r` that allow=
-s
-> us to delete corrupted bitmaps, however. That can be a bugfix for 3.0.
->=20
-> There is a follow-up series that's also on hold because it's blocked on
-> this series, that adds the actual add/delete/clear offline functionalit=
-y.
->=20
->=20
-> # Miscellaneous:
->=20
-> - [Qemu-devel] [PATCH] migration: Appease coverity, skip empty block tr=
-ees
->=20
-> Needs a respin based on Stefan's feedback. Only important so that it
-> doesn't keep annoying Peter Maydell, does not actually fix a bug.
->=20
-> - [Qemu-devel] [PATCH 0/2] dirty bitmap fixes=E2=80=8B
->=20
-> Staged: https://github.com/jnsnow/qemu/commits/bitmaps
->=20
-> - [Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap directory
->=20
-> Needs a V3 after review from Max. Not crucial for release, but nice to =
-have.
->=20
->=20
->=20
->=20
-> So in order to put together a demo from QEMU's point-of-view that both
-> push and pull model are working, I think we still need:
->=20
-> - iotest 222 and 223 merged, with their respective enablement patches.
-> - A new iotest (224?) that combines functionality of both; which makes
-> use of perhaps some new features that allow us to tie bitmap
-> manipulation to the start of the node fleecing.
-> - All of the various bugfixes above reviewed and merged.
->=20
->=20
->=20
-> Please let me know if this roadmap is missing anything.
->=20
-> Thanks,
-> --js
->=20
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index dc09466b3e..f19c8b82d0 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -168,10 +168,9 @@ static void pc_init1(MachineState *machine,
+>      pc_guest_info_init(pcms);
+>  
+>      if (pcmc->smbios_defaults) {
+> -        MachineClass *mc = MACHINE_GET_CLASS(machine);
+>          /* These values are guest ABI, do not change */
+>          smbios_set_defaults("QEMU", "Standard PC (i440FX + PIIX, 1996)",
+> -                            mc->name, pcmc->smbios_legacy_mode,
+> +                            pcmc->smbios_version, pcmc->smbios_legacy_mode,
+>                              pcmc->smbios_uuid_encoded,
+>                              SMBIOS_ENTRY_POINT_21);
+>      }
+> @@ -440,9 +439,11 @@ DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+>  
+>  static void pc_i440fx_2_12_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_i440fx_3_0_machine_options(m);
+>      m->is_default = 0;
+>      m->alias = NULL;
+> +    pcmc->smbios_version = m->name;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+>  }
+>  
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 532241e3f8..d6551ed8e9 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -146,7 +146,7 @@ static void pc_q35_init(MachineState *machine)
+>      if (pcmc->smbios_defaults) {
+>          /* These values are guest ABI, do not change */
+>          smbios_set_defaults("QEMU", "Standard PC (Q35 + ICH9, 2009)",
+> -                            mc->name, pcmc->smbios_legacy_mode,
+> +                            pcmc->smbios_version, pcmc->smbios_legacy_mode,
+>                              pcmc->smbios_uuid_encoded,
+>                              SMBIOS_ENTRY_POINT_21);
+>      }
+> @@ -336,6 +336,7 @@ static void pc_q35_2_11_machine_options(MachineClass *m)
+>  
+>      pc_q35_2_12_machine_options(m);
+>      pcmc->default_nic_model = "e1000";
+> +    pcmc->smbios_version = m->name;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_11);
+>  }
+>  
+> -- 
+> 2.18.0.rc1.1.g3f1ff2140
