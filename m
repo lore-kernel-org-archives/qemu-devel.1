@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAG-0002bj-7j
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAG-0002bl-8s
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAB-0002cm-9i
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcZAB-0002cx-B2
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 12:37:28 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  9 Jul 2018 19:37:19 +0300
-Message-Id: <20180709163719.87107-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20180709163719.87107-1-vsementsov@virtuozzo.com>
-References: <20180709163719.87107-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 4/4] block/backup: fix fleecing scheme: use
- serialized writes
+Date: Mon,  9 Jul 2018 19:37:15 +0300
+Message-Id: <20180709163719.87107-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] fix image fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,121 +20,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, famz@redhat.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Fleecing scheme works as follows: we want a kind of temporary snapshot
-of active drive A. We create temporary image B, with B->backing = A.
-Then we start backup(sync=none) from A to B. From this point, B reads
-as point-in-time snapshot of A (A continues to be active drive,
-accepting guest IO).
+Hi all.
 
-This scheme needs some additional synchronization between reads from B
-and backup COW operations, otherwise, the following situation is
-theoretically possible:
+This fixes image fleecing scheme for 3.0, details are in 04 patch.
+01 is a significant fix too.
 
-(assume B is qcow2, client is NBD client, reading from B)
+v5: - keep one _internal recursive function like in original code [Fam]
+    - grammar and rewording [Eric] (a bit changed,
+                                    be free to fix/reword in flight)
 
-1. client starts reading and take qcow2 mutex in qcow2_co_preadv, and
-   goes up to l2 table loading (assume cache miss)
+PS: 222 now fails for me, no matter with or without these series...
 
-2) guest write => backup COW => qcow2 write =>
-   try to take qcow2 mutex => waiting
+v4:
+01: fix copy_range architecture here too
+02: rebase on 01
+03: rebase
 
-3. l2 table loaded, we see that cluster is UNALLOCATED, go to
-   "case QCOW2_CLUSTER_UNALLOCATED" and unlock mutex before
-   bdrv_co_preadv(bs->backing, ...)
+v3:
+02: fix typo in assert, to fix build
 
-4) aha, mutex unlocked, backup COW continues, and we finally finish
-   guest write and change cluster in our active disk A
+v2:
+01,02: new patches
 
-5. actually, do bdrv_co_preadv(bs->backing, ...) and read
-   _new updated_ data.
+03: - improve comment
+    - fix assert in bdrv_aligned_pwritev
+    - add asserts to not use the flag on read requests
+    - support copy_range
 
-To avoid this, let's make backup writes serializing, to not intersect
-with reads from B.
+04: - expand "detected cases" range 
+    - s/fleecing/serialize_target_writes
+    - support backup_cow_with_offload
+    - drop restriction on compressed writes
 
-Note: we expand range of handled cases from (sync=none and
-B->backing = A) to just (A in backing chain of B), to finally allow
-safe reading from B during backup for all cases when A in backing chain
-of B, i.e. B formally looks like point-in-time snapshot of A.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/backup.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+v1 cover:
 
-diff --git a/block/backup.c b/block/backup.c
-index f3e4e814b6..319fc922e8 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -47,6 +47,8 @@ typedef struct BackupBlockJob {
-     HBitmap *copy_bitmap;
-     bool use_copy_range;
-     int64_t copy_range_size;
-+
-+    bool serialize_target_writes;
- } BackupBlockJob;
- 
- static const BlockJobDriver backup_job_driver;
-@@ -102,6 +104,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     QEMUIOVector qiov;
-     BlockBackend *blk = job->common.blk;
-     int nbytes;
-+    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-+    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
- 
-     hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-     nbytes = MIN(job->cluster_size, job->len - start);
-@@ -112,8 +116,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     iov.iov_len = nbytes;
-     qemu_iovec_init_external(&qiov, &iov, 1);
- 
--    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
--                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    ret = blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_read_fail(job, start, ret);
-         if (error_is_read) {
-@@ -124,11 +127,11 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
- 
-     if (qemu_iovec_is_zero(&qiov)) {
-         ret = blk_co_pwrite_zeroes(job->target, start,
--                                   qiov.size, BDRV_REQ_MAY_UNMAP);
-+                                   qiov.size, write_flags | BDRV_REQ_MAY_UNMAP);
-     } else {
-         ret = blk_co_pwritev(job->target, start,
--                             qiov.size, &qiov,
--                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-+                             qiov.size, &qiov, write_flags |
-+                             (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
-     }
-     if (ret < 0) {
-         trace_backup_do_cow_write_fail(job, start, ret);
-@@ -156,6 +159,8 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     int nr_clusters;
-     BlockBackend *blk = job->common.blk;
-     int nbytes;
-+    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-+    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
- 
-     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-     nbytes = MIN(job->copy_range_size, end - start);
-@@ -163,7 +168,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
-                   nr_clusters);
-     ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
--                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0, 0);
-+                            read_flags, write_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_copy_range_fail(job, start, ret);
-         hbitmap_set(job->copy_bitmap, start / job->cluster_size,
-@@ -701,6 +706,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                        sync_bitmap : NULL;
-     job->compress = compress;
- 
-+    /* Detect image-fleecing (and similar) schemes */
-+    job->serialize_target_writes = bdrv_chain_contains(target, bs);
-+
-     /* If there is no backing file on the target, we cannot rely on COW if our
-      * backup cluster size is smaller than the target cluster size. Even for
-      * targets with a backing file, try to avoid COW if possible. */
+It's a continuation of discussion under
+"[PATCH v2 2/3] block/fleecing-filter: new filter driver for fleecing" [1].
+
+Here is my try to implement Kevin's idea, that all backup writes (for
+fleecing case) should be serialized. (However, I've skipped for now
+fixing related permissions).
+
+Looks like these patches may replace patch [1], to make fleecing scheme
+safe. But I'm not sure, a look by Kevin is necessary.
+
+A test is still needed, to prove that this patch is necessary and that it
+works..
+
+
+PS: 222 now fails for me, no matter with or without these series:
+    222         [failed, exit status 1] - output mismatch (see 222.out.bad)
+    --- /work/src/qemu/up-new-fleecing/tests/qemu-iotests/222.out   2018-07-03 20:18:24.247252451 +0300
+    +++ /work/src/qemu/up-new-fleecing/tests/qemu-iotests/222.out.bad       2018-07-09 19:36:39.586747425 +0300
+    @@ -40,28 +40,7 @@
+     --- Verifying Data ---
+     
+     read -P0x5d 0 64k
+    -read -P0xd5 1M 64k
+    -read -P0xdc 32M 64k
+    -read -P0xcd 0x3ff0000 64k
+    -read -P0 0x00f8000 32k
+    -read -P0 0x2010000 32k
+    -read -P0 0x3fe0000 64k
+    -
+    ---- Cleanup ---
+    -
+    -{u'return': {}}
+    -{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'backup', u'speed': 0, u'len': 67108864, u'offset': 393216}, u'event': u'BLOCK_JOB_CANCELLED'}
+    -{u'return': {}}
+    -{u'return': {}}
+    -
+    ---- Confirming writes ---
+    -
+    -read -P0xab 0 64k
+    -read -P0xad 0x00f8000 64k
+    -read -P0x1d 0x2008000 64k
+    -read -P0xea 0x3fe0000 64k
+    -read -P0xd5 0x108000 32k
+    -read -P0xdc 32M 32k
+    -read -P0xcd 0x3ff0000 64k
+    -
+    -Done
+    +Traceback (most recent call last):
+    +  File "222", line 132, in <module>
+    +    assert qemu_io_silent('-r', '-f', 'raw', '-c', cmd, nbd_uri) == 0
+    +AssertionError
+    Failures: 222
+    Failed 1 of 1 tests
+
+
+
+Vladimir Sementsov-Ogievskiy (4):
+  block/io: fix copy_range
+  block: split flags in copy_range
+  block: add BDRV_REQ_SERIALISING flag
+  block/backup: fix fleecing scheme: use serialized writes
+
+ include/block/block.h          |  27 ++++++++++-
+ include/block/block_int.h      |  14 ++++--
+ include/sysemu/block-backend.h |   3 +-
+ block/backup.c                 |  20 +++++---
+ block/block-backend.c          |   5 +-
+ block/file-posix.c             |  21 ++++----
+ block/io.c                     | 106 ++++++++++++++++++++++++++++-------------
+ block/iscsi.c                  |   9 ++--
+ block/qcow2.c                  |  20 ++++----
+ block/raw-format.c             |  24 ++++++----
+ qemu-img.c                     |   2 +-
+ 11 files changed, 174 insertions(+), 77 deletions(-)
+
 -- 
 2.11.1
