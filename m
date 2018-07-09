@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq7-00052x-Ab
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQq8-000537-E4
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQq4-0002AG-8H
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:07 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQq7-0002DN-EQ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:08 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  9 Jul 2018 17:43:35 +1000
-Message-Id: <20180709074350.27086-2-david@gibson.dropbear.id.au>
+Date: Mon,  9 Jul 2018 17:43:45 +1000
+Message-Id: <20180709074350.27086-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
 References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/16] ppc: fix default VGA display for Mac
- machines
+Subject: [Qemu-devel] [PULL 11/16] target/ppc: fix build on ppc64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +20,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <laurent@vivier.eu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Laurent Vivier <laurent@vivier.eu>
 
-Commit 29f9cef39e "ppc: Include vga cirrus card into the compiling process"
-changed the default display adapter for all PPC machines to cirrus. Unfortunately
-it missed setting the default display type to stdvga for both Mac machines
-causing the display to fail to initialise under OpenBIOS.
+When I try to build a ppc64 target on a ppc64 host (gcc 8.1.1), I have:
 
-Update the MachineClass for both Old World and New World Macs so that the
-default std(vga) display adapter is the default if no options are specified
-which fixes the display for the Mac machines.
+.../target/ppc/int_helper.c: In function 'helper_vinsertb':
+.../target/ppc/int_helper.c:1954:32: error: array subscript 18446744073709551608 is above array bounds of 'uint8_t[16]' {aka 'unsigned char[16]'} [-Werror=array-bounds]
+         memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],              \
+                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.../target/ppc/int_helper.c:1965:1: note: in expansion of macro 'VINSERT'
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+If we compare with the macro for ppc64le, we can see
+sizeof(r->element[0]) should be used instead of sizeof(r->element).
+
+And VINSERT uses only u8, u16, u32 and u64, so the maximum value
+of sizeof(r->element[0]) is 8
+
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/mac_newworld.c | 1 +
- hw/ppc/mac_oldworld.c | 1 +
- 2 files changed, 2 insertions(+)
+ target/ppc/int_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index d11980166f..2ca294664b 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -525,6 +525,7 @@ static void core99_machine_class_init(ObjectClass *oc, void *data)
-     mc->block_default_type = IF_IDE;
-     mc->max_cpus = MAX_CPUS;
-     mc->default_boot_order = "cd";
-+    mc->default_display = "std";
-     mc->kvm_type = core99_kvm_type;
- #ifdef TARGET_PPC64
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("970fx_v3.1");
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 06ed6f660e..064d7eb30a 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -383,6 +383,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
-     mc->default_boot_order = "cd";
-     mc->kvm_type = heathrow_kvm_type;
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
-+    mc->default_display = "std";
- }
- 
- static const TypeInfo ppc_heathrow_machine_info = {
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 03d37da79f..d52338ed71 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1951,7 +1951,7 @@ VSPLT(w, u32)
+ #define VINSERT(suffix, element)                                            \
+     void helper_vinsert##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t index) \
+     {                                                                       \
+-        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element)],              \
++        memmove(&r->u8[index], &b->u8[8 - sizeof(r->element[0])],           \
+                sizeof(r->element[0]));                                      \
+     }
+ #else
 -- 
 2.17.1
