@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcdxE-0003RT-P3
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:44:21 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fce5g-0005Dg-Qh
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcdxD-0007r4-Tl
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:44:20 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:45476)
+	(envelope-from <alistair23@gmail.com>) id 1fce5g-0004Mu-1M
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:53:04 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:34927)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcdxD-0007qZ-Oc
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:44:19 -0400
-Received: by mail-oi0-x232.google.com with SMTP id q11-v6so13166886oic.12
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 14:44:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fce5f-0004Lz-Pr
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:53:03 -0400
+Received: by mail-lj1-x241.google.com with SMTP id p10-v6so9793958ljg.2
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 14:53:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180709174154.9470-1-ehabkost@redhat.com>
-References: <20180709174154.9470-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jul 2018 22:43:58 +0100
-Message-ID: <CAFEAcA8zML2G1vV1_i+V2h590vEWq9UOtHq6kQ0cOQ6_6Y+_Dw@mail.gmail.com>
+In-Reply-To: <mvm36ws7mq7.fsf@suse.de>
+References: <20180706012215.21714-1-alistair.francis@wdc.com>
+	<mvm36ws7mq7.fsf@suse.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 9 Jul 2018 14:52:31 -0700
+Message-ID: <CAKmqyKNx9M6rLGcrv-ZuCtf5q5QyjrdpNr5d+q=tAdqZSXvJRQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Machine/NUMA fixes for -rc0
+Subject: Re: [Qemu-devel] [PULL v4 0/7] riscv-pull queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Andreas Schwab <schwab@suse.de>
+Cc: Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Michael Clark <mjc@sifive.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 9 July 2018 at 18:41, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit 43a473993fd9378bf850dcafa68eb6dee8c300f8:
+On Mon, Jul 9, 2018 at 3:00 AM, Andreas Schwab <schwab@suse.de> wrote:
+> What is the state of the sifive_u emulation?  When I tried to boot a bbl
+> with an included kernel I get these errors:
 >
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-07-06 18:18:08 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
->
-> for you to fetch changes up to 7747abf114874537e898c60ff863828a4e82201d:
->
->   hw/machine: Remove the Zero check of nb_numa_nodes for numa_complete_configuration() (2018-07-09 14:37:48 -0300)
->
-> ----------------------------------------------------------------
-> Machine/NUMA fixes for -rc0
->
-> * Properly free device_memory at machine_finalize()
-> * Fix implicit NUMA initialization regression (for machines with
->   auto_enable_numa_with_memhp=true)
->
-> ----------------------------------------------------------------
->
+> qemu-system-riscv64: plic: invalid register write: 00002090
+> qemu-system-riscv64: plic: invalid register write: 00002094
+> qemu-system-riscv64: plic: invalid register write: 00002098
+> qemu-system-riscv64: plic: invalid register write: 0000209c
+> qemu-system-riscv64: plic: invalid register write: 000020a0
+> qemu-system-riscv64: plic: invalid register write: 000020a4
+> qemu-system-riscv64: plic: invalid register write: 000020a8
+> qemu-system-riscv64: plic: invalid register write: 000020ac
+> qemu-system-riscv64: plic: invalid register write: 000020b0
+> qemu-system-riscv64: plic: invalid register write: 000020b4
 
-Applied, thanks.
+I see those as well. I haven't investigated but I assume we are just
+not completely modelling the PLIC. In saying that it should still
+boot. Do you not see the kernel booting?
 
--- PMM
+Alistair
+
+>
+> Andreas.
+>
+> --
+> Andreas Schwab, SUSE Labs, schwab@suse.de
+> GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
+> "And now for something completely different."
