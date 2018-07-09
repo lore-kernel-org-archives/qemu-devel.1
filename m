@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fcaGV-00018a-9m
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:48:01 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fcaJO-0003Nj-T5
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:50:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fcaGS-0000fR-4F
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:47:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54968 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fcaGR-0000f9-U0
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:47:56 -0400
-Date: Mon, 9 Jul 2018 20:47:52 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180709204747-mutt-send-email-mst@kernel.org>
-References: <20180709151947.940759-1-arnd@arndb.de>
+	(envelope-from <rth7680@gmail.com>) id 1fcaJL-0001W6-P8
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:50:58 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fcaJL-0001Vp-IU
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:50:55 -0400
+Received: by mail-pl0-x241.google.com with SMTP id s24-v6so6367817plq.6
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 10:50:55 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180709155826.18993-1-peter.maydell@linaro.org>
+	<c2311584-618a-b880-d42a-637a9333702a@linaro.org>
+	<CAFEAcA9g3NCcodB8H3m5MsCL=JD56HO6D-utLyUKvY_Nwv-0Jg@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a7caddb3-038e-a97c-26db-13a7ad05576e@twiddle.net>
+Date: Mon, 9 Jul 2018 10:50:51 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180709151947.940759-1-arnd@arndb.de>
-Subject: Re: [Qemu-devel] [PATCH] headers: fix linux/mod_devicetable.h
- inclusions
+In-Reply-To: <CAFEAcA9g3NCcodB8H3m5MsCL=JD56HO6D-utLyUKvY_Nwv-0Jg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] exec.c: Replace
+ memory_region_is_unassigned() with memory_region_is_ram_backed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gabriel Somlo <somlo@cmu.edu>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Jean-Christophe Trotin <jean-christophe.trotin@st.com>, Zha Qipeng <qipeng.zha@intel.com>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org, platform-driver-x86@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On Mon, Jul 09, 2018 at 05:19:02PM +0200, Arnd Bergmann wrote:
-> A couple of drivers produced build errors after the mod_devicetable.h
-> header was split out from the platform_device one, e.g.
+On 07/09/2018 10:33 AM, Peter Maydell wrote:
+>> Well... ok.  We should document that this, surprisingly, does not include
+>> actual ram.  Just things that are ram with caveats.
 > 
-> drivers/media/platform/davinci/vpbe_osd.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
-> drivers/media/platform/davinci/vpbe_venc.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
+> I think it must include actual RAM, or we would not be able to
+> execute from actual RAM ? The only way to get to get_page_addr_code()'s
+> "here's the ram_addr_t for this" exit path is if memory_region_is_unassigned()
+> returns false.
 > 
-> This adds the inclusion where needed.
-> 
-> Fixes: ac3167257b9f ("headers: separate linux/mod_devicetable.h from linux/platform_device.h")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>>> -    return mr != &io_mem_rom && mr != &io_mem_notdirty && !mr->rom_device
+>>> -        && mr != &io_mem_watch;
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Huh.  I don't follow how this old expression excludes ram,
+and so assumed that must be checked separately earlier.
 
-> ---
->  drivers/firmware/qemu_fw_cfg.c             | 1 +
->  drivers/media/platform/davinci/vpbe_osd.c  | 1 +
->  drivers/media/platform/davinci/vpbe_venc.c | 1 +
->  drivers/media/platform/qcom/venus/vdec.c   | 1 +
->  drivers/media/platform/qcom/venus/venc.c   | 1 +
->  drivers/media/platform/sti/hva/hva-v4l2.c  | 1 +
->  drivers/platform/x86/intel_punit_ipc.c     | 1 +
->  7 files changed, 7 insertions(+)
-> 
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
-> index 14fedbeca724..039e0f91dba8 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -28,6 +28,7 @@
->   */
->  
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/acpi.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/davinci/vpbe_osd.c b/drivers/media/platform/davinci/vpbe_osd.c
-> index 7f610320426d..c551a25d90d9 100644
-> --- a/drivers/media/platform/davinci/vpbe_osd.c
-> +++ b/drivers/media/platform/davinci/vpbe_osd.c
-> @@ -18,6 +18,7 @@
->   *
->   */
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/kernel.h>
->  #include <linux/interrupt.h>
->  #include <linux/platform_device.h>
-> diff --git a/drivers/media/platform/davinci/vpbe_venc.c b/drivers/media/platform/davinci/vpbe_venc.c
-> index ba157827192c..ddcad7b3e76c 100644
-> --- a/drivers/media/platform/davinci/vpbe_venc.c
-> +++ b/drivers/media/platform/davinci/vpbe_venc.c
-> @@ -11,6 +11,7 @@
->   * GNU General Public License for more details.
->   */
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/kernel.h>
->  #include <linux/init.h>
->  #include <linux/ctype.h>
-> diff --git a/drivers/media/platform/qcom/venus/vdec.c b/drivers/media/platform/qcom/venus/vdec.c
-> index f89a91d43cc9..d4e23c7df347 100644
-> --- a/drivers/media/platform/qcom/venus/vdec.c
-> +++ b/drivers/media/platform/qcom/venus/vdec.c
-> @@ -14,6 +14,7 @@
->   */
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/qcom/venus/venc.c b/drivers/media/platform/qcom/venus/venc.c
-> index f7a87a3dbb46..0522cf202b75 100644
-> --- a/drivers/media/platform/qcom/venus/venc.c
-> +++ b/drivers/media/platform/qcom/venus/venc.c
-> @@ -14,6 +14,7 @@
->   */
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/sti/hva/hva-v4l2.c b/drivers/media/platform/sti/hva/hva-v4l2.c
-> index 15080cb00fa7..5a807c7c5e79 100644
-> --- a/drivers/media/platform/sti/hva/hva-v4l2.c
-> +++ b/drivers/media/platform/sti/hva/hva-v4l2.c
-> @@ -6,6 +6,7 @@
->   */
->  
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/slab.h>
->  #include <media/v4l2-event.h>
-> diff --git a/drivers/platform/x86/intel_punit_ipc.c b/drivers/platform/x86/intel_punit_ipc.c
-> index b5b890127479..f1afc0ebbc68 100644
-> --- a/drivers/platform/x86/intel_punit_ipc.c
-> +++ b/drivers/platform/x86/intel_punit_ipc.c
-> @@ -12,6 +12,7 @@
->   */
->  
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/acpi.h>
->  #include <linux/delay.h>
->  #include <linux/bitops.h>
-> -- 
-> 2.9.0
+There's clearly still something here I don't understand.
+
+
+r~
