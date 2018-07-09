@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fcVzz-0000Qz-Te
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fcW1C-0001JL-2S
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fcVzv-0001h3-SW
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:39 -0400
-Received: from mail-ve1eur03hn0208.outbound.protection.outlook.com
-	([104.47.9.208]:45472
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1fcVzv-0001gh-35
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:14:35 -0400
-Date: Mon, 9 Jul 2018 16:14:19 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180709131419.GB6271@rkaganb.sw.ru>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-	<20180702161404.GA2339@rkaganb.sw.ru>
-	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
-	<20180703095825.GC30904@rkaganb.sw.ru>
-	<20180703142817.GA3088@vbusired-vm>
-	<20180703165200.180c93bb.cohuck@redhat.com>
-	<CADGSJ23+sZiMCx=n=DytZ=TT2z7i0sMhrmnPuFYtuZhSc=qA+Q@mail.gmail.com>
-	<20180704141523.377cb66d.cohuck@redhat.com>
-	<CADGSJ206U4x0UNTEKu0Lt9K9qA025ajtmnj6ym4PDz4Q-c8RKA@mail.gmail.com>
-	<20180706155406.0587733c.cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fcW18-0002Dk-41
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:15:54 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:41164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fcW17-0002DZ-Uk
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:15:50 -0400
+Received: by mail-oi0-x242.google.com with SMTP id k12-v6so35741669oiw.8
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 06:15:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180706155406.0587733c.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+In-Reply-To: <20180702130605.13611-1-peter.maydell@linaro.org>
+References: <20180702130605.13611-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jul 2018 14:15:28 +0100
+Message-ID: <CAFEAcA8gpNbc=a1r_OBNV+KOu0CDbM1X7kH1__1G6rrADry8Mw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-3.0] boards.h: Remove doc
+ comment reference to nonexistent function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,18 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, Venu Busireddy <venu.busireddy@oracle.com>, si-wei liu <si-wei.liu@oracle.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <huth@tuxfamily.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, Jul 06, 2018 at 03:54:06PM +0200, Cornelia Huck wrote:
-> If we want to extend that to other device types, we can add the field
-> in their config space; but I'd rather prefer a more generic "host
-> relays config metainformation" approach.
+Ping for review? I can put this in via target-arm.next...
 
-The problem with this approach is that it's too generic and poorly
-scoped.  As a result I guess it's likely to take ages to converge.
+thanks
+-- PMM
 
-See for instance the discussion on including vm config metadata in qcow2
-images: I think it's similar in scope (or the absense thereof).
-
-Roman.
+On 2 July 2018 at 14:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+> commit b08199c6fbea1 accidentally added a reference to a doc
+> comment to a nonexistent memory_region_allocate_aux_memory().
+> This was a leftover from a previous version of the patchset
+> which defined memory_region_allocate_aux_memory() for
+> "allocate RAM MemoryRegion and register it for migration"
+> and left "memory_region_init_ram()" with its original semantics
+> of "allocate RAM MR but do not register for migration". In
+> the end we decided on the approach of "memory_region_init_ram()
+> registers the MR for migration, and memory_region_init_ram_nomigrate()
+> is a new function which does not", but this comment change
+> got left in by mistake. Revert that part of the commit.
+>
+> Reported-by: Thomas Huth <huth@tuxfamily.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Doesn't strictly need to go into 3.0, but it's a trivial
+> doc comment fix...
+>
+>  include/hw/boards.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 79069ddcbec..d139a431a67 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -35,8 +35,7 @@
+>   *
+>   * Smaller pieces of memory (display RAM, static RAMs, etc) don't need
+>   * to be backed via the -mem-path memory backend and can simply
+> - * be created via memory_region_allocate_aux_memory() or
+> - * memory_region_init_ram().
+> + * be created via memory_region_init_ram().
+>   */
+>  void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+>                                            const char *name,
+> --
+> 2.17.1
+>
+>
