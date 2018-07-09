@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fcSCb-0004qj-Lj
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:11:26 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fcSDz-0005R9-NG
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:12:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fcSCW-0006lX-VC
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:11:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1fcSCW-0006l6-Mh
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:11:20 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D25765AFEB
-	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 09:11:19 +0000 (UTC)
-Date: Mon, 9 Jul 2018 10:11:16 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180709091116.GA1455@redhat.com>
-References: <20180705123929.GB16293@redhat.com>
-	<20180705125231.GD16293@redhat.com>
-	<20180705165348-mutt-send-email-mst@kernel.org>
-	<20180705141132.GM1455@redhat.com>
-	<20180709073647.GF16293@redhat.com>
-	<9cb4ee1c-52c8-d112-4bfa-22436127826e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9cb4ee1c-52c8-d112-4bfa-22436127826e@redhat.com>
-Subject: Re: [Qemu-devel] Byte ordering of VM Generation ID in Windows VMs
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fcSDw-0007Hk-QW
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:12:51 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:33780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
+	id 1fcSDw-0007HK-JI
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 05:12:48 -0400
+Received: by mail-ed1-x544.google.com with SMTP id x5-v6so9676238edr.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 02:12:48 -0700 (PDT)
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Date: Mon,  9 Jul 2018 11:11:31 +0200
+Message-Id: <20180709091136.28849-3-e.emanuelegiuseppe@gmail.com>
+In-Reply-To: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
+References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
+Subject: [Qemu-devel] [PATCH 2/7] tests/qgraph: pci-pc driver and interface
+ nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +27,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, jferlan@redhat.com, mxie@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-On Mon, Jul 09, 2018 at 11:05:34AM +0200, Laszlo Ersek wrote:
-> On 07/09/18 09:36, Richard W.M. Jones wrote:
-> > On Thu, Jul 05, 2018 at 03:11:32PM +0100, Richard W.M. Jones wrote:
-> >> VMware represents these internally as two signed 64 bit integers, eg:
-> >>
-> >>   vm.genid = "-570734802784577186"
-> >>   vm.genidx = "-5042519231342505152"
-> >>
-> >> I am still trying to get verification, but I believe the first is the
-> >> low 64 bit word and the second is the high 64 bit word.
-> > 
-> > I have now been able to verify how this works using a real VMware
-> > hypervisor (thanks to help from Ming Xie).  For the record, here is
-> > how it maps, since I could not find any documentation about this.
-> > 
-> > VMX file contains:
-> > 
-> >   vm.genid = "7344585841658099715"
-> >   vm.genidX = "-8483171368186442967"
-> > 
-> > Those numbers are signed 64 bit integers written in hex as:
-> > 
-> >   vm.genid = 65 ED 35 E8 E2 64 F8 03
-> >   vm.genidX = 8A 45 B8 96 1E 7B 8B 29
-> 
-> If you mean to describe the byte array representations: these are the
-> big endian ones.
+Add pci-bus-pc node and pci-bus interface, moved QPCIBusPC struct
+declaration in its header (since it will be needed by other drivers)
+and introduced a setter method for drivers that do not need to allocate
+but have to initialize QPCIBusPC.
 
-Yes, the spaces were not meant to indicate that this is the in-memory
-representation.
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+---
+ tests/libqos/pci-pc.c | 53 ++++++++++++++++++++++++++++++++++++-------
+ tests/libqos/pci-pc.h |  8 +++++++
+ tests/libqos/pci.c    |  8 +++++++
+ 3 files changed, 61 insertions(+), 8 deletions(-)
 
-> > In the guest the VMGENID.EXE program prints (with my spaces added for
-> > clarity):
-> 
-> Right, it's important to note that the spaces below were added for
-> clarity. The decimal constant 7344585841658099715 is equal to the
-> hexadecimal constant 0x65ED35E8E264F803. The big endian byte array
-> representation for that is what you quote above, the little endian one
-> is the reverse.
-> 
-> >   VmCounterValue: 65 ED 35 E8 E2 64 F8 03 : 8A 45 B8 96 1E 7B 8B 29
-> > 
-> > So this confirms my original guess.  Note that VMware is not doing any
-> > endianness adjustment, but then VMware only works on LE hardware.
-> 
-> Thanks for tracking this down -- TIL.
-> 
-> (My above remarks are not meant as disagreement: it looks like VMWare
-> simply stores the int64_t values from the config file to guest memory,
-> without any kind of conversion. I only meant to comment on your
-> paragraph "written in hex as ...", because it wasn't clear to me whether
-> you meant "as uint64_t with spaces for clarity" or "as uint8_t[8]". The
-> latter is endianness-dependent, and the rendering you gave was BE, which
-> seemed to conflict with your final statement.)
-
-Agreed too.
-
-Rich.
-
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index a7803308b7..f1c1741279 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -18,15 +18,9 @@
+ 
+ #include "qemu-common.h"
+ 
+-
+ #define ACPI_PCIHP_ADDR         0xae00
+ #define PCI_EJ_BASE             0x0008
+ 
+-typedef struct QPCIBusPC
+-{
+-    QPCIBus bus;
+-} QPCIBusPC;
+-
+ static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
+ {
+     return inb(addr);
+@@ -115,10 +109,33 @@ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint3
+     outl(0xcfc, value);
+ }
+ 
+-QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
++static void *qpci_get_driver(void *obj, const char *interface)
+ {
+-    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
++    QPCIBusPC *qpci = obj;
++    if (!g_strcmp0(interface, "pci-bus")) {
++        return &qpci->bus;
++    }
++    printf("%s not present in pci-bus-pc", interface);
++    abort();
++}
+ 
++void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, int devfn)
++{
++    if (!bus) {
++        return;
++    }
++    dev->bus = bus;
++    dev->devfn = devfn;
++
++    if (qpci_config_readw(dev, PCI_VENDOR_ID) == 0xFFFF) {
++        printf("PCI Device not found\n");
++        abort();
++    }
++    qpci_device_enable(dev);
++}
++
++void qpci_set_pc(QPCIBusPC *ret, QTestState *qts, QGuestAllocator *alloc)
++{
+     assert(qts);
+ 
+     ret->bus.pio_readb = qpci_pc_pio_readb;
+@@ -147,11 +164,23 @@ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+     ret->bus.mmio_alloc_ptr = 0xE0000000;
+     ret->bus.mmio_limit = 0x100000000ULL;
+ 
++    ret->obj.get_driver = qpci_get_driver;
++}
++
++QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
++{
++    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
++    qpci_set_pc(ret, qts, alloc);
++
+     return &ret->bus;
+ }
+ 
+ void qpci_free_pc(QPCIBus *bus)
+ {
++    if (!bus) {
++        return;
++    }
++
+     QPCIBusPC *s = container_of(bus, QPCIBusPC, bus);
+ 
+     g_free(s);
+@@ -176,3 +205,11 @@ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
+ 
+     qmp_eventwait("DEVICE_DELETED");
+ }
++
++static void qpci_pc(void)
++{
++    qos_node_create_driver("pci-bus-pc", NULL);
++    qos_node_produces("pci-bus-pc", "pci-bus");
++}
++
++libqos_init(qpci_pc);
+diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
+index 491eeac756..ee381c5667 100644
+--- a/tests/libqos/pci-pc.h
++++ b/tests/libqos/pci-pc.h
+@@ -15,7 +15,15 @@
+ 
+ #include "libqos/pci.h"
+ #include "libqos/malloc.h"
++#include "qgraph.h"
+ 
++typedef struct QPCIBusPC {
++    QOSGraphObject obj;
++    QPCIBus bus;
++} QPCIBusPC;
++
++void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, int devfn);
++void qpci_set_pc(QPCIBusPC *ret, QTestState *qts, QGuestAllocator *alloc);
+ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc);
+ void     qpci_free_pc(QPCIBus *bus);
+ 
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index 0b73cb23d0..c51c186867 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -15,6 +15,7 @@
+ 
+ #include "hw/pci/pci_regs.h"
+ #include "qemu/host-utils.h"
++#include "qgraph.h"
+ 
+ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
+                          void (*func)(QPCIDevice *dev, int devfn, void *data),
+@@ -402,3 +403,10 @@ void qpci_plug_device_test(const char *driver, const char *id,
+     qtest_qmp_device_add(driver, id, "'addr': '%d'%s%s", slot,
+                          opts ? ", " : "", opts ? opts : "");
+ }
++
++static void qpci(void)
++{
++    qos_node_create_interface("pci-bus");
++}
++
++libqos_init(qpci);
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+2.17.1
