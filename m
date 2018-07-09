@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQqB-00056D-AJ
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQqB-00055u-5g
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcQqA-0002HP-8Z
+	(envelope-from <dgibson@ozlabs.org>) id 1fcQqA-0002H5-0G
 	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 03:44:11 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  9 Jul 2018 17:43:50 +1000
-Message-Id: <20180709074350.27086-17-david@gibson.dropbear.id.au>
+Date: Mon,  9 Jul 2018 17:43:49 +1000
+Message-Id: <20180709074350.27086-16-david@gibson.dropbear.id.au>
 In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
 References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 16/16] sam460ex: Make
- sam460ex_load_device_tree() handle all errors internally
+Subject: [Qemu-devel] [PULL 15/16] sam460ex: Don't check for errors from
+ qemu_fdt_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, clg@kaod.org, balaton@eik.bme.hu, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-sam460ex_load_device_tree() handles nearly all possible errors by simply
-exiting (within helper functions and macros).  It handles two early error
-cases by returning an error.
-
-There's no particular point to this, so make it handle those directly as
-well, removing the need for the caller to handle a failure.  As a bonus it
-gives us more specific error messages.
+The qemu_fdt_*() helper functions already exit with a message instead of
+returning errors, so we don't need to check for errors in the caller.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/sam460ex.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ hw/ppc/sam460ex.c | 26 ++++++--------------------
+ 1 file changed, 6 insertions(+), 20 deletions(-)
 
 diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 8194f32cd3..e2b7028843 100644
+index 1661e036f3..8194f32cd3 100644
 --- a/hw/ppc/sam460ex.c
 +++ b/hw/ppc/sam460ex.c
-@@ -255,7 +255,6 @@ static int sam460ex_load_device_tree(hwaddr addr,
-                                      hwaddr initrd_size,
-                                      const char *kernel_cmdline)
- {
--    int ret = -1;
-     uint32_t mem_reg_property[] = { 0, 0, cpu_to_be32(ramsize) };
-     char *filename;
-     int fdt_size;
-@@ -266,12 +265,14 @@ static int sam460ex_load_device_tree(hwaddr addr,
- 
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
-     if (!filename) {
--        goto out;
-+        error_report("Couldn't find dtb file `%s'", BINARY_DEVICE_TREE_FILE);
-+        exit(1);
-     }
-     fdt = load_device_tree(filename, &fdt_size);
-     g_free(filename);
--    if (fdt == NULL) {
--        goto out;
-+    if (!fdt) {
-+        error_report("Couldn't load dtb file `%s'", filename);
-+        exit(1);
-     }
+@@ -276,32 +276,18 @@ static int sam460ex_load_device_tree(hwaddr addr,
  
      /* Manipulate device tree in memory. */
-@@ -325,11 +326,8 @@ static int sam460ex_load_device_tree(hwaddr addr,
  
-     rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
-     g_free(fdt);
--    ret = fdt_size;
--
--out:
+-    ret = qemu_fdt_setprop(fdt, "/memory", "reg", mem_reg_property,
+-                               sizeof(mem_reg_property));
+-    if (ret < 0) {
+-        error_report("couldn't set /memory/reg");
+-    }
++    qemu_fdt_setprop(fdt, "/memory", "reg", mem_reg_property,
++                     sizeof(mem_reg_property));
  
--    return ret;
-+    return fdt_size;
- }
+     /* default FDT doesn't have a /chosen node... */
+     qemu_fdt_add_subnode(fdt, "/chosen");
  
- /* Create reset TLB entries for BookE, mapping only the flash memory.  */
-@@ -599,10 +597,6 @@ static void sam460ex_init(MachineState *machine)
-         dt_size = sam460ex_load_device_tree(FDT_ADDR, machine->ram_size,
-                                     RAMDISK_ADDR, initrd_size,
-                                     machine->kernel_cmdline);
--        if (dt_size < 0) {
--            error_report("couldn't load device tree");
--            exit(1);
--        }
+-    ret = qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
+-                                    initrd_base);
+-    if (ret < 0) {
+-        error_report("couldn't set /chosen/linux,initrd-start");
+-    }
++    qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start", initrd_base);
  
-         boot_info->dt_base = FDT_ADDR;
-         boot_info->dt_size = dt_size;
+-    ret = qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
+-                                    (initrd_base + initrd_size));
+-    if (ret < 0) {
+-        error_report("couldn't set /chosen/linux,initrd-end");
+-    }
++    qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
++                          (initrd_base + initrd_size));
+ 
+-    ret = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
+-                                      kernel_cmdline);
+-    if (ret < 0) {
+-        error_report("couldn't set /chosen/bootargs");
+-    }
++    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", kernel_cmdline);
+ 
+     /* Copy data from the host device tree into the guest. Since the guest can
+      * directly access the timebase without host involvement, we must expose
 -- 
 2.17.1
