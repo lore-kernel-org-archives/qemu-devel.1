@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcUgs-0007mo-C5
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:50:51 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcUoD-000296-Qy
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcUgn-0004JH-Hg
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fcUgn-0004J0-Ad
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:50:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fcUgk-00013p-HY
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 11:50:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C88252E8078
-	for <qemu-devel@nongnu.org>; Mon,  9 Jul 2018 11:50:41 +0000 (UTC)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fcUo9-0006p5-RQ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:58:25 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59594 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1fcUo9-0006lV-Iv
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:58:21 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon,  9 Jul 2018 13:57:36 +0200
+Message-Id: <1531137463-28014-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Jul 2018 11:41:13 -0000
-From: Paolo Bonzini <bonzini@gnu.org>
-Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
-Message-Id: <153113647351.29762.17411981188544903441.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
+Subject: [Qemu-devel] [PATCH v5 0/7] Maintenance and misc fixes and
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +27,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-Does reverting the commit fix it? It was just a cleanup I think.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
--- =
+v4->v5:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774677
+  - patch 5 (Add CP0 BadInstrX) corrected to work for both 32-bit and
+    64-bit targets, and using correct tcg function
+  - patch 7 (Amend CP0 WatchHi) was removed from the series until it
+    is reimplemented in a better way
 
-Title:
-  -icount increases boot time by >10x
+v3->v4:
 
-Status in QEMU:
-  Confirmed
+  - accepted suggestion on better format of bit definitions in patch 3
+  - fixed build errors caused by a mistake in patch 4
+  - removed spurious comments in patch 4
+  - added setting lower 16 bits to 0 in patch 5
+  - used proper email address for a reviewer in patch 7 commit message
 
-Bug description:
-  When I specify the -icount option, some guest operations such as
-  booting a Linux kernel take more than 10 times longer than otherwise.
-  For example, the following will boot Aboriginal Linux to the login
-  prompt about 6 seconds on my system (using TCG, not KVM):
+v2->v3:
 
-  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
-age-i686.tar.gz
-  gunzip <system-image-i686.tar.gz | tar xfv -
-  cd system-image-i686
-  sh run-emulator.sh
+  - replaced invalid @imgtec.com and @mips.com in "From:",,
+    "Signed-off-by:", "Reviewed-by:" lines with the most current
+    email addresses for a particular person
+  - fixed build errors that appeared because of a mistake during
+    integration
 
-  If I replace the last line with
+v1->v2:
 
-  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
+  - fixed recipient's email addresses
 
-  booting to the login prompt takes about 1 minute 20 seconds.
+Maintenance issues, fixes, and improvements collected during recent
+development. Some of them are related to the upcoming nanoMIPS changes.
 
-  I have tried different values for "shift" other than the "auto" used
-  above, but have not been able to find one that gives reasonable
-  performance.  Specifying "sleep=3Doff" also did not help.
+Note: These patches are, of course, supposed to be applied AFTER the
+code freeze.
 
-  During the slow boots, qemu appears to spend most of its time
-  sleeping, not using the host CPU.
+Aleksandar Markovic (4):
+  target/mips: Update maintainer's email addresses
+  target/mips: Workaround for checkpatch.pl hanging on msa_helper.c
+  target/mips: Update some CP0 registers bit definitions
+  target/mips: Avoid case statements formulated by ranges
 
-  I see this with multiple versions of qemu, including current git
-  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
-  host OSes, including Debian 9 on x86_64.
+Stefan Markovic (1):
+  target/mips: Add CP0 BadInstrX register
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
+Yongbok Kim (2):
+  target/mips: Don't update BadVAddr register in Debug Mode
+  target/mips: Check ELPA flag only in some cases of MFHC0 and MTHC0
+
+ .mailmap                 |   7 +-
+ MAINTAINERS              |   9 +-
+ target/mips/cpu.h        |  39 ++++---
+ target/mips/helper.c     |   4 +-
+ target/mips/machine.c    |   5 +-
+ target/mips/msa_helper.c |   4 +-
+ target/mips/op_helper.c  |  12 +-
+ target/mips/translate.c  | 279 ++++++++++++++++++++++++++++++++++++++---=
+------
+ 8 files changed, 278 insertions(+), 81 deletions(-)
+
+--=20
+2.7.4
