@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fcZpf-0002oD-3J
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:20:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fcZrg-000412-NR
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fcZpa-0004bO-4u
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:20:15 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:40170)
+	(envelope-from <ehabkost@redhat.com>) id 1fcZrc-0005W2-93
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:22:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fcZpZ-0004WU-Tz
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:20:10 -0400
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 9 Jul 2018 19:02:36 +0200
-Message-Id: <20180709172005.5306274569D@zero.eik.bme.hu>
-Subject: [Qemu-devel] [PATCH] sm501: Update screen on frame buffer address
- change
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fcZrc-0005UB-3h
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:22:16 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon,  9 Jul 2018 14:22:05 -0300
+Message-Id: <20180709172206.6334-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] x86 fix for -rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +21,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Sebastian Bauer <mail@sebastianbauer.info>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-When the guest changes the address of the frame buffer we need to
-refresh the screen to correctly display the new content. This fixes
-display update problems when changing between screens on AmigaOS.
+The following changes since commit 43a473993fd9378bf850dcafa68eb6dee8c300f8:
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
-This fixes an annoying refresh problem in AmigaOS when changing or
-moving screens. The user could work around it by moving the mouse to
-repaint the screen but if it's possible to get this in before or
-during the freeze that could avoid this problem in the release.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-07-06 18:18:08 +0100)
 
- hw/display/sm501.c | 2 ++
- 1 file changed, 2 insertions(+)
+are available in the Git repository at:
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 3661a89..9ab29d3 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1235,6 +1235,7 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         if (value & 0x8000000) {
-             qemu_log_mask(LOG_UNIMP, "Panel external memory not supported\n");
-         }
-+        s->do_full_update = true;
-         break;
-     case SM501_DC_PANEL_FB_OFFSET:
-         s->dc_panel_fb_offset = value & 0x3FF03FF0;
-@@ -1298,6 +1299,7 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         if (value & 0x8000000) {
-             qemu_log_mask(LOG_UNIMP, "CRT external memory not supported\n");
-         }
-+        s->do_full_update = true;
-         break;
-     case SM501_DC_CRT_FB_OFFSET:
-         s->dc_crt_fb_offset = value & 0x3FF03FF0;
+  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
+
+for you to fetch changes up to 97e50dd013fbf2643a3b3f693a72159de5d25b50:
+
+  pc: Fix typo on PC_COMPAT_2_12 (2018-07-09 14:20:57 -0300)
+
+----------------------------------------------------------------
+x86 fix for -rc0
+
+* Fix EPYC-IBPB compat code
+
+----------------------------------------------------------------
+
+Eduardo Habkost (1):
+  pc: Fix typo on PC_COMPAT_2_12
+
+ include/hw/i386/pc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 -- 
-2.7.6
+2.18.0.rc1.1.g3f1ff2140
