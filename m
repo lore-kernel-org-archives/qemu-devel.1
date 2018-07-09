@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fcUK6-00039b-Bu
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:27:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fcUQx-0004YF-Uf
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fcUK3-0000EA-5V
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:27:18 -0400
-Received: from mail-eopbgr700131.outbound.protection.outlook.com
-	([40.107.70.131]:38544
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fcUK2-0000DG-Lf
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:27:14 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 9 Jul 2018 11:27:11 +0000
-Message-ID: <BN7PR08MB4868570BBE04A506513CD9E7C6440@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <20180706174309.27110-1-peter.maydell@linaro.org>
-In-Reply-To: <20180706174309.27110-1-peter.maydell@linaro.org>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1fcUQx-0003bw-6G
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:34:23 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39435)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fcUQx-0003aF-15
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 07:34:23 -0400
+Received: by mail-oi0-x244.google.com with SMTP id d189-v6so35210575oib.6
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 04:34:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0] hw/net/dp8393x: don't make prom
- region 'nomigrate'
+In-Reply-To: <20180709074350.27086-1-david@gibson.dropbear.id.au>
+References: <20180709074350.27086-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jul 2018 12:34:01 +0100
+Message-ID: <CAFEAcA9xtsCpHmEuNO3bRaCHe_U7kWWCJuOK_nd6wrEgdc7u2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/16] ppc-for-3.0 queue 20180709
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>, Jason Wang <jasowang@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, BALATON Zoltan <balaton@eik.bme.hu>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-> Currently we use memory_region_init_rom_nomigrate() to create
-> the "dp3893x-prom" memory region, and we don't manually register
-> it with vmstate_register_ram(). This currently means that its
-> contents are migrated but as a ram block whose name is the empty
-> string; in future it may mean they are not migrated at all. Use
-> memory_region_init_ram() instead.
+On 9 July 2018 at 08:43, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 43a473993fd9378bf850dcafa68eb6dee8c300f8:
 >
-> Note that this is a a cross-version migration compatibility break
-> for the MIPS "magnum" and "pica61" machines.
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-07-06 18:18:08 +0100)
 >
-
-As far as MIPS jazz ("magnum" and "pica61") boards are concerned:
-
-Reviewed-by: Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
-
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This is I think the last device that creates a RAM memory
-> region and never registers it for migration.  Only used on
-> the MIPS 'jazz' boards.
+> are available in the Git repository at:
 >
->  hw/net/dp8393x.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180709
+>
+> for you to fetch changes up to 51b0d834c414f494410cc94e56886b6584ae3c54:
+>
+>   sam460ex: Make sam460ex_load_device_tree() handle all errors internally (2018-07-09 14:38:45 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2018-07-09
+>
+> Here's a final pull request before tomorrow's hard freeze.
+>
+> There are a number of fixes and improvements to the sm501 display
+> driver (not strictly ppc related, but used only on ppc and SH).
+> There's also a handful of unrelated fixes.
+>
+> Whether all the sm501 changes are bugfixes is somewhat debatable, but
+> Peter has indicated he's ok with merging those for 3.0.
+>
+> ----------------------------------------------------------------
+Applied, thanks.
+
+-- PMM
