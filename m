@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcdd3-0004GZ-UP
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:23:32 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fcdkx-0008TM-Uk
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcdcz-0006I3-W1
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:23:29 -0400
-Date: Mon, 9 Jul 2018 18:23:19 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fcdkx-0002hJ-7w
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 17:31:39 -0400
+Date: Mon, 9 Jul 2018 18:31:31 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180709212319.GB22336@localhost.localdomain>
-References: <20180705064348.3162-1-kraxel@redhat.com>
-	<20180705064348.3162-3-kraxel@redhat.com>
-	<20180705163501.GN7451@localhost.localdomain>
-	<20180706065342.pggd2qgd4nyv35ys@sirius.home.kraxel.org>
-	<20180709210833.GC7451@localhost.localdomain>
+Message-ID: <20180709213131.GD7451@localhost.localdomain>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180709210833.GC7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vga: don't pick cirrus by default
+In-Reply-To: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@mips.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Jul 09, 2018 at 06:08:33PM -0300, Eduardo Habkost wrote:
-> On Fri, Jul 06, 2018 at 08:53:42AM +0200, Gerd Hoffmann wrote:
-> > On Thu, Jul 05, 2018 at 01:35:01PM -0300, Eduardo Habkost wrote:
-> > > Do we have a list of all machine-types with default_display==NULL
-> > > that would be affected by this?
-> > 
-> > There are not many which use the default vga thing in the first place.
-> > Workflow is this:
-> > 
-> >  (1) vl.c calls select_vgahw(vga_model) after setting vga_model.
-> >  (2) select_hw() sets vga_interface_type.
-> >  (3) isa_vga_init() and pci_vga_init() look at vga_interface_type.
-> > 
-> > Checking where either vga_interface_type or *_vga_init() is used doesn't
-> > yield many places:
-> > 
-> > # find -name "*.[ch]" | xargs egrep '((isa|pci)_vga_init|vga_interface_type)'
-> > ./hw/alpha/dp264.c:    pci_vga_init(pci_bus);
-> > ./hw/i386/pc.c:        PCIDevice *pcidev = pci_vga_init(pci_bus);
-> > ./hw/i386/pc.c:        ISADevice *isadev = isa_vga_init(isa_bus);
-> > ./hw/isa/isa-bus.c:ISADevice *isa_vga_init(ISABus *bus)
-> > ./hw/isa/isa-bus.c:    switch (vga_interface_type) {
-> > ./hw/mips/mips_malta.c:    pci_vga_init(pci_bus);
-> > ./hw/mips/mips_r4k.c:    isa_vga_init(isa_bus);
-> > ./hw/pci/pci.c:PCIDevice *pci_vga_init(PCIBus *bus)
-> > ./hw/pci/pci.c:    switch (vga_interface_type) {
-> > ./hw/ppc/mac_newworld.c:    pci_vga_init(pci_bus);
-> > ./hw/ppc/mac_oldworld.c:    pci_vga_init(pci_bus);
-> > ./hw/ppc/spapr.c:    switch (vga_interface_type) {
-> > ./hw/ppc/spapr.c:        return pci_vga_init(pci_bus) != NULL;
-> > ./hw/ppc/prep.c:    pci_vga_init(pci_bus);
-> > ./hw/ppc/prep.c:        pci_vga_init(pci_bus);
-> > ./hw/sparc/sun4m.c:        if (vga_interface_type == VGA_CG3) {
-> > ./include/hw/isa/isa.h:ISADevice *isa_vga_init(ISABus *bus);
-> > ./include/hw/pci/pci.h:PCIDevice *pci_vga_init(PCIBus *bus);
-> > ./include/sysemu/sysemu.h:extern int vga_interface_type;
-> > ./include/sysemu/sysemu.h:#define xenfb_enabled (vga_interface_type == VGA_XENFB)
-> > ./vl.c:int vga_interface_type = VGA_NONE;
-> > ./vl.c:    assert(vga_interface_type == VGA_NONE);
-> > ./vl.c:            vga_interface_type = t;
-> > ./vl.c:        vga_interface_type = VGA_DEVICE;
-> > 
-> > So it is alpha, mips, i386, ppc.
+On Mon, Jul 09, 2018 at 11:03:00PM +0200, Thomas Huth wrote:
+> When trying to "device_add bcm2837" on a machine that is not suitable for
+> this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
 > 
-> Right, and all of them have both CONFIG_VGA_CIRRUS and
-> CONFIG_VGA_PCI enabled.  This means all of them will be affected
-> by this patch if they have any machines with
-> default_display==NULL.
+> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
+>  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
+>  "'arguments': {'command-line': 'info qtree'}}" | \
+>  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
+
+Interesting, how did you find this bug?
+
+Running "info qtree" and other queries on device-crash-test
+sounds like a good idea.  I will add it to my TODO list.
+
 > 
-> At least on x86 we still have a few machines with
-> default_display==NULL: isapc, xenpv, xenfv.  We need to fix them
-> before we apply this patch.
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> {"return": {}}
+> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
+>  hotplugged on this machine"}}
+> Segmentation fault (core dumped)
 > 
-> I didn't check alpha/mips/ppc yet.
-
-List of machines with default_display==NULL on those
-architectures:
-
-alpha:
-none                 empty machine
-
-mips:
-mipssim              MIPS MIPSsim platform
-none                 empty machine
-
-ppc*:
-bamboo               bamboo
-mpc8544ds            mpc8544ds
-none                 empty machine
-powernv              IBM PowerNV (Non-Virtualized)
-ppce500              generic paravirt e500 platform
-ref405ep             ref405ep
-sam460ex             aCube Sam460ex
-taihu                taihu
-virtex-ml507         Xilinx Virtex ML507 reference design
-
-x86_64:
-isapc                ISA-only PC
-none                 empty machine
-xenfv                Xen Fully-virtualized PC
-xenpv                Xen Para-virtualized PC
-
-Tested on qemu.git master after applying this series.  List
-generated by hacking machine_parse(), so some machines may be
-missing if they are disabled at build time.
+> The problem is that qdev_set_parent_bus() from instance_init adds a link
+> to the child devices which is not valid anymore after the device init
+> failed. Thus the qdev_set_parent_bus() must rather be done in the realize
+> function instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+[...]
 
 -- 
 Eduardo
