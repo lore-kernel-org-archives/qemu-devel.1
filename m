@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arnd@arndb.de>) id 1fcXxf-0008UL-9c
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:20:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fcXye-0000lW-Im
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arnd@arndb.de>) id 1fcXxb-0004tA-5h
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:20:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:43984)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arnd@arndb.de>) id 1fcXxa-0004qI-Sr
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:20:19 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Mon,  9 Jul 2018 17:19:02 +0200
-Message-Id: <20180709151947.940759-1-arnd@arndb.de>
-Subject: [Qemu-devel] [PATCH] headers: fix linux/mod_devicetable.h inclusions
+	(envelope-from <alex.bennee@linaro.org>) id 1fcXyb-0005Uc-CV
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fcXyb-0005UL-5F
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 11:21:21 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p1-v6so11409629wrs.9
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 08:21:21 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon,  9 Jul 2018 16:21:07 +0100
+Message-Id: <20180709152117.21585-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for 3.0 00/10] various docker fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,112 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Randy Dunlap <rdunlap@infradead.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Jean-Christophe Trotin <jean-christophe.trotin@st.com>, Zha Qipeng <qipeng.zha@intel.com>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org, platform-driver-x86@vger.kernel.org
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-A couple of drivers produced build errors after the mod_devicetable.h
-header was split out from the platform_device one, e.g.
+Hi,
 
-drivers/media/platform/davinci/vpbe_osd.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
-drivers/media/platform/davinci/vpbe_venc.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
+The addition of the cross compilers for check-tcg broke the ability to
+run "make docker-test".  In truth this was probably already broken as
+it attempts to run every single test with every single docker image
+which isn't something that gets done on a regular basis.
 
-This adds the inclusion where needed.
+Anyway the patches clean up the ability to do that in a sane way
+although it still takes a long time to run the full test set.
 
-Fixes: ac3167257b9f ("headers: separate linux/mod_devicetable.h from linux/platform_device.h")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/firmware/qemu_fw_cfg.c             | 1 +
- drivers/media/platform/davinci/vpbe_osd.c  | 1 +
- drivers/media/platform/davinci/vpbe_venc.c | 1 +
- drivers/media/platform/qcom/venus/vdec.c   | 1 +
- drivers/media/platform/qcom/venus/venc.c   | 1 +
- drivers/media/platform/sti/hva/hva-v4l2.c  | 1 +
- drivers/platform/x86/intel_punit_ipc.c     | 1 +
- 7 files changed, 7 insertions(+)
+To help with running a better subset I've expanded the individual
+tests so you can now run a line like:
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
-index 14fedbeca724..039e0f91dba8 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -28,6 +28,7 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/platform_device.h>
- #include <linux/acpi.h>
- #include <linux/slab.h>
-diff --git a/drivers/media/platform/davinci/vpbe_osd.c b/drivers/media/platform/davinci/vpbe_osd.c
-index 7f610320426d..c551a25d90d9 100644
---- a/drivers/media/platform/davinci/vpbe_osd.c
-+++ b/drivers/media/platform/davinci/vpbe_osd.c
-@@ -18,6 +18,7 @@
-  *
-  */
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/kernel.h>
- #include <linux/interrupt.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/media/platform/davinci/vpbe_venc.c b/drivers/media/platform/davinci/vpbe_venc.c
-index ba157827192c..ddcad7b3e76c 100644
---- a/drivers/media/platform/davinci/vpbe_venc.c
-+++ b/drivers/media/platform/davinci/vpbe_venc.c
-@@ -11,6 +11,7 @@
-  * GNU General Public License for more details.
-  */
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/kernel.h>
- #include <linux/init.h>
- #include <linux/ctype.h>
-diff --git a/drivers/media/platform/qcom/venus/vdec.c b/drivers/media/platform/qcom/venus/vdec.c
-index f89a91d43cc9..d4e23c7df347 100644
---- a/drivers/media/platform/qcom/venus/vdec.c
-+++ b/drivers/media/platform/qcom/venus/vdec.c
-@@ -14,6 +14,7 @@
-  */
- #include <linux/clk.h>
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/slab.h>
-diff --git a/drivers/media/platform/qcom/venus/venc.c b/drivers/media/platform/qcom/venus/venc.c
-index f7a87a3dbb46..0522cf202b75 100644
---- a/drivers/media/platform/qcom/venus/venc.c
-+++ b/drivers/media/platform/qcom/venus/venc.c
-@@ -14,6 +14,7 @@
-  */
- #include <linux/clk.h>
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/slab.h>
-diff --git a/drivers/media/platform/sti/hva/hva-v4l2.c b/drivers/media/platform/sti/hva/hva-v4l2.c
-index 15080cb00fa7..5a807c7c5e79 100644
---- a/drivers/media/platform/sti/hva/hva-v4l2.c
-+++ b/drivers/media/platform/sti/hva/hva-v4l2.c
-@@ -6,6 +6,7 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <media/v4l2-event.h>
-diff --git a/drivers/platform/x86/intel_punit_ipc.c b/drivers/platform/x86/intel_punit_ipc.c
-index b5b890127479..f1afc0ebbc68 100644
---- a/drivers/platform/x86/intel_punit_ipc.c
-+++ b/drivers/platform/x86/intel_punit_ipc.c
-@@ -12,6 +12,7 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/mod_devicetable.h>
- #include <linux/acpi.h>
- #include <linux/delay.h>
- #include <linux/bitops.h>
+  make docker-test-build TARGET_LIST=aarch64-softmmu J=30
+
+To make sure your favourite architecture still builds everywhere.
+
+There is now also a docker-test-unit which just runs the unit tests
+although we have to do a little re-factoring to make sure we don't
+attempt to run "make check" steps when the docker image isn't capable
+of it. This is also needed to make sure the other test-FOO build tests
+don't choke on the check step.
+
+Finally there is a minor tweak for .gitignore and a fix for docker.py
+throwing backtraces when we attempt to calculate SID_AGE. A cleaner
+re-factoring can be left for a future release.
+
+Alex Bennée (10):
+  tests/.gitignore: don't ignore docker tests
+  docker: debian-tricore add git tools
+  docker: fail more gracefully on docker.py check
+  docker: split configure_qemu from build_qemu
+  docker: move make check into check_qemu helper
+  docker: gracefully skip check_qemu
+  docker: Makefile.include don't include partial images
+  docker: disable debian-powerpc-user-cross
+  docker: add test-unit runner
+  docker: add expansion for docker-test-FOO to Makefile.include
+
+ tests/.gitignore                              |  1 +
+ tests/docker/Makefile.include                 | 14 +++++++++--
+ tests/docker/common.rc                        | 23 ++++++++++++++++++-
+ tests/docker/docker.py                        |  7 +++++-
+ .../dockerfiles/debian-tricore-cross.docker   |  3 +++
+ tests/docker/test-clang                       |  2 +-
+ tests/docker/test-debug                       |  2 +-
+ tests/docker/test-full                        |  2 +-
+ tests/docker/test-quick                       |  2 +-
+ tests/docker/test-unit                        | 19 +++++++++++++++
+ 10 files changed, 67 insertions(+), 8 deletions(-)
+ create mode 100755 tests/docker/test-unit
+
 -- 
-2.9.0
+2.17.1
