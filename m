@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fcZZU-0003hX-QU
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:03:34 -0400
+	(envelope-from <mst@redhat.com>) id 1fcZou-00028E-15
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fcZZT-0004qS-OH
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:03:32 -0400
-References: <20180627232951.14725-1-laurent@vivier.eu>
-	<20180627232951.14725-5-laurent@vivier.eu>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <8d1c30eb-1dc7-4ea9-08ea-660991044e5c@tuxfamily.org>
-Date: Mon, 9 Jul 2018 19:03:18 +0200
+	(envelope-from <mst@redhat.com>) id 1fcZos-0003hp-Cl
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 13:19:28 -0400
+Date: Mon, 9 Jul 2018 20:19:17 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180709200456-mutt-send-email-mst@kernel.org>
+References: <20180705235305.124423-1-mst@redhat.com>
+	<20180709175232.5e768dfb@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180627232951.14725-5-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 04/10] hw/m68k: add video card
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180709175232.5e768dfb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] acpi: generalize aml_package /
+ aml_varpackage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,163 +24,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-On 28.06.2018 01:29, Laurent Vivier wrote:
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
-[...]
-> diff --git a/hw/display/macfb-template.h b/hw/display/macfb-template.h
-> new file mode 100644
-> index 0000000000..b6ae5d728f
-> --- /dev/null
-> +++ b/hw/display/macfb-template.h
-> @@ -0,0 +1,158 @@
-> +#if defined(READ_BITS)
-> +#define PALETTE(i, r, g, b)                        \
-> +    do {                                           \
-> +        r =  s->color_palette[i * 3];              \
-> +        g =  s->color_palette[i * 3 + 1];          \
-> +        b =  s->color_palette[i * 3 + 2];          \
-> +    } while (0)
-> +
-> +#if READ_BITS == 1
-> +#define READ_PIXEL(from, x, r, g, b)               \
-> +    do {                                           \
-> +        int bit = x & 7;                           \
-> +        int idx = (*from >> (7 - bit)) & 1;        \
-> +        r = g = b  = ((1 - idx) << 7);             \
-> +        from += (bit == 7);                        \
-> +    } while (0)
-> +#elif READ_BITS == 2
-> +#define READ_PIXEL(from, x, r, g, b)               \
-> +    do {                                           \
-> +        int bit = (x & 3);                         \
-> +        int idx = (*from >> ((3 - bit) << 1)) & 3; \
-> +        PALETTE(idx, r, g, b);                     \
-> +        from += (bit == 3);                        \
-> +    } while (0)
-> +#elif READ_BITS == 4
-> +#define READ_PIXEL(from, x, r, g, b)               \
-> +    do {                                           \
-> +        int bit = x & 1;                           \
-> +        int idx = (*from >> ((1 - bit) << 2)) & 15; \
-> +        PALETTE(idx, r, g, b);                     \
-> +        from += (bit == 1);                        \
-> +    } while (0)
-> +#elif READ_BITS == 8
-> +#define READ_PIXEL(from, x, r, g, b)               \
-> +    do {                                           \
-> +        PALETTE(*from, r, g, b);                   \
-> +        from++;                                    \
-> +    } while (0)
-> +#elif READ_BITS == 16
-> +#define READ_PIXEL(from, x, r, g, b)               \
-> +    do {                                           \
-> +        uint16_t pixel;                            \
-> +        pixel = (from[0] << 8) | from[1];          \
-> +        r = ((pixel >> 10) & 0x1f) << 3;           \
-> +        g = ((pixel >> 5) & 0x1f) << 3;            \
-> +        b = (pixel & 0x1f) << 3;                   \
-> +        from += 2;                                 \
-> +    } while (0)
-> +#elif READ_BITS == 24
-> +#define READ_PIXEL(from, x, r, g, b)               \
-> +    do {                                           \
-> +        r = *from++;                               \
-> +        g = *from++;                               \
-> +        b = *from++;                               \
-> +    } while (0)
-> +#else
-> +#error unknown bit depth
-> +#endif
-> +
-> +#if WRITE_BITS == 8
-> +#define WRITE_PIXEL(to, r, g, b)                   \
-> +    do {                                           \
-> +        *to = rgb_to_pixel8(r, g, b);              \
-> +        to += 1;                                   \
-> +    } while (0)
-> +#elif WRITE_BITS == 15
-> +#define WRITE_PIXEL(to, r, g, b)                   \
-> +    do {                                           \
-> +        *(uint16_t *)to = rgb_to_pixel15(r, g, b); \
-> +        to += 2;                                   \
-> +    } while (0)
-> +#elif WRITE_BITS == 16
-> +#define WRITE_PIXEL(to, r, g, b)                   \
-> +    do {                                           \
-> +        *(uint16_t *)to = rgb_to_pixel16(r, g, b); \
-> +        to += 2;                                   \
-> +    } while (0)
-> +#elif WRITE_BITS == 24
-> +#define WRITE_PIXEL(to, r, g, b)                   \
-> +    do {                                           \
-> +        uint32_t tmp = rgb_to_pixel24(r, g, b);    \
-> +        *(to++) =         tmp & 0xff;              \
-> +        *(to++) =  (tmp >> 8) & 0xff;              \
-> +        *(to++) = (tmp >> 16) & 0xff;              \
-> +    } while (0)
-> +#elif WRITE_BITS == 32
-> +#define WRITE_PIXEL(to, r, g, b)                   \
-> +    do {                                           \
-> +        *(uint32_t *)to = rgb_to_pixel32(r, g, b); \
-> +        to += 4;                                   \
-> +    } while (0)
-> +#else
-> +#error unknown bit depth
-> +#endif
-> +
-> +static void glue(glue(glue(draw_line, READ_BITS), _), WRITE_BITS)
-> +                          (MacfbState *s, uint8_t *to, uint8_t *from, int width)
-> +{
-> +    uint8_t r, g, b;
-> +    int x;
-> +    for (x = 0; x < width; x++) {
-> +        READ_PIXEL(from, x, r, g, b);
-> +        WRITE_PIXEL(to, r, g, b);
-> +    }
-> +}
-> +#undef READ_BITS
-> +#undef READ_PIXEL
-> +#undef WRITE_PIXEL
-> +
-> +#elif defined(WRITE_BITS)
-> +
-> +#undef MACFB_RECLEVEL
-> +#define MACFB_RECLEVEL 2
-> +#define READ_BITS 1
-> +#include "macfb-template.h"
-> +#define READ_BITS 2
-> +#include "macfb-template.h"
-> +#define READ_BITS 4
-> +#include "macfb-template.h"
-> +#define READ_BITS 8
-> +#include "macfb-template.h"
-> +#define READ_BITS 16
-> +#include "macfb-template.h"
-> +#define READ_BITS 24
-> +#include "macfb-template.h"
-> +#undef WRITE_BITS
-> +
-> +#else
-> +
-> +#define WRITE_BITS 8
-> +#include "macfb-template.h"
-> +
-> +#define WRITE_BITS 16
-> +#include "macfb-template.h"
-> +
-> +#define WRITE_BITS 24
-> +#include "macfb-template.h"
-> +
-> +#define WRITE_BITS 32
-> +#include "macfb-template.h"
+On Mon, Jul 09, 2018 at 05:52:32PM +0200, Igor Mammedov wrote:
+> On Fri, 6 Jul 2018 02:53:09 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > VarPackage can accept an expression evaluating to int, not just an int.
+> > Change the API to make it more generic.
+> > Further, rather than have users call the correct API depending on
+> > value passed, use either PackageOp or VarPackageOp automatically.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/hw/acpi/aml-build.h |  4 ++--
+> >  hw/acpi/aml-build.c         | 18 ++++++++++++++----
+> >  hw/acpi/cpu_hotplug.c       | 11 ++---------
+> >  hw/arm/virt-acpi-build.c    |  2 +-
+> >  4 files changed, 19 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> > index 10c7946028..7cf2cf64bf 100644
+> > --- a/include/hw/acpi/aml-build.h
+> > +++ b/include/hw/acpi/aml-build.h
+> > @@ -360,7 +360,7 @@ Aml *aml_method(const char *name, int arg_count, AmlSerializeFlag sflag);
+> >  Aml *aml_if(Aml *predicate);
+> >  Aml *aml_else(void);
+> >  Aml *aml_while(Aml *predicate);
+> > -Aml *aml_package(uint8_t num_elements);
+> > +Aml *aml_package(uint64_t num_elements);
+> >  Aml *aml_buffer(int buffer_size, uint8_t *byte_list);
+> >  Aml *aml_resource_template(void);
+> >  Aml *aml_field(const char *name, AmlAccessType type, AmlLockRule lock,
+> > @@ -373,7 +373,7 @@ Aml *aml_create_field(Aml *srcbuf, Aml *bit_index, Aml *num_bits,
+> >                        const char *name);
+> >  Aml *aml_create_dword_field(Aml *srcbuf, Aml *index, const char *name);
+> >  Aml *aml_create_qword_field(Aml *srcbuf, Aml *index, const char *name);
+> > -Aml *aml_varpackage(uint32_t num_elements);
+> > +Aml *aml_varpackage(Aml *num_elements);
+> maybe drop it from header and make static so only aml_package() would be
+> left as public API like in spec?
 
-Not sure, but do we still need all these "destination" bit depth
-nowadays? I thought QEMU only supports 32 bit depths these days?
+There are places in the spec that say VarPackage.
+E.g. _CST: Return Value: A variable-length Package.
 
- Thomas
+We probably want to keep aml_varpackage around for these
+cases.
+
+> 
+> >  Aml *aml_touuid(const char *uuid);
+> >  Aml *aml_unicode(const char *str);
+> >  Aml *aml_refof(Aml *arg);
+> > diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> > index def62b3112..1996768b40 100644
+> > --- a/hw/acpi/aml-build.c
+> > +++ b/hw/acpi/aml-build.c
+> > @@ -1016,9 +1016,19 @@ Aml *aml_buffer(int buffer_size, uint8_t *byte_list)
+> >  }
+> >  
+> >  /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefPackage */
+> > -Aml *aml_package(uint8_t num_elements)
+> > +/* Note: The ability to create variable-sized packages was first
+> > + * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
+> > + * with up to 255 elements. Windows guests up to win2k8 fail when
+> > + * VarPackageOp is used.
+> > + */
+> > +Aml *aml_package(uint64_t num_elements)
+> >  {
+> > -    Aml *var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
+> > +    Aml *var;
+> > +
+> > +    if (num_elements > 0xFF)
+> > +        return aml_varpackage(aml_int(num_elements));
+> > +
+> > +    var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
+> >      build_append_byte(var->buf, num_elements);
+> >      return var;
+> >  }
+> > @@ -1136,10 +1146,10 @@ Aml *aml_local(int num)
+> >  }
+> >  
+> >  /* ACPI 2.0a: 17.2.2 Data Objects Encoding: DefVarPackage */
+> > -Aml *aml_varpackage(uint32_t num_elements)
+> > +Aml *aml_varpackage(Aml *num_elements)
+> >  {
+> >      Aml *var = aml_bundle(0x13 /* VarPackageOp */, AML_PACKAGE);
+> > -    build_append_int(var->buf, num_elements);
+> > +    aml_append(var, num_elements);
+> >      return var;
+> >  }
+> >  
+> > diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
+> > index 5243918125..f8246fca6f 100644
+> > --- a/hw/acpi/cpu_hotplug.c
+> > +++ b/hw/acpi/cpu_hotplug.c
+> > @@ -309,15 +309,8 @@ void build_legacy_cpu_hotplug_aml(Aml *ctx, MachineState *machine,
+> >      }
+> >      aml_append(sb_scope, method);
+> >  
+> > -    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })"
+> > -     *
+> > -     * Note: The ability to create variable-sized packages was first
+> > -     * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
+> > -     * ith up to 255 elements. Windows guests up to win2k8 fail when
+> > -     * VarPackageOp is used.
+> > -     */
+> > -    pkg = pcms->apic_id_limit <= 255 ? aml_package(pcms->apic_id_limit) :
+> > -                                       aml_varpackage(pcms->apic_id_limit);
+> > +    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })" */
+> > +    pkg = aml_package(pcms->apic_id_limit);
+> >  
+> >      for (i = 0, apic_idx = 0; i < apic_ids->len; i++) {
+> >          int apic_id = apic_ids->cpus[i].arch_id;
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index 6ea47e2588..2adb1de378 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -174,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+> >      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+> >  
+> >      /* Declare the PCI Routing Table. */
+> > -    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
+> > +    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
+> >      for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
+> >          for (i = 0; i < PCI_NUM_PINS; i++) {
+> >              int gsi = (i + bus_no) % PCI_NUM_PINS;
