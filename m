@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcW1C-0001JL-2S
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:15:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fcW2s-0002CG-5J
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcW18-0002Dk-41
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:15:54 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:41164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcW17-0002DZ-Uk
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:15:50 -0400
-Received: by mail-oi0-x242.google.com with SMTP id k12-v6so35741669oiw.8
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 06:15:49 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1fcW2q-00030f-67
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:17:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44876 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fcW2q-000308-0v
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 09:17:36 -0400
+References: <1528185295-14199-1-git-send-email-slp@redhat.com>
+	<4e35ea24-147d-1b51-fa1b-0f1cc32966e0@redhat.com>
+	<CAJ+F1CLjAXcdkUS2cj_6x2UnE1jTcFAfy88yDWfomp6+Mt7v+g@mail.gmail.com>
+	<CAFEAcA8WN1K-r0u6ZDBFRwRa1WZAMBf2MQhkhg-WDRazfVjQzw@mail.gmail.com>
+	<CAJ+F1CKk=3amSNTSusbPj1MUM+ksTse2YVddLyTf5jqr6RDyFQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <01f5d4ef-cea1-ff81-82cc-30a617a3c648@redhat.com>
+Date: Mon, 9 Jul 2018 15:17:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180702130605.13611-1-peter.maydell@linaro.org>
-References: <20180702130605.13611-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jul 2018 14:15:28 +0100
-Message-ID: <CAFEAcA8gpNbc=a1r_OBNV+KOu0CDbM1X7kH1__1G6rrADry8Mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-3.0] boards.h: Remove doc
- comment reference to nonexistent function
+In-Reply-To: <CAJ+F1CKk=3amSNTSusbPj1MUM+ksTse2YVddLyTf5jqr6RDyFQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/char/serial: Only retry if
+ qemu_chr_fe_write returns 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Thomas Huth <huth@tuxfamily.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Ping for review? I can put this in via target-arm.next...
+On 09/07/2018 14:23, Marc-Andr=C3=A9 Lureau wrote:
+> I suppose the patch should also change qemu_chr_fe_write() to
+> qemu_chr_fe_write_all() to be complete and let the chardev handle
+> EAGAIN.
 
-thanks
--- PMM
+No, using qemu_chr_fe_write_all() is even more wrong, because hw/char
+devices should never block (and hw/char/serial.c handles flow control
+properly).
 
-On 2 July 2018 at 14:06, Peter Maydell <peter.maydell@linaro.org> wrote:
-> commit b08199c6fbea1 accidentally added a reference to a doc
-> comment to a nonexistent memory_region_allocate_aux_memory().
-> This was a leftover from a previous version of the patchset
-> which defined memory_region_allocate_aux_memory() for
-> "allocate RAM MemoryRegion and register it for migration"
-> and left "memory_region_init_ram()" with its original semantics
-> of "allocate RAM MR but do not register for migration". In
-> the end we decided on the approach of "memory_region_init_ram()
-> registers the MR for migration, and memory_region_init_ram_nomigrate()
-> is a new function which does not", but this comment change
-> got left in by mistake. Revert that part of the commit.
->
-> Reported-by: Thomas Huth <huth@tuxfamily.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Doesn't strictly need to go into 3.0, but it's a trivial
-> doc comment fix...
->
->  include/hw/boards.h | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 79069ddcbec..d139a431a67 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -35,8 +35,7 @@
->   *
->   * Smaller pieces of memory (display RAM, static RAMs, etc) don't need
->   * to be backed via the -mem-path memory backend and can simply
-> - * be created via memory_region_allocate_aux_memory() or
-> - * memory_region_init_ram().
-> + * be created via memory_region_init_ram().
->   */
->  void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
->                                            const char *name,
-> --
-> 2.17.1
->
->
+However, indeed it seems to me that the logic of the patch is backwards:
+
+- -1/EAGAIN should retry
+
+- 0 should *not* retry, because it means the other side has hung up
+
+- everything else should not retry.
+
+Paolo
