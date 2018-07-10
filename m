@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41696)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
-	id 1fcgWc-00053T-1i
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:29:03 -0400
+	id 1fcgWo-0005BW-Ft
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
-	id 1fcgWY-0008UI-Sn
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:29:02 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:61579)
+	id 1fcgWl-00006q-BQ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:29:14 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:50067)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
-	id 1fcgWY-0008Tn-Fq
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:58 -0400
+	id 1fcgWk-00004u-UJ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:29:11 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Mon,  9 Jul 2018 17:28:47 -0700
-Message-Id: <89f23a990c112dcf46597cea815a87965ab22032.1531182400.git.alistair.francis@wdc.com>
+Date: Mon,  9 Jul 2018 17:28:58 -0700
+Message-Id: <93d3ddab10fa45e0fc081b7008f634b635acb204.1531182400.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1531182400.git.alistair.francis@wdc.com>
 References: <cover.1531182400.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 5/6] hw/riscv/sifive_u: Connect the Xilinx
- PCIe
+Subject: [Qemu-devel] [PATCH v2 6/6] riscv64-softmmu.mak: Build Virtio Block
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,163 +32,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@wdc.com, alistair23@gmail.com, mjc@sifive.com
 
-Connect the Xilinx PCIe device based on the information in the device
-tree stored in the ROM of the HiFish Unleashed board.
+Add build time support for the VirtIO block device. This allows us to
+attach a drive using the virtio-blk-device.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- default-configs/riscv32-softmmu.mak |  1 +
- default-configs/riscv64-softmmu.mak |  1 +
- hw/riscv/sifive_u.c                 | 64 +++++++++++++++++++++++++++++
- include/hw/riscv/sifive_u.h         |  4 +-
- 4 files changed, 69 insertions(+), 1 deletion(-)
+ default-configs/riscv64-softmmu.mak | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index fcefa68f1e..35e74bebe9 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -8,6 +8,7 @@ CONFIG_CADENCE=y
- 
- CONFIG_PCI=y
- CONFIG_PCI_GENERIC=y
-+CONFIG_PCI_XILINX=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
 diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index fcefa68f1e..35e74bebe9 100644
+index 35e74bebe9..8790f3b115 100644
 --- a/default-configs/riscv64-softmmu.mak
 +++ b/default-configs/riscv64-softmmu.mak
-@@ -8,6 +8,7 @@ CONFIG_CADENCE=y
- 
- CONFIG_PCI=y
- CONFIG_PCI_GENERIC=y
-+CONFIG_PCI_XILINX=y
+@@ -12,3 +12,5 @@ CONFIG_PCI_XILINX=y
  
  CONFIG_VGA=y
  CONFIG_VGA_PCI=y
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 3a6ffeb437..48164f852c 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -45,6 +45,8 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/device_tree.h"
- #include "exec/address-spaces.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci-host/xilinx-pcie.h"
- #include "elf.h"
- 
- #include <libfdt.h>
-@@ -61,6 +63,7 @@ static const struct MemmapEntry {
-     [SIFIVE_U_UART1] =    { 0x10023000,     0x1000 },
-     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
-     [SIFIVE_U_GEM] =      { 0x100900FC,     0x2000 },
-+    [SIFIVE_U_PCIE] =     { 0x2000000000, 0x4000000 },
- };
- 
- #define GEM_REVISION        0x10070109
-@@ -218,6 +221,32 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x0);
-     g_free(nodename);
- 
-+    nodename = g_strdup_printf("/pci@%lx",
-+        (long) memmap[SIFIVE_U_PCIE].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x3);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0x2);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-+                            "xlnx,axi-pcie-host-1.00.a");
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x20, 0x0, 0x0,
-+                           memmap[SIFIVE_U_PCIE].size);
-+    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-+    qemu_fdt_setprop_cells(fdt, nodename, "ranges", 0x2000000, 0x0,
-+                           0x40000000, 0x0, 0x40000000, 0x0, 0x20000000);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_PCIE_IRQ);
-+    g_free(nodename);
 +
-+    nodename = g_strdup_printf("/pci@%lx/interrupt-controller",
-+            (long) memmap[SIFIVE_U_PCIE].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x00);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
-+    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-+    g_free(nodename);
-+
-     nodename = g_strdup_printf("/soc/uart@%lx",
-         (long)memmap[SIFIVE_U_UART0].base);
-     qemu_fdt_add_subnode(fdt, nodename);
-@@ -234,6 +263,37 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     g_free(nodename);
- }
- 
-+static inline DeviceState *
-+xilinx_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
-+                 hwaddr cfg_base, uint64_t cfg_size,
-+                 hwaddr mmio_base, uint64_t mmio_size,
-+                 qemu_irq irq, bool link_up)
-+{
-+    DeviceState *dev;
-+    MemoryRegion *cfg, *mmio;
-+
-+    dev = qdev_create(NULL, TYPE_XILINX_PCIE_HOST);
-+
-+    qdev_prop_set_uint32(dev, "bus_nr", bus_nr);
-+    qdev_prop_set_uint64(dev, "cfg_base", cfg_base);
-+    qdev_prop_set_uint64(dev, "cfg_size", cfg_size);
-+    qdev_prop_set_uint64(dev, "mmio_base", mmio_base);
-+    qdev_prop_set_uint64(dev, "mmio_size", mmio_size);
-+    qdev_prop_set_bit(dev, "link_up", link_up);
-+
-+    qdev_init_nofail(dev);
-+
-+    cfg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-+    memory_region_add_subregion_overlap(sys_mem, cfg_base, cfg, 0);
-+
-+    mmio = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
-+    memory_region_add_subregion_overlap(sys_mem, 0, mmio, 0);
-+
-+    qdev_connect_gpio_out_named(dev, "interrupt_out", 0, irq);
-+
-+    return dev;
-+}
-+
- static void riscv_sifive_u_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = sifive_u_memmap;
-@@ -374,6 +434,10 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
-                        plic_gpios[SIFIVE_U_GEM_IRQ]);
-+
-+    xilinx_pcie_init(system_memory, 0, memmap[SIFIVE_U_PCIE].base,
-+                     memmap[SIFIVE_U_PCIE].size, 0x40000000, 0x20000000,
-+                     qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_PCIE_IRQ), true);
- }
- 
- static void riscv_sifive_u_machine_init(MachineClass *mc)
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index e8b4d9ffa3..e7292ea83b 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -53,12 +53,14 @@ enum {
-     SIFIVE_U_UART0,
-     SIFIVE_U_UART1,
-     SIFIVE_U_DRAM,
--    SIFIVE_U_GEM
-+    SIFIVE_U_GEM,
-+    SIFIVE_U_PCIE
- };
- 
- enum {
-     SIFIVE_U_UART0_IRQ = 3,
-     SIFIVE_U_UART1_IRQ = 4,
-+    SIFIVE_U_PCIE_IRQ = 0x20,
-     SIFIVE_U_GEM_IRQ = 0x35
- };
- 
++CONFIG_VIRTIO_BLK=y
 -- 
 2.17.1
