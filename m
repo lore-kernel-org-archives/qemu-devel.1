@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcnIZ-0000in-Cu
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:43:00 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcnJT-0001Eu-ED
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:43:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcnIW-0004DV-8I
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:42:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49318 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fcnIW-0004DJ-30
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:42:56 -0400
-Date: Tue, 10 Jul 2018 09:42:53 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180710094253.0c122846@redhat.com>
-In-Reply-To: <20180704132239.6506-1-douly.fnst@cn.fujitsu.com>
-References: <20180704132239.6506-1-douly.fnst@cn.fujitsu.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fcnJS-0004RO-I2
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:43:55 -0400
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<20180626135035.133432-4-vsementsov@virtuozzo.com>
+	<92c99cf7-7e60-236f-fe23-8341840e1d09@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e0c515bf-6618-74a7-aab4-6c828389a404@virtuozzo.com>
+Date: Tue, 10 Jul 2018 10:43:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <92c99cf7-7e60-236f-fe23-8341840e1d09@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/machine: Remove the Zero check of
- nb_numa_nodes for numa_complete_configuration()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 3/6] bloc/qcow2: drop dirty_bitmaps_loaded
+ state variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +26,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: dgilbert@redhat.com, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Wed, 4 Jul 2018 21:22:39 +0800
-Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+10.07.2018 02:25, John Snow wrote:
+>
+> On 06/26/2018 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> This variable doesn't work as it should, because it is actually cleared
+>> in qcow2_co_invalidate_cache() by memset(). Drop it, as the following
+>> patch will introduce new behavior.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2.h |  1 -
+>>   block/qcow2.c | 19 ++-----------------
+>>   2 files changed, 2 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index 01b5250415..c9df19b6e6 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -294,7 +294,6 @@ typedef struct BDRVQcow2State {
+>>       uint32_t nb_bitmaps;
+>>       uint64_t bitmap_directory_size;
+>>       uint64_t bitmap_directory_offset;
+>> -    bool dirty_bitmaps_loaded;
+>>   
+>>       int flags;
+>>       int qcow_version;
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index 46194a33ca..0044ff58e7 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -1149,7 +1149,6 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>>       uint64_t ext_end;
+>>       uint64_t l1_vm_state_index;
+>>       bool update_header = false;
+>> -    bool header_updated = false;
+>>   
+>>       ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
+>>       if (ret < 0) {
+>> @@ -1488,23 +1487,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>>           s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+>>       }
+>>   
+>> -    if (s->dirty_bitmaps_loaded) {
+>> -        /* It's some kind of reopen. There are no known cases where we need to
+>> -         * reload bitmaps in such a situation, so it's safer to skip them.
+>> -         *
+>> -         * Moreover, if we have some readonly bitmaps and we are reopening for
+>> -         * rw we should reopen bitmaps correspondingly.
+>> -         */
+>> -        if (bdrv_has_readonly_bitmaps(bs) &&
+>> -            !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
+>> -        {
+>> -            qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+>> -        }
+>> -    } else {
+>> -        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
+>> -        s->dirty_bitmaps_loaded = true;
+>> +    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
+>> +        update_header = false;
+>>       }
+>> -    update_header = update_header && !header_updated;
+>>       if (local_err != NULL) {
+>>           error_propagate(errp, local_err);
+>>           ret = -EINVAL;
+>>
+> Usually I'd like to see the new behavior introduced before removing the
+> old, imperfect solution... (it doesn't make any tests fail!? ...)
+>
+> At this point in the series I just have to trust that you will fix it to
+> be better :)
 
-> Commit 7a3099fc9c5c("numa: postpone options post-processing till machine_run_board_init()")
-> broke the commit 7b8be49d36fc("NUMA: Enable adding NUMA node implicitly").
-> 
-> The machine_run_board_init() doesn't do NUMA setup if nb_numa_nodes=0,
-> but the numa_complete_configuration need add a new node if memory hotplug
-> is enabled (slots > 0) even nb_numa_nodes=0.
-> 
-> So, Remove the check for numa_complete_configuration() to fix this.
-> 
-> Fixes 7a3099fc9c5c("numa: postpone options post-processing till machine_run_board_init()")
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> ---
-> v1 --> v2:
->   -Fix it to pass the "make check". 
-> ---
->  hw/core/machine.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2077328bcc..32b3c5a7d3 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -791,10 +791,9 @@ void machine_run_board_init(MachineState *machine)
->  {
->      MachineClass *machine_class = MACHINE_GET_CLASS(machine);
->  
-> -    if (nb_numa_nodes) {
-> -        numa_complete_configuration(machine);
-> +    numa_complete_configuration(machine);
-> +    if (nb_numa_nodes)
->          machine_numa_finish_cpu_init(machine);
-> -    }
-missing curly brackets, should look like:
-       if (nb_numa_nodes) {
-           machine_numa_finish_cpu_init(machine);
-       }
+As I understand, this field is actually always false, so it's safe to 
+drop it.
 
-with that fixed
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>
+> --js
 
->  
->      /* If the machine supports the valid_cpu_types check and the user
->       * specified a CPU with -cpu check here that the user CPU is supported.
+
+-- 
+Best regards,
+Vladimir
