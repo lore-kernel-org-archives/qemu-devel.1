@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fcxMg-0002DE-K7
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:27:55 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcxPQ-0004Xt-HB
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fcxMd-0002Qc-Gs
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:27:54 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-	<20180710160013.26559-4-peter.maydell@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e24ed93f-e386-ec00-0d83-1bd5b68db0e0@twiddle.net>
-Date: Tue, 10 Jul 2018 11:27:48 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcxPN-0003iJ-8T
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:30:44 -0400
+Received: from mail-eopbgr700098.outbound.protection.outlook.com
+	([40.107.70.98]:59810
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fcxPM-0003gy-Pl
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:30:41 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 10 Jul 2018 18:30:37 +0000
+Message-ID: <BN7PR08MB4868FB7672ABE73989A896DCC65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1531169431-10772-29-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1531169431-10772-29-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/6] accel/tcg: Handle get_page_addr_code()
- returning -1 in tb_check_watchpoint()
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 28/33] mips_malta: Add basic nanoMIPS
+ boot code for MIPS' Malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +32,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 07/10/2018 09:00 AM, Peter Maydell wrote:
-> When we support execution from non-RAM MMIO regions, get_page_addr_code()
-> will return -1 to indicate that there is no RAM at the requested address.
-> Handle this in tb_check_watchpoint() -- if the exception happened for a
-> PC which doesn't correspond to RAM then there is no need to invalidate
-> any TBs, because the one-instruction TB will not have been cached.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Subject: [PATCH v2 28/33] mips_malta: Add basic nanoMIPS boot code for MI=
+PS' Malta
+>
+> From: Matthew Fortune <matthew.fortune@mips.com>
+>
+> Added very very basic nanoMIPS boot code but this is hacked in
+> unconditionally currently.
+>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > ---
->  accel/tcg/translate-all.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  hw/mips/mips_malta.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++=
++-----
+>  include/elf.h        |  1 +
+>  2 files changed, 70 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 3467451..4bc9036 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -620,6 +620,58 @@ static void network_init(PCIBus *pci_bus)
+>       a2 - 32-bit address of the environment variables table
+>       a3 - RAM size in bytes
+>  */
+> +static void write_bootloader_nanomips(uint8_t *base, int64_t run_addr,
+> +                                      int64_t kernel_entry)
+> +{
+> +    uint16_t *p;
+> +
+> +    /* Small bootloader */
+> +    p =3D (uint16_t *)base;
+> +
+> +#define NM_HI1(VAL) (((VAL) >> 16) & 0x1f)
+> +#define NM_HI2(VAL) \
+> +            (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31)=
+ & 0x1))
+> +#define NM_LO(VAL)  ((VAL) & 0xfff)
+> +
+> +    stw_p(p++, 0x2800); stw_p(p++, 0x001c); /* bc to_here */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
+> +
+> +    /* to_here: */
+> +    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
+> +    stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
+> +    stw_p(p++, NM_HI2(ENVP_ADDR - 64));
+> +                                /* lui sp,%hi(ENVP_ADDR - 64) */
+> +    stw_p(p++, 0x83bd); stw_p(p++, NM_LO(ENVP_ADDR - 64));
+> +                                /* ori sp,sp,%lo(ENVP_ADDR - 64) */
+> +    stw_p(p++, 0xe0a0 | NM_HI1(ENVP_ADDR));
+> +    stw_p(p++, NM_HI2(ENVP_ADDR));
+> +                                /* lui a1,%hi(ENVP_ADDR) */
+> +    stw_p(p++, 0x80a5); stw_p(p++, NM_LO(ENVP_ADDR));
+> +                                /* ori a1,a1,%lo(ENVP_ADDR) */
+> +    stw_p(p++, 0xe0c0 | NM_HI1(ENVP_ADDR + 8));
+> +    stw_p(p++, NM_HI2(ENVP_ADDR + 8));
+> +                                /* lui a2,%hi(ENVP_ADDR + 8) */
+> +    stw_p(p++, 0x80c6); stw_p(p++, NM_LO(ENVP_ADDR + 8));
+> +                                /* ori a2,a2,%lo(ENVP_ADDR + 8) */
+> +    stw_p(p++, 0xe0e0 | NM_HI1(loaderparams.ram_low_size));
+> +    stw_p(p++, NM_HI2(loaderparams.ram_low_size));
+> +                                /* lui a3,%hi(loaderparams.ram_low_size)=
+ */
+> +    stw_p(p++, 0x80e7); stw_p(p++, NM_LO(loaderparams.ram_low_size));
+> +                                /* ori a3,a3,%lo(loaderparams.ram_low_si=
+ze) */
+> +    stw_p(p++, 0xe320 | NM_HI1(kernel_entry));
+> +    stw_p(p++, NM_HI2(kernel_entry));
+> +                                /* lui t9,%hi(kernel_entry) */
+> +    stw_p(p++, 0x8339); stw_p(p++, NM_LO(kernel_entry));
+> +                                /* ori t9,t9,%lo(kernel_entry) */
+> +    stw_p(p++, 0x4bf9); stw_p(p++, 0x0000);
+> +                                /* jalrc   t8 */
+> +}
+>
+>  static void write_bootloader(uint8_t *base, int64_t run_addr,
+>                               int64_t kernel_entry)
+> @@ -813,10 +865,16 @@ static int64_t load_kernel (void)
+>                             NULL, (uint64_t *)&kernel_entry, NULL,
+>                             (uint64_t *)&kernel_high, big_endian, EM_MIPS=
+, 1, 0);
+>      if (kernel_size < 0) {
+> -        error_report("could not load kernel '%s': %s",
+> -                     loaderparams.kernel_filename,
+> -                     load_elf_strerror(kernel_size));
+> -        exit(1);
+> +        kernel_size =3D load_elf(loaderparams.kernel_filename,
+> +                    cpu_mips_kseg0_to_phys, NULL,
+> +                    (uint64_t *)&kernel_entry, NULL,
+> +                    (uint64_t *)&kernel_high, big_endian, EM_NANOMIPS, 1=
+, 0);
+> +        if (kernel_size < 0) {
+> +            error_report("could not load kernel '%s': %s",
+> +                         loaderparams.kernel_filename,
+> +                         load_elf_strerror(kernel_size));
+> +            exit(1);
+> +        }
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hmmmm... Is there a better way of doing this decision logic?
 
-r~
+>      }
+>
+>      /* Check where the kernel has been linked */
+> @@ -1096,8 +1154,13 @@ void mips_malta_init(MachineState *machine)
+>          loaderparams.initrd_filename =3D initrd_filename;
+>          kernel_entry =3D load_kernel();
+>
+> -        write_bootloader(memory_region_get_ram_ptr(bios),
+> -                         bootloader_run_addr, kernel_entry);
+> +        if (!cpu_supports_isa(machine->cpu_type, ISA_NANOMIPS32)) {
+> +            write_bootloader(memory_region_get_ram_ptr(bios),
+> +                             bootloader_run_addr, kernel_entry);
+> +        } else {
+> +            write_bootloader_nanomips(memory_region_get_ram_ptr(bios),
+> +                                      bootloader_run_addr, kernel_entry)=
+;
+> +        }
+>          if (kvm_enabled()) {
+>              /* Write the bootloader code @ the end of RAM, 1MB reserved =
+*/
+>              write_bootloader(memory_region_get_ram_ptr(ram_low_preio) +
+> diff --git a/include/elf.h b/include/elf.h
+> index b39e303..d322458 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -144,6 +144,7 @@ typedef int64_t  Elf64_Sxword;
+>
+>  #define EM_RISCV        243     /* RISC-V */
+>
+> +#define EM_NANOMIPS     249     /* MIPS Tech nanoMIPS */
+>  /*
+>   * This is an interim value that we will use until the committee comes
+>   * up with a final number.
+> --
+> 2.7.4
+>
+>
