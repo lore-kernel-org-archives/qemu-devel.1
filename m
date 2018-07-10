@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54594)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fczUc-00069B-4P
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:44:15 -0400
+	id 1fczVI-00073h-FQ
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:44:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fczUY-0006A9-4k
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:44:14 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:40663)
+	id 1fczVE-0006eo-12
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:44:56 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35421)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fczUX-00069y-WC
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:44:10 -0400
-Received: by mail-qk0-x242.google.com with SMTP id c126-v6so3595869qkd.7
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 13:44:09 -0700 (PDT)
+	id 1fczVD-0006eA-Ss
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:44:51 -0400
+Received: by mail-qt0-x242.google.com with SMTP id a5-v6so5050104qtp.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 13:44:51 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180709152117.21585-1-alex.bennee@linaro.org>
-	<20180709152117.21585-3-alex.bennee@linaro.org>
+	<20180709152117.21585-4-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1de61649-ac83-234a-0d97-3f9f4b51767e@amsat.org>
-Date: Tue, 10 Jul 2018 17:44:00 -0300
+Message-ID: <dba15966-cc27-947c-ae52-b57b4153d0f5@amsat.org>
+Date: Tue, 10 Jul 2018 17:44:45 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180709152117.21585-3-alex.bennee@linaro.org>
+In-Reply-To: <20180709152117.21585-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 3.0 02/10] docker: debian-tricore add
- git tools
+Subject: Re: [Qemu-devel] [PATCH for 3.0 03/10] docker: fail more gracefully
+ on docker.py check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,31 +40,36 @@ To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@
 Cc: qemu-devel@nongnu.org
 
 On 07/09/2018 12:21 PM, Alex Bennée wrote:
-> As we check out we need git installed before we start. We would have
-> had this based on the heavier qemu:debian9 image but we only use plain
-> debian:9 here.
-
-I first thought "weird, I checked this already" then noticed you rebased
-on debian:9.
-'stretch-slim' is an alias for '9-slim' and should be tinier (the
-previous RFC image is 323MB).
-
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>> ---
->  tests/docker/dockerfiles/debian-tricore-cross.docker | 3 +++
->  1 file changed, 3 insertions(+)
+> As this is called directly from the Makefile while determining
+> dependencies and it is possible the user was configured in one window
+> but not have credentials in the other. Let's catch the Exceptions and
+> deal with it quietly.
 > 
-> diff --git a/tests/docker/dockerfiles/debian-tricore-cross.docker b/tests/docker/dockerfiles/debian-tricore-cross.docker
-> index 898b8dd511..5ba3ca88a7 100644
-> --- a/tests/docker/dockerfiles/debian-tricore-cross.docker
-> +++ b/tests/docker/dockerfiles/debian-tricore-cross.docker
-> @@ -11,6 +11,9 @@ FROM debian:9
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  tests/docker/docker.py | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 69e7130db7..2f81c6b13b 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -479,7 +479,12 @@ class CheckCommand(SubCommand):
+>      def run(self, args, argv):
+>          tag = args.tag
 >  
->  MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
->  
-> +RUN apt-get update && \
-> +    DEBIAN_FRONTEND=noninteractive apt-get install -yy git
+> -        dkr = Docker()
+> +        try:
+> +            dkr = Docker()
+> +        except:
+> +            print("Docker not set up")
+> +            return 1
 > +
->  RUN git clone --single-branch \
->          https://github.com/bkoppelmann/tricore-binutils.git \
->          /usr/src/binutils && \
+>          info = dkr.inspect_tag(tag)
+>          if info is None:
+>              print("Image does not exist")
 > 
