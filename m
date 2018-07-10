@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fcmBi-0001QN-Eg
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:31:51 -0400
+	(envelope-from <famz@redhat.com>) id 1fcmBj-0001RD-El
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fcmBh-0007nb-N2
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:31:50 -0400
+	(envelope-from <famz@redhat.com>) id 1fcmBi-0007nk-I2
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:31:51 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 10 Jul 2018 14:31:14 +0800
-Message-Id: <20180710063124.2263-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/10] block: Fix dst reading after tail
- copy offloading
+Date: Tue, 10 Jul 2018 14:31:15 +0800
+Message-Id: <20180710063124.2263-2-famz@redhat.com>
+In-Reply-To: <20180710063124.2263-1-famz@redhat.com>
+References: <20180710063124.2263-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/10] block: Prefix file driver trace
+ points with "file_"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +23,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Based-on: 20180709163719.87107-1-vsementsov@virtuozzo.com
+With in one module, trace points usually have a common prefix named
+after the module name. paio_submit and paio_submit_co are the only two
+trace points so far in the two file protocol drivers. As we are adding
+more, having a common prefix here is better so that trace points can be
+enabled with a glob. Rename them.
 
-v3: - Rebase onto Vladmir's:
-      [PATCH v5 0/4] fix image fleecing
-      on top of master, which has blklogwrites to be converted to BdrvChild for
-      the bdrv_co_pdiscard() parameter.  [Kevin]
-    - Add file_ prefix to file protocol trace points. [Kevin]
-    - Assert that BdrvTrackedRequest bytes and offset don't overflow INT64_MAX.
-      [Kevin]
-    - Don't misuse req->offset/req->bytes in bdrv_co_write_req_prepare/finish.
-      [Kevin]
-    - Fix stat64_max. [Kevin]
-    - Keep lines within 80 columns. [Kevin]
-    - Grammar fix in commit message and rev-by. [Eric]
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/file-posix.c | 2 +-
+ block/file-win32.c | 2 +-
+ block/trace-events | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Qcow2 allocates new clusters after the end of the file. If it is the destinaton
-of copy offloading, we must adjust dst->bs->total_sectors. Otherwise, further
-reads will drop to the "beyond EOF" code path and return zeroes, which problem
-is caught by iotests 222.
-
-Follow the logic in the normal write code and update bs->total_sectors after
-I/O is done.
-
-While at it, add a few convenient trace points to aid future debug experiences
-in the topic.
-
-Fam Zheng (10):
-  block: Prefix file driver trace points with "file_"
-  block: Add copy offloading trace points
-  block: Use BdrvChild to discard
-  block: Use uint64_t for BdrvTrackedRequest byte fields
-  block: Extract common write req handling
-  block: Fix handling of image enlarging write
-  block: Use common req handling for discard
-  block: Use common req handling in copy offloading
-  block: Fix bdrv_co_truncate overlap check
-  block: Use common write req handling in truncate
-
- block/blkdebug.c          |   2 +-
- block/blklogwrites.c      |   2 +-
- block/blkreplay.c         |   2 +-
- block/block-backend.c     |   2 +-
- block/copy-on-read.c      |   2 +-
- block/file-posix.c        |   4 +-
- block/file-win32.c        |   2 +-
- block/io.c                | 213 ++++++++++++++++++++++++--------------
- block/iscsi.c             |   3 +
- block/mirror.c            |   2 +-
- block/qcow2-refcount.c    |   2 +-
- block/raw-format.c        |   2 +-
- block/throttle.c          |   2 +-
- block/trace-events        |  10 +-
- include/block/block.h     |   4 +-
- include/block/block_int.h |   4 +-
- 16 files changed, 163 insertions(+), 95 deletions(-)
-
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 4fec8cb53c..1185c7c5cc 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1743,7 +1743,7 @@ static int paio_submit_co_full(BlockDriverState *bs, int fd,
+         assert(qiov->size == bytes);
+     }
+ 
+-    trace_paio_submit_co(offset, bytes, type);
++    trace_file_paio_submit_co(offset, bytes, type);
+     pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
+     return thread_pool_submit_co(pool, aio_worker, acb);
+ }
+diff --git a/block/file-win32.c b/block/file-win32.c
+index 0411fe80fd..f1e2187f3b 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -162,7 +162,7 @@ static BlockAIOCB *paio_submit(BlockDriverState *bs, HANDLE hfile,
+     acb->aio_nbytes = count;
+     acb->aio_offset = offset;
+ 
+-    trace_paio_submit(acb, opaque, offset, count, type);
++    trace_file_paio_submit(acb, opaque, offset, count, type);
+     pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
+     return thread_pool_submit_aio(pool, aio_worker, acb, cb, opaque);
+ }
+diff --git a/block/trace-events b/block/trace-events
+index c35287b48a..854d5525af 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -55,8 +55,8 @@ qmp_block_stream(void *bs, void *job) "bs %p job %p"
+ 
+ # block/file-win32.c
+ # block/file-posix.c
+-paio_submit_co(int64_t offset, int count, int type) "offset %"PRId64" count %d type %d"
+-paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
++file_paio_submit_co(int64_t offset, int count, int type) "offset %"PRId64" count %d type %d"
++file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
+ 
+ # block/qcow2.c
+ qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
 -- 
 2.17.1
