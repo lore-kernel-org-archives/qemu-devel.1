@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fclgL-00063o-AY
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:59:26 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fclnK-0007kH-Hj
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fclgJ-0005hR-Uw
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:59:25 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-	<20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
-	<20180704150256.408d4a07.cohuck@redhat.com>
-	<20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<20180709072953.GE7755@andariel.pipo.sk>
-Date: Tue, 10 Jul 2018 07:59:15 +0200
-In-Reply-To: <20180709072953.GE7755@andariel.pipo.sk> (Peter Krempa's message
-	of "Mon, 9 Jul 2018 09:29:53 +0200")
-Message-ID: <87k1q3ljgs.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+	(envelope-from <junyan.he@gmx.com>) id 1fclnH-0007IL-UF
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:06:38 -0400
+Received: from mga01.intel.com ([192.55.52.88]:23582)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fclnH-0007HY-Jt
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:06:35 -0400
+From: junyan.he@gmx.com
+Date: Tue, 10 Jul 2018 14:06:23 +0800
+Message-Id: <1531202789-31006-2-git-send-email-junyan.he@gmx.com>
+In-Reply-To: <1531202789-31006-1-git-send-email-junyan.he@gmx.com>
+References: <1531202789-31006-1-git-send-email-junyan.he@gmx.com>
+Subject: [Qemu-devel] [PATCH 2/7 V8] memory,
+ exec: switch file ram allocation functions to 'flags' parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,81 +24,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-Peter Krempa <pkrempa@redhat.com> writes:
+From: Junyan He <junyan.he@intel.com>
 
-> On Fri, Jul 06, 2018 at 16:56:46 +0200, Kevin Wolf wrote:
->> Am 06.07.2018 um 13:11 hat Cornelia Huck geschrieben:
->> > On Wed, 4 Jul 2018 17:14:02 +0100
->> > Peter Maydell <peter.maydell@linaro.org> wrote:
->> > 
->> > > On 4 July 2018 at 14:34, Kevin Wolf <kwolf@redhat.com> wrote:
->> > > > Essentially, what is important to me isn't getting these options dropped
->> > > > exactly in 3.0, but not setting a bad precedence that deprecation isn't
->> > > > actually worth anything. We may easily end up with this deprecation
->> > > > process:
->> > > >
->> > > > depreate a feature
->> > > > release QEMU version n + 1
->> > > > release QEMU version n + 2
->> > > > remove the feature
->> > > > while libvirt hasn't removed use of the feature:
->> > > >     # ...and why should it when everything is still working?
->> > > >     reinstate the feature
->> > > >     release QEMU version n + x
->> > > >     remove the feature  
->> > > 
->> > > My take on the deprecation policy essentially is that it gives
->> > > us a *minimum* bar for how soon we can drop something. We
->> > > shouldn't be using it as an "always target this speed for
->> > > dropping something" -- we ought to be pragmatic. We can
->> > > drop stuff that's unused quickly, but should be slower
->> > > for things that still have major users (or reconsider
->> > > the deprecation entirely, potentially). There should be
->> > > a balance between making our work as developers easier and
->> > > inconveniencing our users.
->> > 
->> > What about the following?
->> > 
->> > - put a feature on the "normal" deprecation list to remove after two
->> >   releases
->> > Case (a): nobody complains, either within the deprecation period or
->> > when it is finally removed
->> >   -> all is good
->> > Case (b): the feature turns out to be widely used, and/or it turns out
->> > that it offers value that currently can't be offered easily in another
->> > way
->> >   -> remove from deprecation list; this obviously needs more thinking
->> > Case (c): the feature is used, the users are willing to move away from
->> > it, but they need a bit more time
->> >   -> put it on a "deprecation watchlist", listing the users we are
->> >   waiting for, and then remove after all are done (no +2)
->> > 
->> > That way, we can still easily remove old cruft (case (a)), but still
->> > accommodate cases like this (case (c)). The obvious drawback is that
->> > we'd need someone to curate the deprecation watchlist, to poke the
->> > users we're waiting for, and probably remove anyway after some time if
->> > they don't get their act together.
->> 
->> The problem is that things are only starting to move after two releases
->> have passed. The original idea was to already use that time. If we don't
->> use it, then waiting for two releases is pointless and we can just
->> directly let things go to a deprecation watchlist.
->> 
->> Maybe we can just use the existing wiki page:
->> 
->>     https://wiki.qemu.org/index.php/Features/LegacyRemoval
->> 
->> And add a column for whether libvirt is ready? Of course, that only
->> makes sense if libvirt people make use of and contribute to this page.
->
-> This should not be a problem, but I think we need some active
-> encouraging/prodding to remove deprecated stuff. Otherwise we might miss
-> the news.
+As more flag parameters besides the existing 'share' are going to be
+added to following functions
+memory_region_init_ram_from_file
+qemu_ram_alloc_from_fd
+qemu_ram_alloc_from_file
+let's switch them to use the 'flags' parameters so as to ease future
+flag additions.
 
-In addition to actively pulling libvirt developers into review of
-deprecation patches, we should pursue the idea to optionally let QEMU
-fail on use of deprecated features, then have libvirt run its test suite
-that way.
+The existing 'share' flag is converted to the RAM_SHARED bit in ram_flags,
+and other flag bits are ignored by above functions right now.
+
+Signed-off-by: Junyan He <junyan.he@intel.com>
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ backends/hostmem-file.c |  3 ++-
+ exec.c                  | 10 +++++-----
+ include/exec/memory.h   |  7 +++++--
+ include/exec/ram_addr.h | 25 +++++++++++++++++++++++--
+ memory.c                |  8 +++++---
+ numa.c                  |  2 +-
+ 6 files changed, 41 insertions(+), 14 deletions(-)
+
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 134b08d..34c68bb 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -58,7 +58,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+         path = object_get_canonical_path(OBJECT(backend));
+         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+                                  path,
+-                                 backend->size, fb->align, backend->share,
++                                 backend->size, fb->align,
++                                 backend->share ? RAM_SHARED : 0,
+                                  fb->mem_path, errp);
+         g_free(path);
+     }
+diff --git a/exec.c b/exec.c
+index cc042dc..1ec539d 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2238,7 +2238,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+ 
+ #ifdef __linux__
+ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+-                                 bool share, int fd,
++                                 uint64_t ram_flags, int fd,
+                                  Error **errp)
+ {
+     RAMBlock *new_block;
+@@ -2280,14 +2280,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->mr = mr;
+     new_block->used_length = size;
+     new_block->max_length = size;
+-    new_block->flags = share ? RAM_SHARED : 0;
++    new_block->flags = ram_flags;
+     new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
+     if (!new_block->host) {
+         g_free(new_block);
+         return NULL;
+     }
+ 
+-    ram_block_add(new_block, &local_err, share);
++    ram_block_add(new_block, &local_err, ram_flags & RAM_SHARED);
+     if (local_err) {
+         g_free(new_block);
+         error_propagate(errp, local_err);
+@@ -2299,7 +2299,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+ 
+ 
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+-                                   bool share, const char *mem_path,
++                                   uint64_t ram_flags, const char *mem_path,
+                                    Error **errp)
+ {
+     int fd;
+@@ -2311,7 +2311,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+         return NULL;
+     }
+ 
+-    block = qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
++    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
+     if (!block) {
+         if (created) {
+             unlink(mem_path);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 6d0af29..513ec8d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -640,6 +640,7 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+                                                        void *host),
+                                        Error **errp);
+ #ifdef __linux__
++
+ /**
+  * memory_region_init_ram_from_file:  Initialize RAM memory region with a
+  *                                    mmap-ed backend.
+@@ -651,7 +652,9 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+  * @size: size of the region.
+  * @align: alignment of the region base address; if 0, the default alignment
+  *         (getpagesize()) will be used.
+- * @share: %true if memory must be mmaped with the MAP_SHARED flag
++ * @ram_flags: Memory region features:
++ *             - RAM_SHARED: memory must be mmaped with the MAP_SHARED flag
++ *             Other bits are ignored now.
+  * @path: the path in which to allocate the RAM.
+  * @errp: pointer to Error*, to store an error if it happens.
+  *
+@@ -663,7 +666,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+                                       const char *name,
+                                       uint64_t size,
+                                       uint64_t align,
+-                                      bool share,
++                                      uint64_t ram_flags,
+                                       const char *path,
+                                       Error **errp);
+ 
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index cf4ce06..bb0a09b 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -71,12 +71,33 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+ }
+ 
+ long qemu_getrampagesize(void);
++
++/**
++ * qemu_ram_alloc_from_file,
++ * qemu_ram_alloc_from_fd:  Allocate a ram block from the specified backing
++ *                          file or device
++ *
++ * Parameters:
++ *  @size: the size in bytes of the ram block
++ *  @mr: the memory region where the ram block is
++ *  @ram_flags: specify the properties of the ram block, which can be one
++ *              or bit-or of following values
++ *              - RAM_SHARED: mmap the backing file or device with MAP_SHARED
++ *              Other bits are ignored.
++ *  @mem_path or @fd: specify the backing file or device
++ *  @errp: pointer to Error*, to store an error if it happens
++ *
++ * Return:
++ *  On success, return a pointer to the ram block.
++ *  On failure, return NULL.
++ */
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+-                                   bool share, const char *mem_path,
++                                   uint64_t ram_flags, const char *mem_path,
+                                    Error **errp);
+ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+-                                 bool share, int fd,
++                                 uint64_t ram_flags, int fd,
+                                  Error **errp);
++
+ RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+                                   MemoryRegion *mr, Error **errp);
+ RAMBlock *qemu_ram_alloc(ram_addr_t size, bool share, MemoryRegion *mr,
+diff --git a/memory.c b/memory.c
+index e9cd446..7c5695c 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1551,7 +1551,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+                                       const char *name,
+                                       uint64_t size,
+                                       uint64_t align,
+-                                      bool share,
++                                      uint64_t ram_flags,
+                                       const char *path,
+                                       Error **errp)
+ {
+@@ -1560,7 +1560,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->align = align;
+-    mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
++    mr->ram_block = qemu_ram_alloc_from_file(size, mr, ram_flags, path, errp);
+     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+ }
+ 
+@@ -1576,7 +1576,9 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+     mr->ram = true;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+-    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
++    mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
++                                           share ? RAM_SHARED : 0,
++                                           fd, errp);
+     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+ }
+ #endif
+diff --git a/numa.c b/numa.c
+index 5f6367b..81542d4 100644
+--- a/numa.c
++++ b/numa.c
+@@ -479,7 +479,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+     if (mem_path) {
+ #ifdef __linux__
+         Error *err = NULL;
+-        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, false,
++        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, 0,
+                                          mem_path, &err);
+         if (err) {
+             error_report_err(err);
+-- 
+2.7.4
