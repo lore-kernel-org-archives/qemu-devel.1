@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcuaz-00038v-QF
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fcub0-00039c-I2
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcuay-0003NK-QQ
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60500 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fcuaz-0003Nr-Nw
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38424 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcuay-0003N0-MM
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:28 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcuaz-0003Nf-Jl
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:29 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A3DC40214E2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 15:30:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E7AD7C6A9
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 15:30:29 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 10 Jul 2018 16:30:07 +0100
-Message-Id: <20180710153016.131258-7-dgilbert@redhat.com>
+Date: Tue, 10 Jul 2018 16:30:08 +0100
+Message-Id: <20180710153016.131258-8-dgilbert@redhat.com>
 In-Reply-To: <20180710153016.131258-1-dgilbert@redhat.com>
 References: <20180710153016.131258-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 06/15] migration: loosen recovery check when
- load vm
+Subject: [Qemu-devel] [PULL 07/15] migration: fix incorrect bitmap size
+ calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +34,44 @@ To: qemu-devel@nongnu.org, peterx@redhat.com, quintela@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-We were checking against -EIO, assuming that it will cover all IO
-failures.  But actually it is not.  One example is that in
-qemu_loadvm_section_start_full() we can have tons of places that will
-return -EINVAL even if the error is caused by IO failures on the
-network.
+The calculation on size of received bitmap is incorrect for postcopy
+recovery.  Here we wanted to let the size to cover all the valid bits in
+the bitmap, we should use DIV_ROUND_UP() instead of a division.
 
-Let's loosen the recovery check logic here to cover all the error cases
-happened by removing the explicit check against -EIO.  After all we
-won't lose anything here if any other failure happened.
+For example, a RAMBlock with size=4K (which contains only one single 4K
+page) will have nbits=1, then nbits/8=0, then the real bitmap won't be
+sent to source at all.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180710091902.28780-3-peterx@redhat.com>
+Message-Id: <20180710091902.28780-4-peterx@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/savevm.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ migration/ram.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 851d74e8b6..efcc795071 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2276,18 +2276,14 @@ out:
-         qemu_file_set_error(f, ret);
+diff --git a/migration/ram.c b/migration/ram.c
+index 49068e86d3..52dd678092 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -235,7 +235,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+     bitmap_to_le(le_bitmap, block->receivedmap, nbits);
  
-         /*
--         * Detect whether it is:
--         *
--         * 1. postcopy running (after receiving all device data, which
--         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
--         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
--         *    still receiving device states).
--         * 2. network failure (-EIO)
--         *
--         * If so, we try to wait for a recovery.
-+         * If we are during an active postcopy, then we pause instead
-+         * of bail out to at least keep the VM's dirty data.  Note
-+         * that POSTCOPY_INCOMING_LISTENING stage is still not enough,
-+         * during which we're still receiving device states and we
-+         * still haven't yet started the VM on destination.
-          */
-         if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
--            ret == -EIO && postcopy_pause_incoming(mis)) {
-+            postcopy_pause_incoming(mis)) {
-             /* Reset f to point to the newly created channel */
-             f = mis->from_src_file;
-             goto retry;
+     /* Size of the bitmap, in bytes */
+-    size = nbits / 8;
++    size = DIV_ROUND_UP(nbits, 8);
+ 
+     /*
+      * size is always aligned to 8 bytes for 64bit machines, but it
+@@ -3944,7 +3944,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+     int ret = -EINVAL;
+     QEMUFile *file = s->rp_state.from_dst_file;
+     unsigned long *le_bitmap, nbits = block->used_length >> TARGET_PAGE_BITS;
+-    uint64_t local_size = nbits / 8;
++    uint64_t local_size = DIV_ROUND_UP(nbits, 8);
+     uint64_t size, end_mark;
+ 
+     trace_ram_dirty_bitmap_reload_begin(block->idstr);
 -- 
 2.17.1
