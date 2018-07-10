@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcprR-00026n-IR
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:27:10 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fcpud-0003h0-Hp
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcprO-0006Ae-IA
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:16074)
+	(envelope-from <junyan.he@gmx.com>) id 1fcpub-0007p5-P1
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:27 -0400
+Received: from mga03.intel.com ([134.134.136.65]:54550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fcprO-00069x-Cp
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:27:06 -0400
-Date: Tue, 10 Jul 2018 07:27:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180710102703.GF7451@localhost.localdomain>
-References: <20180704132239.6506-1-douly.fnst@cn.fujitsu.com>
-	<20180710094253.0c122846@redhat.com>
-	<2052cdff-3dea-1267-3442-39557637b2d4@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2052cdff-3dea-1267-3442-39557637b2d4@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hw/machine: Remove the Zero check of
- nb_numa_nodes for numa_complete_configuration()
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fcpub-0007jf-8y
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:25 -0400
+From: junyan.he@gmx.com
+Date: Tue, 10 Jul 2018 18:30:14 +0800
+Message-Id: <1531218620-14645-2-git-send-email-junyan.he@gmx.com>
+In-Reply-To: <1531218620-14645-1-git-send-email-junyan.he@gmx.com>
+References: <1531218620-14645-1-git-send-email-junyan.he@gmx.com>
+Subject: [Qemu-devel] [PATCH 1/7 V9] memory,
+ exec: Expose all memory block related flags.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Junyan He <junyan.he@intel.com>
 
-On Tue, Jul 10, 2018 at 04:15:30PM +0800, Dou Liyang wrote:
-[...]
-> > > +    if (nb_numa_nodes)
-> > >           machine_numa_finish_cpu_init(machine);
-> > > -    }
-> > missing curly brackets, should look like:
-> >         if (nb_numa_nodes) {
-> >             machine_numa_finish_cpu_init(machine);
-> >         }
-> > 
-> > with that fixed
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > 
-> 
-> Thank you, Igor.
-> 
-> Due to Eduardo has sent the pull request of this patch,
-> Can I fix this and send v2 patch now?
+From: Junyan He <junyan.he@intel.com>
 
-You can fix this on a follow-up patch and CC qemu-trivial.
+We need to use these flags in other files rather than just in exec.c,
+For example, RAM_SHARED should be used when create a ram block from file.
+We expose them the exec/memory.h
 
+Signed-off-by: Junyan He <junyan.he@intel.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ exec.c                | 20 --------------------
+ include/exec/memory.h | 20 ++++++++++++++++++++
+ 2 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index 4f5df07..cc042dc 100644
+--- a/exec.c
++++ b/exec.c
+@@ -87,26 +87,6 @@ AddressSpace address_space_memory;
+ 
+ MemoryRegion io_mem_rom, io_mem_notdirty;
+ static MemoryRegion io_mem_unassigned;
+-
+-/* RAM is pre-allocated and passed into qemu_ram_alloc_from_ptr */
+-#define RAM_PREALLOC   (1 << 0)
+-
+-/* RAM is mmap-ed with MAP_SHARED */
+-#define RAM_SHARED     (1 << 1)
+-
+-/* Only a portion of RAM (used_length) is actually used, and migrated.
+- * This used_length size can change across reboots.
+- */
+-#define RAM_RESIZEABLE (1 << 2)
+-
+-/* UFFDIO_ZEROPAGE is available on this RAMBlock to atomically
+- * zero the page and wake waiting processes.
+- * (Set during postcopy)
+- */
+-#define RAM_UF_ZEROPAGE (1 << 3)
+-
+-/* RAM can be migrated */
+-#define RAM_MIGRATABLE (1 << 4)
+ #endif
+ 
+ #ifdef TARGET_PAGE_BITS_VARY
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 448d41a..6d0af29 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -103,6 +103,26 @@ struct IOMMUNotifier {
+ };
+ typedef struct IOMMUNotifier IOMMUNotifier;
+ 
++/* RAM is pre-allocated and passed into qemu_ram_alloc_from_ptr */
++#define RAM_PREALLOC   (1 << 0)
++
++/* RAM is mmap-ed with MAP_SHARED */
++#define RAM_SHARED     (1 << 1)
++
++/* Only a portion of RAM (used_length) is actually used, and migrated.
++ * This used_length size can change across reboots.
++ */
++#define RAM_RESIZEABLE (1 << 2)
++
++/* UFFDIO_ZEROPAGE is available on this RAMBlock to atomically
++ * zero the page and wake waiting processes.
++ * (Set during postcopy)
++ */
++#define RAM_UF_ZEROPAGE (1 << 3)
++
++/* RAM can be migrated */
++#define RAM_MIGRATABLE (1 << 4)
++
+ static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+                                        IOMMUNotifierFlag flags,
+                                        hwaddr start, hwaddr end,
 -- 
-Eduardo
+2.7.4
