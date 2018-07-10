@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fcsLm-0004bt-5B
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:06:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcsM0-0004jb-FY
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:06:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fcsLh-0007bC-Vi
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:06:38 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39001)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fcsLh-0007b0-L8
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:06:33 -0400
-Received: by mail-wm0-x244.google.com with SMTP id h20-v6so8343496wmb.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 06:06:33 -0700 (PDT)
-Date: Tue, 10 Jul 2018 14:06:30 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180710130630.GB30635@stefanha-x1.localdomain>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
-	<001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
+	(envelope-from <kwolf@redhat.com>) id 1fcsLw-0007et-6z
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:06:52 -0400
+Date: Tue, 10 Jul 2018 15:06:38 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180710130638.GH5852@localhost.localdomain>
+References: <1530963723-14380-1-git-send-email-pl@kamp.de>
+	<20180710122832.GF5852@localhost.localdomain>
+	<66172b50-db34-73c8-124a-5a2481b8e14b@kamp.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Y7xTucakfITjPcLV"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+In-Reply-To: <66172b50-db34-73c8-124a-5a2481b8e14b@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V4] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,169 +25,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, maria.klimushenkova@ispras.ru, 'QEMU Developers' <qemu-devel@nongnu.org>, =?iso-8859-1?Q?'Llu=EDs?= Vilanova' <vilanova@ac.upc.edu>
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
+Am 10.07.2018 um 14:36 hat Peter Lieven geschrieben:
+> Am 10.07.2018 um 14:28 schrieb Kevin Wolf:
+> > Am 07.07.2018 um 13:42 hat Peter Lieven geschrieben:
+> > > We currently don't enforce that the sparse segments we detect during convert are
+> > > aligned. This leads to unnecessary and costly read-modify-write cycles either
+> > > internally in Qemu or in the background on the storage device as nearly all
+> > > modern filesystems or hardware have a 4k alignment internally.
+> > > 
+> > > This patch modifies is_allocated_sectors so that its *pnum result will always
+> > > end at an alignment boundary. This way all requests will end at an alignment
+> > > boundary. The start of all requests will also be aligned as long as the results
+> > > of get_block_status do not lead to an unaligned offset.
+> > > 
+> > > The number of RMW cycles when converting an example image [1] to a raw device that
+> > > has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+> > > write requests. With this path the additional 4600 read requests are eliminated while
+> > > the number of total write requests stays constant.
+> > > 
+> > > [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
+> > > 
+> > > Signed-off-by: Peter Lieven <pl@kamp.de>
+> > > ---
+> > > V3->V4: - only focus on the end offset in is_allocated_sectors [Kevin]
+> > > V2->V3: - ensure that s.alignment is a power of 2
+> > >          - correctly handle n < alignment in is_allocated_sectors if
+> > >            sector_num % alignment > 0.
+> > > V1->V2: - take the current sector offset into account [Max]
+> > >          - try to figure out the target alignment [Max]
+> > > 
+> > >   qemu-img.c | 44 ++++++++++++++++++++++++++++++++++++++------
+> > >   1 file changed, 38 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/qemu-img.c b/qemu-img.c
+> > > index e1a506f..20e3236 100644
+> > > --- a/qemu-img.c
+> > > +++ b/qemu-img.c
+> > > @@ -1105,11 +1105,15 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
+> > >    *
+> > >    * 'pnum' is set to the number of sectors (including and immediately following
+> > >    * the first one) that are known to be in the same allocated/unallocated state.
+> > > + * The function will try to align the end offset to alignment boundaries so
+> > > + * that the request will at least end aligned and consequtive requests will
+> > > + * also start at an aligned offset.
+> > >    */
+> > > -static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+> > > +static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
+> > > +                                int64_t sector_num, int alignment)
+> > >   {
+> > >       bool is_zero;
+> > > -    int i;
+> > > +    int i, tail;
+> > >       if (n <= 0) {
+> > >           *pnum = 0;
+> > > @@ -1122,6 +1126,23 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+> > >               break;
+> > >           }
+> > >       }
+> > > +
+> > > +    tail = (sector_num + i) & (alignment - 1);
+> > > +    if (tail) {
+> > > +        if (is_zero && i == tail) {
+> > Should this be i <= tail for the case where sector_num is unaligned?
+> > 
+> > For example:
+> > 
+> >      Bytes 0     - 1024:     zero
+> >      Bytes 1024  - 4096:     non-zero
+> > 
+> >      /* Check from 512 to 4096, alignment 2048 */
+> >      is_allocated_sectors(buf, 7, &pnum, 1, 4)
+> > 
+> >      -> is_zero = true
+> >      -> i = 1
+> >      -> tail = (sector_num + i) & (alignment - 1)
+> >              = (1 + 1) & (4 - 1)
+> >              = 2
+> >              != i
+> 
+> You are right. I missed that.
+> 
+> > 
+> > > +            /* treat unallocated areas which only consist
+> > > +             * of a small tail as allocated. */
+> > > +            is_zero = 0;
+> > (This should be false rather than 0, is_zero is a bool)
+> 
+> will fix.
+> 
+> > 
+> > > +        }
+> > > +        if (!is_zero) {
+> > > +            /* align up end offset of allocated areas. */
+> > > +            i += alignment - tail;
+> > > +            i = MIN(i, n);
+> > > +        } else {
+> > > +            /* align down end offset of zero areas. */
+> > > +            i -= tail;
+> > So our example above will end up in this branch and we get:
+> > 
+> >      i = i - tail
+> >        = 1 - 2
+> >        = -1
+> > 
+> > I'm not sure what callers will do with a negative *pnum, but I expect it
+> > won't be anything good.
+> 
+> But with i <= tail, we avoid ending up here.
+> So with the 2 fixes you are okay with this Patch?
 
---Y7xTucakfITjPcLV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think so, yes.
 
-On Tue, Jun 05, 2018 at 02:56:29PM +0300, Pavel Dovgalyuk wrote:
-> > From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> >=20
-> > This series doesn't seem to add anything to Documentation/ that
-> > describes the API we make available to plugins. I'm a lot more
-> > interested in reviewing the API that will be used by plugins
-> > than I am in the implementation at this stage. Can you provide
-> > a description/documentation of the API for review, please?
->=20
->=20
-> Here is the draft:
-
-I like the minimal interface that you are proposing and that it is
-completely separate from QEMU-internal APIs.  This will make it easy to
-keep this public API cleanly separated from private internal APIs.
-
-> Introduction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> This document describes an API for creating the QEMU
-> instrumentation plugins.
->=20
-> It is based on the following prior sources:
->  - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with =
-QEMU"
->    https://www.linux-kvm.org/images/3/3d/Introspect.pdf
->  - Discussion on Lluis Vilanova instrumentation patch series
->    https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
->=20
-> The aim of the instrumentation is implementing different runtime
-> tracers that can track the executed instructions, memory and
-> hardware operations.
->=20
-> Instrumenting the code
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Instrumentation subsystem exploits TCG helper mechanism to embed
-> callbacks into the translation blocks. These callbacks may be inserted
-> before the specific instructions, when the plugins require such filtering.
->=20
-> Translator uses two functions for embedding the callbacks:
->  - first function checks whether the current instruction should be
->    instrumented
->  - second function embeds the callback for executing the plugin-specific
->    code before that instruction
->=20
-> The similar method may be used for memory access instrumentation.
->=20
-> QEMU->Plugin API
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Instrumentation layer passes the requests from the translator
-> to the dynamically loaded plugins. Every plugin may provide
-> the following functions to perform the instrumentation:
->=20
->  1. bool plugin_init(const char *args);
->     Initialization function. May return false if the plugin
->     can't work in the current environment.
-
-Please document how plugin loading and argument handling works.
-
-Do you think unloading is necessary?  For example, on a long-running
-guest it could be useful to unload the plugin, modify and recompile it,
-and then load it again during development.  And maybe unloading is also
-useful in cases where a plugin produces a lot of data or slows down
-execution of a long-running guest.
-
->=20
->  2. bool plugin_needs_before_insn(uint64_t pc, void *cpu);
->     Returns true if the plugin needs to instrument the current instructio=
-n.
->     It may use the address (pc) for making the decision or the guest
->     CPU state (cpu), which can be passed back to QEMU core API
->     (e.g., for reading the guest memory).
->     This function is called at both translation and execution phases.
-
-What type of address is 'pc' - guest virtual or guest physical?
-
-Is the guest CPU state well-defined when this function is called?  For
-example, is reading CPU registers meaningful in this function since it
-could be called at pretty much any time?
-
-Why is this function called during execution?  I expected this to be
-called at translation time only.  If a plugin decides at runtime to
-instrument instructions that were previously not instrumented, then it
-could flush the relevant TB(s) - that seems a lot more efficient than
-calling this function for every instruction that gets executed.  But
-maybe I am missing a use case for calling this at execution time...?
-
->  3. void plugin_before_insn(uint64_t pc, void *cpu);
->     If the previous function returned true for some instruction,
->     then this function will be called. This process is repeated before
->     every execution of the instruction, if it was instrumented.
-
-Plugins that instrument multiple kinds of instructions will have to
-first look up pc and decide which kind of instruction it is.  The plugin
-could keep a list or hash table, or it could read memory to check the
-guest code again.  This will be very repetitive - many plugins will need
-to do this.
-
-A slightly different take on this API is:
-
-  /* Plugin->QEMU API */
-
-  /* Called by QEMU before translating an instruction
-   * @pc: guest virtual address of instruction
-   */
-  void plugin_pre_translate(void *cpu, uint64_t pc);
-
-  /* QEMU->Plugin API */
-
-  /* A callback invoked by QEMU before executing an instrumented
-   * instruction
-   * @opaque: plugin-specific data
-   */
-  typedef void (*InstrumentCallback)(void *cpu, void *opaque);
-
-  /* Register a callback @cb each time the instruction at @pc is about
-   * to be executed
-   * @cpu: the cpu to instrument or NULL to instrument all cpus
-   * @opaque: plugin-specific data that is passed to @cb
-   */
-  void instrument(void *cpu, uint64_t pc,
-                  InstrumentCallback cb,
-                  void *opaque);
-
-  /* Unregister a callback @cb previously registered using instrument()
-   */
-  void uninstrument(void *cpu, uint64_t pc,
-                    InstrumentCallback cb,
-		    void *opaque);
-
-Here plugin_pre_translate() is similar to plugin_needs_before_insn(),
-but note it has no return value.  Instead of telling QEMU whether or not
-to instrument an instruction, it must call instrument() if it wishes to
-receive a callback immediately before a particular instruction is
-executed.
-
-This is just an idea I wanted to share.  You understand the use cases
-for binary instrumentation much better than me.  Feel free to disregard
-if it doesn't fit.
-
---Y7xTucakfITjPcLV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbRK9WAAoJEJykq7OBq3PIpq4H/2eEUfm9nHTiBzdOUXjgsfOx
-KSsbQ81PFPce0aUMArADx9YmdEqumYcIqZ+GX1qkMHAfSPsEQ706tuHvnFHjyyqY
-JjZjbAnm79wjxeVb18ocGELT5ygrXFweG3Bh72+6CZ247VH4+FCqqWe+gTccbNSN
-ny3RWsRmy8pe19YqTL+cuYt9INAS3e8LOu+9Rs3BWdcmpJPWE/loI7LTutyOGeOb
-Qlm9F2cOeM8nkCaX8Niv/dWNSZSXk/YQG1UF3dVvhM5fyaz5ucXXhZr0CvXeUjqi
-Kc69ZuQhPWbY07UjPwdSJr3AgsyhnjcVo9vmyIN3ZWBMKTqZ1KmC2IRPeJJyp04=
-=Rv9H
------END PGP SIGNATURE-----
-
---Y7xTucakfITjPcLV--
+Kevin
