@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcwMB-0003Vz-Cw
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:23:20 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcwbv-0007rA-Lr
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fcwM7-0006Os-W1
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:23:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fcwM7-0006OV-Ph
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:23:15 -0400
-Date: Tue, 10 Jul 2018 14:23:09 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180710172309.GK914@localhost.localdomain>
-References: <20180514171913.17664-1-berrange@redhat.com>
-	<20180607094747.GA12019@redhat.com>
-	<20180710171157.GA3636@rkaganb.sw.ru>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcwbs-0005ti-Ie
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:39:35 -0400
+Received: from mail-bn3nam01on0138.outbound.protection.outlook.com
+	([104.47.33.138]:38560
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fcwbs-0005s6-4b
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:39:32 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 10 Jul 2018 17:39:29 +0000
+Message-ID: <BN7PR08MB48685FD7E55C9FC058A38813C65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1531169431-10772-10-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1531169431-10772-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180710171157.GA3636@rkaganb.sw.ru>
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] i386: fix handling of multiboot modules
+Subject: Re: [Qemu-devel] [PATCH v2 09/33] target/mips: Add emulation of
+ misc nanoMIPS instructions (pool32a0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On Tue, Jul 10, 2018 at 08:11:58PM +0300, Roman Kagan wrote:
-> On Thu, Jun 07, 2018 at 10:47:47AM +0100, Daniel P. Berrang=E9 wrote:
-> > ping...
-> >=20
-> > On Mon, May 14, 2018 at 06:19:10PM +0100, Daniel P. Berrang=E9 wrote:
-> > > This short series fixes a flaw identified by coverity which broke t=
-he
-> > > handling of multiboot modules.
-> > >=20
-> > > Daniel P. Berrang=E9 (3):
-> > >   i386: fix regression parsing multiboot initrd modules
-> > >   i386: only parse the initrd_filename once for multiboot modules
-> > >   opts: remove redundant check for NULL parameter
-> > >=20
-> > >  hw/i386/multiboot.c | 35 ++++++++++++++++-------------------
-> > >  util/qemu-option.c  |  8 +++-----
-> > >  2 files changed, 19 insertions(+), 24 deletions(-)
-> > >=20
-> > > --=20
-> > > 2.17.0
->=20
-> Any reason this hasn't been merged yet?
+> Subject: [PATCH v2 09/33] target/mips: Add emulation of misc nanoMIPS ins=
+tructions (pool32a0)
+>
+> From: Yongbok Kim <yongbok.kim@mips.com>
+>
+> Add emulation of nanoMIPS instructions that are situated in pool32a0.
+>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  target/mips/translate.c | 190 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 190 insertions(+)
 
-Lack of reviews, unfortunately.  I guess we don't have many
-people familiar with the multiboot code.
+Technically, this covers slightly more than pool pool32a0, but this is real=
+ly splitting the hair, so, anyway:
 
->=20
-> This fixes a regression that, in particular, makes QEMU segfault when
-> running kvm-unit-tests.
-
-As it is a bug fix, I will try to review merge it for the next
-rc.
-
---=20
-Eduardo
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
