@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fcocY-0000TQ-Ie
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:07:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1fconh-0002xa-5B
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fcocS-0007aR-Ho
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:07:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36384 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fcond-0002tZ-PS
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:19:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40118 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fcocS-0007a9-Bu
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:07:36 -0400
-Date: Tue, 10 Jul 2018 10:07:31 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180710090731.GC1612@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180709203731.19865-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180709203731.19865-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0] pc: Use "3.0+" constant as default
- SMBIOS version
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fcond-0002tO-Kf
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:19:09 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Tue, 10 Jul 2018 17:18:52 +0800
+Message-Id: <20180710091902.28780-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.0 v2 00/10] migration: postcopy recovery
+ unit test, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-On Mon, Jul 09, 2018 at 05:37:31PM -0300, Eduardo Habkost wrote:
-> Every time we create new PC machine-types in QEMU, the defaults
-> for SMBIOS fields change unnecessarily because the version field
-> defaults to MachineClass::name.
-> 
-> This can cause unexpected side-effects, like triggering license
-> reactivation on guest software, or changing the VM memory layout
-> because of BIOS table size changes.
+Based-on: <20180627132246.5576-1-peterx@redhat.com>
 
-Does that really matter though ? By its very nature the 'Version'
-field in SMBIOS is expected to change if you alter something about
-the hardware. If guests OS don't want to be exposed to changes in
-SMBIOS they would be using a fixed machine type, not the variable
-"pc" type that continually changes.
+Based on the series to unbreak postcopy:
+  Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
+  Message-Id: <20180627132246.5576-1-peterx@redhat.com>
 
-We could put padding in the string if we want to avoid BIOS table
-layout changes.
+v2:
+- collect r-bs, and t-b for Balamuruhan
+- rename matching_target_page_size to matches_target_page_size [Dave]
+- fixup the race that Dave reported: the 1st patch was added as
+  a new patch (patch 4); the 2nd patch was squashed into the unit test
+  patch (patch 9)
 
-Having version change though feels like it is working as intended
-for the semantics of these Version: fields in BIOS.
+Please review.  Thanks,
 
-> Change the SMBIOS version string for pc-*-3.0 to "3.0+" to avoid
-> doing this on every QEMU release, and keep compatible version
-> strings on older machine-types using a new
-> MachineClass::smbios_version field.
+Peter Xu (10):
+  migration: simplify check to use qemu file buffer
+  migration: loosen recovery check when load vm
+  migration: fix incorrect bitmap size calculation
+  migration: show pause/recover state on dst host
+  tests: introduce migrate_postcopy_* helpers
+  tests: allow migrate() to take extra flags
+  tests: introduce migrate_query*() helpers
+  tests: introduce wait_for_migration_status()
+  tests: add postcopy recovery test
+  tests: hide stderr for postcopy recovery test
 
+ migration/migration.c  |   2 +
+ migration/ram.c        |  21 +++--
+ migration/savevm.c     |  16 ++--
+ tests/migration-test.c | 205 ++++++++++++++++++++++++++++++++---------
+ 4 files changed, 185 insertions(+), 59 deletions(-)
 
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.1
