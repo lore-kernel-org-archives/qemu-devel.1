@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcqh2-0001Rg-MA
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:20:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fcqkR-0002TB-Vs
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcqgx-0004w6-OA
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:20:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57274 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcqgx-0004vx-Ia
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:20:23 -0400
-Date: Tue, 10 Jul 2018 12:20:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180710112019.GG2656@work-vm>
-References: <20180710091902.28780-1-peterx@redhat.com>
-	<20180710091902.28780-5-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fcqkR-0005k1-0C
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:23:59 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:32949)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fcqkQ-0005jp-PR
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:23:58 -0400
+Received: by mail-oi0-x244.google.com with SMTP id c6-v6so41915968oiy.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 04:23:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180710091902.28780-5-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 04/10] migration: show
- pause/recover state on dst host
+In-Reply-To: <7fafbf1c-9af1-cfb9-24c7-ee9a00ef9d4e@linaro.org>
+References: <20180709124535.1116-1-peter.maydell@linaro.org>
+	<7fafbf1c-9af1-cfb9-24c7-ee9a00ef9d4e@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Jul 2018 12:23:37 +0100
+Message-ID: <CAFEAcA_F03w0REiTrT-Xi5cGcBtnv5m3RK4f6QvU+bufSEhb7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.0] target/arm: Use correct mmu_idx
+ for exception-return unstacking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Balamuruhan S <bala24@linux.vnet.ibm.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Adithya Baglody <adithya.nagaraj.baglody@intel.com>, "patches@linaro.org" <patches@linaro.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> These two states will be missing when doing "query-migrate" on
-> destination VM.  Add these states so that we can get the query results
-> as expected.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 9 July 2018 at 15:30, Richard Henderson <richard.henderson@linaro.org> wrote:
+> On 07/09/2018 05:45 AM, Peter Maydell wrote:
+>> For M-profile exception returns, the mmu index to use for exception
+>> return unstacking is supposed to be that of wherever we are returning to:
+>>  * if returning to handler mode, privileged
+>>  * if returning to thread mode, privileged or unprivileged depending on
+>>    CONTROL.nPRIV for the destination security state
+>>
+>> We were passing the wrong thing as the 'priv' argument to
+>> arm_v7m_mmu_idx_for_secstate_and_priv(). The effect was that guests
+>> which programmed the MPU to behave differently for privileged and
+>> unprivileged code could get spurious MemManage Unstack exceptions.
+>>
+>> Reported-by: Adithya Baglody <adithya.nagaraj.baglody@intel.com>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  target/arm/helper.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Thanks; applied to master for 3.0-rc0.
 
-> ---
->  migration/migration.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 0404c53215..8d56d56930 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -911,6 +911,8 @@ static void fill_destination_migration_info(MigrationInfo *info)
->      case MIGRATION_STATUS_CANCELLED:
->      case MIGRATION_STATUS_ACTIVE:
->      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
-> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
->      case MIGRATION_STATUS_FAILED:
->      case MIGRATION_STATUS_COLO:
->          info->has_status = true;
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
