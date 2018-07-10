@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcmdl-0006mI-Q4
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1fcmdv-0006pg-Ly
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:01:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcmdk-00044G-Qd
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:49 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44302)
+	(envelope-from <bounces@canonical.com>) id 1fcmdr-00049e-1Q
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51720)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcmdk-00043w-Jc
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:48 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s198-v6so40621681oih.11
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 00:00:48 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fcmdq-00048h-Qx
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fcmdp-0004Df-Cc
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 07:00:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5B2002E819B
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 07:00:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180709175603.1320-1-richard.henderson@linaro.org>
-References: <20180709175603.1320-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jul 2018 08:00:27 +0100
-Message-ID: <CAFEAcA-Y0DvZgvjrdpMqnFjQdwsr=xinr0hJiBc9+tPrsDzVtQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-3.0 0/1] target/sh4: Fix translator.c
- assertion failure for gUSA
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Jul 2018 06:48:01 -0000
+From: siva krishna <1780814@bugs.launchpad.net>
+Reply-To: Bug 1780814 <1780814@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153115132054.17859.168324292889810627.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153120528181.12409.16527103543449309511.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1780814] Re: lib/raid6/neon4.c:118:1: internal
+ compiler error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 9 July 2018 at 18:56, Richard Henderson <richard.henderson@linaro.org> wrote:
-> This patch got lost, and represents a regression from 2.12.
->
-> Running check-tcg with all of the docker bells and whistles
-> will show this up, and is what reminded me.
->
->
-> r~
->
->
-> The following changes since commit ec7eb2ae77cc207064e17ace048f7ec0c4b85d6f:
->
->   translate-all: honour CF_NOCACHE in tb_gen_code (2018-07-09 16:14:36 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-sh4-20180709
->
-> for you to fetch changes up to be0e3d7a1e148180fe1b89c7f93720db0607614e:
->
->   target/sh4: Fix translator.c assertion failure for gUSA (2018-07-09 10:34:04 -0700)
->
-> ----------------------------------------------------------------
-> Fix translation for gUSA regions.
->
-> ----------------------------------------------------------------
-> Richard Henderson (1):
->       target/sh4: Fix translator.c assertion failure for gUSA
->
->  target/sh4/translate.c | 81 +++++++++++++++++++++++++++-----------------------
->  1 file changed, 44 insertions(+), 37 deletions(-)
+Hi Peter Maydell ,
+
+is that GCC compiler error or cross-compiler error ?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1780814
+
+Title:
+  lib/raid6/neon4.c:118:1: internal compiler error
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  I am facing below issue when i am trying to cross compile kernel for rasp=
+berry pi 3.
+  please give solution .
+
+  =
+
+  Below is log
 
 
-Applied, thanks.
+  CHK     include/config/kernel.release
+    CHK     include/generated/uapi/linux/version.h
+    CHK     include/generated/utsrelease.h
+    CHK     include/generated/bounds.h
+    CHK     include/generated/timeconst.h
+    CHK     include/generated/asm-offsets.h
+    CALL    scripts/checksyscalls.sh
+    CHK     scripts/mod/devicetable-offsets.h
+    CHK     include/generated/compile.h
+    CHK     kernel/config_data.h
+    CC [M]  lib/raid6/neon4.o
+  lib/raid6/neon4.c: In function =E2=80=98raid6_neon4_gen_syndrome_real=E2=
+=80=99:
+  lib/raid6/neon4.c:118:1: internal compiler error: in dwarf2out_frame_debu=
+g_adjust_cfa, at dwarf2cfi.c:1078
+   }
+   ^
+  Please submit a full bug report,
+  with preprocessed source if appropriate.
+  See <https://bugs.launchpad.net/gcc-linaro> for instructions.
+  scripts/Makefile.build:328: recipe for target 'lib/raid6/neon4.o' failed
+  make[2]: *** [lib/raid6/neon4.o] Error 1
+  scripts/Makefile.build:587: recipe for target 'lib/raid6' failed
+  make[1]: *** [lib/raid6] Error 2
+  Makefile:1034: recipe for target 'lib' failed
 
--- PMM
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1780814/+subscriptions
