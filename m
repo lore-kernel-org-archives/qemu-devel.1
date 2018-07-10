@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fcw0R-0001Ud-1w
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:00:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1fcw1W-0002A0-W8
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fcw0P-0006Gs-T5
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:00:51 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue, 10 Jul 2018 13:00:41 -0400
-Message-Id: <20180710170041.875-3-jsnow@redhat.com>
-In-Reply-To: <20180710170041.875-1-jsnow@redhat.com>
-References: <20180710170041.875-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 2/2] iotests: add test 226 for file driver
- types
+	(envelope-from <berrange@redhat.com>) id 1fcw1V-0006Zm-Kc
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:01:59 -0400
+Date: Tue, 10 Jul 2018 18:01:45 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180710170145.GG1612@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180704150256.408d4a07.cohuck@redhat.com>
+	<20180704133440.GE4334@localhost.localdomain>
+	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
+	<20180706131103.4e713911.cohuck@redhat.com>
+	<20180706145645.GB3939@localhost.localdomain>
+	<20180709072953.GE7755@andariel.pipo.sk>
+	<87k1q3ljgs.fsf@dusky.pond.sub.org>
+	<20180710162208.7b1b5cdc.cohuck@redhat.com>
+	<20180710143931.GQ1148@andariel.pipo.sk>
+	<20180710170122.427ce3a4.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180710170122.427ce3a4.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,135 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Test that we're rejecting what we ought to for file,
-host_driver and host_cdrom drivers. Test that we're
-seeing the deprecated message for block and chardevs
-on the file driver.
+On Tue, Jul 10, 2018 at 05:01:22PM +0200, Cornelia Huck wrote:
+> Who is, in general, testing which libvirt version? I can think of:
+> - libvirt developers, which will probably run libvirt current git, but
+>   more likely a released QEMU?
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/226     | 66 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/226.out | 26 ++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 93 insertions(+)
- create mode 100755 tests/qemu-iotests/226
- create mode 100644 tests/qemu-iotests/226.out
+In general libvirt devs tend to run a mixture of whatever the default QEMU
+is in Fedora / RHEL, along side current QEMU git master, depending on what
+feature(s) we're working on.
 
-diff --git a/tests/qemu-iotests/226 b/tests/qemu-iotests/226
-new file mode 100755
-index 0000000000..460aea2fc9
---- /dev/null
-+++ b/tests/qemu-iotests/226
-@@ -0,0 +1,66 @@
-+#!/bin/bash
-+#
-+# This test covers expected filetypes for the file, host_cdrom and
-+# host_device drivers.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=jsnow@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1    # failure is the default!
-+
-+_cleanup()
-+{
-+    rmdir "$TEST_IMG"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.pattern
-+
-+# Generic format, but tests file-protocol specific error handling
-+_supported_fmt generic
-+_supported_proto file
-+_supported_os Linux
-+
-+# Create something decidedly not a file, blockdev or chardev...
-+mkdir "$TEST_IMG"
-+
-+for PROTO in "file" "host_device" "host_cdrom"; do
-+    echo
-+    echo "=== Testing with driver:$PROTO ==="
-+    echo
-+    echo "== Testing RO =="
-+    $QEMU_IO -c "open -r -o driver=$PROTO,filename=$TEST_IMG" 2>&1 | _filter_imgfmt | _filter_testdir
-+    $QEMU_IO -c "open -r -o driver=$PROTO,filename=/dev/null" 2>&1 | _filter_imgfmt
-+    echo "== Testing RW =="
-+    $QEMU_IO -c "open -o driver=$PROTO,filename=$TEST_IMG" 2>&1 | _filter_imgfmt | _filter_testdir
-+    $QEMU_IO -c "open -o driver=$PROTO,filename=/dev/null" 2>&1 | _filter_imgfmt
-+done
-+
-+# success, all done
-+echo
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/226.out b/tests/qemu-iotests/226.out
-new file mode 100644
-index 0000000000..8c0d060ffc
---- /dev/null
-+++ b/tests/qemu-iotests/226.out
-@@ -0,0 +1,26 @@
-+QA output created by 226
-+
-+=== Testing with driver:file ===
-+
-+== Testing RO ==
-+can't open: A regular file was expected by the 'file' driver, but something else was given
-+warning: Opening a character device as a file using the 'file' driver is deprecated
-+== Testing RW ==
-+can't open: Could not open 'TEST_DIR/t.IMGFMT': Is a directory
-+warning: Opening a character device as a file using the 'file' driver is deprecated
-+
-+=== Testing with driver:host_device ===
-+
-+== Testing RO ==
-+can't open: 'host_device' driver expects either a character or block device
-+== Testing RW ==
-+can't open: Could not open 'TEST_DIR/t.IMGFMT': Is a directory
-+
-+=== Testing with driver:host_cdrom ===
-+
-+== Testing RO ==
-+can't open: 'host_cdrom' driver expects either a character or block device
-+== Testing RW ==
-+can't open: Could not open 'TEST_DIR/t.IMGFMT': Is a directory
-+
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 1c9f679821..68f66259b2 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -223,3 +223,4 @@
- 222 rw auto quick
- 223 rw auto quick
- 225 rw auto quick
-+226 auto quick
+> - QEMU (and other related tools) developers, who will probably use QEMU
+>   current git, but a released libvirt
+> - normal (technical) users and (integration) testers, who will probably
+>   use released versions of libvirt and QEMU
+
+We don't currently have any integration testing CI system, but we are in
+process of getting hardware resource to allow us to run CI. With that we
+can setup jobs which test various relevant QEMU versions, both git master
+and released versions.
+
+
+Regards,
+Daniel
 -- 
-2.14.4
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
