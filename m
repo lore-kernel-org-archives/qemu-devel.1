@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34782)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fcu97-0001at-3u
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:01:47 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35555)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1fcuDE-0003A3-MV
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fcu93-0000Kq-7h
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:01:41 -0400
-Date: Tue, 10 Jul 2018 17:01:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180710170122.427ce3a4.cohuck@redhat.com>
-In-Reply-To: <20180710143931.GQ1148@andariel.pipo.sk>
-References: <20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
-	<20180704150256.408d4a07.cohuck@redhat.com>
-	<20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<20180709072953.GE7755@andariel.pipo.sk>
-	<87k1q3ljgs.fsf@dusky.pond.sub.org>
-	<20180710162208.7b1b5cdc.cohuck@redhat.com>
-	<20180710143931.GQ1148@andariel.pipo.sk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+	(envelope-from <pl@kamp.de>) id 1fcuDB-00020i-Eb
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:05:56 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:44780 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fcuDB-0001xL-55
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:05:53 -0400
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 17:05:47 +0200
+From: Peter Lieven <pl@kamp.de>
+Date: Tue, 10 Jul 2018 17:05:46 +0200
+Message-Id: <1531235146-6048-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V5] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +25,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, Peter Lieven <pl@kamp.de>
 
-On Tue, 10 Jul 2018 16:39:31 +0200
-Peter Krempa <pkrempa@redhat.com> wrote:
+We currently don't enforce that the sparse segments we detect during convert are
+aligned. This leads to unnecessary and costly read-modify-write cycles either
+internally in Qemu or in the background on the storage device as nearly all
+modern filesystems or hardware have a 4k alignment internally.
 
-> On Tue, Jul 10, 2018 at 16:22:08 +0200, Cornelia Huck wrote:
-> > On Tue, 10 Jul 2018 07:59:15 +0200
-> > Markus Armbruster <armbru@redhat.com> wrote:
-> >   
-> > > In addition to actively pulling libvirt developers into review of
-> > > deprecation patches, we should pursue the idea to optionally let QEMU
-> > > fail on use of deprecated features, then have libvirt run its test suite
-> > > that way.  
-> > 
-> > What about the following:
-> > 
-> > qemu_deprecated_option("old_option", "modern_option");  
-> 
-> I think this is too simplified. You can deprecate only a certain value
-> for an option or even just a combination of values and options. The
-> check will need to be programatic and error reporting probably can't be
-> reasonably machine readable anyways.
+This patch modifies is_allocated_sectors so that its *pnum result will always
+end at an alignment boundary. This way all requests will end at an alignment
+boundary. The start of all requests will also be aligned as long as the results
+of get_block_status do not lead to an unaligned offset.
 
-Kevin's suggestion of using a simple message instead of this old/modern
-option thing is actually better (and would cover more). My intention
-behind printing a message (somewhere) was to make this friendly to
-command line users as well.
+The number of RMW cycles when converting an example image [1] to a raw device that
+has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+write requests. With this path the additional 4600 read requests are eliminated while
+the number of total write requests stays constant.
 
-> 
-> > Which would then print (in normal operation)
-> > 
-> > "WARNING: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
-> > 
-> > to the monitor (or to stderr? to both?).
-> > 
-> > If you start QEMU with a -no-deprecated-options switch, it would print
-> > 
-> > "ERROR: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
-> > 
-> > and do an exit(1).
-> > 
-> > Would that be workable?  
-> 
-> For delivering the warnings via monitor you'll need a store that will
-> collect all the warnings and prepare them for delivery. You've got
-> basically two options:
-> 
-> 1) monitor command to poll for deprecated options
-> 2) event with deprecated options
-> 
-> Both require storing them since libvirt connects to the monitor only
-> after the command line is processed.
-> 
-> Warnings printed to stderr are nearly useless because until something
-> breaks nobody bothers to read the log files.
+[1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
 
-So, from that I gather that a hard failure would be the easiest for
-libvirt to detect (and everything else would become complicated really
-quickly), right?
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+V4->V5: - is_zero is a bool [Kevin]
+        - treat zero areas as allocated if i <= tail to avoid *pnum underflow [Kevin]
+V3->V4: - only focus on the end offset in is_allocated_sectors [Kevin]
+V2->V3: - ensure that s.alignment is a power of 2
+        - correctly handle n < alignment in is_allocated_sectors if
+          sector_num % alignment > 0.
+V1->V2: - take the current sector offset into account [Max]
+        - try to figure out the target alignment [Max]
 
-If we fail with exit(1), can libvirt check any message that is logged
-right before that?
+ qemu-img.c | 44 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 38 insertions(+), 6 deletions(-)
 
-> 
-> To make any reasonable use of -no-deprecated-options we'd also need
-> something that simulates qemu startup (no resources are touched in fact)
-> so that we can run it against the testsuite. Otherwise the use will be
-> limited to developers using it with the configuration they are
-> currently testing.
-
-Would that moan loudly that you should poke the libvirt developers if
-some kind of testsuite failure is detected? Or am I misunderstanding?
-
-Who is, in general, testing which libvirt version? I can think of:
-- libvirt developers, which will probably run libvirt current git, but
-  more likely a released QEMU?
-- QEMU (and other related tools) developers, who will probably use QEMU
-  current git, but a released libvirt
-- normal (technical) users and (integration) testers, who will probably
-  use released versions of libvirt and QEMU
+diff --git a/qemu-img.c b/qemu-img.c
+index 7651d81..9021ab0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1105,11 +1105,15 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
+  *
+  * 'pnum' is set to the number of sectors (including and immediately following
+  * the first one) that are known to be in the same allocated/unallocated state.
++ * The function will try to align the end offset to alignment boundaries so
++ * that the request will at least end aligned and consequtive requests will
++ * also start at an aligned offset.
+  */
+-static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
++static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
++                                int64_t sector_num, int alignment)
+ {
+     bool is_zero;
+-    int i;
++    int i, tail;
+ 
+     if (n <= 0) {
+         *pnum = 0;
+@@ -1122,6 +1126,23 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+             break;
+         }
+     }
++
++    tail = (sector_num + i) & (alignment - 1);
++    if (tail) {
++        if (is_zero && i <= tail) {
++            /* treat unallocated areas which only consist
++             * of a small tail as allocated. */
++            is_zero = false;
++        }
++        if (!is_zero) {
++            /* align up end offset of allocated areas. */
++            i += alignment - tail;
++            i = MIN(i, n);
++        } else {
++            /* align down end offset of zero areas. */
++            i -= tail;
++        }
++    }
+     *pnum = i;
+     return !is_zero;
+ }
+@@ -1132,7 +1153,7 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+  * breaking up write requests for only small sparse areas.
+  */
+ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+-    int min)
++    int min, int64_t sector_num, int alignment)
+ {
+     int ret;
+     int num_checked, num_used;
+@@ -1141,7 +1162,7 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+         min = n;
+     }
+ 
+-    ret = is_allocated_sectors(buf, n, pnum);
++    ret = is_allocated_sectors(buf, n, pnum, sector_num, alignment);
+     if (!ret) {
+         return ret;
+     }
+@@ -1149,13 +1170,15 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+     num_used = *pnum;
+     buf += BDRV_SECTOR_SIZE * *pnum;
+     n -= *pnum;
++    sector_num += *pnum;
+     num_checked = num_used;
+ 
+     while (n > 0) {
+-        ret = is_allocated_sectors(buf, n, pnum);
++        ret = is_allocated_sectors(buf, n, pnum, sector_num, alignment);
+ 
+         buf += BDRV_SECTOR_SIZE * *pnum;
+         n -= *pnum;
++        sector_num += *pnum;
+         num_checked += *pnum;
+         if (ret) {
+             num_used = num_checked;
+@@ -1560,6 +1583,7 @@ typedef struct ImgConvertState {
+     bool wr_in_order;
+     bool copy_range;
+     int min_sparse;
++    int alignment;
+     size_t cluster_sectors;
+     size_t buf_sectors;
+     long num_coroutines;
+@@ -1724,7 +1748,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+              * zeroed. */
+             if (!s->min_sparse ||
+                 (!s->compressed &&
+-                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
++                 is_allocated_sectors_min(buf, n, &n, s->min_sparse,
++                                          sector_num, s->alignment)) ||
+                 (s->compressed &&
+                  !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)))
+             {
+@@ -2368,6 +2393,13 @@ static int img_convert(int argc, char **argv)
+                                 out_bs->bl.pdiscard_alignment >>
+                                 BDRV_SECTOR_BITS)));
+ 
++    /* try to align the write requests to the destination to avoid unnecessary
++     * RMW cycles. */
++    s.alignment = MAX(pow2floor(s.min_sparse),
++                      DIV_ROUND_UP(out_bs->bl.request_alignment,
++                                   BDRV_SECTOR_SIZE));
++    assert(is_power_of_2(s.alignment));
++
+     if (skip_create) {
+         int64_t output_sectors = blk_nb_sectors(s.target);
+         if (output_sectors < 0) {
+-- 
+2.7.4
