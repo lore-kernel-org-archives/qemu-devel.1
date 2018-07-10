@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcmdv-0006pg-Ly
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:01:02 -0400
+	(envelope-from <famz@redhat.com>) id 1fcmhj-000071-Tv
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:05:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcmdr-00049e-1Q
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fcmdq-00048h-Qx
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:00:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fcmdp-0004Df-Cc
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 07:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5B2002E819B
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 07:00:53 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1fcmhf-0005Pj-1j
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:04:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54616 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fcmhe-0005PM-Tc
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:04:50 -0400
+Date: Tue, 10 Jul 2018 15:04:46 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180710070446.GM17581@lemon.usersys.redhat.com>
+References: <20180709152117.21585-1-alex.bennee@linaro.org>
+	<20180709152117.21585-10-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180709152117.21585-10-alex.bennee@linaro.org>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Jul 2018 06:48:01 -0000
-From: siva krishna <1780814@bugs.launchpad.net>
-Reply-To: Bug 1780814 <1780814@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153115132054.17859.168324292889810627.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153120528181.12409.16527103543449309511.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780814] Re: lib/raid6/neon4.c:118:1: internal
- compiler error
+Subject: Re: [Qemu-devel] [PATCH for 3.0 09/10] docker: add test-unit runner
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: cota@braap.org, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-Hi Peter Maydell ,
+On Mon, 07/09 16:21, Alex Benn=E9e wrote:
+> This test doesn't even build QEMU, it just runs all the unit tests.
+> Intended to make checking unit tests on all docker images easier.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  tests/docker/test-unit | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>  create mode 100755 tests/docker/test-unit
+>=20
+> diff --git a/tests/docker/test-unit b/tests/docker/test-unit
+> new file mode 100755
+> index 0000000000..be0d90d748
+> --- /dev/null
+> +++ b/tests/docker/test-unit
+> @@ -0,0 +1,19 @@
+> +#!/bin/bash
+> +#
+> +# Build and run the unit tests
+> +#
+> +# Copyright (c) 2018 Linaro Ltd.
+> +#
+> +# Authors:
+> +#  Alex Benn=E9e <alex.bennee@linaro.org>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2
+> +# or (at your option) any later version. See the COPYING file in
+> +# the top-level directory.
+> +
+> +. common.rc
+> +
+> +cd "$BUILD_DIR"
+> +
+> +configure_qemu
 
-is that GCC compiler error or cross-compiler error ?
+This reads a bit unusual and counter-intuitive: how could configure_qemu =
+succeed
+when the env cannot actually build it? Does configure_qemu fail but the s=
+ide
+effects needed to run build and run unit tests are done anyway?  Either w=
+ay,
+please add a comment explaining what is happening here.
 
--- =
+Also, should we test the exit code of configure_qemu?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780814
-
-Title:
-  lib/raid6/neon4.c:118:1: internal compiler error
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I am facing below issue when i am trying to cross compile kernel for rasp=
-berry pi 3.
-  please give solution .
-
-  =
-
-  Below is log
-
-
-  CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
-    CHK     include/generated/utsrelease.h
-    CHK     include/generated/bounds.h
-    CHK     include/generated/timeconst.h
-    CHK     include/generated/asm-offsets.h
-    CALL    scripts/checksyscalls.sh
-    CHK     scripts/mod/devicetable-offsets.h
-    CHK     include/generated/compile.h
-    CHK     kernel/config_data.h
-    CC [M]  lib/raid6/neon4.o
-  lib/raid6/neon4.c: In function =E2=80=98raid6_neon4_gen_syndrome_real=E2=
-=80=99:
-  lib/raid6/neon4.c:118:1: internal compiler error: in dwarf2out_frame_debu=
-g_adjust_cfa, at dwarf2cfi.c:1078
-   }
-   ^
-  Please submit a full bug report,
-  with preprocessed source if appropriate.
-  See <https://bugs.launchpad.net/gcc-linaro> for instructions.
-  scripts/Makefile.build:328: recipe for target 'lib/raid6/neon4.o' failed
-  make[2]: *** [lib/raid6/neon4.o] Error 1
-  scripts/Makefile.build:587: recipe for target 'lib/raid6' failed
-  make[1]: *** [lib/raid6] Error 2
-  Makefile:1034: recipe for target 'lib' failed
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780814/+subscriptions
+> +check_qemu check-unit
+> --=20
+> 2.17.1
+>=20
