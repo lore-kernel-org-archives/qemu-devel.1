@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fcpCE-0006ay-QK
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:44:35 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fcpEo-0007sh-4j
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fcpC9-0006eM-UJ
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:44:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40972 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fcpC9-0006eD-Pj
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:44:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45F2B40122C4
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 09:44:29 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue, 10 Jul 2018 17:44:24 +0800
-Message-Id: <20180710094424.30754-1-peterx@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1fcpEj-00088t-7A
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:47:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:43964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fcpEi-00088a-TS
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:47:09 -0400
+References: <20180709191529.13080-1-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a964f8f3-b30d-b23e-d4d3-b3213943bead@vivier.eu>
+Date: Tue, 10 Jul 2018 11:47:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.0] migration: reorder
- MIG_CMD_POSTCOPY_RESUME
+In-Reply-To: <20180709191529.13080-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix shmat emulation by
+ honoring host SHMLBA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-It was accidently added before MIG_CMD_PACKAGED so it might break
-command compatibility when we run postcopy migration between old/new
-QEMUs.  Fix that up quickly before the QEMU 3.0 release.
+Le 09/07/2018 à 21:15, Richard Henderson a écrit :
+> For those hosts with SHMLBA > getpagesize, we don't automatically
+> select a guest address that is compatible with the host.  We can
+> achieve this by boosting the alignment of guest_base and by adding
+> an extra alignment argument to mmap_find_vma.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+...
+> @@ -299,7 +303,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
+>          if (h2g_valid(ptr + size - 1)) {
+>              addr = h2g(ptr);
+>  
+> -            if ((addr & ~TARGET_PAGE_MASK) == 0) {
+> +            if ((addr & (align - 1)) == 0) {
 
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/savevm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+so ~TARGET_PAGE_MASK is (align - 1)...
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index c2f34ffc7c..0d2c4a0739 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -81,8 +81,8 @@ enum qemu_vm_cmd {
-     MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
-                                       were previously sent during
-                                       precopy but are dirty. */
--    MIG_CMD_POSTCOPY_RESUME,       /* resume postcopy on dest */
-     MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stre=
-am */
-+    MIG_CMD_POSTCOPY_RESUME,   /* resume postcopy on dest */
-     MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
-     MIG_CMD_MAX
- };
---=20
-2.17.1
+>                  /* Success.  */
+>                  if (start == mmap_next_start && addr >= TASK_UNMAPPED_BASE) {
+>                      mmap_next_start = addr + size;
+> @@ -313,12 +317,12 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
+>                  /* Assume the result that the kernel gave us is the
+>                     first with enough free space, so start again at the
+>                     next higher target page.  */
+> -                addr = TARGET_PAGE_ALIGN(addr);
+> +                addr = ROUND_UP(addr, align);
+>                  break;
+>              case 1:
+>                  /* Sometimes the kernel decides to perform the allocation
+>                     at the top end of memory instead.  */
+> -                addr &= TARGET_PAGE_MASK;
+> +                addr &= align - 1;
+
+and here TARGET_PAGE_MASK is also (align - 1)...
+
+So I think it should be "addr &= -align".
+
+Thanks,
+Laurent
