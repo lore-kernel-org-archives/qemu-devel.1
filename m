@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fciqe-0007nX-Km
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:57:53 -0400
+	(envelope-from <peterx@redhat.com>) id 1fcj0a-0001BK-DD
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fciqd-0005kV-IS
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:57:52 -0400
-Date: Tue, 10 Jul 2018 10:57:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180710025743.GI17581@lemon.usersys.redhat.com>
-References: <20180709163719.87107-1-vsementsov@virtuozzo.com>
-	<20180709163719.87107-5-vsementsov@virtuozzo.com>
+	(envelope-from <peterx@redhat.com>) id 1fcj0X-0000YV-85
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:08:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42162 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fcj0X-0000WB-1j
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:08:05 -0400
+Date: Tue, 10 Jul 2018 11:07:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180710030754.GK23001@xz-mi>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180710015640.GA10680@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180709163719.87107-5-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] block/backup: fix fleecing scheme:
- use serialized writes
+In-Reply-To: <20180710015640.GA10680@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/9] migration: postcopy recovery
+ unit test, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 07/09 19:37, Vladimir Sementsov-Ogievskiy wrote:
-> Fleecing scheme works as follows: we want a kind of temporary snapshot
-> of active drive A. We create temporary image B, with B->backing = A.
-> Then we start backup(sync=none) from A to B. From this point, B reads
-> as point-in-time snapshot of A (A continues to be active drive,
-> accepting guest IO).
+On Tue, Jul 10, 2018 at 07:26:40AM +0530, Balamuruhan S wrote:
+> On Thu, Jul 05, 2018 at 11:17:46AM +0800, Peter Xu wrote:
+> > Based-on: <20180627132246.5576-1-peterx@redhat.com>
+> > 
+> > Based on the series to unbreak postcopy:
+> >   Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
+> >   Message-Id: <20180627132246.5576-1-peterx@redhat.com>
+> > 
+> > This series introduce a new postcopy recovery test.  The new test
+> > actually helped me to identify two bugs there so fix them as well
+> > before 3.0 release.
+> > 
+> > Patch 1: a trivial cleanup for existing postcopy ram load, which I
+> >          found a bit confusing during debugging the problem.
+> > 
+> > Patch 2-3: two bug fixes that address different issues.  Please see
+> >            the commit log for more information.
+> > 
+> > Patch 4-9: add the postcopy recovery unit test.
+> > 
+> > Please review.  Thanks,
 > 
-> This scheme needs some additional synchronization between reads from B
-> and backup COW operations, otherwise, the following situation is
-> theoretically possible:
+> Hi Peter, Dave,
 > 
-> (assume B is qcow2, client is NBD client, reading from B)
+> I am sorry, I have missed to include Peter's postcopy-recover fix patchset,
 > 
-> 1. client starts reading and take qcow2 mutex in qcow2_co_preadv, and
->    goes up to l2 table loading (assume cache miss)
+> migration: delay postcopy paused state
+> migration: move income process out of multifd
+> migration: unbreak postcopy recovery
+> migration: unify incoming processing
 > 
-> 2) guest write => backup COW => qcow2 write =>
->    try to take qcow2 mutex => waiting
+> Postcopy migration with pause and recover is working fine.
 > 
-> 3. l2 table loaded, we see that cluster is UNALLOCATED, go to
->    "case QCOW2_CLUSTER_UNALLOCATED" and unlock mutex before
->    bdrv_co_preadv(bs->backing, ...)
+> # QTEST_QEMU_BINARY=./ppc64-softmmu/qemu-system-ppc64
+> # ./tests/migration-test
+> /ppc64/migration/deprecated: OK
+> /ppc64/migration/bad_dest: OK
+> /ppc64/migration/postcopy/unix: OK
+> /ppc64/migration/postcopy/recovery: OK
+> /ppc64/migration/precopy/unix: OK
 > 
-> 4) aha, mutex unlocked, backup COW continues, and we finally finish
->    guest write and change cluster in our active disk A
+> But qtest patches in this patchset have to be rebased as commit
+> 5fd4a9c97397bc0819a919de7a62ec972ec85260 (tests/migration: Skip tests
+> for ppc tcg) have gone in.
 > 
-> 5. actually, do bdrv_co_preadv(bs->backing, ...) and read
->    _new updated_ data.
+> # git am ../postcopy_pause/4.patch 
+> Applying: tests: introduce migrate_postcopy_* helpers
+> error: patch failed: tests/migration-test.c:351
+> error: tests/migration-test.c: patch does not apply
+> Patch failed at 0001 tests: introduce migrate_postcopy_* helpers
+> The copy of the patch that failed is found in:
+>    /home/bala/qemu/.git/rebase-apply/patch
+> When you have resolved this problem, run "git am --resolved".
+> If you prefer to skip this patch, run "git am --skip" instead.
+> To restore the original branch and stop patching, run "git am --abort".
 > 
-> To avoid this, let's make backup writes serializing, to not intersect
-> with reads from B.
 > 
-> Note: we expand range of handled cases from (sync=none and
-> B->backing = A) to just (A in backing chain of B), to finally allow
-> safe reading from B during backup for all cases when A in backing chain
-> of B, i.e. B formally looks like point-in-time snapshot of A.
+> I have manually reverted it to apply and test your patchset.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
+> This Patchset is working without any issues.
 > 
-> diff --git a/block/backup.c b/block/backup.c
-> index f3e4e814b6..319fc922e8 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -47,6 +47,8 @@ typedef struct BackupBlockJob {
->      HBitmap *copy_bitmap;
->      bool use_copy_range;
->      int64_t copy_range_size;
-> +
-> +    bool serialize_target_writes;
->  } BackupBlockJob;
->  
->  static const BlockJobDriver backup_job_driver;
-> @@ -102,6 +104,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->      QEMUIOVector qiov;
->      BlockBackend *blk = job->common.blk;
->      int nbytes;
-> +    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-> +    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
->  
->      hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
->      nbytes = MIN(job->cluster_size, job->len - start);
-> @@ -112,8 +116,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->      iov.iov_len = nbytes;
->      qemu_iovec_init_external(&qiov, &iov, 1);
->  
-> -    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
-> -                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-> +    ret = blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
->      if (ret < 0) {
->          trace_backup_do_cow_read_fail(job, start, ret);
->          if (error_is_read) {
-> @@ -124,11 +127,11 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->  
->      if (qemu_iovec_is_zero(&qiov)) {
->          ret = blk_co_pwrite_zeroes(job->target, start,
-> -                                   qiov.size, BDRV_REQ_MAY_UNMAP);
-> +                                   qiov.size, write_flags | BDRV_REQ_MAY_UNMAP);
->      } else {
->          ret = blk_co_pwritev(job->target, start,
-> -                             qiov.size, &qiov,
-> -                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-> +                             qiov.size, &qiov, write_flags |
-> +                             (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
->      }
->      if (ret < 0) {
->          trace_backup_do_cow_write_fail(job, start, ret);
-> @@ -156,6 +159,8 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
->      int nr_clusters;
->      BlockBackend *blk = job->common.blk;
->      int nbytes;
-> +    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-> +    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
->  
->      assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
->      nbytes = MIN(job->copy_range_size, end - start);
-> @@ -163,7 +168,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
->      hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
->                    nr_clusters);
->      ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-> -                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0, 0);
-> +                            read_flags, write_flags);
->      if (ret < 0) {
->          trace_backup_do_cow_copy_range_fail(job, start, ret);
->          hbitmap_set(job->copy_bitmap, start / job->cluster_size,
-> @@ -701,6 +706,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->                         sync_bitmap : NULL;
->      job->compress = compress;
->  
-> +    /* Detect image-fleecing (and similar) schemes */
-> +    job->serialize_target_writes = bdrv_chain_contains(target, bs);
-> +
->      /* If there is no backing file on the target, we cannot rely on COW if our
->       * backup cluster size is smaller than the target cluster size. Even for
->       * targets with a backing file, try to avoid COW if possible. */
+> Tested-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-I always thought mirror is by far the most complicated job, but now backup is
-catching up quickly!
+Thanks for the quick follow up!  I'll have a look today at the problem
+that Dave reported.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Regards,
+
+-- 
+Peter Xu
