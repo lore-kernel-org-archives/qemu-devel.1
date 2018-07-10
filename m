@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
-	id 1fcgWG-0004lW-W2
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:42 -0400
+	id 1fcgWQ-0004ta-Df
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
-	id 1fcgWD-0008Lq-Pd
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:40 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:33241)
+	id 1fcgWN-0008Ov-7i
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:50 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:6522)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
-	id 1fcgWD-0008LZ-C0
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:37 -0400
+	id 1fcgWM-0008Ni-SV
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:47 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Mon,  9 Jul 2018 17:28:24 -0700
-Message-Id: <1183ecd4c583855f33f36cffbc9307a094bac68f.1531182400.git.alistair.francis@wdc.com>
+Date: Mon,  9 Jul 2018 17:28:36 -0700
+Message-Id: <b36a916b0e4532c5dfc93541ceb3292b9c92bdd4.1531182400.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1531182400.git.alistair.francis@wdc.com>
 References: <cover.1531182400.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/6] hw/riscv/virt: Connect the gpex PCIe
+Subject: [Qemu-devel] [PATCH v2 4/6] hw/riscv/virt: Connect a VGA PCIe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,156 +31,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@wdc.com, alistair23@gmail.com, mjc@sifive.com
 
-Connect the gpex PCIe device based on the device tree included in the
-HiFive Unleashed ROM.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- default-configs/riscv32-softmmu.mak |  3 ++
- default-configs/riscv64-softmmu.mak |  3 ++
- hw/riscv/virt.c                     | 58 +++++++++++++++++++++++++++++
- include/hw/riscv/virt.h             |  4 +-
- 4 files changed, 67 insertions(+), 1 deletion(-)
+ default-configs/riscv32-softmmu.mak | 3 +++
+ default-configs/riscv64-softmmu.mak | 3 +++
+ hw/riscv/virt.c                     | 7 ++++++-
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index 7937c69e22..2c943e2669 100644
+index 2c943e2669..fcefa68f1e 100644
 --- a/default-configs/riscv32-softmmu.mak
 +++ b/default-configs/riscv32-softmmu.mak
-@@ -5,3 +5,6 @@ CONFIG_VIRTIO_MMIO=y
- include virtio.mak
+@@ -8,3 +8,6 @@ CONFIG_CADENCE=y
  
- CONFIG_CADENCE=y
+ CONFIG_PCI=y
+ CONFIG_PCI_GENERIC=y
 +
-+CONFIG_PCI=y
-+CONFIG_PCI_GENERIC=y
++CONFIG_VGA=y
++CONFIG_VGA_PCI=y
 diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index 7937c69e22..2c943e2669 100644
+index 2c943e2669..fcefa68f1e 100644
 --- a/default-configs/riscv64-softmmu.mak
 +++ b/default-configs/riscv64-softmmu.mak
-@@ -5,3 +5,6 @@ CONFIG_VIRTIO_MMIO=y
- include virtio.mak
+@@ -8,3 +8,6 @@ CONFIG_CADENCE=y
  
- CONFIG_CADENCE=y
+ CONFIG_PCI=y
+ CONFIG_PCI_GENERIC=y
 +
-+CONFIG_PCI=y
-+CONFIG_PCI_GENERIC=y
++CONFIG_VGA=y
++CONFIG_VGA_PCI=y
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 5336166f6d..0c3800fd64 100644
+index 0c3800fd64..f973c43c70 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -39,6 +39,8 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/device_tree.h"
- #include "exec/address-spaces.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci-host/gpex.h"
- #include "elf.h"
- 
- #include <libfdt.h>
-@@ -55,6 +57,7 @@ static const struct MemmapEntry {
-     [VIRT_UART0] =    { 0x10000000,      0x100 },
-     [VIRT_VIRTIO] =   { 0x10001000,     0x1000 },
-     [VIRT_DRAM] =     { 0x80000000,        0x0 },
-+    [VIRT_PCIE] =     { 0x2000000000, 0x4000000 },
- };
- 
- static uint64_t load_kernel(const char *kernel_filename)
-@@ -233,6 +236,32 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-         g_free(nodename);
-     }
- 
-+    nodename = g_strdup_printf("/pci@%lx",
-+        (long) memmap[VIRT_PCIE].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x3);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0x2);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-+                            "pci-host-ecam-generic");
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x20, 0x0, 0x0,
-+                           memmap[VIRT_PCIE].size);
-+    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-+    qemu_fdt_setprop_cells(fdt, nodename, "ranges", 0x2000000, 0x0,
-+                           0x40000000, 0x0, 0x40000000, 0x0, 0x20000000);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", PCIE_IRQ);
-+    g_free(nodename);
-+
-+    nodename = g_strdup_printf("/pci@%lx/interrupt-controller",
-+            (long) memmap[VIRT_PCIE].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x00);
-+    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
-+    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-+    g_free(nodename);
-+
-     nodename = g_strdup_printf("/test@%lx",
-         (long)memmap[VIRT_TEST].base);
-     qemu_fdt_add_subnode(fdt, nodename);
-@@ -260,6 +289,31 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     return fdt;
- }
- 
-+
-+static inline DeviceState *
-+gpex_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
-+                 hwaddr cfg_base, uint64_t cfg_size,
-+                 hwaddr mmio_base, uint64_t mmio_size,
-+                 qemu_irq irq, bool link_up)
-+{
+@@ -322,6 +322,8 @@ static void riscv_virt_board_init(MachineState *machine)
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
++    PCIBus *pci_bus;
 +    DeviceState *dev;
-+    MemoryRegion *cfg, *mmio;
-+
-+    dev = qdev_create(NULL, TYPE_GPEX_HOST);
-+
-+    qdev_init_nofail(dev);
-+
-+    cfg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-+    memory_region_add_subregion_overlap(sys_mem, cfg_base, cfg, 0);
-+
-+    mmio = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
-+    memory_region_add_subregion_overlap(sys_mem, 0, mmio, 0);
-+
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
-+
-+    return dev;
-+}
-+
- static void riscv_virt_board_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = virt_memmap;
-@@ -383,6 +437,10 @@ static void riscv_virt_board_init(MachineState *machine)
+     char *plic_hart_config;
+     size_t plic_hart_config_len;
+     int i;
+@@ -437,9 +439,12 @@ static void riscv_virt_board_init(MachineState *machine)
              qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
      }
  
-+    gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
-+                           memmap[VIRT_PCIE].size, 0x40000000, 0x20000000,
-+                           qdev_get_gpio_in(DEVICE(s->plic), PCIE_IRQ), true);
+-    gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
++    dev = gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
+                            memmap[VIRT_PCIE].size, 0x40000000, 0x20000000,
+                            qdev_get_gpio_in(DEVICE(s->plic), PCIE_IRQ), true);
++    pci_bus = PCI_HOST_BRIDGE(dev)->bus;
 +
++    pci_vga_init(pci_bus);
+ 
      serial_mm_init(system_memory, memmap[VIRT_UART0].base,
          0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
-         serial_hd(0), DEVICE_LITTLE_ENDIAN);
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index 7cb2742070..d0129c2ca5 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -38,13 +38,15 @@ enum {
-     VIRT_PLIC,
-     VIRT_UART0,
-     VIRT_VIRTIO,
--    VIRT_DRAM
-+    VIRT_DRAM,
-+    VIRT_PCIE
- };
- 
- enum {
-     UART0_IRQ = 10,
-     VIRTIO_IRQ = 1, /* 1 to 8 */
-     VIRTIO_COUNT = 8,
-+    PCIE_IRQ = 0x20,
-     VIRTIO_NDEV = 0x35
- };
- 
 -- 
 2.17.1
