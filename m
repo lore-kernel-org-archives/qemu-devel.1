@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fcoTR-0003Cc-3n
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:18 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fcoTi-0003O4-4J
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fcoTN-0003yn-W9
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:17 -0400
-Received: from mga03.intel.com ([134.134.136.65]:51105)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fcoTN-0003yN-Lp
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:13 -0400
-From: Jingqi Liu <jingqi.liu@intel.com>
-Date: Tue, 10 Jul 2018 16:57:33 +0800
-Message-Id: <1531213054-63327-3-git-send-email-jingqi.liu@intel.com>
-In-Reply-To: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
-References: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
-Subject: [Qemu-devel] [PATCH 2/3] x86/cpu: Enable MOVDIRI cpu feature
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fcoTf-00042r-2i
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:34 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:55231
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fcoTe-00042X-Jq
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:30 -0400
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Date: Tue, 10 Jul 2018 16:58:01 +0800
+Message-ID: <20180710085802.30386-1-douly.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/2] hw/acpi-build: Add a check for
+ memory-less NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, wei.w.wang@intel.com, Jingqi Liu <jingqi.liu@intel.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, indou.takao@jp.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-MOVDIRI moves doubleword or quadword from register to memory through
-direct store which is implemented by using write combining (WC) for
-writing data directly into memory without caching the data.
+Currently, Qemu ACPI builder doesn't consider the memory-less NUMA nodes, eg:
 
-The bit definition:
-CPUID.(EAX=7,ECX=0):ECX[bit 27] MOVDIRI
+  -m 4G,slots=4,maxmem=8G \
+  -numa node,nodeid=0 \
+  -numa node,nodeid=1,mem=2G \
+  -numa node,nodeid=2,mem=2G \
+  -numa node,nodeid=3\
 
-The release document ref below link:
-https://software.intel.com/sites/default/files/managed/c5/15/\
-architecture-instruction-set-extensions-programming-reference.pdf
+Guest Linux will report
 
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+  [    0.000000] ACPI: SRAT: Node 0 PXM 0 [mem 0x00000000-0xffffffffffffffff]
+  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
+  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
+  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
+  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
+  [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x13fffffff]
+  [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+
+[mem 0x00000000-0xffffffffffffffff] and [mem 0x140000000-0x13fffffff] are bogus.
+
+Add a check to avoid building srat memory for memory-less NUMA nodes, also update
+the test file. Now the info in guest linux will be
+
+  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
+  [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
+  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
+  [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
+  [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+
+Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- target/i386/cpu.c | 2 +-
- target/i386/cpu.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Note to maintainer: update ACPI tables test blobs on commit.
+---
+ hw/i386/acpi-build.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e0d151f..775cfcb 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -983,7 +983,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
-             "la57", NULL, NULL, NULL,
-             NULL, NULL, "rdpid", NULL,
--            NULL, "cldemote", NULL, NULL,
-+            NULL, "cldemote", NULL, "movdiri",
-             NULL, NULL, NULL, NULL,
-         },
-         .cpuid_eax = 7,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f651105..d94bf2d 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -685,6 +685,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_ECX_LA57     (1U << 16)
- #define CPUID_7_0_ECX_RDPID    (1U << 22)
- #define CPUID_7_0_ECX_CLDEMOTE (1U << 25)  /* CLDEMOTE Instruction */
-+#define CPUID_7_0_ECX_MOVDIRI  (1U << 27)  /* MOVDIRI Instruction */
- 
- #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 9e8350c55d..c584642e4e 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2392,9 +2392,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+             mem_len = next_base - pcms->below_4g_mem_size;
+             next_base = mem_base + mem_len;
+         }
+-        numamem = acpi_data_push(table_data, sizeof *numamem);
+-        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+-                          MEM_AFFINITY_ENABLED);
++
++        if (mem_len > 0) {
++            numamem = acpi_data_push(table_data, sizeof *numamem);
++            build_srat_memory(numamem, mem_base, mem_len, i - 1,
++                              MEM_AFFINITY_ENABLED);
++        }
+     }
+     slots = (table_data->len - numa_start) / sizeof *numamem;
+     for (; slots < pcms->numa_nodes + 2; slots++) {
 -- 
-1.8.3.1
+2.14.3
