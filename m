@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fci7g-0006ky-Op
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:11:25 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fciIs-00009E-Tg
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fci7d-0004tg-K0
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:11:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58118 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fci7d-0004t0-Di
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:11:21 -0400
-Date: Tue, 10 Jul 2018 05:11:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180710050913-mutt-send-email-mst@kernel.org>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	(envelope-from <aik@ozlabs.ru>) id 1fciIo-0008Bi-JD
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:22:58 -0400
+Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:42229)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fciIo-0008B5-Am
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:22:54 -0400
+Received: by mail-pf0-x234.google.com with SMTP id l9-v6so3353447pff.9
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 19:22:54 -0700 (PDT)
+Date: Tue, 10 Jul 2018 12:22:44 +1000
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <20180710122244.7466489f@aik.ozlabs.ibm.com>
+In-Reply-To: <20180702062644.48040-1-aik@ozlabs.ru>
+References: <20180702062644.48040-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180629221907.3662-1-venu.busireddy@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Use of unique identifier for
- pairing virtio and passthrough devices...
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
+ firmware image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Venu Busireddy <venu.busireddy@oracle.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Fri, Jun 29, 2018 at 05:19:03PM -0500, Venu Busireddy wrote:
-> The current patch set includes all the feedback received for proposals [3]
-> and [4]. For the sake of completeness, patch for the virtio specification
-> is also included here. Following is the updated proposal.
+On Mon,  2 Jul 2018 16:26:44 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> The following changes since commit edb1fb337f65f82fe32b989c4f018efe85c1dddb:
 > 
-> 1. Extend the virtio specification to include a new virtio PCI capability
->    "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+>   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
+> 
+> are available in the git repository at:
+> 
+>   git@github.com:aik/qemu.git tags/qemu-slof-20180702
+> 
+> for you to fetch changes up to edb1fb337f65f82fe32b989c4f018efe85c1dddb:
+> 
+>   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
+> 
+> ----------------------------------------------------------------
+> 
+> I just missed a couple of gcc 8.1 fixes and thought I can still squeeze
+> them before the 3.0  soft freeze.
+> 
+> 
+> *** Note: this is not for master, this is for pseries
 
-....
 
->  default-configs/arm-softmmu.mak             |   1 +
->  default-configs/i386-softmmu.mak            |   1 +
->  default-configs/x86_64-softmmu.mak          |   1 +
->  hw/pci-bridge/Makefile.objs                 |   1 +
->  hw/pci-bridge/pci_bridge_dev.c              |  10 +
->  hw/pci-bridge/pcie_downstream.c             | 220 ++++++++++++++++++++
->  hw/pci-bridge/pcie_downstream.h             |  10 +
->  hw/pci/pci_bridge.c                         |  34 +++
->  hw/virtio/virtio-pci.c                      |  15 ++
->  hw/virtio/virtio-pci.h                      |   3 +-
->  include/hw/pci/pci.h                        |  37 ++--
->  include/hw/pci/pci_bridge.h                 |   2 +
->  include/hw/pci/pcie.h                       |   1 +
->  include/standard-headers/linux/virtio_pci.h |   8 +
->  14 files changed, 326 insertions(+), 18 deletions(-)
->  create mode 100644 hw/pci-bridge/pcie_downstream.c
->  create mode 100644 hw/pci-bridge/pcie_downstream.h
+Not good for 3.1 either?
 
-I don't see the spec patch here.
 
--- 
-MST
+--
+Alexey
