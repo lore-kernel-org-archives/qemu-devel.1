@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcuaw-00035j-Uu
+	(envelope-from <dgilbert@redhat.com>) id 1fcuaw-00035h-UB
 	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcuav-0003KG-0A
+	(envelope-from <dgilbert@redhat.com>) id 1fcuat-0003Gz-2P
 	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38414 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45234 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcuau-0003Ii-Li
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:24 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcuas-0003GU-Mz
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:22 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 361AD346F3
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 15:30:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 50C2677889
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 15:30:22 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 10 Jul 2018 16:30:05 +0100
-Message-Id: <20180710153016.131258-5-dgilbert@redhat.com>
+Date: Tue, 10 Jul 2018 16:30:03 +0100
+Message-Id: <20180710153016.131258-3-dgilbert@redhat.com>
 In-Reply-To: <20180710153016.131258-1-dgilbert@redhat.com>
 References: <20180710153016.131258-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 04/15] migration: unify incoming processing
+Subject: [Qemu-devel] [PULL 02/15] migration: move income process out of
+ multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,107 +34,92 @@ To: qemu-devel@nongnu.org, peterx@redhat.com, quintela@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-This is the 2nd patch to unbreak postcopy recovery.
+Move the call to migration_incoming_process() out of multifd code.  It's
+a bit strange that we can migration generic calls in multifd code.
+Instead, let multifd_recv_new_channel() return a boolean showing whether
+it's ready to continue the incoming migration.
 
-Let's unify the migration_incoming_process() call at a single place
-rather than calling it in connection setup codes.  This fixes a problem
-that we will go into incoming migration procedure even if we are trying
-to recovery from a paused postcopy migration.
-
-Fixes: 36c2f8be2c ("migration: Delay start of migration main routines")
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180627132246.5576-5-peterx@redhat.com>
+Message-Id: <20180627132246.5576-3-peterx@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/exec.c      |  3 ---
- migration/fd.c        |  3 ---
- migration/migration.c | 18 ++++++++++++++++--
- migration/socket.c    |  5 -----
- 4 files changed, 16 insertions(+), 13 deletions(-)
+ migration/migration.c |  5 ++++-
+ migration/ram.c       | 11 +++++------
+ migration/ram.h       |  2 +-
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/migration/exec.c b/migration/exec.c
-index 0bbeb63c97..375d2e1b54 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -49,9 +49,6 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    if (!migrate_use_multifd()) {
--        migration_incoming_process();
--    }
-     return G_SOURCE_REMOVE;
- }
- 
-diff --git a/migration/fd.c b/migration/fd.c
-index fee34ffdc0..a7c13df4ad 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -49,9 +49,6 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    if (!migrate_use_multifd()) {
--        migration_incoming_process();
--    }
-     return G_SOURCE_REMOVE;
- }
- 
 diff --git a/migration/migration.c b/migration/migration.c
-index eb3e09e899..0404c53215 100644
+index 94d71f8b24..aea6fb7444 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -511,17 +511,31 @@ void migration_fd_process_incoming(QEMUFile *f)
- void migration_ioc_process_incoming(QIOChannel *ioc)
- {
-     MigrationIncomingState *mis = migration_incoming_get_current();
-+    bool start_migration;
- 
-     if (!mis->from_src_file) {
-+        /* The first connection (multifd may have multiple) */
-         QEMUFile *f = qemu_fopen_channel_input(ioc);
-+
-+        /* If it's a recovery, we're done */
-         if (postcopy_try_recover(f)) {
-             return;
-         }
-+
+@@ -507,7 +507,10 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
          migration_incoming_setup(f);
--        return;
+         return;
+     }
+-    multifd_recv_new_channel(ioc);
 +
-+        /*
-+         * Common migration only needs one channel, so we can start
-+         * right now.  Multifd needs more than one channel, we wait.
-+         */
-+        start_migration = !migrate_use_multifd();
-+    } else {
-+        /* Multiple connections */
-+        assert(migrate_use_multifd());
-+        start_migration = multifd_recv_new_channel(ioc);
-     }
- 
--    if (multifd_recv_new_channel(ioc)) {
-+    if (start_migration) {
-         migration_incoming_process();
-     }
- }
-diff --git a/migration/socket.c b/migration/socket.c
-index 3456eb76e9..f4c8174400 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -168,12 +168,7 @@ static void socket_accept_incoming_migration(QIONetListener *listener,
-     if (migration_has_all_channels()) {
-         /* Close listening socket as its no longer needed */
-         qio_net_listener_disconnect(listener);
--
-         object_unref(OBJECT(listener));
--
--        if (!migrate_use_multifd()) {
--            migration_incoming_process();
--        }
-     }
++    if (multifd_recv_new_channel(ioc)) {
++        migration_incoming_process();
++    }
  }
  
+ /**
+diff --git a/migration/ram.c b/migration/ram.c
+index 1cd98d6398..23cea47090 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1311,7 +1311,8 @@ bool multifd_recv_all_channels_created(void)
+     return thread_count == atomic_read(&multifd_recv_state->count);
+ }
+ 
+-void multifd_recv_new_channel(QIOChannel *ioc)
++/* Return true if multifd is ready for the migration, otherwise false */
++bool multifd_recv_new_channel(QIOChannel *ioc)
+ {
+     MultiFDRecvParams *p;
+     Error *local_err = NULL;
+@@ -1320,7 +1321,7 @@ void multifd_recv_new_channel(QIOChannel *ioc)
+     id = multifd_recv_initial_packet(ioc, &local_err);
+     if (id < 0) {
+         multifd_recv_terminate_threads(local_err);
+-        return;
++        return false;
+     }
+ 
+     p = &multifd_recv_state->params[id];
+@@ -1328,7 +1329,7 @@ void multifd_recv_new_channel(QIOChannel *ioc)
+         error_setg(&local_err, "multifd: received id '%d' already setup'",
+                    id);
+         multifd_recv_terminate_threads(local_err);
+-        return;
++        return false;
+     }
+     p->c = ioc;
+     object_ref(OBJECT(ioc));
+@@ -1339,9 +1340,7 @@ void multifd_recv_new_channel(QIOChannel *ioc)
+     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+                        QEMU_THREAD_JOINABLE);
+     atomic_inc(&multifd_recv_state->count);
+-    if (multifd_recv_state->count == migrate_multifd_channels()) {
+-        migration_incoming_process();
+-    }
++    return multifd_recv_state->count == migrate_multifd_channels();
+ }
+ 
+ /**
+diff --git a/migration/ram.h b/migration/ram.h
+index d386f4d641..457bf54b8c 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -46,7 +46,7 @@ int multifd_save_cleanup(Error **errp);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
+ bool multifd_recv_all_channels_created(void);
+-void multifd_recv_new_channel(QIOChannel *ioc);
++bool multifd_recv_new_channel(QIOChannel *ioc);
+ 
+ uint64_t ram_pagesize_summary(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
 -- 
 2.17.1
