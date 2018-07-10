@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fct01-000295-TY
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:48:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fct0e-0002YR-EJ
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:48:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcszv-0007WM-SJ
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:48:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41002 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fcszv-0007W5-Mx
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:48:07 -0400
-Date: Tue, 10 Jul 2018 15:48:00 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180710154800.7ea50b73@redhat.com>
-In-Reply-To: <4e35ea24-147d-1b51-fa1b-0f1cc32966e0@redhat.com>
-References: <1528185295-14199-1-git-send-email-slp@redhat.com>
-	<4e35ea24-147d-1b51-fa1b-0f1cc32966e0@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fct0Z-0007v0-JY
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:48:52 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:35262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fct0Z-0007ti-Bf
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 09:48:47 -0400
+Received: by mail-pl0-x242.google.com with SMTP id k1-v6so7650486plt.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 06:48:46 -0700 (PDT)
+References: <20180709191529.13080-1-richard.henderson@linaro.org>
+	<a964f8f3-b30d-b23e-d4d3-b3213943bead@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <34f1f5e5-7654-88c6-862a-0e4403987279@linaro.org>
+Date: Tue, 10 Jul 2018 06:48:42 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <a964f8f3-b30d-b23e-d4d3-b3213943bead@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/char/serial: Only retry if
- qemu_chr_fe_write returns 0
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix shmat emulation by
+ honoring host SHMLBA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sergio Lopez <slp@redhat.com>, mst@redhat.com, peter.maydell@linaro.org, marcandre.lureau@gmail.com, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On Tue, 5 Jun 2018 11:18:35 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 07/10/2018 02:47 AM, Laurent Vivier wrote:
+>> -                addr &= TARGET_PAGE_MASK;
+>> +                addr &= align - 1;
+> 
+> and here TARGET_PAGE_MASK is also (align - 1)...
+> 
+> So I think it should be "addr &= -align".
 
-> On 05/06/2018 09:54, Sergio Lopez wrote:
-> > Only retry on serial_xmit if qemu_chr_fe_write returns 0, as this is the
-> > only recoverable error.
-> > 
-> > Retrying with any other scenario, in addition to being a waste of CPU
-> > cycles, can compromise the Guest stability if by the vCPU issuing the
-> > write and the main loop thread are, by chance or explicit pinning,
-> > running on the same pCPU.
-> > 
-> > Previous discussion:
-> > 
-> > https://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06998.html
-> > 
-> > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> > ---
-> >  hw/char/serial.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> > index 605b0d0..6de6c29 100644
-> > --- a/hw/char/serial.c
-> > +++ b/hw/char/serial.c
-> > @@ -260,7 +260,7 @@ static void serial_xmit(SerialState *s)
-> >          if (s->mcr & UART_MCR_LOOP) {
-> >              /* in loopback mode, say that we just received a char */
-> >              serial_receive1(s, &s->tsr, 1);
-> > -        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) != 1 &&
-> > +        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) == 0 &&
-> >                     s->tsr_retry < MAX_XMIT_RETRY) {
-> >              assert(s->watch_tag == 0);
-> >              s->watch_tag =
-> >   
-Hi Sergio, Paolo,
+Whoops, yes indeed.
 
-it looks like commit 
-commit 019288bf137183bf3407c9824655b753bfafc99f
-Author: Sergio Lopez <slp@redhat.com>
-Date:   Tue Jun 5 03:54:55 2018 -0400
 
-    hw/char/serial: Only retry if qemu_chr_fe_write returns 0
-
-introduced regression wrt 2.12 and broke windows guest remote kernel debug over
-serial, where windbg can't connect to target and target hangs when windbg tries
-to connect to it.
-
-Reverting the commit fixes issue
+r~
