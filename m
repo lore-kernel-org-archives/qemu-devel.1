@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fcxRi-0005yp-Ky
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:33:07 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcxRt-00068s-4r
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fcxRf-0006Sv-JP
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:33:06 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-	<20180710160013.26559-6-peter.maydell@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <09c87542-9178-6277-85d3-6a5830616e88@twiddle.net>
-Date: Tue, 10 Jul 2018 11:33:00 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-6-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcxRq-0006XU-0c
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:33:17 -0400
+Received: from mail-eopbgr700096.outbound.protection.outlook.com
+	([40.107.70.96]:23232
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fcxRp-0006XB-Np
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:33:13 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 10 Jul 2018 18:33:09 +0000
+Message-ID: <BN7PR08MB48685B014B52A2DFA5A297C0C65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1531169431-10772-32-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1531169431-10772-32-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] accel/tcg: Return -1 for execution
- from MMIO regions in get_page_addr_code()
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 31/33] gdbstub: Disable handling of
+ nanoMIPS ISA bit in the MIPS gdbstub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 07/10/2018 09:00 AM, Peter Maydell wrote:
-> Now that all the callers can handle get_page_addr_code() returning -1,
-> remove all the code which tries to handle execution from MMIO regions
-> or small-MMU-region RAM areas. This will mean that we can correctly
-> execute from these areas, rather than ending up either aborting QEMU
-> or delivering an incorrect guest exception.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Subject: [PATCH v2 31/33] gdbstub: Disable handling of nanoMIPS ISA bit i=
+n the MIPS gdbstub
+>
+> From: James Hogan <james.hogan@mips.com>
+>
+> nanoMIPS has no ISA bit in the PC, so remove the handling of the low bit
+> of the PC in the MIPS gdbstub for nanoMIPS. This prevents the PC being
+> read as e.g. 0xbfc00001, and prevents writing to the PC clearing
+> MIPS_HFLAG_M16.
+>
+> Signed-off-by: James Hogan <james.hogan@mips.com>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > ---
->  accel/tcg/cputlb.c | 95 +++++-----------------------------------------
->  1 file changed, 10 insertions(+), 85 deletions(-)
+>  target/mips/gdbstub.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+>
 
-Yay!
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+> diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
+> index 18e0e6d..559b69f 100644
+> --- a/target/mips/gdbstub.c
+> +++ b/target/mips/gdbstub.c
+> @@ -60,7 +60,8 @@ int mips_cpu_gdb_read_register(CPUState *cs, uint8_t *m=
+em_buf, int n)
+>          return gdb_get_regl(mem_buf, (int32_t)env->CP0_Cause);
+>      case 37:
+>          return gdb_get_regl(mem_buf, env->active_tc.PC |
+> -                                     !!(env->hflags & MIPS_HFLAG_M16));
+> +                                     (!(env->insn_flags & ISA_NANOMIPS32=
+) &&
+> +                                      env->hflags & MIPS_HFLAG_M16));
+>      case 72:
+>          return gdb_get_regl(mem_buf, 0); /* fp */
+>      case 89:
+> @@ -131,10 +132,12 @@ int mips_cpu_gdb_write_register(CPUState *cs, uint8=
+_t *mem_buf, int n)
+>          break;
+>      case 37:
+>          env->active_tc.PC =3D tmp & ~(target_ulong)1;
+> -        if (tmp & 1) {
+> -            env->hflags |=3D MIPS_HFLAG_M16;
+> -        } else {
+> -            env->hflags &=3D ~(MIPS_HFLAG_M16);
+> +        if (!(env->insn_flags & ISA_NANOMIPS32)) {
+> +            if (tmp & 1) {
+> +                env->hflags |=3D MIPS_HFLAG_M16;
+> +            } else {
+> +                env->hflags &=3D ~(MIPS_HFLAG_M16);
+> +            }
+>          }
+>          break;
+>      case 72: /* fp, ignored */
+> --
+> 2.7.4
+>
+>
