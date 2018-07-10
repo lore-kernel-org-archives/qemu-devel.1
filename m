@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcoaa-00084D-V4
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:05:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1fcocY-0000TQ-Ie
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcoaV-00079T-36
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:05:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fcoaU-00079J-NU
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:05:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fcoaT-0000jb-Fn
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 09:05:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6FF912E819A
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 09:05:33 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1fcocS-0007aR-Ho
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:07:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36384 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fcocS-0007a9-Bu
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 05:07:36 -0400
+Date: Tue, 10 Jul 2018 10:07:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180710090731.GC1612@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180709203731.19865-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Jul 2018 08:59:40 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1780928 <1780928@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153121318079.13203.2840846134376544024.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780928] [NEW] v2.12.0-2321-gb34181056c: vcpu
- hotplug crashes qemu-kvm with segfault
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180709203731.19865-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0] pc: Use "3.0+" constant as default
+ SMBIOS version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,107 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Public bug reported:
+On Mon, Jul 09, 2018 at 05:37:31PM -0300, Eduardo Habkost wrote:
+> Every time we create new PC machine-types in QEMU, the defaults
+> for SMBIOS fields change unnecessarily because the version field
+> defaults to MachineClass::name.
+> 
+> This can cause unexpected side-effects, like triggering license
+> reactivation on guest software, or changing the VM memory layout
+> because of BIOS table size changes.
 
-vcpu hotplug crashes upstream qemu(v2.12.0-2321-gb34181056c), vcpu
-hotplug works fine in v2.12.0-rc4.
+Does that really matter though ? By its very nature the 'Version'
+field in SMBIOS is expected to change if you alter something about
+the hardware. If guests OS don't want to be exposed to changes in
+SMBIOS they would be using a fixed machine type, not the variable
+"pc" type that continually changes.
 
-Host: Power8, kernel: 4.18.0-rc2-00037-g6f0d349d922b
-Guest: Power8, kernel: 4.18.0-rc3-00183-gc42c12a90545 (base image: fedora27=
- ppc64le)
+We could put padding in the string if we want to avoid BIOS table
+layout changes.
 
-/usr/share/avocado-plugins-vt/build/qemu/ppc64-softmmu/qemu-system-ppc64 -M=
- pseries,accel=3Dkvm,max-cpu-compat=3Dpower8 -m 8192 -device virtio-scsi-pc=
-i,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/var/lib/avocado/data/avo=
-cado-vt/images/jeos-27-ppc64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive1 -=
-device scsi-hd,drive=3Ddrive1,bus=3Dscsi0.0 -smp 1,cores=3D1,threads=3D1,so=
-ckets=3D1,maxcpus=3D8 -serial /dev/pts/0 -monitor stdio -vga none -nographi=
-c -kernel /home/kvmci/linux/vmlinux -append 'root=3D/dev/sda2 rw console=3D=
-tty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug' -nic user,mod=
-el=3Dvirtio-net-pci =
+Having version change though feels like it is working as intended
+for the semantics of these Version: fields in BIOS.
 
-QEMU 2.12.50 monitor - type 'help' for more information
-(qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-Segmentation fault (core dumped)
+> Change the SMBIOS version string for pc-*-3.0 to "3.0+" to avoid
+> doing this on every QEMU release, and keep compatible version
+> strings on older machine-types using a new
+> MachineClass::smbios_version field.
 
 
-Guest initial cpu:
-# lscpu
-Architecture:        ppc64le
-Byte Order:          Little Endian
-CPU(s):              1
-On-line CPU(s) list: 0
-Thread(s) per core:  1
-Core(s) per socket:  1
-Socket(s):           1
-NUMA node(s):        1
-Model:               2.1 (pvr 004b 0201)
-Model name:          POWER8 (architected), altivec supported
-Hypervisor vendor:   KVM
-Virtualization type: para
-L1d cache:           64K
-L1i cache:           32K
-NUMA node0 CPU(s):   0
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780928
-
-Title:
-  v2.12.0-2321-gb34181056c: vcpu hotplug crashes qemu-kvm with segfault
-
-Status in QEMU:
-  New
-
-Bug description:
-  vcpu hotplug crashes upstream qemu(v2.12.0-2321-gb34181056c), vcpu
-  hotplug works fine in v2.12.0-rc4.
-
-  Host: Power8, kernel: 4.18.0-rc2-00037-g6f0d349d922b
-  Guest: Power8, kernel: 4.18.0-rc3-00183-gc42c12a90545 (base image: fedora=
-27 ppc64le)
-
-  /usr/share/avocado-plugins-vt/build/qemu/ppc64-softmmu/qemu-system-ppc64 =
--M pseries,accel=3Dkvm,max-cpu-compat=3Dpower8 -m 8192 -device virtio-scsi-=
-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/var/lib/avocado/data/a=
-vocado-vt/images/jeos-27-ppc64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive1=
- -device scsi-hd,drive=3Ddrive1,bus=3Dscsi0.0 -smp 1,cores=3D1,threads=3D1,=
-sockets=3D1,maxcpus=3D8 -serial /dev/pts/0 -monitor stdio -vga none -nograp=
-hic -kernel /home/kvmci/linux/vmlinux -append 'root=3D/dev/sda2 rw console=
-=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug' -nic user,=
-model=3Dvirtio-net-pci =
-
-  QEMU 2.12.50 monitor - type 'help' for more information
-  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-  Segmentation fault (core dumped)
-
-  =
-
-  Guest initial cpu:
-  # lscpu
-  Architecture:        ppc64le
-  Byte Order:          Little Endian
-  CPU(s):              1
-  On-line CPU(s) list: 0
-  Thread(s) per core:  1
-  Core(s) per socket:  1
-  Socket(s):           1
-  NUMA node(s):        1
-  Model:               2.1 (pvr 004b 0201)
-  Model name:          POWER8 (architected), altivec supported
-  Hypervisor vendor:   KVM
-  Virtualization type: para
-  L1d cache:           64K
-  L1i cache:           32K
-  NUMA node0 CPU(s):   0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780928/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
