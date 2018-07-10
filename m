@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qiaochong@loongson.cn>) id 1fcidu-000490-3f
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:44:43 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fciiJ-0005aC-Fr
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qiaochong@loongson.cn>) id 1fcidq-0008Nk-5V
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:44:42 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:47205)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qiaochong@loongson.cn>) id 1fcidp-0008Fa-Ev
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:44:38 -0400
-From: QiaoChong <qiaochong@loongson.cn>
-Date: Tue, 10 Jul 2018 10:44:21 +0800
-Message-Id: <1531190661-19327-1-git-send-email-qiaochong@loongson.cn>
-Subject: [Qemu-devel] [PATCH] make pci_bridge_region_cleanup to be done in
- rcu queue after flatview_destroy.
+	(envelope-from <no-reply@patchew.org>) id 1fciiG-0002WI-Du
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:49:15 -0400
+Resent-Message-Id: <E1fciiG-0002WI-Du@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fciiG-0002UX-84
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:49:12 -0400
+In-Reply-To: <1531190661-19327-1-git-send-email-qiaochong@loongson.cn>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153119091798.1503.16066005947112586883@946cad8fd14e>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Jul 2018 19:48:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] make pci_bridge_region_cleanup to be done
+ in rcu queue after flatview_destroy.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,91 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qiaochong@loongson.cn
+To: qiaochong@loongson.cn
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-pci_bridge_region_cleanup need to done after flatview_destroy,
-because memory_region_unref need access memory regions in PCIBridgeWindows in flatview_destroy.
-here we delay pci_bridge_region_cleanup to be done in rcu queue work.
-
-bellow are gdb backtraces.
-
-oldcode mr->name will be freed in object_unparent, before flatview_destroy.
-
-    mask=<optimized out>, attrs=...) at /work/work/loongson/qemu/qemu-latest/memory.c:559
-    access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x555555876850 <memory_region_write_accessor>,
-    mr=0x5555569608c0, attrs=...) at /work/work/loongson/qemu/qemu-latest/memory.c:626
-    at /work/work/loongson/qemu/qemu-latest/memory.c:1518
-    buf=buf@entry=0x7fffbff0ae40 "", len=len@entry=4, addr1=4, l=4, mr=0x5555569608c0) at /work/work/loongson/qemu/qemu-latest/exec.c:3255
-    at /work/work/loongson/qemu/qemu-latest/exec.c:3294
-    at /work/work/loongson/qemu/qemu-latest/exec.c:2910
-    shift=<optimized out>, mask=<optimized out>, attrs=...) at /work/work/loongson/qemu/qemu-latest/memory.c:585
-    access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x555555874700 <memory_region_write_with_attrs_accessor>,
-    mr=0x555557338120, attrs=...) at /work/work/loongson/qemu/qemu-latest/memory.c:626
-    size=size@entry=4, attrs=...) at /work/work/loongson/qemu/qemu-latest/memory.c:1518
-    val=val@entry=44040192, addr=addr@entry=18446744072502722564, retaddr=retaddr@entry=140736012783717, recheck=false, size=4)
-    at /work/work/loongson/qemu/qemu-latest/accel/tcg/cputlb.c:905
-    mmu_idx=<optimized out>, env=0x55555681d218) at /work/work/loongson/qemu/qemu-latest/accel/tcg/softmmu_template.h:268
-    at /work/work/loongson/qemu/qemu-latest/accel/tcg/softmmu_template.h:304
-    at /work/work/loongson/qemu/qemu-latest/accel/tcg/cpu-exec.c:171
-    at /work/work/loongson/qemu/qemu-latest/accel/tcg/cpu-exec.c:612
-
-here mr mr->owner, mr->name has been freed in object_unparent before.
-
-void memory_region_unref(MemoryRegion *mr)
-{
-    if (mr && mr->owner) {
-        object_unref(mr->owner);
-    }
-}
-
-Signed-off-by: QiaoChong <qiaochong@loongson.cn>
----
- hw/pci/pci_bridge.c         | 12 +++++++++++-
- include/hw/pci/pci_bridge.h |  1 +
- 2 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 40a39f5..a3c9501 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -233,6 +233,16 @@ static void pci_bridge_region_cleanup(PCIBridge *br, PCIBridgeWindows *w)
-     g_free(w);
- }
- 
-+/*
-+pci_bridge_region_cleanup need to done after flatview_destroy,
-+because memory_region_unref need access memory regions in PCIBridgeWindows in flatview_destroy.
-+here we delay pci_bridge_region_cleanup to be done in rcu queue work.
-+*/
-+static void pci_bridge_region_cleanup_schedule(PCIBridgeWindows *w)
-+{
-+  pci_bridge_region_cleanup(NULL, w);
-+}
-+
- void pci_bridge_update_mappings(PCIBridge *br)
- {
-     PCIBridgeWindows *w = br->windows;
-@@ -243,7 +253,7 @@ void pci_bridge_update_mappings(PCIBridge *br)
-     pci_bridge_region_del(br, br->windows);
-     br->windows = pci_bridge_region_init(br);
-     memory_region_transaction_commit();
--    pci_bridge_region_cleanup(br, w);
-+    call_rcu(w,  pci_bridge_region_cleanup_schedule, rcu);
- }
- 
- /* default write_config function for PCI-to-PCI bridge */
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index 0347da5..0e1fd82 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -37,6 +37,7 @@ typedef struct PCIBridgeWindows PCIBridgeWindows;
-  * as subregions.
-  */
- struct PCIBridgeWindows {
-+    struct rcu_head rcu;
-     MemoryRegion alias_pref_mem;
-     MemoryRegion alias_mem;
-     MemoryRegion alias_io;
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MzExOTA2NjEtMTkzMjctMS1naXQtc2VuZC1lbWFpbC1xaWFvY2hvbmdAbG9v
+bmdzb24uY24KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gbWFrZSBwY2lfYnJpZGdlX3Jl
+Z2lvbl9jbGVhbnVwIHRvIGJlIGRvbmUgaW4gcmN1IHF1ZXVlIGFmdGVyIGZsYXR2aWV3X2Rlc3Ry
+b3kuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1
+MzExOTA2NjEtMTkzMjctMS1naXQtc2VuZC1lbWFpbC1xaWFvY2hvbmdAbG9vbmdzb24uY24gLT4g
+cGF0Y2hldy8xNTMxMTkwNjYxLTE5MzI3LTEtZ2l0LXNlbmQtZW1haWwtcWlhb2Nob25nQGxvb25n
+c29uLmNuClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDdiZTVmNDE5OSBtYWtlIHBj
+aV9icmlkZ2VfcmVnaW9uX2NsZWFudXAgdG8gYmUgZG9uZSBpbiByY3UgcXVldWUgYWZ0ZXIgZmxh
+dHZpZXdfZGVzdHJveS4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
+bWFrZSBwY2lfYnJpZGdlX3JlZ2lvbl9jbGVhbnVwIHRvIGJlIGRvbmUgaW4gcmN1IHF1ZXVlIGFm
+dGVyIGZsYXR2aWV3X2Rlc3Ryb3kuLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+NTU6IEZJTEU6IGh3L3BjaS9wY2lfYnJpZGdlLmM6MjM4OgorYmVjYXVzZSBtZW1vcnlfcmVnaW9u
+X3VucmVmIG5lZWQgYWNjZXNzIG1lbW9yeSByZWdpb25zIGluIFBDSUJyaWRnZVdpbmRvd3MgaW4g
+ZmxhdHZpZXdfZGVzdHJveS4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzEgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
