@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fcxh4-0002lc-OV
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:48:59 -0400
+	(envelope-from <loseweigh@gmail.com>) id 1fcxoN-0004cL-Gs
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fcxgz-0002Jb-Lu
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:48:58 -0400
-Received: from mail-bn3nam01on0102.outbound.protection.outlook.com
-	([104.47.33.102]:45381
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fcxgz-0002JA-Dj
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:48:53 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 10 Jul 2018 18:48:49 +0000
-Message-ID: <BN7PR08MB48688AF8EF3E3BCAC2D8F7FAC65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1531169431-10772-33-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1531169431-10772-33-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <loseweigh@gmail.com>) id 1fcxoM-0004to-Mm
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:56:31 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:36340)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fcxoM-0004te-Gz
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:56:30 -0400
+Received: by mail-io0-x241.google.com with SMTP id k3-v6so21351856iog.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 11:56:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 32/33] gdbstub: Add XML support for GDB
- for nanoMIPS
+In-Reply-To: <20180710045614-mutt-send-email-mst@kernel.org>
+References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	<20180702161404.GA2339@rkaganb.sw.ru>
+	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
+	<20180703095825.GC30904@rkaganb.sw.ru>
+	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
+	<20180709130035.GA6271@rkaganb.sw.ru>
+	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
+	<20180710045614-mutt-send-email-mst@kernel.org>
+From: Siwei Liu <loseweigh@gmail.com>
+Date: Tue, 10 Jul 2018 11:56:28 -0700
+Message-ID: <CADGSJ21sjds8h4Djvu221WeEnyVCbo0WbL9a_SUkntUvx5_S2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
+ identifier for pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
 
-> Subject: [PATCH v2 32/33] gdbstub: Add XML support for GDB for nanoMIPS
+On Mon, Jul 9, 2018 at 6:58 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Mon, Jul 09, 2018 at 06:11:53PM -0700, si-wei liu wrote:
+>> What do we buy
+>> for using a random address during initial discovery and requiring VF to
+>> complete the handshake?
 >
-> From: Stefan Markovic <smarkovic@wavecomp.com>
+> I don't see advantages to using a random address that is then
+> changed either: changing a MAC causes network downtime for most users.
 >
-> Add XML support files for GDB for nanoMIPS.
+Definitely.
+
+I see Linux host stack fundamentally different with Windows, it's
+non-sense to duplicate what Hyper-V is doing especially if there's no
+extra benefit.
+
+>> Less network downtime during datapath switching?
+>> Sorry but that's not a key factor at all for our main goal - live migration.
 >
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> ---
->  MAINTAINERS                |  3 ++-
->  gdb-xml/nanomips-cp0.xml   | 13 +++++++++++++
->  gdb-xml/nanomips-cpu.xml   | 44 ++++++++++++++++++++++++++++++++++++++++=
-++++
->  gdb-xml/nanomips-dsp.xml   | 20 ++++++++++++++++++++
->  gdb-xml/nanomips-fpu.xml   | 45 ++++++++++++++++++++++++++++++++++++++++=
-+++++
->  gdb-xml/nanomips-linux.xml | 20 ++++++++++++++++++++
->  6 files changed, 144 insertions(+), 1 deletion(-)
->  create mode 100644 gdb-xml/nanomips-cp0.xml
->  create mode 100644 gdb-xml/nanomips-cpu.xml
->  create mode 100644 gdb-xml/nanomips-dsp.xml
->  create mode 100644 gdb-xml/nanomips-fpu.xml
->  create mode 100644 gdb-xml/nanomips-linux.xml
+> Isn't avoiding downtime what makes the migration "live"?
+> If you don't care about it at all just remove the device
+> and migrate without all these tricks.
+
+Apparently this downtime is not avoidable even if guest initiates the
+switch-over when it is done on Linux host stack. Unless the NIC
+supports adding duplicate MAC filters with one has higher priority
+than the other when both are present. I feel there's very little or
+perhaps zero improvement for the downtime if moving to a
+guest-initiated datapath switching model.
+
+However, since this downtime is intermittent and generally
+unnoticeable with a few packet drops, network should be resilient in
+recovering from the drops. My point is that unless we can move to a
+datapath switching model with zero downtime theoretically, this kind
+of minor optimization offers very little help in general.
+
+Regards,
+-Siwei
+
+
+
 >
-
-Stefan,
-
-Can you clarify here:
-
-- Was the intention to implement XML support for nanoMIPS only?
-
-- In any case, is there a way to support pre-nanoMIPS MIPS configurations t=
-hat would require only a reasonable implementation time?
-
-
-Thanks,
-Aleksandar
+>
+> --
+> MST
+>
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>
