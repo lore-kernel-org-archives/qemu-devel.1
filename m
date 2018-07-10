@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fcuec-0005kJ-EG
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:34:15 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fcueo-0005vH-FL
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:34:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fcueX-0005Jq-Dz
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:34:14 -0400
-Received: from smtp38.i.mail.ru ([94.100.177.98]:37930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fcueX-0005Ix-1B
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:34:09 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Tue, 10 Jul 2018 18:33:35 +0300
-Message-Id: <20180710153335.1232-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH] nvic: Change NVIC to support ARMv6-M
+	(envelope-from <jsnow@redhat.com>) id 1fcuen-0005Y7-LI
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:34:26 -0400
+References: <20180710093802.28308-1-famz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <fd182f4f-3205-2683-bbb7-eca3b0972609@redhat.com>
+Date: Tue, 10 Jul 2018 11:34:16 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180710093802.28308-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotests: 222: Don't run with luks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,98 +23,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The differences from ARMv7-M NVIC are:
-  * ARMv6-M only supports up to 32 external interrupts
-   (configurable feature already). The ICTR is reserved.
-  * Active Bit Register is reserved.
-  * ARMv6-M supports 4 priority levels against 256 in ARMv7-M.
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- hw/intc/armv7m_nvic.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 38aaf3dc8e..8545c87caa 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -420,6 +420,10 @@ static void set_prio(NVICState *s, unsigned irq, bool secure, uint8_t prio)
-     assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
-     assert(irq < s->num_irq);
- 
-+    if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+        prio &= 0xc0;
-+    }
-+
-     if (secure) {
-         assert(exc_is_banked(irq));
-         s->sec_vectors[irq].prio = prio;
-@@ -777,6 +781,9 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
- 
-     switch (offset) {
-     case 4: /* Interrupt Control Type.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            goto bad_offset;
-+        }
-         return ((s->num_irq - NVIC_FIRST_IRQ) / 32) - 1;
-     case 0xc: /* CPPWR */
-         if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-@@ -850,7 +857,10 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-     case 0xd08: /* Vector Table Offset.  */
-         return cpu->env.v7m.vecbase[attrs.secure];
-     case 0xd0c: /* Application Interrupt/Reset Control (AIRCR) */
--        val = 0xfa050000 | (s->prigroup[attrs.secure] << 8);
-+        val = 0xfa050000;
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            val |= (s->prigroup[attrs.secure] << 8);
-+        }
-         if (attrs.secure) {
-             /* s->aircr stores PRIS, BFHFNMINS, SYSRESETREQS */
-             val |= cpu->env.v7m.aircr;
-@@ -1274,6 +1284,10 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-                               "Setting VECTRESET when not in DEBUG mode "
-                               "is UNPREDICTABLE\n");
-             }
-+            if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+                nvic_irq_update(s);
-+                break;
-+            }
-             s->prigroup[attrs.secure] = extract32(value,
-                                                   R_V7M_AIRCR_PRIGROUP_SHIFT,
-                                                   R_V7M_AIRCR_PRIGROUP_LENGTH);
-@@ -1785,6 +1799,11 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         break;
-     case 0x300 ... 0x33f: /* NVIC Active */
-         val = 0;
-+
-+        if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
-+            break;
-+        }
-+
-         startvec = 8 * (offset - 0x300) + NVIC_FIRST_IRQ; /* vector # */
- 
-         for (i = 0, end = size * 8; i < end && startvec + i < s->num_irq; i++) {
-@@ -2160,13 +2179,15 @@ static Property props_nvic[] = {
- 
- static void armv7m_nvic_reset(DeviceState *dev)
- {
--    int resetprio;
-+    int resetprio, resetprigroup;
-     NVICState *s = NVIC(dev);
- 
-     memset(s->vectors, 0, sizeof(s->vectors));
-     memset(s->sec_vectors, 0, sizeof(s->sec_vectors));
--    s->prigroup[M_REG_NS] = 0;
--    s->prigroup[M_REG_S] = 0;
-+
-+    resetprigroup = arm_feature(&s->cpu->env, ARM_FEATURE_V7) ? 0 : 5;
-+    s->prigroup[M_REG_NS] = resetprigroup;
-+    s->prigroup[M_REG_S] = resetprigroup;
- 
-     s->vectors[ARMV7M_EXCP_NMI].enabled = 1;
-     /* MEM, BUS, and USAGE are enabled through
--- 
-2.17.1
+On 07/10/2018 05:38 AM, Fam Zheng wrote:
+> Luks needs special parameters to operate the image. Since this test is
+> focusing on image fleecing, skip skip that format.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/qemu-iotests/222 | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
+> index ff3bfc1470..0ead56d574 100644
+> --- a/tests/qemu-iotests/222
+> +++ b/tests/qemu-iotests/222
+> @@ -25,6 +25,8 @@ import iotests
+>  from iotests import log, qemu_img, qemu_io, qemu_io_silent
+>  
+>  iotests.verify_platform(['linux'])
+> +iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk',
+> +                                            'vhdx', 'raw'])
+>  
+>  patterns = [("0x5d", "0",         "64k"),
+>              ("0xd5", "1M",        "64k"),
+> 
+
+Ah; do we not have a nicer way to exclude just one format? Evidently not.
+
+Apologies for breaking LUKS.
+
+--js
