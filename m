@@ -1,38 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcuHB-00056o-1r
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:10:01 -0400
+	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fcuT0-0007pW-8g
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcuHA-0004DY-7j
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:10:01 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:43669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcuHA-0004DK-2J
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:10:00 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id b15-v6so43210882oib.10
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 08:09:59 -0700 (PDT)
+	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fcuSv-00006n-8N
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:22:14 -0400
+Received: from mail-eopbgr70114.outbound.protection.outlook.com
+	([40.107.7.114]:5312
+	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <viktor.prutyanov@virtuozzo.com>)
+	id 1fcuSu-000069-HJ
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:22:09 -0400
+From: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Date: Tue, 10 Jul 2018 18:21:09 +0300
+Message-Id: <1531236069-7500-1-git-send-email-viktor.prutyanov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180710162208.7b1b5cdc.cohuck@redhat.com>
-References: <20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-	<20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
-	<20180704150256.408d4a07.cohuck@redhat.com>
-	<20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<20180709072953.GE7755@andariel.pipo.sk>
-	<87k1q3ljgs.fsf@dusky.pond.sub.org>
-	<20180710162208.7b1b5cdc.cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jul 2018 16:09:38 +0100
-Message-ID: <CAFEAcA8AZK+Nsts2bPKAw-F=j5dFB0MBD5AO_9zf1ztbAYGWVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] dump: add kernel_gs_base to QEMU CPU state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,36 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, rkagan@virtuozzo.com, Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-On 10 July 2018 at 15:22, Cornelia Huck <cohuck@redhat.com> wrote:
-> On Tue, 10 Jul 2018 07:59:15 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
->
->> In addition to actively pulling libvirt developers into review of
->> deprecation patches, we should pursue the idea to optionally let QEMU
->> fail on use of deprecated features, then have libvirt run its test suite
->> that way.
->
-> What about the following:
->
-> qemu_deprecated_option("old_option", "modern_option");
->
-> Which would then print (in normal operation)
->
-> "WARNING: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
->
-> to the monitor (or to stderr? to both?).
->
-> If you start QEMU with a -no-deprecated-options switch, it would print
->
-> "ERROR: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
+This patch adds field with content of KERNEL_GS_BASE MSR to QEMU note in
+ELF dump.
 
-I'd prefer to see more hand-tailored deprecation messages that can
-be more detailed about exactly what the new syntax needs to be.
-The ideal would be if you could get right down to the detailed
-level of "replace -old_thing -with_foo=x with -device new_thing,foo=x"...
+On Windows, if all vCPUs are running usermode tasks at the time the dump is
+created, this can be helpful in the discovery of guest system structures
+during conversion ELF dump to MEMORY.DMP dump.
 
-thanks
--- PMM
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+---
+ target/i386/arch_dump.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
+index 35b55fc..a702138 100644
+--- a/target/i386/arch_dump.c
++++ b/target/i386/arch_dump.c
+@@ -237,7 +237,7 @@ int x86_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+  * please count up QEMUCPUSTATE_VERSION if you have changed definition of
+  * QEMUCPUState, and modify the tools using this information accordingly.
+  */
+-#define QEMUCPUSTATE_VERSION (1)
++#define QEMUCPUSTATE_VERSION (2)
+ 
+ struct QEMUCPUSegment {
+     uint32_t selector;
+@@ -258,6 +258,7 @@ struct QEMUCPUState {
+     QEMUCPUSegment cs, ds, es, fs, gs, ss;
+     QEMUCPUSegment ldt, tr, gdt, idt;
+     uint64_t cr[5];
++    uint64_t kernel_gs_base;
+ };
+ 
+ typedef struct QEMUCPUState QEMUCPUState;
+@@ -315,6 +316,8 @@ static void qemu_get_cpustate(QEMUCPUState *s, CPUX86State *env)
+     s->cr[2] = env->cr[2];
+     s->cr[3] = env->cr[3];
+     s->cr[4] = env->cr[4];
++
++    s->kernel_gs_base = env->kernelgsbase;
+ }
+ 
+ static inline int cpu_write_qemu_note(WriteCoreDumpFunction f,
+-- 
+2.7.4
