@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcmRX-0001t1-N6
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:48:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fcmUa-00034O-BM
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fcmRW-0004yJ-BY
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:48:11 -0400
-Date: Tue, 10 Jul 2018 16:42:48 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180710064248.GM22363@umbus.fritz.box>
-References: <20180702062644.48040-1-aik@ozlabs.ru>
-	<20180710122244.7466489f@aik.ozlabs.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fcmUZ-0006mN-J1
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:51:20 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fcmUZ-0006m4-C6
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:51:19 -0400
+Received: by mail-oi0-x242.google.com with SMTP id c6-v6so40655595oiy.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 23:51:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3FyYKcuUbgqNYeqV"
-Content-Disposition: inline
-In-Reply-To: <20180710122244.7466489f@aik.ozlabs.ibm.com>
-Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
- firmware image
+In-Reply-To: <5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
+	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Jul 2018 07:50:58 +0100
+Message-ID: <CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+On 9 July 2018 at 23:03, Thomas Huth <thuth@redhat.com> wrote:
+> On 09.07.2018 23:42, Peter Maydell wrote:
+>> On 9 July 2018 at 22:03, Thomas Huth <thuth@redhat.com> wrote:
+>>> When trying to "device_add bcm2837" on a machine that is not suitable for
+>>> this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
+>>>
+>>> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
+>>>  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
+>>>  "'arguments': {'command-line': 'info qtree'}}" | \
+>>>  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
+>>>
+>>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
+>>>  "package": "build-all"}, "capabilities": []}}
+>>> {"return": {}}
+>>> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
+>>>  hotplugged on this machine"}}
+>>> Segmentation fault (core dumped)
+>>>
+>>> The problem is that qdev_set_parent_bus() from instance_init adds a link
+>>> to the child devices which is not valid anymore after the device init
+>>> failed. Thus the qdev_set_parent_bus() must rather be done in the realize
+>>> function instead.
+>>
+>> Yuck. The real problem here is that we're still requiring the
+>> code that creates these QOM devices to manually set the parent
+>> in the first place. It's not surprising that we don't get it right
+>> (either parenting in the wrong place or not at all). I'd much
+>> rather see us fix that properly than keep papering over places
+>> where we get it wrong.
+>
+> Sorry, I'm still not an expert in all this QOM stuff yet ... so what do
+> you exactly recommend to do instead?
 
---3FyYKcuUbgqNYeqV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm not clear either, but I don't think that what we're
+currently doing can be right.
 
-On Tue, Jul 10, 2018 at 12:22:44PM +1000, Alexey Kardashevskiy wrote:
-> On Mon,  2 Jul 2018 16:26:44 +1000
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->=20
-> > The following changes since commit edb1fb337f65f82fe32b989c4f018efe85c1=
-dddb:
-> >=20
-> >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
-> >=20
-> > are available in the git repository at:
-> >=20
-> >   git@github.com:aik/qemu.git tags/qemu-slof-20180702
-> >=20
-> > for you to fetch changes up to edb1fb337f65f82fe32b989c4f018efe85c1dddb:
-> >=20
-> >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
-> >=20
-> > ----------------------------------------------------------------
-> >=20
-> > I just missed a couple of gcc 8.1 fixes and thought I can still squeeze
-> > them before the 3.0  soft freeze.
-> >=20
-> >=20
-> > *** Note: this is not for master, this is for pseries
->=20
->=20
-> Not good for 3.1 either?
-
-Ugh.. somehow I missed this SLOF update request, and now we're in 3.0
-hard freeze.
-
-How bad are the bugs this SLOF update fixes?
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---3FyYKcuUbgqNYeqV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltEVWUACgkQbDjKyiDZ
-s5I79hAAiDEzPxfbKQhjDqxzW/0mz3AJPte5QzMCiHZoKEo6QNmtNX+wb59exaEs
-T+lNsK2Zo6gCXHBvWo0N69Ug1e+hVyhyG9sQqQURFL+T55M+qOspIgS5x3bsByYW
-7wIqU/ZA0+lX4khsrmDy908ihy4DEmbxTP+0gzAoJII5lqYB/yHkaRWJp1N7/LM8
-vTp59HwrR+/3ue6KuEH5zke26Q500q9jgdBvzbsxkQD3klo/DMLx09jamApP2bnt
-W20LV4oizu7jDMJnkwr6iiD27LxtSuYeO+GacEaJY/lLYh5DVoIx48HOYQSeqjDt
-8UJVEc942NpBsiu0PPKQr/b/xjLml86p8BueE8u+15c2Xsj8hxgNPxCnfV9YZ01B
-wxY0y2+ByFnCxKAhmDJCyaisxuKe6H7qM++wmeFOS/Qm4eJxGPE4GijDZBlVes9h
-FY71Cx6c2bQ263YNyQ1U1kyJqbIxfnbeDK3tqj5laGIHDVkJTImr03BMyV1Ca/bx
-vkeq2uszI9zCPZ5i3jokNc35uLKp+/oErxdyaGvj3f3lTE++EvFJdJsbTMQyiCzV
-40GSuYGcFVANIeDU+Tx2ctSi7twknwzozhaqOn7xKK6kwaqUfQBipFACF0rR8mwM
-6NaepFVdipdhdhUvpZwvcCzLY1Wy3OBkY3iQWn3HIrgn7Tq+Me8=
-=LEXq
------END PGP SIGNATURE-----
-
---3FyYKcuUbgqNYeqV--
+thanks
+-- PMM
