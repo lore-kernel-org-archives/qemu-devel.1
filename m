@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcoPJ-0001qF-7p
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:54:04 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1fcoTB-00032h-VR
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcoPF-0002NE-VL
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:54:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58538 helo=mx1.redhat.com)
+	(envelope-from <jingqi.liu@intel.com>) id 1fcoT9-0003uD-Ds
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:58:02 -0400
+Received: from mga09.intel.com ([134.134.136.24]:44704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcoPF-0002Mg-P2
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:53:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ADB1C87A83
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 08:53:56 +0000 (UTC)
-Date: Tue, 10 Jul 2018 09:53:53 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180710085353.GA2656@work-vm>
-References: <20180705031755.3254-1-peterx@redhat.com>
-	<20180706091716.GA9761@work-vm> <20180706105658.GB2661@work-vm>
-	<20180710032725.GL23001@xz-mi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180710032725.GL23001@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 0/9] migration: postcopy recovery
- unit test, bug fixes
+	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+	id 1fcoT9-0003tC-5d
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:57:59 -0400
+From: Jingqi Liu <jingqi.liu@intel.com>
+Date: Tue, 10 Jul 2018 16:57:32 +0800
+Message-Id: <1531213054-63327-2-git-send-email-jingqi.liu@intel.com>
+In-Reply-To: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
+References: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
+Subject: [Qemu-devel] [PATCH 1/3] x86/cpu: Enable UMONITOR/UMWAIT/TPAUSE cpu
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,116 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, wei.w.wang@intel.com, Jingqi Liu <jingqi.liu@intel.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Jul 06, 2018 at 11:56:59AM +0100, Dr. David Alan Gilbert wrote:
-> > * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > Based-on: <20180627132246.5576-1-peterx@redhat.com>
-> > > > 
-> > > > Based on the series to unbreak postcopy:
-> > > >   Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
-> > > >   Message-Id: <20180627132246.5576-1-peterx@redhat.com>
-> > > > 
-> > > > This series introduce a new postcopy recovery test.  The new test
-> > > > actually helped me to identify two bugs there so fix them as well
-> > > > before 3.0 release.
-> > > > 
-> > > > Patch 1: a trivial cleanup for existing postcopy ram load, which I
-> > > >          found a bit confusing during debugging the problem.
-> > > > 
-> > > > Patch 2-3: two bug fixes that address different issues.  Please see
-> > > >            the commit log for more information.
-> > > > 
-> > > > Patch 4-9: add the postcopy recovery unit test.
-> > > > 
-> > > > Please review.  Thanks,
-> > > 
-> > > Queued
-> > 
-> > Hi Peter,
-> >   There's a problem in there somewhere;  I'm getting
-> > an intermittent failure of the test if I run a make check -j 8    on my
-> > laptop.  Just running two copies of tests/migration-test in parallel
-> > sometimes triggers it (but not if I turn on QTEST_LOG!).
-> > But it's always failing with:
-> > 
-> >   ERROR:/home/dgilbert/git/migpull/tests/migration-test.c:373:migrate_recover: assertion failed: (qdict_haskey(rsp, "return"))
-> 
-> Hmm, so this should be a race.  I suspect it's because destination VM
-> hasn't reached the correct state when sending the recovery command.
-> 
-> Could you help to try these two tiny patches to see whether it can fix
-> the problem?
+UMONITOR, UMWAIT, and TPAUSE are a set of user wait instructions.
 
-Yes, this seems to work; even running 6 in parallel.
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
 
-Dave
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+or an improved power/performance optimized state.
 
-> ================
-> 
-> commit d875ea1a98932174e3fa202859b65df26def174d
-> Author: Peter Xu <peterx@redhat.com>
-> Date:   Tue Jul 10 11:17:24 2018 +0800
-> 
->     migration: show pause/recover state on dst host
-> 
->     These two states will be missing when doing "query-migrate" on
->     destination VM.  Add these states so that we can get the query results
->     as expected.
-> 
->     Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 0404c53215..8d56d56930 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -911,6 +911,8 @@ static void fill_destination_migration_info(MigrationInfo *info)
->      case MIGRATION_STATUS_CANCELLED:
->      case MIGRATION_STATUS_ACTIVE:
->      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
-> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
->      case MIGRATION_STATUS_FAILED:
->      case MIGRATION_STATUS_COLO:
->          info->has_status = true;
-> 
-> ================
-> 
-> commit 9fa7fc773961cd0ea0b5f70a166def0d8aebf464
-> Author: Peter Xu <peterx@redhat.com>
-> Date:   Tue Jul 10 11:18:48 2018 +0800
-> 
->     tests: don't send recovery cmd until dst pauses
-> 
->     Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 96e69dab99..45558446f1 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -646,6 +646,13 @@ static void test_postcopy_recovery(void)
->       */
->      migrate_pause(from);
-> 
-> +    /*
-> +     * Wait for destination side to reach postcopy-paused state.  The
-> +     * migrate-recover command can only succeed if destination machine
-> +     * is in the paused state
-> +     */
-> +    wait_for_migration_status(to, "postcopy-paused");
-> +
->      /*
->       * Create a new socket to emulate a new channel that is different
->       * from the broken migration channel; tell the destination to
-> 
-> ================
-> 
-> Thanks!
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+The bit definition:
+CPUID.(EAX=7,ECX=0):ECX[bit 05] WAITPKG
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/managed/c5/15/\
+architecture-instruction-set-extensions-programming-reference.pdf
+
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+---
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e0e2f2e..e0d151f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -978,7 +978,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+     [FEAT_7_0_ECX] = {
+         .feat_names = {
+             NULL, "avx512vbmi", "umip", "pku",
+-            NULL /* ospke */, NULL, "avx512vbmi2", NULL,
++            NULL /* ospke */, "waitpkg", "avx512vbmi2", NULL,
+             "gfni", "vaes", "vpclmulqdq", "avx512vnni",
+             "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
+             "la57", NULL, NULL, NULL,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 2c5a0d9..f651105 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -674,6 +674,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_WAITPKG  (1U << 5) /* UMONITOR/UMWAIT/TPAUSE Instructions */
+ #define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
+ #define CPUID_7_0_ECX_GFNI     (1U << 8)
+ #define CPUID_7_0_ECX_VAES     (1U << 9)
+-- 
+1.8.3.1
