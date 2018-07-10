@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcrQ6-00049v-A2
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:07:03 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fcrbd-0006Rx-2X
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:18:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fcrQ1-0005nM-Mk
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:07:02 -0400
-Date: Tue, 10 Jul 2018 14:06:55 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180710140655.00742582@redhat.com>
-In-Reply-To: <20180710105129.23296-1-douly.fnst@cn.fujitsu.com>
-References: <20180710105129.23296-1-douly.fnst@cn.fujitsu.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fcrbY-0002A3-0R
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:18:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37324 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcrbX-00029f-S1
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:18:51 -0400
+Date: Tue, 10 Jul 2018 13:18:45 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180710121845.GA37263@work-vm>
+References: <20180710091902.28780-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/machine: Remove the Zero check of
- nb_numa_nodes for numa_complete_configuration() follow-up
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180710091902.28780-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 00/10] migration: postcopy
+ recovery unit test, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, ehabkost@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-On Tue, 10 Jul 2018 18:51:29 +0800
-Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> Based-on: <20180627132246.5576-1-peterx@redhat.com>
+> 
+> Based on the series to unbreak postcopy:
+>   Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
+>   Message-Id: <20180627132246.5576-1-peterx@redhat.com>
 
-> This Commit 7747abf11487 misses the curly brackets. Follow Igor's and Eduardo's suggestion,
-> 
-> Add a follow-up patch for it.
-> 
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> ---
->  hw/core/machine.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index a9aeb22f03..6b68e1218f 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -793,8 +793,9 @@ void machine_run_board_init(MachineState *machine)
->      MachineClass *machine_class = MACHINE_GET_CLASS(machine);
->  
->      numa_complete_configuration(machine);
-> -    if (nb_numa_nodes)
-> +    if (nb_numa_nodes) {
->          machine_numa_finish_cpu_init(machine);
-> +    }
->  
->      /* If the machine supports the valid_cpu_types check and the user
->       * specified a CPU with -cpu check here that the user CPU is supported.
+Queued
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+(Took a bit of manual merging relative to my skip-tcg ppc patch)
+
+> v2:
+> - collect r-bs, and t-b for Balamuruhan
+> - rename matching_target_page_size to matches_target_page_size [Dave]
+> - fixup the race that Dave reported: the 1st patch was added as
+>   a new patch (patch 4); the 2nd patch was squashed into the unit test
+>   patch (patch 9)
+> 
+> Please review.  Thanks,
+> 
+> Peter Xu (10):
+>   migration: simplify check to use qemu file buffer
+>   migration: loosen recovery check when load vm
+>   migration: fix incorrect bitmap size calculation
+>   migration: show pause/recover state on dst host
+>   tests: introduce migrate_postcopy_* helpers
+>   tests: allow migrate() to take extra flags
+>   tests: introduce migrate_query*() helpers
+>   tests: introduce wait_for_migration_status()
+>   tests: add postcopy recovery test
+>   tests: hide stderr for postcopy recovery test
+> 
+>  migration/migration.c  |   2 +
+>  migration/ram.c        |  21 +++--
+>  migration/savevm.c     |  16 ++--
+>  tests/migration-test.c | 205 ++++++++++++++++++++++++++++++++---------
+>  4 files changed, 185 insertions(+), 59 deletions(-)
+> 
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
