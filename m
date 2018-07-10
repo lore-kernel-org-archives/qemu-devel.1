@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcunn-0005Nk-Il
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcunn-0005OG-Uq
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcunm-0001mN-Je
+	(envelope-from <kwolf@redhat.com>) id 1fcunm-0001mV-Rx
 	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:43 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 10 Jul 2018 17:43:01 +0200
-Message-Id: <20180710154304.18304-22-kwolf@redhat.com>
+Date: Tue, 10 Jul 2018 17:42:59 +0200
+Message-Id: <20180710154304.18304-20-kwolf@redhat.com>
 In-Reply-To: <20180710154304.18304-1-kwolf@redhat.com>
 References: <20180710154304.18304-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 21/24] block: Use common req handling for discard
+Subject: [Qemu-devel] [PULL 19/24] block: Extract common write req handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +24,156 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
-Reuse the new bdrv_co_write_req_prepare/finish helpers. The variation
-here is that discard requests don't affect bs->wr_highest_offset, and it
-cannot extend the image.
+As a mechanical refactoring patch, this is the first step towards
+unified and more correct write code paths. This is helpful because
+multiple BlockDriverState fields need to be updated after modifying
+image data, and it's hard to maintain in multiple places such as copy
+offload, discard and truncate.
 
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/io.c | 33 +++++++++++++++++++++++----------
- 1 file changed, 23 insertions(+), 10 deletions(-)
+ block/io.c | 91 +++++++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 57 insertions(+), 34 deletions(-)
 
 diff --git a/block/io.c b/block/io.c
-index c88b2b48d7..72cfd9bd16 100644
+index 6293612e73..313fe0776c 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1623,15 +1623,32 @@ bdrv_co_write_req_finish(BdrvChild *child, int64_t offset, uint64_t bytes,
- 
-     atomic_inc(&bs->write_gen);
- 
--    stat64_max(&bs->wr_highest_offset, offset + bytes);
--
-+    /*
-+     * Discard cannot extend the image, but in error handling cases, such as
-+     * when reverting a qcow2 cluster allocation, the discarded range can pass
-+     * the end of image file, so we cannot assert about BDRV_TRACKED_DISCARD
-+     * here. Instead, just skip it, since semantically a discard request
-+     * beyond EOF cannot expand the image anyway.
-+     */
-     if (ret == 0 &&
--        end_sector > bs->total_sectors) {
-+        end_sector > bs->total_sectors &&
-+        req->type != BDRV_TRACKED_DISCARD)  {
-         bs->total_sectors = end_sector;
-         bdrv_parent_cb_resize(bs);
-         bdrv_dirty_bitmap_truncate(bs, end_sector << BDRV_SECTOR_BITS);
-     }
--    bdrv_set_dirty(bs, offset, bytes);
-+    if (req->bytes) {
-+        switch (req->type) {
-+        case BDRV_TRACKED_WRITE:
-+            stat64_max(&bs->wr_highest_offset, offset + bytes);
-+            /* fall through, to set dirty bits */
-+        case BDRV_TRACKED_DISCARD:
-+            bdrv_set_dirty(bs, offset, bytes);
-+            break;
-+        default:
-+            break;
-+        }
-+    }
+@@ -1575,6 +1575,61 @@ fail:
+     return ret;
  }
  
++static inline int coroutine_fn
++bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
++                          BdrvTrackedRequest *req, int flags)
++{
++    BlockDriverState *bs = child->bs;
++    bool waited;
++    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
++
++    if (bs->read_only) {
++        return -EPERM;
++    }
++
++    /* BDRV_REQ_NO_SERIALISING is only for read operation */
++    assert(!(flags & BDRV_REQ_NO_SERIALISING));
++    assert(!(bs->open_flags & BDRV_O_INACTIVE));
++    assert((bs->open_flags & BDRV_O_NO_IO) == 0);
++    assert(!(flags & ~BDRV_REQ_MASK));
++
++    if (flags & BDRV_REQ_SERIALISING) {
++        mark_request_serialising(req, bdrv_get_cluster_size(bs));
++    }
++
++    waited = wait_serialising_requests(req);
++
++    assert(!waited || !req->serialising ||
++           is_request_serialising_and_aligned(req));
++    assert(req->overlap_offset <= offset);
++    assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
++
++    if (flags & BDRV_REQ_WRITE_UNCHANGED) {
++        assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
++    } else {
++        assert(child->perm & BLK_PERM_WRITE);
++    }
++    assert(end_sector <= bs->total_sectors || child->perm & BLK_PERM_RESIZE);
++    return notifier_with_return_list_notify(&bs->before_write_notifiers, req);
++}
++
++static inline void coroutine_fn
++bdrv_co_write_req_finish(BdrvChild *child, int64_t offset, uint64_t bytes,
++                         BdrvTrackedRequest *req, int ret)
++{
++    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
++    BlockDriverState *bs = child->bs;
++
++    atomic_inc(&bs->write_gen);
++    bdrv_set_dirty(bs, offset, bytes);
++
++    stat64_max(&bs->wr_highest_offset, offset + bytes);
++
++    if (ret == 0) {
++        bs->total_sectors = MAX(bs->total_sectors, end_sector);
++    }
++}
++
  /*
-@@ -2692,10 +2709,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-     ret = bdrv_check_byte_request(bs, offset, bytes);
-     if (ret < 0) {
-         return ret;
--    } else if (bs->read_only) {
--        return -EPERM;
+  * Forwards an already correctly aligned write request to the BlockDriver,
+  * after possibly fragmenting it.
+@@ -1585,10 +1640,8 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+ {
+     BlockDriverState *bs = child->bs;
+     BlockDriver *drv = bs->drv;
+-    bool waited;
+     int ret;
+ 
+-    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
+     uint64_t bytes_remaining = bytes;
+     int max_transfer;
+ 
+@@ -1604,31 +1657,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     assert((offset & (align - 1)) == 0);
+     assert((bytes & (align - 1)) == 0);
+     assert(!qiov || bytes == qiov->size);
+-    assert((bs->open_flags & BDRV_O_NO_IO) == 0);
+-    assert(!(flags & ~BDRV_REQ_MASK));
+     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
+                                    align);
+ 
+-    /* BDRV_REQ_NO_SERIALISING is only for read operation */
+-    assert(!(flags & BDRV_REQ_NO_SERIALISING));
+-
+-    if (flags & BDRV_REQ_SERIALISING) {
+-        mark_request_serialising(req, bdrv_get_cluster_size(bs));
+-    }
+-
+-    waited = wait_serialising_requests(req);
+-    assert(!waited || !req->serialising ||
+-           is_request_serialising_and_aligned(req));
+-    assert(req->overlap_offset <= offset);
+-    assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
+-    if (flags & BDRV_REQ_WRITE_UNCHANGED) {
+-        assert(child->perm & (BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE));
+-    } else {
+-        assert(child->perm & BLK_PERM_WRITE);
+-    }
+-    assert(end_sector <= bs->total_sectors || child->perm & BLK_PERM_RESIZE);
+-
+-    ret = notifier_with_return_list_notify(&bs->before_write_notifiers, req);
++    ret = bdrv_co_write_req_prepare(child, offset, bytes, req, flags);
+ 
+     if (!ret && bs->detect_zeroes != BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF &&
+         !(flags & BDRV_REQ_ZERO_WRITE) && drv->bdrv_co_pwrite_zeroes &&
+@@ -1677,15 +1709,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
      }
+     bdrv_debug_event(bs, BLKDBG_PWRITEV_DONE);
+ 
+-    atomic_inc(&bs->write_gen);
+-    bdrv_set_dirty(bs, offset, bytes);
+-
+-    stat64_max(&bs->wr_highest_offset, offset + bytes);
+-
+     if (ret >= 0) {
+-        bs->total_sectors = MAX(bs->total_sectors, end_sector);
+         ret = 0;
+     }
++    bdrv_co_write_req_finish(child, offset, bytes, req, ret);
+ 
+     return ret;
+ }
+@@ -1800,10 +1827,6 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     if (!bs->drv) {
+         return -ENOMEDIUM;
+     }
+-    if (bs->read_only) {
+-        return -EPERM;
+-    }
 -    assert(!(bs->open_flags & BDRV_O_INACTIVE));
  
-     /* Do nothing if disabled.  */
-     if (!(bs->open_flags & BDRV_O_UNMAP)) {
-@@ -2719,7 +2733,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-     bdrv_inc_in_flight(bs);
-     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_DISCARD);
- 
--    ret = notifier_with_return_list_notify(&bs->before_write_notifiers, &req);
-+    ret = bdrv_co_write_req_prepare(child, offset, bytes, &req, 0);
+     ret = bdrv_check_byte_request(bs, offset, bytes);
      if (ret < 0) {
-         goto out;
-     }
-@@ -2785,8 +2799,7 @@ int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int bytes)
-     }
-     ret = 0;
- out:
--    atomic_inc(&bs->write_gen);
--    bdrv_set_dirty(bs, req.offset, req.bytes);
-+    bdrv_co_write_req_finish(child, req.offset, req.bytes, &req, ret);
-     tracked_request_end(&req);
-     bdrv_dec_in_flight(bs);
-     return ret;
 -- 
 2.13.6
