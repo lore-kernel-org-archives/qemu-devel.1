@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fcnJT-0001Eu-ED
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:43:56 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fcnRn-0003JI-9Z
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fcnJS-0004RO-I2
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:43:55 -0400
-References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
-	<20180626135035.133432-4-vsementsov@virtuozzo.com>
-	<92c99cf7-7e60-236f-fe23-8341840e1d09@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e0c515bf-6618-74a7-aab4-6c828389a404@virtuozzo.com>
-Date: Tue, 10 Jul 2018 10:43:39 +0300
+	(envelope-from <imammedo@redhat.com>) id 1fcnRk-0000lQ-6k
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:52:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50468 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fcnRk-0000lG-1Z
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 03:52:28 -0400
+Date: Tue, 10 Jul 2018 09:52:23 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180710095223.05c72466@redhat.com>
+In-Reply-To: <20180705021038.14036-1-douly.fnst@cn.fujitsu.com>
+References: <20180705021038.14036-1-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <92c99cf7-7e60-236f-fe23-8341840e1d09@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 3/6] bloc/qcow2: drop dirty_bitmaps_loaded
- state variable
+Subject: Re: [Qemu-devel] [PATCH] hw/acpi-build: Add a check for non-memory
+ NUMA nodes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, stefanha@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, ehabkost@redhat.com
 
-10.07.2018 02:25, John Snow wrote:
->
-> On 06/26/2018 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
->> This variable doesn't work as it should, because it is actually cleared
->> in qcow2_co_invalidate_cache() by memset(). Drop it, as the following
->> patch will introduce new behavior.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/qcow2.h |  1 -
->>   block/qcow2.c | 19 ++-----------------
->>   2 files changed, 2 insertions(+), 18 deletions(-)
->>
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index 01b5250415..c9df19b6e6 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
->> @@ -294,7 +294,6 @@ typedef struct BDRVQcow2State {
->>       uint32_t nb_bitmaps;
->>       uint64_t bitmap_directory_size;
->>       uint64_t bitmap_directory_offset;
->> -    bool dirty_bitmaps_loaded;
->>   
->>       int flags;
->>       int qcow_version;
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 46194a33ca..0044ff58e7 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -1149,7 +1149,6 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->>       uint64_t ext_end;
->>       uint64_t l1_vm_state_index;
->>       bool update_header = false;
->> -    bool header_updated = false;
->>   
->>       ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
->>       if (ret < 0) {
->> @@ -1488,23 +1487,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->>           s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
->>       }
->>   
->> -    if (s->dirty_bitmaps_loaded) {
->> -        /* It's some kind of reopen. There are no known cases where we need to
->> -         * reload bitmaps in such a situation, so it's safer to skip them.
->> -         *
->> -         * Moreover, if we have some readonly bitmaps and we are reopening for
->> -         * rw we should reopen bitmaps correspondingly.
->> -         */
->> -        if (bdrv_has_readonly_bitmaps(bs) &&
->> -            !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
->> -        {
->> -            qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
->> -        }
->> -    } else {
->> -        header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
->> -        s->dirty_bitmaps_loaded = true;
->> +    if (qcow2_load_dirty_bitmaps(bs, &local_err)) {
->> +        update_header = false;
->>       }
->> -    update_header = update_header && !header_updated;
->>       if (local_err != NULL) {
->>           error_propagate(errp, local_err);
->>           ret = -EINVAL;
->>
-> Usually I'd like to see the new behavior introduced before removing the
-> old, imperfect solution... (it doesn't make any tests fail!? ...)
->
-> At this point in the series I just have to trust that you will fix it to
-> be better :)
+On Thu, 5 Jul 2018 10:10:38 +0800
+Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
 
-As I understand, this field is actually always false, so it's safe to 
-drop it.
-
->
-> --js
+> Currently, Qemu ACPI builder doesn't consider the non-memory NUMA nodes, eg:
+s/non-memory/memory-less/ throughout subj/commit message
 
 
--- 
-Best regards,
-Vladimir
+>   -m 4G,slots=4,maxmem=8G \
+>   -numa node,nodeid=0 \
+>   -numa node,nodeid=1,mem=2G \
+>   -numa node,nodeid=2,mem=2G \
+>   -numa node,nodeid=3\
+> 
+> Guest Linux will report
+> 
+>   [    0.000000] ACPI: SRAT: Node 0 PXM 0 [mem 0x00000000-0xffffffffffffffff]
+>   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
+>   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
+>   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
+>   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
+>   [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x13fffffff]
+>   [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+> 
+> [mem 0x00000000-0xffffffffffffffff] and [mem 0x140000000-0x13fffffff] are bogus.
+> 
+> Add a check to avoid building srat memory for non-memory NUMA nodes, also update
+> the test file. Now the info in guest linux will be
+> 
+>   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
+>   [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
+>   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
+>   [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
+>   [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+> 
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> ---
+> Have done a bootup test in Linux and window 10, 7
+
+add here":
+note to maintainer: update ACPI tables test blobs on commit.
+
+with patch amended
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/i386/acpi-build.c                  |   9 ++++++---
+>  tests/acpi-test-data/pc/SRAT.numamem  | Bin 224 -> 224 bytes
+>  tests/acpi-test-data/q35/SRAT.numamem | Bin 224 -> 224 bytes
+>  3 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 9e8350c55d..c584642e4e 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2392,9 +2392,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>              mem_len = next_base - pcms->below_4g_mem_size;
+>              next_base = mem_base + mem_len;
+>          }
+> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                          MEM_AFFINITY_ENABLED);
+> +
+> +        if (mem_len > 0) {
+> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+> +            build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> +                              MEM_AFFINITY_ENABLED);
+> +        }
+>      }
+>      slots = (table_data->len - numa_start) / sizeof *numamem;
+>      for (; slots < pcms->numa_nodes + 2; slots++) {
+
+Drop binary blobs from patch (for reviewer convenience we post
+blobs as separate patch with DO NOT APPLY tag in subject).
+
+Michael will update test blobs manually when merging your patch.
+
+> diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/acpi-test-data/pc/SRAT.numamem
+> index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
+> GIT binary patch
+> delta 24
+> gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
+> 
+> delta 24
+> gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
+> 
+> diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/acpi-test-data/q35/SRAT.numamem
+> index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
+> GIT binary patch
+> delta 24
+> gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
+> 
+> delta 24
+> gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
+> 
