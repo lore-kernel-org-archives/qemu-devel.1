@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60699)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1fcrsc-00048N-JX
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:36:31 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60779)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcrtZ-0004cb-9j
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1fcrsZ-0001mN-BR
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:36:30 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34684 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fcrsZ-0001lO-1u
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:36:27 -0400
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:36:20 +0200
-References: <1530963723-14380-1-git-send-email-pl@kamp.de>
-	<20180710122832.GF5852@localhost.localdomain>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <66172b50-db34-73c8-124a-5a2481b8e14b@kamp.de>
-Date: Tue, 10 Jul 2018 14:36:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180710122832.GF5852@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcrtV-00022Z-Uj
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:37:29 -0400
+Received: from mail-eopbgr730093.outbound.protection.outlook.com
+	([40.107.73.93]:28427
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fcrtV-00021c-Hf
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:37:25 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 10 Jul 2018 12:37:21 +0000
+Message-ID: <BN7PR08MB4868D2C292BDD44B45EEF488C65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1531169431-10772-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1531169431-10772-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V4] qemu-img: align result of
- is_allocated_sectors
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/33] target/mips: Add nanoMIPS OPCODE
+ table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,117 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-Am 10.07.2018 um 14:28 schrieb Kevin Wolf:
-> Am 07.07.2018 um 13:42 hat Peter Lieven geschrieben:
->> We currently don't enforce that the sparse segments we detect during convert are
->> aligned. This leads to unnecessary and costly read-modify-write cycles either
->> internally in Qemu or in the background on the storage device as nearly all
->> modern filesystems or hardware have a 4k alignment internally.
->>
->> This patch modifies is_allocated_sectors so that its *pnum result will always
->> end at an alignment boundary. This way all requests will end at an alignment
->> boundary. The start of all requests will also be aligned as long as the results
->> of get_block_status do not lead to an unaligned offset.
->>
->> The number of RMW cycles when converting an example image [1] to a raw device that
->> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
->> write requests. With this path the additional 4600 read requests are eliminated while
->> the number of total write requests stays constant.
->>
->> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
->>
->> Signed-off-by: Peter Lieven <pl@kamp.de>
->> ---
->> V3->V4: - only focus on the end offset in is_allocated_sectors [Kevin]
->> V2->V3: - ensure that s.alignment is a power of 2
->>          - correctly handle n < alignment in is_allocated_sectors if
->>            sector_num % alignment > 0.
->> V1->V2: - take the current sector offset into account [Max]
->>          - try to figure out the target alignment [Max]
->>
->>   qemu-img.c | 44 ++++++++++++++++++++++++++++++++++++++------
->>   1 file changed, 38 insertions(+), 6 deletions(-)
->>
->> diff --git a/qemu-img.c b/qemu-img.c
->> index e1a506f..20e3236 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->> @@ -1105,11 +1105,15 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
->>    *
->>    * 'pnum' is set to the number of sectors (including and immediately following
->>    * the first one) that are known to be in the same allocated/unallocated state.
->> + * The function will try to align the end offset to alignment boundaries so
->> + * that the request will at least end aligned and consequtive requests will
->> + * also start at an aligned offset.
->>    */
->> -static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
->> +static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
->> +                                int64_t sector_num, int alignment)
->>   {
->>       bool is_zero;
->> -    int i;
->> +    int i, tail;
->>   
->>       if (n <= 0) {
->>           *pnum = 0;
->> @@ -1122,6 +1126,23 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
->>               break;
->>           }
->>       }
->> +
->> +    tail = (sector_num + i) & (alignment - 1);
->> +    if (tail) {
->> +        if (is_zero && i == tail) {
-> Should this be i <= tail for the case where sector_num is unaligned?
+> Subject: [PATCH v2 01/33] target/mips: Add nanoMIPS OPCODE table
 >
-> For example:
+> From: Yongbok Kim <yongbok.kim@mips.com>
 >
->      Bytes 0     - 1024:     zero
->      Bytes 1024  - 4096:     non-zero
+> nanoMIPS opcodes are organized by so-called instruction pools.
 >
->      /* Check from 512 to 4096, alignment 2048 */
->      is_allocated_sectors(buf, 7, &pnum, 1, 4)
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  target/mips/mips-defs.h |   4 +
+>  target/mips/translate.c | 674 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 678 insertions(+)
 >
->      -> is_zero = true
->      -> i = 1
->      -> tail = (sector_num + i) & (alignment - 1)
->              = (1 + 1) & (4 - 1)
->              = 2
->              != i
 
-You are right. I missed that.
+I think changes in target/mips/mips-defs.h shoudl be in a separate patch.
 
+For opcodes, a comment explaining instruction pool organization would be he=
+lpful.
+
+Also, there is no distinction between opcode constants for instruction and =
+instuction pools: they all begin NM_ plus instruction/pool mnemonic. If the=
+re is enough time, that should be corrected so that trere are NM_IN_XXX and=
+ NM_PL_YYY opcodes, let's say.
+
+> diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+> index d239069..eadc1d8 100644
+> --- a/target/mips/mips-defs.h
+> +++ b/target/mips/mips-defs.h
+> @@ -39,6 +39,7 @@
+>  #define   ISA_MIPS64R5  0x00001000
+>  #define   ISA_MIPS32R6  0x00002000
+>  #define   ISA_MIPS64R6  0x00004000
+> +#define   ISA_NANOMIPS32  0x00008000
 >
->> +            /* treat unallocated areas which only consist
->> +             * of a small tail as allocated. */
->> +            is_zero = 0;
-> (This should be false rather than 0, is_zero is a bool)
-
-will fix.
-
+>  /* MIPS ASEs. */
+>  #define   ASE_MIPS16    0x00010000
+> @@ -87,6 +88,9 @@
+>  #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+>  #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
 >
->> +        }
->> +        if (!is_zero) {
->> +            /* align up end offset of allocated areas. */
->> +            i += alignment - tail;
->> +            i = MIN(i, n);
->> +        } else {
->> +            /* align down end offset of zero areas. */
->> +            i -= tail;
-> So our example above will end up in this branch and we get:
+> +/* MIPS Technologies "nanoMIPS" */
+> +#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
+> +
+>  /* Strictly follow the architecture standard:
+>     - Disallow "special" instruction handling for PMON/SPIM.
+>     Note that we still maintain Count/Compare to match the host clock. */
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index de0d55b..3ccf6fc 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -15644,6 +15644,680 @@ static int decode_micromips_opc (CPUMIPSState *=
+env, DisasContext > *ctx)
+>      return 2;
+>  }
 >
->      i = i - tail
->        = 1 - 2
->        = -1
->
-> I'm not sure what callers will do with a negative *pnum, but I expect it
-> won't be anything good.
-
-But with i <= tail, we avoid ending up here.
-So with the 2 fixes you are okay with this Patch?
-
-Thanks,
-Peter
+> +/*
+> + *
+> + * nanoMIPS opcodes
+> + *
+> + */
+> +
+> +/* MAJOR, P16, and P32 pools opcodes */
+> +enum {
+> +    NM_P_ADDIU      =3D 0x00,
+> +    NM_ADDIUPC      =3D 0x01,
+> +    NM_MOVE_BALC    =3D 0x02,
