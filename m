@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcqmJ-0003d3-Du
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:25:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1fcr0t-0006La-2x
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcqmE-0006p4-DI
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:25:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55206 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcqmE-0006oi-6M
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:25:50 -0400
-Date: Tue, 10 Jul 2018 12:25:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180710112543.GH2656@work-vm>
-References: <20180710091902.28780-1-peterx@redhat.com>
-	<20180710091902.28780-10-peterx@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fcr0p-0004LK-5L
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:40:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fcr0o-0004K6-UL
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:40:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fcr0n-0002Cl-BH
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 11:40:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 49C1A2E819A
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 11:40:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180710091902.28780-10-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 09/10] tests: add postcopy
- recovery test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Jul 2018 11:30:28 -0000
+From: Greg Kurz <groug@kaod.org>
+Reply-To: Bug 1780928 <1780928@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153121318079.13203.2840846134376544024.malonedeb@gac.canonical.com>
+Message-Id: <153122222945.12699.5595023027621124570.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1780928] Re: v2.12.0-2321-gb34181056c: vcpu
+ hotplug crashes qemu-kvm with segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Balamuruhan S <bala24@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Test the postcopy recovery procedure by emulating a network failure
-> using migrate-pause command.
-> 
-> Tested-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Greg Kurz (gkurz)
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+-- =
 
-> ---
->  tests/migration-test.c | 78 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 78 insertions(+)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 761bf62ffe..e952d94529 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -352,6 +352,29 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
->      migrate_check_parameter(who, parameter, value);
->  }
->  
-> +static void migrate_pause(QTestState *who)
-> +{
-> +    QDict *rsp;
-> +
-> +    rsp = wait_command(who, "{ 'execute': 'migrate-pause' }");
-> +    g_assert(qdict_haskey(rsp, "return"));
-> +    qobject_unref(rsp);
-> +}
-> +
-> +static void migrate_recover(QTestState *who, const char *uri)
-> +{
-> +    QDict *rsp;
-> +    gchar *cmd = g_strdup_printf(
-> +        "{ 'execute': 'migrate-recover', "
-> +        "  'id': 'recover-cmd', "
-> +        "  'arguments': { 'uri': '%s' } }", uri);
-> +
-> +    rsp = wait_command(who, cmd);
-> +    g_assert(qdict_haskey(rsp, "return"));
-> +    g_free(cmd);
-> +    qobject_unref(rsp);
-> +}
-> +
->  static void migrate_set_capability(QTestState *who, const char *capability,
->                                     const char *value)
->  {
-> @@ -597,6 +620,60 @@ static void test_postcopy(void)
->      migrate_postcopy_complete(from, to);
->  }
->  
-> +static void test_postcopy_recovery(void)
-> +{
-> +    QTestState *from, *to;
-> +    char *uri;
-> +
-> +    migrate_postcopy_prepare(&from, &to);
-> +
-> +    /* Turn postcopy speed down, 4K/s is slow enough on any machines */
-> +    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
-> +
-> +    /* Now we start the postcopy */
-> +    migrate_postcopy_start(from, to);
-> +
-> +    /*
-> +     * Wait until postcopy is really started; we can only run the
-> +     * migrate-pause command during a postcopy
-> +     */
-> +    wait_for_migration_status(from, "postcopy-active");
-> +
-> +    /*
-> +     * Manually stop the postcopy migration. This emulates a network
-> +     * failure with the migration socket
-> +     */
-> +    migrate_pause(from);
-> +
-> +    /*
-> +     * Wait for destination side to reach postcopy-paused state.  The
-> +     * migrate-recover command can only succeed if destination machine
-> +     * is in the paused state
-> +     */
-> +    wait_for_migration_status(to, "postcopy-paused");
-> +
-> +    /*
-> +     * Create a new socket to emulate a new channel that is different
-> +     * from the broken migration channel; tell the destination to
-> +     * listen to the new port
-> +     */
-> +    uri = g_strdup_printf("unix:%s/migsocket-recover", tmpfs);
-> +    migrate_recover(to, uri);
-> +
-> +    /*
-> +     * Try to rebuild the migration channel using the resume flag and
-> +     * the newly created channel
-> +     */
-> +    wait_for_migration_status(from, "postcopy-paused");
-> +    migrate(from, uri, ", 'resume': true");
-> +    g_free(uri);
-> +
-> +    /* Restore the postcopy bandwidth to unlimited */
-> +    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
-> +
-> +    migrate_postcopy_complete(from, to);
-> +}
-> +
->  static void test_baddest(void)
->  {
->      QTestState *from, *to;
-> @@ -683,6 +760,7 @@ int main(int argc, char **argv)
->      module_call_init(MODULE_INIT_QOM);
->  
->      qtest_add_func("/migration/postcopy/unix", test_postcopy);
-> +    qtest_add_func("/migration/postcopy/recovery", test_postcopy_recovery);
->      qtest_add_func("/migration/deprecated", test_deprecated);
->      qtest_add_func("/migration/bad_dest", test_baddest);
->      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1780928
+
+Title:
+  v2.12.0-2321-gb34181056c: vcpu hotplug crashes qemu-kvm with segfault
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  vcpu hotplug crashes upstream qemu(v2.12.0-2321-gb34181056c), vcpu
+  hotplug works fine in v2.12.0-rc4.
+
+  Host: Power8, kernel: 4.18.0-rc2-00037-g6f0d349d922b
+  Guest: Power8, kernel: 4.18.0-rc3-00183-gc42c12a90545 (base image: fedora=
+27 ppc64le)
+
+  /usr/share/avocado-plugins-vt/build/qemu/ppc64-softmmu/qemu-system-ppc64 =
+-M pseries,accel=3Dkvm,max-cpu-compat=3Dpower8 -m 8192 -device virtio-scsi-=
+pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/var/lib/avocado/data/a=
+vocado-vt/images/jeos-27-ppc64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive1=
+ -device scsi-hd,drive=3Ddrive1,bus=3Dscsi0.0 -smp 1,cores=3D1,threads=3D1,=
+sockets=3D1,maxcpus=3D8 -serial /dev/pts/0 -monitor stdio -vga none -nograp=
+hic -kernel /home/kvmci/linux/vmlinux -append 'root=3D/dev/sda2 rw console=
+=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug' -nic user,=
+model=3Dvirtio-net-pci =
+
+  QEMU 2.12.50 monitor - type 'help' for more information
+  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+  Segmentation fault (core dumped)
+
+  =
+
+  Guest initial cpu:
+  # lscpu
+  Architecture:        ppc64le
+  Byte Order:          Little Endian
+  CPU(s):              1
+  On-line CPU(s) list: 0
+  Thread(s) per core:  1
+  Core(s) per socket:  1
+  Socket(s):           1
+  NUMA node(s):        1
+  Model:               2.1 (pvr 004b 0201)
+  Model name:          POWER8 (architected), altivec supported
+  Hypervisor vendor:   KVM
+  Virtualization type: para
+  L1d cache:           64K
+  L1i cache:           32K
+  NUMA node0 CPU(s):   0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1780928/+subscriptions
