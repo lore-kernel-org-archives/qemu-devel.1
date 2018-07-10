@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fctX4-0003am-0J
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 10:22:22 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fctde-00057k-DT
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 10:29:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fctX3-0006fL-AY
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 10:22:21 -0400
-Date: Tue, 10 Jul 2018 16:22:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180710162208.7b1b5cdc.cohuck@redhat.com>
-In-Reply-To: <87k1q3ljgs.fsf@dusky.pond.sub.org>
-References: <20180625114528.GL16514@angien.pipo.sk>
-	<20180702080411.GA4299@localhost.localdomain>
-	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
-	<20180703111949.GB24516@redhat.com>
-	<20180703113229.GD3812@localhost.localdomain>
-	<20180704150256.408d4a07.cohuck@redhat.com>
-	<20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<20180709072953.GE7755@andariel.pipo.sk>
-	<87k1q3ljgs.fsf@dusky.pond.sub.org>
+	(envelope-from <venu.busireddy@oracle.com>) id 1fctdb-0002Nt-8l
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 10:29:10 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:57382)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1fctda-0002N2-W5
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 10:29:07 -0400
+Date: Tue, 10 Jul 2018 09:28:57 -0500
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Message-ID: <20180710142857.GA17258@troi>
+References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	<20180710050913-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180710050913-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Use of unique identifier for
+ pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On Tue, 10 Jul 2018 07:59:15 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+On 2018-07-10 05:11:18 +0300, Michael S. Tsirkin wrote:
+> On Fri, Jun 29, 2018 at 05:19:03PM -0500, Venu Busireddy wrote:
+> > The current patch set includes all the feedback received for proposals [3]
+> > and [4]. For the sake of completeness, patch for the virtio specification
+> > is also included here. Following is the updated proposal.
+> > 
+> > 1. Extend the virtio specification to include a new virtio PCI capability
+> >    "VIRTIO_PCI_CAP_GROUP_ID_CFG".
+> 
+> ....
+> 
+> >  default-configs/arm-softmmu.mak             |   1 +
+> >  default-configs/i386-softmmu.mak            |   1 +
+> >  default-configs/x86_64-softmmu.mak          |   1 +
+> >  hw/pci-bridge/Makefile.objs                 |   1 +
+> >  hw/pci-bridge/pci_bridge_dev.c              |  10 +
+> >  hw/pci-bridge/pcie_downstream.c             | 220 ++++++++++++++++++++
+> >  hw/pci-bridge/pcie_downstream.h             |  10 +
+> >  hw/pci/pci_bridge.c                         |  34 +++
+> >  hw/virtio/virtio-pci.c                      |  15 ++
+> >  hw/virtio/virtio-pci.h                      |   3 +-
+> >  include/hw/pci/pci.h                        |  37 ++--
+> >  include/hw/pci/pci_bridge.h                 |   2 +
+> >  include/hw/pci/pcie.h                       |   1 +
+> >  include/standard-headers/linux/virtio_pci.h |   8 +
+> >  14 files changed, 326 insertions(+), 18 deletions(-)
+> >  create mode 100644 hw/pci-bridge/pcie_downstream.c
+> >  create mode 100644 hw/pci-bridge/pcie_downstream.h
+> 
+> I don't see the spec patch here.
 
-> In addition to actively pulling libvirt developers into review of
-> deprecation patches, we should pursue the idea to optionally let QEMU
-> fail on use of deprecated features, then have libvirt run its test suite
-> that way.
+Since the spec patch is in a different repo, I could not get 'git
+format-patch' to combine them together. As a result, I added the spec
+patch itself to the patches, but it is not in the cover letter.
 
-What about the following:
+I can combine them manually, and repost. Do you want me do that? 
 
-qemu_deprecated_option("old_option", "modern_option");
+Thanks,
 
-Which would then print (in normal operation)
-
-"WARNING: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
-
-to the monitor (or to stderr? to both?).
-
-If you start QEMU with a -no-deprecated-options switch, it would print
-
-"ERROR: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
-
-and do an exit(1).
-
-Would that be workable?
+Venu
