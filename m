@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcung-0005ES-3k
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:37 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcunf-0001hm-8n
+	(envelope-from <kwolf@redhat.com>) id 1fcunf-0005DN-8E
 	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:36 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1fcune-0001h9-2q
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:35 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 10 Jul 2018 17:42:55 +0200
-Message-Id: <20180710154304.18304-16-kwolf@redhat.com>
+Date: Tue, 10 Jul 2018 17:42:53 +0200
+Message-Id: <20180710154304.18304-14-kwolf@redhat.com>
 In-Reply-To: <20180710154304.18304-1-kwolf@redhat.com>
 References: <20180710154304.18304-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/24] block: Prefix file driver trace points
- with "file_"
+Subject: [Qemu-devel] [PULL 13/24] Revert "block: Remove deprecated -drive
+ option addr"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +23,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Cornelia Huck <cohuck@redhat.com>
 
-With in one module, trace points usually have a common prefix named
-after the module name. paio_submit and paio_submit_co are the only two
-trace points so far in the two file protocol drivers. As we are adding
-more, having a common prefix here is better so that trace points can be
-enabled with a glob. Rename them.
+This reverts commit eae3bd1eb7c6b105d30ec06008b3bc3dfc5f45bb.
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Reverted to avoid conflicts for geometry options revert.
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 2 +-
- block/file-win32.c | 2 +-
- block/trace-events | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ include/sysemu/blockdev.h |  1 +
+ blockdev.c                | 17 ++++++++++++++++-
+ device-hotplug.c          |  4 ++++
+ qemu-doc.texi             |  5 +++++
+ qemu-options.hx           |  5 ++++-
+ 5 files changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 4fec8cb53c..1185c7c5cc 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1743,7 +1743,7 @@ static int paio_submit_co_full(BlockDriverState *bs, int fd,
-         assert(qiov->size == bytes);
+diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+index c0ae3700ec..37ea39719e 100644
+--- a/include/sysemu/blockdev.h
++++ b/include/sysemu/blockdev.h
+@@ -28,6 +28,7 @@ typedef enum {
+ } BlockInterfaceType;
+ 
+ struct DriveInfo {
++    const char *devaddr;
+     BlockInterfaceType type;
+     int bus;
+     int unit;
+diff --git a/blockdev.c b/blockdev.c
+index 6c530769fd..c23587b075 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -731,6 +731,10 @@ QemuOptsList qemu_legacy_drive_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "interface (ide, scsi, sd, mtd, floppy, pflash, virtio)",
+         },{
++            .name = "addr",
++            .type = QEMU_OPT_STRING,
++            .help = "pci address (virtio only)",
++        },{
+             .name = "serial",
+             .type = QEMU_OPT_STRING,
+             .help = "disk serial number",
+@@ -773,6 +777,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     DriveMediaType media = MEDIA_DISK;
+     BlockInterfaceType type;
+     int max_devs, bus_id, unit_id, index;
++    const char *devaddr;
+     const char *werror, *rerror;
+     bool read_only = false;
+     bool copy_on_read;
+@@ -781,7 +786,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     Error *local_err = NULL;
+     int i;
+     const char *deprecated[] = {
+-        "serial"
++        "serial", "addr"
+     };
+ 
+     /* Change legacy command line options into QMP ones */
+@@ -971,6 +976,12 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
      }
  
--    trace_paio_submit_co(offset, bytes, type);
-+    trace_file_paio_submit_co(offset, bytes, type);
-     pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
-     return thread_pool_submit_co(pool, aio_worker, acb);
- }
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 0411fe80fd..f1e2187f3b 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -162,7 +162,7 @@ static BlockAIOCB *paio_submit(BlockDriverState *bs, HANDLE hfile,
-     acb->aio_nbytes = count;
-     acb->aio_offset = offset;
+     /* Add virtio block device */
++    devaddr = qemu_opt_get(legacy_opts, "addr");
++    if (devaddr && type != IF_VIRTIO) {
++        error_report("addr is not supported by this bus type");
++        goto fail;
++    }
++
+     if (type == IF_VIRTIO) {
+         QemuOpts *devopts;
+         devopts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
+@@ -982,6 +993,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+         }
+         qemu_opt_set(devopts, "drive", qdict_get_str(bs_opts, "id"),
+                      &error_abort);
++        if (devaddr) {
++            qemu_opt_set(devopts, "addr", devaddr, &error_abort);
++        }
+     }
  
--    trace_paio_submit(acb, opaque, offset, count, type);
-+    trace_file_paio_submit(acb, opaque, offset, count, type);
-     pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
-     return thread_pool_submit_aio(pool, aio_worker, acb, cb, opaque);
- }
-diff --git a/block/trace-events b/block/trace-events
-index c35287b48a..854d5525af 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -55,8 +55,8 @@ qmp_block_stream(void *bs, void *job) "bs %p job %p"
+     filename = qemu_opt_get(legacy_opts, "file");
+@@ -1026,6 +1040,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     dinfo->type = type;
+     dinfo->bus = bus_id;
+     dinfo->unit = unit_id;
++    dinfo->devaddr = devaddr;
+     dinfo->serial = g_strdup(serial);
  
- # block/file-win32.c
- # block/file-posix.c
--paio_submit_co(int64_t offset, int count, int type) "offset %"PRId64" count %d type %d"
--paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
-+file_paio_submit_co(int64_t offset, int count, int type) "offset %"PRId64" count %d type %d"
-+file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
+     blk_set_legacy_dinfo(blk, dinfo);
+diff --git a/device-hotplug.c b/device-hotplug.c
+index cd427e2c76..23fd6656f1 100644
+--- a/device-hotplug.c
++++ b/device-hotplug.c
+@@ -69,6 +69,10 @@ void hmp_drive_add(Monitor *mon, const QDict *qdict)
+     if (!dinfo) {
+         goto err;
+     }
++    if (dinfo->devaddr) {
++        monitor_printf(mon, "Parameter addr not supported\n");
++        goto err;
++    }
  
- # block/qcow2.c
- qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
+     switch (dinfo->type) {
+     case IF_NONE:
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index d343affd6d..ae5531a053 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2892,6 +2892,11 @@ provided per NIC.
+ The drive serial argument is replaced by the the serial argument
+ that can be specified with the ``-device'' parameter.
+ 
++@subsection -drive addr=... (since 2.10.0)
++
++The drive addr argument is replaced by the the addr argument
++that can be specified with the ``-device'' parameter.
++
+ @subsection -usbdevice (since 2.10.0)
+ 
+ The ``-usbdevice DEV'' argument is now a synonym for setting
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 381648b9cb..df248d1568 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -805,7 +805,7 @@ ETEXI
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
+-    "       [,snapshot=on|off][,serial=s][,rerror=ignore|stop|report]\n"
++    "       [,snapshot=on|off][,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
+     "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
+     "       [,readonly=on|off][,copy-on-read=on|off]\n"
+     "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
+@@ -883,6 +883,9 @@ an untrusted format header.
+ This option specifies the serial number to assign to the device. This
+ parameter is deprecated, use the corresponding parameter of @code{-device}
+ instead.
++@item addr=@var{addr}
++Specify the controller's PCI address (if=virtio only). This parameter is
++deprecated, use the corresponding parameter of @code{-device} instead.
+ @item werror=@var{action},rerror=@var{action}
+ Specify which @var{action} to take on write and read errors. Valid actions are:
+ "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
 -- 
 2.13.6
