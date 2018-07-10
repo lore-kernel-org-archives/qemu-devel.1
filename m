@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcunb-000582-79
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcund-0005BJ-Oy
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcunY-0001dc-5D
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcunc-0001g9-Fr
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:33 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 10 Jul 2018 17:42:48 +0200
-Message-Id: <20180710154304.18304-9-kwolf@redhat.com>
+Date: Tue, 10 Jul 2018 17:42:50 +0200
+Message-Id: <20180710154304.18304-11-kwolf@redhat.com>
 In-Reply-To: <20180710154304.18304-1-kwolf@redhat.com>
 References: <20180710154304.18304-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/24] block/backup: fix fleecing scheme: use
- serialized writes
+Subject: [Qemu-devel] [PULL 10/24] block/blklogwrites: Make sure the log
+ sector size is not too small
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +23,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Ari Sundholm <ari@tuxera.com>
 
-Fleecing scheme works as follows: we want a kind of temporary snapshot
-of active drive A. We create temporary image B, with B->backing = A.
-Then we start backup(sync=none) from A to B. From this point, B reads
-as point-in-time snapshot of A (A continues to be active drive,
-accepting guest IO).
+The sector size needs to be large enough to accommodate the data
+structures for the log super block and log write entries. This was
+previously not properly checked, which made it possible to cause
+QEMU to badly misbehave.
 
-This scheme needs some additional synchronization between reads from B
-and backup COW operations, otherwise, the following situation is
-theoretically possible:
-
-(assume B is qcow2, client is NBD client, reading from B)
-
-1. client starts reading and take qcow2 mutex in qcow2_co_preadv, and
-   goes up to l2 table loading (assume cache miss)
-
-2) guest write => backup COW => qcow2 write =>
-   try to take qcow2 mutex => waiting
-
-3. l2 table loaded, we see that cluster is UNALLOCATED, go to
-   "case QCOW2_CLUSTER_UNALLOCATED" and unlock mutex before
-   bdrv_co_preadv(bs->backing, ...)
-
-4) aha, mutex unlocked, backup COW continues, and we finally finish
-   guest write and change cluster in our active disk A
-
-5. actually, do bdrv_co_preadv(bs->backing, ...) and read
-   _new updated_ data.
-
-To avoid this, let's make backup writes serializing, to not intersect
-with reads from B.
-
-Note: we expand range of handled cases from (sync=none and
-B->backing = A) to just (A in backing chain of B), to finally allow
-safe reading from B during backup for all cases when A in backing chain
-of B, i.e. B formally looks like point-in-time snapshot of A.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Ari Sundholm <ari@tuxera.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/backup.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ block/blklogwrites.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index f3e4e814b6..319fc922e8 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -47,6 +47,8 @@ typedef struct BackupBlockJob {
-     HBitmap *copy_bitmap;
-     bool use_copy_range;
-     int64_t copy_range_size;
-+
-+    bool serialize_target_writes;
- } BackupBlockJob;
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index 63bf6b34a9..efa2c7a66a 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -89,7 +89,10 @@ static inline uint32_t blk_log_writes_log2(uint32_t value)
  
- static const BlockJobDriver backup_job_driver;
-@@ -102,6 +104,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     QEMUIOVector qiov;
-     BlockBackend *blk = job->common.blk;
-     int nbytes;
-+    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-+    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
+ static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
+ {
+-    return sector_size < (1ull << 24) && is_power_of_2(sector_size);
++    return is_power_of_2(sector_size) &&
++        sector_size >= sizeof(struct log_write_super) &&
++        sector_size >= sizeof(struct log_write_entry) &&
++        sector_size < (1ull << 24);
+ }
  
-     hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-     nbytes = MIN(job->cluster_size, job->len - start);
-@@ -112,8 +116,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     iov.iov_len = nbytes;
-     qemu_iovec_init_external(&qiov, &iov, 1);
- 
--    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
--                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    ret = blk_co_preadv(blk, start, qiov.size, &qiov, read_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_read_fail(job, start, ret);
-         if (error_is_read) {
-@@ -124,11 +127,11 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
- 
-     if (qemu_iovec_is_zero(&qiov)) {
-         ret = blk_co_pwrite_zeroes(job->target, start,
--                                   qiov.size, BDRV_REQ_MAY_UNMAP);
-+                                   qiov.size, write_flags | BDRV_REQ_MAY_UNMAP);
-     } else {
-         ret = blk_co_pwritev(job->target, start,
--                             qiov.size, &qiov,
--                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-+                             qiov.size, &qiov, write_flags |
-+                             (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
-     }
-     if (ret < 0) {
-         trace_backup_do_cow_write_fail(job, start, ret);
-@@ -156,6 +159,8 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     int nr_clusters;
-     BlockBackend *blk = job->common.blk;
-     int nbytes;
-+    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-+    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
- 
-     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-     nbytes = MIN(job->copy_range_size, end - start);
-@@ -163,7 +168,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
-                   nr_clusters);
-     ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
--                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0, 0);
-+                            read_flags, write_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_copy_range_fail(job, start, ret);
-         hbitmap_set(job->copy_bitmap, start / job->cluster_size,
-@@ -701,6 +706,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                        sync_bitmap : NULL;
-     job->compress = compress;
- 
-+    /* Detect image-fleecing (and similar) schemes */
-+    job->serialize_target_writes = bdrv_chain_contains(target, bs);
-+
-     /* If there is no backing file on the target, we cannot rely on COW if our
-      * backup cluster size is smaller than the target cluster size. Even for
-      * targets with a backing file, try to avoid COW if possible. */
+ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
 -- 
 2.13.6
