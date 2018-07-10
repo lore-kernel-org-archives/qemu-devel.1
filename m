@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fcg64-00018j-Ph
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:37 -0400
+	(envelope-from <mst@redhat.com>) id 1fcg65-00019M-GV
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fcg63-0001pe-Hr
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38466 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fcg63-0001pM-By
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:35 -0400
-Date: Tue, 10 Jul 2018 03:01:34 +0300
+	(envelope-from <mst@redhat.com>) id 1fcg64-0001px-4y
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:37 -0400
+Date: Tue, 10 Jul 2018 03:01:31 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180710000024.542612-8-mst@redhat.com>
+Message-ID: <20180710000024.542612-3-mst@redhat.com>
 References: <20180710000024.542612-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180710000024.542612-1-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH hack dontapply v2 7/7] pc: HACK: acpi: tie in
- _CST object to Processor
+Subject: [Qemu-devel] [PATCH hack dontapply v2 2/7] acpi: generalize
+ aml_package / aml_varpackage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,97 +24,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-Based on patch by Igor Mammedov.
-
-This is a hack: we definitely shouldn't do it
-unconditionally, and initialization should be handled
-differently (through an isa device?). io port to use
-should depend on the PC type and should be documented.
-
-Notifications should be supported.
+VarPackage can accept an expression evaluating to int, not just an int.
+Change the API to make it more generic.
+Further, rather than have users call the correct API depending on
+value passed, use either PackageOp or VarPackageOp automatically.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/i386/pc.h |  5 +++++
- hw/acpi/cpu.c        |  5 +++++
- hw/i386/acpi-build.c | 10 +++++++++-
- 3 files changed, 19 insertions(+), 1 deletion(-)
+ include/hw/acpi/aml-build.h |  4 ++--
+ hw/acpi/aml-build.c         | 19 +++++++++++++++----
+ hw/acpi/cpu_hotplug.c       | 11 ++---------
+ hw/arm/virt-acpi-build.c    |  2 +-
+ 4 files changed, 20 insertions(+), 16 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 316230e570..83b3a84322 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -20,6 +20,11 @@
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 10c7946028..7cf2cf64bf 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -360,7 +360,7 @@ Aml *aml_method(const char *name, int arg_count, AmlSerializeFlag sflag);
+ Aml *aml_if(Aml *predicate);
+ Aml *aml_else(void);
+ Aml *aml_while(Aml *predicate);
+-Aml *aml_package(uint8_t num_elements);
++Aml *aml_package(uint64_t num_elements);
+ Aml *aml_buffer(int buffer_size, uint8_t *byte_list);
+ Aml *aml_resource_template(void);
+ Aml *aml_field(const char *name, AmlAccessType type, AmlLockRule lock,
+@@ -373,7 +373,7 @@ Aml *aml_create_field(Aml *srcbuf, Aml *bit_index, Aml *num_bits,
+                       const char *name);
+ Aml *aml_create_dword_field(Aml *srcbuf, Aml *index, const char *name);
+ Aml *aml_create_qword_field(Aml *srcbuf, Aml *index, const char *name);
+-Aml *aml_varpackage(uint32_t num_elements);
++Aml *aml_varpackage(Aml *num_elements);
+ Aml *aml_touuid(const char *uuid);
+ Aml *aml_unicode(const char *str);
+ Aml *aml_refof(Aml *arg);
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index def62b3112..7165f19585 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1016,9 +1016,20 @@ Aml *aml_buffer(int buffer_size, uint8_t *byte_list)
+ }
  
- #define HPET_INTCAP "hpet-intcap"
- 
-+typedef struct PCCstate {
-+    uint32_t latency;
-+    uint32_t hint;
-+} PCCstate;
+ /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefPackage */
+-Aml *aml_package(uint8_t num_elements)
++/* Note: The ability to create variable-sized packages was first
++ * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
++ * with up to 255 elements. Windows guests up to win2k8 fail when
++ * VarPackageOp is used.
++ */
++Aml *aml_package(uint64_t num_elements)
+ {
+-    Aml *var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
++    Aml *var;
 +
- /**
-  * PCMachineState:
-  * @acpi_dev: link to ACPI PM device that performs ACPI hotplug handling
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index 5ae595ecbe..e9e207b033 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -561,6 +561,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
-                            aml_int(arch_ids->cpus[i].props.node_id)));
-             }
++    if (num_elements > 0xFF) {
++        return aml_varpackage(aml_int(num_elements));
++    }
++
++    var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
+     build_append_byte(var->buf, num_elements);
+     return var;
+ }
+@@ -1136,10 +1147,10 @@ Aml *aml_local(int num)
+ }
  
-+            if (1) {
-+                method = aml_method("_CST", 0, AML_NOTSERIALIZED);
-+                aml_append(method, aml_return(aml_call0("CCST")));
-+                aml_append(dev, method);
-+            }
-             aml_append(cpus_dev, dev);
-         }
+ /* ACPI 2.0a: 17.2.2 Data Objects Encoding: DefVarPackage */
+-Aml *aml_varpackage(uint32_t num_elements)
++Aml *aml_varpackage(Aml *num_elements)
+ {
+     Aml *var = aml_bundle(0x13 /* VarPackageOp */, AML_PACKAGE);
+-    build_append_int(var->buf, num_elements);
++    aml_append(var, num_elements);
+     return var;
+ }
+ 
+diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
+index 5243918125..f8246fca6f 100644
+--- a/hw/acpi/cpu_hotplug.c
++++ b/hw/acpi/cpu_hotplug.c
+@@ -309,15 +309,8 @@ void build_legacy_cpu_hotplug_aml(Aml *ctx, MachineState *machine,
      }
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index fff1059a31..da2c830db7 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -64,6 +64,7 @@
- #include "hw/i386/intel_iommu.h"
+     aml_append(sb_scope, method);
  
- #include "hw/acpi/ipmi.h"
-+#include "hw/acpi/cst.h"
+-    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })"
+-     *
+-     * Note: The ability to create variable-sized packages was first
+-     * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
+-     * ith up to 255 elements. Windows guests up to win2k8 fail when
+-     * VarPackageOp is used.
+-     */
+-    pkg = pcms->apic_id_limit <= 255 ? aml_package(pcms->apic_id_limit) :
+-                                       aml_varpackage(pcms->apic_id_limit);
++    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })" */
++    pkg = aml_package(pcms->apic_id_limit);
  
- /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
-  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-@@ -1840,7 +1841,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
-     } else {
-         CPUHotplugFeatures opts = {
--            .apci_1_compatible = true, .has_legacy_cphp = true
-+            .apci_1_compatible = true, .has_legacy_cphp = true,
-         };
-         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
-                        "\\_SB.PCI0", "\\_GPE._E02");
-@@ -2693,6 +2694,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-                            tables->vmgenid, tables->linker);
-     }
+     for (i = 0, apic_idx = 0; i < apic_ids->len; i++) {
+         int apic_id = apic_ids->cpus[i].arch_id;
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 6ea47e2588..2adb1de378 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -174,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
  
-+    /* TODO: get a free ioport. This one is PIIX specific. */
-+    acpi_add_table(table_offsets, tables_blob);
-+    cst_build_acpi(tables_blob, tables->linker, 0xaf20);
-+
-     if (misc.has_hpet) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_hpet(tables_blob, tables->linker);
-@@ -2891,6 +2896,9 @@ void acpi_setup(void)
- 
-     build_state = g_malloc0(sizeof *build_state);
- 
-+    /* TODO: this is not the best place to do it */
-+    cst_register(pcms->fw_cfg, 0xaf20);
-+
-     acpi_build_tables_init(&tables);
-     acpi_build(&tables, MACHINE(pcms));
- 
+     /* Declare the PCI Routing Table. */
+-    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
++    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
+     for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
+         for (i = 0; i < PCI_NUM_PINS; i++) {
+             int gsi = (i + bus_no) % PCI_NUM_PINS;
 -- 
 MST
