@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fcrf5-0008ON-Vt
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:22:32 -0400
+	(envelope-from <quintela@redhat.com>) id 1fcrgN-0000YE-GE
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:23:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fcrf1-0006Oi-Ug
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:22:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54662 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fcrgJ-00080F-Fc
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:23:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59274 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fcrf1-0006NX-PG
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:22:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9F6E40AC6DF
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 12:22:26 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fcrgJ-0007zO-Bu
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 08:23:47 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180710094424.30754-1-peterx@redhat.com> (Peter Xu's message of
-	"Tue, 10 Jul 2018 17:44:24 +0800")
-References: <20180710094424.30754-1-peterx@redhat.com>
+In-Reply-To: <20180710091902.28780-10-peterx@redhat.com> (Peter Xu's message
+	of "Tue, 10 Jul 2018 17:19:01 +0800")
+References: <20180710091902.28780-1-peterx@redhat.com>
+	<20180710091902.28780-10-peterx@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Tue, 10 Jul 2018 14:22:23 +0200
-Message-ID: <87pnzvgu0w.fsf@secure.mitica>
+Date: Tue, 10 Jul 2018 14:23:43 +0200
+Message-ID: <87lgajgtyo.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0] migration: reorder
- MIG_CMD_POSTCOPY_RESUME
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 09/10] tests: add postcopy
+ recovery test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +30,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Balamuruhan S <bala24@linux.vnet.ibm.com>
 
 Peter Xu <peterx@redhat.com> wrote:
-> It was accidently added before MIG_CMD_PACKAGED so it might break
-> command compatibility when we run postcopy migration between old/new
-> QEMUs.  Fix that up quickly before the QEMU 3.0 release.
+> Test the postcopy recovery procedure by emulating a network failure
+> using migrate-pause command.
 >
-> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Tested-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-
-> ---
->  migration/savevm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index c2f34ffc7c..0d2c4a0739 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -81,8 +81,8 @@ enum qemu_vm_cmd {
->      MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
->                                        were previously sent during
->                                        precopy but are dirty. */
-> -    MIG_CMD_POSTCOPY_RESUME,       /* resume postcopy on dest */
->      MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stre=
-am */
-> +    MIG_CMD_POSTCOPY_RESUME,   /* resume postcopy on dest */
->      MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
->      MIG_CMD_MAX
->  };
