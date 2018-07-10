@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fclCq-0007rz-ON
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:28:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1fclgL-00063o-AY
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fclCn-00079E-Fe
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:28:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51396 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fclCn-000795-AT
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:28:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1fclgJ-0005hR-Uw
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:59:25 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <1530879678-20487-1-git-send-email-ari@tuxera.com>
-	<87lgakopio.fsf@dusky.pond.sub.org>
-	<fcebd6aa-6346-35d8-cedf-71f5677033e7@tuxera.com>
-Date: Tue, 10 Jul 2018 07:28:51 +0200
-In-Reply-To: <fcebd6aa-6346-35d8-cedf-71f5677033e7@tuxera.com> (Ari Sundholm's
-	message of "Mon, 9 Jul 2018 14:17:27 +0300")
-Message-ID: <87o9fflkvg.fsf@dusky.pond.sub.org>
+References: <20180625114528.GL16514@angien.pipo.sk>
+	<20180702080411.GA4299@localhost.localdomain>
+	<60f6bf3c-6cad-c86f-01d7-8c376a6ccfe0@de.ibm.com>
+	<20180703111949.GB24516@redhat.com>
+	<20180703113229.GD3812@localhost.localdomain>
+	<20180704150256.408d4a07.cohuck@redhat.com>
+	<20180704133440.GE4334@localhost.localdomain>
+	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
+	<20180706131103.4e713911.cohuck@redhat.com>
+	<20180706145645.GB3939@localhost.localdomain>
+	<20180709072953.GE7755@andariel.pipo.sk>
+Date: Tue, 10 Jul 2018 07:59:15 +0200
+In-Reply-To: <20180709072953.GE7755@andariel.pipo.sk> (Peter Krempa's message
+	of "Mon, 9 Jul 2018 09:29:53 +0200")
+Message-ID: <87k1q3ljgs.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qapi/block-core.json: Add missing
- documentation for blklogwrites log-append option
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +33,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ari Sundholm <ari@tuxera.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Ari Sundholm <ari@tuxera.com> writes:
+Peter Krempa <pkrempa@redhat.com> writes:
 
-> On 07/09/2018 10:07 AM, Markus Armbruster wrote:
->> Ari Sundholm <ari@tuxera.com> writes:
->>
->>> This was accidentally omitted. Thanks to Eric Blake for spotting this.
->>>
->>> Signed-off-by: Ari Sundholm <ari@tuxera.com>
->>> ---
->>>   qapi/block-core.json | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index 38b3125..62a92fa 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -3057,6 +3057,8 @@
->>>   # @log-sector-size: sector size used in logging writes to @file, determines
->>>   #                   granularity of offsets and sizes of writes (default: 512)
->>>   #
->>> +# @log-append:      append to an existing log (default: false)
->>> +#
->>>   # @log-super-update-interval: interval of write requests after which the log
->>>   #                             super block is updated to disk (default: 4096)
->>>   #
->>
->> Applied to qapi-next.  Thanks!
->>
+> On Fri, Jul 06, 2018 at 16:56:46 +0200, Kevin Wolf wrote:
+>> Am 06.07.2018 um 13:11 hat Cornelia Huck geschrieben:
+>> > On Wed, 4 Jul 2018 17:14:02 +0100
+>> > Peter Maydell <peter.maydell@linaro.org> wrote:
+>> > 
+>> > > On 4 July 2018 at 14:34, Kevin Wolf <kwolf@redhat.com> wrote:
+>> > > > Essentially, what is important to me isn't getting these options dropped
+>> > > > exactly in 3.0, but not setting a bad precedence that deprecation isn't
+>> > > > actually worth anything. We may easily end up with this deprecation
+>> > > > process:
+>> > > >
+>> > > > depreate a feature
+>> > > > release QEMU version n + 1
+>> > > > release QEMU version n + 2
+>> > > > remove the feature
+>> > > > while libvirt hasn't removed use of the feature:
+>> > > >     # ...and why should it when everything is still working?
+>> > > >     reinstate the feature
+>> > > >     release QEMU version n + x
+>> > > >     remove the feature  
+>> > > 
+>> > > My take on the deprecation policy essentially is that it gives
+>> > > us a *minimum* bar for how soon we can drop something. We
+>> > > shouldn't be using it as an "always target this speed for
+>> > > dropping something" -- we ought to be pragmatic. We can
+>> > > drop stuff that's unused quickly, but should be slower
+>> > > for things that still have major users (or reconsider
+>> > > the deprecation entirely, potentially). There should be
+>> > > a balance between making our work as developers easier and
+>> > > inconveniencing our users.
+>> > 
+>> > What about the following?
+>> > 
+>> > - put a feature on the "normal" deprecation list to remove after two
+>> >   releases
+>> > Case (a): nobody complains, either within the deprecation period or
+>> > when it is finally removed
+>> >   -> all is good
+>> > Case (b): the feature turns out to be widely used, and/or it turns out
+>> > that it offers value that currently can't be offered easily in another
+>> > way
+>> >   -> remove from deprecation list; this obviously needs more thinking
+>> > Case (c): the feature is used, the users are willing to move away from
+>> > it, but they need a bit more time
+>> >   -> put it on a "deprecation watchlist", listing the users we are
+>> >   waiting for, and then remove after all are done (no +2)
+>> > 
+>> > That way, we can still easily remove old cruft (case (a)), but still
+>> > accommodate cases like this (case (c)). The obvious drawback is that
+>> > we'd need someone to curate the deprecation watchlist, to poke the
+>> > users we're waiting for, and probably remove anyway after some time if
+>> > they don't get their act together.
+>> 
+>> The problem is that things are only starting to move after two releases
+>> have passed. The original idea was to already use that time. If we don't
+>> use it, then waiting for two releases is pointless and we can just
+>> directly let things go to a deprecation watchlist.
+>> 
+>> Maybe we can just use the existing wiki page:
+>> 
+>>     https://wiki.qemu.org/index.php/Features/LegacyRemoval
+>> 
+>> And add a column for whether libvirt is ready? Of course, that only
+>> makes sense if libvirt people make use of and contribute to this page.
 >
-> Thanks. Does this mean that the patch be queued for 3.0 or should I
-> take some additional steps to ensure this?
+> This should not be a problem, but I think we need some active
+> encouraging/prodding to remove deprecated stuff. Otherwise we might miss
+> the news.
 
-When a maintainer (like me) accepts your patch, he also accepts
-resposibility to get it merged into master.  The patch submitter (you)
-should not have to do anything to get that done.
-
-"Should" only because maintainers aren't infallible :) I keep tracking
-my own patches until they reach master.  Pretty much always they just
-do.  Only once in a great while I have to ask a maintainer what's up.
-
-In this case, your patch should be in my next QAPI pull request, and you
-should receive a copy.
+In addition to actively pulling libvirt developers into review of
+deprecation patches, we should pursue the idea to optionally let QEMU
+fail on use of deprecated features, then have libvirt run its test suite
+that way.
