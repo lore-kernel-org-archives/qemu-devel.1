@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qiaochong@loongson.cn>) id 1fcj50-0002IC-Q2
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:12:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1fcjJN-0004fK-VZ
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qiaochong@loongson.cn>) id 1fcj4x-0002Ul-K3
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:12:42 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:47732)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qiaochong@loongson.cn>) id 1fcj4w-0002U5-QM
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:12:39 -0400
-From: QiaoChong <qiaochong@loongson.cn>
-Date: Tue, 10 Jul 2018 11:12:28 +0800
-Message-Id: <1531192348-21056-1-git-send-email-qiaochong@loongson.cn>
-Subject: [Qemu-devel] [PATCH] make pci_bridge_region_cleanup to be done in
- rcu queue after flatview_destroy.
+	(envelope-from <peterx@redhat.com>) id 1fcjJK-00023o-Pq
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:27:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42662 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fcjJK-00023i-K5
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 23:27:30 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 20C3EDFE0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 03:27:30 +0000 (UTC)
+Date: Tue, 10 Jul 2018 11:27:25 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180710032725.GL23001@xz-mi>
+References: <20180705031755.3254-1-peterx@redhat.com>
+	<20180706091716.GA9761@work-vm> <20180706105658.GB2661@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180706105658.GB2661@work-vm>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 0/9] migration: postcopy recovery
+ unit test, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,93 +34,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qiaochong@loongson.cn
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-pci_bridge_region_cleanup need to done after flatview_destroy,
-because memory_region_unref need access memory regions in PCIBridgeWindows in flatview_destroy.
-here we delay pci_bridge_region_cleanup to be done in rcu queue work.
+On Fri, Jul 06, 2018 at 11:56:59AM +0100, Dr. David Alan Gilbert wrote:
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > Based-on: <20180627132246.5576-1-peterx@redhat.com>
+> > > 
+> > > Based on the series to unbreak postcopy:
+> > >   Subject: [PATCH v3 0/4] migation: unbreak postcopy recovery
+> > >   Message-Id: <20180627132246.5576-1-peterx@redhat.com>
+> > > 
+> > > This series introduce a new postcopy recovery test.  The new test
+> > > actually helped me to identify two bugs there so fix them as well
+> > > before 3.0 release.
+> > > 
+> > > Patch 1: a trivial cleanup for existing postcopy ram load, which I
+> > >          found a bit confusing during debugging the problem.
+> > > 
+> > > Patch 2-3: two bug fixes that address different issues.  Please see
+> > >            the commit log for more information.
+> > > 
+> > > Patch 4-9: add the postcopy recovery unit test.
+> > > 
+> > > Please review.  Thanks,
+> > 
+> > Queued
+> 
+> Hi Peter,
+>   There's a problem in there somewhere;  I'm getting
+> an intermittent failure of the test if I run a make check -j 8    on my
+> laptop.  Just running two copies of tests/migration-test in parallel
+> sometimes triggers it (but not if I turn on QTEST_LOG!).
+> But it's always failing with:
+> 
+>   ERROR:/home/dgilbert/git/migpull/tests/migration-test.c:373:migrate_recover: assertion failed: (qdict_haskey(rsp, "return"))
 
-bellow are gdb backtraces.
+Hmm, so this should be a race.  I suspect it's because destination VM
+hasn't reached the correct state when sending the recovery command.
 
-oldcode mr->name will be freed in object_unparent, before flatview_destroy.
+Could you help to try these two tiny patches to see whether it can fix
+the problem?
 
-0  _int_free (av=0x7fffe00bcb20 <main_arena>, p=0x555556a988c0, have_lock=0) at malloc.c:3947
-1  0x00007fffdfd7c53c in __GI___libc_free (mem=<optimized out>) at malloc.c:2968
-2  0x000055555587ad73 in memory_region_finalize (obj=<optimized out>) at /work/work/loongson/qemu/qemu-latest/memory.c:1731
-3  0x0000555555b52e52 in object_deinit (type=0x5555565a54f0, obj=0x5555567dcbf0) at qom/object.c:462
-4  object_finalize (data=0x5555567dcbf0) at qom/object.c:476
-5  object_unref (obj=0x5555567dcbf0) at qom/object.c:924
-6  0x0000555555b51e57 in object_property_del_child (obj=0x55555695f3d0, child=child@entry=0x5555567dcbf0, errp=0x0) at qom/object.c:436
-7  0x0000555555b525e4 in object_unparent (obj=obj@entry=0x5555567dcbf0) at qom/object.c:455
-8  0x0000555555a7bd70 in pci_bridge_region_cleanup (w=0x5555567dca10, br=<optimized out>) at hw/pci/pci_bridge.c:229
-9  0x0000555555a7c336 in pci_bridge_update_mappings (br=<optimized out>) at hw/pci/pci_bridge.c:248
-10 0x0000555555a7c3ba in pci_bridge_write_config (d=0x55555695f3d0, address=4, val=44040192, len=4) at hw/pci/pci_bridge.c:272
+================
 
-here mr mr->owner, mr->name has been freed in object_unparent before.
+commit d875ea1a98932174e3fa202859b65df26def174d
+Author: Peter Xu <peterx@redhat.com>
+Date:   Tue Jul 10 11:17:24 2018 +0800
 
-0  memory_region_unref_do (mr=0x5555567dcbf0) at /work/work/loongson/qemu/qemu-latest/memory.c:296
-1  0x0000555555877c49 in flatview_destroy (view=0x555557344020) at /work/work/loongson/qemu/qemu-latest/memory.c:290
-2  0x0000555555c4a0ae in call_rcu_thread (opaque=<optimized out>) at util/rcu.c:284
-3  0x00007fffe00c96ba in start_thread (arg=0x7fffd007c700) at pthread_create.c:333
-4  0x00007fffdfdff41d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+    migration: show pause/recover state on dst host
 
-void memory_region_unref(MemoryRegion *mr)
-{
-    if (mr && mr->owner) {
-        object_unref(mr->owner);
-    }
-}
+    These two states will be missing when doing "query-migrate" on
+    destination VM.  Add these states so that we can get the query results
+    as expected.
 
-Signed-off-by: QiaoChong <qiaochong@loongson.cn>
----
- hw/pci/pci_bridge.c         | 14 +++++++++++++-
- include/hw/pci/pci_bridge.h |  1 +
- 2 files changed, 14 insertions(+), 1 deletion(-)
+    Signed-off-by: Peter Xu <peterx@redhat.com>
 
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 40a39f5..c080471 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -233,6 +233,18 @@ static void pci_bridge_region_cleanup(PCIBridge *br, PCIBridgeWindows *w)
-     g_free(w);
- }
- 
-+/*
-+ * pci_bridge_region_cleanup need to done after flatview_destroy,
-+ * because memory_region_unref need access memory regions in PCIBridgeWindows
-+ * in flatview_destroy.Here we delay pci_bridge_region_cleanup to be done
-+ * in rcu queue work.
-+ */
+diff --git a/migration/migration.c b/migration/migration.c
+index 0404c53215..8d56d56930 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -911,6 +911,8 @@ static void fill_destination_migration_info(MigrationInfo *info)
+     case MIGRATION_STATUS_CANCELLED:
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
++    case MIGRATION_STATUS_POSTCOPY_PAUSED:
++    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+     case MIGRATION_STATUS_FAILED:
+     case MIGRATION_STATUS_COLO:
+         info->has_status = true;
+
+================
+
+commit 9fa7fc773961cd0ea0b5f70a166def0d8aebf464
+Author: Peter Xu <peterx@redhat.com>
+Date:   Tue Jul 10 11:18:48 2018 +0800
+
+    tests: don't send recovery cmd until dst pauses
+
+    Signed-off-by: Peter Xu <peterx@redhat.com>
+
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 96e69dab99..45558446f1 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -646,6 +646,13 @@ static void test_postcopy_recovery(void)
+      */
+     migrate_pause(from);
+
++    /*
++     * Wait for destination side to reach postcopy-paused state.  The
++     * migrate-recover command can only succeed if destination machine
++     * is in the paused state
++     */
++    wait_for_migration_status(to, "postcopy-paused");
 +
-+static void pci_bridge_region_cleanup_schedule(PCIBridgeWindows *w)
-+{
-+    pci_bridge_region_cleanup(NULL, w);
-+}
-+
- void pci_bridge_update_mappings(PCIBridge *br)
- {
-     PCIBridgeWindows *w = br->windows;
-@@ -243,7 +255,7 @@ void pci_bridge_update_mappings(PCIBridge *br)
-     pci_bridge_region_del(br, br->windows);
-     br->windows = pci_bridge_region_init(br);
-     memory_region_transaction_commit();
--    pci_bridge_region_cleanup(br, w);
-+    call_rcu(w,  pci_bridge_region_cleanup_schedule, rcu);
- }
- 
- /* default write_config function for PCI-to-PCI bridge */
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index 0347da5..0e1fd82 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -37,6 +37,7 @@ typedef struct PCIBridgeWindows PCIBridgeWindows;
-  * as subregions.
-  */
- struct PCIBridgeWindows {
-+    struct rcu_head rcu;
-     MemoryRegion alias_pref_mem;
-     MemoryRegion alias_mem;
-     MemoryRegion alias_io;
+     /*
+      * Create a new socket to emulate a new channel that is different
+      * from the broken migration channel; tell the destination to
+
+================
+
+Thanks!
+
 -- 
-2.7.4
+Peter Xu
