@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcqkR-0002TB-Vs
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:24:00 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fcqmJ-0003d3-Du
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcqkR-0005k1-0C
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:23:59 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:32949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcqkQ-0005jp-PR
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:23:58 -0400
-Received: by mail-oi0-x244.google.com with SMTP id c6-v6so41915968oiy.0
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 04:23:58 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fcqmE-0006p4-DI
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:25:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55206 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcqmE-0006oi-6M
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:25:50 -0400
+Date: Tue, 10 Jul 2018 12:25:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180710112543.GH2656@work-vm>
+References: <20180710091902.28780-1-peterx@redhat.com>
+	<20180710091902.28780-10-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7fafbf1c-9af1-cfb9-24c7-ee9a00ef9d4e@linaro.org>
-References: <20180709124535.1116-1-peter.maydell@linaro.org>
-	<7fafbf1c-9af1-cfb9-24c7-ee9a00ef9d4e@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jul 2018 12:23:37 +0100
-Message-ID: <CAFEAcA_F03w0REiTrT-Xi5cGcBtnv5m3RK4f6QvU+bufSEhb7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0] target/arm: Use correct mmu_idx
- for exception-return unstacking
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180710091902.28780-10-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0 v2 09/10] tests: add postcopy
+ recovery test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Adithya Baglody <adithya.nagaraj.baglody@intel.com>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-On 9 July 2018 at 15:30, Richard Henderson <richard.henderson@linaro.org> wrote:
-> On 07/09/2018 05:45 AM, Peter Maydell wrote:
->> For M-profile exception returns, the mmu index to use for exception
->> return unstacking is supposed to be that of wherever we are returning to:
->>  * if returning to handler mode, privileged
->>  * if returning to thread mode, privileged or unprivileged depending on
->>    CONTROL.nPRIV for the destination security state
->>
->> We were passing the wrong thing as the 'priv' argument to
->> arm_v7m_mmu_idx_for_secstate_and_priv(). The effect was that guests
->> which programmed the MPU to behave differently for privileged and
->> unprivileged code could get spurious MemManage Unstack exceptions.
->>
->> Reported-by: Adithya Baglody <adithya.nagaraj.baglody@intel.com>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  target/arm/helper.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+* Peter Xu (peterx@redhat.com) wrote:
+> Test the postcopy recovery procedure by emulating a network failure
+> using migrate-pause command.
+> 
+> Tested-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Thanks; applied to master for 3.0-rc0.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
--- PMM
+> ---
+>  tests/migration-test.c | 78 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 78 insertions(+)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 761bf62ffe..e952d94529 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -352,6 +352,29 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
+>      migrate_check_parameter(who, parameter, value);
+>  }
+>  
+> +static void migrate_pause(QTestState *who)
+> +{
+> +    QDict *rsp;
+> +
+> +    rsp = wait_command(who, "{ 'execute': 'migrate-pause' }");
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    qobject_unref(rsp);
+> +}
+> +
+> +static void migrate_recover(QTestState *who, const char *uri)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd = g_strdup_printf(
+> +        "{ 'execute': 'migrate-recover', "
+> +        "  'id': 'recover-cmd', "
+> +        "  'arguments': { 'uri': '%s' } }", uri);
+> +
+> +    rsp = wait_command(who, cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    g_free(cmd);
+> +    qobject_unref(rsp);
+> +}
+> +
+>  static void migrate_set_capability(QTestState *who, const char *capability,
+>                                     const char *value)
+>  {
+> @@ -597,6 +620,60 @@ static void test_postcopy(void)
+>      migrate_postcopy_complete(from, to);
+>  }
+>  
+> +static void test_postcopy_recovery(void)
+> +{
+> +    QTestState *from, *to;
+> +    char *uri;
+> +
+> +    migrate_postcopy_prepare(&from, &to);
+> +
+> +    /* Turn postcopy speed down, 4K/s is slow enough on any machines */
+> +    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
+> +
+> +    /* Now we start the postcopy */
+> +    migrate_postcopy_start(from, to);
+> +
+> +    /*
+> +     * Wait until postcopy is really started; we can only run the
+> +     * migrate-pause command during a postcopy
+> +     */
+> +    wait_for_migration_status(from, "postcopy-active");
+> +
+> +    /*
+> +     * Manually stop the postcopy migration. This emulates a network
+> +     * failure with the migration socket
+> +     */
+> +    migrate_pause(from);
+> +
+> +    /*
+> +     * Wait for destination side to reach postcopy-paused state.  The
+> +     * migrate-recover command can only succeed if destination machine
+> +     * is in the paused state
+> +     */
+> +    wait_for_migration_status(to, "postcopy-paused");
+> +
+> +    /*
+> +     * Create a new socket to emulate a new channel that is different
+> +     * from the broken migration channel; tell the destination to
+> +     * listen to the new port
+> +     */
+> +    uri = g_strdup_printf("unix:%s/migsocket-recover", tmpfs);
+> +    migrate_recover(to, uri);
+> +
+> +    /*
+> +     * Try to rebuild the migration channel using the resume flag and
+> +     * the newly created channel
+> +     */
+> +    wait_for_migration_status(from, "postcopy-paused");
+> +    migrate(from, uri, ", 'resume': true");
+> +    g_free(uri);
+> +
+> +    /* Restore the postcopy bandwidth to unlimited */
+> +    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
+> +
+> +    migrate_postcopy_complete(from, to);
+> +}
+> +
+>  static void test_baddest(void)
+>  {
+>      QTestState *from, *to;
+> @@ -683,6 +760,7 @@ int main(int argc, char **argv)
+>      module_call_init(MODULE_INIT_QOM);
+>  
+>      qtest_add_func("/migration/postcopy/unix", test_postcopy);
+> +    qtest_add_func("/migration/postcopy/recovery", test_postcopy_recovery);
+>      qtest_add_func("/migration/deprecated", test_deprecated);
+>      qtest_add_func("/migration/bad_dest", test_baddest);
+>      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
