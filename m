@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcubA-0003IY-7D
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcucW-0004Gx-Tt
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:32:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fcub9-0003U3-EN
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34036 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fcub9-0003Ts-Aa
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:30:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F24FE402315B
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 15:30:38 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 10 Jul 2018 16:30:16 +0100
-Message-Id: <20180710153016.131258-16-dgilbert@redhat.com>
-In-Reply-To: <20180710153016.131258-1-dgilbert@redhat.com>
-References: <20180710153016.131258-1-dgilbert@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1fcucV-0004Lu-Ot
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:32:04 -0400
+Date: Tue, 10 Jul 2018 17:31:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180710153155.GM5852@localhost.localdomain>
+References: <1531235146-6048-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/15] migration: reorder MIG_CMD_POSTCOPY_RESUME
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1531235146-6048-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V5] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peterx@redhat.com, quintela@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-From: Peter Xu <peterx@redhat.com>
+Am 10.07.2018 um 17:05 hat Peter Lieven geschrieben:
+> We currently don't enforce that the sparse segments we detect during convert are
+> aligned. This leads to unnecessary and costly read-modify-write cycles either
+> internally in Qemu or in the background on the storage device as nearly all
+> modern filesystems or hardware have a 4k alignment internally.
+> 
+> This patch modifies is_allocated_sectors so that its *pnum result will always
+> end at an alignment boundary. This way all requests will end at an alignment
+> boundary. The start of all requests will also be aligned as long as the results
+> of get_block_status do not lead to an unaligned offset.
+> 
+> The number of RMW cycles when converting an example image [1] to a raw device that
+> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+> write requests. With this path the additional 4600 read requests are eliminated while
+> the number of total write requests stays constant.
+> 
+> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
+> 
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 
-It was accidently added before MIG_CMD_PACKAGED so it might break
-command compatibility when we run postcopy migration between old/new
-QEMUs.  Fix that up quickly before the QEMU 3.0 release.
+It looked convincing, but I'm afraid this is still not correct.
+qemu-iotests 122 fails for me with this patch.
 
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180710094424.30754-1-peterx@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/savevm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/migration/savevm.c b/migration/savevm.c
-index efcc795071..7f92567a10 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -81,8 +81,8 @@ enum qemu_vm_cmd {
-     MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
-                                       were previously sent during
-                                       precopy but are dirty. */
--    MIG_CMD_POSTCOPY_RESUME,       /* resume postcopy on dest */
-     MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stre=
-am */
-+    MIG_CMD_POSTCOPY_RESUME,   /* resume postcopy on dest */
-     MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
-     MIG_CMD_MAX
- };
---=20
-2.17.1
+Kevin
