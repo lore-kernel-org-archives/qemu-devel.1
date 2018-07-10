@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fcnoH-0001PZ-GN
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:15:46 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fco41-000455-O7
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:32:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fcnoE-0000US-CS
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:15:45 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:43429
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fco3x-00085z-5R
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:32:01 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:27289
 	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fcnoD-0000Ta-TE
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:15:42 -0400
-References: <20180704132239.6506-1-douly.fnst@cn.fujitsu.com>
-	<20180710094253.0c122846@redhat.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1fco3w-00084t-5U
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 04:31:57 -0400
+References: <20180705021038.14036-1-douly.fnst@cn.fujitsu.com>
+	<20180710095223.05c72466@redhat.com>
 From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <2052cdff-3dea-1267-3442-39557637b2d4@cn.fujitsu.com>
-Date: Tue, 10 Jul 2018 16:15:30 +0800
+Message-ID: <3a950332-21e1-7e9f-0094-1a22a1aeb900@cn.fujitsu.com>
+Date: Tue, 10 Jul 2018 16:31:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180710094253.0c122846@redhat.com>
+In-Reply-To: <20180710095223.05c72466@redhat.com>
 Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/machine: Remove the Zero check of
- nb_numa_nodes for numa_complete_configuration()
+Subject: Re: [Qemu-devel] [PATCH] hw/acpi-build: Add a check for non-memory
+ NUMA nodes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +30,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, mst@redhat.com, ehabkost@redhat.com
 
 Hi Igor,
 
-At 07/10/2018 03:42 PM, Igor Mammedov wrote:
-> On Wed, 4 Jul 2018 21:22:39 +0800
+At 07/10/2018 03:52 PM, Igor Mammedov wrote:
+> On Thu, 5 Jul 2018 10:10:38 +0800
 > Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
 > 
->> Commit 7a3099fc9c5c("numa: postpone options post-processing till machine_run_board_init()")
->> broke the commit 7b8be49d36fc("NUMA: Enable adding NUMA node implicitly").
+>> Currently, Qemu ACPI builder doesn't consider the non-memory NUMA nodes, eg:
+> s/non-memory/memory-less/ throughout subj/commit message
+> 
+
+Yes, I will do it.
+
+> 
+>>    -m 4G,slots=4,maxmem=8G \
+>>    -numa node,nodeid=0 \
+>>    -numa node,nodeid=1,mem=2G \
+>>    -numa node,nodeid=2,mem=2G \
+>>    -numa node,nodeid=3\
 >>
->> The machine_run_board_init() doesn't do NUMA setup if nb_numa_nodes=0,
->> but the numa_complete_configuration need add a new node if memory hotplug
->> is enabled (slots > 0) even nb_numa_nodes=0.
+>> Guest Linux will report
 >>
->> So, Remove the check for numa_complete_configuration() to fix this.
+>>    [    0.000000] ACPI: SRAT: Node 0 PXM 0 [mem 0x00000000-0xffffffffffffffff]
+>>    [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
+>>    [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
+>>    [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
+>>    [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
+>>    [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x13fffffff]
+>>    [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
 >>
->> Fixes 7a3099fc9c5c("numa: postpone options post-processing till machine_run_board_init()")
+>> [mem 0x00000000-0xffffffffffffffff] and [mem 0x140000000-0x13fffffff] are bogus.
+>>
+>> Add a check to avoid building srat memory for non-memory NUMA nodes, also update
+>> the test file. Now the info in guest linux will be
+>>
+>>    [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00000000-0x0009ffff]
+>>    [    0.000000] ACPI: SRAT: Node 1 PXM 1 [mem 0x00100000-0x7fffffff]
+>>    [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x80000000-0xbfffffff]
+>>    [    0.000000] ACPI: SRAT: Node 2 PXM 2 [mem 0x100000000-0x13fffffff]
+>>    [    0.000000] ACPI: SRAT: Node 3 PXM 3 [mem 0x140000000-0x33fffffff] hotplug
+>>
 >> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
 >> ---
->> v1 --> v2:
->>    -Fix it to pass the "make check".
->> ---
->>   hw/core/machine.c | 5 ++---
->>   1 file changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index 2077328bcc..32b3c5a7d3 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -791,10 +791,9 @@ void machine_run_board_init(MachineState *machine)
->>   {
->>       MachineClass *machine_class = MACHINE_GET_CLASS(machine);
->>   
->> -    if (nb_numa_nodes) {
->> -        numa_complete_configuration(machine);
->> +    numa_complete_configuration(machine);
->> +    if (nb_numa_nodes)
->>           machine_numa_finish_cpu_init(machine);
->> -    }
-> missing curly brackets, should look like:
->         if (nb_numa_nodes) {
->             machine_numa_finish_cpu_init(machine);
->         }
+>> Have done a bootup test in Linux and window 10, 7
 > 
-> with that fixed
+> add here":
+> note to maintainer: update ACPI tables test blobs on commit.
+> 
+> with patch amended
+> 
 > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > 
-
-Thank you, Igor.
-
-Due to Eduardo has sent the pull request of this patch,
-Can I fix this and send v2 patch now?
+>> ---
+>>   hw/i386/acpi-build.c                  |   9 ++++++---
+>>   tests/acpi-test-data/pc/SRAT.numamem  | Bin 224 -> 224 bytes
+>>   tests/acpi-test-data/q35/SRAT.numamem | Bin 224 -> 224 bytes
+>>   3 files changed, 6 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 9e8350c55d..c584642e4e 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2392,9 +2392,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>>               mem_len = next_base - pcms->below_4g_mem_size;
+>>               next_base = mem_base + mem_len;
+>>           }
+>> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+>> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+>> -                          MEM_AFFINITY_ENABLED);
+>> +
+>> +        if (mem_len > 0) {
+>> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+>> +            build_srat_memory(numamem, mem_base, mem_len, i - 1,
+>> +                              MEM_AFFINITY_ENABLED);
+>> +        }
+>>       }
+>>       slots = (table_data->len - numa_start) / sizeof *numamem;
+>>       for (; slots < pcms->numa_nodes + 2; slots++) {
+> 
+> Drop binary blobs from patch (for reviewer convenience we post
+> blobs as separate patch with DO NOT APPLY tag in subject).
+> 
+> Michael will update test blobs manually when merging your patch.
+> 
+Thank you for your explanation. I see. will split them out in v2.
 
 Thanks,
 	dou
->>   
->>       /* If the machine supports the valid_cpu_types check and the user
->>        * specified a CPU with -cpu check here that the user CPU is supported.
+
+>> diff --git a/tests/acpi-test-data/pc/SRAT.numamem b/tests/acpi-test-data/pc/SRAT.numamem
+>> index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
+>> GIT binary patch
+>> delta 24
+>> gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
+>>
+>> delta 24
+>> gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
+>>
+>> diff --git a/tests/acpi-test-data/q35/SRAT.numamem b/tests/acpi-test-data/q35/SRAT.numamem
+>> index dbc595d9cb85d3fcb5a4243153f42bb431c9de8f..119922f4973f621602047d1dc160519f810922a3 100644
+>> GIT binary patch
+>> delta 24
+>> gcmaFB_<)fsILI;N0RsaA<JXB?78A3|ChpJx0A~{jk^lez
+>>
+>> delta 24
+>> gcmaFB_<)fsILI;N0RsaA<ClqC787?#O*Cl%0A_s%T>t<8
+>>
 > 
 > 
 > 
