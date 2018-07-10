@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcv41-0003UD-Tp
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 12:00:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fcv42-0003Uk-Bz
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 12:00:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fcv41-0002JS-1j
+	(envelope-from <pm215@archaic.org.uk>) id 1fcv41-0002Jk-57
 	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 12:00:30 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jul 2018 17:00:09 +0100
-Message-Id: <20180710160013.26559-3-peter.maydell@linaro.org>
+Date: Tue, 10 Jul 2018 17:00:08 +0100
+Message-Id: <20180710160013.26559-2-peter.maydell@linaro.org>
 In-Reply-To: <20180710160013.26559-1-peter.maydell@linaro.org>
 References: <20180710160013.26559-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/6] accel/tcg: Handle get_page_addr_code()
- returning -1 in hashtable lookups
+Subject: [Qemu-devel] [PATCH 1/6] accel/tcg: Pass read access type through
+ to io_readx()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +23,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-When we support execution from non-RAM MMIO regions, get_page_addr_code()
-will return -1 to indicate that there is no RAM at the requested address.
-Handle this in the cpu-exec TB hashtable lookup code, treating it as
-"no match found".
+The io_readx() function needs to know whether the load it is
+doing is an MMU_DATA_LOAD or an MMU_INST_FETCH, so that it
+can pass the right value to the cpu_transaction_failed()
+function. Plumb this information through from the softmmu
+code.
 
-Note that the call to get_page_addr_code() in tb_lookup_cmp() needs
-no changes -- a return of -1 will already correctly result in the
-function returning false.
+This is currently not often going to give the wrong answer,
+because usually instruction fetches go via get_page_addr_code().
+However once we switch over to handling execution from non-RAM by
+creating single-insn TBs, the path for an insn fetch to generate
+a bus error will be through cpu_ld*_code() and io_readx(),
+so without this change we will generate a d-side fault when we
+should generate an i-side fault.
+
+We also have to pass the access type via a CPU struct global
+down to unassigned_mem_read(), for the benefit of the targets
+which still use the cpu_unassigned_access() hook (m68k, mips,
+sparc, xtensa).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- accel/tcg/cpu-exec.c | 3 +++
- 1 file changed, 3 insertions(+)
+ accel/tcg/softmmu_template.h | 11 +++++++----
+ include/qom/cpu.h            |  6 ++++++
+ accel/tcg/cputlb.c           |  5 +++--
+ memory.c                     |  3 ++-
+ 4 files changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index c738b7f7d6e..6bcb6d99bd7 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -332,6 +332,9 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-     desc.trace_vcpu_dstate = *cpu->trace_dstate;
-     desc.pc = pc;
-     phys_pc = get_page_addr_code(desc.env, pc);
-+    if (phys_pc == -1) {
-+        return NULL;
-+    }
-     desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
-     h = tb_hash_func(phys_pc, pc, flags, cf_mask, *cpu->trace_dstate);
-     return qht_lookup_custom(&tb_ctx.htable, &desc, h, tb_lookup_cmp);
+diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
+index badbf148803..f060a693d41 100644
+--- a/accel/tcg/softmmu_template.h
++++ b/accel/tcg/softmmu_template.h
+@@ -99,11 +99,12 @@ static inline DATA_TYPE glue(io_read, SUFFIX)(CPUArchState *env,
+                                               size_t mmu_idx, size_t index,
+                                               target_ulong addr,
+                                               uintptr_t retaddr,
+-                                              bool recheck)
++                                              bool recheck,
++                                              MMUAccessType access_type)
+ {
+     CPUIOTLBEntry *iotlbentry = &env->iotlb[mmu_idx][index];
+     return io_readx(env, iotlbentry, mmu_idx, addr, retaddr, recheck,
+-                    DATA_SIZE);
++                    access_type, DATA_SIZE);
+ }
+ #endif
+ 
+@@ -140,7 +141,8 @@ WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr,
+         /* ??? Note that the io helpers always read data in the target
+            byte ordering.  We should push the LE/BE request down into io.  */
+         res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr,
+-                                    tlb_addr & TLB_RECHECK);
++                                    tlb_addr & TLB_RECHECK,
++                                    READ_ACCESS_TYPE);
+         res = TGT_LE(res);
+         return res;
+     }
+@@ -207,7 +209,8 @@ WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr,
+         /* ??? Note that the io helpers always read data in the target
+            byte ordering.  We should push the LE/BE request down into io.  */
+         res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr,
+-                                    tlb_addr & TLB_RECHECK);
++                                    tlb_addr & TLB_RECHECK,
++                                    READ_ACCESS_TYPE);
+         res = TGT_BE(res);
+         return res;
+     }
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index bd796579ee4..ecf6ed556a9 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -386,6 +386,12 @@ struct CPUState {
+      */
+     uintptr_t mem_io_pc;
+     vaddr mem_io_vaddr;
++    /*
++     * This is only needed for the legacy cpu_unassigned_access() hook;
++     * when all targets using it have been converted to use
++     * cpu_transaction_failed() instead it can be removed.
++     */
++    MMUAccessType mem_io_access_type;
+ 
+     int kvm_fd;
+     struct KVMState *kvm_state;
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 20c147d6554..c491703f15f 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -789,7 +789,7 @@ static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+                          int mmu_idx,
+                          target_ulong addr, uintptr_t retaddr,
+-                         bool recheck, int size)
++                         bool recheck, MMUAccessType access_type, int size)
+ {
+     CPUState *cpu = ENV_GET_CPU(env);
+     hwaddr mr_offset;
+@@ -831,6 +831,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+     }
+ 
+     cpu->mem_io_vaddr = addr;
++    cpu->mem_io_access_type = access_type;
+ 
+     if (mr->global_locking && !qemu_mutex_iothread_locked()) {
+         qemu_mutex_lock_iothread();
+@@ -843,7 +844,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+             section->offset_within_address_space -
+             section->offset_within_region;
+ 
+-        cpu_transaction_failed(cpu, physaddr, addr, size, MMU_DATA_LOAD,
++        cpu_transaction_failed(cpu, physaddr, addr, size, access_type,
+                                mmu_idx, iotlbentry->attrs, r, retaddr);
+     }
+     if (locked) {
+diff --git a/memory.c b/memory.c
+index e9cd4469688..2ea16e7bfb0 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1249,7 +1249,8 @@ static uint64_t unassigned_mem_read(void *opaque, hwaddr addr,
+     printf("Unassigned mem read " TARGET_FMT_plx "\n", addr);
+ #endif
+     if (current_cpu != NULL) {
+-        cpu_unassigned_access(current_cpu, addr, false, false, 0, size);
++        bool is_exec = current_cpu->mem_io_access_type == MMU_INST_FETCH;
++        cpu_unassigned_access(current_cpu, addr, false, is_exec, 0, size);
+     }
+     return 0;
+ }
 -- 
 2.17.1
