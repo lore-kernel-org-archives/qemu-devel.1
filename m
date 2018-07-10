@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fcxIu-000148-C5
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:24:01 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcxM9-0001ym-1f
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:27:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fcxIr-00017l-72
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:24:00 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-	<20180710160013.26559-3-peter.maydell@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <5582b918-6583-30f3-fa84-2b03353a2f09@twiddle.net>
-Date: Tue, 10 Jul 2018 11:23:53 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fcxM5-000287-R8
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:27:21 -0400
+Received: from mail-eopbgr690112.outbound.protection.outlook.com
+	([40.107.69.112]:63936
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fcxM5-00026k-FE
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:27:17 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 10 Jul 2018 18:27:12 +0000
+Message-ID: <BN7PR08MB4868B34DA0B4033C20B4A736C65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1531169431-10772-28-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1531169431-10772-28-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] accel/tcg: Handle get_page_addr_code()
- returning -1 in hashtable lookups
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 27/33] target/mips: Add ELF flags for
+ MIPS machine variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-On 07/10/2018 09:00 AM, Peter Maydell wrote:
-> When we support execution from non-RAM MMIO regions, get_page_addr_code()
-> will return -1 to indicate that there is no RAM at the requested address.
-> Handle this in the cpu-exec TB hashtable lookup code, treating it as
-> "no match found".
-> 
-> Note that the call to get_page_addr_code() in tb_lookup_cmp() needs
-> no changes -- a return of -1 will already correctly result in the
-> function returning false.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Subject: [PATCH v2 27/33] target/mips: Add ELF flags for MIPS machine var=
+iants
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Add MIPS machine variants ELF flags so that the emulation behavior
+> can be adjusted if needed.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 > ---
->  accel/tcg/cpu-exec.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  include/elf.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This update is good for general MIPS support in QEMU, but where are nanoMIP=
+S-specifics regarding ELF header? These must be included in this (or anothe=
+r, separate) patch, within this series. I know this was actually the initia=
+l intention of the author. (I know that since I was the author.)
 
-r~
+> diff --git a/include/elf.h b/include/elf.h
+> index 934dbbd..b39e303 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -63,6 +63,29 @@ typedef int64_t  Elf64_Sxword;
+>  #define EF_MIPS_NAN2008   0x00000400
+>  #define EF_MIPS_ARCH      0xf0000000
+>
+> +/* MIPS machine variant */
+> +#define EF_MIPS_MACH_NONE     0x00000000  /* A standard MIPS implementat=
+ion  */
+> +#define EF_MIPS_MACH_3900     0x00810000  /* Toshiba R3900              =
+     */
+> +#define EF_MIPS_MACH_4010     0x00820000  /* LSI R4010                  =
+     */
+> +#define EF_MIPS_MACH_4100     0x00830000  /* NEC VR4100                 =
+     */
+> +#define EF_MIPS_MACH_4650     0x00850000  /* MIPS R4650                 =
+     */
+> +#define EF_MIPS_MACH_4120     0x00870000  /* NEC VR4120                 =
+     */
+> +#define EF_MIPS_MACH_4111     0x00880000  /* NEC VR4111/VR4181          =
+     */
+> +#define EF_MIPS_MACH_SB1      0x008a0000  /* Broadcom SB-1              =
+     */
+> +#define EF_MIPS_MACH_OCTEON   0x008b0000  /* Cavium Networks Octeon     =
+     */
+> +#define EF_MIPS_MACH_XLR      0x008c0000  /* RMI Xlr                    =
+     */
+> +#define EF_MIPS_MACH_OCTEON2  0x008d0000  /* Cavium Networks Octeon2    =
+     */
+> +#define EF_MIPS_MACH_OCTEON3  0x008e0000  /* Cavium Networks Octeon3    =
+     */
+> +#define EF_MIPS_MACH_5400     0x00910000  /* NEC VR5400                 =
+     */
+> +#define EF_MIPS_MACH_5900     0x00920000  /* MIPS R5900                 =
+     */
+> +#define EF_MIPS_MACH_5500     0x00980000  /* NEC VR5500                 =
+     */
+> +#define EF_MIPS_MACH_9000     0x00990000  /* Unknown                    =
+     */
+> +#define EF_MIPS_MACH_LS2E     0x00a00000  /* ST Microelectronics Loongso=
+n 2E */
+> +#define EF_MIPS_MACH_LS2F     0x00a10000  /* ST Microelectronics Loongso=
+n 2F */
+> +#define EF_MIPS_MACH_LS3A     0x00a20000  /* Loongson 3A                =
+     */
+> +#define EF_MIPS_MACH          0x00ff0000  /* EF_MIPS_MACH_xxx selection =
+mask */
+> +
+> +
+>  /* These constants define the different elf file types */
+>  #define ET_NONE   0
+>  #define ET_REL    1
+> --
+> 2.7.4
+>
+>
