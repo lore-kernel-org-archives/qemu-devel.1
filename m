@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fcxHU-00007k-Rp
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:22:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fcxIu-000148-C5
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fcxHR-0000kK-Li
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:22:32 -0400
-Received: from mail-co1nam03on0124.outbound.protection.outlook.com
-	([104.47.40.124]:59616
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fcxHR-0000jl-9v
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:22:29 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 10 Jul 2018 18:22:25 +0000
-Message-ID: <BN7PR08MB4868AFE369CE2DD08FA57422C65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1531169431-10772-27-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1531169431-10772-27-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <rth7680@gmail.com>) id 1fcxIr-00017l-72
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:24:00 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180710160013.26559-1-peter.maydell@linaro.org>
+	<20180710160013.26559-3-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <5582b918-6583-30f3-fa84-2b03353a2f09@twiddle.net>
+Date: Tue, 10 Jul 2018 11:23:53 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 26/33] target/mips: Fix ERET/ERETNC
- behavior related to ADEL exception
+In-Reply-To: <20180710160013.26559-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/6] accel/tcg: Handle get_page_addr_code()
+ returning -1 in hashtable lookups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-> Subject: [PATCH v2 26/33] target/mips: Fix ERET/ERETNC behavior related t=
-o ADEL exception
->
-> From: Yongbok Kim <yongbok.kim@mips.com>
->
-> Fix ERET/ERETNC so that ADEL exception can be raised.
->
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+On 07/10/2018 09:00 AM, Peter Maydell wrote:
+> When we support execution from non-RAM MMIO regions, get_page_addr_code()
+> will return -1 to indicate that there is no RAM at the requested address.
+> Handle this in the cpu-exec TB hashtable lookup code, treating it as
+> "no match found".
+> 
+> Note that the call to get_page_addr_code() in tb_lookup_cmp() needs
+> no changes -- a return of -1 will already correctly result in the
+> function returning false.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/mips/op_helper.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
+>  accel/tcg/cpu-exec.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index c55a1e6..e6749c5 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -2430,6 +2430,13 @@ static void set_pc(CPUMIPSState *env, target_ulong=
- error_pc)
->      env->active_tc.PC =3D error_pc & ~(target_ulong)1;
->      if (env->insn_flags & ISA_NANOMIPS32) {
->          /* Don't clear MIPS_HFLAG_M16 */
-> +        if (error_pc & 1) {
-> +            if (!(env->hflags & MIPS_HFLAG_DM)) {
-> +                env->CP0_BadVAddr =3D error_pc;
-> +            }
-> +            env->active_tc.PC =3D error_pc;
-> +            do_raise_exception(env, EXCP_AdEL, 0);
-> +        }
->          return;
->      }
->      if (error_pc & 1) {
-> @@ -2467,10 +2474,12 @@ void helper_eretnc(CPUMIPSState *env)
->  void helper_deret(CPUMIPSState *env)
->  {
->      debug_pre_eret(env);
-> -    set_pc(env, env->CP0_DEPC);
->
->      env->hflags &=3D ~MIPS_HFLAG_DM;
->      compute_hflags(env);
-> +
-> +    set_pc(env, env->CP0_DEPC);
-> +
->      debug_post_eret(env);
->  }
->  #endif /* !CONFIG_USER_ONLY */
-> --
-> 2.7.4
->
->
+r~
