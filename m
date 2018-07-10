@@ -1,32 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fcxoN-0004cL-Gs
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:56:32 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fcyxl-0005CU-F1
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:10:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fcxoM-0004to-Mm
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:56:31 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:36340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fcxoM-0004te-Gz
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 14:56:30 -0400
-Received: by mail-io0-x241.google.com with SMTP id k3-v6so21351856iog.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 11:56:30 -0700 (PDT)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fcyxi-00008H-MR
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:10:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57432
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1fcyxi-00007z-6n
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 16:10:14 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6AK9FlZ012825
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 16:10:13 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2k4yhmm349-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 16:10:13 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 10 Jul 2018 14:10:12 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180710045614-mutt-send-email-mst@kernel.org>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-	<20180702161404.GA2339@rkaganb.sw.ru>
-	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
-	<20180703095825.GC30904@rkaganb.sw.ru>
-	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
-	<20180709130035.GA6271@rkaganb.sw.ru>
-	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
-	<20180710045614-mutt-send-email-mst@kernel.org>
-From: Siwei Liu <loseweigh@gmail.com>
-Date: Tue, 10 Jul 2018 11:56:28 -0700
-Message-ID: <CADGSJ21sjds8h4Djvu221WeEnyVCbo0WbL9a_SUkntUvx5_S2A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Tue, 10 Jul 2018 15:10:01 -0500
+Message-Id: <153125340100.30710.7168106493152609709@sif>
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 3.0.0-rc0 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +39,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Mon, Jul 9, 2018 at 6:58 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Mon, Jul 09, 2018 at 06:11:53PM -0700, si-wei liu wrote:
->> What do we buy
->> for using a random address during initial discovery and requiring VF to
->> complete the handshake?
->
-> I don't see advantages to using a random address that is then
-> changed either: changing a MAC causes network downtime for most users.
->
-Definitely.
+Hello,
 
-I see Linux host stack fundamentally different with Windows, it's
-non-sense to duplicate what Hyper-V is doing especially if there's no
-extra benefit.
+On behalf of the QEMU Team, I'd like to announce the availability of the
+first release candidate for the QEMU 3.0 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
->> Less network downtime during datapath switching?
->> Sorry but that's not a key factor at all for our main goal - live migration.
->
-> Isn't avoiding downtime what makes the migration "live"?
-> If you don't care about it at all just remove the device
-> and migrate without all these tricks.
+  http://download.qemu-project.org/qemu-3.0.0-rc0.tar.xz
+  http://download.qemu-project.org/qemu-3.0.0-rc0.tar.xz.sig
 
-Apparently this downtime is not avoidable even if guest initiates the
-switch-over when it is done on Linux host stack. Unless the NIC
-supports adding duplicate MAC filters with one has higher priority
-than the other when both are present. I feel there's very little or
-perhaps zero improvement for the downtime if moving to a
-guest-initiated datapath switching model.
+A note from the maintainer:
 
-However, since this downtime is intermittent and generally
-unnoticeable with a few packet drops, network should be resilient in
-recovering from the drops. My point is that unless we can move to a
-datapath switching model with zero downtime theoretically, this kind
-of minor optimization offers very little help in general.
+  Here's the first release candidate for the upcoming QEMU 3.0 release.
+  Why 3.0? Well, we felt that our version numbers were getting a bit
+  unwieldy, and since this year is QEMU's 15th birthday it seemed like a
+  good excuse to roll over the major digit. Going forward we plan to
+  increment the major version once a year, for the first release of the
+  year. Don't read too much into it: it doesn't imply a drastic
+  compatibility break.
+  =
 
-Regards,
--Siwei
+  Rumours of our triskaidekaphobia have been greatly exaggerated :-)
 
+You can help improve the quality of the QEMU 3.0 release by testing this
+release and reporting bugs on Launchpad:
 
+  https://bugs.launchpad.net/qemu/
 
->
->
-> --
-> MST
->
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->
+The release plan, as well a documented known issues for release
+candidates, are available at:
+
+  http://wiki.qemu.org/Planning/3.0
+
+Please add entries to the ChangeLog for the 3.0 release below:
+
+  http://wiki.qemu.org/ChangeLog/3.0
+
+Thank you to everyone involved!
