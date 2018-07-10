@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fcl8f-0006z6-Tt
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:24:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1fclCq-0007rz-ON
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fcl8f-0005zx-03
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:24:37 -0400
-Date: Tue, 10 Jul 2018 13:24:23 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180710052423.GJ17581@lemon.usersys.redhat.com>
-References: <20180705073701.10558-1-famz@redhat.com>
-	<20180705073701.10558-9-famz@redhat.com>
-	<bc82c67c-0907-c727-e881-2f4622aa1d96@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fclCn-00079E-Fe
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:28:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51396 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fclCn-000795-AT
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 01:28:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1530879678-20487-1-git-send-email-ari@tuxera.com>
+	<87lgakopio.fsf@dusky.pond.sub.org>
+	<fcebd6aa-6346-35d8-cedf-71f5677033e7@tuxera.com>
+Date: Tue, 10 Jul 2018 07:28:51 +0200
+In-Reply-To: <fcebd6aa-6346-35d8-cedf-71f5677033e7@tuxera.com> (Ari Sundholm's
+	message of "Mon, 9 Jul 2018 14:17:27 +0300")
+Message-ID: <87o9fflkvg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc82c67c-0907-c727-e881-2f4622aa1d96@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 8/9] block: Fix bdrv_co_truncate overlap
- check
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qapi/block-core.json: Add missing
+ documentation for blklogwrites log-append option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Ari Sundholm <ari@tuxera.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 07/06 17:09, Eric Blake wrote:
-> On 07/05/2018 02:37 AM, Fam Zheng wrote:
-> > If we are growing the image and potentially using preallocation for the
-> > new area, we need to make sure that no write requests are made to the
-> > "preallocated" area which [@old_size, @offset), not [@offset, offset * 2
-> 
-> s/which/which is/
-> 
-> > - @old_size).
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >   block/io.c | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> > 
-> > diff --git a/block/io.c b/block/io.c
-> > index d07849fa96..ed18eb0ca3 100644
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -3070,7 +3070,8 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
-> >       }
-> >       bdrv_inc_in_flight(bs);
-> > -    tracked_request_begin(&req, bs, offset, new_bytes, BDRV_TRACKED_TRUNCATE);
-> > +    tracked_request_begin(&req, bs, offset - new_bytes, new_bytes,
-> > +                          BDRV_TRACKED_TRUNCATE);
-> 
-> Is it any more legible to do s/offset - new_bytes/old_size/, since those are
-> equivalent?
+Ari Sundholm <ari@tuxera.com> writes:
 
-No they are not. offset - new_bytes is either old_size (if expanding), or
-smaller than old_size (if shrinking).
+> On 07/09/2018 10:07 AM, Markus Armbruster wrote:
+>> Ari Sundholm <ari@tuxera.com> writes:
+>>
+>>> This was accidentally omitted. Thanks to Eric Blake for spotting this.
+>>>
+>>> Signed-off-by: Ari Sundholm <ari@tuxera.com>
+>>> ---
+>>>   qapi/block-core.json | 2 ++
+>>>   1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>>> index 38b3125..62a92fa 100644
+>>> --- a/qapi/block-core.json
+>>> +++ b/qapi/block-core.json
+>>> @@ -3057,6 +3057,8 @@
+>>>   # @log-sector-size: sector size used in logging writes to @file, determines
+>>>   #                   granularity of offsets and sizes of writes (default: 512)
+>>>   #
+>>> +# @log-append:      append to an existing log (default: false)
+>>> +#
+>>>   # @log-super-update-interval: interval of write requests after which the log
+>>>   #                             super block is updated to disk (default: 4096)
+>>>   #
+>>
+>> Applied to qapi-next.  Thanks!
+>>
+>
+> Thanks. Does this mean that the patch be queued for 3.0 or should I
+> take some additional steps to ensure this?
 
-Fam
+When a maintainer (like me) accepts your patch, he also accepts
+resposibility to get it merged into master.  The patch submitter (you)
+should not have to do anything to get that done.
 
-> 
-> >       /* If we are growing the image and potentially using preallocation for the
-> >        * new area, we need to make sure that no write requests are made to it
-> > 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+"Should" only because maintainers aren't infallible :) I keep tracking
+my own patches until they reach master.  Pretty much always they just
+do.  Only once in a great while I have to ask a maintainer what's up.
+
+In this case, your patch should be in my next QAPI pull request, and you
+should receive a copy.
