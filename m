@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fcpud-0003h1-I6
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:28 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fcpuf-0003hA-O2
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fcpua-0007mK-DB
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:27 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fcpue-0007tZ-At
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:29 -0400
 Received: from mga03.intel.com ([134.134.136.65]:54550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fcpuZ-0007jf-SL
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:24 -0400
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fcpud-0007jf-PS
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 06:30:28 -0400
 From: junyan.he@gmx.com
-Date: Tue, 10 Jul 2018 18:30:13 +0800
-Message-Id: <1531218620-14645-1-git-send-email-junyan.he@gmx.com>
-Subject: [Qemu-devel] [PATCH 0/7 V9] nvdimm: guarantee persistence of QEMU
- writes to persistent memory
+Date: Tue, 10 Jul 2018 18:30:15 +0800
+Message-Id: <1531218620-14645-3-git-send-email-junyan.he@gmx.com>
+In-Reply-To: <1531218620-14645-1-git-send-email-junyan.he@gmx.com>
+References: <1531218620-14645-1-git-send-email-junyan.he@gmx.com>
+Subject: [Qemu-devel] [PATCH 2/7 V9] memory,
+ exec: switch file ram allocation functions to 'flags' parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +29,209 @@ Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.p
 
 From: Junyan He <junyan.he@intel.com>
 
-QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and 
-live migration. If the backend is on the persistent memory, QEMU needs
-to take proper operations to ensure its writes persistent on the 
-persistent memory. Otherwise, a host power failure may result in the 
-loss the guest data on the persistent memory.
+As more flag parameters besides the existing 'share' are going to be
+added to following functions
+memory_region_init_ram_from_file
+qemu_ram_alloc_from_fd
+qemu_ram_alloc_from_file
+let's switch them to use the 'flags' parameters so as to ease future
+flag additions.
 
-This patch series is based on Marcel's patch "mem: add share parameter to
-memory-backend-ram" [1] because of the changes in patch 1.
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
-
-Previous versions of this patch series can be found at: 
-v8: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02279.html
-v7: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02997.html
-v6: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg00061.html
-v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
-V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
-v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
-v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
-v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
-
-Changes in v9:
-* (Patch 3 and Patch 4) Reorder these two patches to make logic right.
-  Firstly add libpmem support, and then we can use libpmem's configure
-  check result. Also fix some typo and grammar issues in these two patches.
-
-Changs in v8: 
-* (Patch 3) Report a error when user set 'pmem' to file-backend, while
-  the qemu is lack of libpmem support. In this case, we can not ensure
-  the persistence of the file-backend, so we choose to fail the build
-  rather than contine and make the thing more confused.
-
-Changes in v7: 
-The v6 patch set has already reviewed by Stefan Hajnoczi <stefanha@redhat.com>
-No logic change in this v7 version, just:
-* Spelling check and some document words refined.
-* Rebase to "ram is migratable" patch set.
-
-Changes in v6: 
-* (Patch 1) Expose all ram block flags rather than redefine the flags.
-* (Patch 4) Use pkg-config rather the hard check when configure. 
-* (Patch 7) Sync and flush all the pmem data when migration completes,
-  rather than sync pages one by one in previous version.
-
-Changes in v5: 
-* (Patch 9) Add post copy check and output some messages for nvdimm.
-
-Changes in v4: 
-* (Patch 2) Fix compilation errors found by patchew.
-
-Changes in v3:
-* (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
-  PMEM writes in it, so we don't need the _common function.
-* (Patch 6) Expose qemu_get_buffer_common so we can remove the
-  unnecessary qemu_get_buffer_to_pmem wrapper.
-* (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
-  PMEM writes in it, so we can remove the unnecessary
-  xbzrle_decode_buffer_{common, to_pmem}.
-* Move libpmem stubs to stubs/pmem.c and fix the compilation failures
-  of test-{xbzrle,vmstate}.c.
-
-Changes in v2:
-* (Patch 1) Use a flags parameter in file ram allocation functions.
-* (Patch 2) Add a new option 'pmem' to hostmem-file.
-* (Patch 3) Use libpmem to operate on the persistent memory, rather
-  than re-implementing those operations in QEMU.
-* (Patch 5-8) Consider the write persistence in the migration path.
-
-Junyan:
-[1/7] memory, exec: Expose all memory block related flags.
-[6/7] migration/ram: Add check and info message to nvdimm post copy.
-[7/7] migration/ram: ensure write persistence on loading all date to PMEM.
-
-Haozhong:
-[5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
-
-Haozhong & Junyan:
-[2/7] memory, exec: switch file ram allocation functions to 'flags' parameters
-[3/7] configure: add libpmem support
-[4/7] hostmem-file: add the 'pmem' option
-
+The existing 'share' flag is converted to the RAM_SHARED bit in ram_flags,
+and other flag bits are ignored by above functions right now.
 
 Signed-off-by: Junyan He <junyan.he@intel.com>
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-
- backends/hostmem-file.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- configure               | 29 +++++++++++++++++++++++++++++
- docs/nvdimm.txt         | 22 ++++++++++++++++++++++
- exec.c                  | 38 +++++++++++++-------------------------
- hw/mem/nvdimm.c         |  9 ++++++++-
- include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
- include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
- include/qemu/pmem.h     | 24 ++++++++++++++++++++++++
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ backends/hostmem-file.c |  3 ++-
+ exec.c                  | 10 +++++-----
+ include/exec/memory.h   |  7 +++++--
+ include/exec/ram_addr.h | 25 +++++++++++++++++++++++--
  memory.c                |  8 +++++---
- migration/ram.c         | 17 +++++++++++++++++
  numa.c                  |  2 +-
- qemu-options.hx         |  7 +++++++
- stubs/Makefile.objs     |  1 +
- stubs/pmem.c            | 23 +++++++++++++++++++++++
- 14 files changed, 246 insertions(+), 35 deletions(-)
- create mode 100644 include/qemu/pmem.h
- create mode 100644 stubs/pmem.c
+ 6 files changed, 41 insertions(+), 14 deletions(-)
 
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 134b08d..34c68bb 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -58,7 +58,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+         path = object_get_canonical_path(OBJECT(backend));
+         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+                                  path,
+-                                 backend->size, fb->align, backend->share,
++                                 backend->size, fb->align,
++                                 backend->share ? RAM_SHARED : 0,
+                                  fb->mem_path, errp);
+         g_free(path);
+     }
+diff --git a/exec.c b/exec.c
+index cc042dc..1ec539d 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2238,7 +2238,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+ 
+ #ifdef __linux__
+ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+-                                 bool share, int fd,
++                                 uint64_t ram_flags, int fd,
+                                  Error **errp)
+ {
+     RAMBlock *new_block;
+@@ -2280,14 +2280,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->mr = mr;
+     new_block->used_length = size;
+     new_block->max_length = size;
+-    new_block->flags = share ? RAM_SHARED : 0;
++    new_block->flags = ram_flags;
+     new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
+     if (!new_block->host) {
+         g_free(new_block);
+         return NULL;
+     }
+ 
+-    ram_block_add(new_block, &local_err, share);
++    ram_block_add(new_block, &local_err, ram_flags & RAM_SHARED);
+     if (local_err) {
+         g_free(new_block);
+         error_propagate(errp, local_err);
+@@ -2299,7 +2299,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+ 
+ 
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+-                                   bool share, const char *mem_path,
++                                   uint64_t ram_flags, const char *mem_path,
+                                    Error **errp)
+ {
+     int fd;
+@@ -2311,7 +2311,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+         return NULL;
+     }
+ 
+-    block = qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
++    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
+     if (!block) {
+         if (created) {
+             unlink(mem_path);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 6d0af29..513ec8d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -640,6 +640,7 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+                                                        void *host),
+                                        Error **errp);
+ #ifdef __linux__
++
+ /**
+  * memory_region_init_ram_from_file:  Initialize RAM memory region with a
+  *                                    mmap-ed backend.
+@@ -651,7 +652,9 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+  * @size: size of the region.
+  * @align: alignment of the region base address; if 0, the default alignment
+  *         (getpagesize()) will be used.
+- * @share: %true if memory must be mmaped with the MAP_SHARED flag
++ * @ram_flags: Memory region features:
++ *             - RAM_SHARED: memory must be mmaped with the MAP_SHARED flag
++ *             Other bits are ignored now.
+  * @path: the path in which to allocate the RAM.
+  * @errp: pointer to Error*, to store an error if it happens.
+  *
+@@ -663,7 +666,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+                                       const char *name,
+                                       uint64_t size,
+                                       uint64_t align,
+-                                      bool share,
++                                      uint64_t ram_flags,
+                                       const char *path,
+                                       Error **errp);
+ 
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index cf4ce06..bb0a09b 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -71,12 +71,33 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+ }
+ 
+ long qemu_getrampagesize(void);
++
++/**
++ * qemu_ram_alloc_from_file,
++ * qemu_ram_alloc_from_fd:  Allocate a ram block from the specified backing
++ *                          file or device
++ *
++ * Parameters:
++ *  @size: the size in bytes of the ram block
++ *  @mr: the memory region where the ram block is
++ *  @ram_flags: specify the properties of the ram block, which can be one
++ *              or bit-or of following values
++ *              - RAM_SHARED: mmap the backing file or device with MAP_SHARED
++ *              Other bits are ignored.
++ *  @mem_path or @fd: specify the backing file or device
++ *  @errp: pointer to Error*, to store an error if it happens
++ *
++ * Return:
++ *  On success, return a pointer to the ram block.
++ *  On failure, return NULL.
++ */
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+-                                   bool share, const char *mem_path,
++                                   uint64_t ram_flags, const char *mem_path,
+                                    Error **errp);
+ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+-                                 bool share, int fd,
++                                 uint64_t ram_flags, int fd,
+                                  Error **errp);
++
+ RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+                                   MemoryRegion *mr, Error **errp);
+ RAMBlock *qemu_ram_alloc(ram_addr_t size, bool share, MemoryRegion *mr,
+diff --git a/memory.c b/memory.c
+index e9cd446..7c5695c 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1551,7 +1551,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+                                       const char *name,
+                                       uint64_t size,
+                                       uint64_t align,
+-                                      bool share,
++                                      uint64_t ram_flags,
+                                       const char *path,
+                                       Error **errp)
+ {
+@@ -1560,7 +1560,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->align = align;
+-    mr->ram_block = qemu_ram_alloc_from_file(size, mr, share, path, errp);
++    mr->ram_block = qemu_ram_alloc_from_file(size, mr, ram_flags, path, errp);
+     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+ }
+ 
+@@ -1576,7 +1576,9 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+     mr->ram = true;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+-    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
++    mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
++                                           share ? RAM_SHARED : 0,
++                                           fd, errp);
+     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+ }
+ #endif
+diff --git a/numa.c b/numa.c
+index 5f6367b..81542d4 100644
+--- a/numa.c
++++ b/numa.c
+@@ -479,7 +479,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+     if (mem_path) {
+ #ifdef __linux__
+         Error *err = NULL;
+-        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, false,
++        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, 0,
+                                          mem_path, &err);
+         if (err) {
+             error_report_err(err);
 -- 
 2.7.4
