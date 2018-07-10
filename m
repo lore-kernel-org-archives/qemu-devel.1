@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fcgFU-00005M-Lq
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:11:22 -0400
+	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
+	id 1fcgVh-0004Nt-Ar
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fcgFQ-0000go-2z
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:11:20 -0400
-Resent-Message-Id: <E1fcgFQ-0000go-2z@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fcgFP-0000fh-OX
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:11:15 -0400
-In-Reply-To: <20180710000024.542612-1-mst@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153118145016.1491.16051130905565633016@946cad8fd14e>
+	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
+	id 1fcgVe-00087c-6r
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:05 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:51642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=722272e76=Alistair.Francis@wdc.com>)
+	id 1fcgVd-000856-IK
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:28:02 -0400
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Mon,  9 Jul 2018 17:27:47 -0700
+Message-Id: <cover.1531182400.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 9 Jul 2018 17:10:51 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 0/7] Dynamic _CST
- generation
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 0/6] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: alistair.francis@wdc.com, alistair23@gmail.com, mjc@sifive.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNzEwMDAwMDI0LjU0MjYxMi0xLW1zdEByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggaGFjayBkb250YXBwbHkgdjIgMC83XSBEeW5hbWljIF9DU1Qg
-Z2VuZXJhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
-LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
-dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
-ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
-OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
-KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
-Y2hldy8yMDE4MDYyNjEzNTAzNS4xMzM0MzItMS12c2VtZW50c292QHZpcnR1b3p6by5jb20gLT4g
-cGF0Y2hldy8yMDE4MDYyNjEzNTAzNS4xMzM0MzItMS12c2VtZW50c292QHZpcnR1b3p6by5jb20K
-ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDcxMDAwMDAyNC41NDI2MTIt
-MS1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNzEwMDAwMDI0LjU0MjYxMi0xLW1zdEBy
-ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWVhNjY5OTQ3YiBwYzog
-SEFDSzogYWNwaTogdGllIGluIF9DU1Qgb2JqZWN0IHRvIFByb2Nlc3Nvcgo1MTQ1NWU2MTQzIGFj
-cGk6IGFtbCBnZW5lcmF0aW9uIGZvciBfQ1NUCmJlMTcyYzNmNmYgYWNwaTogaW5pdCBoZWFkZXIg
-d2l0aG91dCBsaW5raW5nCjg5ODZiODA4MGIgYWNwaTogZXhwb3J0IGFjcGlfY2hlY2tzdW0KM2M3
-YTk3ODEzOSBhY3BpOiBhbWxfbG9hZC9hbWxfdW5sb2FkCjRmYzY5ODg2M2UgYWNwaTogZ2VuZXJh
-bGl6ZSBhbWxfcGFja2FnZSAvIGFtbF92YXJwYWNrYWdlCjc1ZDA4MThkZDggYWNwaTogYW1sOiBh
-ZGQgYW1sX3JlZ2lzdGVyKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
-NzogYWNwaTogYW1sOiBhZGQgYW1sX3JlZ2lzdGVyKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi83OiBh
-Y3BpOiBnZW5lcmFsaXplIGFtbF9wYWNrYWdlIC8gYW1sX3ZhcnBhY2thZ2UuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMy83OiBhY3BpOiBhbWxfbG9hZC9hbWxfdW5sb2FkLi4uCkNoZWNraW5nIFBBVENIIDQv
-NzogYWNwaTogZXhwb3J0IGFjcGlfY2hlY2tzdW0uLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBhY3Bp
-OiBpbml0IGhlYWRlciB3aXRob3V0IGxpbmtpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBhY3Bp
-OiBhbWwgZ2VuZXJhdGlvbiBmb3IgX0NTVC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTM5OiBGSUxFOiBo
-dy9hY3BpL2NzdC5jOjk0OgorICAgICAqIGEgZ29vZCBpZGVhIGZvciBmdXR1cmUgZXh0ZW5zaW9u
-cy4gICAgICAkCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzE1MDogRklMRTog
-aHcvYWNwaS9jc3QuYzoxMDU6CisgICAgLy90YWJsZV9kYXRhLT5kYXRhW2NzdHBfb2Zmc2V0XSA9
-IDB4ODsgLyogaGFjayAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3Mjog
-RklMRTogaHcvYWNwaS9jc3QuYzoxMjc6CisgICAgYWNwaV9pbml0X2hlYWRlcihkeW5fc3NkdF9o
-ZHIsICJTU0RUIiwgZHluX3NzZHQtPmJ1Zi0+bGVuLCAxLCBOVUxMLCAiRFlOU1NEVCIpOwoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NTogRklMRTogaHcvYWNwaS9jc3QuYzox
-NDA6CitzdGF0aWMgdm9pZCBjc3RfaW9wb3J0X3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFk
-ZHIsIHVpbnQ2NF90IGRhdGEsIHVuc2lnbmVkIHNpemUpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMjE0OiBGSUxFOiBody9hY3BpL2NzdC5jOjE2OToKKyAgICBtZW1vcnlfcmVn
-aW9uX2luaXRfaW8oJmNzdF9tciwgTlVMTCwgJmNzdF9vcHMsIE5VTEwsICJjc3QtdXBkYXRlLXJl
-cXVlc3QiLCA0KTsKCnRvdGFsOiAyIGVycm9ycywgNCB3YXJuaW5ncywgMTg3IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDcvNzogcGM6IEhBQ0s6IGFjcGk6IHRpZSBpbiBfQ1NUIG9iamVjdCB0byBQcm9jZXNzb3IuLi4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+V2:
+ - Use the gpex PCIe host for virt
+ - Add support for SiFive U PCIe
+
+
+Alistair Francis (6):
+  hw/riscv/virtio: Set the soc device tree node as a simple-bus
+  hw/riscv/virt: Increase the number of interrupts
+  hw/riscv/virt: Connect the gpex PCIe
+  hw/riscv/virt: Connect a VGA PCIe device
+  hw/riscv/sifive_u: Connect the Xilinx PCIe
+  riscv64-softmmu.mak: Build Virtio Block support
+
+ default-configs/riscv32-softmmu.mak |  7 ++++
+ default-configs/riscv64-softmmu.mak |  9 ++++
+ hw/riscv/sifive_u.c                 | 64 ++++++++++++++++++++++++++++
+ hw/riscv/virt.c                     | 65 ++++++++++++++++++++++++++++-
+ include/hw/riscv/sifive_u.h         |  4 +-
+ include/hw/riscv/virt.h             |  6 ++-
+ 6 files changed, 151 insertions(+), 4 deletions(-)
+
+-- 
+2.17.1
