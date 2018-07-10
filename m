@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fciiJ-0005aC-Fr
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:49:16 -0400
+	(envelope-from <famz@redhat.com>) id 1fcikE-0006Pd-R8
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fciiG-0002WI-Du
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:49:15 -0400
-Resent-Message-Id: <E1fciiG-0002WI-Du@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fciiG-0002UX-84
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:49:12 -0400
-In-Reply-To: <1531190661-19327-1-git-send-email-qiaochong@loongson.cn>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <153119091798.1503.16066005947112586883@946cad8fd14e>
+	(envelope-from <famz@redhat.com>) id 1fcikD-0003OH-GK
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 22:51:14 -0400
+Date: Tue, 10 Jul 2018 10:51:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180710025101.GH17581@lemon.usersys.redhat.com>
+References: <20180709163719.87107-1-vsementsov@virtuozzo.com>
+	<20180709163719.87107-4-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 9 Jul 2018 19:48:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] make pci_bridge_region_cleanup to be done
- in rcu queue after flatview_destroy.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180709163719.87107-4-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] block: add BDRV_REQ_SERIALISING flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +23,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qiaochong@loongson.cn
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pl@kamp.de, pbonzini@redhat.com, ronniesahlberg@gmail.com, stefanha@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MzExOTA2NjEtMTkzMjctMS1naXQtc2VuZC1lbWFpbC1xaWFvY2hvbmdAbG9v
-bmdzb24uY24KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gbWFrZSBwY2lfYnJpZGdlX3Jl
-Z2lvbl9jbGVhbnVwIHRvIGJlIGRvbmUgaW4gcmN1IHF1ZXVlIGFmdGVyIGZsYXR2aWV3X2Rlc3Ry
-b3kuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1
-MzExOTA2NjEtMTkzMjctMS1naXQtc2VuZC1lbWFpbC1xaWFvY2hvbmdAbG9vbmdzb24uY24gLT4g
-cGF0Y2hldy8xNTMxMTkwNjYxLTE5MzI3LTEtZ2l0LXNlbmQtZW1haWwtcWlhb2Nob25nQGxvb25n
-c29uLmNuClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDdiZTVmNDE5OSBtYWtlIHBj
-aV9icmlkZ2VfcmVnaW9uX2NsZWFudXAgdG8gYmUgZG9uZSBpbiByY3UgcXVldWUgYWZ0ZXIgZmxh
-dHZpZXdfZGVzdHJveS4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
-bWFrZSBwY2lfYnJpZGdlX3JlZ2lvbl9jbGVhbnVwIHRvIGJlIGRvbmUgaW4gcmN1IHF1ZXVlIGFm
-dGVyIGZsYXR2aWV3X2Rlc3Ryb3kuLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-NTU6IEZJTEU6IGh3L3BjaS9wY2lfYnJpZGdlLmM6MjM4OgorYmVjYXVzZSBtZW1vcnlfcmVnaW9u
-X3VucmVmIG5lZWQgYWNjZXNzIG1lbW9yeSByZWdpb25zIGluIFBDSUJyaWRnZVdpbmRvd3MgaW4g
-ZmxhdHZpZXdfZGVzdHJveS4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzEgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Mon, 07/09 19:37, Vladimir Sementsov-Ogievskiy wrote:
+> Serialized writes should be used in copy-on-write of backup(sync=none)
+> for image fleecing scheme.
+> 
+> We need to change an assert in bdrv_aligned_pwritev, added in
+> 28de2dcd88de. The assert may fail now, because call to
+> wait_serialising_requests here may become first call to it for this
+> request with serializing flag set.
+> It occurs if the request is aligned
+> (otherwise, we should already set serializing flag before calling
+> bdrv_aligned_pwritev and correspondingly waited for all intersecting
+> requests). However, for aligned requests, we should not care about
+> outdating of previously read data, as there no such data. Therefore,
+> let's just update an assert to not care about aligned requests.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/block.h | 13 ++++++++++++-
+>  block/io.c            | 26 +++++++++++++++++++++++++-
+>  2 files changed, 37 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 57a96d4988..6623d15432 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -69,8 +69,19 @@ typedef enum {
+>       * content. */
+>      BDRV_REQ_WRITE_UNCHANGED    = 0x40,
+>  
+> +    /* BDRV_REQ_SERIALISING forces request serialisation for writes.
+> +     * It is used to ensure that writes to the backing file of a backup process
+> +     * target cannot race with a read of the backup target that defers to the
+> +     * backing file.
+> +     *
+> +     * Note, that BDRV_REQ_SERIALISING is _not_ opposite in meaning to
+> +     * BDRV_REQ_NO_SERIALISING. A more descriptive name for the latter might be
+> +     * _DO_NOT_WAIT_FOR_SERIALISING, except that is too long.
+> +     */
+> +    BDRV_REQ_SERIALISING        = 0x80,
+> +
+>      /* Mask of valid flags */
+> -    BDRV_REQ_MASK               = 0x7f,
+> +    BDRV_REQ_MASK               = 0xff,
+>  } BdrvRequestFlags;
+>  
+>  typedef struct BlockSizes {
+> diff --git a/block/io.c b/block/io.c
+> index 5d5651ad84..102cb0e1ba 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -623,6 +623,16 @@ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+>      req->overlap_bytes = MAX(req->overlap_bytes, overlap_bytes);
+>  }
+>  
+> +static bool is_request_serialising_and_aligned(BdrvTrackedRequest *req)
+> +{
+> +    /* if request is serialising, overlap_offset and overlap_bytes are set, so
+> +     * we can check is request aligned. Otherwise don't care and return false
+
+"if the request is aligned".
+
+> +     */
+> +
+> +    return req->serialising && (req->offset == req->overlap_offset) &&
+> +           (req->bytes == req->overlap_bytes);
+> +}
+> +
+>  /**
+>   * Round a region to cluster boundaries
+>   */
+> @@ -1291,6 +1301,9 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+>          mark_request_serialising(req, bdrv_get_cluster_size(bs));
+>      }
+>  
+> +    /* BDRV_REQ_SERIALISING is only for write operation */
+> +    assert(!(flags & BDRV_REQ_SERIALISING));
+> +
+>      if (!(flags & BDRV_REQ_NO_SERIALISING)) {
+>          wait_serialising_requests(req);
+>      }
+> @@ -1574,8 +1587,14 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+>  
+>      /* BDRV_REQ_NO_SERIALISING is only for read operation */
+>      assert(!(flags & BDRV_REQ_NO_SERIALISING));
+> +
+> +    if (flags & BDRV_REQ_SERIALISING) {
+> +        mark_request_serialising(req, bdrv_get_cluster_size(bs));
+> +    }
+> +
+>      waited = wait_serialising_requests(req);
+> -    assert(!waited || !req->serialising);
+> +    assert(!waited || !req->serialising ||
+> +           is_request_serialising_and_aligned(req));
+
+Note to myself: what can happen is when we have a CoR request in flight which
+was marked serialising, this aligned write overlaps with it. In this case, we
+will wait (waited == true), and req->serialising == true as set by
+BDRV_REQ_SERIALISING.  (Previously we must have called
+wait_serialising_requests() in bdrv_co_pwritev() or bdrv_co_do_zero_pwritev()
+before reaching here, if req->serialising, in which case no wait should happen.)
+
+>      assert(req->overlap_offset <= offset);
+>      assert(offset + bytes <= req->overlap_offset + req->overlap_bytes);
+>      if (flags & BDRV_REQ_WRITE_UNCHANGED) {
+> @@ -2929,6 +2948,8 @@ static int coroutine_fn bdrv_co_copy_range_internal(
+>          tracked_request_begin(&req, src->bs, src_offset, bytes,
+>                                BDRV_TRACKED_READ);
+>  
+> +        /* BDRV_REQ_SERIALISING is only for write operation */
+> +        assert(!(read_flags & BDRV_REQ_SERIALISING));
+>          if (!(read_flags & BDRV_REQ_NO_SERIALISING)) {
+>              wait_serialising_requests(&req);
+>          }
+> @@ -2948,6 +2969,9 @@ static int coroutine_fn bdrv_co_copy_range_internal(
+>  
+>          /* BDRV_REQ_NO_SERIALISING is only for read operation */
+>          assert(!(write_flags & BDRV_REQ_NO_SERIALISING));
+> +        if (write_flags & BDRV_REQ_SERIALISING) {
+> +            mark_request_serialising(&req, bdrv_get_cluster_size(dst->bs));
+> +        }
+>          wait_serialising_requests(&req);
+>  
+>          ret = dst->bs->drv->bdrv_co_copy_range_to(dst->bs,
+> -- 
+> 2.11.1
+> 
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
+
+Fam
