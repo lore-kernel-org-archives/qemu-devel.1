@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fcg65-00019M-GV
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fcgFU-00005M-Lq
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:11:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fcg64-0001px-4y
-	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:01:37 -0400
-Date: Tue, 10 Jul 2018 03:01:31 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180710000024.542612-3-mst@redhat.com>
-References: <20180710000024.542612-1-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	(envelope-from <no-reply@patchew.org>) id 1fcgFQ-0000go-2z
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:11:20 -0400
+Resent-Message-Id: <E1fcgFQ-0000go-2z@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fcgFP-0000fh-OX
+	for qemu-devel@nongnu.org; Mon, 09 Jul 2018 20:11:15 -0400
 In-Reply-To: <20180710000024.542612-1-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH hack dontapply v2 2/7] acpi: generalize
- aml_package / aml_varpackage
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153118145016.1491.16051130905565633016@946cad8fd14e>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Jul 2018 17:10:51 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH hack dontapply v2 0/7] Dynamic _CST
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com
 
-VarPackage can accept an expression evaluating to int, not just an int.
-Change the API to make it more generic.
-Further, rather than have users call the correct API depending on
-value passed, use either PackageOp or VarPackageOp automatically.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/hw/acpi/aml-build.h |  4 ++--
- hw/acpi/aml-build.c         | 19 +++++++++++++++----
- hw/acpi/cpu_hotplug.c       | 11 ++---------
- hw/arm/virt-acpi-build.c    |  2 +-
- 4 files changed, 20 insertions(+), 16 deletions(-)
-
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 10c7946028..7cf2cf64bf 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -360,7 +360,7 @@ Aml *aml_method(const char *name, int arg_count, AmlSerializeFlag sflag);
- Aml *aml_if(Aml *predicate);
- Aml *aml_else(void);
- Aml *aml_while(Aml *predicate);
--Aml *aml_package(uint8_t num_elements);
-+Aml *aml_package(uint64_t num_elements);
- Aml *aml_buffer(int buffer_size, uint8_t *byte_list);
- Aml *aml_resource_template(void);
- Aml *aml_field(const char *name, AmlAccessType type, AmlLockRule lock,
-@@ -373,7 +373,7 @@ Aml *aml_create_field(Aml *srcbuf, Aml *bit_index, Aml *num_bits,
-                       const char *name);
- Aml *aml_create_dword_field(Aml *srcbuf, Aml *index, const char *name);
- Aml *aml_create_qword_field(Aml *srcbuf, Aml *index, const char *name);
--Aml *aml_varpackage(uint32_t num_elements);
-+Aml *aml_varpackage(Aml *num_elements);
- Aml *aml_touuid(const char *uuid);
- Aml *aml_unicode(const char *str);
- Aml *aml_refof(Aml *arg);
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index def62b3112..7165f19585 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1016,9 +1016,20 @@ Aml *aml_buffer(int buffer_size, uint8_t *byte_list)
- }
- 
- /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefPackage */
--Aml *aml_package(uint8_t num_elements)
-+/* Note: The ability to create variable-sized packages was first
-+ * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
-+ * with up to 255 elements. Windows guests up to win2k8 fail when
-+ * VarPackageOp is used.
-+ */
-+Aml *aml_package(uint64_t num_elements)
- {
--    Aml *var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
-+    Aml *var;
-+
-+    if (num_elements > 0xFF) {
-+        return aml_varpackage(aml_int(num_elements));
-+    }
-+
-+    var = aml_bundle(0x12 /* PackageOp */, AML_PACKAGE);
-     build_append_byte(var->buf, num_elements);
-     return var;
- }
-@@ -1136,10 +1147,10 @@ Aml *aml_local(int num)
- }
- 
- /* ACPI 2.0a: 17.2.2 Data Objects Encoding: DefVarPackage */
--Aml *aml_varpackage(uint32_t num_elements)
-+Aml *aml_varpackage(Aml *num_elements)
- {
-     Aml *var = aml_bundle(0x13 /* VarPackageOp */, AML_PACKAGE);
--    build_append_int(var->buf, num_elements);
-+    aml_append(var, num_elements);
-     return var;
- }
- 
-diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
-index 5243918125..f8246fca6f 100644
---- a/hw/acpi/cpu_hotplug.c
-+++ b/hw/acpi/cpu_hotplug.c
-@@ -309,15 +309,8 @@ void build_legacy_cpu_hotplug_aml(Aml *ctx, MachineState *machine,
-     }
-     aml_append(sb_scope, method);
- 
--    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })"
--     *
--     * Note: The ability to create variable-sized packages was first
--     * introduced in ACPI 2.0. ACPI 1.0 only allowed fixed-size packages
--     * ith up to 255 elements. Windows guests up to win2k8 fail when
--     * VarPackageOp is used.
--     */
--    pkg = pcms->apic_id_limit <= 255 ? aml_package(pcms->apic_id_limit) :
--                                       aml_varpackage(pcms->apic_id_limit);
-+    /* build "Name(CPON, Package() { One, One, ..., Zero, Zero, ... })" */
-+    pkg = aml_package(pcms->apic_id_limit);
- 
-     for (i = 0, apic_idx = 0; i < apic_ids->len; i++) {
-         int apic_id = apic_ids->cpus[i].arch_id;
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 6ea47e2588..2adb1de378 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -174,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
- 
-     /* Declare the PCI Routing Table. */
--    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
-+    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
-     for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
-         for (i = 0; i < PCI_NUM_PINS; i++) {
-             int gsi = (i + bus_no) % PCI_NUM_PINS;
--- 
-MST
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNzEwMDAwMDI0LjU0MjYxMi0xLW1zdEByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggaGFjayBkb250YXBwbHkgdjIgMC83XSBEeW5hbWljIF9DU1Qg
+Z2VuZXJhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
+LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
+dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
+ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
+OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
+KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
+Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
+Y2hldy8yMDE4MDYyNjEzNTAzNS4xMzM0MzItMS12c2VtZW50c292QHZpcnR1b3p6by5jb20gLT4g
+cGF0Y2hldy8yMDE4MDYyNjEzNTAzNS4xMzM0MzItMS12c2VtZW50c292QHZpcnR1b3p6by5jb20K
+ICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDcxMDAwMDAyNC41NDI2MTIt
+MS1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNzEwMDAwMDI0LjU0MjYxMi0xLW1zdEBy
+ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWVhNjY5OTQ3YiBwYzog
+SEFDSzogYWNwaTogdGllIGluIF9DU1Qgb2JqZWN0IHRvIFByb2Nlc3Nvcgo1MTQ1NWU2MTQzIGFj
+cGk6IGFtbCBnZW5lcmF0aW9uIGZvciBfQ1NUCmJlMTcyYzNmNmYgYWNwaTogaW5pdCBoZWFkZXIg
+d2l0aG91dCBsaW5raW5nCjg5ODZiODA4MGIgYWNwaTogZXhwb3J0IGFjcGlfY2hlY2tzdW0KM2M3
+YTk3ODEzOSBhY3BpOiBhbWxfbG9hZC9hbWxfdW5sb2FkCjRmYzY5ODg2M2UgYWNwaTogZ2VuZXJh
+bGl6ZSBhbWxfcGFja2FnZSAvIGFtbF92YXJwYWNrYWdlCjc1ZDA4MThkZDggYWNwaTogYW1sOiBh
+ZGQgYW1sX3JlZ2lzdGVyKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
+NzogYWNwaTogYW1sOiBhZGQgYW1sX3JlZ2lzdGVyKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi83OiBh
+Y3BpOiBnZW5lcmFsaXplIGFtbF9wYWNrYWdlIC8gYW1sX3ZhcnBhY2thZ2UuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMy83OiBhY3BpOiBhbWxfbG9hZC9hbWxfdW5sb2FkLi4uCkNoZWNraW5nIFBBVENIIDQv
+NzogYWNwaTogZXhwb3J0IGFjcGlfY2hlY2tzdW0uLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBhY3Bp
+OiBpbml0IGhlYWRlciB3aXRob3V0IGxpbmtpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBhY3Bp
+OiBhbWwgZ2VuZXJhdGlvbiBmb3IgX0NTVC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTM5OiBGSUxFOiBo
+dy9hY3BpL2NzdC5jOjk0OgorICAgICAqIGEgZ29vZCBpZGVhIGZvciBmdXR1cmUgZXh0ZW5zaW9u
+cy4gICAgICAkCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzE1MDogRklMRTog
+aHcvYWNwaS9jc3QuYzoxMDU6CisgICAgLy90YWJsZV9kYXRhLT5kYXRhW2NzdHBfb2Zmc2V0XSA9
+IDB4ODsgLyogaGFjayAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3Mjog
+RklMRTogaHcvYWNwaS9jc3QuYzoxMjc6CisgICAgYWNwaV9pbml0X2hlYWRlcihkeW5fc3NkdF9o
+ZHIsICJTU0RUIiwgZHluX3NzZHQtPmJ1Zi0+bGVuLCAxLCBOVUxMLCAiRFlOU1NEVCIpOwoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NTogRklMRTogaHcvYWNwaS9jc3QuYzox
+NDA6CitzdGF0aWMgdm9pZCBjc3RfaW9wb3J0X3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFk
+ZHIsIHVpbnQ2NF90IGRhdGEsIHVuc2lnbmVkIHNpemUpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMjE0OiBGSUxFOiBody9hY3BpL2NzdC5jOjE2OToKKyAgICBtZW1vcnlfcmVn
+aW9uX2luaXRfaW8oJmNzdF9tciwgTlVMTCwgJmNzdF9vcHMsIE5VTEwsICJjc3QtdXBkYXRlLXJl
+cXVlc3QiLCA0KTsKCnRvdGFsOiAyIGVycm9ycywgNCB3YXJuaW5ncywgMTg3IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDcvNzogcGM6IEhBQ0s6IGFjcGk6IHRpZSBpbiBfQ1NUIG9iamVjdCB0byBQcm9jZXNzb3IuLi4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
