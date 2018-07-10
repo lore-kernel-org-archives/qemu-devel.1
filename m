@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcunl-0005Kf-3A
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcuni-0005H3-9R
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fcung-0001iu-Vn
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fcung-0001ic-FV
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 11:43:38 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 10 Jul 2018 17:42:56 +0200
-Message-Id: <20180710154304.18304-17-kwolf@redhat.com>
+Date: Tue, 10 Jul 2018 17:42:54 +0200
+Message-Id: <20180710154304.18304-15-kwolf@redhat.com>
 In-Reply-To: <20180710154304.18304-1-kwolf@redhat.com>
 References: <20180710154304.18304-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 16/24] block: Add copy offloading trace points
+Subject: [Qemu-devel] [PULL 14/24] Revert "block: Remove deprecated -drive
+ geometry options"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,103 +23,322 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Cornelia Huck <cohuck@redhat.com>
 
-A few trace points that can help reveal what is happening in a copy
-offloading I/O path.
+This reverts commit a7aff6dd10b16b67e8b142d0c94c5d92c3fe88f6.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Hold off removing this for one more QEMU release (current libvirt
+release still uses it.)
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 2 ++
- block/io.c         | 4 ++++
- block/iscsi.c      | 3 +++
- block/trace-events | 6 ++++++
- 4 files changed, 15 insertions(+)
+ include/sysemu/blockdev.h |  1 +
+ blockdev.c                | 75 ++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/block/block.c          | 14 +++++++++
+ tests/hd-geo-test.c       | 37 ++++++++++++++++++-----
+ hmp-commands.hx           |  1 +
+ qemu-doc.texi             |  5 ++++
+ qemu-options.hx           |  7 ++++-
+ 7 files changed, 131 insertions(+), 9 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1185c7c5cc..09f6b938f6 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1488,6 +1488,8 @@ static ssize_t handle_aiocb_copy_range(RawPosixAIOData *aiocb)
-         ssize_t ret = copy_file_range(aiocb->aio_fildes, &in_off,
-                                       aiocb->aio_fd2, &out_off,
-                                       bytes, 0);
-+        trace_file_copy_file_range(aiocb->bs, aiocb->aio_fildes, in_off,
-+                                   aiocb->aio_fd2, out_off, bytes, 0, ret);
-         if (ret == 0) {
-             /* No progress (e.g. when beyond EOF), let the caller fall back to
-              * buffer I/O. */
-diff --git a/block/io.c b/block/io.c
-index 6be9c40f23..9b2aa04010 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -3019,6 +3019,8 @@ int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, uint64_t src_offset,
-                                          BdrvRequestFlags read_flags,
-                                          BdrvRequestFlags write_flags)
- {
-+    trace_bdrv_co_copy_range_from(src, src_offset, dst, dst_offset, bytes,
-+                                  read_flags, write_flags);
-     return bdrv_co_copy_range_internal(src, src_offset, dst, dst_offset,
-                                        bytes, read_flags, write_flags, true);
- }
-@@ -3033,6 +3035,8 @@ int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, uint64_t src_offset,
-                                        BdrvRequestFlags read_flags,
-                                        BdrvRequestFlags write_flags)
- {
-+    trace_bdrv_co_copy_range_to(src, src_offset, dst, dst_offset, bytes,
-+                                read_flags, write_flags);
-     return bdrv_co_copy_range_internal(src, src_offset, dst, dst_offset,
-                                        bytes, read_flags, write_flags, false);
- }
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 38b917a1e5..bb69faf34a 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -44,6 +44,7 @@
- #include "qapi/qmp/qstring.h"
- #include "crypto/secret.h"
- #include "scsi/utils.h"
-+#include "trace.h"
+diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+index 37ea39719e..ac22f2ae1f 100644
+--- a/include/sysemu/blockdev.h
++++ b/include/sysemu/blockdev.h
+@@ -35,6 +35,7 @@ struct DriveInfo {
+     int auto_del;               /* see blockdev_mark_auto_del() */
+     bool is_default;            /* Added by default_drive() ?  */
+     int media_cd;
++    int cyls, heads, secs, trans;
+     QemuOpts *opts;
+     char *serial;
+     QTAILQ_ENTRY(DriveInfo) next;
+diff --git a/blockdev.c b/blockdev.c
+index c23587b075..dcf8c8d2ab 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -731,6 +731,22 @@ QemuOptsList qemu_legacy_drive_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "interface (ide, scsi, sd, mtd, floppy, pflash, virtio)",
+         },{
++            .name = "cyls",
++            .type = QEMU_OPT_NUMBER,
++            .help = "number of cylinders (ide disk geometry)",
++        },{
++            .name = "heads",
++            .type = QEMU_OPT_NUMBER,
++            .help = "number of heads (ide disk geometry)",
++        },{
++            .name = "secs",
++            .type = QEMU_OPT_NUMBER,
++            .help = "number of sectors (ide disk geometry)",
++        },{
++            .name = "trans",
++            .type = QEMU_OPT_STRING,
++            .help = "chs translation (auto, lba, none)",
++        },{
+             .name = "addr",
+             .type = QEMU_OPT_STRING,
+             .help = "pci address (virtio only)",
+@@ -776,6 +792,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     QemuOpts *legacy_opts;
+     DriveMediaType media = MEDIA_DISK;
+     BlockInterfaceType type;
++    int cyls, heads, secs, translation;
+     int max_devs, bus_id, unit_id, index;
+     const char *devaddr;
+     const char *werror, *rerror;
+@@ -786,7 +803,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     Error *local_err = NULL;
+     int i;
+     const char *deprecated[] = {
+-        "serial", "addr"
++        "serial", "trans", "secs", "heads", "cyls", "addr"
+     };
  
- /* Conflict between scsi/utils.h and libiscsi! :( */
- #define SCSI_XFER_NONE ISCSI_XFER_NONE
-@@ -2399,6 +2400,8 @@ retry:
+     /* Change legacy command line options into QMP ones */
+@@ -915,6 +932,57 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+         type = block_default_type;
      }
  
- out_unlock:
++    /* Geometry */
++    cyls  = qemu_opt_get_number(legacy_opts, "cyls", 0);
++    heads = qemu_opt_get_number(legacy_opts, "heads", 0);
++    secs  = qemu_opt_get_number(legacy_opts, "secs", 0);
 +
-+    trace_iscsi_xcopy(src_lun, src_offset, dst_lun, dst_offset, bytes, r);
-     g_free(iscsi_task.task);
-     qemu_mutex_unlock(&dst_lun->mutex);
-     g_free(iscsi_task.err_str);
-diff --git a/block/trace-events b/block/trace-events
-index 854d5525af..3e8c47bb24 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -15,6 +15,8 @@ bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs
- bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
- bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
- bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, int64_t cluster_bytes) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %"PRId64
-+bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
-+bdrv_co_copy_range_to(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
- 
- # block/stream.c
- stream_one_iteration(void *s, int64_t offset, uint64_t bytes, int is_allocated) "s %p offset %" PRId64 " bytes %" PRIu64 " is_allocated %d"
-@@ -57,6 +59,7 @@ qmp_block_stream(void *bs, void *job) "bs %p job %p"
- # block/file-posix.c
- file_paio_submit_co(int64_t offset, int count, int type) "offset %"PRId64" count %d type %d"
- file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
-+file_copy_file_range(void *bs, int src, int64_t src_off, int dst, int64_t dst_off, int64_t bytes, int flags, int64_t ret) "bs %p src_fd %d offset %"PRIu64" dst_fd %d offset %"PRIu64" bytes %"PRIu64" flags %d ret %"PRId64
- 
- # block/qcow2.c
- qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
-@@ -150,3 +153,6 @@ nvme_free_req_queue_wait(void *q) "q %p"
- nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
- nvme_cmd_map_qiov_pages(void *s, int i, uint64_t page) "s %p page[%d] 0x%"PRIx64
- nvme_cmd_map_qiov_iov(void *s, int i, void *page, int pages) "s %p iov[%d] %p pages %d"
++    if (cyls || heads || secs) {
++        if (cyls < 1) {
++            error_report("invalid physical cyls number");
++            goto fail;
++        }
++        if (heads < 1) {
++            error_report("invalid physical heads number");
++            goto fail;
++        }
++        if (secs < 1) {
++            error_report("invalid physical secs number");
++            goto fail;
++        }
++    }
 +
-+# block/iscsi.c
-+iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t dst_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p offset %"PRIu64" bytes %"PRIu64" ret %d"
++    translation = BIOS_ATA_TRANSLATION_AUTO;
++    value = qemu_opt_get(legacy_opts, "trans");
++    if (value != NULL) {
++        if (!cyls) {
++            error_report("'%s' trans must be used with cyls, heads and secs",
++                         value);
++            goto fail;
++        }
++        if (!strcmp(value, "none")) {
++            translation = BIOS_ATA_TRANSLATION_NONE;
++        } else if (!strcmp(value, "lba")) {
++            translation = BIOS_ATA_TRANSLATION_LBA;
++        } else if (!strcmp(value, "large")) {
++            translation = BIOS_ATA_TRANSLATION_LARGE;
++        } else if (!strcmp(value, "rechs")) {
++            translation = BIOS_ATA_TRANSLATION_RECHS;
++        } else if (!strcmp(value, "auto")) {
++            translation = BIOS_ATA_TRANSLATION_AUTO;
++        } else {
++            error_report("'%s' invalid translation type", value);
++            goto fail;
++        }
++    }
++
++    if (media == MEDIA_CDROM) {
++        if (cyls || secs || heads) {
++            error_report("CHS can't be set with media=cdrom");
++            goto fail;
++        }
++    }
++
+     /* Device address specified by bus/unit or index.
+      * If none was specified, try to find the first free one. */
+     bus_id  = qemu_opt_get_number(legacy_opts, "bus", 0);
+@@ -1037,6 +1105,11 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     dinfo = g_malloc0(sizeof(*dinfo));
+     dinfo->opts = all_opts;
+ 
++    dinfo->cyls = cyls;
++    dinfo->heads = heads;
++    dinfo->secs = secs;
++    dinfo->trans = translation;
++
+     dinfo->type = type;
+     dinfo->bus = bus_id;
+     dinfo->unit = unit_id;
+diff --git a/hw/block/block.c b/hw/block/block.c
+index b6c80ab0b7..b91e2b6d7e 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -108,6 +108,20 @@ bool blkconf_geometry(BlockConf *conf, int *ptrans,
+                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+                       Error **errp)
+ {
++    DriveInfo *dinfo;
++
++    if (!conf->cyls && !conf->heads && !conf->secs) {
++        /* try to fall back to value set with legacy -drive cyls=... */
++        dinfo = blk_legacy_dinfo(conf->blk);
++        if (dinfo) {
++            conf->cyls  = dinfo->cyls;
++            conf->heads = dinfo->heads;
++            conf->secs  = dinfo->secs;
++            if (ptrans) {
++                *ptrans = dinfo->trans;
++            }
++        }
++    }
+     if (!conf->cyls && !conf->heads && !conf->secs) {
+         hd_geometry_guess(conf->blk,
+                           &conf->cyls, &conf->heads, &conf->secs,
+diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
+index ce665f1f83..24870b38f4 100644
+--- a/tests/hd-geo-test.c
++++ b/tests/hd-geo-test.c
+@@ -201,7 +201,7 @@ static void setup_mbr(int img_idx, MBRcontents mbr)
+ 
+ static int setup_ide(int argc, char *argv[], int argv_sz,
+                      int ide_idx, const char *dev, int img_idx,
+-                     MBRcontents mbr)
++                     MBRcontents mbr, const char *opts)
+ {
+     char *s1, *s2, *s3;
+ 
+@@ -216,7 +216,7 @@ static int setup_ide(int argc, char *argv[], int argv_sz,
+         s3 = g_strdup(",media=cdrom");
+     }
+     argc = append_arg(argc, argv, argv_sz,
+-                      g_strdup_printf("%s%s%s", s1, s2, s3));
++                      g_strdup_printf("%s%s%s%s", s1, s2, s3, opts));
+     g_free(s1);
+     g_free(s2);
+     g_free(s3);
+@@ -260,7 +260,7 @@ static void test_ide_mbr(bool use_device, MBRcontents mbr)
+     for (i = 0; i < backend_last; i++) {
+         cur_ide[i] = &hd_chst[i][mbr];
+         dev = use_device ? (is_hd(cur_ide[i]) ? "ide-hd" : "ide-cd") : NULL;
+-        argc = setup_ide(argc, argv, ARGV_SIZE, i, dev, i, mbr);
++        argc = setup_ide(argc, argv, ARGV_SIZE, i, dev, i, mbr, "");
+     }
+     args = g_strjoinv(" ", argv);
+     qtest_start(args);
+@@ -327,12 +327,16 @@ static void test_ide_drive_user(const char *dev, bool trans)
+     const CHST expected_chst = { secs / (4 * 32) , 4, 32, trans };
+ 
+     argc = setup_common(argv, ARGV_SIZE);
+-    opts = g_strdup_printf("%s,%scyls=%d,heads=%d,secs=%d",
+-                           dev, trans ? "bios-chs-trans=lba," : "",
++    opts = g_strdup_printf("%s,%s%scyls=%d,heads=%d,secs=%d",
++                           dev ?: "",
++                           trans && dev ? "bios-chs-" : "",
++                           trans ? "trans=lba," : "",
+                            expected_chst.cyls, expected_chst.heads,
+                            expected_chst.secs);
+     cur_ide[0] = &expected_chst;
+-    argc = setup_ide(argc, argv, ARGV_SIZE, 0, opts, backend_small, mbr_chs);
++    argc = setup_ide(argc, argv, ARGV_SIZE,
++                     0, dev ? opts : NULL, backend_small, mbr_chs,
++                     dev ? "" : opts);
+     g_free(opts);
+     args = g_strjoinv(" ", argv);
+     qtest_start(args);
+@@ -343,6 +347,22 @@ static void test_ide_drive_user(const char *dev, bool trans)
+ }
+ 
+ /*
++ * Test case: IDE device (if=ide) with explicit CHS
++ */
++static void test_ide_drive_user_chs(void)
++{
++    test_ide_drive_user(NULL, false);
++}
++
++/*
++ * Test case: IDE device (if=ide) with explicit CHS and translation
++ */
++static void test_ide_drive_user_chst(void)
++{
++    test_ide_drive_user(NULL, true);
++}
++
++/*
+  * Test case: IDE device (if=none) with explicit CHS
+  */
+ static void test_ide_device_user_chs(void)
+@@ -372,7 +392,8 @@ static void test_ide_drive_cd_0(void)
+     for (i = 0; i <= backend_empty; i++) {
+         ide_idx = backend_empty - i;
+         cur_ide[ide_idx] = &hd_chst[i][mbr_blank];
+-        argc = setup_ide(argc, argv, ARGV_SIZE, ide_idx, NULL, i, mbr_blank);
++        argc = setup_ide(argc, argv, ARGV_SIZE,
++                         ide_idx, NULL, i, mbr_blank, "");
+     }
+     args = g_strjoinv(" ", argv);
+     qtest_start(args);
+@@ -401,6 +422,8 @@ int main(int argc, char **argv)
+     qtest_add_func("hd-geo/ide/drive/mbr/blank", test_ide_drive_mbr_blank);
+     qtest_add_func("hd-geo/ide/drive/mbr/lba", test_ide_drive_mbr_lba);
+     qtest_add_func("hd-geo/ide/drive/mbr/chs", test_ide_drive_mbr_chs);
++    qtest_add_func("hd-geo/ide/drive/user/chs", test_ide_drive_user_chs);
++    qtest_add_func("hd-geo/ide/drive/user/chst", test_ide_drive_user_chst);
+     qtest_add_func("hd-geo/ide/drive/cd_0", test_ide_drive_cd_0);
+     qtest_add_func("hd-geo/ide/device/mbr/blank", test_ide_device_mbr_blank);
+     qtest_add_func("hd-geo/ide/device/mbr/lba", test_ide_device_mbr_lba);
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index c1fc747403..91dfe51c37 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1306,6 +1306,7 @@ ETEXI
+         .params     = "[-n] [[<domain>:]<bus>:]<slot>\n"
+                       "[file=file][,if=type][,bus=n]\n"
+                       "[,unit=m][,media=d][,index=i]\n"
++                      "[,cyls=c,heads=h,secs=s[,trans=t]]\n"
+                       "[,snapshot=on|off][,cache=on|off]\n"
+                       "[,readonly=on|off][,copy-on-read=on|off]",
+         .help       = "add drive to PCI storage controller",
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index ae5531a053..0fbf8b108b 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2887,6 +2887,11 @@ with ``-device ...,netdev=x''), or ``-nic user,smb=/some/dir''
+ (for embedded NICs). The new syntax allows different settings to be
+ provided per NIC.
+ 
++@subsection -drive cyls=...,heads=...,secs=...,trans=... (since 2.10.0)
++
++The drive geometry arguments are replaced by the the geometry arguments
++that can be specified with the ``-device'' parameter.
++
+ @subsection -drive serial=... (since 2.10.0)
+ 
+ The drive serial argument is replaced by the the serial argument
+diff --git a/qemu-options.hx b/qemu-options.hx
+index df248d1568..654e69cc3b 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -804,8 +804,9 @@ ETEXI
+ 
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
++    "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
+     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
+-    "       [,snapshot=on|off][,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
++    "       [,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
+     "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
+     "       [,readonly=on|off][,copy-on-read=on|off]\n"
+     "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
+@@ -846,6 +847,10 @@ This option defines where is connected the drive by using an index in the list
+ of available connectors of a given interface type.
+ @item media=@var{media}
+ This option defines the type of the media: disk or cdrom.
++@item cyls=@var{c},heads=@var{h},secs=@var{s}[,trans=@var{t}]
++Force disk physical geometry and the optional BIOS translation (trans=none or
++lba). These parameters are deprecated, use the corresponding parameters
++of @code{-device} instead.
+ @item snapshot=@var{snapshot}
+ @var{snapshot} is "on" or "off" and controls snapshot mode for the given drive
+ (see @option{-snapshot}).
 -- 
 2.13.6
