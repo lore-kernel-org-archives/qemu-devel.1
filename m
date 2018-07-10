@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcr0t-0006La-2x
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:41:00 -0400
+	(envelope-from <stephane.duverger@gmail.com>) id 1fcr4O-0007PY-Hv
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fcr0p-0004LK-5L
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:40:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48136)
+	(envelope-from <stephane.duverger@gmail.com>) id 1fcr4M-0005bU-UI
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:44:36 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41283)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fcr0o-0004K6-UL
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:40:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fcr0n-0002Cl-BH
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 11:40:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 49C1A2E819A
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 11:40:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <stephane.duverger@gmail.com>)
+	id 1fcr4M-0005bO-Nx
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 07:44:34 -0400
+Received: by mail-oi0-x244.google.com with SMTP id k12-v6so41936438oiw.8
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 04:44:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20180709125452.7utyomtsxr6xaxdi@vm.localdomain>
+	<878t6ke7qh.fsf@linaro.org>
+In-Reply-To: <878t6ke7qh.fsf@linaro.org>
+From: stephane duverger <stephane.duverger@gmail.com>
+Date: Tue, 10 Jul 2018 13:44:22 +0200
+Message-ID: <CAGF1vyGaPwZ9nBFJYJjJQPG8g8Ahdf1Y8USGnRr=-6DibJxxHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Jul 2018 11:30:28 -0000
-From: Greg Kurz <groug@kaod.org>
-Reply-To: Bug 1780928 <1780928@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153121318079.13203.2840846134376544024.malonedeb@gac.canonical.com>
-Message-Id: <153122222945.12699.5595023027621124570.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780928] Re: v2.12.0-2321-gb34181056c: vcpu
- hotplug crashes qemu-kvm with segfault
+Subject: Re: [Qemu-devel] [PATCH] fix gdbserver_state pointer validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: alex.bennee@linaro.org, qemu-devel@nongnu.org
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Greg Kurz (gkurz)
+Hi Alex,
 
--- =
+There don't seem to be any other patches attached? I would NACK a patch
+> that isn't actually used in-tree.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780928
 
-Title:
-  v2.12.0-2321-gb34181056c: vcpu hotplug crashes qemu-kvm with segfault
+No there isn't ! I should have not been so prolix. Actually the patch
+corrects a
+possible null pointer dereference in the gdbserver code. That's all folks.
 
-Status in QEMU:
-  Confirmed
+Below is how I discovered it and why it matters, imho, to be fixed
+(out of a pending issue).
 
-Bug description:
-  vcpu hotplug crashes upstream qemu(v2.12.0-2321-gb34181056c), vcpu
-  hotplug works fine in v2.12.0-rc4.
+This null deref does not happen in normal operation because of the way
+gdbserver is initialized. However what I was telling you, is that it may be
+really interesting to be able to take benefit of some gdb features
+internally
+without starting a gdbserver and the overhead of the gdb protocol when
+there is no need for a client/server interaction while debugging.
 
-  Host: Power8, kernel: 4.18.0-rc2-00037-g6f0d349d922b
-  Guest: Power8, kernel: 4.18.0-rc3-00183-gc42c12a90545 (base image: fedora=
-27 ppc64le)
+For instance, I developed a special purpose x86 board where I needed to
+break at some instructions, do some automation (snapshots, vm memory
+access, cpu analysis) and then resume the VM. Implementing a
+"vm_change_state handler" and dealing with RUN_STATE_DEBUG was
+perfect for my need.
 
-  /usr/share/avocado-plugins-vt/build/qemu/ppc64-softmmu/qemu-system-ppc64 =
--M pseries,accel=3Dkvm,max-cpu-compat=3Dpower8 -m 8192 -device virtio-scsi-=
-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/var/lib/avocado/data/a=
-vocado-vt/images/jeos-27-ppc64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive1=
- -device scsi-hd,drive=3Ddrive1,bus=3Dscsi0.0 -smp 1,cores=3D1,threads=3D1,=
-sockets=3D1,maxcpus=3D8 -serial /dev/pts/0 -monitor stdio -vga none -nograp=
-hic -kernel /home/kvmci/linux/vmlinux -append 'root=3D/dev/sda2 rw console=
-=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug' -nic user,=
-model=3Dvirtio-net-pci =
+The debug events (#BP, #DB) are tied to the gdbserver stub, at some point
+when "cpu_handle_guest_debug()" is called, a call to "gdb_set_stop_cpu()"
+triggers the NULL deref because the gdbserver is not initialized.
 
-  QEMU 2.12.50 monitor - type 'help' for more information
-  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-  Segmentation fault (core dumped)
+My little fix addresses this error and allows to make use of the following
+Qemu
+breakpoint functions without touching "cpus.c" or "exec.c":
+- cpu_breakpoint_remove/insert()
+- kvm_remove/insert_breakpoint()
 
-  =
+Notice, that in the particular case of KVM, I had to async_run_on_cpu() my
+debug handler instead of directly executing it in the context of
+vm_change_state(). The vCPU started to significantly slow down
+(low irq rate), while this never happens with the TCG.
 
-  Guest initial cpu:
-  # lscpu
-  Architecture:        ppc64le
-  Byte Order:          Little Endian
-  CPU(s):              1
-  On-line CPU(s) list: 0
-  Thread(s) per core:  1
-  Core(s) per socket:  1
-  Socket(s):           1
-  NUMA node(s):        1
-  Model:               2.1 (pvr 004b 0201)
-  Model name:          POWER8 (architected), altivec supported
-  Hypervisor vendor:   KVM
-  Virtualization type: para
-  L1d cache:           64K
-  L1i cache:           32K
-  NUMA node0 CPU(s):   0
+Is that more clear to you Alex ? (and hopefully lead to patch ACK :)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780928/+subscriptions
+Regards,
+
+stephane
+
+> Signed-off-by: Stephane Duverger <stephane.duverger@gmail.com>
+> > ---
+> >  gdbstub.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/gdbstub.c b/gdbstub.c
+> > index d6ab95006c..788fd625ab 100644
+> > --- a/gdbstub.c
+> > +++ b/gdbstub.c
+> > @@ -1412,6 +1412,9 @@ static int gdb_handle_packet(GDBState *s, const
+> char *line_buf)
+> >
+> >  void gdb_set_stop_cpu(CPUState *cpu)
+> >  {
+> > +    if (!gdbserver_state) {
+> > +        return;
+> > +    }
+> >      gdbserver_state->c_cpu =3D cpu;
+> >      gdbserver_state->g_cpu =3D cpu;
+> >  }
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
