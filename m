@@ -1,28 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcmUa-00034O-BM
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:51:21 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fcmWt-0003mW-IH
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcmUZ-0006mN-J1
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:51:20 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33058)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcmUZ-0006m4-C6
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:51:19 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c6-v6so40655595oiy.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Jul 2018 23:51:19 -0700 (PDT)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fcmWq-0007eR-H0
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:53:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40778)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fcmWq-0007dh-6x
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 02:53:40 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6A6naEh006762
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 02:53:38 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k4jpkw4b3-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 02:53:38 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 10 Jul 2018 07:53:35 +0100
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-6-git-send-email-jjherne@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 10 Jul 2018 08:53:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jul 2018 07:50:58 +0100
-Message-ID: <CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+In-Reply-To: <1530811543-6881-6-git-send-email-jjherne@linux.ibm.com>
+Content-Language: en-US
+Message-Id: <2c9a3595-6afa-1a03-413d-1632cad979cc@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC 05/15] s390-bios: Factor finding boot device
+ out of virtio code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +43,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com
 
-On 9 July 2018 at 23:03, Thomas Huth <thuth@redhat.com> wrote:
-> On 09.07.2018 23:42, Peter Maydell wrote:
->> On 9 July 2018 at 22:03, Thomas Huth <thuth@redhat.com> wrote:
->>> When trying to "device_add bcm2837" on a machine that is not suitable for
->>> this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
->>>
->>> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
->>>  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
->>>  "'arguments': {'command-line': 'info qtree'}}" | \
->>>  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
->>>
->>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
->>>  "package": "build-all"}, "capabilities": []}}
->>> {"return": {}}
->>> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
->>>  hotplugged on this machine"}}
->>> Segmentation fault (core dumped)
->>>
->>> The problem is that qdev_set_parent_bus() from instance_init adds a link
->>> to the child devices which is not valid anymore after the device init
->>> failed. Thus the qdev_set_parent_bus() must rather be done in the realize
->>> function instead.
->>
->> Yuck. The real problem here is that we're still requiring the
->> code that creates these QOM devices to manually set the parent
->> in the first place. It's not surprising that we don't get it right
->> (either parenting in the wrong place or not at all). I'd much
->> rather see us fix that properly than keep papering over places
->> where we get it wrong.
->
-> Sorry, I'm still not an expert in all this QOM stuff yet ... so what do
-> you exactly recommend to do instead?
 
-I'm not clear either, but I don't think that what we're
-currently doing can be right.
+On 07/05/2018 07:25 PM, Jason J. Herne wrote:
+[...]
+> -    IPL_assert(found, "No virtio device found");
+Can you also change the boot-serial testcase:
 
-thanks
--- PMM
+this seems to work:
+
+
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index 952a2e7ead..b03b55d182 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -96,7 +96,7 @@ static testdef_t tests[] = {
+     { "sparc", "SS-4", "", "MB86904" },
+     { "sparc", "SS-600MP", "", "TMS390Z55" },
+     { "sparc64", "sun4u", "", "UltraSPARC" },
+-    { "s390x", "s390-ccw-virtio", "", "virtio device" },
++    { "s390x", "s390-ccw-virtio", "", "device" },
+     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
+     { "microblaze", "petalogix-s3adsp1800", "", "TT",
+       sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
