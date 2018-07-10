@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcwIw-0002Qv-8J
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:19:59 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fcwMB-0003Vz-Cw
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fcwIv-0005U3-Ch
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:19:58 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:37358)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fcwIv-0005TD-7M
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:19:57 -0400
-Received: by mail-oi0-x230.google.com with SMTP id k81-v6so44086283oib.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Jul 2018 10:19:57 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fcwM7-0006Os-W1
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:23:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fcwM7-0006OV-Ph
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 13:23:15 -0400
+Date: Tue, 10 Jul 2018 14:23:09 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180710172309.GK914@localhost.localdomain>
+References: <20180514171913.17664-1-berrange@redhat.com>
+	<20180607094747.GA12019@redhat.com>
+	<20180710171157.GA3636@rkaganb.sw.ru>
 MIME-Version: 1.0
-In-Reply-To: <20180710154304.18304-1-kwolf@redhat.com>
-References: <20180710154304.18304-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jul 2018 18:19:36 +0100
-Message-ID: <CAFEAcA_fnUJ-gpOb8RgD+dicxG+-MgokMz9RTv0O9pKwKVf7ag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/24] Block layer patches
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180710171157.GA3636@rkaganb.sw.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] i386: fix handling of multiboot modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Roman Kagan <rkagan@virtuozzo.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 10 July 2018 at 16:42, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit b34181056c04e05db6c632063012beaee7006a37:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-sh4-20180709' into staging (2018-07-09 22:44:22 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to cd47d792d7a27a57f4b621e2ff1ed8f4e83de1e9:
->
->   block: Use common write req handling in truncate (2018-07-10 16:46:22 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Copy offloading fixes for when the copy increases the image size
-> - Temporary revert of the removal of deprecated -drive options
-> - Fix request serialisation in the image fleecing scenario
-> - Fix copy-on-read crash with unaligned image size
-> - Fix another drain crash
->
-> ----------------------------------------------------------------
+On Tue, Jul 10, 2018 at 08:11:58PM +0300, Roman Kagan wrote:
+> On Thu, Jun 07, 2018 at 10:47:47AM +0100, Daniel P. Berrang=E9 wrote:
+> > ping...
+> >=20
+> > On Mon, May 14, 2018 at 06:19:10PM +0100, Daniel P. Berrang=E9 wrote:
+> > > This short series fixes a flaw identified by coverity which broke t=
+he
+> > > handling of multiboot modules.
+> > >=20
+> > > Daniel P. Berrang=E9 (3):
+> > >   i386: fix regression parsing multiboot initrd modules
+> > >   i386: only parse the initrd_filename once for multiboot modules
+> > >   opts: remove redundant check for NULL parameter
+> > >=20
+> > >  hw/i386/multiboot.c | 35 ++++++++++++++++-------------------
+> > >  util/qemu-option.c  |  8 +++-----
+> > >  2 files changed, 19 insertions(+), 24 deletions(-)
+> > >=20
+> > > --=20
+> > > 2.17.0
+>=20
+> Any reason this hasn't been merged yet?
 
+Lack of reviews, unfortunately.  I guess we don't have many
+people familiar with the multiboot code.
 
+>=20
+> This fixes a regression that, in particular, makes QEMU segfault when
+> running kvm-unit-tests.
 
-Applied, thanks.
+As it is a bug fix, I will try to review merge it for the next
+rc.
 
--- PMM
+--=20
+Eduardo
