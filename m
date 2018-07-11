@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fdFwL-0000pJ-81
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:17:59 -0400
+	(envelope-from <famz@redhat.com>) id 1fdFx5-0001HP-UY
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fdFwI-0003R7-3y
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:17:57 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:44599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
-	id 1fdFwH-0003Qh-Sg
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:17:54 -0400
-Received: by mail-ed1-x541.google.com with SMTP id d17-v6so7251196eds.11
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 07:17:53 -0700 (PDT)
-References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
-	<20180711140054.GL31228@stefanha-x1.localdomain>
-From: Emanuele <e.emanuelegiuseppe@gmail.com>
-Message-ID: <647e9b9b-d206-e9af-02b2-e6bb732dc3ea@gmail.com>
-Date: Wed, 11 Jul 2018 16:17:50 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180711140054.GL31228@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/7] Qtest driver framework
+	(envelope-from <famz@redhat.com>) id 1fdFx2-0003gk-Ja
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:18:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41792 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fdFx2-0003ga-EH
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:18:40 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 11 Jul 2018 22:18:25 +0800
+Message-Id: <20180711141829.17406-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] Add a CentOS test image to run docker
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +22,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 07/11/2018 04:00 PM, Stefan Hajnoczi wrote:
+v2: Drop archive-source.sh changes.
+    The new test depends on the iotests nbd fix I posted today to pass.
 
-> On Mon, Jul 09, 2018 at 11:11:29AM +0200, Emanuele Giuseppe Esposito wrote:
->> Basic framework steps are the following:
->> - All nodes and edges are created in their respective machine/driver/test files
->> - The framework starts QEMU and asks for a list of available drivers
->>    and machines
-> QEMU doesn't know about qtest drivers.  Does "drivers" mean "devices"
-> (i.e. qemu -device \?) and they have a 1:1 correspondence with qtest
-> drivers?
-Yes, they are QEMU devices, it was a typo.
-Not all qtest drivers are mapped with the QEMU devices, though. In fact, 
-for now all drivers "contained" or "produced" by other nodes are not 
-QEMU devices.
+Docker testing on patchew has long suffered from 'make check' hangings. The
+cleanness of VM testing is the cure. Now let's add a CentOS 7 image to run the
+tests.  It's purely ad-hoc, but hopefully still easy to understand and use for
+everyone.
 
-The others (machines and nodes that "consume"), are mapped to QEMU using 
-the
-{ "execute": "qom-list-types", "arguments" : { "implements" : "device" } }
-for "consume" and
-{ "execute": "query-machines" }
-for machines.
+The first patch makes passing source code from host to the container in VM
+working, and is a nice clean up.
 
-With "consume" I mean in situation like "node X" ---> consumes --> "node 
-Y",
-"X" should be in the output of qom-list-types query.
-> The concept of qgraph makes sense.  Ease of use and documentation will
-> be critical to gain adoption.  The extra complexity makes it hard for
-> people writing and running tests, so it's important that it's clear
-> which tests will get run and why (or why not).
-I am trying to document and makes it as easy and clean as possible :)
+The second patch makes caches work, to speed up repetitive runs like on
+patchew.
+
+The last patch adds the new image that does the job. Two out of three docker
+tests running on patchew.org are added to the image. I'll wait for Peter to fix
+the 'docker-test-quick@centos6' hanging (oob test) before adding it too.
+
+Fam
+
+Fam Zheng (4):
+  tests: Add an option for snapshot (default: off)
+  tests/vm: Pass verbose flag into VM make commands
+  tests: Allow overriding archive path with SRC_ARCHIVE
+  tests: Add centos VM testing
+
+ tests/docker/Makefile.include |  7 ++-
+ tests/vm/Makefile.include     |  2 +-
+ tests/vm/basevm.py            | 10 ++++-
+ tests/vm/centos               | 84 +++++++++++++++++++++++++++++++++++
+ tests/vm/freebsd              |  4 +-
+ tests/vm/netbsd               |  4 +-
+ tests/vm/openbsd              |  4 +-
+ tests/vm/ubuntu.i386          |  4 +-
+ 8 files changed, 106 insertions(+), 13 deletions(-)
+ create mode 100755 tests/vm/centos
+
+-- 
+2.17.1
