@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fdH4m-0002L2-5L
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:30:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fdH76-00036C-5Q
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fdH4i-0004Aw-Sm
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:30:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44112 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fdH70-0005GM-Ah
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:33:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48875)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fdH4i-0004An-N6
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:30:40 -0400
-References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
-	<20180709091136.28849-5-e.emanuelegiuseppe@gmail.com>
-	<20180711145946.GO31228@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2df3c7f1-3777-dbe9-80b9-8bf911a6eb60@redhat.com>
-Date: Wed, 11 Jul 2018 17:30:35 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fdH70-0005FR-4D
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:33:02 -0400
+Date: Wed, 11 Jul 2018 12:32:54 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180711153254.GR7451@localhost.localdomain>
+References: <20180709203731.19865-1-ehabkost@redhat.com>
+	<20180710090731.GC1612@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180711145946.GO31228@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180710090731.GC1612@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] tests/qgraph: arm/raspi2 machine node
+Subject: Re: [Qemu-devel] [PATCH for-3.0] pc: Use "3.0+" constant as default
+ SMBIOS version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 11/07/2018 16:59, Stefan Hajnoczi wrote:
->> +    machine->obj.get_device =3D raspi2_get_device;
->> +    machine->obj.destructor =3D raspi2_destroy;
->> +    qos_create_sdhci_mm(&machine->sdhci, 0x3f300000, &(QSDHCIProperti=
-es) {
->> +        .version =3D 3,
->> +        .baseclock =3D 52,
->> +        .capab.sdma =3D false,
->> +        .capab.reg =3D 0x052134b4
->> +    });
->> +    return &machine->obj;
->> +}
->> +
->> +static void raspi2(void)
->> +{
->> +    qos_node_create_machine("arm/raspi2", qos_create_machine_arm_rasp=
-i2);
->> +    qos_node_contains("arm/raspi2", "generic-sdhci");
->> +}
->> +
->> +libqos_init(raspi2);
-> Hmm...I didn't realize it would be necessary to manually define each
-> machine type.  I thought qgraph would use qemu-system-x86_64
-> -machine/-device/info qtree to introspect QEMU and instantiate the
-> appropriate drivers.
+On Tue, Jul 10, 2018 at 10:07:31AM +0100, Daniel P. Berrang=E9 wrote:
+> On Mon, Jul 09, 2018 at 05:37:31PM -0300, Eduardo Habkost wrote:
+> > Every time we create new PC machine-types in QEMU, the defaults
+> > for SMBIOS fields change unnecessarily because the version field
+> > defaults to MachineClass::name.
+> >=20
+> > This can cause unexpected side-effects, like triggering license
+> > reactivation on guest software, or changing the VM memory layout
+> > because of BIOS table size changes.
+>=20
+> Does that really matter though ? By its very nature the 'Version'
+> field in SMBIOS is expected to change if you alter something about
+> the hardware. If guests OS don't want to be exposed to changes in
+> SMBIOS they would be using a fixed machine type, not the variable
+> "pc" type that continually changes.
+>=20
+> We could put padding in the string if we want to avoid BIOS table
+> layout changes.
+>=20
+> Having version change though feels like it is working as intended
+> for the semantics of these Version: fields in BIOS.
 
-That doesn't provide enough information yet.  However, PCI devices are
-already discovered automatically and the next step (next year :)) could
-be to use device tree or ACPI to discover embedded devices.
+Michael, do you have additional info on the original motivation
+for suggesting this change and why do you consider it a bug?
+(I don't have any concrete examples to justify the change)
 
-Using QOM properties instead of duplicating things like QSDHCIProperties
-is a great idea.  Of course the duplication was already there ("old
-sdhci_t structure" in patch 7), so I don't think it should be a blocker,
-but indeed there's a better way to do it.
-
-> My concern is that this manual approach of defining machines complicate=
-s
-> qtests.  This file will need to be modified by multiple people - each o=
-f
-> them will be interested in a specific driver and not interested in the
-> driver that other people have added.
-
-This is exactly the opposite problem that we have now: when you write a
-test you are interested typically only in one machine, and the
-"if(x86)elseif(arm)" gets in the way.  (Also: it's also difficult to
-split the ifs across files, i.e. it scales worse; and there's lots of
-duplicated code across tests to do "for" loops of g_test_add, because
-the ifs don't lend itself to "automatic" generation of test cases via
-path walk).
-
-The advantage is that (just like for OS vs. QEMU) the structure of this
-file matches closely the board files in hw/arm/, which is something you
-should already be familiar with if you're adding a new board to QEMU.
-
-Paolo
+--=20
+Eduardo
