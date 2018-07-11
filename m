@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fdEYn-0003FF-Hl
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:49:34 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fdEaT-0004Tx-0f
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fdEYj-0006pH-KA
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:49:33 -0400
-Date: Wed, 11 Jul 2018 13:49:26 +0100
+	(envelope-from <stefanha@gmail.com>) id 1fdEaR-0007ci-Vh
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:51:17 -0400
+Date: Wed, 11 Jul 2018 13:51:12 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180711124926.GE31228@stefanha-x1.localdomain>
-References: <CA++5wji+jjiTcBT+Uhd4VL2U70vmRFnvacbRqhnxWX3M=f7svA@mail.gmail.com>
-	<edee4a56-e75e-f3cb-8423-2f891be1ff3f@oracle.com>
-	<CA++5wjjCMY0Si0HWw4Y5DEswOsQ5MnaoE_6y2xUXcG=y-9FwBQ@mail.gmail.com>
-	<298d7750-3dca-f741-abe2-4efef0b2d200@oracle.com>
+Message-ID: <20180711125112.GF31228@stefanha-x1.localdomain>
+References: <20180630091343.14391-1-stefanha@redhat.com>
+	<20180630091343.14391-2-stefanha@redhat.com>
+	<CAFEAcA-boywojdasSCZ5EnnGMtETMH7JZw30fOR7fepMQaqctQ@mail.gmail.com>
+	<CAFEAcA8AzjD3f44U+He1Y10p8iNR8EaWODdv3XRUQtQiDdCotg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cYtjc4pxslFTELvY"
+	protocol="application/pgp-signature"; boundary="fwqqG+mf3f7vyBCB"
 Content-Disposition: inline
-In-Reply-To: <298d7750-3dca-f741-abe2-4efef0b2d200@oracle.com>
-Subject: Re: [Qemu-devel] [Qemu-discuss] IRQ per CPU
+In-Reply-To: <CAFEAcA8AzjD3f44U+He1Y10p8iNR8EaWODdv3XRUQtQiDdCotg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] hw/arm: extract ARM M Profile base
+ class from ARMv7-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: Probir Roy <roy@probir.info>, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Liviu Ionescu <ilg@livius.net>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
 
 
---cYtjc4pxslFTELvY
+--fwqqG+mf3f7vyBCB
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 05, 2018 at 03:16:44PM +0800, Dongli Zhang wrote:
+On Thu, Jul 05, 2018 at 04:49:22PM +0100, Peter Maydell wrote:
+> On 5 July 2018 at 16:45, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 30 June 2018 at 10:13, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >> The ARMv7-M code is largely similar to what other M Profile CPUs need.
+> >> Extract the common M Profile aspects into the ARMMProfileState base
+> >> class.  ARMv6-M will inherit from this class in the following patch.
+> >>
+> >> It might be possible to make ARMv6-M the base class of ARMv7-M, but it
+> >> seems cleaner to have an M Profile base class instead of saying an
+> >> "ARMv7-M is an ARMv6-M".
+> >>
+> >> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >
+> > This makes sense, I guess (though it currently leaves us in the
+> > odd position that we have separate a object for v6m, but the v7m
+> > object handles both v7m and v8m...)
 >=20
->=20
-> On 07/05/2018 12:12 PM, Probir Roy wrote:
-> >> Does 'per CPU basis' indicates irq per cpu, or irq per device queue?
-> >=20
-> > IRQ per CPU core, meaning that IRQ will be raised at and served by
-> > that CPU. Does IRQ per queue mean the same thing?
-> >=20
->=20
-> About 'IRQ per queue', the device may create multiple queue in the OS dri=
-ver.
-> The number of queues are always proportional to the number of CPU core/th=
-read
-> (although this is also always configurable by OS driver).
->=20
-> Usually the per-queue irq/vector is bound to each CPU. As the number of
-> queue/irq is always the same as the number of CPU, it is sort of 'per CPU
-> basis', as each CPU will be serving irq for its own queue.
+> ...though I guess the counter-argument is that the only thing that
+> the v7m object is doing that v6m doesn't want is creating
+> the bitbanding device, and in fact bitbanding is optional in v7m
+> (you can configure a Cortex-M3 without it). So maybe we should
+> instead just have a QOM property to let you turn off the
+> bitbanding ?
 
-Some more background on devices with multiple irqs:
-
-It's the guest kernel that configures interrupt routing on modern
-systems where the interrupt controller hardware supports that.
-
-With a PCI device you would need multiple Message-Signalled Interrupt
-vectors.  Then the guest driver can set the irq affinity so that the
-vcpu of your choice receives each of these interrupts.
-
-Interrupts are a limited resource, even when using Message-Signalled
-Interrupts, so you'll have to choose a maximum number of interrupts that
-the device supports.
-
-https://en.wikipedia.org/wiki/Message_Signaled_Interrupts#MSI-X
+Okay, we can do that.  So how about a single ARMMProfileState class for
+v6, v7, and v8?
 
 Stefan
 
---cYtjc4pxslFTELvY
+--fwqqG+mf3f7vyBCB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbRfzWAAoJEJykq7OBq3PIaPcIAIdOqWYWpMUEMi+i/fLo51g1
-ihHrldy9tGyugF24ZCQ7x68U7V4Qo4l1YABhoVolEfae9TGMHDuUIkCpmMV0Fmka
-R9Nk/OYxMCg16qW377PbtAwW1GfJyaHAJPVanIDmLP9w6Z/amXvPZw0sFuRj8J/0
-ZO1WsYF6/skVeXJUnZMlZ0QOOzzG8vwEs2MrWEf6NmlFSE5dOTJGsVxNYIJIKZWa
-GZ83amv77jC0WGrAsQYhvrzG7EC8gPLL7w7ix6SVypu0nwYmsopNZ/VEwz0fge5x
-a7FAFZfa5eH0KGmJTM3fY2tC+J049vgxpKt48leZPZdaDp3WeUjR/JvnnrAwXd8=
-=2RoM
+iQEcBAEBAgAGBQJbRf1AAAoJEJykq7OBq3PI45MIALDNi9sqZmezhnoluWeZUJZd
+4IArjNNhqOpcKHO6gz86WZfBVdkqtIX6EdniBM6uHwNcbhUntFALq5+J1N0QcgF2
+CpTDiiecMMsKO+9yqtnfJSvRv78hMCUkwy71TkWIgljR/ai6k6zxyM1WfkxBiA5H
+LZoOIUPxpU3x6GeQVaw3QRlZ2+72Z99OcTb8UUrJMR7ZWBUPdxA3AtnirebtD9dc
+nukh+e9B1RMgu0juyN3r93LH039zjRJcNecmylac7IeRgzs2wC/h/+sVQGwBHHA2
+SLmVLbgy7WB/vcVe/+71eyptqawEGny2AFIeExfT9LrKuJLi8Q7eq9r8jxIVVbU=
+=w5i6
 -----END PGP SIGNATURE-----
 
---cYtjc4pxslFTELvY--
+--fwqqG+mf3f7vyBCB--
