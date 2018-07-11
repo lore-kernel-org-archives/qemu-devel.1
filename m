@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdEqg-0001eW-EA
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:08:07 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fdEyM-0003eh-Vd
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdEqb-0006Tq-9f
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:08:02 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:36881)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fdEqa-0006Td-Ue
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:07:57 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-References: <153130635623.17872.6735154721391367314.stgit@lep8c.aus.stglabs.ibm.com>
-	<a6e06c37-5fe8-589c-f0c4-dcffef0b4c60@vivier.eu>
-Message-ID: <5716d895-3c0a-f3c6-ac4b-ae04179d933c@vivier.eu>
-Date: Wed, 11 Jul 2018 15:07:13 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fdEyL-0000uo-U3
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:15:58 -0400
+Date: Wed, 11 Jul 2018 15:15:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180711151545.7e55234a.cohuck@redhat.com>
+In-Reply-To: <20180711130617.GH31228@stefanha-x1.localdomain>
+References: <20180709154549.7df475b9.cohuck@redhat.com>
+	<20180711130617.GH31228@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <a6e06c37-5fe8-589c-f0c4-dcffef0b4c60@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: use the correct values
- for F_*LK64s
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu-nbd vs 'simple' trace backend vs iotest 147
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, riku.voipio@iki.fi
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Le 11/07/2018 à 15:04, Laurent Vivier a écrit :
-> Le 11/07/2018 à 12:55, Shivaprasad G Bhat a écrit :
->> Qemu includes the glibc headers for the host defines and target headers are
->> part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
->> and F_SETLKW64 defined to 12, 13 and 14 for all archs(generic) in
->> sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
->> definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
->> include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
->> assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
->> can be seen in include/linux/fcntl.h in linux source.
->>
->> On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
->> explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
->> Whereas, a PPC64 host doesn't have such a definition in
->> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
->> the sources on PPC64 host sees the default value of F_*LK64*
->> as 12, 13 & 14(fcntl-linux.h).
->>
->> Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
->> implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
->> convertion back to F_*LK* values on PPC64 as seen in
->> sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
->> macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
->> and no adjustments are needed.
->>
->> Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
->> own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
->> adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
->> fail by all pplications run on PPC64 host user emulation.
->>
->> The fix here could be to see why on PPC64 the glibc is still keeping
->> F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
->> the syscall for PPC only. See if we can make the
->> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
->> 5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That way,
->> qemu sources see the kernel supported values in glibc headers.
->>
->> OR
->>
->> On PPC64 host, qemu sources see both F_LK* & F_LK64* as same and set to
->> 12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
->> sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
->> Since F_*LK and F_*LK64 are same, the value adjument like done by glibc in
->> qemu sources is difficult. So, Overwrite the glibc defaults with the actual
->> supported values in Qemu. The current patch is doing this.
->>
->> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
->> ---
->>  linux-user/syscall.c |   14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 7b9ac3b408..1693e69ce0 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -250,6 +250,20 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
->>  #define TARGET_NR__llseek TARGET_NR_llseek
->>  #endif
->>  
->> +/* glibc headers has these defined to 12, 13 and 14 and is not supported
->> + * by kernel. The glibc fcntl call actually adjusts them back to 5, 6 and 7
->> + * before making the syscall(). Since we make the syscall directly,
->> + * overwite/adjust to what is supported by the kernel.
->> + */
->> +#if defined(__linux__) && defined(__powerpc64__)
->> +#undef F_GETLK64
->> +#define F_GETLK64      5       /* Get record locking info.  */
->> +#undef F_SETLK64
->> +#define F_SETLK64      6       /* Set record locking info (non-blocking).  */
->> +#undef F_SETLKW64
->> +#define F_SETLKW64     7       /* Set record locking info (blocking).  */
->> +#endif
->> +
->>  #ifdef __NR_gettid
->>  _syscall0(int, gettid)
->>  #else
->>
-> 
-> These macros are used in target_to_host_fcntl_cmd(), and this function
-> is used with safe_fcntl() and fcntl().
-> 
-> So I think it would be cleaner to do the change after
-> target_to_host_fcntl_cmd() in do_fcntl() as it is done in glibc instead
-> of redefining system values. Something like:
-> 
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6782,6 +6782,12 @@ static abi_long do_fcntl(int fd, int cmd,
-> abi_ulong arg)
->      if (host_cmd == -TARGET_EINVAL)
->             return host_cmd;
-> 
-> +#if defined(__linux__) && defined(__powerpc64__)
+On Wed, 11 Jul 2018 14:06:17 +0100
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-Moreover, I think the "defined(__linux__)" is not needed as
-linux-user/syscall.c is compiled only on linux.
+> On Mon, Jul 09, 2018 at 03:45:49PM +0200, Cornelia Huck wrote:
+> > Hi,
+> > 
+> > I recently noticed that iotest 147 was hanging on my laptop, but worked
+> > fine on my s390x LPAR. Turned out that the architecture was a red
+> > herring; on both platforms, things fail with the 'simple' trace backend
+> > and work with e.g. the 'log' trace backend. Some details on the
+> > failures with the 'simple' backend:
+> > 
+> > - The first run of 147 passes. However, there are two processes hanging
+> >   around, one using a unix socket and one using an inet socket:
+> > 
+> > cohuck   22912  0.0  0.0 156580  3836 ?        Ss   14:32   0:00 /home/cohuck/git/qemu/build/tests/qemu-iotests/../../qemu-nbd --fork -f qcow2 /home/cohuck/git/qemu/build/tests/qemu-iotests/scratch/test.img -p 10811
+> > cohuck   22925  0.0  0.0 156580  3840 ?        Ss   14:32   0:00 /home/cohuck/git/qemu/build/tests/qemu-iotests/../../qemu-nbd --fork -f qcow2 /home/cohuck/git/qemu/build/tests/qemu-iotests/scratch/test.img -k /home/cohuck/git/qemu/build/tests/qemu-iotests/scratch/nbd.socket
+> > 
+> > Attaching a gdb shows that we seem to be waiting on flushing:
+> > 
+> > (gdb) bt
+> > #0  0x00007f461c078b99 in syscall () from /lib64/libc.so.6
+> > #1  0x00007f461d13650f in g_cond_wait () from /lib64/libglib-2.0.so.0
+> > #2  0x0000560cf3a1caf2 in flush_trace_file (wait=255)
+> >     at /home/cohuck/git/qemu/trace/simple.c:139
+> > #3  st_flush_trace_buffer () at /home/cohuck/git/qemu/trace/simple.c:374
+> > #4  0x00007f461bfc01d8 in __run_exit_handlers () from /lib64/libc.so.6
+> > #5  0x00007f461bfc022a in exit () from /lib64/libc.so.6
+> > #6  0x0000560cf392eb7e in main (argc=<optimized out>, argv=<optimized out>)
+> >     at /home/cohuck/git/qemu/qemu-nbd.c:1076
+> > 
+> > (for both processes)  
+> 
+> Please also print backtraces for the other threads:
+> 
+>   (gdb) thread apply all bt
+> 
+> There should be another thread in writeout_thread() so I'm surprised
+> that flush_trace_file() is getting stuck in g_cond_wait().
 
-Thanks,
-Laurent
+I'll re-run to check, but there was only one thread in the process in
+question.
