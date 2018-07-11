@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdJqU-0006li-1m
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 14:28:10 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fdJsu-0008Gr-KM
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 14:30:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdJqQ-0002hS-UM
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 14:28:10 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:50148)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fdJqQ-0002h7-K7
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 14:28:06 -0400
-References: <20180711164025.10924-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <515ab6e6-14b3-2687-18b9-582d63b82903@vivier.eu>
-Date: Wed, 11 Jul 2018 20:27:30 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fdJst-0003kW-SA
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 14:30:40 -0400
+Date: Wed, 11 Jul 2018 15:30:31 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180711183031.GM914@localhost.localdomain>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<ca91bffe-2bcf-78a2-02cd-8ae7cc48074c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180711164025.10924-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: fix mmap_find_vma_reserved()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ca91bffe-2bcf-78a2-02cd-8ae7cc48074c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-Le 11/07/2018 à 18:40, Laurent Vivier a écrit :
-> The value given by mmap_find_vma_reserved() is used with mmap(),
-> so it is needed to be aligned with the host page size.
+On Wed, Jul 11, 2018 at 07:20:42PM +0200, Paolo Bonzini wrote:
+> On 09/07/2018 23:03, Thomas Huth wrote:
+> > 
+> > The problem is that qdev_set_parent_bus() from instance_init adds a link
+> > to the child devices which is not valid anymore after the device init
+> > failed. Thus the qdev_set_parent_bus() must rather be done in the realize
+> > function instead.
 > 
-> Since commit 18e80c55bb, reserved_va is only aligned to TARGET_PAGE_SIZE,
-> and it works well if this size is greater or equal to the host page size.
+> The theoretical behavior should be:
+
+It's not clear below where you expect
+  qdev_set_parent_bus(..., sysbus_get_default())
+to be called (if it should be called at all).
+
+I don't know where it should be called, but I'm absolutely sure
+instance_init is not the right place.
+
 > 
-> But ppc64 hosts have 64kB page size and when we start a 4kiB page size
-> guest (like i386), it fails when it tries to mmap the stack:
+> - realize fails
 > 
->     mmap stack: Invalid argument
+> - object_unparent is called on the device that failed to realize (see
+> qdev_device_add).  object_unparent calls device_unparent
 > 
-> Fixes: 18e80c55bb (linux-user: Tidy and enforce reserved_va initialization)
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> - after device_unparent finishes, the last reference to the device has
+> been dropped and the device is freed
+> 
+> - object finalization releases all properties
+> 
+> - this includes child properties, so for each child device
+> object_unparent is called
+> 
+> - again device_unparent is called (for the child) and this removes the
+> child from the bus.
+> 
+> Paolo
 
-Richard,
-
-I think this fix could be merged into your "linux-user: Fix shmat
-emulation by honoring host SHMLBA" patch, by adding something like this
-instead:
-
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -262,6 +262,8 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong
-size, abi_ulong align)
-     abi_ulong addr;
-     int wrapped, repeat;
-
-+    align = MAX(align, qemu_host_page_size);
-+
-     /* If 'start' == 0, then a default start address is used. */
-     if (start == 0) {
-         start = mmap_next_start;
-
-Thanks,
-Laurent
+-- 
+Eduardo
