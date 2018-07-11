@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fd3q7-00067K-Ad
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 21:22:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fd3vS-0007PN-HT
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 21:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fd3q6-0002e3-Gl
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 21:22:43 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 11 Jul 2018 09:22:27 +0800
-Message-Id: <20180711012227.31600-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-img: Document copy offloading
- implications with -S and -c
+	(envelope-from <dgibson@ozlabs.org>) id 1fd3vQ-0005rW-7j
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 21:28:14 -0400
+Date: Wed, 11 Jul 2018 11:28:02 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180711012802.GN22363@umbus.fritz.box>
+References: <153123811483.256409.15360824885082888930.stgit@bahia.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vDEbda84Uy/oId5W"
+Content-Disposition: inline
+In-Reply-To: <153123811483.256409.15360824885082888930.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] ppc/xics: split ICP into icp-base and icp
+ class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,41 +24,473 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Explicitly enabling zero detection or compression suppresses copy
-offloading during convert. Document it.
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- qemu-img.texi | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+--vDEbda84Uy/oId5W
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index aeb1b9e66c..5853cd18d1 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -96,7 +96,8 @@ will enumerate information about backing files in a disk image chain. Refer
- below for further description.
- 
- @item -c
--indicates that target image must be compressed (qcow format only)
-+indicates that target image must be compressed (qcow format only). If this
-+option is used, copy offloading will not be attempted.
- 
- @item -h
- with or without a command shows help and lists the supported formats
-@@ -115,7 +116,8 @@ in case both @var{-q} and @var{-p} options are used.
- indicates the consecutive number of bytes that must contain only zeros
- for qemu-img to create a sparse image during conversion. This value is rounded
- down to the nearest 512 bytes. You may use the common size suffixes like
--@code{k} for kilobytes.
-+@code{k} for kilobytes. If this option is used, copy offloading will not be
-+attempted.
- 
- @item -t @var{cache}
- specifies the cache mode that should be used with the (destination) file. See
--- 
-2.17.1
+On Tue, Jul 10, 2018 at 05:55:14PM +0200, Greg Kurz wrote:
+> Recent cleanup in commit a028dd423ee6 causes QEMU to crash during CPU
+> hotplug:
+>=20
+> (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+> Segmentation fault (core dumped)
+>=20
+> When the hotplug path tries to reset the ICP device, we end
+> up calling:
+>=20
+> static void icp_kvm_reset(DeviceState *dev)
+> {
+>     ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+>=20
+>     icpc->parent_reset(dev);
+>=20
+> but icpc->parent_reset is NULL.
+
+This seems terribly complex to address this symptom.  Couldn't we just
+do a
+
+	if (icpc->parent_reset)
+		icpc->parent_reset(dev);
+
+?
+
+> Indeed, the TYPE_ICP class doesn't implement DeviceClass::reset, but
+> rather directly registers a reset handler with qemu_register_reset().
+> This is done this way because ICPs aren't SysBus devices but we want
+> machine reset to reset them anyway (commit 7ea6e0671754).
+>=20
+> The crash also proves that ipc_kvm_reset() is obviously not called for
+> cold plugged devices, ie, TYPE_ICP_KVM should register its own handler
+> with qemu_register_reset().
+>=20
+> The motivation of commit a028dd423ee6 to have cleaner object patterns
+> is good, but it means that all specialized ICP types should register
+> their own reset handler to be called at machine reset.
+>=20
+> So this patchs converts the current TYPE_ICP class into an abstract
+> TYPE_ICP_BASE class that implements DeviceClass::reset instead of
+> calling qemu_register_reset().
+>=20
+> The _new_ TYPE_ICP class is derived from TYPE_ICP_BASE to cover the
+> the pseries.kernel-irqchip=3Doff case. It merely registers a reset
+> handler with qemu_register_reset(). Its device class functions
+> are renamed as icp_simple_* to avoid confusion with the base class.
+>=20
+> All other specialized ICP types are also converted to register their
+> own reset handler as well.
+>=20
+> This matches what we already have with ICS.
+>=20
+> Since we support CPU hot unplug with spapr, unrealize functions
+> are added to TYPE_ICP and TYPE_ICP_KVM so that they can call
+> qemu_unregister_reset().
+>=20
+> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> Fixes: a028dd423ee6dfd091a8c63028240832bf10f671
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>=20
+> I've successfully tested the following:
+> - pseries with in-kernel XICS
+> - pseries with emulated XICS
+> - powernv
+> - migration of pseries, including migration to QEMU 2.12 and back
+> ---
+>  hw/intc/xics.c        |   97 ++++++++++++++++++++++++++++++++++++++++---=
+------
+>  hw/intc/xics_kvm.c    |   27 +++++++++++---
+>  hw/intc/xics_pnv.c    |   27 +++++++++++---
+>  include/hw/ppc/xics.h |   12 ++++--
+>  4 files changed, 129 insertions(+), 34 deletions(-)
+>=20
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index b9f1a3c97214..b478b9120062 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -40,7 +40,7 @@
+> =20
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+>  {
+> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(icp);
+>      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+> =20
+>      if (!icp->output) {
+> @@ -255,7 +255,7 @@ static void icp_irq(ICSState *ics, int server, int nr=
+, uint8_t priority)
+>  static int icp_dispatch_pre_save(void *opaque)
+>  {
+>      ICPState *icp =3D opaque;
+> -    ICPStateClass *info =3D ICP_GET_CLASS(icp);
+> +    ICPStateClass *info =3D ICP_BASE_GET_CLASS(icp);
+> =20
+>      if (info->pre_save) {
+>          info->pre_save(icp);
+> @@ -267,7 +267,7 @@ static int icp_dispatch_pre_save(void *opaque)
+>  static int icp_dispatch_post_load(void *opaque, int version_id)
+>  {
+>      ICPState *icp =3D opaque;
+> -    ICPStateClass *info =3D ICP_GET_CLASS(icp);
+> +    ICPStateClass *info =3D ICP_BASE_GET_CLASS(icp);
+> =20
+>      if (info->post_load) {
+>          return info->post_load(icp, version_id);
+> @@ -291,9 +291,9 @@ static const VMStateDescription vmstate_icp_server =
+=3D {
+>      },
+>  };
+> =20
+> -static void icp_reset(void *dev)
+> +static void icp_base_reset(DeviceState *dev)
+>  {
+> -    ICPState *icp =3D ICP(dev);
+> +    ICPState *icp =3D ICP_BASE(dev);
+> =20
+>      icp->xirr =3D 0;
+>      icp->pending_priority =3D 0xff;
+> @@ -303,9 +303,9 @@ static void icp_reset(void *dev)
+>      qemu_set_irq(icp->output, 0);
+>  }
+> =20
+> -static void icp_realize(DeviceState *dev, Error **errp)
+> +static void icp_base_realize(DeviceState *dev, Error **errp)
+>  {
+> -    ICPState *icp =3D ICP(dev);
+> +    ICPState *icp =3D ICP_BASE(dev);
+>      PowerPCCPU *cpu;
+>      CPUPPCState *env;
+>      Object *obj;
+> @@ -345,31 +345,91 @@ static void icp_realize(DeviceState *dev, Error **e=
+rrp)
+>          return;
+>      }
+> =20
+> -    qemu_register_reset(icp_reset, dev);
+>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
+>  }
+> =20
+> -static void icp_unrealize(DeviceState *dev, Error **errp)
+> +static void icp_base_unrealize(DeviceState *dev, Error **errp)
+>  {
+> -    ICPState *icp =3D ICP(dev);
+> +    ICPState *icp =3D ICP_BASE(dev);
+> =20
+>      vmstate_unregister(NULL, &vmstate_icp_server, icp);
+> -    qemu_unregister_reset(icp_reset, dev);
+>  }
+> =20
+> -static void icp_class_init(ObjectClass *klass, void *data)
+> +static void icp_base_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> -    dc->realize =3D icp_realize;
+> -    dc->unrealize =3D icp_unrealize;
+> +    dc->realize =3D icp_base_realize;
+> +    dc->unrealize =3D icp_base_unrealize;
+> +    dc->reset =3D icp_base_reset;
+>  }
+> =20
+> -static const TypeInfo icp_info =3D {
+> -    .name =3D TYPE_ICP,
+> +static const TypeInfo icp_base_info =3D {
+> +    .name =3D TYPE_ICP_BASE,
+>      .parent =3D TYPE_DEVICE,
+>      .instance_size =3D sizeof(ICPState),
+> -    .class_init =3D icp_class_init,
+> +    .class_init =3D icp_base_class_init,
+> +    .class_size =3D sizeof(ICPStateClass),
+> +    .abstract =3D true,
+> +};
+> +
+> +static void icp_simple_reset(DeviceState *dev)
+> +{
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> +
+> +    icpc->parent_reset(dev);
+> +}
+> +
+> +static void icp_simple_reset_handler(void *dev)
+> +{
+> +    icp_simple_reset(dev);
+> +}
+> +
+> +static void icp_simple_realize(DeviceState *dev, Error **errp)
+> +{
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> +    Error *local_err =3D NULL;
+> +
+> +    icpc->parent_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    qemu_register_reset(icp_simple_reset_handler, dev);
+> +}
+> +
+> +static void icp_simple_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> +    Error *local_err =3D NULL;
+> +
+> +    icpc->parent_unrealize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    qemu_unregister_reset(icp_simple_reset_handler, dev);
+> +}
+> +
+> +static void icp_simple_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    ICPStateClass *icpc =3D ICP_BASE_CLASS(klass);
+> +
+> +    device_class_set_parent_realize(dc, icp_simple_realize,
+> +                                    &icpc->parent_realize);
+> +    device_class_set_parent_unrealize(dc, icp_simple_unrealize,
+> +                                      &icpc->parent_unrealize);
+> +    device_class_set_parent_reset(dc, icp_simple_reset, &icpc->parent_re=
+set);
+> +}
+> +
+> +static const TypeInfo icp_simple_info =3D {
+> +    .name =3D TYPE_ICP,
+> +    .parent =3D TYPE_ICP_BASE,
+> +    .instance_size =3D sizeof(ICPState),
+> +    .class_init =3D icp_simple_class_init,
+>      .class_size =3D sizeof(ICPStateClass),
+>  };
+> =20
+> @@ -744,7 +804,8 @@ static void xics_register_types(void)
+>  {
+>      type_register_static(&ics_simple_info);
+>      type_register_static(&ics_base_info);
+> -    type_register_static(&icp_info);
+> +    type_register_static(&icp_simple_info);
+> +    type_register_static(&icp_base_info);
+>      type_register_static(&xics_fabric_info);
+>  }
+> =20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 30c3769a2084..72e700677059 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -116,17 +116,22 @@ static int icp_set_kvm_state(ICPState *icp, int ver=
+sion_id)
+> =20
+>  static void icp_kvm_reset(DeviceState *dev)
+>  {
+> -    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> =20
+>      icpc->parent_reset(dev);
+> =20
+> -    icp_set_kvm_state(ICP(dev), 1);
+> +    icp_set_kvm_state(ICP_BASE(dev), 1);
+> +}
+> +
+> +static void icp_kvm_reset_handler(void *dev)
+> +{
+> +    icp_kvm_reset(dev);
+>  }
+> =20
+>  static void icp_kvm_realize(DeviceState *dev, Error **errp)
+>  {
+> -    ICPState *icp =3D ICP(dev);
+> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> +    ICPState *icp =3D ICP_BASE(dev);
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(icp);
+>      Error *local_err =3D NULL;
+>      CPUState *cs;
+>      KVMEnabledICP *enabled_icp;
+> @@ -166,15 +171,25 @@ static void icp_kvm_realize(DeviceState *dev, Error=
+ **errp)
+>      enabled_icp =3D g_malloc(sizeof(*enabled_icp));
+>      enabled_icp->vcpu_id =3D vcpu_id;
+>      QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
+> +    qemu_register_reset(icp_kvm_reset_handler, icp);
+> +}
+> +
+> +static void icp_kvm_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    ICPState *icp =3D ICP_BASE(dev);
+> +
+> +    qemu_unregister_reset(icp_kvm_reset_handler, icp);
+>  }
+> =20
+>  static void icp_kvm_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -    ICPStateClass *icpc =3D ICP_CLASS(klass);
+> +    ICPStateClass *icpc =3D ICP_BASE_CLASS(klass);
+> =20
+>      device_class_set_parent_realize(dc, icp_kvm_realize,
+>                                      &icpc->parent_realize);
+> +    device_class_set_parent_unrealize(dc, icp_kvm_unrealize,
+> +                                      &icpc->parent_unrealize);
+>      device_class_set_parent_reset(dc, icp_kvm_reset,
+>                                    &icpc->parent_reset);
+> =20
+> @@ -185,7 +200,7 @@ static void icp_kvm_class_init(ObjectClass *klass, vo=
+id *data)
+> =20
+>  static const TypeInfo icp_kvm_info =3D {
+>      .name =3D TYPE_KVM_ICP,
+> -    .parent =3D TYPE_ICP,
+> +    .parent =3D TYPE_ICP_BASE,
+>      .instance_size =3D sizeof(ICPState),
+>      .class_init =3D icp_kvm_class_init,
+>      .class_size =3D sizeof(ICPStateClass),
+> diff --git a/hw/intc/xics_pnv.c b/hw/intc/xics_pnv.c
+> index fa48505f365e..a29ccb68df73 100644
+> --- a/hw/intc/xics_pnv.c
+> +++ b/hw/intc/xics_pnv.c
+> @@ -33,7 +33,7 @@
+> =20
+>  static uint64_t pnv_icp_read(void *opaque, hwaddr addr, unsigned width)
+>  {
+> -    ICPState *icp =3D ICP(opaque);
+> +    ICPState *icp =3D ICP_BASE(opaque);
+>      PnvICPState *picp =3D PNV_ICP(opaque);
+>      bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
+>      uint64_t val =3D 0xffffffff;
+> @@ -96,7 +96,7 @@ bad_access:
+>  static void pnv_icp_write(void *opaque, hwaddr addr, uint64_t val,
+>                                unsigned width)
+>  {
+> -    ICPState *icp =3D ICP(opaque);
+> +    ICPState *icp =3D ICP_BASE(opaque);
+>      PnvICPState *picp =3D PNV_ICP(opaque);
+>      bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
+> =20
+> @@ -145,6 +145,18 @@ bad_access:
+>      }
+>  }
+> =20
+> +static void pnv_icp_reset(DeviceState *dev)
+> +{
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> +
+> +    icpc->parent_reset(dev);
+> +}
+> +
+> +static void pnv_icp_reset_handler(void *dev)
+> +{
+> +    pnv_icp_reset(dev);
+> +}
+> +
+>  static const MemoryRegionOps pnv_icp_ops =3D {
+>      .read =3D pnv_icp_read,
+>      .write =3D pnv_icp_write,
+> @@ -161,9 +173,9 @@ static const MemoryRegionOps pnv_icp_ops =3D {
+> =20
+>  static void pnv_icp_realize(DeviceState *dev, Error **errp)
+>  {
+> -    ICPState *icp =3D ICP(dev);
+> +    ICPState *icp =3D ICP_BASE(dev);
+>      PnvICPState *pnv_icp =3D PNV_ICP(icp);
+> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(icp);
+>      Error *local_err =3D NULL;
+> =20
+>      icpc->parent_realize(dev, &local_err);
+> @@ -174,21 +186,24 @@ static void pnv_icp_realize(DeviceState *dev, Error=
+ **errp)
+> =20
+>      memory_region_init_io(&pnv_icp->mmio, OBJECT(icp), &pnv_icp_ops,
+>                            icp, "icp-thread", 0x1000);
+> +    qemu_register_reset(pnv_icp_reset_handler, icp);
+>  }
+> =20
+>  static void pnv_icp_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -    ICPStateClass *icpc =3D ICP_CLASS(klass);
+> +    ICPStateClass *icpc =3D ICP_BASE_CLASS(klass);
+> =20
+>      device_class_set_parent_realize(dc, pnv_icp_realize,
+>                                      &icpc->parent_realize);
+> +    device_class_set_parent_reset(dc, pnv_icp_reset,
+> +                                  &icpc->parent_reset);
+>      dc->desc =3D "PowerNV ICP";
+>  }
+> =20
+>  static const TypeInfo pnv_icp_info =3D {
+>      .name          =3D TYPE_PNV_ICP,
+> -    .parent        =3D TYPE_ICP,
+> +    .parent        =3D TYPE_ICP_BASE,
+>      .instance_size =3D sizeof(PnvICPState),
+>      .class_init    =3D pnv_icp_class_init,
+>      .class_size    =3D sizeof(ICPStateClass),
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 6ac8a9392da6..6a2e45997f8f 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -48,6 +48,9 @@ typedef struct ICSState ICSState;
+>  typedef struct ICSIRQState ICSIRQState;
+>  typedef struct XICSFabric XICSFabric;
+> =20
+> +#define TYPE_ICP_BASE "icp-base"
+> +#define ICP_BASE(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP_BASE)
+> +
+>  #define TYPE_ICP "icp"
+>  #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+> =20
+> @@ -57,15 +60,16 @@ typedef struct XICSFabric XICSFabric;
+>  #define TYPE_PNV_ICP "pnv-icp"
+>  #define PNV_ICP(obj) OBJECT_CHECK(PnvICPState, (obj), TYPE_PNV_ICP)
+> =20
+> -#define ICP_CLASS(klass) \
+> -     OBJECT_CLASS_CHECK(ICPStateClass, (klass), TYPE_ICP)
+> -#define ICP_GET_CLASS(obj) \
+> -     OBJECT_GET_CLASS(ICPStateClass, (obj), TYPE_ICP)
+> +#define ICP_BASE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(ICPStateClass, (klass), TYPE_ICP_BASE)
+> +#define ICP_BASE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(ICPStateClass, (obj), TYPE_ICP_BASE)
+> =20
+>  struct ICPStateClass {
+>      DeviceClass parent_class;
+> =20
+>      DeviceRealize parent_realize;
+> +    DeviceUnrealize parent_unrealize;
+>      DeviceReset parent_reset;
+> =20
+>      void (*pre_save)(ICPState *icp);
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--vDEbda84Uy/oId5W
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltFXSAACgkQbDjKyiDZ
+s5LDABAAhWJ0Y2vYNH7A8s0TlHVE2PBwDNA0l4L2sWrKC17BleMjmhpZQA6cnhuL
+kfpxhxznWK2KyxcAE/jWekaoK3odMjhAFTeh7DId2RjgaCc7WCOhQj7rs5I8Pk55
+2IQyR1l6Q6A3D8kEGPKMgb+9QgBFGGjkomFXKMg0UYt411MPf9eeimQVY8mXCTcY
+VRWNuvMjPeaEAESneBxXZUVcwPcPXz3Sm20liRtQNguacCGgXh9G1+bNBoasxMnh
+S6PzjWeL+F5aIim1l/wQpfdh8ubo4rzn+UBhH2fjsG3akJfcYxaJKzfdPHvan3GK
+6ftnfL0qDkXQ1gCBCKcIgZuejZz8zGSuUW+ZGHbfB7gqKAJvJq/ygRMwcS40dhQJ
+GL7FDmtao1AfxLiq7V2t1WZR9WwwS5gFFlBKOlXKeCpj0E/z9xD3jvg9kRHOg6p9
+WcIasCLHOkUscxonvUvFybvQaJ9CWzd0e1FBMA1EFP82XXk5Jnxu/+B6ReVxAswC
+ZKG3ulcqQ4EOq41P1a9CMUaEjPbr8iRHrUmZmt0h5PG9rT3m8JVtzhQyAfnaZMV+
+umbgWQz14EnVDPwnC/LZlHDhsvvALsB4wfUWGOsNndsY5ftmUYzBEB2/WCFHcz3T
+q0rLBasfhmQ/lnUh2hRs4X+w6Lf5Z3I+nyYHVldj3tHiWJupA0A=
+=LjR2
+-----END PGP SIGNATURE-----
+
+--vDEbda84Uy/oId5W--
