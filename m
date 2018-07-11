@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suzuki.Poulose@arm.com>) id 1fdB4U-0002Yg-4y
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:06:03 -0400
+	(envelope-from <groug@kaod.org>) id 1fdBQF-0006LN-7E
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Suzuki.Poulose@arm.com>) id 1fdB4P-00070l-6n
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:06:02 -0400
-Received: from foss.arm.com ([217.140.101.70]:38630)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suzuki.Poulose@arm.com>) id 1fdB4O-00070U-TY
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:05:57 -0400
-References: <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
-	<20180704155104.GN4828@arm.com>
-	<12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
-	<fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
-	<9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
-	<f3463d0a-c6a3-c34d-acb3-13c99fc61c5a@arm.com>
-	<20180709112326.GD9486@e103592.cambridge.arm.com>
-	<17f8d585-3489-ab6f-6ee1-4d8d337dcf9c@arm.com>
-	<20180709133750.GE9486@e103592.cambridge.arm.com>
-	<377420ce-97a8-4359-6224-273d91f37247@arm.com>
-	<20180710170330.GJ9486@e103592.cambridge.arm.com>
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Message-ID: <0d9d48fc-f913-9f05-afbe-83299c470611@arm.com>
-Date: Wed, 11 Jul 2018 10:05:50 +0100
+	(envelope-from <groug@kaod.org>) id 1fdBQB-0006S0-PC
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:28:31 -0400
+Received: from 11.mo4.mail-out.ovh.net ([46.105.34.195]:54529)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fdBQB-0006Pi-Fz
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:28:27 -0400
+Received: from player695.ha.ovh.net (unknown [10.109.105.120])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2FE0F187D18
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 11:28:18 +0200 (CEST)
+Date: Wed, 11 Jul 2018 11:26:41 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180711112641.4e56c25b@bahia.lan>
+In-Reply-To: <20180711012802.GN22363@umbus.fritz.box>
+References: <153123811483.256409.15360824885082888930.stgit@bahia.lan>
+	<20180711012802.GN22363@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20180710170330.GJ9486@e103592.cambridge.arm.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the
- physical address size for VM
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/m72urcFjBI33HBhRu3JWKt0";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] ppc/xics: split ICP into icp-base and icp
+ class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,114 +32,486 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, cdall@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-On 10/07/18 18:03, Dave Martin wrote:
-> On Tue, Jul 10, 2018 at 05:38:39PM +0100, Suzuki K Poulose wrote:
->> On 09/07/18 14:37, Dave Martin wrote:
->>> On Mon, Jul 09, 2018 at 01:29:42PM +0100, Marc Zyngier wrote:
->>>> On 09/07/18 12:23, Dave Martin wrote:
-> 
-> [...]
-> 
->>>>> Wedging arguments into a few bits in the type argument feels awkward,
->>>>> and may be regretted later if we run out of bits, or something can't be
->>>>> represented in the chosen encoding.
->>>>
->>>> I think that's a pretty convincing argument for a "better" CREATE_VM,
->>>> one that would have a clearly defined, structured (and potentially
->>>> extensible) argument.
->>>>
->>>> I've quickly hacked the following:
->>>>
->>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>>> index b6270a3b38e9..3e76214034c2 100644
->>>> --- a/include/uapi/linux/kvm.h
->>>> +++ b/include/uapi/linux/kvm.h
->>>> @@ -735,6 +735,20 @@ struct kvm_ppc_resize_hpt {
->>>>   	__u32 pad;
->>>>   };
->>>>
->>>> +struct kvm_create_vm2 {
->>>> +	__u64	version;	/* Or maybe not */
->>>> +	union {
->>>> +		struct {
->>>> +#define KVM_ARM_SVE_CAPABLE	(1 << 0)
->>>> +#define KVM_ARM_SELECT_IPA	{1 << 1)
->>>> +			__u64	capabilities;
->>>> +			__u16	sve_vlen;
->>>> +			__u8	ipa_size;
->>>> +		} arm64;
->>>> +		__u64	dummy[15];
->>>> +	};
->>>> +};
->>>> +
->>>>   #define KVMIO 0xAE
->>>>
->>>>   /* machine type bits, to be used as argument to KVM_CREATE_VM */
->>>>
->>>> Other architectures could fill in their own bits if they need to.
->>>>
->>>> Thoughts?
->>>
->>> This kind of thing should work, but it may still get messy when we
->>> add additional fields.
->>
->>
->> Marc, Dave,
->>
->> I like Dave's approach. Some comments below.
->>
->>>
->>> It we want this to work cross-arch, would it make sense to go
->>> for a more generic approach, say
->>>
->>> struct kvm_create_vm_attr_any {
->>>          __u32   type;
->>> };
->>>
->>> #define KVM_CREATE_VM_ATTR_ARCH_CAPABILITIES 1
->>> struct kvm_create_vm_attr_arch_capabilities {
->>>          __u32   type;
->>>          __u16   size; /* support future expansion of capabilities[] */
->>>          __u16   reserved;
->>>          __u64   capabilities[1];
->>> };
->>
->> We also need to advertise which attributes are supported by the host,
->> so that the user can tune the available ones. That would make a bit mask
->> like the above trickier, unless we return the supported values back
->> in the argument ptr for the "probe" call. And this scheme in general
->> can be useful for passing back a non-boolean result specific to the
->> attribute, without having a per-attribute ioctl. (e.g, maximum limit
->> for IPA).
-> 
-> Maybe, but this could quickly become bloated.  (My approach already
-> feels a bit bloated...)
-> 
-> I'm not sure that arbitrarily complex negotiation will really be
-> needed, but userspace might want to change its mind if setting a
-> particular propertiy fails.
-> 
-> An alternative might be to have a bunch of per-VM ioctls to configure
-> different things, like x86 has.  There's at least precedent for that.
-> For arm, we currently only have a few.  That allows for easy extension,
-> at the cost of adding ioctls.
+--Sig_/m72urcFjBI33HBhRu3JWKt0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-As you know, one of the major problems with the per-VM ioctls is
-the ordering of different operations and tracking to make sure that
-the userspace follows the expected order. e.g, the first approach for
-IPA series was based on this and it made things complex enough to drop
-it.
+On Wed, 11 Jul 2018 11:28:02 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> 
-> There may be some ioctls we can reuse, like KVM_ENABLE_CAP for per-
-> vm capability flags.
+> On Tue, Jul 10, 2018 at 05:55:14PM +0200, Greg Kurz wrote:
+> > Recent cleanup in commit a028dd423ee6 causes QEMU to crash during CPU
+> > hotplug:
+> >=20
+> > (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+> > Segmentation fault (core dumped)
+> >=20
+> > When the hotplug path tries to reset the ICP device, we end
+> > up calling:
+> >=20
+> > static void icp_kvm_reset(DeviceState *dev)
+> > {
+> >     ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+> >=20
+> >     icpc->parent_reset(dev);
+> >=20
+> > but icpc->parent_reset is NULL. =20
+>=20
+> This seems terribly complex to address this symptom.  Couldn't we just
+> do a
+>=20
+> 	if (icpc->parent_reset)
+> 		icpc->parent_reset(dev);
+>=20
+> ?
+>=20
 
-May be we could switch to KVM_VM_CAPS and pass a list of capabilities
-to be enabled at creation time ? The kvm_enable_cap can pass in additional
-arguments for each cap. That way we don't have to rely on a new set of
-attributes and probing becomes straight forward.
+This would certainly avoid the SEGV but this would mean that
+we skip icp_reset() for hot plugged ICPs... and it doesn't
+address the fact that icp_kvm_reset() is never called for cold
+plugged ones.
 
-Suzuki
+Commit a028dd423ee6 inverted the control: icp_reset() no
+longer calls per-ICP type reset function. It is up to each
+type to call icp_reset().
+
+Maybe I can split the patch to ease review. But if you're really
+seeking simplicity, the best call is probably to simply revert
+a028dd423ee6 at this point.
+
+> > Indeed, the TYPE_ICP class doesn't implement DeviceClass::reset, but
+> > rather directly registers a reset handler with qemu_register_reset().
+> > This is done this way because ICPs aren't SysBus devices but we want
+> > machine reset to reset them anyway (commit 7ea6e0671754).
+> >=20
+> > The crash also proves that ipc_kvm_reset() is obviously not called for
+> > cold plugged devices, ie, TYPE_ICP_KVM should register its own handler
+> > with qemu_register_reset().
+> >=20
+> > The motivation of commit a028dd423ee6 to have cleaner object patterns
+> > is good, but it means that all specialized ICP types should register
+> > their own reset handler to be called at machine reset.
+> >=20
+> > So this patchs converts the current TYPE_ICP class into an abstract
+> > TYPE_ICP_BASE class that implements DeviceClass::reset instead of
+> > calling qemu_register_reset().
+> >=20
+> > The _new_ TYPE_ICP class is derived from TYPE_ICP_BASE to cover the
+> > the pseries.kernel-irqchip=3Doff case. It merely registers a reset
+> > handler with qemu_register_reset(). Its device class functions
+> > are renamed as icp_simple_* to avoid confusion with the base class.
+> >=20
+> > All other specialized ICP types are also converted to register their
+> > own reset handler as well.
+> >=20
+> > This matches what we already have with ICS.
+> >=20
+> > Since we support CPU hot unplug with spapr, unrealize functions
+> > are added to TYPE_ICP and TYPE_ICP_KVM so that they can call
+> > qemu_unregister_reset().
+> >=20
+> > Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> > Fixes: a028dd423ee6dfd091a8c63028240832bf10f671
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >=20
+> > I've successfully tested the following:
+> > - pseries with in-kernel XICS
+> > - pseries with emulated XICS
+> > - powernv
+> > - migration of pseries, including migration to QEMU 2.12 and back
+> > ---
+> >  hw/intc/xics.c        |   97 ++++++++++++++++++++++++++++++++++++++++-=
+--------
+> >  hw/intc/xics_kvm.c    |   27 +++++++++++---
+> >  hw/intc/xics_pnv.c    |   27 +++++++++++---
+> >  include/hw/ppc/xics.h |   12 ++++--
+> >  4 files changed, 129 insertions(+), 34 deletions(-)
+> >=20
+> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> > index b9f1a3c97214..b478b9120062 100644
+> > --- a/hw/intc/xics.c
+> > +++ b/hw/intc/xics.c
+> > @@ -40,7 +40,7 @@
+> > =20
+> >  void icp_pic_print_info(ICPState *icp, Monitor *mon)
+> >  {
+> > -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(icp);
+> >      int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
+> > =20
+> >      if (!icp->output) {
+> > @@ -255,7 +255,7 @@ static void icp_irq(ICSState *ics, int server, int =
+nr, uint8_t priority)
+> >  static int icp_dispatch_pre_save(void *opaque)
+> >  {
+> >      ICPState *icp =3D opaque;
+> > -    ICPStateClass *info =3D ICP_GET_CLASS(icp);
+> > +    ICPStateClass *info =3D ICP_BASE_GET_CLASS(icp);
+> > =20
+> >      if (info->pre_save) {
+> >          info->pre_save(icp);
+> > @@ -267,7 +267,7 @@ static int icp_dispatch_pre_save(void *opaque)
+> >  static int icp_dispatch_post_load(void *opaque, int version_id)
+> >  {
+> >      ICPState *icp =3D opaque;
+> > -    ICPStateClass *info =3D ICP_GET_CLASS(icp);
+> > +    ICPStateClass *info =3D ICP_BASE_GET_CLASS(icp);
+> > =20
+> >      if (info->post_load) {
+> >          return info->post_load(icp, version_id);
+> > @@ -291,9 +291,9 @@ static const VMStateDescription vmstate_icp_server =
+=3D {
+> >      },
+> >  };
+> > =20
+> > -static void icp_reset(void *dev)
+> > +static void icp_base_reset(DeviceState *dev)
+> >  {
+> > -    ICPState *icp =3D ICP(dev);
+> > +    ICPState *icp =3D ICP_BASE(dev);
+> > =20
+> >      icp->xirr =3D 0;
+> >      icp->pending_priority =3D 0xff;
+> > @@ -303,9 +303,9 @@ static void icp_reset(void *dev)
+> >      qemu_set_irq(icp->output, 0);
+> >  }
+> > =20
+> > -static void icp_realize(DeviceState *dev, Error **errp)
+> > +static void icp_base_realize(DeviceState *dev, Error **errp)
+> >  {
+> > -    ICPState *icp =3D ICP(dev);
+> > +    ICPState *icp =3D ICP_BASE(dev);
+> >      PowerPCCPU *cpu;
+> >      CPUPPCState *env;
+> >      Object *obj;
+> > @@ -345,31 +345,91 @@ static void icp_realize(DeviceState *dev, Error *=
+*errp)
+> >          return;
+> >      }
+> > =20
+> > -    qemu_register_reset(icp_reset, dev);
+> >      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, ic=
+p);
+> >  }
+> > =20
+> > -static void icp_unrealize(DeviceState *dev, Error **errp)
+> > +static void icp_base_unrealize(DeviceState *dev, Error **errp)
+> >  {
+> > -    ICPState *icp =3D ICP(dev);
+> > +    ICPState *icp =3D ICP_BASE(dev);
+> > =20
+> >      vmstate_unregister(NULL, &vmstate_icp_server, icp);
+> > -    qemu_unregister_reset(icp_reset, dev);
+> >  }
+> > =20
+> > -static void icp_class_init(ObjectClass *klass, void *data)
+> > +static void icp_base_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > =20
+> > -    dc->realize =3D icp_realize;
+> > -    dc->unrealize =3D icp_unrealize;
+> > +    dc->realize =3D icp_base_realize;
+> > +    dc->unrealize =3D icp_base_unrealize;
+> > +    dc->reset =3D icp_base_reset;
+> >  }
+> > =20
+> > -static const TypeInfo icp_info =3D {
+> > -    .name =3D TYPE_ICP,
+> > +static const TypeInfo icp_base_info =3D {
+> > +    .name =3D TYPE_ICP_BASE,
+> >      .parent =3D TYPE_DEVICE,
+> >      .instance_size =3D sizeof(ICPState),
+> > -    .class_init =3D icp_class_init,
+> > +    .class_init =3D icp_base_class_init,
+> > +    .class_size =3D sizeof(ICPStateClass),
+> > +    .abstract =3D true,
+> > +};
+> > +
+> > +static void icp_simple_reset(DeviceState *dev)
+> > +{
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> > +
+> > +    icpc->parent_reset(dev);
+> > +}
+> > +
+> > +static void icp_simple_reset_handler(void *dev)
+> > +{
+> > +    icp_simple_reset(dev);
+> > +}
+> > +
+> > +static void icp_simple_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    icpc->parent_realize(dev, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    qemu_register_reset(icp_simple_reset_handler, dev);
+> > +}
+> > +
+> > +static void icp_simple_unrealize(DeviceState *dev, Error **errp)
+> > +{
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    icpc->parent_unrealize(dev, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    qemu_unregister_reset(icp_simple_reset_handler, dev);
+> > +}
+> > +
+> > +static void icp_simple_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > +    ICPStateClass *icpc =3D ICP_BASE_CLASS(klass);
+> > +
+> > +    device_class_set_parent_realize(dc, icp_simple_realize,
+> > +                                    &icpc->parent_realize);
+> > +    device_class_set_parent_unrealize(dc, icp_simple_unrealize,
+> > +                                      &icpc->parent_unrealize);
+> > +    device_class_set_parent_reset(dc, icp_simple_reset, &icpc->parent_=
+reset);
+> > +}
+> > +
+> > +static const TypeInfo icp_simple_info =3D {
+> > +    .name =3D TYPE_ICP,
+> > +    .parent =3D TYPE_ICP_BASE,
+> > +    .instance_size =3D sizeof(ICPState),
+> > +    .class_init =3D icp_simple_class_init,
+> >      .class_size =3D sizeof(ICPStateClass),
+> >  };
+> > =20
+> > @@ -744,7 +804,8 @@ static void xics_register_types(void)
+> >  {
+> >      type_register_static(&ics_simple_info);
+> >      type_register_static(&ics_base_info);
+> > -    type_register_static(&icp_info);
+> > +    type_register_static(&icp_simple_info);
+> > +    type_register_static(&icp_base_info);
+> >      type_register_static(&xics_fabric_info);
+> >  }
+> > =20
+> > diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> > index 30c3769a2084..72e700677059 100644
+> > --- a/hw/intc/xics_kvm.c
+> > +++ b/hw/intc/xics_kvm.c
+> > @@ -116,17 +116,22 @@ static int icp_set_kvm_state(ICPState *icp, int v=
+ersion_id)
+> > =20
+> >  static void icp_kvm_reset(DeviceState *dev)
+> >  {
+> > -    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> > =20
+> >      icpc->parent_reset(dev);
+> > =20
+> > -    icp_set_kvm_state(ICP(dev), 1);
+> > +    icp_set_kvm_state(ICP_BASE(dev), 1);
+> > +}
+> > +
+> > +static void icp_kvm_reset_handler(void *dev)
+> > +{
+> > +    icp_kvm_reset(dev);
+> >  }
+> > =20
+> >  static void icp_kvm_realize(DeviceState *dev, Error **errp)
+> >  {
+> > -    ICPState *icp =3D ICP(dev);
+> > -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> > +    ICPState *icp =3D ICP_BASE(dev);
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(icp);
+> >      Error *local_err =3D NULL;
+> >      CPUState *cs;
+> >      KVMEnabledICP *enabled_icp;
+> > @@ -166,15 +171,25 @@ static void icp_kvm_realize(DeviceState *dev, Err=
+or **errp)
+> >      enabled_icp =3D g_malloc(sizeof(*enabled_icp));
+> >      enabled_icp->vcpu_id =3D vcpu_id;
+> >      QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
+> > +    qemu_register_reset(icp_kvm_reset_handler, icp);
+> > +}
+> > +
+> > +static void icp_kvm_unrealize(DeviceState *dev, Error **errp)
+> > +{
+> > +    ICPState *icp =3D ICP_BASE(dev);
+> > +
+> > +    qemu_unregister_reset(icp_kvm_reset_handler, icp);
+> >  }
+> > =20
+> >  static void icp_kvm_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > -    ICPStateClass *icpc =3D ICP_CLASS(klass);
+> > +    ICPStateClass *icpc =3D ICP_BASE_CLASS(klass);
+> > =20
+> >      device_class_set_parent_realize(dc, icp_kvm_realize,
+> >                                      &icpc->parent_realize);
+> > +    device_class_set_parent_unrealize(dc, icp_kvm_unrealize,
+> > +                                      &icpc->parent_unrealize);
+> >      device_class_set_parent_reset(dc, icp_kvm_reset,
+> >                                    &icpc->parent_reset);
+> > =20
+> > @@ -185,7 +200,7 @@ static void icp_kvm_class_init(ObjectClass *klass, =
+void *data)
+> > =20
+> >  static const TypeInfo icp_kvm_info =3D {
+> >      .name =3D TYPE_KVM_ICP,
+> > -    .parent =3D TYPE_ICP,
+> > +    .parent =3D TYPE_ICP_BASE,
+> >      .instance_size =3D sizeof(ICPState),
+> >      .class_init =3D icp_kvm_class_init,
+> >      .class_size =3D sizeof(ICPStateClass),
+> > diff --git a/hw/intc/xics_pnv.c b/hw/intc/xics_pnv.c
+> > index fa48505f365e..a29ccb68df73 100644
+> > --- a/hw/intc/xics_pnv.c
+> > +++ b/hw/intc/xics_pnv.c
+> > @@ -33,7 +33,7 @@
+> > =20
+> >  static uint64_t pnv_icp_read(void *opaque, hwaddr addr, unsigned width)
+> >  {
+> > -    ICPState *icp =3D ICP(opaque);
+> > +    ICPState *icp =3D ICP_BASE(opaque);
+> >      PnvICPState *picp =3D PNV_ICP(opaque);
+> >      bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
+> >      uint64_t val =3D 0xffffffff;
+> > @@ -96,7 +96,7 @@ bad_access:
+> >  static void pnv_icp_write(void *opaque, hwaddr addr, uint64_t val,
+> >                                unsigned width)
+> >  {
+> > -    ICPState *icp =3D ICP(opaque);
+> > +    ICPState *icp =3D ICP_BASE(opaque);
+> >      PnvICPState *picp =3D PNV_ICP(opaque);
+> >      bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
+> > =20
+> > @@ -145,6 +145,18 @@ bad_access:
+> >      }
+> >  }
+> > =20
+> > +static void pnv_icp_reset(DeviceState *dev)
+> > +{
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(dev);
+> > +
+> > +    icpc->parent_reset(dev);
+> > +}
+> > +
+> > +static void pnv_icp_reset_handler(void *dev)
+> > +{
+> > +    pnv_icp_reset(dev);
+> > +}
+> > +
+> >  static const MemoryRegionOps pnv_icp_ops =3D {
+> >      .read =3D pnv_icp_read,
+> >      .write =3D pnv_icp_write,
+> > @@ -161,9 +173,9 @@ static const MemoryRegionOps pnv_icp_ops =3D {
+> > =20
+> >  static void pnv_icp_realize(DeviceState *dev, Error **errp)
+> >  {
+> > -    ICPState *icp =3D ICP(dev);
+> > +    ICPState *icp =3D ICP_BASE(dev);
+> >      PnvICPState *pnv_icp =3D PNV_ICP(icp);
+> > -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> > +    ICPStateClass *icpc =3D ICP_BASE_GET_CLASS(icp);
+> >      Error *local_err =3D NULL;
+> > =20
+> >      icpc->parent_realize(dev, &local_err);
+> > @@ -174,21 +186,24 @@ static void pnv_icp_realize(DeviceState *dev, Err=
+or **errp)
+> > =20
+> >      memory_region_init_io(&pnv_icp->mmio, OBJECT(icp), &pnv_icp_ops,
+> >                            icp, "icp-thread", 0x1000);
+> > +    qemu_register_reset(pnv_icp_reset_handler, icp);
+> >  }
+> > =20
+> >  static void pnv_icp_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > -    ICPStateClass *icpc =3D ICP_CLASS(klass);
+> > +    ICPStateClass *icpc =3D ICP_BASE_CLASS(klass);
+> > =20
+> >      device_class_set_parent_realize(dc, pnv_icp_realize,
+> >                                      &icpc->parent_realize);
+> > +    device_class_set_parent_reset(dc, pnv_icp_reset,
+> > +                                  &icpc->parent_reset);
+> >      dc->desc =3D "PowerNV ICP";
+> >  }
+> > =20
+> >  static const TypeInfo pnv_icp_info =3D {
+> >      .name          =3D TYPE_PNV_ICP,
+> > -    .parent        =3D TYPE_ICP,
+> > +    .parent        =3D TYPE_ICP_BASE,
+> >      .instance_size =3D sizeof(PnvICPState),
+> >      .class_init    =3D pnv_icp_class_init,
+> >      .class_size    =3D sizeof(ICPStateClass),
+> > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> > index 6ac8a9392da6..6a2e45997f8f 100644
+> > --- a/include/hw/ppc/xics.h
+> > +++ b/include/hw/ppc/xics.h
+> > @@ -48,6 +48,9 @@ typedef struct ICSState ICSState;
+> >  typedef struct ICSIRQState ICSIRQState;
+> >  typedef struct XICSFabric XICSFabric;
+> > =20
+> > +#define TYPE_ICP_BASE "icp-base"
+> > +#define ICP_BASE(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP_BASE)
+> > +
+> >  #define TYPE_ICP "icp"
+> >  #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+> > =20
+> > @@ -57,15 +60,16 @@ typedef struct XICSFabric XICSFabric;
+> >  #define TYPE_PNV_ICP "pnv-icp"
+> >  #define PNV_ICP(obj) OBJECT_CHECK(PnvICPState, (obj), TYPE_PNV_ICP)
+> > =20
+> > -#define ICP_CLASS(klass) \
+> > -     OBJECT_CLASS_CHECK(ICPStateClass, (klass), TYPE_ICP)
+> > -#define ICP_GET_CLASS(obj) \
+> > -     OBJECT_GET_CLASS(ICPStateClass, (obj), TYPE_ICP)
+> > +#define ICP_BASE_CLASS(klass) \
+> > +     OBJECT_CLASS_CHECK(ICPStateClass, (klass), TYPE_ICP_BASE)
+> > +#define ICP_BASE_GET_CLASS(obj) \
+> > +     OBJECT_GET_CLASS(ICPStateClass, (obj), TYPE_ICP_BASE)
+> > =20
+> >  struct ICPStateClass {
+> >      DeviceClass parent_class;
+> > =20
+> >      DeviceRealize parent_realize;
+> > +    DeviceUnrealize parent_unrealize;
+> >      DeviceReset parent_reset;
+> > =20
+> >      void (*pre_save)(ICPState *icp);
+> >  =20
+>=20
+
+
+--Sig_/m72urcFjBI33HBhRu3JWKt0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAltFzVEACgkQcdTV5YIv
+c9Z/txAAqV7RjyI8/IlLp6CM2jXdphBopsQLe4OWUCD4gljBpo0TXXEDg2oIH73X
+cLMItzkiOQ0eN74kbsRJJS3RSsuDya9hZo/oVFBqve2hil7wqhHCpd8g4x6inYSH
+L5+AVTzJfGTwctSnJrBMygpWXhxZuFFf/hsLEsnyRs9IjZVAHuS5yJ8q4b05L52S
+RMdpSt3nkmjD8l4CXXq/YtTdZoc3zXMTE/TJvKkyktsRRIPZLaM0tTICUAe4iuZO
+hiVUt876/LRF8SkmIKmtuHFVw7ykCdXST47iyosjgMHiHK3DBKv2L0V8AxB2oe0f
+CVk3sFMRISAwp3lPk1S99SbOl5fqa+IxGJn7PR7ZqNquTiR8K3qWb3CY/yC14T71
+26ciQBWlWBELm+wdOmusXbq338e2NKxLD56z9PqwN+bR7zWP6Y2IgNLHu0ByiF7s
+goAkFCCknvEkVhuESwbXMf0574w03QaLdiIjRtz245hBxQrSPoH3N2Esk9YQkDak
+x4YQhR88Rfesc/5+vsilAmX2r4dgI00fvN1iM98MCfktDoAYi7FLfVbh0cXIWmUI
+xw0nileU9jwkznhOCb4RYlA4GgN8ykIgG0ZspLQfrSZdHbEMOgosGRA8Ovf8tKyd
+knYnNvNPbPogem/giV808+jUI51XS1fjHPBafLZHxmhPVjDNSWk=
+=DL6R
+-----END PGP SIGNATURE-----
+
+--Sig_/m72urcFjBI33HBhRu3JWKt0--
