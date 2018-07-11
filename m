@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fdFUU-0000e0-Au
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:49:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1fd9Qw-0005AU-V9
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fdFUT-0007gP-Ac
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:49:10 -0400
-Date: Wed, 11 Jul 2018 15:48:58 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180711134858.GO18181@paraplu>
-References: <20180704150256.408d4a07.cohuck@redhat.com>
-	<20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<20180709072953.GE7755@andariel.pipo.sk>
-	<87k1q3ljgs.fsf@dusky.pond.sub.org>
-	<20180710162208.7b1b5cdc.cohuck@redhat.com>
-	<20180710143931.GQ1148@andariel.pipo.sk>
-	<20180710170122.427ce3a4.cohuck@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fd9Qs-0004QU-B7
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:21:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49324)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fd9Qr-0004Po-Ij
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:21:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fd9Qp-00025e-F7
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 07:20:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3963F2E80E1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 07:20:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180710170122.427ce3a4.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Jul 2018 07:12:55 -0000
+From: Paul Gear <paul.gear@canonical.com>
+Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
+Message-Id: <153129317560.4418.16984556445176387576.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719339] Re: serial8250: too much work for irq3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +36,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Jul 10, 2018 at 05:01:22PM +0200, Cornelia Huck wrote:
+On further investigation of my instance, there appeared to be no high
+logging volume to the console, nor anything using the /dev/ttyS0 other
+than agetty.  Switching from the generic kernel to the AWS kernel seems
+to have stabilised it.
 
-[...]
+-- =
 
-> Who is, in general, testing which libvirt version? I can think of:
-> - libvirt developers, which will probably run libvirt current git, but
->   more likely a released QEMU?
-> - QEMU (and other related tools) developers, who will probably use QEMU
->   current git, but a released libvirt
-> - normal (technical) users and (integration) testers, who will probably
->   use released versions of libvirt and QEMU
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719339
 
-There is another kind of integration tester -- e.g. FWIW, in Nova I've
-been advocating to create a CI job that would do the following:
+Title:
+  serial8250: too much work for irq3
 
-    - QEMU from Git
-    - libvirt from Git
-    - Nova from Git
+Status in QEMU:
+  New
 
-Along with:
+Bug description:
+  It's know issue and sometimes mentioned since 2007. But it seems not
+  fixed.
 
-    - Latest QEMU release
-    - Latest libvirt release
-    - Nova from Git
+  http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
+  http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/m=
+sg00696.html
 
-With the aim of seeing what explodes in Nova and file bugs (for the
-relevant low-leve components) and coordinate with relevant upstream
-accordingly.
+  I don't think fixes like increases PASS_LIMIT
+  (/drivers/tty/serial/8250.c) or remove this annoying message
+  (https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix
+  was proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
 
-    * * *
+  Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
+  16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
+  branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
+  if we write a lot of message into console (dmesg or dd if=3D/dev/zero
+  of=3D/dev/ttyS1).
 
-Further, Nova's libvirt driver defines several version constants.  The
-following two are set to a version that is available across a set of
-"Linux distributions that matter"[*]
+  /usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don
+  -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+7-ultra1
+  /master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+  core=3Doff -cpu Skylake-
+  Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,mon=
+itor=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3D=
+on,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
+  -m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -u=
+uid
+  4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
+  -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/mon=
+itor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
+pet
+  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
+  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7 -drive
+  file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddr=
+ive-
+  ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
+  ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -d=
+evice
+  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,add=
+r=3D0x3
+  -chardev
+  socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
 
-    MIN_LIBVIRT_VERSION = (1, 3, 1)
-    MIN_QEMU_VERSION = (2, 5, 0)
-
-(The above are the minimum required versions _today_.)
-
-And at the start of each development cycle (lasts 6 months), we evaluate
-what versions are available and update the version matrix[*]:
-
-    NEXT_MIN_LIBVIRT_VERSION = (3, 0, 0)
-    NEXT_MIN_QEMU_VERSION = (2, 8, 0)
-
-(The above will be the versions for the _upcoming_ development cycle --
-sometime end of this year.)
-
-https://wiki.openstack.org/wiki/LibvirtDistroSupportMatrix
-
-
--- 
-/kashyap
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719339/+subscriptions
