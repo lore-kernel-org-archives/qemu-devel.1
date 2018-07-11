@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fd8DN-00059j-M5
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:03:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fd8aH-0001E7-SF
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fd8DK-0008Uv-EW
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:03:01 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45836)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fd8DK-0008UX-0z
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:02:58 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
-	<001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
-	<20180710130630.GB30635@stefanha-x1.localdomain>
-In-Reply-To: <20180710130630.GB30635@stefanha-x1.localdomain>
-Date: Wed, 11 Jul 2018 09:02:48 +0300
-Message-ID: <000601d418dc$cbd606a0$638213e0$@ru>
+	(envelope-from <dgibson@ozlabs.org>) id 1fd8aE-0008Cg-2a
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:26:41 -0400
+Date: Wed, 11 Jul 2018 16:26:19 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180711062619.GQ22363@umbus.fritz.box>
+References: <20180702062644.48040-1-aik@ozlabs.ru>
+	<20180710122244.7466489f@aik.ozlabs.ibm.com>
+	<20180710064248.GM22363@umbus.fritz.box>
+	<20180710171453.6e3eee34@aik.ozlabs.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="wr1Q/2bz0MCWWNYv"
+Content-Disposition: inline
+In-Reply-To: <20180710171453.6e3eee34@aik.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
+ firmware image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,177 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefan Hajnoczi' <stefanha@gmail.com>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, maria.klimushenkova@ispras.ru, 'QEMU Developers' <qemu-devel@nongnu.org>, =?iso-8859-1?Q?'Llu=EDs_Vilanova'?= <vilanova@ac.upc.edu>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> On Tue, Jun 05, 2018 at 02:56:29PM +0300, Pavel Dovgalyuk wrote:
-> > > From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> > >
-> > > This series doesn't seem to add anything to Documentation/ that
-> > > describes the API we make available to plugins. I'm a lot more
-> > > interested in reviewing the API that will be used by plugins
-> > > than I am in the implementation at this stage. Can you provide
-> > > a description/documentation of the API for review, please?
-> >
-> >
-> > Here is the draft:
-> 
-> I like the minimal interface that you are proposing and that it is
-> completely separate from QEMU-internal APIs.  This will make it easy to
-> keep this public API cleanly separated from private internal APIs.
-> 
-> > Introduction
-> > ============
-> >
-> > This document describes an API for creating the QEMU
-> > instrumentation plugins.
-> >
-> > It is based on the following prior sources:
-> >  - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with QEMU"
-> >    https://www.linux-kvm.org/images/3/3d/Introspect.pdf
-> >  - Discussion on Lluis Vilanova instrumentation patch series
-> >    https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
-> >
-> > The aim of the instrumentation is implementing different runtime
-> > tracers that can track the executed instructions, memory and
-> > hardware operations.
-> >
-> > Instrumenting the code
-> > ======================
-> >
-> > Instrumentation subsystem exploits TCG helper mechanism to embed
-> > callbacks into the translation blocks. These callbacks may be inserted
-> > before the specific instructions, when the plugins require such filtering.
-> >
-> > Translator uses two functions for embedding the callbacks:
-> >  - first function checks whether the current instruction should be
-> >    instrumented
-> >  - second function embeds the callback for executing the plugin-specific
-> >    code before that instruction
-> >
-> > The similar method may be used for memory access instrumentation.
-> >
-> > QEMU->Plugin API
-> > ================
-> >
-> > Instrumentation layer passes the requests from the translator
-> > to the dynamically loaded plugins. Every plugin may provide
-> > the following functions to perform the instrumentation:
-> >
-> >  1. bool plugin_init(const char *args);
-> >     Initialization function. May return false if the plugin
-> >     can't work in the current environment.
-> 
-> Please document how plugin loading and argument handling works.
-> 
-> Do you think unloading is necessary?
 
-Yes, I think we'll need it, but I omitted it in the draft.
-Will fix in the next version.
+--wr1Q/2bz0MCWWNYv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> >  2. bool plugin_needs_before_insn(uint64_t pc, void *cpu);
-> >     Returns true if the plugin needs to instrument the current instruction.
-> >     It may use the address (pc) for making the decision or the guest
-> >     CPU state (cpu), which can be passed back to QEMU core API
-> >     (e.g., for reading the guest memory).
-> >     This function is called at both translation and execution phases.
-> 
-> What type of address is 'pc' - guest virtual or guest physical?
+On Tue, Jul 10, 2018 at 05:14:53PM +1000, Alexey Kardashevskiy wrote:
+> On Tue, 10 Jul 2018 16:42:48 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Tue, Jul 10, 2018 at 12:22:44PM +1000, Alexey Kardashevskiy wrote:
+> > > On Mon,  2 Jul 2018 16:26:44 +1000
+> > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> > >  =20
+> > > > The following changes since commit edb1fb337f65f82fe32b989c4f018efe=
+85c1dddb:
+> > > >=20
+> > > >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
+> > > >=20
+> > > > are available in the git repository at:
+> > > >=20
+> > > >   git@github.com:aik/qemu.git tags/qemu-slof-20180702
+> > > >=20
+> > > > for you to fetch changes up to edb1fb337f65f82fe32b989c4f018efe85c1=
+dddb:
+> > > >=20
+> > > >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
+> > > >=20
+> > > > ----------------------------------------------------------------
+> > > >=20
+> > > > I just missed a couple of gcc 8.1 fixes and thought I can still squ=
+eeze
+> > > > them before the 3.0  soft freeze.
+> > > >=20
+> > > >=20
+> > > > *** Note: this is not for master, this is for pseries =20
+> > >=20
+> > >=20
+> > > Not good for 3.1 either? =20
+> >=20
+> > Ugh.. somehow I missed this SLOF update request, and now we're in 3.0
+> > hard freeze.
+> >=20
+> > How bad are the bugs this SLOF update fixes?
+>=20
+> These only fix gcc 8.1 warnings and runtime errors =3D> not really
+> bugfixes so it is not a big deal if they miss 3.0.
 
-It is a guest virtual address. We can expose a function for address translation
-to let the plugin obtain physical address.
+Ok, well, if you want to resend the update, I'll queue it for 3.1.
 
-> Is the guest CPU state well-defined when this function is called?  For
-> example, is reading CPU registers meaningful in this function since it
-> could be called at pretty much any time?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-It is not. The guest state is the same as in translate.c.
-Therefore such functions are limited in accessing the registers.
+--wr1Q/2bz0MCWWNYv
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Why is this function called during execution?  I expected this to be
-> called at translation time only.  If a plugin decides at runtime to
-> instrument instructions that were previously not instrumented, then it
-> could flush the relevant TB(s) - that seems a lot more efficient than
-> calling this function for every instruction that gets executed.  But
-> maybe I am missing a use case for calling this at execution time...?
+-----BEGIN PGP SIGNATURE-----
 
-It isn't called for every executed instruction. It is called for instructions
-that was marked by the same function to instrument.
-I had a choice of two options:
- - insert many callbacks in case of multiple plugins, but call 'needs' only once.
- - insert one callback to dispatch function and call 'needs' for every plugin again,
-   because there is no information which plugin caused the instrumentation.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltFowsACgkQbDjKyiDZ
+s5JhPBAAmop+/MDwcl9HWHJDs17fh9BF0BO47yHdB+q1+j4k35m6B5Sc9tm1J0qI
+gaqZtml4Fm8IPCPRdCf1LG19LkDQtuTy0u7RNj58HaNTqWw2tympEi2tev43KakM
+I/yw+WkCk9cG+qUNI82ce6O1KGooLE0psobJMMFGz0NwFgszPP1XV5B21bw1l/Av
+HsDcTJ+/KVFmWgAVGF1K6iFZRUDIgXt32MobZjyn7Tsek8nssLi/Oi+8mOEOiOdh
+W1nTkm/Nnb+2Sl8hUO/0vPNOmr7hEpWFFAevWgEa7XDW3uhUKSuazGJKscnX9o5z
+8DDXDhm4X4fe3EvVmpL8fGN6eh7oM2wMWnzGs47lZV9xEmE2ESVMaDUuzIPlPzt/
+K1zI7JSu6bFJZZBzzWtKLE1IcaNjsdmrRQ9uAOZ8LI9TjhnNNG+xzcInB/2TdAna
+2hR/wgQfOpEo1pDCtv8u2hVcalbo9WIdB2lFPy/P1OVbwOjG8avXThLIDGPnk13V
+UjeCBaHC+faftUZoaxq7zNC0DVi/M1ZlOZQMGUirmpZOaZARssX4kY/Io12tzKr0
+uewamnLHwDW9Z2ZBwi8l6ucFIsjDy/LVcnEcoiGk3UqpQ1PdXlYO1D1jFD4wBJuD
+FfHZPTsd8ZwofT/0nzMq/E8sPe8c2lNnR3qNoMdiMeinS1lvObc=
+=Z/7A
+-----END PGP SIGNATURE-----
 
-Anyway, we can switch to the first option, if you don't see any other pitfalls
-except the larger generated code.
-
-> >  3. void plugin_before_insn(uint64_t pc, void *cpu);
-> >     If the previous function returned true for some instruction,
-> >     then this function will be called. This process is repeated before
-> >     every execution of the instruction, if it was instrumented.
-> 
-> Plugins that instrument multiple kinds of instructions will have to
-> first look up pc and decide which kind of instruction it is.  The plugin
-> could keep a list or hash table, or it could read memory to check the
-> guest code again.  This will be very repetitive - many plugins will need
-> to do this.
-
-Right.
-
-> A slightly different take on this API is:
-> 
->   /* Plugin->QEMU API */
-> 
->   /* Called by QEMU before translating an instruction
->    * @pc: guest virtual address of instruction
->    */
->   void plugin_pre_translate(void *cpu, uint64_t pc);
-> 
->   /* QEMU->Plugin API */
-> 
->   /* A callback invoked by QEMU before executing an instrumented
->    * instruction
->    * @opaque: plugin-specific data
->    */
->   typedef void (*InstrumentCallback)(void *cpu, void *opaque);
-> 
->   /* Register a callback @cb each time the instruction at @pc is about
->    * to be executed
->    * @cpu: the cpu to instrument or NULL to instrument all cpus
-
-This is interesting point I missed.
-As far, as I understand, current version translates TB only once for all CPUs.
-And we could need to instrument only some of them, which means that translation
-should be somehow extended for that.
-
->    * @opaque: plugin-specific data that is passed to @cb
->    */
->   void instrument(void *cpu, uint64_t pc,
->                   InstrumentCallback cb,
->                   void *opaque);
-> 
->   /* Unregister a callback @cb previously registered using instrument()
->    */
->   void uninstrument(void *cpu, uint64_t pc,
->                     InstrumentCallback cb,
-> 		    void *opaque);
-> 
-> Here plugin_pre_translate() is similar to plugin_needs_before_insn(),
-> but note it has no return value.  Instead of telling QEMU whether or not
-> to instrument an instruction, it must call instrument() if it wishes to
-> receive a callback immediately before a particular instruction is
-> executed.
-
-This is similar to our current approach here: https://github.com/ispras/qemu/tree/plugins
-
-But it has some issues:
- - You can't switch QEMU core from translation to interpretation, because this interface
-   is targeted to translation.
- - Callbacks can't be inserted without registering them in tcg
-   (this in needed at least for debug output).
-   Therefore someone should maintain already registered callbacks, or we should
-   expose the registration interface to the plugins (as we do in our projects now),
-   which also nail them to the translation-based emulation.
-
-Pavel Dovgalyuk
+--wr1Q/2bz0MCWWNYv--
