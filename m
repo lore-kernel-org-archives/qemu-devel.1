@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdGEE-0001kb-3G
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:36:27 -0400
+	(envelope-from <otubo@redhat.com>) id 1fdGQQ-0004fU-Rm
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdGE9-0004Eg-CZ
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:36:26 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-	<20180710160013.26559-6-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <544c91ef-b30e-a597-8f2a-59bd432c1b99@amsat.org>
-Date: Wed, 11 Jul 2018 11:36:15 -0300
+	(envelope-from <otubo@redhat.com>) id 1fdGQN-0000Xg-P0
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:49:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42770 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fdGQN-0000XP-CY
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 10:48:59 -0400
+Date: Wed, 11 Jul 2018 16:48:55 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20180711144855.GE14423@vader>
+References: <20180710145557.12902-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-6-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 5/6] accel/tcg: Return -1 for
- execution from MMIO regions in get_page_addr_code()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="so9zsI5B81VjUb/o"
+Content-Disposition: inline
+In-Reply-To: <20180710145557.12902-1-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] seccomp: allow sched_setscheduler() with
+ SCHED_IDLE policy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, KONRAD Frederic <frederic.konrad@adacore.com>, "Emilio G . Cota" <cota@braap.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, eskultet@redhat.com, kraxel@redhat.com, berrange@redhat.com, gschafer@gmail.com
 
-On 07/10/2018 01:00 PM, Peter Maydell wrote:
-> Now that all the callers can handle get_page_addr_code() returning -1,
-> remove all the code which tries to handle execution from MMIO regions
-> or small-MMU-region RAM areas. This will mean that we can correctly
-> execute from these areas, rather than ending up either aborting QEMU
-> or delivering an incorrect guest exception.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--so9zsI5B81VjUb/o
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 10/07/2018 - 16:55:57, Marc-Andr=C3=A9 Lureau wrote:
+> Current and upcoming mesa releases rely on a shader disk cash. It uses
+> a thread job queue with low priority, set with
+> sched_setscheduler(SCHED_IDLE). However, that syscall is rejected by
+> the "resourcecontrol" seccomp qemu filter.
+>=20
+> Since it should be safe to allow lowering thread priority, let's allow
+> scheduling thread to idle policy.
+>=20
+> Related to:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  accel/tcg/cputlb.c | 95 +++++-----------------------------------------
->  1 file changed, 10 insertions(+), 85 deletions(-)
-> 
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index c491703f15f..abb0225dc79 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -741,39 +741,6 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
->                              prot, mmu_idx, size);
->  }
->  
-> -static void report_bad_exec(CPUState *cpu, target_ulong addr)
-> -{
-> -    /* Accidentally executing outside RAM or ROM is quite common for
-> -     * several user-error situations, so report it in a way that
-> -     * makes it clear that this isn't a QEMU bug and provide suggestions
-> -     * about what a user could do to fix things.
-> -     */
-> -    error_report("Trying to execute code outside RAM or ROM at 0x"
-> -                 TARGET_FMT_lx, addr);
-> -    error_printf("This usually means one of the following happened:\n\n"
-> -                 "(1) You told QEMU to execute a kernel for the wrong machine "
-> -                 "type, and it crashed on startup (eg trying to run a "
-> -                 "raspberry pi kernel on a versatilepb QEMU machine)\n"
-> -                 "(2) You didn't give QEMU a kernel or BIOS filename at all, "
-> -                 "and QEMU executed a ROM full of no-op instructions until "
-> -                 "it fell off the end\n"
-> -                 "(3) Your guest kernel has a bug and crashed by jumping "
-> -                 "off into nowhere\n\n"
-> -                 "This is almost always one of the first two, so check your "
-> -                 "command line and that you are using the right type of kernel "
-> -                 "for this machine.\n"
-> -                 "If you think option (3) is likely then you can try debugging "
-> -                 "your guest with the -d debug options; in particular "
-> -                 "-d guest_errors will cause the log to include a dump of the "
-> -                 "guest register state at this point.\n\n"
-> -                 "Execution cannot continue; stopping here.\n\n");
-> -
-> -    /* Report also to the logs, with more detail including register dump */
-> -    qemu_log_mask(LOG_GUEST_ERROR, "qemu: fatal: Trying to execute code "
-> -                  "outside RAM or ROM at 0x" TARGET_FMT_lx "\n", addr);
-> -    log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
-> -}
-> -
->  static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
->  {
->      ram_addr_t ram_addr;
-> @@ -963,7 +930,6 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->      MemoryRegionSection *section;
->      CPUState *cpu = ENV_GET_CPU(env);
->      CPUIOTLBEntry *iotlbentry;
-> -    hwaddr physaddr, mr_offset;
->  
->      index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
->      mmu_idx = cpu_mmu_index(env, true);
-> @@ -977,65 +943,24 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->                    (TLB_RECHECK | TLB_INVALID_MASK)) == TLB_RECHECK)) {
->          /*
->           * This is a TLB_RECHECK access, where the MMU protection
-> -         * covers a smaller range than a target page, and we must
-> -         * repeat the MMU check here. This tlb_fill() call might
-> -         * longjump out if this access should cause a guest exception.
-> -         */
-> -        int index;
-> -        target_ulong tlb_addr;
-> -
-> -        tlb_fill(cpu, addr, 0, MMU_INST_FETCH, mmu_idx, 0);
-> -
-> -        index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> -        tlb_addr = env->tlb_table[mmu_idx][index].addr_code;
-> -        if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-> -            /* RAM access. We can't handle this, so for now just stop */
-> -            cpu_abort(cpu, "Unable to handle guest executing from RAM within "
-> -                      "a small MPU region at 0x" TARGET_FMT_lx, addr);
-> -        }
-> -        /*
-> -         * Fall through to handle IO accesses (which will almost certainly
-> -         * also result in failure)
-> +         * covers a smaller range than a target page. Return -1 to
-> +         * indicate that we cannot simply execute from RAM here;
-> +         * we will perform the necessary repeat of the MMU check
-> +         * when the "execute a single insn" code performs the
-> +         * load of the guest insn.
->           */
-> +        return -1;
->      }
->  
->      iotlbentry = &env->iotlb[mmu_idx][index];
->      section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
->      mr = section->mr;
->      if (memory_region_is_unassigned(mr)) {
-> -        qemu_mutex_lock_iothread();
-> -        if (memory_region_request_mmio_ptr(mr, addr)) {
-> -            qemu_mutex_unlock_iothread();
-> -            /* A MemoryRegion is potentially added so re-run the
-> -             * get_page_addr_code.
-> -             */
-> -            return get_page_addr_code(env, addr);
-> -        }
-> -        qemu_mutex_unlock_iothread();
-> -
-> -        /* Give the new-style cpu_transaction_failed() hook first chance
-> -         * to handle this.
-> -         * This is not the ideal place to detect and generate CPU
-> -         * exceptions for instruction fetch failure (for instance
-> -         * we don't know the length of the access that the CPU would
-> -         * use, and it would be better to go ahead and try the access
-> -         * and use the MemTXResult it produced). However it is the
-> -         * simplest place we have currently available for the check.
-> +        /*
-> +         * Not guest RAM, so there is no ram_addr_t for it. Return -1,
-> +         * and we will execute a single insn from this device.
->           */
-> -        mr_offset = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-> -        physaddr = mr_offset +
-> -            section->offset_within_address_space -
-> -            section->offset_within_region;
-> -        cpu_transaction_failed(cpu, physaddr, addr, 0, MMU_INST_FETCH, mmu_idx,
-> -                               iotlbentry->attrs, MEMTX_DECODE_ERROR, 0);
-> -
-> -        cpu_unassigned_access(cpu, addr, false, true, 0, 4);
-> -        /* The CPU's unassigned access hook might have longjumped out
-> -         * with an exception. If it didn't (or there was no hook) then
-> -         * we can't proceed further.
-> -         */
-> -        report_bad_exec(cpu, addr);
-> -        exit(1);
-> +        return -1;
->      }
->      p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
->      return qemu_ram_addr_from_host_nofail(p);
-> 
+>  qemu-seccomp.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> index 148e4c6f24..9cd8eb9499 100644
+> --- a/qemu-seccomp.c
+> +++ b/qemu-seccomp.c
+> @@ -34,6 +34,12 @@
+>  struct QemuSeccompSyscall {
+>      int32_t num;
+>      uint8_t set;
+> +    uint8_t narg;
+> +    const struct scmp_arg_cmp *arg_cmp;
+> +};
+> +
+> +const struct scmp_arg_cmp sched_setscheduler_arg[] =3D {
+> +    SCMP_A1(SCMP_CMP_NE, SCHED_IDLE)
+>  };
+> =20
+>  static const struct QemuSeccompSyscall blacklist[] =3D {
+> @@ -92,7 +98,8 @@ static const struct QemuSeccompSyscall blacklist[] =3D {
+>      { SCMP_SYS(setpriority),            QEMU_SECCOMP_SET_RESOURCECTL },
+>      { SCMP_SYS(sched_setparam),         QEMU_SECCOMP_SET_RESOURCECTL },
+>      { SCMP_SYS(sched_getparam),         QEMU_SECCOMP_SET_RESOURCECTL },
+> -    { SCMP_SYS(sched_setscheduler),     QEMU_SECCOMP_SET_RESOURCECTL },
+> +    { SCMP_SYS(sched_setscheduler),     QEMU_SECCOMP_SET_RESOURCECTL,
+> +      ARRAY_SIZE(sched_setscheduler_arg), sched_setscheduler_arg },
+>      { SCMP_SYS(sched_getscheduler),     QEMU_SECCOMP_SET_RESOURCECTL },
+>      { SCMP_SYS(sched_setaffinity),      QEMU_SECCOMP_SET_RESOURCECTL },
+>      { SCMP_SYS(sched_getaffinity),      QEMU_SECCOMP_SET_RESOURCECTL },
+> @@ -118,7 +125,8 @@ static int seccomp_start(uint32_t seccomp_opts)
+>              continue;
+>          }
+> =20
+> -        rc =3D seccomp_rule_add(ctx, SCMP_ACT_KILL, blacklist[i].num, 0);
+> +        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_KILL, blacklist[i].n=
+um,
+> +                                    blacklist[i].narg, blacklist[i].arg_=
+cmp);
+>          if (rc < 0) {
+>              goto seccomp_return;
+>          }
+> --=20
+> 2.18.0.129.ge3331758f1
+>=20
+
+Acked-by: Eduardo Otubo <otubo@redhat.com>
+
+Patch looks safe enough for me. If everyone else is OK with this I'll send a
+pull-request tomorrow morning.
+
+--so9zsI5B81VjUb/o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbRhjXAAoJEN8y58Dw//miVIMH/Rplt5ij0SkTXIkeaZua00hD
+o9MQ3AKO12SPb9qhQWcHco7F2k3DQ63g4UhlSUF8xh7JZ3HEyy1OtRTC2TVwNVtS
+p2LgZ2PYFEky/0fMTFpP0azybA5p1KJaeYeGKBIB3d1ptjM2O+P+2e1HHR/NG0eo
+JdFJ7PQ+ZJvAF0tYxLS7qeaS8cu0HrWd1Aqi38u5F7br0UI8auXeK6F+EYjlphHV
+1x44AOspmFBAoad85ll55GTKzSdiVkLfssb2ZhO+KugXI3++bkTGwrLC+CE9ZIyj
+qKIblbPAsf7ZK+ymdqsXwE3eQfDrggAbo9yUj8XLcLvPt3B84v2ApvWjAG5rt+Q=
+=TVDJ
+-----END PGP SIGNATURE-----
+
+--so9zsI5B81VjUb/o--
