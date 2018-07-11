@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fdEbQ-0004w8-Ff
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:52:18 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fdEjp-0007i6-I0
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fdEbP-0007zR-6h
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:52:16 -0400
-Date: Wed, 11 Jul 2018 14:51:55 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180711125155.wkvyjge76r6o3bk4@kamzik.brq.redhat.com>
-References: <20180704124923.32483-1-drjones@redhat.com>
-	<20180704124923.32483-6-drjones@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1fdEjm-0003wf-FQ
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:00:57 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53145)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fdEjm-0003wS-6u
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:00:54 -0400
+Received: by mail-wm0-x241.google.com with SMTP id w16-v6so2349298wmc.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 06:00:53 -0700 (PDT)
+Date: Wed, 11 Jul 2018 14:00:50 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180711130050.GG31228@stefanha-x1.localdomain>
+References: <20180705222115.17013-1-jusual@mail.ru>
+	<20180705222115.17013-3-jusual@mail.ru>
+	<CAFEAcA8TPN=05ncaSp8k7gAvwF7cmSoykTcG5YdLvByvhgasHg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="f5QefDQHtn8hx44O"
 Content-Disposition: inline
-In-Reply-To: <20180704124923.32483-6-drjones@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 5/6] virt-acpi-build: add PPTT table
+In-Reply-To: <CAFEAcA8TPN=05ncaSp8k7gAvwF7cmSoykTcG5YdLvByvhgasHg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v3 2/2] tests: Add ARMv6-M reserved register
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,169 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, imammedo@redhat.com, eric.auger@redhat.com, wei@redhat.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Julia Suvorova <jusual@mail.ru>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
 
-On Wed, Jul 04, 2018 at 02:49:22PM +0200, Andrew Jones wrote:
-> The ACPI PPTT table supports topology descriptions for ACPI
-> guests. Note, while a DT boot Linux guest with a non-flat CPU
-> topology will see socket and core IDs being sequential integers
-> starting from zero, e.g. with -smp 4,sockets=2,cores=2,threads=1
-> 
-> a DT boot produces
-> 
->  cpu:  0 package_id:  0 core_id:  0
->  cpu:  1 package_id:  0 core_id:  1
->  cpu:  2 package_id:  1 core_id:  0
->  cpu:  3 package_id:  1 core_id:  1
-> 
-> an ACPI boot produces
-> 
->  cpu:  0 package_id: 36 core_id:  0
->  cpu:  1 package_id: 36 core_id:  1
->  cpu:  2 package_id: 96 core_id:  2
->  cpu:  3 package_id: 96 core_id:  3
-> 
-> This is due to several reasons:
-> 
->  1) DT cpu nodes do not have an equivalent field to what the PPTT
->     ACPI Processor ID must be, i.e. something equal to the MADT CPU
->     UID or equal to the UID of an ACPI processor container. In both
->     ACPI cases those are platform dependant IDs assigned by the
->     vendor.
-> 
->  2) While QEMU is the vendor for a guest, if the topology specifies
->     SMT (> 1 thread), then, with ACPI, it is impossible to assign a
->     core-id the same value as a package-id, thus it is not possible
->     to have package-id=0 and core-id=0. This is because package and
->     core containers must be in the same ACPI namespace and therefore
->     must have unique UIDs.
-> 
->  3) ACPI processor containers are not required for PPTT tables to
->     be used and, due to the limitations of which IDs are selected
->     described above in (2), they are not helpful for QEMU, so we
->     don't build them with this patch. In the absence of them, Linux
->     assigns its own unique IDs. The maintainers have chosen not to use
->     counters from zero, but rather ACPI table offsets, which explains
->     why the numbers are so much larger than with DT.
-> 
->  4) When there is no SMT (threads=1) the core IDs for ACPI boot guests
->     match the logical CPU IDs, because these IDs must be equal to the
->     MADT CPU UID (as no processor containers are present), and QEMU
->     uses the logical CPU ID for these MADT IDs.
-> 
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  hw/acpi/aml-build.c         | 50 +++++++++++++++++++++++++++++++++++++
->  hw/arm/virt-acpi-build.c    |  5 ++++
->  include/hw/acpi/aml-build.h |  2 ++
->  3 files changed, 57 insertions(+)
-> 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 1e43cd736de9..37e8f5182ae9 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -24,6 +24,7 @@
->  #include "hw/acpi/aml-build.h"
->  #include "qemu/bswap.h"
->  #include "qemu/bitops.h"
-> +#include "sysemu/cpus.h"
->  #include "sysemu/numa.h"
->  
->  static GArray *build_alloc_array(void)
-> @@ -1679,6 +1680,55 @@ void build_slit(GArray *table_data, BIOSLinker *linker)
->                   table_data->len - slit_start, 1, NULL, NULL);
+
+--f5QefDQHtn8hx44O
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jul 06, 2018 at 03:55:14PM +0100, Peter Maydell wrote:
+> On 5 July 2018 at 23:21, Julia Suvorova <jusual@mail.ru> wrote:
+> > Check that reserved SCS registers return 0 at read,
+> > and writes are ignored.
+> >
+> > Based-on: <20180627143815.1829-1-joel@jms.id.au>
+> > Based-on: <20180630091343.14391-1-stefanha@redhat.com>
+> >
+> > Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> > ---
+> > Test will work if Joel's patches will use ARMv6-M.
+> >
+> >  tests/Makefile.include            |  2 ++
+> >  tests/tcg/arm/test-reserved-reg.c | 60 +++++++++++++++++++++++++++++++
+> >  2 files changed, 62 insertions(+)
+> >  create mode 100644 tests/tcg/arm/test-reserved-reg.c
+>=20
+> Is this in the wrong place? It doesn't look like a
+> tests/tcg test -- those directories are for test
+> programs which need to be compiled with a cross compiler
+> for the guest CPU and then run on it.
+
+Yes, this test should go in tests/ along with the other qtests.
+
+>=20
+> I tried running 'make check' and I got this error:
+>=20
+>   CC      tests/tcg/arm/test-reserved-reg.o
+> /home/petmay01/linaro/qemu-from-laptop/qemu/tests/tcg/arm/test-reserved-r=
+eg.c:60:1:
+> fatal error: opening dependency file
+> tests/tcg/arm/test-reserved-reg.d: No such file or directory
 >  }
->  
-> +/*
-> + * ACPI 6.2 Processor Properties Topology Table (PPTT)
-> + */
-> +static void build_cpu_hierarchy(GArray *tbl, uint32_t flags,
-> +                                uint32_t parent, uint32_t id)
-> +{
-> +    build_append_byte(tbl, 0);  /* Type 0 - processor */
-> +    build_append_byte(tbl, 20); /* Length, no private resources */
-> +    build_append_int_noprefix(tbl, 0, 2);           /* Reserved */
-> +    build_append_int_noprefix(tbl, flags, 4);
-> +    build_append_int_noprefix(tbl, parent, 4);
-> +    build_append_int_noprefix(tbl, id, 4);
-> +    build_append_int_noprefix(tbl, 0, 4); /* Num private resources */
-> +}
-> +
-> +void build_pptt(GArray *table_data, BIOSLinker *linker, int possible_cpus)
-> +{
-> +    int pptt_start = table_data->len;
-> +    int uid = 0, cpus = 0, socket;
-> +
-> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> +
-> +    for (socket = 0; cpus < possible_cpus; socket++) {
-> +        uint32_t socket_offset = table_data->len - pptt_start;
-> +        int core;
-> +
-> +        build_cpu_hierarchy(table_data, 1, 0, socket);
-> +
-> +        for (core = 0; core < smp_cores; core++) {
-> +            uint32_t core_offset = table_data->len - pptt_start;
-> +            int thread;
-> +
-> +            if (smp_threads > 1) {
-> +                build_cpu_hierarchy(table_data, 0, socket_offset, core);
-> +                for (thread = 0; thread < smp_threads; thread++) {
-> +                    build_cpu_hierarchy(table_data, 2, core_offset, uid++);
-> +                }
-> +             } else {
-> +                build_cpu_hierarchy(table_data, 2, socket_offset, uid++);
+>  ^
+>=20
+> which is a bit weird.
+>=20
+> thanks
+> -- PMM
+>=20
 
-It just occurred to me that the uid++'s above should be something like
-uid[i++]'s, where uid[] is an argument to the function instead. Otherwise
-this general aml builder function isn't written generally enough.
+--f5QefDQHtn8hx44O
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +             }
-> +        }
-> +        cpus += smp_cores * smp_threads;
-> +    }
-> +
-> +    build_header(linker, table_data,
-> +                 (void *)(table_data->data + pptt_start), "PPTT",
-> +                 table_data->len - pptt_start, 1, NULL, NULL);
-> +}
-> +
->  /* build rev1/rev3/rev5.1 FADT */
->  void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
->                  const char *oem_id, const char *oem_table_id)
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 1d1fc824da6f..aa77e1f018d9 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -832,6 +832,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      acpi_add_table(table_offsets, tables_blob);
->      build_madt(tables_blob, tables->linker, vms);
->  
-> +    if (!vmc->ignore_cpu_topology) {
-> +        acpi_add_table(table_offsets, tables_blob);
-> +        build_pptt(tables_blob, tables->linker, possible_cpus(vms));
-> +    }
-> +
->      acpi_add_table(table_offsets, tables_blob);
->      build_gtdt(tables_blob, tables->linker, vms);
->  
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 6c36903c0a5d..2b0fde6bd417 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -414,6 +414,8 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
->  
->  void build_slit(GArray *table_data, BIOSLinker *linker);
->  
-> +void build_pptt(GArray *table_data, BIOSLinker *linker, int possible_cpus);
-> +
->  void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
->                  const char *oem_id, const char *oem_table_id);
->  #endif
-> -- 
-> 2.17.1
-> 
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbRf+CAAoJEJykq7OBq3PIXmIH/j9kHcI8SM7xOE3QXm07IxzN
+iVU/SxUMiyWUNih0Rp/S6DosY6G3DlJwYV/YEgU6ocNdkkjicJyv3DNTlZxcrXmP
+EhT3sjgjnKCEDqI3q99aODDrlEZXmJ8NWmUqBy5YaqqdR/B6IX409FvsJlUhjnvU
+Y2746ZqJNEWvf7BpMJG6gOEMuu26p5hNsWUcVE7nohKsHJBEKISrk+/rXCexaP4q
+pn4rUMliN0/F+uNK75E+yaw/jzQAdbj7oGGaKPCcYPKnt0eHJPQ8ielxEBZMlhJu
+9TjPyFZfkGHLl2JeUBY2CngieC9YfvTmiQU+Wp/Cg58jGNc+kF9ffm2+eoOhpKk=
+=NczO
+-----END PGP SIGNATURE-----
+
+--f5QefDQHtn8hx44O--
