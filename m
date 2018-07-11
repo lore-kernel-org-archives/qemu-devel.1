@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fdCkJ-0002Yk-AY
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:53:20 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdCmR-0003lm-Lm
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fdCkG-00042G-8X
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:53:19 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:45637)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fdCkF-00041x-Um
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:53:16 -0400
-Received: by mail-pf0-x242.google.com with SMTP id i26-v6so6738124pfo.12
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 03:53:15 -0700 (PDT)
-Date: Wed, 11 Jul 2018 20:53:05 +1000
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20180711205305.0f3a42f1@aik.ozlabs.ibm.com>
-In-Reply-To: <20180711062619.GQ22363@umbus.fritz.box>
-References: <20180702062644.48040-1-aik@ozlabs.ru>
-	<20180710122244.7466489f@aik.ozlabs.ibm.com>
-	<20180710064248.GM22363@umbus.fritz.box>
-	<20180710171453.6e3eee34@aik.ozlabs.ibm.com>
-	<20180711062619.GQ22363@umbus.fritz.box>
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdCmO-0005L8-JA
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:55:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
+	id 1fdCmO-0005IM-AH
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:55:28 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6BAsYLs069617
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 06:55:25 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k5d6a0c1s-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 06:55:25 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
+	Wed, 11 Jul 2018 11:55:21 +0100
+From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Date: Wed, 11 Jul 2018 05:55:17 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/5KBUzk1s=B3gWWQNshYYyxq";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
- firmware image
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <153130635623.17872.6735154721391367314.stgit@lep8c.aus.stglabs.ibm.com>
+Subject: [Qemu-devel] [PATCH] linux-user: ppc64: use the correct values for
+ F_*LK64s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +39,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: riku.voipio@iki.fi, laurent@vivier.eu
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
---Sig_/5KBUzk1s=B3gWWQNshYYyxq
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Qemu includes the glibc headers for the host defines and target headers are
+part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
+and F_SETLKW64 defined to 12, 13 and 14 for all archs(generic) in
+sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
+definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
+include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
+assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
+can be seen in include/linux/fcntl.h in linux source.
 
-On Wed, 11 Jul 2018 16:26:19 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
+explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
+Whereas, a PPC64 host doesn't have such a definition in
+/usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
+the sources on PPC64 host sees the default value of F_*LK64*
+as 12, 13 & 14(fcntl-linux.h).
 
-> On Tue, Jul 10, 2018 at 05:14:53PM +1000, Alexey Kardashevskiy wrote:
-> > On Tue, 10 Jul 2018 16:42:48 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Tue, Jul 10, 2018 at 12:22:44PM +1000, Alexey Kardashevskiy wrote:=
- =20
-> > > > On Mon,  2 Jul 2018 16:26:44 +1000
-> > > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> > > >    =20
-> > > > > The following changes since commit edb1fb337f65f82fe32b989c4f018e=
-fe85c1dddb:
-> > > > >=20
-> > > > >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
-> > > > >=20
-> > > > > are available in the git repository at:
-> > > > >=20
-> > > > >   git@github.com:aik/qemu.git tags/qemu-slof-20180702
-> > > > >=20
-> > > > > for you to fetch changes up to edb1fb337f65f82fe32b989c4f018efe85=
-c1dddb:
-> > > > >=20
-> > > > >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +1000)
-> > > > >=20
-> > > > > ----------------------------------------------------------------
-> > > > >=20
-> > > > > I just missed a couple of gcc 8.1 fixes and thought I can still s=
-queeze
-> > > > > them before the 3.0  soft freeze.
-> > > > >=20
-> > > > >=20
-> > > > > *** Note: this is not for master, this is for pseries   =20
-> > > >=20
-> > > >=20
-> > > > Not good for 3.1 either?   =20
-> > >=20
-> > > Ugh.. somehow I missed this SLOF update request, and now we're in 3.0
-> > > hard freeze.
-> > >=20
-> > > How bad are the bugs this SLOF update fixes? =20
-> >=20
-> > These only fix gcc 8.1 warnings and runtime errors =3D> not really
-> > bugfixes so it is not a big deal if they miss 3.0. =20
->=20
-> Ok, well, if you want to resend the update, I'll queue it for 3.1.
+Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
+implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
+convertion back to F_*LK* values on PPC64 as seen in
+sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
+macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
+and no adjustments are needed.
 
+Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
+own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
+adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
+fail by all pplications run on PPC64 host user emulation.
 
-It is still on github, why resend?
+The fix here could be to see why on PPC64 the glibc is still keeping
+F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
+the syscall for PPC only. See if we can make the
+/usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
+5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That way,
+qemu sources see the kernel supported values in glibc headers.
 
+OR
 
+On PPC64 host, qemu sources see both F_LK* & F_LK64* as same and set to
+12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
+sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
+Since F_*LK and F_*LK64 are same, the value adjument like done by glibc in
+qemu sources is difficult. So, Overwrite the glibc defaults with the actual
+supported values in Qemu. The current patch is doing this.
 
---
-Alexey
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+---
+ linux-user/syscall.c |   14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
---Sig_/5KBUzk1s=B3gWWQNshYYyxq
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEECIb1sawlPgRl/px9ze7KtGKK020FAltF4ZEACgkQze7KtGKK
-021X0Q//fFd1YcpvIwRwZR/SfIZQgv0GVB+JPkd57BIa6IauOABzILVtf6ov5FoJ
-XwgYiPejYOgOeRr4ZZ4ASx/xxzWvVLYHHI8h0HrphwJ00E519bueMWk1RHPlIAga
-k6iegGpfi+O0PT+90CRdFVLF1vEo/wZqUUGzE0nlv6/WXfHqSlzjUO6Yt0t3q/ku
-ZQh6pNShLyc9T87WZQuzg4pNOXEc9/sYVzndQ1OL1vHF2Itj18lYdhKA20RyZo+4
-EpNjkU4HcoXK8kLVBob7inrBwdKelEFqlOUqC08y4xM/xRk+PjEvpUJvlPTcCqZC
-e1DRj1eFxO0yjHNp22KmKJyQYqYkICvFc1jLn/lUNTMBt+xUPI7eRNtEibH8l5do
-14fJCbZq8EN2zmoE4fU0nVcDuNntu40CJ8Ctw76djC3kKHFnvZslRQxAgSlUJzVh
-BBaeyaqWnpob4o7DPkP4PxGi7C4uSCAgs6PS6rfpUSxAySEbcNW14lrTuWQWtfSW
-Ik7BArcDjJFxzNSrdg8K5hDJ5Pg1o+RP8LFICxeqlpZvRz64X95zN0nN0D43hhAD
-66CuY3pxxyxGTjKQ+E+Fip5XGO2JMTeIlMAb+VgO2QmNYTKhNXvOWugaJv9odlQ+
-vg+9I35X6d+JK+OjbLHS1ZvMGdbjiyl4DjGzWaE8r+9eOhAzWbo=
-=JKk9
------END PGP SIGNATURE-----
-
---Sig_/5KBUzk1s=B3gWWQNshYYyxq--
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7b9ac3b408..1693e69ce0 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -250,6 +250,20 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
+ #define TARGET_NR__llseek TARGET_NR_llseek
+ #endif
+ 
++/* glibc headers has these defined to 12, 13 and 14 and is not supported
++ * by kernel. The glibc fcntl call actually adjusts them back to 5, 6 and 7
++ * before making the syscall(). Since we make the syscall directly,
++ * overwite/adjust to what is supported by the kernel.
++ */
++#if defined(__linux__) && defined(__powerpc64__)
++#undef F_GETLK64
++#define F_GETLK64      5       /* Get record locking info.  */
++#undef F_SETLK64
++#define F_SETLK64      6       /* Set record locking info (non-blocking).  */
++#undef F_SETLKW64
++#define F_SETLKW64     7       /* Set record locking info (blocking).  */
++#endif
++
+ #ifdef __NR_gettid
+ _syscall0(int, gettid)
+ #else
