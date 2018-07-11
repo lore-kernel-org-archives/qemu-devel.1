@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdARL-0003xL-Gs
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:25:36 -0400
+	(envelope-from <dimastep@yandex-team.ru>) id 1fdAaA-0006DV-5G
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdARK-0001NQ-J7
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:25:35 -0400
-Date: Wed, 11 Jul 2018 10:25:26 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180711082526.GA4266@localhost.localdomain>
-References: <1531235146-6048-1-git-send-email-pl@kamp.de>
-	<20180710153155.GM5852@localhost.localdomain>
-	<73DCB217-9027-4248-8C81-A83AD4512927@kamp.de>
+	(envelope-from <dimastep@yandex-team.ru>) id 1fdAa6-00045r-TO
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:34:42 -0400
+Received: from forwardcorp1j.cmail.yandex.net ([5.255.227.105]:37269)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dimastep@yandex-team.ru>)
+	id 1fdAa6-00045Q-GO
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:34:38 -0400
+Date: Wed, 11 Jul 2018 11:34:31 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+Message-ID: <20180711083431.GA5085@dimastep-nix>
+References: <1528877995-5043-1-git-send-email-dimastep@yandex-team.ru>
+	<1528877995-5043-3-git-send-email-dimastep@yandex-team.ru>
+	<20180619141216.GA16512@dimastep-nix>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <73DCB217-9027-4248-8C81-A83AD4512927@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V5] qemu-img: align result of
- is_allocated_sectors
+In-Reply-To: <20180619141216.GA16512@dimastep-nix>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] memory: fix possible NULL pointer
+ dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: wrfsh@yandex-team.ru, pbonzini@redhat.com
 
-Am 10.07.2018 um 22:16 hat Peter Lieven geschrieben:
+Gentle ping. CCing Paolo Bonzini.
+
+Regards, Dima.
+
+On Tue, Jun 19, 2018 at 05:12:16PM +0300, Dima Stepanov wrote:
+> Ping.
 > 
+> Regards, Dima.
 > 
-> > Am 10.07.2018 um 17:31 schrieb Kevin Wolf <kwolf@redhat.com>:
+> On Wed, Jun 13, 2018 at 11:19:55AM +0300, Dima Stepanov wrote:
+> > In the memory_region_do_invalidate_mmio_ptr() routine the section
+> > variable is intialized by the memory_region_find() call. The section.mr
+> > field can be set to NULL.
 > > 
-> > Am 10.07.2018 um 17:05 hat Peter Lieven geschrieben:
-> >> We currently don't enforce that the sparse segments we detect during convert are
-> >> aligned. This leads to unnecessary and costly read-modify-write cycles either
-> >> internally in Qemu or in the background on the storage device as nearly all
-> >> modern filesystems or hardware have a 4k alignment internally.
-> >> 
-> >> This patch modifies is_allocated_sectors so that its *pnum result will always
-> >> end at an alignment boundary. This way all requests will end at an alignment
-> >> boundary. The start of all requests will also be aligned as long as the results
-> >> of get_block_status do not lead to an unaligned offset.
-> >> 
-> >> The number of RMW cycles when converting an example image [1] to a raw device that
-> >> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
-> >> write requests. With this path the additional 4600 read requests are eliminated while
-> >> the number of total write requests stays constant.
-> >> 
-> >> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
-> >> 
-> >> Signed-off-by: Peter Lieven <pl@kamp.de>
+> > Add the check for NULL before trying to drop a section.
 > > 
-> > It looked convincing, but I'm afraid this is still not correct.
-> > qemu-iotests 122 fails for me with this patch.
-> 
-> I will have a look, where and why exactly it fails, but the allocation
-> pattern might be slightly different due to the alignment. What counts
-> is that the output is byte identical or not?
-
-Right, I noticed only after sending this email that it's qemu-img map
-output that changes and this might actually be okay. I didn't check,
-however, if the exact changes are what is expected and whether we need
-to add more test cases to cover what the test originally wanted to
-cover.
-
-So after all, there's a good chance that all that's missing is just an
-update to the test case.
-
-Kevin
+> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > ---
+> >  memory.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/memory.c b/memory.c
+> > index 3212acc..bb45248 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -2712,7 +2712,7 @@ static void memory_region_do_invalidate_mmio_ptr(CPUState *cpu,
+> >      /* Reset dirty so this doesn't happen later. */
+> >      cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
+> >  
+> > -    if (section.mr != mr) {
+> > +    if (section.mr && (section.mr != mr)) {
+> >          /* memory_region_find add a ref on section.mr */
+> >          memory_region_unref(section.mr);
+> >          if (MMIO_INTERFACE(section.mr->owner)) {
+> > -- 
+> > 2.7.4
+> > 
+> > 
