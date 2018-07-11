@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fdLDo-0004xe-SA
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:56:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fdLGv-00068H-1W
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fdLDl-0003HE-PR
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:56:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46236)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fdLDl-0003Gx-Jo
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:56:17 -0400
-Received: from smtp.corp.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com
-	[10.5.11.26])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA1795F72D
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 19:56:16 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 11 Jul 2018 13:56:13 -0600
-Message-ID: <153133896639.31530.10135934557052494909.stgit@w520.home>
-In-Reply-To: <153133890557.31530.586346402906852972.stgit@w520.home>
-References: <153133890557.31530.586346402906852972.stgit@w520.home>
+	(envelope-from <ehabkost@redhat.com>) id 1fdLGu-0004GP-3z
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:59:33 -0400
+Date: Wed, 11 Jul 2018 16:59:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180711195924.GC7451@localhost.localdomain>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
+	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
+	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
+	<955f26d7-5a0b-28e0-bd0f-f663593afefe@redhat.com>
+	<1be41104-d896-b03b-e0f3-47ea9c3b333f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] vfio/pci: do not set the PCIDevice
- 'has_rom' attribute
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1be41104-d896-b03b-e0f3-47ea9c3b333f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+On Wed, Jul 11, 2018 at 09:04:35PM +0200, Thomas Huth wrote:
+> On 11.07.2018 19:21, Paolo Bonzini wrote:
+> > On 10/07/2018 08:50, Peter Maydell wrote:
+> >>>> Yuck. The real problem here is that we're still requiring the
+> >>>> code that creates these QOM devices to manually set the parent
+> >>>> in the first place. It's not surprising that we don't get it right
+> >>>> (either parenting in the wrong place or not at all). I'd much
+> >>>> rather see us fix that properly than keep papering over places
+> >>>> where we get it wrong.
+> >>> Sorry, I'm still not an expert in all this QOM stuff yet ... so what do
+> >>> you exactly recommend to do instead?
+> >> I'm not clear either, but I don't think that what we're
+> >> currently doing can be right.
+> > 
+> > Well, in theory it should work...  I sent the expected flow in another email.
+> 
+> Something that just came to my mind:
+> 
+> bcm2836_init() creates the TYPE_BCM2835_PERIPHERALS object with
+> object_initialize(). This creates one reference to the object already.
+> Then the object is linked to its parent with
+> object_property_add_child(), which creates another reference to the
+> object. But where are the two references correctly destroyed again? One
+> is certainly destroyed by device_unparent later, but the initial one?
+> Could it be that we are simply lacking one object_unref() after the
+> object_property_add_child() here?
 
-PCI devices needing a ROM allocate an optional MemoryRegion with
-pci_add_option_rom(). pci_del_option_rom() does the cleanup when the
-device is destroyed. The only action taken by this routine is to call
-vmstate_unregister_ram() which clears the id string of the optional
-ROM RAMBlock and now, also flags the RAMBlock as non-migratable. This
-was recently added by commit b895de502717 ("migration: discard
-non-migratable RAMBlocks"), .
+This seems to be true, but I'm confused about the reference
+counting model, here:
 
-VFIO devices do their own loading of the PCI option ROM in
-vfio_pci_size_rom(). The memory region is switched to an I/O region
-and the PCI attribute 'has_rom' is set but the RAMBlock of the ROM
-region is not allocated. When the associated PCI device is deleted,
-pci_del_option_rom() calls vmstate_unregister_ram() which tries to
-flag a NULL RAMBlock, leading to a SEGV.
+What exactly guarantees there will be no other references to
+(e.g.) `&s->control` when `s` is freed?
 
-It seems that 'has_rom' was set to have memory_region_destroy()
-called, but since commit 469b046ead06 ("memory: remove
-memory_region_destroy") this is not necessary anymore as the
-MemoryRegion is freed automagically.
+We know the references added by object_initialize(),
+object_property_add_child() and qdev_set_parent_bus() will be
+dropped, but what about other code calling object_ref()?
 
-Remove the PCIDevice 'has_rom' attribute setting in vfio.
-
-Fixes: b895de502717 ("migration: discard non-migratable RAMBlocks")
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci.c |    1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index a1577dea7fdb..6cbb8fa0549d 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -990,7 +990,6 @@ static void vfio_pci_size_rom(VFIOPCIDevice *vdev)
-     pci_register_bar(&vdev->pdev, PCI_ROM_SLOT,
-                      PCI_BASE_ADDRESS_SPACE_MEMORY, &vdev->pdev.rom);
-=20
--    vdev->pdev.has_rom =3D true;
-     vdev->rom_read_failed =3D false;
- }
-=20
+-- 
+Eduardo
