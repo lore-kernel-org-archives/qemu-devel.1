@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1fdHa9-0004gR-4q
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 12:03:10 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fdHj8-000199-0H
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 12:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1fdHa8-0001bS-6c
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 12:03:09 -0400
-Received: from forwardcorp1g.cmail.yandex.net ([2a02:6b8:0:1465::fd]:56987)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dimastep@yandex-team.ru>)
-	id 1fdHa7-0001ac-UD
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 12:03:08 -0400
-Date: Wed, 11 Jul 2018 19:03:04 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-Message-ID: <20180711160304.GB7198@dimastep-nix>
-References: <1528877995-5043-1-git-send-email-dimastep@yandex-team.ru>
-	<1528877995-5043-3-git-send-email-dimastep@yandex-team.ru>
-	<20180619141216.GA16512@dimastep-nix>
-	<20180711083431.GA5085@dimastep-nix>
-	<69f9565f-e5f9-54f3-03dd-e610bea47ddc@amsat.org>
-	<CAFEAcA_6mnQZA9HhaTW1oQ9wAVzpTkJq-bjyxg9NGDEqc55zoQ@mail.gmail.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fdHj6-00051p-RI
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 12:12:25 -0400
+Date: Wed, 11 Jul 2018 13:12:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180711161216.GV7451@localhost.localdomain>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
+	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
+	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
+	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_6mnQZA9HhaTW1oQ9wAVzpTkJq-bjyxg9NGDEqc55zoQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] memory: fix possible NULL pointer
- dereference
+In-Reply-To: <931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, wrfsh@yandex-team.ru
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On Wed, Jul 11, 2018 at 03:09:13PM +0100, Peter Maydell wrote:
-> On 11 July 2018 at 14:47, Philippe Mathieu-Daud=E9 <f4bug@amsat.org> wr=
-ote:
-> > Hi Dima,
-> >
-> > On 07/11/2018 05:34 AM, Dima Stepanov wrote:
-> >> Gentle ping. CCing Paolo Bonzini.
-> >>
-> >> Regards, Dima.
-> >>
-> >> On Tue, Jun 19, 2018 at 05:12:16PM +0300, Dima Stepanov wrote:
-> >>> Ping.
+On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
+> On 10.07.2018 08:50, Peter Maydell wrote:
+> > On 9 July 2018 at 23:03, Thomas Huth <thuth@redhat.com> wrote:
+> >> On 09.07.2018 23:42, Peter Maydell wrote:
+> >>> On 9 July 2018 at 22:03, Thomas Huth <thuth@redhat.com> wrote:
+> >>>> When trying to "device_add bcm2837" on a machine that is not suitable for
+> >>>> this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
+> >>>>
+> >>>> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
+> >>>>  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
+> >>>>  "'arguments': {'command-line': 'info qtree'}}" | \
+> >>>>  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
+> >>>>
+> >>>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
+> >>>>  "package": "build-all"}, "capabilities": []}}
+> >>>> {"return": {}}
+> >>>> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
+> >>>>  hotplugged on this machine"}}
+> >>>> Segmentation fault (core dumped)
+> >>>>
+> >>>> The problem is that qdev_set_parent_bus() from instance_init adds a link
+> >>>> to the child devices which is not valid anymore after the device init
+> >>>> failed. Thus the qdev_set_parent_bus() must rather be done in the realize
+> >>>> function instead.
 > >>>
-> >>> Regards, Dima.
-> >>>
-> >>> On Wed, Jun 13, 2018 at 11:19:55AM +0300, Dima Stepanov wrote:
-> >>>> In the memory_region_do_invalidate_mmio_ptr() routine the section
-> >>>> variable is intialized by the memory_region_find() call. The secti=
-on.mr
-> >>>> field can be set to NULL.
-> >>>>
-> >>>> Add the check for NULL before trying to drop a section.
-> >>>>
-> >>>> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> >>>> ---
-> >>>>  memory.c | 2 +-
-> >>>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/memory.c b/memory.c
-> >>>> index 3212acc..bb45248 100644
-> >>>> --- a/memory.c
-> >>>> +++ b/memory.c
-> >>>> @@ -2712,7 +2712,7 @@ static void memory_region_do_invalidate_mmio=
-_ptr(CPUState *cpu,
-> >>>>      /* Reset dirty so this doesn't happen later. */
-> >>>>      cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
-> >>>>
-> >>>> -    if (section.mr !=3D mr) {
-> >>>> +    if (section.mr && (section.mr !=3D mr)) {
-> >
-> > section.mr can't be NULL here.
-> >
-> > You can give the static analyzer a hint using "assert(section.mr);"
->=20
-> Not in my view much point in messing with this code, though:
-> (a) it's broken and unusable as it stands (race conditions)
-> (b) it's obsoleted by the execute-from-mmio patchset
-> http://patchwork.ozlabs.org/cover/942090/ and if/when that
-> goes in it will all just get deleted.
+> >>> Yuck. The real problem here is that we're still requiring the
+> >>> code that creates these QOM devices to manually set the parent
+> >>> in the first place. It's not surprising that we don't get it right
+> >>> (either parenting in the wrong place or not at all). I'd much
+> >>> rather see us fix that properly than keep papering over places
+> >>> where we get it wrong.
+> >>
+> >> Sorry, I'm still not an expert in all this QOM stuff yet ... so what do
+> >> you exactly recommend to do instead?
+> > 
+> > I'm not clear either, but I don't think that what we're
+> > currently doing can be right.
+> 
+> Hm, ok, so how to continue here now? Shall we at least mark the
+> bcm2836/7 devices with user_creatable=false, so that users can not crash
+> their QEMU so easily with device_add? The problem with introspection via
+> device-list-properties would still continue to exist, but I think that's
+> less likely used in practice... otherwise we could still move the
+> qdev_set_parent_bus() calls to the realize() function instead, and just
+> add a big fat FIXME comment in front of the code block, so that we
+> remember to clean that up one day...
 
+Crashing device-list-properties should be a blocker bug, IMO.
 
-Got it.
+Moving to realize is not the best solution, but I would prefer to
+do that in 3.0 instead of leaving the device-list-properties
+crash unfixed.
 
-Thanks, Dima.
+Another solution is to reintroduce
+DeviceClass::cannot_destroy_with_object_finalize_yet (commit
+08f00df4f4b8b4e38ad620477cc90cf5f73832d9), and set
+cannot_destroy_with_object_finalize_yet=true on bcm2837.
 
->=20
-> thanks
-> -- PMM
+-- 
+Eduardo
