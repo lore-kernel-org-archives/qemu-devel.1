@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fdBoq-0004De-RU
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:53:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fdCHq-0001zx-CC
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:23:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fdBon-0007gR-Qg
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:53:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51528 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fdBon-0007g9-LN
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:53:53 -0400
-Date: Wed, 11 Jul 2018 11:53:44 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180711115344.633eba9e.cohuck@redhat.com>
-In-Reply-To: <CADGSJ20H1S88S6AsYoLMns3XH+YVKh006Dqu808X7Ug+2Mgdnw@mail.gmail.com>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-	<20180702161404.GA2339@rkaganb.sw.ru>
-	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
-	<20180703095825.GC30904@rkaganb.sw.ru>
-	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
-	<20180709130035.GA6271@rkaganb.sw.ru>
-	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
-	<20180710045101-mutt-send-email-mst@kernel.org>
-	<CADGSJ20H1S88S6AsYoLMns3XH+YVKh006Dqu808X7Ug+2Mgdnw@mail.gmail.com>
+	(envelope-from <kwolf@redhat.com>) id 1fdCHp-0001Vd-Hk
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:23:54 -0400
+Date: Wed, 11 Jul 2018 12:23:44 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180711102344.GD4266@localhost.localdomain>
+References: <20180711064046.10989-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180711064046.10989-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: nbd: Stop qemu-nbd before
+ remaking image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Siwei Liu <loseweigh@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, "Samudrala,
-	Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Tue, 10 Jul 2018 17:07:37 -0700
-Siwei Liu <loseweigh@gmail.com> wrote:
-
-> On Mon, Jul 9, 2018 at 6:54 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Mon, Jul 09, 2018 at 06:11:53PM -0700, si-wei liu wrote:  
-> >> The plan is to enable group ID based matching in the first place rather than
-> >> match by MAC, the latter of which is fragile and problematic.  
-> >
-> > It isn't all that fragile - hyperv used same for a while, so if someone
-> > posts working patches with QEMU support but before this grouping stuff,
-> > I'll happily apply them.  
+Am 11.07.2018 um 08:40 hat Fam Zheng geschrieben:
+> 197 is one example where _make_test_img is used twice without stopping
+> the NBD server in between. An error will occur like this:
 > 
-> I wouldn't box the solution to very limited scenario just because of
-> matching by MAC, the benefit of having generic group ID in the first
-> place is that we save the effort of maintaining legacy MAC based
-> pairing that just adds complexity anyway. Currently the VF's MAC
-> address cannot be changed by either PF or by the guest user is a
-> severe limitation due to this. The other use case is that PT device
-> than VF would generally have different MAC than the standby virtio. We
-> shouldn't limit itself to VF specific scenario from the very
-> beginning.
+>     @@ -26,9 +26,13 @@
+> 
+>      === Partial final cluster ===
+> 
+>     +qemu-img: TEST_DIR/t.IMGFMT: Failed to get "resize" lock
+>     +Is another process using the image?
+>      Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1024
+>     +Failed to find an available port: Address already in use
+>      read 1024/1024 bytes at offset 0
+> 
+> Patch _make_test_img to stop the old qemu-nbd before starting a new one,
+> which fixes this problem, and similarly 215.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-So, this brings me to a different concern: the semantics of
-VIRTIO_NET_F_STANDBY.
+Thanks, applied to the block branch.
 
-* The currently sole user seems to be the virtio-net Linux driver.
-* The commit messages, code comments and Documentation/ all talk about
-  matching by MAC.
-* I could not find any proposed update to the virtio spec. (If there
-  had been an older proposal with a different feature name, it is not
-  discoverable.)
-
-VIRTIO_NET_F_STANDBY is a host <-> guest interface. As there's no
-official spec, you can only go by the Linux implementation, and by that
-its semantics seem to be 'match by MAC', not 'match by other criteria'.
-
-How is this supposed to work in the long run?
+Kevin
