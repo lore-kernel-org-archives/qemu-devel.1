@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1fdAaA-0006DV-5G
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:34:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fdAcJ-0006w1-4i
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1fdAa6-00045r-TO
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:34:42 -0400
-Received: from forwardcorp1j.cmail.yandex.net ([5.255.227.105]:37269)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dimastep@yandex-team.ru>)
-	id 1fdAa6-00045Q-GO
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:34:38 -0400
-Date: Wed, 11 Jul 2018 11:34:31 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-Message-ID: <20180711083431.GA5085@dimastep-nix>
-References: <1528877995-5043-1-git-send-email-dimastep@yandex-team.ru>
-	<1528877995-5043-3-git-send-email-dimastep@yandex-team.ru>
-	<20180619141216.GA16512@dimastep-nix>
+	(envelope-from <kwolf@redhat.com>) id 1fdAcI-0004nv-74
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:36:55 -0400
+Date: Wed, 11 Jul 2018 10:36:46 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180711083646.GB4266@localhost.localdomain>
+References: <20180703213556.20619-1-armbru@redhat.com>
+	<20180703213556.20619-19-armbru@redhat.com>
+	<20180710132000.GI5852@localhost.localdomain>
+	<CAJ+F1CK4h-5-_UagKFJE8Ev4yAELqQM4LYDq94XYJF2fyus7Zw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180619141216.GA16512@dimastep-nix>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] memory: fix possible NULL pointer
- dereference
+In-Reply-To: <CAJ+F1CK4h-5-_UagKFJE8Ev4yAELqQM4LYDq94XYJF2fyus7Zw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 18/32] qmp: Don't let JSON errors jump
+ the queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wrfsh@yandex-team.ru, pbonzini@redhat.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Gentle ping. CCing Paolo Bonzini.
+Am 10.07.2018 um 16:02 hat Marc-Andr=E9 Lureau geschrieben:
+> Hi
+>=20
+> On Tue, Jul 10, 2018 at 3:20 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 03.07.2018 um 23:35 hat Markus Armbruster geschrieben:
+> >> handle_qmp_command() reports JSON syntax errors right away.  This is
+> >> wrong when OOB is enabled, because the errors can "jump the queue"
+> >> then.
+> >>
+> >> The previous commit fixed the same bug for semantic errors, by
+> >> delaying the checking until dispatch.  We can't delay the checking, =
+so
+> >> delay the reporting.
+> >>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >> Message-Id: <20180703085358.13941-19-armbru@redhat.com>
+> >
+> > I'm observing a qemu crash in qemu-iotests 153 (which does however no=
+t
+> > seem to make the test case fail). git bisect points me to this patch.
+> >
+> > I'm getting output like this:
+> >
+> > *** Error in `/home/kwolf/source/qemu/tests/qemu-iotests/qemu': free(=
+): invalid pointer: 0x0000555f7870f7e0 ***
+> > =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > /lib64/libc.so.6(+0x7cbac)[0x7fa9b29a2bac]
+> > /lib64/libc.so.6(+0x87a59)[0x7fa9b29ada59]
+> > /lib64/libc.so.6(cfree+0x16e)[0x7fa9b29b33be]
+> > /lib64/libglib-2.0.so.0(g_free+0xe)[0x7fa9ce462b4e]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6eb9dc)[0x555f76f4=
+89dc]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x30ae4b)[0x555f76b6=
+7e4b]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x311558)[0x555f76b6=
+e558]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e2d4e)[0x555f76f3=
+fd4e]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e5fa0)[0x555f76f4=
+2fa0]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e2c2e)[0x555f76f3=
+fc2e]
+> > /lib64/libglib-2.0.so.0(g_main_context_dispatch+0x157)[0x7fa9ce45d257=
+]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e526e)[0x555f76f4=
+226e]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x42349e)[0x555f76c8=
+049e]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x2c27ef)[0x555f76b1=
+f7ef]
+> > /lib64/libc.so.6(__libc_start_main+0xea)[0x7fa9b294688a]
+> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x2c5b8a)[0x555f76b2=
+2b8a]
+> >
+> > Interestingly, this doesn't want to produce a core dump for me, so no
+> > backtrace with usable function names here. But I assume that you can
+> > easily reproduce this yourself.
+> >
+>=20
+> Looks like the double-free regression, you could try: "[PATCH]
+> monitor: fix double-free of request error"
 
-Regards, Dima.
+Thanks, that does fix it. Looks like it missed -rc0, though?
 
-On Tue, Jun 19, 2018 at 05:12:16PM +0300, Dima Stepanov wrote:
-> Ping.
-> 
-> Regards, Dima.
-> 
-> On Wed, Jun 13, 2018 at 11:19:55AM +0300, Dima Stepanov wrote:
-> > In the memory_region_do_invalidate_mmio_ptr() routine the section
-> > variable is intialized by the memory_region_find() call. The section.mr
-> > field can be set to NULL.
-> > 
-> > Add the check for NULL before trying to drop a section.
-> > 
-> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> > ---
-> >  memory.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/memory.c b/memory.c
-> > index 3212acc..bb45248 100644
-> > --- a/memory.c
-> > +++ b/memory.c
-> > @@ -2712,7 +2712,7 @@ static void memory_region_do_invalidate_mmio_ptr(CPUState *cpu,
-> >      /* Reset dirty so this doesn't happen later. */
-> >      cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
-> >  
-> > -    if (section.mr != mr) {
-> > +    if (section.mr && (section.mr != mr)) {
-> >          /* memory_region_find add a ref on section.mr */
-> >          memory_region_unref(section.mr);
-> >          if (MMIO_INTERFACE(section.mr->owner)) {
-> > -- 
-> > 2.7.4
-> > 
-> > 
+Kevin
