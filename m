@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fdH76-00036C-5Q
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:33:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdHEo-0005iY-Fj
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fdH70-0005GM-Ah
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:33:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48875)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fdH70-0005FR-4D
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:33:02 -0400
-Date: Wed, 11 Jul 2018 12:32:54 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180711153254.GR7451@localhost.localdomain>
-References: <20180709203731.19865-1-ehabkost@redhat.com>
-	<20180710090731.GC1612@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fdHEj-000807-Ko
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:41:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdHEj-0007zv-EI
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 11:41:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdHEi-0005lQ-4c
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 15:41:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 125322E80C9
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 15:41:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180710090731.GC1612@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.0] pc: Use "3.0+" constant as default
- SMBIOS version
+Date: Wed, 11 Jul 2018 15:25:58 -0000
+From: Dmitriy <fsmoke@mail.ru>
+Reply-To: Bug 1781211 <1781211@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153131507336.32554.286859961070270937.malonedeb@wampee.canonical.com>
+Message-Id: <153132275884.24134.6391832031332522655.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1781211] Re: HAXM acceleration does not work at
+ all.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Jul 10, 2018 at 10:07:31AM +0100, Daniel P. Berrang=E9 wrote:
-> On Mon, Jul 09, 2018 at 05:37:31PM -0300, Eduardo Habkost wrote:
-> > Every time we create new PC machine-types in QEMU, the defaults
-> > for SMBIOS fields change unnecessarily because the version field
-> > defaults to MachineClass::name.
-> >=20
-> > This can cause unexpected side-effects, like triggering license
-> > reactivation on guest software, or changing the VM memory layout
-> > because of BIOS table size changes.
->=20
-> Does that really matter though ? By its very nature the 'Version'
-> field in SMBIOS is expected to change if you alter something about
-> the hardware. If guests OS don't want to be exposed to changes in
-> SMBIOS they would be using a fixed machine type, not the variable
-> "pc" type that continually changes.
->=20
-> We could put padding in the string if we want to avoid BIOS table
-> layout changes.
->=20
-> Having version change though feels like it is working as intended
-> for the semantics of these Version: fields in BIOS.
+After some time I decided it is haxm bug - so i created the same issue
+on haxm project too
 
-Michael, do you have additional info on the original motivation
-for suggesting this change and why do you consider it a bug?
-(I don't have any concrete examples to justify the change)
+https://github.com/intel/haxm/issues/74
 
---=20
-Eduardo
+** Bug watch added: github.com/intel/haxm/issues #74
+   https://github.com/intel/haxm/issues/74
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781211
+
+Title:
+  HAXM acceleration does not work at all.
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have qemu windows build 2.12.90, haxm 7.2.0. Ubuntu, nor arch linux doe=
+s not works when i turn on hax acceleration. Permanent kernel panics, black=
+ screen freezing and other crashes happens when i run qemu.
+  Qemu crashed with hax - when i ran it from iso. It crashed on already ins=
+talled system - it's not matters. =
+
+
+  Versions:
+  archlinux-2018.07.01-x86_64
+  ubuntu-18.04-live-server-amd64.iso
+
+  I run qemu-system-x86_64.exe binary.
+
+  My CPU:
+  core i7 2600k
+
+  See screenshot
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781211/+subscriptions
