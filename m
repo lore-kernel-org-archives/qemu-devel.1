@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fdLeb-00076u-M7
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:24:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdLgA-0008PG-84
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fdLea-0005x9-UE
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:24:01 -0400
-Date: Wed, 11 Jul 2018 17:23:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180711202351.GA31657@localhost.localdomain>
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<ca91bffe-2bcf-78a2-02cd-8ae7cc48074c@redhat.com>
-	<20180711183031.GM914@localhost.localdomain>
-	<ce0b8bf9-b0e6-fe02-c685-5a6c3140a3ae@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fdLg7-0007aN-39
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:25:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdLg6-0007a3-Sq
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:25:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdLg5-0002bI-Hl
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 20:25:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 665922E80D2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 20:25:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ce0b8bf9-b0e6-fe02-c685-5a6c3140a3ae@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Jul 2018 20:17:24 -0000
+From: Jonas Schievink <1781280@bugs.launchpad.net>
+Reply-To: Bug 1781280 <1781280@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153134024411.21119.3686305138505928817.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1781280] [NEW] QEMU ignores all but the first
+ control message sent over a Unix socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Jul 11, 2018 at 10:16:42PM +0200, Paolo Bonzini wrote:
-> On 11/07/2018 20:30, Eduardo Habkost wrote:
-> >> The theoretical behavior should be:
-> > It's not clear below where you expect
-> >   qdev_set_parent_bus(..., sysbus_get_default())
-> > to be called (if it should be called at all).
-> > 
-> > I don't know where it should be called, but I'm absolutely sure
-> > instance_init is not the right place.
-> 
-> I think instance_init is fine to call qdev_set_parent_bus on contained
-> devices.  Why do you say it's not?
+Public bug reported:
 
-Because object_unref(object_new(...)) is not supposed to affect
-QEMU global state at all.
+I've written a test program that sends both an SCM_CREDENTIALS and an
+SCM_RIGHTS cmsg in the same sendmsg call. On native x86-64, armv6 and
+armv7 Linux, this works as expected (the recvmsg receives both control
+messages). On QEMU (both qemu-x86_64 and qemu-arm), only the first
+message is received.
 
--- 
-Eduardo
+I've traced the problem back to a glibc bug:
+https://sourceware.org/bugzilla/show_bug.cgi?id=3D13500
+
+This means that writing control messages into an uninitialized buffer
+makes CMSG_NXTHDR erroneously return NULL even though there's still
+space inside the allocated buffer. QEMU's logic inside
+`target_to_host_cmsg` is a bit questionable here, since it stops
+encoding cmsgs as soon as *either* the host or the target buffer reaches
+its end, so we lose the target's cmsgs when the host's buffer runs out.
+However, the host buffer should *never* reach its end before the target
+buffer does, so an assertion might be more useful there. Anyway, the
+actual fix for this bug is simply zeroing out the buffer created for the
+host. I've attached a patch doing that and verified that it fixes the
+issue.
+
+The test program I used can be found here: https://gist.github.com
+/jonas-schievink/cb6e6584a055539d2113f22d91068e2d
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Patch added: "0001-Zero-out-the-host-s-msg_control-buffer.patch"
+   https://bugs.launchpad.net/bugs/1781280/+attachment/5162557/+files/0001-=
+Zero-out-the-host-s-msg_control-buffer.patch
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781280
+
+Title:
+  QEMU ignores all but the first control message sent over a Unix socket
+
+Status in QEMU:
+  New
+
+Bug description:
+  I've written a test program that sends both an SCM_CREDENTIALS and an
+  SCM_RIGHTS cmsg in the same sendmsg call. On native x86-64, armv6 and
+  armv7 Linux, this works as expected (the recvmsg receives both control
+  messages). On QEMU (both qemu-x86_64 and qemu-arm), only the first
+  message is received.
+
+  I've traced the problem back to a glibc bug:
+  https://sourceware.org/bugzilla/show_bug.cgi?id=3D13500
+
+  This means that writing control messages into an uninitialized buffer
+  makes CMSG_NXTHDR erroneously return NULL even though there's still
+  space inside the allocated buffer. QEMU's logic inside
+  `target_to_host_cmsg` is a bit questionable here, since it stops
+  encoding cmsgs as soon as *either* the host or the target buffer
+  reaches its end, so we lose the target's cmsgs when the host's buffer
+  runs out. However, the host buffer should *never* reach its end before
+  the target buffer does, so an assertion might be more useful there.
+  Anyway, the actual fix for this bug is simply zeroing out the buffer
+  created for the host. I've attached a patch doing that and verified
+  that it fixes the issue.
+
+  The test program I used can be found here: https://gist.github.com
+  /jonas-schievink/cb6e6584a055539d2113f22d91068e2d
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781280/+subscriptions
