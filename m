@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fd5qD-00018G-Dx
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 23:30:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1fd4R2-0008Ft-Il
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 22:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fd5qA-0007Vi-AB
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 23:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49934)
+	(envelope-from <bounces@canonical.com>) id 1fd4Qz-00064J-AM
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 22:00:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fd5qA-0007VC-3T
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 23:30:54 -0400
+	id 1fd4Qz-00062x-36
+	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 22:00:49 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fd5q7-0006BH-EG
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 03:30:51 +0000
+	id 1fd4Qx-0004b0-6d
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 02:00:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 629EF2E8194
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 03:30:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2F46C2E8076
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 02:00:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jul 2018 03:22:16 -0000
+Date: Wed, 11 Jul 2018 01:53:23 -0000
 From: Paul Gear <paul.gear@canonical.com>
 Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
-Message-Id: <153127933748.21051.12276803020299364277.launchpad@soybean.canonical.com>
+Message-Id: <153127400351.21193.13676349970783120569.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719339] Re: serial8250: too much work for irq3
 List-Id: <qemu-devel.nongnu.org>
@@ -38,7 +38,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Tags added: canonical-is
+I'm seeing this on AWS EC2 when there's (apparently) high logging volume
+to the console, very similarly to
+https://www.reddit.com/r/sysadmin/comments/6zuqad/mongodb_aws_ec2_serial825=
+0_too_much_work_for_irq4/
 
 -- =
 
