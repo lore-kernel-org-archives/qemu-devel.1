@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1fdF5t-00065u-KV
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:23:46 -0400
+	(envelope-from <elohimes@gmail.com>) id 1fdF7W-0007Dc-Ev
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1fdF5p-0003vW-GW
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:23:45 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36061)
+	(envelope-from <elohimes@gmail.com>) id 1fdF7S-0004Zo-E8
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:25:26 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:37223)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1fdF5p-0003vP-AF
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:23:41 -0400
-Received: by mail-pf0-x243.google.com with SMTP id u16-v6so18410480pfh.3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 06:23:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1fdF7S-0004Yb-9I
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:25:22 -0400
+Received: by mail-pf0-x242.google.com with SMTP id x10-v6so8554644pfm.4
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 06:25:22 -0700 (PDT)
 From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 11 Jul 2018 21:22:44 +0800
-Message-Id: <1531315364-2551-1-git-send-email-xieyongji@baidu.com>
+Date: Wed, 11 Jul 2018 21:24:48 +0800
+Message-Id: <1531315488-2590-1-git-send-email-xieyongji@baidu.com>
 Subject: [Qemu-devel] [PATCH] kvmclock: run KVM_KVMCLOCK_CTRL ioctl in vcpu
  thread
 List-Id: <qemu-devel.nongnu.org>
