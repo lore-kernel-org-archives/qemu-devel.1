@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdKPu-0007c4-3t
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:04:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdKZ3-0001x5-Oi
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdKPt-0000ZD-6m
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:04:46 -0400
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
-	<955f26d7-5a0b-28e0-bd0f-f663593afefe@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1be41104-d896-b03b-e0f3-47ea9c3b333f@redhat.com>
-Date: Wed, 11 Jul 2018 21:04:35 +0200
+	(envelope-from <armbru@redhat.com>) id 1fdKZ0-0003VX-Gy
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:14:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37360 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdKZ0-0003VR-CS
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 15:14:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D5808182D20
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 19:14:10 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-125.ams2.redhat.com
+	[10.36.116.125])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D720410FFE4D
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 19:14:09 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Wed, 11 Jul 2018 21:14:07 +0200
+Message-Id: <20180711191408.2438-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <955f26d7-5a0b-28e0-bd0f-f663593afefe@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+Subject: [Qemu-devel] [PULL 0/1] Monitor patches for 2018-07-11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 11.07.2018 19:21, Paolo Bonzini wrote:
-> On 10/07/2018 08:50, Peter Maydell wrote:
->>>> Yuck. The real problem here is that we're still requiring the
->>>> code that creates these QOM devices to manually set the parent
->>>> in the first place. It's not surprising that we don't get it right
->>>> (either parenting in the wrong place or not at all). I'd much
->>>> rather see us fix that properly than keep papering over places
->>>> where we get it wrong.
->>> Sorry, I'm still not an expert in all this QOM stuff yet ... so what =
-do
->>> you exactly recommend to do instead?
->> I'm not clear either, but I don't think that what we're
->> currently doing can be right.
->=20
-> Well, in theory it should work...  I sent the expected flow in another =
-email.
+The following changes since commit c447afd5783b9237fa51b7a85777007d8d568b=
+fc:
 
-Something that just came to my mind:
+  Update version for v3.0.0-rc0 release (2018-07-10 18:19:50 +0100)
 
-bcm2836_init() creates the TYPE_BCM2835_PERIPHERALS object with
-object_initialize(). This creates one reference to the object already.
-Then the object is linked to its parent with
-object_property_add_child(), which creates another reference to the
-object. But where are the two references correctly destroyed again? One
-is certainly destroyed by device_unparent later, but the initial one?
-Could it be that we are simply lacking one object_unref() after the
-object_property_add_child() here?
+are available in the Git repository at:
 
- Thomas
+  git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2018-07-11
+
+for you to fetch changes up to 42eab8dbec2f3fd4a14bd63ab01aa155ce5724a3:
+
+  monitor: fix double-free of request error (2018-07-11 21:11:15 +0200)
+
+----------------------------------------------------------------
+Monitor patches for 2018-07-11
+
+----------------------------------------------------------------
+Marc-Andr=C3=A9 Lureau (1):
+      monitor: fix double-free of request error
+
+ monitor.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Marc-Andr=C3=A9 Lureau (1):
+  monitor: fix double-free of request error
+
+ monitor.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+--=20
+2.17.1
