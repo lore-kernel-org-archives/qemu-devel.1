@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdCIo-0002qW-Up
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:24:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1fdCRf-0004oL-8t
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:34:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdCIo-0002Eu-7R
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:24:54 -0400
-Date: Wed, 11 Jul 2018 12:24:44 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180711102444.GE4266@localhost.localdomain>
-References: <20180711012227.31600-1-famz@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fdCRa-0005I8-E2
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 06:34:03 -0400
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-2-git-send-email-jjherne@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <998a5201-3fa0-2f60-ff89-ebe1161fed4b@redhat.com>
+Date: Wed, 11 Jul 2018 12:33:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180711012227.31600-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Document copy offloading
- implications with -S and -c
+In-Reply-To: <1530811543-6881-2-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 01/15] s390 vfio-ccw: Add
+ bootindex property and IPLB data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-Am 11.07.2018 um 03:22 hat Fam Zheng geschrieben:
-> Explicitly enabling zero detection or compression suppresses copy
-> offloading during convert. Document it.
+On 05.07.2018 19:25, Jason J. Herne wrote:
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+
+You might want to do a --reset-author of this patch to get rid of this
+"From:" line...
+
+> Add bootindex property and iplb data for vfio-ccw devices. This allows us to
+> forward boot information into the bios for vfio-ccw devices.
 > 
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
 
-Thanks, applied to the block branch.
+... and remove the superfluous S-o-b line, too?
 
-Kevin
+> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+
+ Thomas
