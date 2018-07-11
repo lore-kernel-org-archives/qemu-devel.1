@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdAcJ-0006w1-4i
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:36:56 -0400
+	(envelope-from <Suzuki.Poulose@arm.com>) id 1fdB4U-0002Yg-4y
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdAcI-0004nv-74
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 04:36:55 -0400
-Date: Wed, 11 Jul 2018 10:36:46 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180711083646.GB4266@localhost.localdomain>
-References: <20180703213556.20619-1-armbru@redhat.com>
-	<20180703213556.20619-19-armbru@redhat.com>
-	<20180710132000.GI5852@localhost.localdomain>
-	<CAJ+F1CK4h-5-_UagKFJE8Ev4yAELqQM4LYDq94XYJF2fyus7Zw@mail.gmail.com>
+	(envelope-from <Suzuki.Poulose@arm.com>) id 1fdB4P-00070l-6n
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:06:02 -0400
+Received: from foss.arm.com ([217.140.101.70]:38630)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Suzuki.Poulose@arm.com>) id 1fdB4O-00070U-TY
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 05:05:57 -0400
+References: <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+	<20180704155104.GN4828@arm.com>
+	<12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
+	<fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
+	<9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
+	<f3463d0a-c6a3-c34d-acb3-13c99fc61c5a@arm.com>
+	<20180709112326.GD9486@e103592.cambridge.arm.com>
+	<17f8d585-3489-ab6f-6ee1-4d8d337dcf9c@arm.com>
+	<20180709133750.GE9486@e103592.cambridge.arm.com>
+	<377420ce-97a8-4359-6224-273d91f37247@arm.com>
+	<20180710170330.GJ9486@e103592.cambridge.arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Message-ID: <0d9d48fc-f913-9f05-afbe-83299c470611@arm.com>
+Date: Wed, 11 Jul 2018 10:05:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CK4h-5-_UagKFJE8Ev4yAELqQM4LYDq94XYJF2fyus7Zw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 18/32] qmp: Don't let JSON errors jump
- the queue
+In-Reply-To: <20180710170330.GJ9486@e103592.cambridge.arm.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the
+ physical address size for VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +38,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, cdall@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 
-Am 10.07.2018 um 16:02 hat Marc-Andr=E9 Lureau geschrieben:
-> Hi
->=20
-> On Tue, Jul 10, 2018 at 3:20 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> > Am 03.07.2018 um 23:35 hat Markus Armbruster geschrieben:
-> >> handle_qmp_command() reports JSON syntax errors right away.  This is
-> >> wrong when OOB is enabled, because the errors can "jump the queue"
-> >> then.
-> >>
-> >> The previous commit fixed the same bug for semantic errors, by
-> >> delaying the checking until dispatch.  We can't delay the checking, =
-so
-> >> delay the reporting.
-> >>
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >> Message-Id: <20180703085358.13941-19-armbru@redhat.com>
-> >
-> > I'm observing a qemu crash in qemu-iotests 153 (which does however no=
-t
-> > seem to make the test case fail). git bisect points me to this patch.
-> >
-> > I'm getting output like this:
-> >
-> > *** Error in `/home/kwolf/source/qemu/tests/qemu-iotests/qemu': free(=
-): invalid pointer: 0x0000555f7870f7e0 ***
-> > =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > /lib64/libc.so.6(+0x7cbac)[0x7fa9b29a2bac]
-> > /lib64/libc.so.6(+0x87a59)[0x7fa9b29ada59]
-> > /lib64/libc.so.6(cfree+0x16e)[0x7fa9b29b33be]
-> > /lib64/libglib-2.0.so.0(g_free+0xe)[0x7fa9ce462b4e]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6eb9dc)[0x555f76f4=
-89dc]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x30ae4b)[0x555f76b6=
-7e4b]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x311558)[0x555f76b6=
-e558]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e2d4e)[0x555f76f3=
-fd4e]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e5fa0)[0x555f76f4=
-2fa0]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e2c2e)[0x555f76f3=
-fc2e]
-> > /lib64/libglib-2.0.so.0(g_main_context_dispatch+0x157)[0x7fa9ce45d257=
-]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x6e526e)[0x555f76f4=
-226e]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x42349e)[0x555f76c8=
-049e]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x2c27ef)[0x555f76b1=
-f7ef]
-> > /lib64/libc.so.6(__libc_start_main+0xea)[0x7fa9b294688a]
-> > /home/kwolf/source/qemu/tests/qemu-iotests/qemu(+0x2c5b8a)[0x555f76b2=
-2b8a]
-> >
-> > Interestingly, this doesn't want to produce a core dump for me, so no
-> > backtrace with usable function names here. But I assume that you can
-> > easily reproduce this yourself.
-> >
->=20
-> Looks like the double-free regression, you could try: "[PATCH]
-> monitor: fix double-free of request error"
+On 10/07/18 18:03, Dave Martin wrote:
+> On Tue, Jul 10, 2018 at 05:38:39PM +0100, Suzuki K Poulose wrote:
+>> On 09/07/18 14:37, Dave Martin wrote:
+>>> On Mon, Jul 09, 2018 at 01:29:42PM +0100, Marc Zyngier wrote:
+>>>> On 09/07/18 12:23, Dave Martin wrote:
+> 
+> [...]
+> 
+>>>>> Wedging arguments into a few bits in the type argument feels awkward,
+>>>>> and may be regretted later if we run out of bits, or something can't be
+>>>>> represented in the chosen encoding.
+>>>>
+>>>> I think that's a pretty convincing argument for a "better" CREATE_VM,
+>>>> one that would have a clearly defined, structured (and potentially
+>>>> extensible) argument.
+>>>>
+>>>> I've quickly hacked the following:
+>>>>
+>>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>>> index b6270a3b38e9..3e76214034c2 100644
+>>>> --- a/include/uapi/linux/kvm.h
+>>>> +++ b/include/uapi/linux/kvm.h
+>>>> @@ -735,6 +735,20 @@ struct kvm_ppc_resize_hpt {
+>>>>   	__u32 pad;
+>>>>   };
+>>>>
+>>>> +struct kvm_create_vm2 {
+>>>> +	__u64	version;	/* Or maybe not */
+>>>> +	union {
+>>>> +		struct {
+>>>> +#define KVM_ARM_SVE_CAPABLE	(1 << 0)
+>>>> +#define KVM_ARM_SELECT_IPA	{1 << 1)
+>>>> +			__u64	capabilities;
+>>>> +			__u16	sve_vlen;
+>>>> +			__u8	ipa_size;
+>>>> +		} arm64;
+>>>> +		__u64	dummy[15];
+>>>> +	};
+>>>> +};
+>>>> +
+>>>>   #define KVMIO 0xAE
+>>>>
+>>>>   /* machine type bits, to be used as argument to KVM_CREATE_VM */
+>>>>
+>>>> Other architectures could fill in their own bits if they need to.
+>>>>
+>>>> Thoughts?
+>>>
+>>> This kind of thing should work, but it may still get messy when we
+>>> add additional fields.
+>>
+>>
+>> Marc, Dave,
+>>
+>> I like Dave's approach. Some comments below.
+>>
+>>>
+>>> It we want this to work cross-arch, would it make sense to go
+>>> for a more generic approach, say
+>>>
+>>> struct kvm_create_vm_attr_any {
+>>>          __u32   type;
+>>> };
+>>>
+>>> #define KVM_CREATE_VM_ATTR_ARCH_CAPABILITIES 1
+>>> struct kvm_create_vm_attr_arch_capabilities {
+>>>          __u32   type;
+>>>          __u16   size; /* support future expansion of capabilities[] */
+>>>          __u16   reserved;
+>>>          __u64   capabilities[1];
+>>> };
+>>
+>> We also need to advertise which attributes are supported by the host,
+>> so that the user can tune the available ones. That would make a bit mask
+>> like the above trickier, unless we return the supported values back
+>> in the argument ptr for the "probe" call. And this scheme in general
+>> can be useful for passing back a non-boolean result specific to the
+>> attribute, without having a per-attribute ioctl. (e.g, maximum limit
+>> for IPA).
+> 
+> Maybe, but this could quickly become bloated.  (My approach already
+> feels a bit bloated...)
+> 
+> I'm not sure that arbitrarily complex negotiation will really be
+> needed, but userspace might want to change its mind if setting a
+> particular propertiy fails.
+> 
+> An alternative might be to have a bunch of per-VM ioctls to configure
+> different things, like x86 has.  There's at least precedent for that.
+> For arm, we currently only have a few.  That allows for easy extension,
+> at the cost of adding ioctls.
 
-Thanks, that does fix it. Looks like it missed -rc0, though?
+As you know, one of the major problems with the per-VM ioctls is
+the ordering of different operations and tracking to make sure that
+the userspace follows the expected order. e.g, the first approach for
+IPA series was based on this and it made things complex enough to drop
+it.
 
-Kevin
+> 
+> There may be some ioctls we can reuse, like KVM_ENABLE_CAP for per-
+> vm capability flags.
+
+May be we could switch to KVM_VM_CAPS and pass a list of capabilities
+to be enabled at creation time ? The kvm_enable_cap can pass in additional
+arguments for each cap. That way we don't have to rely on a new set of
+attributes and probing becomes straight forward.
+
+Suzuki
