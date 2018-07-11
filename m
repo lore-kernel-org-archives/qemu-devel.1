@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdDKB-0003hY-Sq
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 07:30:25 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fdEIu-0007Qg-8F
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdDK7-0000rE-T2
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 07:30:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43622)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fdDK7-0000qR-EL
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 07:30:19 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fdDK6-0001Bg-5v
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 11:30:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F0A2C2E80CE
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 11:30:17 +0000 (UTC)
+	(envelope-from <stefanha@gmail.com>) id 1fdEIp-00020Z-B1
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 08:33:08 -0400
+Date: Wed, 11 Jul 2018 13:32:59 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180711123259.GA31228@stefanha-x1.localdomain>
+References: <20180704145410.794-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jul 2018 11:18:48 -0000
-From: Max Reitz <1474263@bugs.launchpad.net>
-Reply-To: Bug 1474263 <1474263@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150714085742.25422.46124.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153130792856.32266.13015234927660429956.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1474263] Re: "Image format was not specified"
- warning should be suppressed for the vvfat (and probably nbd) driver
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="AqsLC8rIMeq19msA"
+Content-Disposition: inline
+In-Reply-To: <20180704145410.794-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] throttle-groups: fix hang
+ when group member leaves
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Yes, it does appear, you just need to make vvfat rw:
 
-$ qemu-system-x86_64 -drive file.driver=3Dvvfat,file.dir=3Dfoo,file.rw=3Don
-vvfat foo chs 1024,16,63
-WARNING: Image format was not specified for 'json:{"dir": "foo", "driver": =
-"vvfat", "rw": "on"}' and probing guessed raw.
-         Automatically detecting the format is dangerous for raw images, wr=
-ite operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
+--AqsLC8rIMeq19msA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(The warning is not shown with R/O devices because they don=E2=80=99t have =
-the
-security issue.)
+On Wed, Jul 04, 2018 at 03:54:10PM +0100, Stefan Hajnoczi wrote:
 
-My point hasn=E2=80=99t changed, though,  I fundamentally agree with the po=
-ints
-in this report, but I don=E2=80=98t think =E2=80=9Cfixing=E2=80=9D this is =
-worth it.
+Sorry you weren't CCed originally, Berto.  This one is for you! :)
 
-For NBD, =E2=80=9Cfixing=E2=80=9D it would mean potentially breaking existi=
-ng use cases
-(which I still don=E2=80=99t see the point of, but there=E2=80=99s no point=
- in breaking
-them just to make a warning disappear).
+> Throttle groups consist of members sharing one throttling state
+> (including bps/iops limits).  Round-robin scheduling is used to ensure
+> fairness.  If a group member already has a timer pending then other
+> groups members do not schedule their own timers.  The next group member
+> will have its turn when the existing timer expires.
+>=20
+> A hang may occur when a group member leaves while it had a timer
+> scheduled.  Although the code carefully removes the group member from
+> the round-robin list, it does not schedule the next member.  Therefore
+> remaining members continue to wait for the removed member's timer to
+> expire.
+>=20
+> This patch schedules the next request if a timer is pending.
+> Unfortunately the actual bug is a race condition that I've been unable
+> to capture in a test case.
+>=20
+> Sometimes drive2 hangs when drive1 is removed from the throttling group:
+>=20
+>   $ qemu ... -drive if=3Dnone,id=3Ddrive1,cache=3Dnone,format=3Dqcow2,fil=
+e=3Ddata1.qcow2,iops=3D100,group=3Dfoo \
+>              -device virtio-blk-pci,id=3Dvirtio-blk-pci0,drive=3Ddrive1 \
+>              -drive if=3Dnone,id=3Ddrive2,cache=3Dnone,format=3Dqcow2,fil=
+e=3Ddata2.qcow2,iops=3D10,group=3Dfoo \
+>              -device virtio-blk-pci,id=3Dvirtio-blk-pci1,drive=3Ddrive2
+>   (guest-console1)# fio -filename /dev/vda 4k-seq-read.job
+>   (guest-console2)# fio -filename /dev/vdb 4k-seq-read.job
+>   (qmp) {"execute": "block_set_io_throttle", "arguments": {"device": "dri=
+ve1","bps": 0,"bps_rd": 0,"bps_wr": 0,"iops": 0,"iops_rd": 0,"iops_wr": 0}}
+>=20
+> Reported-by: Nini Gu <ngu@redhat.com>
+> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1535914
+> Cc: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block/throttle-groups.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+> index 36cc0430c3..e297b04e17 100644
+> --- a/block/throttle-groups.c
+> +++ b/block/throttle-groups.c
+> @@ -564,6 +564,10 @@ void throttle_group_unregister_tgm(ThrottleGroupMemb=
+er *tgm)
+> =20
+>      qemu_mutex_lock(&tg->lock);
+>      for (i =3D 0; i < 2; i++) {
+> +        if (timer_pending(tgm->throttle_timers.timers[i])) {
+> +            tg->any_timer_armed[i] =3D false;
+> +            schedule_next_request(tgm, i);
+> +        }
+>          if (tg->tokens[i] =3D=3D tgm) {
+>              token =3D throttle_group_next_tgm(tgm);
+>              /* Take care of the case where this is the last tgm in the g=
+roup */
+> --=20
+> 2.17.1
+>=20
+>=20
 
-For vvfat, there are three things: First of all, I don=E2=80=99t like it ve=
-ry much, so as I said, I=E2=80=99d rather deprecate it altogether (though t=
-his BZ shows we shouldn=E2=80=99t do that).
-Secondly, in order for the warning to disappear, a protocol driver would ne=
-ed to enforce a certain format on top when probing.  That would require a b=
-it of new infrastructure, although I have to admit it wouldn=E2=80=99t be i=
-mpossible.
-Thirdly, I suppose most people use vvfat with block device options like don=
-e in the bug report?  In that case, it is trivial to add a format=3Draw (or=
- driver=3Draw), exactly like the warning suggests.
+--AqsLC8rIMeq19msA
+Content-Type: application/pgp-signature; name="signature.asc"
 
-(Though you can use vvfat with a plain filename, too:
+-----BEGIN PGP SIGNATURE-----
 
-$  qemu-system-x86_64 fat:32:rw:foo
-qemu-system-x86_64: warning: FAT32 has not been tested. You are welcome to =
-do so!
-vvfat foo chs 1024,16,63
-WARNING: Image format was not specified for 'json:{"fat-type": 32, "dir": "=
-foo", "driver": "vvfat", "floppy": false, "rw": true}' and probing guessed =
-raw.
-         Automatically detecting the format is dangerous for raw images, wr=
-ite operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
+iQEcBAEBAgAGBQJbRfj7AAoJEJykq7OBq3PIe1IH/0sk3mZtU+oJf4Oa1IngAQLK
+N7FY1tK8i2gV1oOuLCUf722JCsiotBNUsdgWRY4UEzjPwI7sWeoRhsjhFUxiUFel
+KW43S5aZhN0M2F8UmZyeOZsIouFdEsXBraxbmY6ciyfG2F6PG5mwy4EX9SxTdtWh
+wOD6QBWC/sbWKpI+uEsCzBULa92p/oVAGoNDFBnD5dARrscdTXUuhhjobkCuYlRg
+AO5HGukwWhe4BwsTMJ9QJaZ9bD1cvaehvXekFG7m04gi+wAUQzQX9uhvvSCvc2HR
+MwrvLJ2ifMX10DqmCYYp/w+JvPT8P3G6IVXlKCXQAKpc9Ux743xDexfbezDo/uA=
+=ZvKN
+-----END PGP SIGNATURE-----
 
-)
-
-So all in all I think this is indeed kind of a bug (at least it=E2=80=99s a
-nuisance that could be better), fixing it would not be impossible, but
-it=E2=80=99s just very low on at least my priority list (probably somewhere
-around =E2=80=9Cimplement bdrv_refresh_filename() for vvfat so you don't ge=
-t the
-json:{} filenames you can see above=E2=80=9D).
-
-Max
-
-** Changed in: qemu
-       Status: Incomplete =3D> Opinion
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1474263
-
-Title:
-  "Image format was not specified" warning should be suppressed for the
-  vvfat (and probably nbd) driver
-
-Status in QEMU:
-  Opinion
-
-Bug description:
-  Running
-
-  qemu -drive file.driver=3Dvvfat,file.dir=3D.
-
-  displays
-
-  WARNING: Image format was not specified for 'json:{"dir": ".", "driver": =
-"vvfat"}' and probing guessed raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-
-  However, since "images" provided by the vvfat driver are always raw
-  (and the first sector isn't writeable in any case), this warning is
-  superfluous and should not be displayed.
-
-  A similar warning is displayed for NBD devices; I suspect it should be
-  also disabled for similar reasons, but I'm not sure if serving non-raw
-  images is actually a violation of the protocol. qemu-nbd translates
-  them to raw images, for what it's worth, even if it may be suppressed
-  with -f raw.
-
-  Noticed on 2.3.0; the code that causes this behaviour is still
-  apparently present in today's git master
-  (f3a1b5068cea303a55e2a21a97e66d057eaae638). Speaking of versions: you
-  may want to update the copyright notice that qemu -version displays.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1474263/+subscriptions
+--AqsLC8rIMeq19msA--
