@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdM5d-0006sz-2x
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:51:58 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fdM83-0007l8-5W
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:54:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdM5Y-0002sb-8M
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:51:57 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:37457)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fdM5X-0002sE-Sw
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:51:52 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-References: <153130635623.17872.6735154721391367314.stgit@lep8c.aus.stglabs.ibm.com>
-	<a6e06c37-5fe8-589c-f0c4-dcffef0b4c60@vivier.eu>
-Message-ID: <96fc62a8-2369-05b6-17de-c10b52795f53@vivier.eu>
-Date: Wed, 11 Jul 2018 22:51:08 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fdM7z-0003Ud-GO
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:54:27 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:45510)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fdM7z-0003UN-AP
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:54:23 -0400
+Received: by mail-qk0-x244.google.com with SMTP id c192-v6so14397623qkg.12
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 13:54:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180710233229.9311-1-jonasschievink@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5271d71e-794c-2db0-9046-183fd79dd902@amsat.org>
+Date: Wed, 11 Jul 2018 17:54:17 -0300
 MIME-Version: 1.0
-In-Reply-To: <a6e06c37-5fe8-589c-f0c4-dcffef0b4c60@vivier.eu>
+In-Reply-To: <20180710233229.9311-1-jonasschievink@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: use the correct values
- for F_*LK64s
+Subject: Re: [Qemu-devel] [PATCH] Zero out the host's `msg_control` buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +34,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, riku.voipio@iki.fi
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Jonas Schievink <jonasschievink@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-Le 11/07/2018 à 15:04, Laurent Vivier a écrit :
-> Le 11/07/2018 à 12:55, Shivaprasad G Bhat a écrit :
->> Qemu includes the glibc headers for the host defines and target headers are
->> part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
->> and F_SETLKW64 defined to 12, 13 and 14 for all archs(generic) in
->> sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
->> definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
->> include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
->> assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
->> can be seen in include/linux/fcntl.h in linux source.
->>
->> On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
->> explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
->> Whereas, a PPC64 host doesn't have such a definition in
->> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
->> the sources on PPC64 host sees the default value of F_*LK64*
->> as 12, 13 & 14(fcntl-linux.h).
->>
->> Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
->> implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
->> convertion back to F_*LK* values on PPC64 as seen in
->> sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
->> macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
->> and no adjustments are needed.
->>
->> Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
->> own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
->> adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
->> fail by all pplications run on PPC64 host user emulation.
->>
->> The fix here could be to see why on PPC64 the glibc is still keeping
->> F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
->> the syscall for PPC only. See if we can make the
->> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
->> 5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That way,
->> qemu sources see the kernel supported values in glibc headers.
->>
->> OR
->>
->> On PPC64 host, qemu sources see both F_LK* & F_LK64* as same and set to
->> 12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
->> sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
->> Since F_*LK and F_*LK64 are same, the value adjument like done by glibc in
->> qemu sources is difficult. So, Overwrite the glibc defaults with the actual
->> supported values in Qemu. The current patch is doing this.
->>
->> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
->> ---
->>  linux-user/syscall.c |   14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 7b9ac3b408..1693e69ce0 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -250,6 +250,20 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
->>  #define TARGET_NR__llseek TARGET_NR_llseek
->>  #endif
->>  
->> +/* glibc headers has these defined to 12, 13 and 14 and is not supported
->> + * by kernel. The glibc fcntl call actually adjusts them back to 5, 6 and 7
->> + * before making the syscall(). Since we make the syscall directly,
->> + * overwite/adjust to what is supported by the kernel.
->> + */
->> +#if defined(__linux__) && defined(__powerpc64__)
->> +#undef F_GETLK64
->> +#define F_GETLK64      5       /* Get record locking info.  */
->> +#undef F_SETLK64
->> +#define F_SETLK64      6       /* Set record locking info (non-blocking).  */
->> +#undef F_SETLKW64
->> +#define F_SETLKW64     7       /* Set record locking info (blocking).  */
->> +#endif
->> +
->>  #ifdef __NR_gettid
->>  _syscall0(int, gettid)
->>  #else
->>
+Hi Jonas,
+
+You forgot to notify the maintainers, see
+https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer :
+
+./scripts/get_maintainer.pl -f linux-user/syscall.c
+Riku Voipio <riku.voipio@iki.fi> (maintainer:Linux user)
+Laurent Vivier <laurent@vivier.eu> (reviewer:Linux user)
+qemu-devel@nongnu.org (open list:All patches CC here)
+
+On 07/10/2018 08:32 PM, Jonas Schievink wrote:
+> (Apparently I messed up my git config for the last email so it didn't
+> send the correct name - please bear with me, this is my first time
+> submitting a patch to a mailing list. I've also added a link to the
+> upstream bug in the commit description.)
 > 
-> These macros are used in target_to_host_fcntl_cmd(), and this function
-> is used with safe_fcntl() and fcntl().
+> If this is not done, qemu would drop any control message after the first
+> one.
 > 
-> So I think it would be cleaner to do the change after
-> target_to_host_fcntl_cmd() in do_fcntl() as it is done in glibc instead
-> of redefining system values. Something like:
+> This is because glibc's `CMSG_NXTHDR` macro accesses the uninitialized
+> cmsghdr's length field in order to find out if the message fits into the
+> `msg_control` buffer, wrongly assuming that it doesn't because the
+> length field contains garbage. Accessing the length field is fine for
+> completed messages we receive from the kernel, but is - as far as I know
+> - not needed since the kernel won't return such an invalid cmsghdr in
+> the first place.
 > 
+> This is tracked as this glibc bug:
+> https://sourceware.org/bugzilla/show_bug.cgi?id=13500
+> 
+> It's probably also a good idea to bail with an error if `CMSG_NXTHDR`
+> returns NULL but `TARGET_CMSG_NXTHDR` doesn't (ie. we still expect
+> cmsgs).
+
+This misses your Signed-off-by:
+
+https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
+
+> ---
+>  linux-user/syscall.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index e4b1b7d7da..77ce173b27 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -6782,6 +6782,12 @@ static abi_long do_fcntl(int fd, int cmd,
-> abi_ulong arg)
->      if (host_cmd == -TARGET_EINVAL)
->             return host_cmd;
-> 
-> +#if defined(__linux__) && defined(__powerpc64__)
-> +    if (host_cmd >= F_GETLK64 && host_cmd <= F_SETLKW64) {
-> +        host_cmd -= F_GETLK64 - F_GETLK;
+> @@ -3845,6 +3845,8 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
+>      msg.msg_control = alloca(msg.msg_controllen);
+>      msg.msg_flags = tswap32(msgp->msg_flags);
+>  
+> +    memset(msg.msg_control, 0, msg.msg_controllen);
+> +
+>      count = tswapal(msgp->msg_iovlen);
+>      target_vec = tswapal(msgp->msg_iov);
 
-But as you said, __USE_FILE_OFFSET64 is defined in qemu, and F_GETLK is
-equal to F_GETLK64, so we should use something like:
+Do you mind swapping:
 
-...
-    host_cmd -= F_GETLK64 - 5;
-...
+>      msg.msg_control = alloca(msg.msg_controllen);
+> +    memset(msg.msg_control, 0, msg.msg_controllen);
+> +
+>      msg.msg_flags = tswap32(msgp->msg_flags);
 
-Thanks,
-Laurent
+With your Signed-off-by:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Regards,
+
+Phil.
