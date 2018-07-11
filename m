@@ -1,18 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fd951-0008GE-D8
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:58:30 -0400
+	(envelope-from <famz@redhat.com>) id 1fd9Bt-0001mn-Lt
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fd94y-0004Uw-Bq
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:58:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fd94y-0004UU-7g
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 02:58:24 -0400
+	(envelope-from <famz@redhat.com>) id 1fd9Bs-0006tj-8a
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:05:33 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 11 Jul 2018 14:58:13 +0800
-Message-Id: <20180711065813.14894-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] docker: Install more packages in centos7
+Date: Wed, 11 Jul 2018 15:05:19 +0800
+Message-Id: <20180711070519.23633-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: 153: Fix dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +18,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-This makes test-block work.
+This step was left behind my mistake. As suggested by the echoed text,
+the intention was to test two devices with the same image, with
+different options. The behavior should be the same as two QEMU
+processes. Complete it.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/dockerfiles/centos7.docker | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/qemu-iotests/153     |  2 ++
+ tests/qemu-iotests/153.out | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
-index 575de29a0a..83462b7205 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -3,6 +3,7 @@ RUN yum install -y epel-release centos-release-xen
- RUN yum -y update
- ENV PACKAGES \
-     bison \
-+    bzip2 \
-     bzip2-devel \
-     ccache \
-     csnappy-devel \
-@@ -12,10 +13,12 @@ ENV PACKAGES \
-     gettext \
-     git \
-     glib2-devel \
-+    libaio-devel \
-     libepoxy-devel \
-     libfdt-devel \
-     librdmacm-devel \
-     lzo-devel \
-+    nettle-devel \
-     make \
-     mesa-libEGL-devel \
-     mesa-libgbm-devel \
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index 673813cd39..0daeb1b005 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -162,6 +162,7 @@ for opts1 in "" "read-only=on" "read-only=on,force-share=on"; do
+     _cleanup_qemu
+ done
+ 
++test_opts="read-only=off read-only=on read-only=on,force-share=on"
+ for opt1 in $test_opts; do
+     for opt2 in $test_opts; do
+         echo
+@@ -170,6 +171,7 @@ for opt1 in $test_opts; do
+     done
+ done
+ 
++echo
+ echo "== Creating ${TEST_IMG}.[abc] ==" | _filter_testdir
+ (
+     $QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}"
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index 3492ba7a29..93eaf10486 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -369,6 +369,31 @@ _qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
+ qemu-img: Could not open 'TEST_DIR/t.qcow2': force-share=on can only be used with read-only images
+ 
+ Round done
++
++== Two devices with the same image (read-only=off - read-only=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,read-only=off: Failed to get "write" lock
++Is another process using the image?
++
++== Two devices with the same image (read-only=off - read-only=on) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,read-only=on: Failed to get shared "write" lock
++Is another process using the image?
++
++== Two devices with the same image (read-only=off - read-only=on,force-share=on) ==
++
++== Two devices with the same image (read-only=on - read-only=off) ==
++QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,read-only=off: Failed to get "write" lock
++Is another process using the image?
++
++== Two devices with the same image (read-only=on - read-only=on) ==
++
++== Two devices with the same image (read-only=on - read-only=on,force-share=on) ==
++
++== Two devices with the same image (read-only=on,force-share=on - read-only=off) ==
++
++== Two devices with the same image (read-only=on,force-share=on - read-only=on) ==
++
++== Two devices with the same image (read-only=on,force-share=on - read-only=on,force-share=on) ==
++
+ == Creating TEST_DIR/t.qcow2.[abc] ==
+ Formatting 'TEST_DIR/t.IMGFMT.a', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT
+ Formatting 'TEST_DIR/t.IMGFMT.b', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT
 -- 
 2.17.1
