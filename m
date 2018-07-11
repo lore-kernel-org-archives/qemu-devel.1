@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdMVh-0005Nc-DO
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 17:18:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdMhA-000877-8x
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 17:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdMVg-0005gS-6a
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 17:18:53 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:34494)
+	(envelope-from <bounces@canonical.com>) id 1fdMh7-0002uD-5c
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 17:30:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdMVf-0005fR-Ve
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 17:18:52 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id 13-v6so51938872ois.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 14:18:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdMh6-0002ts-U8
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 17:30:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdMh5-0000TA-Gp
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 21:30:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 544182E80CB
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 21:30:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180709150235.7573-1-programmingkidx@gmail.com>
-References: <20180709150235.7573-1-programmingkidx@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 11 Jul 2018 22:18:30 +0100
-Message-ID: <CAFEAcA82ZxENfCU8C9jnOLJx+WOw6QcR1LYYfG7KVB_7Fv7w_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] ui/cocoa.m: replace scrollingDeltaY
- with deltaY
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Jul 2018 21:21:00 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+Reply-To: Bug 1781281 <1781281@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153134235209.21545.5674967612897238430.malonedeb@soybean.canonical.com>
+Message-Id: <153134406054.4380.3883619056351956813.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1781281] Re: qemu-ppc64le uncaught target signal
+ 4 (Illegal instruction)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 9 July 2018 at 16:02, John Arbuckle <programmingkidx@gmail.com> wrote:
-> The NSEvent class method scrollingDeltaY is available
-> for Mac OS 10.7 and newer. Since QEMU supports Mac OS
-> 10.5 and up, we need to be using a method that is
-> available on these version of Mac OS X. The deltaY
-> method is a method that does the same thing as
-> scrollingDeltaY and is available on Mac OS 10.5 and
-> up. So we replace scrollingDeltaY with deltaY.
->
-> We only check deltaY's value if it is not zero
-> because zero means no scrolling took place.
+If it works fine on a POWER9 machine, you should try to run qemu-ppc64le
+with "-cpu power9".
 
-Not quite -- it means that the scrolling was fine enough
-that it doesn't add up to a big movement. If you use a
-fine-scrolling input device (I used the trackpad on my
-macbook air), then you will get a sequence of events
-like this for a very slow trackpad scroll:
+-- =
 
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -3
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -3
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -3
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -3
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY 0 scrollingDeltaY -4
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY -2
-scroll: deltaY 0 scrollingDeltaY 0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781281
 
-(interestingly it does give events with both deltas 0; maybe
-that event had a horizontal scroll component to it).
+Title:
+  qemu-ppc64le uncaught target signal 4 (Illegal instruction)
 
-Larger scroll gestures get you this sort of thing:
+Status in QEMU:
+  New
 
-scroll: deltaY 0 scrollingDeltaY 0
-scroll: deltaY 0 scrollingDeltaY -1
-scroll: deltaY -3 scrollingDeltaY -31
-scroll: deltaY -3 scrollingDeltaY -36
-scroll: deltaY -2 scrollingDeltaY -30
-scroll: deltaY 0 scrollingDeltaY 0
-scroll: deltaY -1 scrollingDeltaY -16
-scroll: deltaY -3 scrollingDeltaY -32
-scroll: deltaY -3 scrollingDeltaY -30
-scroll: deltaY -2 scrollingDeltaY -28
-scroll: deltaY -2 scrollingDeltaY -25
-scroll: deltaY -2 scrollingDeltaY -23
-scroll: deltaY -1 scrollingDeltaY -19
-scroll: deltaY -1 scrollingDeltaY -15
-scroll: deltaY -1 scrollingDeltaY -14
-scroll: deltaY 0 scrollingDeltaY -12
+Bug description:
+  qemu-ppc64le version 2.12.0
+  host machine: x86_64 Arch Linux =
 
-where OSX has decided that there's enough movement to
-report a deltaY change, not just the fine-grained
-scrollingDeltaY.
 
-Anyway, since the QEMU input layer doesn't provide a mechanism
-for reporting fine-scrolling I guess this patch is OK.
-If we get complaints about the trackpad no longer being
-as responsive as it used to be to scrolls then we can
-look at doing something more complicated then.
+  I'm currently working on VSX support in libVPX, I'm using qemu to
+  test, on line 723 of vpx_dsp/ppc/loopfilter_vsx.c, when I change the
+  vec_sub to vec_subs I get:
 
-I'll tweak the comments and put this in for 3.0 rc1.
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
-> v3 changes:
-> - Added a comment explaining why we drop scrolling events in both the code and
-> the patch comment.
->
-> v2 changes:
-> - Added a condition that drops scroll events that have a deltaY value of zero.
->
->  ui/cocoa.m | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
->
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 2991ed4f19..3bae090101 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -802,14 +802,19 @@ - (void) handleEvent:(NSEvent *)event
->               * This is in-line with standard Mac OS X UI behaviour.
->               */
->
-> +            /*
-> +             * When deltaY is zero, it means the scrolling device did not move
-> +             * for this event. So we drop the event.
-> +             */
-> +            if ([event deltaY] != 0) {
->              /* Determine if this is a scroll up or scroll down event */
-> -            buttons = ([event scrollingDeltaY] > 0) ?
-> -                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
-> -            qemu_input_queue_btn(dcl->con, buttons, true);
-> -            qemu_input_event_sync();
-> -            qemu_input_queue_btn(dcl->con, buttons, false);
-> -            qemu_input_event_sync();
-> -
-> +                buttons = ([event deltaY] > 0) ?
-> +                    INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
-> +                qemu_input_queue_btn(dcl->con, buttons, true);
-> +                qemu_input_event_sync();
-> +                qemu_input_queue_btn(dcl->con, buttons, false);
-> +                qemu_input_event_sync();
-> +            }
->              /*
->               * Since deltaY also reports scroll wheel events we prevent mouse
->               * movement code from executing.
-> --
-> 2.14.3 (Apple Git-98)
->
+  Thread 1 "qemu-ppc64le" received signal SIGILL, Illegal instruction.
+  0x00007ffff66d1bf6 in sigsuspend () from /usr/lib/libc.so.6
+  (gdb) bt
+  #0  0x00007ffff66d1bf6 in sigsuspend () from /usr/lib/libc.so.6
+  #1  0x000055555567ee68 in ?? ()
+  #2  0x000055555567fd18 in ?? ()
+  #3  0x00005555556805ef in process_pending_signals ()
+  #4  0x0000555555661e69 in cpu_loop ()
+  #5  0x000055555561fd72 in main ()
 
-thanks
--- PMM
+  This can be reproduced by downloading this patch (patchset 1):
+
+  https://chromium-review.googlesource.com/c/webm/libvpx/+/1134034
+
+  and running
+
+  qemu-ppc64le -L /home/ltrudeau/x-tools/powerpc64le-unknown-linux-gnu
+  /powerpc64le-unknown-linux-gnu/sysroot/  ./test_libvpx
+  --gtest_also_run_disabled_tests "--gtest_filter=3DVSX/*Loop*/*"
+
+  I don't observe any issues when running the code on a POWER9 machine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781281/+subscriptions
