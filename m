@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fd4R2-0008Ft-Il
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 22:00:53 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fdFde-0006Lq-Ep
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fd4Qz-00064J-AM
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 22:00:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48742)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fdFdb-000394-TU
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:58:38 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35139)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fd4Qz-00062x-36
-	for qemu-devel@nongnu.org; Tue, 10 Jul 2018 22:00:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fd4Qx-0004b0-6d
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 02:00:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F46C2E8076
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 02:00:47 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fdFdb-00038m-LP
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 09:58:35 -0400
+Received: by mail-qk0-x243.google.com with SMTP id u21-v6so13589583qku.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 06:58:35 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180709125452.7utyomtsxr6xaxdi@vm.localdomain>
+	<878t6ke7qh.fsf@linaro.org>
+	<CAGF1vyGaPwZ9nBFJYJjJQPG8g8Ahdf1Y8USGnRr=-6DibJxxHg@mail.gmail.com>
+	<52a7f5d4-7264-9411-98a4-9f59e813e9d3@amsat.org>
+	<CAGF1vyEEez4v+N2VZVULsiaR7_cdn-u0Z1RZ3Y+P-9q2NBV4aw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <89df2b98-0c84-3bb5-1d8d-dceab6c3ad63@amsat.org>
+Date: Wed, 11 Jul 2018 10:58:28 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jul 2018 01:53:23 -0000
-From: Paul Gear <paul.gear@canonical.com>
-Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
-Message-Id: <153127400351.21193.13676349970783120569.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719339] Re: serial8250: too much work for irq3
+In-Reply-To: <CAGF1vyEEez4v+N2VZVULsiaR7_cdn-u0Z1RZ3Y+P-9q2NBV4aw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="YCyAvyeFcQIP6b0oeyrB7NfsMzGxYQK4K"
+Subject: Re: [Qemu-devel] [PATCH] fix gdbserver_state pointer validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,79 +38,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: stephane duverger <stephane.duverger@gmail.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-I'm seeing this on AWS EC2 when there's (apparently) high logging volume
-to the console, very similarly to
-https://www.reddit.com/r/sysadmin/comments/6zuqad/mongodb_aws_ec2_serial825=
-0_too_much_work_for_irq4/
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YCyAvyeFcQIP6b0oeyrB7NfsMzGxYQK4K
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: stephane duverger <stephane.duverger@gmail.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Message-ID: <89df2b98-0c84-3bb5-1d8d-dceab6c3ad63@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH] fix gdbserver_state pointer validation
+References: <20180709125452.7utyomtsxr6xaxdi@vm.localdomain>
+ <878t6ke7qh.fsf@linaro.org>
+ <CAGF1vyGaPwZ9nBFJYJjJQPG8g8Ahdf1Y8USGnRr=-6DibJxxHg@mail.gmail.com>
+ <52a7f5d4-7264-9411-98a4-9f59e813e9d3@amsat.org>
+ <CAGF1vyEEez4v+N2VZVULsiaR7_cdn-u0Z1RZ3Y+P-9q2NBV4aw@mail.gmail.com>
+In-Reply-To: <CAGF1vyEEez4v+N2VZVULsiaR7_cdn-u0Z1RZ3Y+P-9q2NBV4aw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+Hi Stephane,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719339
+On 07/11/2018 04:52 AM, stephane duverger wrote:
+> To reach gdb_set_stop_cpu() with gdbserver_state =3D=3D NULL, you previ=
+ously
+>> entered gdb_vm_state_change() with and use CPUState *cpu =3D
+>> gdbserver_state->c_cpu =3D NULL deref, which shouldn't happen.
+>> Also in gdb_set_stop_cpu() you finally call cpu_single_step(cpu=3Dcrap=
+)
+>> which then deref crap->singlestep_enabled.
+>>
+>> So I think this is not the correct fix.
+>>
+>=20
+> I think you are wrong. You can enter gdb_vm_state_change() only if it h=
+as
+> been registered through qemu_add_vm_change_state_handler(). And this
+> happens in gdbserver_start() which is called only when you start the
+> gdbserver stub.
+>=20
+> This is exactly what we don't want to do here: use qemu breakpoints and=
 
-Title:
-  serial8250: too much work for irq3
+> debug events forwarding without the need to enable a gdb stub.
 
-Status in QEMU:
-  New
+Well, at least we agree the gdb stub code is not straightforward.
 
-Bug description:
-  It's know issue and sometimes mentioned since 2007. But it seems not
-  fixed.
+And apparently without seeing the bigger picture about how you are using
+this, I am missing something.
 
-  http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
-  http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/m=
-sg00696.html
+> There might be an historical reason that vCPU debug events are always
+> forwarded to the gdbserver (from cpu_handle_guest_debug()) but this
+> should not be mandatory.
+>=20
+> One could consider a check to the gdbserver state right before:
+>=20
+> if (gdbserver_enabled())
+>     gdb_set_stop_cpu(cpu);
+>=20
+> As found in other part of qemu code: kvm_enabled, hax_enabled, ...
+>=20
+>=20
+>> Since this shouldn't happen, I'd add an assert(gdbserver_state) in
+>> gdb_set_stop_cpu(), and clean gdb_vm_state_change()'s code flow to not=
 
-  I don't think fixes like increases PASS_LIMIT
-  (/drivers/tty/serial/8250.c) or remove this annoying message
-  (https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix
-  was proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
+>> reach this.
+>>
+>=20
+> Correct if you previously add the gdbserver_enabled() check. Else this
+> would abort the qemu instance each time a debug event is triggered
+> and forwarded to a vm_change_state handler.
+>=20
+>>>>  void gdb_set_stop_cpu(CPUState *cpu)
+>>>>>  {
+>>>>> +    if (!gdbserver_state) {
+>>>>> +        return;
+>>>>> +    }
+>>>>>      gdbserver_state->c_cpu =3D cpu;
+>>>>>      gdbserver_state->g_cpu =3D cpu;
+>>
+>> I find it safer the opposite way, if (s) { s-> ... }
+>>
+>=20
+> Sincerely, this argument is subjective. If it's part of Qemu coding
+> standard,
+> i would agree. Again there is a lot of situations in the Qemu code wher=
+e
+> exit conditions are checked first and then lead to a return, preventing=
+ an
+> unneeded level of indentation. Seriously, we are talking about a 2 line=
+s
+> function.
 
-  Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
-  16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
-  branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
-  if we write a lot of message into console (dmesg or dd if=3D/dev/zero
-  of=3D/dev/ttyS1).
+This is indeed a personal subjective suggestion, not part of QEMU Coding
+standard. Rational is, if in the future someone needs to modify
+gdb_set_stop_cpu(), it would be easier/safer for him.
 
-  /usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don
-  -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
-7-ultra1
-  /master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
-  core=3Doff -cpu Skylake-
-  Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,mon=
-itor=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3D=
-on,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
-  -m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -u=
-uid
-  4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
-  -nodefaults -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/mon=
-itor.sock,server,nowait
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
-pet
-  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
-  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
-  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7 -drive
-  file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddr=
-ive-
-  ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
-  ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -d=
-evice
-  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,add=
-r=3D0x3
-  -chardev
-  socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
-  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-  socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
-  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
-  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
+No worries ;)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1719339/+subscriptions
+Regards,
+
+Phil.
+
+
+--YCyAvyeFcQIP6b0oeyrB7NfsMzGxYQK4K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAltGDQQACgkQ4+MsLN6t
+wN6GYA//c09dxzrg9rETPt8fVYIH7ILl7SvGwzsX7SdTDBJOZu8n7MBpl8neWgbu
+T+1bTWqZ/bEHebexS0M12MhcC9t/yq/8OaUjV6kpWtos3Wn8pIZ7ncGffwRPD5Qx
+dtHgBP+rA7cMy8svi2iAu4jHGqLkSKDITIBb4ZCBA8ng6kQwUaLLygUl2OMHq+/L
+O+evcLehKIjbXb6CD8ZyWIsvv2k70BmygGkyS8PobOKt0/IlIUV1YpEhTkE72wWe
+ZZUAk3l02WrdCXGm9Aqun38yVc8zjvz5tZ3OkzyP+bHSxGPPGuyd50CAmJ22esOD
+PXmDX88UVTvC5K9cF+I/soUnw358+LYV60p3xo75qK314rHmFovQCHQFjclwVfEK
+NoPWVyNagLAdFVKTyRWMHOunJCNzlvt/ZYY5EJxUVtxl1TFJ1TB2THugD1OiBsqI
++tfpLoZxLivdDHvo5/x4eJ4UEFP3nO///6TiOeASOti90flaEJCz5F6UdU2nJzDj
+wOqZI7DIkh77XOVKGjYs9IRAnCA8WkLxXwiyihU3/MUZXJWoaJhZxLOmwWDCDrp2
+2NTGOdFUxXNq7ZpL+aDoCOhKXTfLtFPiLyMXh0phM0VQlrjWYCLRrKOWSfWhcVoc
+eb2SbKFiTVOzTVQaLmO2vNuZ9VDHAYx7jxCrNpbyEXR9kbovAQk=
+=iIIE
+-----END PGP SIGNATURE-----
+
+--YCyAvyeFcQIP6b0oeyrB7NfsMzGxYQK4K--
