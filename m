@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdM83-0007l8-5W
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:54:28 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fdMCo-0000f6-IU
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdM7z-0003Ud-GO
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:54:27 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:45510)
+	(envelope-from <danielhb413@gmail.com>) id 1fdMCn-0005ge-Go
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:59:22 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:41826)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdM7z-0003UN-AP
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:54:23 -0400
-Received: by mail-qk0-x244.google.com with SMTP id c192-v6so14397623qkg.12
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 13:54:22 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180710233229.9311-1-jonasschievink@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5271d71e-794c-2db0-9046-183fd79dd902@amsat.org>
-Date: Wed, 11 Jul 2018 17:54:17 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180710233229.9311-1-jonasschievink@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] Zero out the host's `msg_control` buffer
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1fdMCn-0005ff-Ck
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 16:59:21 -0400
+Received: by mail-qt0-x241.google.com with SMTP id e19-v6so8129822qtp.8
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 13:59:21 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Date: Wed, 11 Jul 2018 17:58:13 -0300
+Message-Id: <20180711205813.22346-1-danielhb413@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 1/1] scsi-disk: Block Device Characteristics
+ emulation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jonas Schievink <jonasschievink@gmail.com>, Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Hi Jonas,
+The current BDC VPD page (page 0xb1) is too short. This can be
+seen running sg_utils:
 
-You forgot to notify the maintainers, see
-https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer :
+$ sg_vpd --page=bdc /dev/sda
+Block device characteristics VPD page (SBC):
+Block device characteristics VPD page length too short=8
 
-./scripts/get_maintainer.pl -f linux-user/syscall.c
-Riku Voipio <riku.voipio@iki.fi> (maintainer:Linux user)
-Laurent Vivier <laurent@vivier.eu> (reviewer:Linux user)
-qemu-devel@nongnu.org (open list:All patches CC here)
+By the SCSI spec, the expected size of the SBC page is 0x40.
+There is no telling how the guest will behave with a shorter
+message - it can ignore it, or worse, make (wrong)
+assumptions.
 
-On 07/10/2018 08:32 PM, Jonas Schievink wrote:
-> (Apparently I messed up my git config for the last email so it didn't
-> send the correct name - please bear with me, this is my first time
-> submitting a patch to a mailing list. I've also added a link to the
-> upstream bug in the commit description.)
-> 
-> If this is not done, qemu would drop any control message after the first
-> one.
-> 
-> This is because glibc's `CMSG_NXTHDR` macro accesses the uninitialized
-> cmsghdr's length field in order to find out if the message fits into the
-> `msg_control` buffer, wrongly assuming that it doesn't because the
-> length field contains garbage. Accessing the length field is fine for
-> completed messages we receive from the kernel, but is - as far as I know
-> - not needed since the kernel won't return such an invalid cmsghdr in
-> the first place.
-> 
-> This is tracked as this glibc bug:
-> https://sourceware.org/bugzilla/show_bug.cgi?id=13500
-> 
-> It's probably also a good idea to bail with an error if `CMSG_NXTHDR`
-> returns NULL but `TARGET_CMSG_NXTHDR` doesn't (ie. we still expect
-> cmsgs).
+This patch fixes the emulation by setting the size to 0x40.
+This is the output of the previous sg_vpd command after
+applying it:
 
-This misses your Signed-off-by:
+$ sg_vpd --page=bdc /dev/sda -v
+    inquiry cdb: 12 01 b1 00 fc 00
+Block device characteristics VPD page (SBC):
+   [PQual=0  Peripheral device type: disk]
+  Medium rotation rate is not reported
+  Product type: Not specified
+  WABEREQ=0
+  WACEREQ=0
+  Nominal form factor not reported
+  FUAB=0
+  VBULS=0
 
-https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
+To improve readability, this patch also adds the VBULS value
+explictly and add comments on the existing fields we're
+setting.
 
-> ---
->  linux-user/syscall.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index e4b1b7d7da..77ce173b27 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -3845,6 +3845,8 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
->      msg.msg_control = alloca(msg.msg_controllen);
->      msg.msg_flags = tswap32(msgp->msg_flags);
->  
-> +    memset(msg.msg_control, 0, msg.msg_controllen);
-> +
->      count = tswapal(msgp->msg_iovlen);
->      target_vec = tswapal(msgp->msg_iov);
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+---
+ hw/scsi/scsi-disk.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Do you mind swapping:
-
->      msg.msg_control = alloca(msg.msg_controllen);
-> +    memset(msg.msg_control, 0, msg.msg_controllen);
-> +
->      msg.msg_flags = tswap32(msgp->msg_flags);
-
-With your Signed-off-by:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Regards,
-
-Phil.
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 32f3f96ff8..5ae7baa082 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -775,11 +775,12 @@ int scsi_disk_emulate_vpd_page(SCSIRequest *req, uint8_t *outbuf)
+     }
+     case 0xb1: /* block device characteristics */
+     {
+-        buflen = 8;
++        buflen = 0x40;
+         outbuf[4] = (s->rotation_rate >> 8) & 0xff;
+         outbuf[5] = s->rotation_rate & 0xff;
+-        outbuf[6] = 0;
+-        outbuf[7] = 0;
++        outbuf[6] = 0; /* PRODUCT TYPE */
++        outbuf[7] = 0; /* WABEREQ | WACEREQ | NOMINAL FORM FACTOR */
++        outbuf[8] = 0; /* VBULS */
+         break;
+     }
+     case 0xb2: /* thin provisioning */
+-- 
+2.17.1
