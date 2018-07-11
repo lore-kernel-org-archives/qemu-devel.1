@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fd9VU-0007Lt-6E
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:25:49 -0400
+	(envelope-from <stephane.duverger@gmail.com>) id 1fd9vO-0004IA-4Q
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fd9VR-0006HK-80
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:25:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49488)
+	(envelope-from <stephane.duverger@gmail.com>) id 1fd9vN-00078c-9B
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:52:34 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:37408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fd9VR-0006Fn-1g
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:25:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fd9VQ-0002Pf-2x
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 07:25:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 12ECF2E80CB
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 07:25:44 +0000 (UTC)
+	(Exim 4.71) (envelope-from <stephane.duverger@gmail.com>)
+	id 1fd9vN-000782-0w
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 03:52:33 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id k81-v6so47584044oib.4
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 00:52:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jul 2018 07:10:10 -0000
-From: Thomas Huth <1474263@bugs.launchpad.net>
-Reply-To: Bug 1474263 <1474263@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150714085742.25422.46124.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153129301010.23804.16758501535776860257.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1474263] Re: "Image format was not specified"
- warning should be suppressed for the vvfat (and probably nbd) driver
+References: <20180709125452.7utyomtsxr6xaxdi@vm.localdomain>
+	<878t6ke7qh.fsf@linaro.org>
+	<CAGF1vyGaPwZ9nBFJYJjJQPG8g8Ahdf1Y8USGnRr=-6DibJxxHg@mail.gmail.com>
+	<52a7f5d4-7264-9411-98a4-9f59e813e9d3@amsat.org>
+In-Reply-To: <52a7f5d4-7264-9411-98a4-9f59e813e9d3@amsat.org>
+From: stephane duverger <stephane.duverger@gmail.com>
+Date: Wed, 11 Jul 2018 09:52:20 +0200
+Message-ID: <CAGF1vyEEez4v+N2VZVULsiaR7_cdn-u0Z1RZ3Y+P-9q2NBV4aw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fix gdbserver_state pointer validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: f4bug@amsat.org
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-Looking through old bug tickets...  can you still reproduce this bug
-with the latest version of QEMU? At least for vvfat, the warning message
-does not seem to occur anymore.
+To reach gdb_set_stop_cpu() with gdbserver_state == NULL, you previously
+> entered gdb_vm_state_change() with and use CPUState *cpu =
+> gdbserver_state->c_cpu = NULL deref, which shouldn't happen.
+> Also in gdb_set_stop_cpu() you finally call cpu_single_step(cpu=crap)
+> which then deref crap->singlestep_enabled.
+>
+> So I think this is not the correct fix.
+>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+I think you are wrong. You can enter gdb_vm_state_change() only if it has
+been registered through qemu_add_vm_change_state_handler(). And this
+happens in gdbserver_start() which is called only when you start the
+gdbserver stub.
 
--- =
+This is exactly what we don't want to do here: use qemu breakpoints and
+debug events forwarding without the need to enable a gdb stub.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1474263
+There might be an historical reason that vCPU debug events are always
+forwarded to the gdbserver (from cpu_handle_guest_debug()) but this
+should not be mandatory.
 
-Title:
-  "Image format was not specified" warning should be suppressed for the
-  vvfat (and probably nbd) driver
+One could consider a check to the gdbserver state right before:
 
-Status in QEMU:
-  Incomplete
+if (gdbserver_enabled())
+    gdb_set_stop_cpu(cpu);
 
-Bug description:
-  Running
+As found in other part of qemu code: kvm_enabled, hax_enabled, ...
 
-  qemu -drive file.driver=3Dvvfat,file.dir=3D.
 
-  displays
+> Since this shouldn't happen, I'd add an assert(gdbserver_state) in
+> gdb_set_stop_cpu(), and clean gdb_vm_state_change()'s code flow to not
+> reach this.
+>
 
-  WARNING: Image format was not specified for 'json:{"dir": ".", "driver": =
-"vvfat"}' and probing guessed raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
+Correct if you previously add the gdbserver_enabled() check. Else this
+would abort the qemu instance each time a debug event is triggered
+and forwarded to a vm_change_state handler.
 
-  However, since "images" provided by the vvfat driver are always raw
-  (and the first sector isn't writeable in any case), this warning is
-  superfluous and should not be displayed.
+>>>  void gdb_set_stop_cpu(CPUState *cpu)
+> >>>  {
+> >>> +    if (!gdbserver_state) {
+> >>> +        return;
+> >>> +    }
+> >>>      gdbserver_state->c_cpu = cpu;
+> >>>      gdbserver_state->g_cpu = cpu;
+>
+> I find it safer the opposite way, if (s) { s-> ... }
+>
 
-  A similar warning is displayed for NBD devices; I suspect it should be
-  also disabled for similar reasons, but I'm not sure if serving non-raw
-  images is actually a violation of the protocol. qemu-nbd translates
-  them to raw images, for what it's worth, even if it may be suppressed
-  with -f raw.
+Sincerely, this argument is subjective. If it's part of Qemu coding
+standard,
+i would agree. Again there is a lot of situations in the Qemu code where
+exit conditions are checked first and then lead to a return, preventing an
+unneeded level of indentation. Seriously, we are talking about a 2 lines
+function.
 
-  Noticed on 2.3.0; the code that causes this behaviour is still
-  apparently present in today's git master
-  (f3a1b5068cea303a55e2a21a97e66d057eaae638). Speaking of versions: you
-  may want to update the copyright notice that qemu -version displays.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1474263/+subscriptions
+stephane
