@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdiDX-0007JC-6d
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:29:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdiEc-0008L5-EI
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdiDW-0000e0-80
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:29:35 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:45383)
+	(envelope-from <bounces@canonical.com>) id 1fdiEX-0001kI-62
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:30:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40662)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdiDV-0000dW-RA
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:29:34 -0400
-Received: by mail-oi0-x243.google.com with SMTP id q11-v6so32659451oic.12
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 13:29:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdiEW-0001j2-J3
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:30:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdiEV-0005Ja-B8
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 20:30:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4F1F72E8019
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 20:30:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180712200152.28569-1-sw@weilnetz.de>
-References: <20180712200152.28569-1-sw@weilnetz.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jul 2018 20:24:17 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jul 2018 21:29:12 +0100
-Message-ID: <CAFEAcA-D_Kw33EeMrCg4k=B0yLB8U_X92OC09BQ1JKH4UiYUNQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] docs: Fix some typos (most found by
- codespell)
+Reply-To: Bug 1779955 <1779955@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153065712229.13372.17157400567540509420.malonedeb@gac.canonical.com>
+Message-Id: <153142705736.23616.14705020349449635933.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779955] Re: qemu linux-user requires read
+ permissions on memory passed to syscalls that should only need write access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: qemu-devel@nongnu.org
 
-On 12 July 2018 at 21:01, Stefan Weil <sw@weilnetz.de> wrote:
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  docs/COLO-FT.txt                     | 2 +-
->  docs/config/mach-virt-graphical.cfg  | 2 +-
->  docs/config/mach-virt-serial.cfg     | 2 +-
->  docs/config/q35-emulated.cfg         | 2 +-
->  docs/config/q35-virtio-graphical.cfg | 2 +-
->  docs/config/q35-virtio-serial.cfg    | 2 +-
->  docs/interop/vhost-user.txt          | 4 ++--
->  docs/replay.txt                      | 2 +-
->  docs/specs/tpm.txt                   | 2 +-
->  9 files changed, 10 insertions(+), 10 deletions(-)
+Oh, yes, I see -- it's mmapping the file specifically in order to write
+the data to the file system. Yes, I agree that's a reasonable thing to
+do.
 
-Hi. A bunch of these are fixed by this patch posted last month
-https://patchwork.kernel.org/patch/10459487/
+-- =
 
-which seems to have got lost because our qemu-trivial
-patch process has stalled out. I think we should apply
-that and then see what still remains to be fixed
-after that.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779955
 
-thanks
--- PMM
+Title:
+  qemu linux-user requires read permissions on memory passed to syscalls
+  that should only need write access
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When read() function takes an mmap'ed address as output buffer, it
+  returns EFAULT. The expected behavior is it should just work.
+
+  The following code works for qemu-system-arm, but not for qemu-arm-
+  static.
+
+  QEMU version affected: latest release 2.12.0.
+
+  Steps to reproduce (please substitute /path/to/qemu-arm-static with
+  the path of the binary, and /tmp/a.cpp with the example source code
+  attached):
+
+  # First register binfmt_misc
+  [hidden]$ docker run --rm --privileged multiarch/qemu-user-static:registe=
+r --reset
+
+  # Compile the code and run
+  [hidden]$ docker run --rm -it -v /tmp/a.cpp:/tmp/a.cpp -v /path/to/qemu-a=
+rm-static:/usr/bin/qemu-arm-static arm32v7/ubuntu:18.04 bash -c '{ apt upda=
+te -y && apt install -y g++; } >& /dev/null && g++ -std=3Dc++14 /tmp/a.cpp =
+-o /tmp/a.out && echo hehe > /tmp/haha.txt && /tmp/a.out'
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xff3f5000
+  fd=3D4
+  0xff3f5023 -1 14
+
+  The expected result in qemu-system-arm as well as natively on x86_64 host:
+  hidden$ ./a.out
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xb6fb7000
+  fd=3D4
+  0xb6fb7023 5 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779955/+subscriptions
