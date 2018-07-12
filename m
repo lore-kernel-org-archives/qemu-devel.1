@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdeMa-0007v7-LV
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:22:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fdeNs-00009F-Pj
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdeMZ-00022x-JN
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:22:40 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:39893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdeMZ-00022j-DJ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:22:39 -0400
-Received: by mail-oi0-x241.google.com with SMTP id d189-v6so56838713oib.6
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 09:22:39 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1fdeNr-0006yU-Px
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:00 -0400
+Date: Thu, 12 Jul 2018 18:23:51 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180712162351.GG4541@localhost.localdomain>
+References: <1531400410-27059-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <87muuwo2dz.fsf@dusky.pond.sub.org>
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
-	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
-	<20180711161216.GV7451@localhost.localdomain>
-	<CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
-	<87y3egmzem.fsf@dusky.pond.sub.org>
-	<6cc1c007-4bdf-2b8c-b0b0-d32979a56ecd@redhat.com>
-	<87muuwo2dz.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jul 2018 17:22:18 +0100
-Message-ID: <CAFEAcA9g0Vu-cF50maC2cVrSffZA5F6AsoM5pz2XT09YKG4WHg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1531400410-27059-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V6] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 12 July 2018 at 17:16, Markus Armbruster <armbru@redhat.com> wrote:
-> Thomas Huth <thuth@redhat.com> writes:
->
->> On 12.07.2018 14:06, Markus Armbruster wrote:
->>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>
->>>> On 11 July 2018 at 17:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>>>> On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
->>>>>> Hm, ok, so how to continue here now? Shall we at least mark the
->>>>>> bcm2836/7 devices with user_creatable=false, so that users can not crash
->>>>>> their QEMU so easily with device_add? The problem with introspection via
->>>>>> device-list-properties would still continue to exist, but I think that's
->>>>>> less likely used in practice... otherwise we could still move the
->>>>>> qdev_set_parent_bus() calls to the realize() function instead, and just
->>>>>> add a big fat FIXME comment in front of the code block, so that we
->>>>>> remember to clean that up one day...
->>>>>
->>>>> Crashing device-list-properties should be a blocker bug, IMO.
->>>
->>> Seconded.
->>
->> Well, maybe I should then not suggest to add a hmp("info qtree") below
->> the hmp("info qom-tree") in test_one_device() of
->> tests/device-introspect-test.c ... otherwise we'll be quite busy in the
->> next weeks...
->
-> If we can't fix these bugs in time, we can bring back
-> cannot_destroy_with_object_finalize_yet, as Eduardo mentioned upthread.
-> Would be sad, but sad beats crash.
+Am 12.07.2018 um 15:00 hat Peter Lieven geschrieben:
+> We currently don't enforce that the sparse segments we detect during convert are
+> aligned. This leads to unnecessary and costly read-modify-write cycles either
+> internally in Qemu or in the background on the storage device as nearly all
+> modern filesystems or hardware have a 4k alignment internally.
+> 
+> This patch modifies is_allocated_sectors so that its *pnum result will always
+> end at an alignment boundary. This way all requests will end at an alignment
+> boundary. The start of all requests will also be aligned as long as the results
+> of get_block_status do not lead to an unaligned offset.
+> 
+> The number of RMW cycles when converting an example image [1] to a raw device that
+> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+> write requests. With this path the additional 4600 read requests are eliminated while
+> the number of total write requests stays constant.
+> 
+> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
+> 
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 
-...but are they actually interesting crashes? Nobody is ever
-going to actually start emulation of an integratorcp machine and
-then try to add a bcm2837 device via the QMP interface, except
-if they're deliberately doing exhaustive testing. They're bugs,
-sure, but they're not bugs I can ever see any real user possibly
-tripping over, so we don't necessarily need to go to any
-particular lengths to fix them for 3.0 if that's painful.
+Thanks, applied to the block branch.
 
-thanks
--- PMM
+Kevin
