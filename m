@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddYq-0005Kr-4k
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:22 -0400
+	(envelope-from <thuth@redhat.com>) id 1fddYw-0005PS-SV
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddYl-0007st-Uz
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1fddYv-00084r-LV
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:22 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 12 Jul 2018 17:30:59 +0200
-Message-Id: <1531409463-3843-2-git-send-email-thuth@redhat.com>
+Date: Thu, 12 Jul 2018 17:31:02 +0200
+Message-Id: <1531409463-3843-5-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531409463-3843-1-git-send-email-thuth@redhat.com>
 References: <1531409463-3843-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] qom/object: Add a new function
- object_initialize_as_child()
+Subject: [Qemu-devel] [PATCH 4/5] hw/arm/armv7: Fix crash when introspecting
+ the "iotkit" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +23,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-A lot of code is using the object_initialize() function followed by a call to
-object_property_add_child() to add the newly initialized object as a child of
-the current object. Both functions increase the reference counter of the new
-object, but many spots that call these two functions then forget to drop one
-of the superfluous references. So the newly created object is often not cleaned
-up correctly when the parent is destroyed. In the worst case, this can cause
-crashes, e.g. because device objects are not correctly removed from their
-parent_bus.
-Since this is a common pattern between many code spots, let's introdcue a
-new function that takes care of calling all three required initialization
-functions, first object_initialize(), then object_property_add_child() and
-finally object_unref().
+QEMU currently crashes when introspecting the "iotkit" device and
+runnint "info qtree" afterwards, e.g. when running QEMU like this:
+
+echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
+ "'arguments':{'typename':'iotkit'}}" "{'execute': 'human-monitor-command', " \
+ "'arguments': {'command-line': 'info qtree'}}" | \
+ aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
+
+Use the new functions object_initialize_as_child() and sysbus_init_child_obj()
+to make sure that all objects get cleaned up correctly when the instances
+are destroyed.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/qom/object.h | 19 +++++++++++++++++++
- qom/object.c         | 14 ++++++++++++++
- 2 files changed, 33 insertions(+)
+ hw/arm/armv7m.c       |  9 ++++---
+ hw/arm/iotkit.c       | 74 ++++++++++++++++++++++-----------------------------
+ hw/intc/armv7m_nvic.c |  5 ++--
+ 3 files changed, 39 insertions(+), 49 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index f3d2308..c1b254c 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -749,6 +749,25 @@ int object_set_propv(Object *obj,
- void object_initialize(void *obj, size_t size, const char *typename);
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 9e00d40..7164e04 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -134,14 +134,15 @@ static void armv7m_instance_init(Object *obj)
  
- /**
-+ * object_initialize_as_child:
-+ * @parentobj: The parent object to add a property to
-+ * @propname: The name of the property
-+ * @childobj: A pointer to the memory to be used for the object.
-+ * @size: The maximum size available at @obj for the object.
-+ * @type: The name of the type of the object to instantiate.
-+ * @errp: If an error occurs, a pointer to an area to store the area
-+ *
-+ * This function will initialize an object. The memory for the object should
-+ * have already been allocated. The object will then be added as child property
-+ * to a parent with object_property_add_child() function. The returned object
-+ * has a reference count of 1, and will be finalized when the last reference is
-+ * dropped.
-+ */
-+void object_initialize_as_child(Object *parentobj, const char *propname,
-+                                void *childobj, size_t size, const char *type,
-+                                Error **errp);
-+
-+/**
-  * object_dynamic_cast:
-  * @obj: The object to cast.
-  * @typename: The @typename to cast to.
-diff --git a/qom/object.c b/qom/object.c
-index 4609e34..de2ded0 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -392,6 +392,20 @@ void object_initialize(void *data, size_t size, const char *typename)
-     object_initialize_with_type(data, size, type);
+     memory_region_init(&s->container, obj, "armv7m-container", UINT64_MAX);
+ 
+-    object_initialize(&s->nvic, sizeof(s->nvic), TYPE_NVIC);
+-    qdev_set_parent_bus(DEVICE(&s->nvic), sysbus_get_default());
++    sysbus_init_child_obj(obj, "nvnic", &s->nvic, sizeof(s->nvic), TYPE_NVIC);
+     object_property_add_alias(obj, "num-irq",
+                               OBJECT(&s->nvic), "num-irq", &error_abort);
+ 
+     for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+-        object_initialize(&s->bitband[i], sizeof(s->bitband[i]), TYPE_BITBAND);
+-        qdev_set_parent_bus(DEVICE(&s->bitband[i]), sysbus_get_default());
++        char *name = g_strdup_printf("bitband-%d", i);
++        sysbus_init_child_obj(obj, name, &s->bitband[i], sizeof(s->bitband[i]),
++                              TYPE_BITBAND);
++        g_free(name);
+     }
  }
  
-+void object_initialize_as_child(Object *parentobj, const char *propname,
-+                                void *childobj, size_t size, const char *type,
-+                                Error **errp)
-+{
-+    object_initialize(childobj, size, type);
-+    object_property_add_child(parentobj, propname, OBJECT(childobj), errp);
-+    /*
-+     * Since object_property_add_child added a reference to the child object,
-+     * we can drop the initial reference from object_initialize now.
-+     */
-+    object_unref(OBJECT(childobj));
-+}
-+
-+
- static inline bool object_property_is_child(ObjectProperty *prop)
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index 133d5bb..d479323 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -30,15 +30,6 @@ static void make_alias(IoTKit *s, MemoryRegion *mr, const char *name,
+     memory_region_add_subregion_overlap(&s->container, base, mr, -1500);
+ }
+ 
+-static void init_sysbus_child(Object *parent, const char *childname,
+-                              void *child, size_t childsize,
+-                              const char *childtype)
+-{
+-    object_initialize(child, childsize, childtype);
+-    object_property_add_child(parent, childname, OBJECT(child), &error_abort);
+-    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
+-}
+-
+ static void irq_status_forwarder(void *opaque, int n, int level)
  {
-     return strstart(prop->type, "child<", NULL);
+     qemu_irq destirq = opaque;
+@@ -119,53 +110,52 @@ static void iotkit_init(Object *obj)
+ 
+     memory_region_init(&s->container, obj, "iotkit-container", UINT64_MAX);
+ 
+-    init_sysbus_child(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
+-                      TYPE_ARMV7M);
++    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
++                          TYPE_ARMV7M);
+     qdev_prop_set_string(DEVICE(&s->armv7m), "cpu-type",
+                          ARM_CPU_TYPE_NAME("cortex-m33"));
+ 
+-    init_sysbus_child(obj, "secctl", &s->secctl, sizeof(s->secctl),
+-                      TYPE_IOTKIT_SECCTL);
+-    init_sysbus_child(obj, "apb-ppc0", &s->apb_ppc0, sizeof(s->apb_ppc0),
+-                      TYPE_TZ_PPC);
+-    init_sysbus_child(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
+-                      TYPE_TZ_PPC);
+-    init_sysbus_child(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
+-    object_initialize(&s->mpc_irq_orgate, sizeof(s->mpc_irq_orgate),
+-                      TYPE_OR_IRQ);
+-    object_property_add_child(obj, "mpc-irq-orgate",
+-                              OBJECT(&s->mpc_irq_orgate), &error_abort);
++    sysbus_init_child_obj(obj, "secctl", &s->secctl, sizeof(s->secctl),
++                          TYPE_IOTKIT_SECCTL);
++    sysbus_init_child_obj(obj, "apb-ppc0", &s->apb_ppc0, sizeof(s->apb_ppc0),
++                          TYPE_TZ_PPC);
++    sysbus_init_child_obj(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
++                          TYPE_TZ_PPC);
++    sysbus_init_child_obj(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
++    object_initialize_as_child(obj, "mpc-irq-orgate", &s->mpc_irq_orgate,
++                               sizeof(s->mpc_irq_orgate), TYPE_OR_IRQ,
++                               &error_abort);
++
+     for (i = 0; i < ARRAY_SIZE(s->mpc_irq_splitter); i++) {
+         char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
+         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
+ 
+-        object_initialize(splitter, sizeof(*splitter), TYPE_SPLIT_IRQ);
+-        object_property_add_child(obj, name, OBJECT(splitter), &error_abort);
++        object_initialize_as_child(obj, name, splitter, sizeof(*splitter),
++                                   TYPE_SPLIT_IRQ, &error_abort);
+         g_free(name);
+     }
+-    init_sysbus_child(obj, "timer0", &s->timer0, sizeof(s->timer0),
+-                      TYPE_CMSDK_APB_TIMER);
+-    init_sysbus_child(obj, "timer1", &s->timer1, sizeof(s->timer1),
+-                      TYPE_CMSDK_APB_TIMER);
+-    init_sysbus_child(obj, "dualtimer", &s->dualtimer, sizeof(s->dualtimer),
+-                      TYPE_UNIMPLEMENTED_DEVICE);
+-    object_initialize(&s->ppc_irq_orgate, sizeof(s->ppc_irq_orgate),
+-                      TYPE_OR_IRQ);
+-    object_property_add_child(obj, "ppc-irq-orgate",
+-                              OBJECT(&s->ppc_irq_orgate), &error_abort);
+-    object_initialize(&s->sec_resp_splitter, sizeof(s->sec_resp_splitter),
+-                      TYPE_SPLIT_IRQ);
+-    object_property_add_child(obj, "sec-resp-splitter",
+-                              OBJECT(&s->sec_resp_splitter), &error_abort);
++    sysbus_init_child_obj(obj, "timer0", &s->timer0, sizeof(s->timer0),
++                          TYPE_CMSDK_APB_TIMER);
++    sysbus_init_child_obj(obj, "timer1", &s->timer1, sizeof(s->timer1),
++                          TYPE_CMSDK_APB_TIMER);
++    sysbus_init_child_obj(obj, "dualtimer", &s->dualtimer, sizeof(s->dualtimer),
++                          TYPE_UNIMPLEMENTED_DEVICE);
++    object_initialize_as_child(obj, "ppc-irq-orgate", &s->ppc_irq_orgate,
++                               sizeof(s->ppc_irq_orgate), TYPE_OR_IRQ,
++                               &error_abort);
++    object_initialize_as_child(obj, "sec-resp-splitter", &s->sec_resp_splitter,
++                               sizeof(s->sec_resp_splitter), TYPE_SPLIT_IRQ,
++                               &error_abort);
+     for (i = 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
+         char *name = g_strdup_printf("ppc-irq-splitter-%d", i);
+         SplitIRQ *splitter = &s->ppc_irq_splitter[i];
+ 
+-        object_initialize(splitter, sizeof(*splitter), TYPE_SPLIT_IRQ);
+-        object_property_add_child(obj, name, OBJECT(splitter), &error_abort);
++        object_initialize_as_child(obj, name, splitter, sizeof(*splitter),
++                                   TYPE_SPLIT_IRQ, &error_abort);
++        g_free(name);
+     }
+-    init_sysbus_child(obj, "s32ktimer", &s->s32ktimer, sizeof(s->s32ktimer),
+-                      TYPE_UNIMPLEMENTED_DEVICE);
++    sysbus_init_child_obj(obj, "s32ktimer", &s->s32ktimer, sizeof(s->s32ktimer),
++                          TYPE_UNIMPLEMENTED_DEVICE);
+ }
+ 
+ static void iotkit_exp_irq(void *opaque, int n, int level)
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 661be88..7a5330f 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -2296,9 +2296,8 @@ static void armv7m_nvic_instance_init(Object *obj)
+     NVICState *nvic = NVIC(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+ 
+-    object_initialize(&nvic->systick[M_REG_NS],
+-                      sizeof(nvic->systick[M_REG_NS]), TYPE_SYSTICK);
+-    qdev_set_parent_bus(DEVICE(&nvic->systick[M_REG_NS]), sysbus_get_default());
++    sysbus_init_child_obj(obj, "systick-reg-ns", &nvic->systick[M_REG_NS],
++                          sizeof(nvic->systick[M_REG_NS]), TYPE_SYSTICK);
+     /* We can't initialize the secure systick here, as we don't know
+      * yet if we need it.
+      */
 -- 
 1.8.3.1
