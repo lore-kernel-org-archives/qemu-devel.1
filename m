@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdaMj-0003Gy-Ih
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:06:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fdaOE-00044y-DX
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdaMi-0001te-IN
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:06:33 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
-	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
-	<20180711161216.GV7451@localhost.localdomain>
-	<CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
-Date: Thu, 12 Jul 2018 14:06:25 +0200
-In-Reply-To: <CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
-	(Peter Maydell's message of "Wed, 11 Jul 2018 18:15:01 +0100")
-Message-ID: <87y3egmzem.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1fdaOB-0003Q1-23
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:08:06 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42236)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fdaOA-0003OY-R9
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:08:02 -0400
+Received: by mail-wr1-f68.google.com with SMTP id e7-v6so1895157wrs.9
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 05:08:02 -0700 (PDT)
+References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
+	<20180709091136.28849-8-e.emanuelegiuseppe@gmail.com>
+	<20180711151544.GQ31228@stefanha-x1.localdomain>
+	<a1639665-a8a4-5f74-19c8-48189f6a0dea@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6f489456-53e9-ad3d-31f3-cfb92d5d5ab7@redhat.com>
+Date: Thu, 12 Jul 2018 14:07:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+In-Reply-To: <a1639665-a8a4-5f74-19c8-48189f6a0dea@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 7/7] tests/qgraph: sdhci test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Emanuele <e.emanuelegiuseppe@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 11 July 2018 at 17:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
->>> Hm, ok, so how to continue here now? Shall we at least mark the
->>> bcm2836/7 devices with user_creatable=false, so that users can not crash
->>> their QEMU so easily with device_add? The problem with introspection via
->>> device-list-properties would still continue to exist, but I think that's
->>> less likely used in practice... otherwise we could still move the
->>> qdev_set_parent_bus() calls to the realize() function instead, and just
->>> add a big fat FIXME comment in front of the code block, so that we
->>> remember to clean that up one day...
+On 11/07/2018 19:52, Emanuele wrote:
+>>>
+>> Do you intend to delete this comment before this series is merged?  It
+>> seems like a TODO that doesn't need to be kept around.
+> Paolo suggested me to put it there, because there still are some devices
+> that need to be implemented.
 >>
->> Crashing device-list-properties should be a blocker bug, IMO.
-
-Seconded.
-
->> Moving to realize is not the best solution, but I would prefer to
->> do that in 3.0 instead of leaving the device-list-properties
->> crash unfixed.
+>>> +    qos_add_test("sdhci-test", "sdhci", test_machine);
+>> How does this work for tests that need access to more than 1 device?
+>> Can they request a driver instance via the API?
 >
-> I would like to see the crash fixed too. But I'd like to
-> see it fixed:
->  (a) by having clear documentation about how the QOM
-> system works, what you should do in init and what you
-> should do in realize, when and why you need to manually
-> parent objects, etc
->  (b) as far as possible making our APIs for doing this
-> easy to use correctly and difficult to use wrongly. At
-> the moment we have APIs that are far too easy to misuse,
-> which means we will continue to get bugs like this and spend
-> a lot of time on one-off fixes for them.
->
-> In particular I don't understand why we need to manually
-> parent these objects at all.
+> Uhm accessing more than one device is something I did not take into
+> account. It is possible to add additional command line to the test, with
+> qos_add_test_args(), but no multiple devices. I'll add it as TODO in my
+> list, thanks
 
-I want both (a) and (b) as badly as anyone, but we should not hold any
-particular crash bug hostage to get them.
+Note that there is only one test that requires multiple devices on the
+same bus, namely usb-hcd-ehci-test.c which instantiates the EHCI
+controller under test together with three companion UHCI controllers.
+
+One possibility is to define a driver which contains all of the devices
+you need in the test, and make the test depend on the driver.  Maybe
+there is a better way to do it, the above is just what came to my mind.
+
+Paolo
