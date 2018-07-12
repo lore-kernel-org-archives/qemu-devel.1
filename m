@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddYl-0005GV-Um
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1fddYp-0005IN-Ag
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddYl-0007rc-2X
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1fddYo-0007vt-Dw
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:15 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 12 Jul 2018 17:30:58 +0200
-Message-Id: <1531409463-3843-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 0/5] Fix crashes with introspection
+Date: Thu, 12 Jul 2018 17:31:00 +0200
+Message-Id: <1531409463-3843-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1531409463-3843-1-git-send-email-thuth@redhat.com>
+References: <1531409463-3843-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/5] hw/core/sysbus: Add a function for
+ creating and attaching an object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,34 +23,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-As discovered recently, you can crash QEMU with a lot of devices
-that do not get the reference counting of child objects right.
-You just have to run 'device-list-properties' and call 'info qtree'
-afterwards.
-This patch series fixes a bunch of these problems in the ARM code.
-I did not fix all problems yet, since it is quite time consuming
-and I first want to get some feedback whether this is the right
-way to go or not.
+A lot of functions are initializing an object and attach it immediately
+afterwards to the system bus. Provide a common function for this, which
+also uses object_initialize_as_child() to make sure that the reference
+counter is correctly initialized to 1 afterwards.
 
-Thomas Huth (5):
-  qom/object: Add a new function object_initialize_as_child()
-  hw/core/sysbus: Add a function for creating and attaching an object
-  hw/arm/bcm2836: Fix crash with device_add bcm2837 on unsupported
-    machines
-  hw/arm/armv7: Fix crash when introspecting the "iotkit" device
-  hw/cpu/a15mpcore: Fix introspection problem with the a15mpcore_priv
-    device
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/core/sysbus.c    | 8 ++++++++
+ include/hw/sysbus.h | 3 +++
+ 2 files changed, 11 insertions(+)
 
- hw/arm/armv7m.c       |  9 ++++---
- hw/arm/bcm2836.c      | 19 +++++--------
- hw/arm/iotkit.c       | 74 ++++++++++++++++++++++-----------------------------
- hw/core/sysbus.c      |  8 ++++++
- hw/cpu/a15mpcore.c    |  8 +++---
- hw/intc/armv7m_nvic.c |  5 ++--
- include/hw/sysbus.h   |  3 +++
- include/qom/object.h  | 19 +++++++++++++
- qom/object.c          | 14 ++++++++++
- 9 files changed, 93 insertions(+), 66 deletions(-)
-
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index ecfb0cf..c164318 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -376,6 +376,14 @@ BusState *sysbus_get_default(void)
+     return main_system_bus;
+ }
+ 
++void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
++                           size_t childsize, const char *childtype)
++{
++    object_initialize_as_child(parent, childname, child, childsize, childtype,
++                               &error_abort);
++    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
++}
++
+ static void sysbus_register_types(void)
+ {
+     type_register_static(&system_bus_info);
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index e88bb6d..e405232 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -96,6 +96,9 @@ void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+                    MemoryRegion *mem);
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev);
+ 
++void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
++                           size_t childsize, const char *childtype);
++
+ /* Call func for every dynamically created sysbus device in the system */
+ void foreach_dynamic_sysbus_device(FindSysbusDeviceFunc *func, void *opaque);
+ 
 -- 
 1.8.3.1
