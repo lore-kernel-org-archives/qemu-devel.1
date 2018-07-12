@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46826)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcOc-0004Gp-RJ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:16:40 -0400
+	id 1fdcTd-0006OL-Bz
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcOX-00084y-Sn
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:16:38 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33784)
+	id 1fdcTY-0002zu-CN
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:21:49 -0400
+Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:35370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcOX-00084s-Np
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:16:33 -0400
-Received: by mail-qk0-x244.google.com with SMTP id 27-v6so2467600qkv.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:16:33 -0700 (PDT)
+	id 1fdcTY-0002zM-5m
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:21:44 -0400
+Received: by mail-qt0-x232.google.com with SMTP id a5-v6so9670942qtp.2
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:21:44 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180712111221.20326-1-armbru@redhat.com>
-	<20180712111221.20326-21-armbru@redhat.com>
+	<20180712111221.20326-3-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3fb3a291-7e14-aff4-d44c-856de90ecf44@amsat.org>
-Date: Thu, 12 Jul 2018 11:16:25 -0300
+Message-ID: <63c8ac38-b46b-4527-c9d5-f2717694f87c@amsat.org>
+Date: Thu, 12 Jul 2018 11:21:34 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180712111221.20326-21-armbru@redhat.com>
+In-Reply-To: <20180712111221.20326-3-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 20/20] libqtest: Enable compile-time format
- string checking
+Subject: Re: [Qemu-devel] [PATCH 02/20] libqtest: Rename functions to send
+ QMP messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,124 +38,278 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
+Hi Markus,
+
 On 07/12/2018 08:12 AM, Markus Armbruster wrote:
-> qtest_qmp() & friends pass their format string and variable arguments
-> to qobject_from_vjsonf_nofail().  Unlike qobject_from_jsonv(), they
-> aren't decorated with GCC_FMT_ATTR().  Fix that to get compile-time
-> format string checking.
+> The functions to receive messages are called qtest_qmp_receive() and
+> qmp_receive(), qmp_fd_receive().  The ones to send messages are called
+> qtest_async_qmp(), qtest_async_qmpv(), qmp_async(), qmp_fd_send(),
+> qmp_fd_sendv().  Inconsistent.  Rename the *_async* ones to
+> qmp_send(), qtest_qmp_send(), qtest_qmp_vsend().  Rename
+> qmp_fd_sendv() to qmp_fd_vsend().
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->  tests/libqtest.h | 32 +++++++++++++++++++-------------
->  1 file changed, 19 insertions(+), 13 deletions(-)
+>  tests/ahci-test.c   | 10 +++++-----
+>  tests/libqos/ahci.c |  4 ++--
+>  tests/libqtest.c    | 20 ++++++++++----------
+>  tests/libqtest.h    | 14 +++++++-------
+>  tests/qmp-test.c    | 18 +++++++++---------
+
+You should setup scripts/git.orderfile so when reviewing we first see
+the changes in the header, then in the C files.
+
+>  5 files changed, 33 insertions(+), 33 deletions(-)
 > 
+> diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+> index 1a7b761304..7e3491b5bd 100644
+> --- a/tests/ahci-test.c
+> +++ b/tests/ahci-test.c
+> @@ -1389,7 +1389,7 @@ static void test_flush_migrate(void)
+>  
+>      /* Complete the command */
+>      s = "{'execute':'cont' }";
+> -    qmp_async(s);
+> +    qmp_send(s);
+>      qmp_eventwait("RESUME");
+>      ahci_command_wait(dst, cmd);
+>      ahci_command_verify(dst, cmd);
+> @@ -1592,8 +1592,8 @@ static void test_atapi_tray(void)
+>      atapi_wait_tray(false);
+>  
+>      /* Remove media */
+> -    qmp_async("{'execute': 'blockdev-open-tray', "
+> -               "'arguments': {'id': 'cd0'}}");
+> +    qmp_send("{'execute': 'blockdev-open-tray',"
+> +             " 'arguments': {'id': 'cd0'}}");
+>      atapi_wait_tray(true);
+>      rsp = qmp_receive();
+>      qobject_unref(rsp);
+> @@ -1619,8 +1619,8 @@ static void test_atapi_tray(void)
+>                                           "'node-name': 'node0' }}");
+>  
+>      /* Again, the event shows up first */
+> -    qmp_async("{'execute': 'blockdev-close-tray', "
+> -               "'arguments': {'id': 'cd0'}}");
+> +    qmp_send("{'execute': 'blockdev-close-tray',"
+> +             " 'arguments': {'id': 'cd0'}}");
+>      atapi_wait_tray(false);
+>      rsp = qmp_receive();
+>      qobject_unref(rsp);
+> diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+> index 42d3f76933..63fbc9e3c9 100644
+> --- a/tests/libqos/ahci.c
+> +++ b/tests/libqos/ahci.c
+> @@ -674,7 +674,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
+>          g_assert_cmpint(rc, ==, 0);
+>      }
+>      if (opts->error) {
+> -        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
+> +        qtest_qmp_send(ahci->parent->qts, "{'execute':'cont' }");
+>          qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
+>      }
+>  
+> @@ -712,7 +712,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
+>  void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
+>  {
+>      /* Complete the command */
+> -    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
+> +    qtest_qmp_send(ahci->parent->qts, "{'execute':'cont' }");
+>      qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
+>      ahci_command_wait(ahci, cmd);
+>      ahci_command_verify(ahci, cmd);
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 098af6aec4..9cb4096639 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -484,7 +484,7 @@ QDict *qtest_qmp_receive(QTestState *s)
+>   * in the case that they choose to discard all replies up until
+>   * a particular EVENT is received.
+>   */
+> -void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+> +void qmp_fd_vsend(int fd, const char *fmt, va_list ap)
+>  {
+>      va_list ap_copy;
+>      QObject *qobj;
+> @@ -529,21 +529,21 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+>      }
+>  }
+>  
+> -void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap)
+> +void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap)
+>  {
+> -    qmp_fd_sendv(s->qmp_fd, fmt, ap);
+> +    qmp_fd_vsend(s->qmp_fd, fmt, ap);
+>  }
+>  
+>  QDict *qmp_fdv(int fd, const char *fmt, va_list ap)
+>  {
+> -    qmp_fd_sendv(fd, fmt, ap);
+> +    qmp_fd_vsend(fd, fmt, ap);
+>  
+>      return qmp_fd_receive(fd);
+>  }
+>  
+>  QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
+>  {
+> -    qtest_async_qmpv(s, fmt, ap);
+> +    qtest_qmp_vsend(s, fmt, ap);
+>  
+>      /* Receive reply */
+>      return qtest_qmp_receive(s);
+> @@ -565,7 +565,7 @@ void qmp_fd_send(int fd, const char *fmt, ...)
+>      va_list ap;
+>  
+>      va_start(ap, fmt);
+> -    qmp_fd_sendv(fd, fmt, ap);
+> +    qmp_fd_vsend(fd, fmt, ap);
+>      va_end(ap);
+>  }
+>  
+> @@ -580,12 +580,12 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
+>      return response;
+>  }
+>  
+> -void qtest_async_qmp(QTestState *s, const char *fmt, ...)
+> +void qtest_qmp_send(QTestState *s, const char *fmt, ...)
+>  {
+>      va_list ap;
+>  
+>      va_start(ap, fmt);
+> -    qtest_async_qmpv(s, fmt, ap);
+> +    qtest_qmp_vsend(s, fmt, ap);
+>      va_end(ap);
+>  }
+>  
+> @@ -968,12 +968,12 @@ QDict *qmp(const char *fmt, ...)
+>      return response;
+>  }
+>  
+> -void qmp_async(const char *fmt, ...)
+> +void qmp_send(const char *fmt, ...)
+>  {
+>      va_list ap;
+>  
+>      va_start(ap, fmt);
+> -    qtest_async_qmpv(global_qtest, fmt, ap);
+> +    qtest_qmp_vsend(global_qtest, fmt, ap);
+>      va_end(ap);
+>  }
+>  
 > diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 68b767fc88..087d6793eb 100644
+> index c63551f14f..85bd1cf7b7 100644
 > --- a/tests/libqtest.h
 > +++ b/tests/libqtest.h
-> @@ -81,7 +81,8 @@ void qtest_quit(QTestState *s);
->   *
->   * Sends a QMP message to QEMU and consumes the response.
->   */
-> -void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
-> +void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...)
-> +    GCC_FMT_ATTR(2, 3);
+> @@ -94,14 +94,14 @@ void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
+>  QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
 >  
 >  /**
->   * qtest_qmp:
-> @@ -91,7 +92,8 @@ void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
->   *
->   * Sends a QMP message to QEMU and returns the response.
->   */
-> -QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
-> +QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
-> +    GCC_FMT_ATTR(2, 3);
->  
->  /**
->   * qtest_qmp_send:
-> @@ -101,7 +103,8 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
+> - * qtest_async_qmp:
+> + * qtest_qmp_send:
+>   * @s: #QTestState instance to operate on.
+>   * @fmt...: QMP message to send to qemu; formats arguments through
+>   * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
 >   *
 >   * Sends a QMP message to QEMU and leaves the response in the stream.
 >   */
-> -void qtest_qmp_send(QTestState *s, const char *fmt, ...);
-> +void qtest_qmp_send(QTestState *s, const char *fmt, ...)
-> +    GCC_FMT_ATTR(2, 3);
+> -void qtest_async_qmp(QTestState *s, const char *fmt, ...);
+> +void qtest_qmp_send(QTestState *s, const char *fmt, ...);
 >  
 >  /**
 >   * qtest_qmpv_discard_response:
-> @@ -112,7 +115,8 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...);
->   *
->   * Sends a QMP message to QEMU and consumes the response.
->   */
-> -void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap);
-> +void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap)
-> +    GCC_FMT_ATTR(2, 0);
+> @@ -126,7 +126,7 @@ void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap);
+>  QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
 >  
 >  /**
->   * qtest_qmpv:
-> @@ -123,7 +127,8 @@ void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap);
->   *
->   * Sends a QMP message to QEMU and returns the response.
->   */
-> -QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
-> +QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap)
-> +    GCC_FMT_ATTR(2, 0);
->  
->  /**
->   * qtest_qmp_vsend:
-> @@ -134,7 +139,8 @@ QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
+> - * qtest_async_qmpv:
+> + * qtest_qmp_vsend:
+>   * @s: #QTestState instance to operate on.
+>   * @fmt: QMP message to send to QEMU; formats arguments through
+>   * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+> @@ -134,7 +134,7 @@ QDict *qtest_qmpv(QTestState *s, const char *fmt, va_list ap);
 >   *
 >   * Sends a QMP message to QEMU and leaves the response in the stream.
 >   */
-> -void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap);
-> +void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap)
-> +    GCC_FMT_ATTR(2, 0);
+> -void qtest_async_qmpv(QTestState *s, const char *fmt, va_list ap);
+> +void qtest_qmp_vsend(QTestState *s, const char *fmt, va_list ap);
 >  
 >  /**
 >   * qtest_receive:
-> @@ -590,7 +596,7 @@ static inline void qtest_end(void)
->   *
->   * Sends a QMP message to QEMU and returns the response.
->   */
-> -QDict *qmp(const char *fmt, ...);
-> +QDict *qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> @@ -576,13 +576,13 @@ static inline void qtest_end(void)
+>  QDict *qmp(const char *fmt, ...);
 >  
 >  /**
->   * qmp_send:
-> @@ -599,7 +605,7 @@ QDict *qmp(const char *fmt, ...);
+> - * qmp_async:
+> + * qmp_send:
+>   * @fmt...: QMP message to send to qemu; formats arguments through
+>   * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
 >   *
 >   * Sends a QMP message to QEMU and leaves the response in the stream.
 >   */
-> -void qmp_send(const char *fmt, ...);
-> +void qmp_send(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> -void qmp_async(const char *fmt, ...);
+> +void qmp_send(const char *fmt, ...);
 >  
 >  /**
 >   * qmp_discard_response:
-> @@ -608,7 +614,7 @@ void qmp_send(const char *fmt, ...);
->   *
->   * Sends a QMP message to QEMU and consumes the response.
->   */
-> -void qmp_discard_response(const char *fmt, ...);
-> +void qmp_discard_response(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  
->  /**
->   * qmp_receive:
-> @@ -967,10 +973,10 @@ static inline int64_t clock_set(int64_t val)
+> @@ -950,7 +950,7 @@ static inline int64_t clock_set(int64_t val)
 >  }
 >  
 >  QDict *qmp_fd_receive(int fd);
-> -void qmp_fd_vsend(int fd, const char *fmt, va_list ap);
-> -void qmp_fd_send(int fd, const char *fmt, ...);
-> -QDict *qmp_fdv(int fd, const char *fmt, va_list ap);
-> -QDict *qmp_fd(int fd, const char *fmt, ...);
-> +void qmp_fd_vsend(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-> +void qmp_fd_send(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
-> +QDict *qmp_fdv(int fd, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
-> +QDict *qmp_fd(int fd, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+> -void qmp_fd_sendv(int fd, const char *fmt, va_list ap);
+> +void qmp_fd_vsend(int fd, const char *fmt, va_list ap);
+>  void qmp_fd_send(int fd, const char *fmt, ...);
+>  QDict *qmp_fdv(int fd, const char *fmt, va_list ap);
+>  QDict *qmp_fd(int fd, const char *fmt, ...);
+> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+> index ceaf4a6789..60685bba3c 100644
+> --- a/tests/qmp-test.c
+> +++ b/tests/qmp-test.c
+> @@ -159,12 +159,12 @@ static void cleanup_blocking_cmd(void)
 >  
->  /**
->   * qtest_cb_for_every_machine:
+>  static void send_cmd_that_blocks(QTestState *s, const char *id)
+>  {
+> -    qtest_async_qmp(s, "{ 'execute': 'blockdev-add',  'id': %s,"
+> -                    " 'arguments': {"
+> -                    " 'driver': 'blkdebug', 'node-name': %s,"
+> -                    " 'config': %s,"
+> -                    " 'image': { 'driver': 'null-co' } } }",
+> -                    id, id, fifo_name);
+> +    qtest_qmp_send(s, "{ 'execute': 'blockdev-add',  'id': %s,"
+> +                   " 'arguments': {"
+> +                   " 'driver': 'blkdebug', 'node-name': %s,"
+> +                   " 'config': %s,"
+> +                   " 'image': { 'driver': 'null-co' } } }",
+> +                   id, id, fifo_name);
+>  }
+>  
+>  static void unblock_blocked_cmd(void)
+> @@ -176,7 +176,7 @@ static void unblock_blocked_cmd(void)
+>  
+>  static void send_oob_cmd_that_fails(QTestState *s, const char *id)
+>  {
+> -    qtest_async_qmp(s, "{ 'exec-oob': 'migrate-pause', 'id': %s }", id);
+> +    qtest_qmp_send(s, "{ 'exec-oob': 'migrate-pause', 'id': %s }", id);
+>  }
+>  
+>  static void recv_cmd_id(QTestState *s, const char *id)
+> @@ -235,7 +235,7 @@ static void test_qmp_oob(void)
+>      /* OOB command overtakes slow in-band command */
+>      setup_blocking_cmd();
+>      send_cmd_that_blocks(qts, "ib-blocks-1");
+> -    qtest_async_qmp(qts, "{ 'execute': 'query-name', 'id': 'ib-quick-1' }");
+> +    qtest_qmp_send(qts, "{ 'execute': 'query-name', 'id': 'ib-quick-1' }");
+>      send_oob_cmd_that_fails(qts, "oob-1");
+>      recv_cmd_id(qts, "oob-1");
+>      unblock_blocked_cmd();
+> @@ -244,7 +244,7 @@ static void test_qmp_oob(void)
+>  
+>      /* Even malformed in-band command fails in-band */
+>      send_cmd_that_blocks(qts, "blocks-2");
+> -    qtest_async_qmp(qts, "{ 'id': 'err-2' }");
+> +    qtest_qmp_send(qts, "{ 'id': 'err-2' }");
+>      unblock_blocked_cmd();
+>      recv_cmd_id(qts, "blocks-2");
+>      recv_cmd_id(qts, "err-2");
 > 
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
