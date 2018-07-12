@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fdXyK-0000oT-EN
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:33:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fdXyN-0000s4-Lm
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fdXyJ-0000hq-HK
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:33:12 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fdXyM-0000mN-SF
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:33:15 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 12 Jul 2018 11:33:00 +0200
-Message-Id: <20180712093301.9343-2-cohuck@redhat.com>
+Date: Thu, 12 Jul 2018 11:33:01 +0200
+Message-Id: <20180712093301.9343-3-cohuck@redhat.com>
 In-Reply-To: <20180712093301.9343-1-cohuck@redhat.com>
 References: <20180712093301.9343-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL for-3.0 1/2] s390x/storage attributes: fix
- CMMA_BLOCK_SIZE usage
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL for-3.0 2/2] error: Remove NULL checks on
+ error_propagate() calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,62 +24,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>
 
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-The macro CMMA_BLOCK_SIZE was defined but not used, and a hardcoded
-value was instead used in the code.
+Patch created mechanically by rerunning:
 
-This patch fixes the value of CMMA_BLOCK_SIZE and uses it in the
-appropriate place in the code, and fixes another case of hardcoded
-value in the KVM backend, replacing it with the more appropriate
-constant KVM_S390_CMMA_SIZE_MAX.
+  $  spatch --sp-file scripts/coccinelle/error_propagate_null.cocci \
+            --macro-file scripts/cocci-macro-file.h \
+            --dir . --in-place
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Message-Id: <1530787170-3101-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20180705155811.20366-3-f4bug@amsat.org>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-stattrib-kvm.c | 3 ++-
- hw/s390x/s390-stattrib.c     | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ hw/s390x/virtio-ccw.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-index 480551c3db..c7e1f35524 100644
---- a/hw/s390x/s390-stattrib-kvm.c
-+++ b/hw/s390x/s390-stattrib-kvm.c
-@@ -105,7 +105,8 @@ static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
-     KVMS390StAttribState *sas = KVM_S390_STATTRIB(sa);
-     MachineState *machine = MACHINE(qdev_get_machine());
-     unsigned long max = machine->maxram_size / TARGET_PAGE_SIZE;
--    unsigned long cx, len = 1 << 19;
-+    /* We do not need to reach the maximum buffer size allowed */
-+    unsigned long cx, len = KVM_S390_SKEYS_MAX / 2;
-     int r;
-     struct kvm_s390_cmma_log clog = {
-         .flags = 0,
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index 5161a1659b..766f2015a4 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -21,7 +21,8 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- 
--#define CMMA_BLOCK_SIZE  (1 * KiB)
-+/* 512KiB cover 2GB of guest memory */
-+#define CMMA_BLOCK_SIZE  (512 * KiB)
- 
- #define STATTR_FLAG_EOS     0x01ULL
- #define STATTR_FLAG_MORE    0x02ULL
-@@ -203,7 +204,7 @@ static int cmma_save(QEMUFile *f, void *opaque, int final)
-     S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-     uint8_t *buf;
-     int r, cx, reallen = 0, ret = 0;
--    uint32_t buflen = 1 << 19;   /* 512kB cover 2GB of guest memory */
-+    uint32_t buflen = CMMA_BLOCK_SIZE;
-     uint64_t start_gfn = sas->migration_cur_gfn;
- 
-     buf = g_try_malloc(buflen);
--- 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index b92a85d0b0..7ddb378d52 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1836,11 +1836,9 @@ static void vhost_vsock_ccw_realize(VirtioCcwDevic=
+e *ccw_dev, Error **errp)
+ {
+     VHostVSockCCWState *dev =3D VHOST_VSOCK_CCW(ccw_dev);
+     DeviceState *vdev =3D DEVICE(&dev->vdev);
+-    Error *err =3D NULL;
+=20
+     qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
+-    error_propagate(errp, err);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+ }
+=20
+ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
+--=20
 2.14.4
