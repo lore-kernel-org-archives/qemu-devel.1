@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fdWvg-0008Vv-Gf
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:26:25 -0400
+	(envelope-from <stephane.duverger@gmail.com>) id 1fdWzv-0001JC-RL
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fdWvc-0005xM-1b
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:26:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fdWvb-0005lu-Rc
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:26:19 -0400
-Date: Thu, 12 Jul 2018 16:26:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180712082602.GA11068@xz-mi>
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-8-xiaoguangrong@tencent.com>
-	<20180619073650.GB14814@xz-mi>
-	<5745f752-50b5-0645-21a7-3336ea0dd5c2@gmail.com>
-	<20180711082143.GB15615@xz-mi>
-	<ad3157b1-5a18-9fac-d863-22c4aee485e0@gmail.com>
+	(envelope-from <stephane.duverger@gmail.com>) id 1fdWzu-0002S8-Ex
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:30:47 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stephane.duverger@gmail.com>)
+	id 1fdWzu-0002Q5-5P
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:30:46 -0400
+Received: by mail-oi0-x243.google.com with SMTP id b15-v6so54254655oib.10
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 01:30:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ad3157b1-5a18-9fac-d863-22c4aee485e0@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 07/12] migration: hold the lock only if it
- is really needed
+References: <20180709125452.7utyomtsxr6xaxdi@vm.localdomain>
+	<878t6ke7qh.fsf@linaro.org>
+	<CAGF1vyGaPwZ9nBFJYJjJQPG8g8Ahdf1Y8USGnRr=-6DibJxxHg@mail.gmail.com>
+	<52a7f5d4-7264-9411-98a4-9f59e813e9d3@amsat.org>
+	<CAGF1vyEEez4v+N2VZVULsiaR7_cdn-u0Z1RZ3Y+P-9q2NBV4aw@mail.gmail.com>
+	<89df2b98-0c84-3bb5-1d8d-dceab6c3ad63@amsat.org>
+In-Reply-To: <89df2b98-0c84-3bb5-1d8d-dceab6c3ad63@amsat.org>
+From: stephane duverger <stephane.duverger@gmail.com>
+Date: Thu, 12 Jul 2018 10:30:33 +0200
+Message-ID: <CAGF1vyG32+ixEZmFUUiKQt4ztZ=M8-+Pz-b60Vcpbe=Jzm0Pmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] fix gdbserver_state pointer validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: f4bug@amsat.org
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On Thu, Jul 12, 2018 at 03:47:57PM +0800, Xiao Guangrong wrote:
-> 
-> 
-> On 07/11/2018 04:21 PM, Peter Xu wrote:
-> > On Thu, Jun 28, 2018 at 05:33:58PM +0800, Xiao Guangrong wrote:
-> > > 
-> > > 
-> > > On 06/19/2018 03:36 PM, Peter Xu wrote:
-> > > > On Mon, Jun 04, 2018 at 05:55:15PM +0800, guangrong.xiao@gmail.com wrote:
-> > > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > > > 
-> > > > > Try to hold src_page_req_mutex only if the queue is not
-> > > > > empty
-> > > > 
-> > > > Pure question: how much this patch would help?  Basically if you are
-> > > > running compression tests then I think it means you are with precopy
-> > > > (since postcopy cannot work with compression yet), then here the lock
-> > > > has no contention at all.
-> > > 
-> > > Yes, you are right, however we can observe it is in the top functions
-> > > (after revert this patch):
-> > > 
-> > > Samples: 29K of event 'cycles', Event count (approx.): 22263412260
-> > > +   7.99%  kqemu  qemu-system-x86_64       [.] ram_bytes_total
-> > > +   6.95%  kqemu  [kernel.kallsyms]        [k] copy_user_enhanced_fast_string
-> > > +   6.23%  kqemu  qemu-system-x86_64       [.] qemu_put_qemu_file
-> > > +   6.20%  kqemu  qemu-system-x86_64       [.] qemu_event_set
-> > > +   5.80%  kqemu  qemu-system-x86_64       [.] __ring_put
-> > > +   4.82%  kqemu  qemu-system-x86_64       [.] compress_thread_data_done
-> > > +   4.11%  kqemu  qemu-system-x86_64       [.] ring_is_full
-> > > +   3.07%  kqemu  qemu-system-x86_64       [.] threads_submit_request_prepare
-> > > +   2.83%  kqemu  qemu-system-x86_64       [.] ring_mp_get
-> > > +   2.71%  kqemu  qemu-system-x86_64       [.] __ring_is_full
-> > > +   2.46%  kqemu  qemu-system-x86_64       [.] buffer_zero_sse2
-> > > +   2.40%  kqemu  qemu-system-x86_64       [.] add_to_iovec
-> > > +   2.21%  kqemu  qemu-system-x86_64       [.] ring_get
-> > > +   1.96%  kqemu  [kernel.kallsyms]        [k] __lock_acquire
-> > > +   1.90%  kqemu  libc-2.12.so             [.] memcpy
-> > > +   1.55%  kqemu  qemu-system-x86_64       [.] ring_len
-> > > +   1.12%  kqemu  libpthread-2.12.so       [.] pthread_mutex_unlock
-> > > +   1.11%  kqemu  qemu-system-x86_64       [.] ram_find_and_save_block
-> > > +   1.07%  kqemu  qemu-system-x86_64       [.] ram_save_host_page
-> > > +   1.04%  kqemu  qemu-system-x86_64       [.] qemu_put_buffer
-> > > +   0.97%  kqemu  qemu-system-x86_64       [.] compress_page_with_multi_thread
-> > > +   0.96%  kqemu  qemu-system-x86_64       [.] ram_save_target_page
-> > > +   0.93%  kqemu  libpthread-2.12.so       [.] pthread_mutex_lock
-> > 
-> > (sorry to respond late; I was busy with other stuff for the
-> >   release...)
-> > 
-> 
-> You're welcome. :)
-> 
-> > I am trying to find out anything related to unqueue_page() but I
-> > failed.  Did I miss anything obvious there?
-> > 
-> 
-> unqueue_page() was not listed here indeed, i think the function
-> itself is light enough (a check then directly return) so it
-> did not leave a trace here.
-> 
-> This perf data was got after reverting this patch, i.e, it's
-> based on the lockless multithread model, then unqueue_page() is
-> the only place using mutex in the main thread.
-> 
-> And you can see the overload of mutext was gone after applying
-> this patch in the mail i replied to Dave.
+Hi Phil,
 
-I see.  It's not a big portion of CPU resource, though of course I
-don't have reason to object to this change as well.
+Well, at least we agree the gdb stub code is not straightforward.
+>
+> And apparently without seeing the bigger picture about how you are using
+> this, I am missing something.
 
-Actually what interested me more is why ram_bytes_total() is such a
-hot spot.  AFAIU it's only called in ram_find_and_save_block() per
-call, and it should be mostly a constant if we don't plug/unplug
-memories.  Not sure that means that's a better spot to work on.
 
-Thanks,
+Sorry for that, i will try to explain it clearly.
+This is something rather simple indeed:
 
--- 
-Peter Xu
+1 - during MachineState init, install a BP1 at an "OS_ready" location
+2 - handle BP1 hit (thanks to vm_state_change())
+3 - delete BP1 and save the VM
+4 - inject some generated code
+5 - install BP2 at injected code end
+6 - resume the VM
+7 - handle BP2 hit and restore the VM
+8 - go to 4
+
+So as you may guess, I didn't need a full gdbstub with a gdbclient
+to do that. I just wanted to install breakpoints and handle them
+internally. To be fast, no overhead with the gdb protocol.
+
+I didn't find something ready to use in Qemu API, but if there exists
+something to do it, I would be glad to know. By the time, I decided to
+make use of the GDB breakpoint type. It was a perfect candidate,
+but unfortunately any time cpu_handle_guest_debug() is called,
+gdb_set_stop_cpu() is systematically called too.
+
+That was my issue. As gdbserver is not up and running,
+gdbserver_state is NULL and Qemu segfaults.
+
+Out of this gdb centric function call, the standard Qemu vm stop
+notification process seems perfect to me:
+- qemu_system_debug_request
+- do_vm_stop
+- vm_state_notify
+- and then my "vm_state_change_handler" is called
+
+So that's why I thought it would be great to be able
+to install breakpoints with either
+cpu_breakpoint_insert() or kvm_insert_breakpoint().
+
+What could have been done to be pragmatic:
+1 - implement a new breakpoint type for internal purpose ?
+2 - implement a gdbserver_enabled state ?
+3 - check for the gdbserver_state NULL pointer case and return ?
+
+The point 3 was the most simple, tied to only one gdb function,
+didn't touch anything else and actually "secured" that
+gdb_set_stop_cpu() function.
+
+This is indeed a personal subjective suggestion, not part of QEMU Coding
+> standard. Rational is, if in the future someone needs to modify
+> gdb_set_stop_cpu(), it would be easier/safer for him.
+>
+
+I do understand that point. So what do we do right now :
+1 - ACK the patch as is ?
+2 - do you want a new patch with:
+    - a gdbserver_enabled state
+    - a safe execution condition in gdb_set_stop_cpu()
+    - an abort() in it if something is wrong
+
+Regards,
+
+stephane
