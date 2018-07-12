@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWQ-0007AW-T7
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdZWQ-0007AH-Ow
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWM-0006rx-Pl
+	(envelope-from <armbru@redhat.com>) id 1fdZWL-0006pq-Hp
 	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49026 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47662 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWM-0006qu-Ip
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWL-0006oW-At
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 363EE40201BF
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:12:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E93814074452
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:12:24 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 12 Jul 2018 13:12:20 +0200
-Message-Id: <20180712111221.20326-20-armbru@redhat.com>
+Date: Thu, 12 Jul 2018 13:12:14 +0200
+Message-Id: <20180712111221.20326-14-armbru@redhat.com>
 In-Reply-To: <20180712111221.20326-1-armbru@redhat.com>
 References: <20180712111221.20326-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/20] migration-test: Clean up string
- interpolation into QMP, part 3
+Subject: [Qemu-devel] [PATCH 13/20] tests: Clean up string interpolation
+ around qtest_qmp_device_add()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,207 +31,404 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>
 
 Leaving interpolation into JSON to qmp() is more robust than building
-QMP input manually, as explained in the recent commit "tests: Clean up
-string interpolation into QMP input (simple cases)".
+QMP input manually, as explained in the commit before previous.
 
-migration-test.c interpolates strings into JSON in a few places:
+qtest_qmp_device_add() and its wrappers interpolate into JSON as
+follows:
 
-* migrate_set_parameter() interpolates string parameter @value as a
-  JSON number.  Change it to long long.  This requires changing
-  migrate_check_parameter() similarly.
+* qtest_qmp_device_add() interpolates members into a JSON object.
 
-* migrate_set_capability() interpolates string parameter @value as a
-  JSON boolean.  Change it to bool.
+* So do its wrappers qpci_plug_device_test() and usb_test_hotplug().
 
-* deprecated_set_speed() interpolates string parameter @value as a
-  JSON number.  Change it to long long.
+* usb_test_hotplug() additionally interpolates strings and numbers
+  into JSON strings.
 
-Bonus: gets rid of non-literal format strings.  A step towards
+Clean them up:
+
+* Have qtest_qmp_device_add() take its extra device properties as
+  arguments for for qdict_from_jsonf_nofail() instead of a string
+  containing JSON members.
+
+* Drop qpci_plug_device_test(), use qtest_qmp_device_add()
+  directly.
+
+* Change usb_test_hotplug() parameter @port to string, to avoid
+  interpolation.  Interpolate @hcd_id separately.
+
+Bonus: gets rid of a non-literal format string.  A step towards
 compile-time format string checking without triggering
 -Wformat-nonliteral.
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/migration-test.c | 74 +++++++++++++++++-------------------------
- 1 file changed, 29 insertions(+), 45 deletions(-)
+ tests/cpu-plug-test.c      |  7 ++++---
+ tests/e1000e-test.c        |  6 ++----
+ tests/ivshmem-test.c       |  8 +++-----
+ tests/libqos/pci.c         |  7 -------
+ tests/libqos/pci.h         |  2 --
+ tests/libqos/usb.c         | 10 ++++++----
+ tests/libqos/usb.h         |  2 +-
+ tests/libqtest.c           | 27 +++++++++++----------------
+ tests/libqtest.h           |  3 ++-
+ tests/usb-hcd-ehci-test.c  |  2 +-
+ tests/usb-hcd-ohci-test.c  |  2 +-
+ tests/usb-hcd-uhci-test.c  |  4 ++--
+ tests/usb-hcd-xhci-test.c  | 10 +++++-----
+ tests/virtio-blk-test.c    |  5 +++--
+ tests/virtio-net-test.c    |  3 ++-
+ tests/virtio-rng-test.c    |  3 ++-
+ tests/virtio-scsi-test.c   |  2 +-
+ tests/virtio-serial-test.c |  2 +-
+ 18 files changed, 47 insertions(+), 58 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 4a4db88b61..8359e2ff78 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -315,31 +315,25 @@ static void cleanup(const char *filename)
- }
+diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
+index ab3bf6df90..f5d57da60e 100644
+--- a/tests/cpu-plug-test.c
++++ b/tests/cpu-plug-test.c
+@@ -88,8 +88,9 @@ static void test_plug_with_device_add_x86(gconstpointer data)
+         for (c = 0; c < td->cores; c++) {
+             for (t = 0; t < td->threads; t++) {
+                 char *id = g_strdup_printf("id-%i-%i-%i", s, c, t);
+-                qtest_qmp_device_add(td->device_model, id, "'socket-id':%u, "
+-                                     "'core-id':%u, 'thread-id':%u",
++                qtest_qmp_device_add(td->device_model, id,
++                                     "{'socket-id':%u, 'core-id':%u,"
++                                     " 'thread-id':%u}",
+                                      s, c, t);
+                 g_free(id);
+             }
+@@ -114,7 +115,7 @@ static void test_plug_with_device_add_coreid(gconstpointer data)
  
- static void migrate_check_parameter(QTestState *who, const char *parameter,
--                                    const char *value)
-+                                    long long value)
- {
-     QDict *rsp_return;
--    char *result;
- 
-     rsp_return = wait_command(who,
-                               "{ 'execute': 'query-migrate-parameters' }");
--    result = g_strdup_printf("%" PRId64,
--                             qdict_get_try_int(rsp_return,  parameter, -1));
--    g_assert_cmpstr(result, ==, value);
--    g_free(result);
-+    g_assert_cmpint(qdict_get_int(rsp_return,  parameter), ==, value);
-     qobject_unref(rsp_return);
- }
- 
- static void migrate_set_parameter(QTestState *who, const char *parameter,
--                                  const char *value)
-+                                  long long value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
--                          "'arguments': { '%s': %s } }",
--                          parameter, value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who,
-+                    "{ 'execute': 'migrate-set-parameters',"
-+                    "'arguments': { %s: %lld } }",
-+                    parameter, value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
-     migrate_check_parameter(who, parameter, value);
-@@ -366,18 +360,16 @@ static void migrate_recover(QTestState *who, const char *uri)
- }
- 
- static void migrate_set_capability(QTestState *who, const char *capability,
--                                   const char *value)
-+                                   bool value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
--                          "'arguments': { "
--                          "'capabilities': [ { "
--                          "'capability': '%s', 'state': %s } ] } }",
--                          capability, value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who,
-+                    "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-+                    "'capabilities': [ { "
-+                    "'capability': %s, 'state': %i } ] } }",
-+                    capability, value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
- }
-@@ -521,29 +513,21 @@ static void test_migrate_end(QTestState *from, QTestState *to, bool test_dest)
- static void deprecated_set_downtime(QTestState *who, const double value)
- {
-     QDict *rsp;
--    char *expected;
--    int64_t result_int;
- 
-     rsp = qtest_qmp(who,
-                     "{ 'execute': 'migrate_set_downtime',"
-                     " 'arguments': { 'value': %f } }", value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
--    result_int = value * 1000L;
--    expected = g_strdup_printf("%" PRId64, result_int);
--    migrate_check_parameter(who, "downtime-limit", expected);
--    g_free(expected);
-+    migrate_check_parameter(who, "downtime-limit", value * 1000);
- }
- 
--static void deprecated_set_speed(QTestState *who, const char *value)
-+static void deprecated_set_speed(QTestState *who, long long value)
- {
-     QDict *rsp;
--    gchar *cmd;
- 
--    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
--                          "'arguments': { 'value': %s } }", value);
--    rsp = qtest_qmp(who, cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(who, "{ 'execute': 'migrate_set_speed',"
-+                          "'arguments': { 'value': %lld } }", value);
-     g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
-     migrate_check_parameter(who, "max-bandwidth", value);
-@@ -556,7 +540,7 @@ static void test_deprecated(void)
-     from = qtest_start("");
- 
-     deprecated_set_downtime(from, 0.12345);
--    deprecated_set_speed(from, "12345");
-+    deprecated_set_speed(from, 12345);
- 
-     qtest_quit(from);
- }
-@@ -572,16 +556,16 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
-         return -1;
+     for (c = td->cores; c < td->maxcpus / td->sockets / td->threads; c++) {
+         char *id = g_strdup_printf("id-%i", c);
+-        qtest_qmp_device_add(td->device_model, id, "'core-id':%u", c);
++        qtest_qmp_device_add(td->device_model, id, "{'core-id':%u}", c);
+         g_free(id);
      }
  
--    migrate_set_capability(from, "postcopy-ram", "true");
--    migrate_set_capability(to, "postcopy-ram", "true");
--    migrate_set_capability(to, "postcopy-blocktime", "true");
-+    migrate_set_capability(from, "postcopy-ram", true);
-+    migrate_set_capability(to, "postcopy-ram", true);
-+    migrate_set_capability(to, "postcopy-blocktime", true);
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index 32aa738b72..c9408a5d1f 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -456,12 +456,10 @@ static void test_e1000e_multiple_transfers(gconstpointer data)
  
-     /* We want to pick a speed slow enough that the test completes
-      * quickly, but that it doesn't complete precopy even on a slow
-      * machine, so also set the downtime.
-      */
--    migrate_set_parameter(from, "max-bandwidth", "100000000");
--    migrate_set_parameter(from, "downtime-limit", "1");
-+    migrate_set_parameter(from, "max-bandwidth", 100000000);
-+    migrate_set_parameter(from, "downtime-limit", 1);
+ static void test_e1000e_hotplug(gconstpointer data)
+ {
+-    static const uint8_t slot = 0x06;
+-
+     qtest_start("-device e1000e");
  
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-@@ -632,7 +616,7 @@ static void test_postcopy_recovery(void)
+-    qpci_plug_device_test("e1000e", "e1000e_net", slot, NULL);
+-    qpci_unplug_acpi_device_test("e1000e_net", slot);
++    qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
++    qpci_unplug_acpi_device_test("e1000e_net", 0x06);
+ 
+     qtest_end();
+ }
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 9b407a3e42..225fde7fff 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -420,19 +420,17 @@ static void test_ivshmem_server_irq(void)
+ static void test_ivshmem_hotplug(void)
+ {
+     const char *arch = qtest_get_arch();
+-    gchar *opts;
+ 
+     qtest_start("");
+ 
+-    opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
+-
+-    qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
++    qtest_qmp_device_add("ivshmem",
++                         "iv1", "{'addr': %s, 'shm': '%s', 'size': '1M'}",
++                         stringify(PCI_SLOT_HP), tmpshm);
+     if (strcmp(arch, "ppc64") != 0) {
+         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
      }
  
-     /* Turn postcopy speed down, 4K/s is slow enough on any machines */
--    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
-+    migrate_set_parameter(from, "max-postcopy-bandwidth", 4096);
- 
-     /* Now we start the postcopy */
-     migrate_postcopy_start(from, to);
-@@ -673,7 +657,7 @@ static void test_postcopy_recovery(void)
-     g_free(uri);
- 
-     /* Restore the postcopy bandwidth to unlimited */
--    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
-+    migrate_set_parameter(from, "max-postcopy-bandwidth", 0);
- 
-     migrate_postcopy_complete(from, to);
+     qtest_end();
+-    g_free(opts);
  }
-@@ -719,9 +703,9 @@ static void test_precopy_unix(void)
-      * machine, so also set the downtime.
-      */
-     /* 1 ms should make it not converge*/
--    migrate_set_parameter(from, "downtime-limit", "1");
-+    migrate_set_parameter(from, "downtime-limit", 1);
-     /* 1GB/s */
--    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+    migrate_set_parameter(from, "max-bandwidth", 1000000000);
  
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-@@ -731,7 +715,7 @@ static void test_precopy_unix(void)
-     wait_for_migration_pass(from);
+ static void test_ivshmem_memdev(void)
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index 0b73cb23d0..e8c342c257 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -395,10 +395,3 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
+     QPCIBar bar = { .addr = addr };
+     return bar;
+ }
+-
+-void qpci_plug_device_test(const char *driver, const char *id,
+-                           uint8_t slot, const char *opts)
+-{
+-    qtest_qmp_device_add(driver, id, "'addr': '%d'%s%s", slot,
+-                         opts ? ", " : "", opts ? opts : "");
+-}
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index 429c382282..0b7e936174 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -109,7 +109,5 @@ QPCIBar qpci_iomap(QPCIDevice *dev, int barno, uint64_t *sizeptr);
+ void qpci_iounmap(QPCIDevice *dev, QPCIBar addr);
+ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
  
-     /* 300 ms should converge */
--    migrate_set_parameter(from, "downtime-limit", "300");
-+    migrate_set_parameter(from, "downtime-limit", 300);
+-void qpci_plug_device_test(const char *driver, const char *id,
+-                           uint8_t slot, const char *opts);
+ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
+ #endif
+diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
+index 2a476049a8..49e2f4bc0a 100644
+--- a/tests/libqos/usb.c
++++ b/tests/libqos/usb.c
+@@ -37,13 +37,14 @@ void uhci_port_test(struct qhc *hc, int port, uint16_t expect)
+     g_assert((value & mask) == (expect & mask));
+ }
  
-     if (!got_stop) {
-         qtest_qmp_eventwait(from, "STOP");
+-void usb_test_hotplug(const char *hcd_id, const int port,
++void usb_test_hotplug(const char *hcd_id, const char *port,
+                       void (*port_check)(void))
+ {
+-    char  *id = g_strdup_printf("usbdev%d", port);
++    char *id = g_strdup_printf("usbdev%s", port);
++    char *bus = g_strdup_printf("%s.0", hcd_id);
+ 
+-    qtest_qmp_device_add("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
+-                         port, hcd_id);
++    qtest_qmp_device_add("usb-tablet", id, "{'port': %s, 'bus': %s}",
++                         port, bus);
+ 
+     if (port_check) {
+         port_check();
+@@ -51,5 +52,6 @@ void usb_test_hotplug(const char *hcd_id, const int port,
+ 
+     qtest_qmp_device_del(id);
+ 
++    g_free(bus);
+     g_free(id);
+ }
+diff --git a/tests/libqos/usb.h b/tests/libqos/usb.h
+index 297cfc564d..c506418a13 100644
+--- a/tests/libqos/usb.h
++++ b/tests/libqos/usb.h
+@@ -13,6 +13,6 @@ void qusb_pci_init_one(QPCIBus *pcibus, struct qhc *hc,
+ void uhci_port_test(struct qhc *hc, int port, uint16_t expect);
+ void uhci_deinit(struct qhc *hc);
+ 
+-void usb_test_hotplug(const char *bus_name, const int port,
++void usb_test_hotplug(const char *bus_name, const char *port,
+                       void (*port_check)(void));
+ #endif
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index e36cc5ede3..dfca3af89d 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1032,26 +1032,21 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+ /*
+  * Generic hot-plugging test via the device_add QMP command.
+  */
+-void qtest_qmp_device_add(const char *driver, const char *id, const char *fmt,
+-                          ...)
++void qtest_qmp_device_add(const char *driver, const char *id,
++                          const char *fmt, ...)
+ {
+-    QDict *response;
+-    char *cmd, *opts = NULL;
+-    va_list va;
++    QDict *args, *response;
++    va_list ap;
+ 
+-    if (fmt) {
+-        va_start(va, fmt);
+-        opts = g_strdup_vprintf(fmt, va);
+-        va_end(va);
+-    }
++    va_start(ap, fmt);
++    args = qdict_from_vjsonf_nofail(fmt, ap);
++    va_end(ap);
+ 
+-    cmd = g_strdup_printf("{'execute': 'device_add',"
+-                          " 'arguments': { 'driver': '%s', 'id': '%s'%s%s }}",
+-                          driver, id, opts ? ", " : "", opts ? opts : "");
+-    g_free(opts);
++    g_assert(!qdict_haskey(args, "driver") && !qdict_haskey(args, "id"));
++    qdict_put_str(args, "driver", driver);
++    qdict_put_str(args, "id", id);
+ 
+-    response = qmp(cmd);
+-    g_free(cmd);
++    response = qmp("{'execute': 'device_add', 'arguments': %p}", args);
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "event")); /* We don't expect any events */
+     g_assert(!qdict_haskey(response, "error"));
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 85bd1cf7b7..53364849bf 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -967,7 +967,8 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine));
+  * qtest_qmp_device_add:
+  * @driver: Name of the device that should be added
+  * @id: Identification string
+- * @fmt: printf-like format string for further options to device_add
++ * @fmt...: Additional arguments for device_add; formatted through
++ * json-lexer.c (only understands '%((l|ll|I64)?d|[ipsf])').
+  *
+  * Generic hot-plugging test via the device_add QMP command.
+  */
+diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
+index 55d4743a2a..f28ea27f37 100644
+--- a/tests/usb-hcd-ehci-test.c
++++ b/tests/usb-hcd-ehci-test.c
+@@ -139,7 +139,7 @@ static void pci_ehci_port_3_hotplug(void)
+ 
+ static void pci_ehci_port_hotplug(void)
+ {
+-    usb_test_hotplug("ich9-ehci-1", 3, pci_ehci_port_3_hotplug);
++    usb_test_hotplug("ich9-ehci-1", "3", pci_ehci_port_3_hotplug);
+ }
+ 
+ 
+diff --git a/tests/usb-hcd-ohci-test.c b/tests/usb-hcd-ohci-test.c
+index 4758813d78..48ddbfd26d 100644
+--- a/tests/usb-hcd-ohci-test.c
++++ b/tests/usb-hcd-ohci-test.c
+@@ -19,7 +19,7 @@ static void test_ohci_init(void)
+ 
+ static void test_ohci_hotplug(void)
+ {
+-    usb_test_hotplug("ohci", 1, NULL);
++    usb_test_hotplug("ohci", "1", NULL);
+ }
+ 
+ int main(int argc, char **argv)
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index 6a7e5a2fed..a119d6d5c8 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -43,12 +43,12 @@ static void test_port_2(void)
+ 
+ static void test_uhci_hotplug(void)
+ {
+-    usb_test_hotplug("uhci", 2, test_port_2);
++    usb_test_hotplug("uhci", "2", test_port_2);
+ }
+ 
+ static void test_usb_storage_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-storage", "usbdev0", "'drive': 'drive0'");
++    qtest_qmp_device_add("usb-storage", "usbdev0", "{'drive': 'drive0'}");
+ 
+     qtest_qmp_device_del("usbdev0");
+ }
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index 5b1b681bf2..9eb24b00e4 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -18,13 +18,13 @@ static void test_xhci_init(void)
+ 
+ static void test_xhci_hotplug(void)
+ {
+-    usb_test_hotplug("xhci", 1, NULL);
++    usb_test_hotplug("xhci", "1", NULL);
+ }
+ 
+ static void test_usb_uas_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-uas", "uas", NULL);
+-    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drive0'");
++    qtest_qmp_device_add("usb-uas", "uas", "{}");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drive0'}");
+ 
+     /* TODO:
+         UAS HBA driver in libqos, to check that
+@@ -37,10 +37,10 @@ static void test_usb_uas_hotplug(void)
+ 
+ static void test_usb_ccid_hotplug(void)
+ {
+-    qtest_qmp_device_add("usb-ccid", "ccid", NULL);
++    qtest_qmp_device_add("usb-ccid", "ccid", "{}");
+     qtest_qmp_device_del("ccid");
+     /* check the device can be added again */
+-    qtest_qmp_device_add("usb-ccid", "ccid", NULL);
++    qtest_qmp_device_add("usb-ccid", "ccid", "{}");
+     qtest_qmp_device_del("ccid");
+ }
+ 
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 9be9ffb378..d96b4c69e1 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -662,8 +662,9 @@ static void pci_hotplug(void)
+     qs = pci_test_start();
+ 
+     /* plug secondary disk */
+-    qpci_plug_device_test("virtio-blk-pci", "drv1", PCI_SLOT_HP,
+-                          "'drive': 'drive1'");
++    qtest_qmp_device_add("virtio-blk-pci", "drv1",
++                         "{'addr': %s, 'drive': 'drive1'}",
++                         stringify(PCI_SLOT_HP));
+ 
+     dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
+     g_assert(dev);
+diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+index b285a262e9..dcb87a8b6e 100644
+--- a/tests/virtio-net-test.c
++++ b/tests/virtio-net-test.c
+@@ -249,7 +249,8 @@ static void hotplug(void)
+ 
+     qtest_start("-device virtio-net-pci");
+ 
+-    qpci_plug_device_test("virtio-net-pci", "net1", PCI_SLOT_HP, NULL);
++    qtest_qmp_device_add("virtio-net-pci", "net1",
++                         "{'addr': %s}", stringify(PCI_SLOT_HP));
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qpci_unplug_acpi_device_test("net1", PCI_SLOT_HP);
+diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
+index dcecf77463..657d9a4105 100644
+--- a/tests/virtio-rng-test.c
++++ b/tests/virtio-rng-test.c
+@@ -22,7 +22,8 @@ static void hotplug(void)
+ {
+     const char *arch = qtest_get_arch();
+ 
+-    qpci_plug_device_test("virtio-rng-pci", "rng1", PCI_SLOT_HP, NULL);
++    qtest_qmp_device_add("virtio-rng-pci", "rng1",
++                         "{'addr': %s}", stringify(PCI_SLOT_HP));
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         qpci_unplug_acpi_device_test("rng1", PCI_SLOT_HP);
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 037872bb98..0d4f25d369 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -199,7 +199,7 @@ static void hotplug(void)
+ 
+     qs = qvirtio_scsi_start(
+             "-drive id=drv1,if=none,file=null-co://,format=raw");
+-    qtest_qmp_device_add("scsi-hd", "scsihd", "'drive': 'drv1'");
++    qtest_qmp_device_add("scsi-hd", "scsihd", "{'drive': 'drv1'}");
+     qtest_qmp_device_del("scsihd");
+     qvirtio_scsi_stop(qs);
+ }
+diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
+index 7cc7060264..e4b18b1c8a 100644
+--- a/tests/virtio-serial-test.c
++++ b/tests/virtio-serial-test.c
+@@ -18,7 +18,7 @@ static void virtio_serial_nop(void)
+ 
+ static void hotplug(void)
+ {
+-    qtest_qmp_device_add("virtserialport", "hp-port", NULL);
++    qtest_qmp_device_add("virtserialport", "hp-port", "{}");
+ 
+     qtest_qmp_device_del("hp-port");
+ }
 -- 
 2.17.1
