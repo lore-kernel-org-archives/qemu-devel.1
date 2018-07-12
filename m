@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fdfuo-0005Z2-Or
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:02:10 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fdfx6-0006XI-SE
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fdful-0007ln-OW
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:02:06 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:52582)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fdful-0007kS-H2
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:02:03 -0400
-Received: by mail-it0-x243.google.com with SMTP id p4-v6so8063337itf.2
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:02:03 -0700 (PDT)
-References: <20180712154152.32183-1-peter.maydell@linaro.org>
-	<20180712154152.32183-3-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <995c9d02-e2d3-0f91-d135-56b25a694819@linaro.org>
-Date: Thu, 12 Jul 2018 13:01:59 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1fdfx6-0001Dj-3a
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:04:28 -0400
+Date: Thu, 12 Jul 2018 15:04:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180712180420.GH31657@localhost.localdomain>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<ca91bffe-2bcf-78a2-02cd-8ae7cc48074c@redhat.com>
+	<20180711183031.GM914@localhost.localdomain>
+	<ce0b8bf9-b0e6-fe02-c685-5a6c3140a3ae@redhat.com>
+	<20180711202351.GA31657@localhost.localdomain>
+	<00130bb8-4dfc-3a76-3f51-9f4c6da891c0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180712154152.32183-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0 2/2] hw/intc/arm_gic: Fix handling
- of GICD_ITARGETSR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00130bb8-4dfc-3a76-3f51-9f4c6da891c0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Jan Kiszka <jan.kiszka@web.de>, Luc Michel <luc.michel@greensocs.com>, patches@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 07/12/2018 10:41 AM, Peter Maydell wrote:
-> The GICD_ITARGETSR implementation still has some 11MPCore behaviour
-> that we were incorrectly using in our GICv1 and GICv2 implementations
-> for the case where the interrupt number is less than GIC_INTERNAL.
-> The desired behaviour here is:
->  * for 11MPCore: RAZ/WI for irqs 0..28; read a number matching the
->    CPU doing the read for irqs 29..31
->  * for GICv1 and v2: RAZ/WI if uniprocessor; otherwise read a
->    number matching the CPU doing the read for all irqs < 32
+On Thu, Jul 12, 2018 at 10:05:46AM +0200, Paolo Bonzini wrote:
+> On 11/07/2018 22:23, Eduardo Habkost wrote:
+> > On Wed, Jul 11, 2018 at 10:16:42PM +0200, Paolo Bonzini wrote:
+> >> On 11/07/2018 20:30, Eduardo Habkost wrote:
+> >>>> The theoretical behavior should be:
+> >>> It's not clear below where you expect
+> >>>   qdev_set_parent_bus(..., sysbus_get_default())
+> >>> to be called (if it should be called at all).
+> >>>
+> >>> I don't know where it should be called, but I'm absolutely sure
+> >>> instance_init is not the right place.
+> >>
+> >> I think instance_init is fine to call qdev_set_parent_bus on contained
+> >> devices.  Why do you say it's not?
+> > 
+> > Because object_unref(object_new(...)) is not supposed to affect
+> > QEMU global state at all.
 > 
-> Stop squashing GICD_ITARGETSR to 0 for IRQs 0..28 unless this
-> is an 11MPCore GIC.
-> 
-> Reported-by: Jan Kiszka <jan.kiszka@web.de>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/arm_gic.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+> It should not affect it.  Any changes to the global state done by
+> instance_init are immediately undone when object_unref destroys the
+> child properties of the object.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I would prefer if it didn't, but not a big deal as long as all
+QOM code is protected by the BQL (it is, right?).
 
+If we get rid of object_new() in qmp_device_list_properties(),
+then most of the restrictions on instance_init can go away,
+anyway.
 
-r~
+-- 
+Eduardo
