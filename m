@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fdfBU-0001DO-AX
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 13:15:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fdfLB-0003Yb-9d
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 13:25:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fdfBT-0006c0-4L
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 13:15:16 -0400
-Date: Thu, 12 Jul 2018 14:15:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180712171507.GN914@localhost.localdomain>
-References: <1531409463-3843-1-git-send-email-thuth@redhat.com>
-	<1531409463-3843-2-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fdfLA-0001HL-C6
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 13:25:17 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:32999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fdfL9-0001GP-Sr
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 13:25:16 -0400
+Received: by mail-oi0-x242.google.com with SMTP id l10-v6so10537526oii.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 10:25:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1531409463-3843-2-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] qom/object: Add a new function
- object_initialize_as_child()
+In-Reply-To: <20180712163152.12521-1-kwolf@redhat.com>
+References: <20180712163152.12521-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Jul 2018 18:24:54 +0100
+Message-ID: <CAFEAcA_kO75WdOBDj+Qmg_yK8P51ePNBJs-sSOZeP-_C=mzogA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] Block layer fixes for 3.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jul 12, 2018 at 05:30:59PM +0200, Thomas Huth wrote:
-> A lot of code is using the object_initialize() function followed by a call to
-> object_property_add_child() to add the newly initialized object as a child of
-> the current object. Both functions increase the reference counter of the new
-> object, but many spots that call these two functions then forget to drop one
-> of the superfluous references. So the newly created object is often not cleaned
-> up correctly when the parent is destroyed. In the worst case, this can cause
-> crashes, e.g. because device objects are not correctly removed from their
-> parent_bus.
-> Since this is a common pattern between many code spots, let's introdcue a
-> new function that takes care of calling all three required initialization
-> functions, first object_initialize(), then object_property_add_child() and
-> finally object_unref().
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  include/qom/object.h | 19 +++++++++++++++++++
->  qom/object.c         | 14 ++++++++++++++
->  2 files changed, 33 insertions(+)
-> 
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index f3d2308..c1b254c 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -749,6 +749,25 @@ int object_set_propv(Object *obj,
->  void object_initialize(void *obj, size_t size, const char *typename);
->  
->  /**
-> + * object_initialize_as_child:
-> + * @parentobj: The parent object to add a property to
-> + * @propname: The name of the property
-> + * @childobj: A pointer to the memory to be used for the object.
-> + * @size: The maximum size available at @obj for the object.
-> + * @type: The name of the type of the object to instantiate.
-> + * @errp: If an error occurs, a pointer to an area to store the area
-
-"to store the error"
-
-> + *
-> + * This function will initialize an object. The memory for the object should
-> + * have already been allocated. The object will then be added as child property
-> + * to a parent with object_property_add_child() function. The returned object
-> + * has a reference count of 1, and will be finalized when the last reference is
-> + * dropped.
-
-I think we need to document clearly who owns the reference and is
-responsible for dropping it.  In this case, we need to make it
-clear that the child property will own the reference, and nobody
-should drop it except object_finalize_child_property().  This is
-a subtle but important difference from object_initialize().
+On 12 July 2018 at 17:31, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit dc3c89d612252fc461a65f54885a1fe108e9ec05:
+>
+>   ui/cocoa.m: replace scrollingDeltaY with deltaY (2018-07-12 16:03:50 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 8dcd3c9b91a300c86e315d7e5427dce1383f7387:
+>
+>   qemu-img: align result of is_allocated_sectors (2018-07-12 18:24:08 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - file-posix: Check correct file type (regular file for 'file',
+>   character or block device for 'host_device'/'host_cdrom')
+> - scsi-disk: Block Device Characteristics emulation fix
+> - qemu-img: Consider required alignment for sparse area detection
+> - Documentation and test improvements
+>
+> ----------------------------------------------------------------
 
 
-> + */
-> +void object_initialize_as_child(Object *parentobj, const char *propname,
-> +                                void *childobj, size_t size, const char *type,
-> +                                Error **errp);
-> +
-> +/**
->   * object_dynamic_cast:
->   * @obj: The object to cast.
->   * @typename: The @typename to cast to.
-> diff --git a/qom/object.c b/qom/object.c
-> index 4609e34..de2ded0 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -392,6 +392,20 @@ void object_initialize(void *data, size_t size, const char *typename)
->      object_initialize_with_type(data, size, type);
->  }
->  
-> +void object_initialize_as_child(Object *parentobj, const char *propname,
-> +                                void *childobj, size_t size, const char *type,
-> +                                Error **errp)
-> +{
-> +    object_initialize(childobj, size, type);
-> +    object_property_add_child(parentobj, propname, OBJECT(childobj), errp);
-> +    /*
-> +     * Since object_property_add_child added a reference to the child object,
-> +     * we can drop the initial reference from object_initialize now.
-> +     */
-> +    object_unref(OBJECT(childobj));
+Applied, thanks.
 
-I suggest "drop the reference added by object_initialize(), the
-child property will own the only reference to the object".
-
--- 
-Eduardo
+-- PMM
