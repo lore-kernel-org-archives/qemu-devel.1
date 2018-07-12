@@ -1,33 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdh8w-0000ws-4G
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:20:47 -0400
+	(envelope-from <stefan@weilnetz.de>) id 1fdhEH-0002lo-9I
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:26:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdh8r-0004kl-6V
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fdh8q-0004iS-SQ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:20:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fdh8p-0002dh-RM
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CB19A2E8076
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:20:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Jul 2018 19:14:51 -0000
-From: David Martins <1781463@bugs.launchpad.net>
-Reply-To: Bug 1781463 <1781463@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153142289132.32266.13097437819271021346.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1781463] [NEW] qemu don't start *.abs firmware
- files
+	(envelope-from <stefan@weilnetz.de>) id 1fdhEC-0003kw-8Z
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:26:17 -0400
+From: Stefan Weil <sw@weilnetz.de>
+Date: Thu, 12 Jul 2018 21:26:03 +0200
+Message-Id: <20180712192603.11599-1-sw@weilnetz.de>
+Subject: [Qemu-devel] [PATCH] configure: Support pkg-config for zlib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,288 +17,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-Hello Devs,
-
-I'm here to report this bug/issue because i'm using Win64 Qemu but i
-can't start a *.abs firmware at normally this firmware is based in Linux
-Kernel and this type of firmware is made for STB Receivers,
-
-So this is all information i provide to get support.
-
-Files extracted by ( binwalk -e )
-
-
-Terminal output:
-
-# binwalk -e AMIKO_HD8150_2.4.43_emu.abs
-
-DECIMAL       HEXADECIMAL     DESCRIPTION
-
----------------------------------------------------------------------------=
------
-196736        0x30080         LZMA compressed data, properties: 0x6C, dicti=
-onary size: 8388608 bytes, uncompressed size: 11883876 bytes
-3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dicti=
-onary size: 8388608 bytes, uncompressed size: 3255512 bytes
-5636224       0x560080        LZMA compressed data, properties: 0x6C, dicti=
-onary size: 8388608 bytes, uncompressed size: 87904 bytes
-
-
-Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
-
-Windows files output:
-
-Software used: Ali Main Code Decrypter 8.9
-
-Files unpacked:
-
-bootloader
-MemCfg
-maincode(AV)
-seecode
-default_lang
-cipluskey
-countryband
-logo_user
-logo_menu
-logo_radio
-logo_boot
-patch
-defaultdb(PRC)
-userdb(64+64)
-
-
-Terminal OUTPUT:
-
-# hexdump -C
-
-part of file
-
-
-00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore ve=
-rs|
-00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@SD=
-K4|
-00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_201=
-61|
-00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc versio=
-n |
-00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssde-=
-6.|
-00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-20070420=
-)(|
-00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrator@=
- F|
-00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, 20=
-17|
-00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM).=
-..|
-00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0...=
-..|
-
-
-When I use readelf it says files isn't an ELF file, so i can't run it like =
-a kernel (Bootloader,Maincode, and etc. )
-
-so this is the cmd output when i use qemu Win64 (I don't whant to use
-linux to do the emulation about this *.abs extension firmware so please
-help me for win64 version from Qemu)
-
-CMD OUTPUT:
-
- C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
-mips32r6-generic -drive file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=
-=3Draw
-
-qemu-system-mips.exe: warning: could not load MIPS bios 'mips_bios.bin'
-
-I also tried a lot of diferents qemu-system... and a lot of diferent
-configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc... and
-nothing hapenned
-
-How can i reproduce this issue ? =
-
-Reply:. =
-
-
-Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
-AliDekompressor in http://www.satedu.cba.pl/
-
-Direct tools:
-
-FirmwareDecrypter_v8.9.zip :
-
-http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmwar=
-eDecrypter_v8.9.zip&directory=3DTest%20Folder&
-
-Ali__tools_Console_v4.0__CRC_FIXER.rar :
-
-http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__to=
-ols_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
-
-
-so if Qemu can explain how can i fix this issue this can be highly helpfull.
-
-With my best regards,
-David Martins =
-
-Screamfox
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1781463
-
-Title:
-  qemu don't start *.abs firmware files
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello Devs,
-
-  I'm here to report this bug/issue because i'm using Win64 Qemu but i
-  can't start a *.abs firmware at normally this firmware is based in
-  Linux Kernel and this type of firmware is made for STB Receivers,
-
-  So this is all information i provide to get support.
-
-  Files extracted by ( binwalk -e )
-
-  =
-
-  Terminal output:
-
-  # binwalk -e AMIKO_HD8150_2.4.43_emu.abs
-
-  DECIMAL       HEXADECIMAL     DESCRIPTION
-
-  -------------------------------------------------------------------------=
--------
-  196736        0x30080         LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 11883876 bytes
-  3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 3255512 bytes
-  5636224       0x560080        LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 87904 bytes
-
-  =
-
-  Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
-
-  Windows files output:
-
-  Software used: Ali Main Code Decrypter 8.9
-
-  Files unpacked:
-
-  bootloader
-  MemCfg
-  maincode(AV)
-  seecode
-  default_lang
-  cipluskey
-  countryband
-  logo_user
-  logo_menu
-  logo_radio
-  logo_boot
-  patch
-  defaultdb(PRC)
-  userdb(64+64)
-
-  =
-
-  Terminal OUTPUT:
-
-  # hexdump -C
-
-  part of file
-
-  =
-
-  00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore =
-vers|
-  00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@=
-SDK4|
-  00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_2=
-0161|
-  00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc vers=
-ion |
-  00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssd=
-e-6.|
-  00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-200704=
-20)(|
-  00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrato=
-r@ F|
-  00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, =
-2017|
-  00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM=
-)...|
-  00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0.=
-....|
-
-  =
-
-  When I use readelf it says files isn't an ELF file, so i can't run it lik=
-e a kernel (Bootloader,Maincode, and etc. )
-
-  so this is the cmd output when i use qemu Win64 (I don't whant to use
-  linux to do the emulation about this *.abs extension firmware so
-  please help me for win64 version from Qemu)
-
-  CMD OUTPUT:
-
-   C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
-  mips32r6-generic -drive
-  file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=3Draw
-
-  qemu-system-mips.exe: warning: could not load MIPS bios
-  'mips_bios.bin'
-
-  I also tried a lot of diferents qemu-system... and a lot of diferent
-  configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc...
-  and nothing hapenned
-
-  How can i reproduce this issue ? =
-
-  Reply:. =
-
-
-  Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
-  AliDekompressor in http://www.satedu.cba.pl/
-
-  Direct tools:
-
-  FirmwareDecrypter_v8.9.zip :
-
-  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmw=
-areDecrypter_v8.9.zip&directory=3DTest%20Folder&
-
-  Ali__tools_Console_v4.0__CRC_FIXER.rar :
-
-  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__=
-tools_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
-
-  =
-
-  so if Qemu can explain how can i fix this issue this can be highly helpfu=
-ll.
-
-  With my best regards,
-  David Martins =
-
-  Screamfox
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1781463/+subscriptions
+To: QEMU Developer <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>
+
+This is needed for builds with the mingw64-* packages from Cygwin,
+but also works for Linux.
+
+Move the zlib test also more to the end because users should
+get information on the really important missing packages
+(which also require zlib) first.
+
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ configure | 40 +++++++++++++++++++++++-----------------
+ 1 file changed, 23 insertions(+), 17 deletions(-)
+
+diff --git a/configure b/configure
+index 2a7796ea80..dcaab01729 100755
+--- a/configure
++++ b/configure
+@@ -2140,23 +2140,6 @@ EOF
+   fi
+ fi
+ 
+-#########################################
+-# zlib check
+-
+-if test "$zlib" != "no" ; then
+-    cat > $TMPC << EOF
+-#include <zlib.h>
+-int main(void) { zlibVersion(); return 0; }
+-EOF
+-    if compile_prog "" "-lz" ; then
+-        :
+-    else
+-        error_exit "zlib check failed" \
+-            "Make sure to have the zlib libs and headers installed."
+-    fi
+-fi
+-LIBS="$LIBS -lz"
+-
+ ##########################################
+ # lzo check
+ 
+@@ -3525,6 +3508,29 @@ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     fi
+ fi
+ 
++#########################################
++# zlib check
++
++if test "$zlib" != "no" ; then
++    if $pkg_config --exists zlib; then
++        zlib_cflags=$($pkg_config --cflags zlib)
++        zlib_libs=$($pkg_config --libs zlib)
++        QEMU_CFLAGS="$zlib_cflags $QEMU_CFLAGS"
++        LIBS="$zlib_libs $LIBS"
++    else
++        cat > $TMPC << EOF
++#include <zlib.h>
++int main(void) { zlibVersion(); return 0; }
++EOF
++        if compile_prog "" "-lz" ; then
++            LIBS="$LIBS -lz"
++        else
++            error_exit "zlib check failed" \
++                "Make sure to have the zlib libs and headers installed."
++        fi
++    fi
++fi
++
+ ##########################################
+ # SHA command probe for modules
+ if test "$modules" = yes; then
+-- 
+2.11.0
