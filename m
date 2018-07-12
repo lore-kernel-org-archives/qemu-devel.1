@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdXXN-0000Vw-J1
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:05:22 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fdXke-0003qz-IZ
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdXXJ-0003XG-8A
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:05:21 -0400
-Date: Thu, 12 Jul 2018 11:05:01 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180712090501.GC4541@localhost.localdomain>
-References: <CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<20180709072953.GE7755@andariel.pipo.sk>
-	<87k1q3ljgs.fsf@dusky.pond.sub.org>
-	<20180710162208.7b1b5cdc.cohuck@redhat.com>
-	<20180710143807.GJ5852@localhost.localdomain>
-	<871sc9gdr2.fsf@dusky.pond.sub.org>
-	<8736wplzff.fsf@dusky.pond.sub.org>
-	<20180712094834.78852622.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180712094834.78852622.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+	(envelope-from <robert.hu@linux.intel.com>) id 1fdXkZ-0004SK-OE
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:19:04 -0400
+Received: from mga02.intel.com ([134.134.136.20]:44405)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fdXkZ-0004LW-DY
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:18:59 -0400
+Message-ID: <1531387131.78672.1.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Thu, 12 Jul 2018 17:18:51 +0800
+In-Reply-To: <20180703110007.GL7451@localhost.localdomain>
+References: <1530098844-236851-1-git-send-email-robert.hu@linux.intel.com>
+	<1530098844-236851-3-git-send-email-robert.hu@linux.intel.com>
+	<20180628182820.GE914@localhost.localdomain>
+	<1530603313.22880.36.camel@linux.intel.com>
+	<20180703110007.GL7451@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] i386: Add CPUID bit and feature
+ words for IA32_ARCH_CAPABILITIES MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-Am 12.07.2018 um 09:48 hat Cornelia Huck geschrieben:
-> On Thu, 12 Jul 2018 08:51:16 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
+On Tue, 2018-07-03 at 08:00 -0300, Eduardo Habkost wrote:
+> On Tue, Jul 03, 2018 at 03:35:13PM +0800, Robert Hoo wrote:
+> > On Thu, 2018-06-28 at 15:28 -0300, Eduardo Habkost wrote:
+> > > On Wed, Jun 27, 2018 at 07:27:21PM +0800, Robert Hoo wrote:
+> > > > Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
+> > > > SPEC_CTRL.
+> > > > 
+> > > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> > > 
+> > > Based on kernel commit 1eaafe91, it looks like we must always set
+> > > IA32_ARCH_CAPABILITIES.RSBA[bit 2] unless we're really sure the
+> > > VM will not be migrated to a vulnerable processor.
+> > > 
+> > > Considering this, I'd like to make "+arch-capabilities" set
+> > > IA32_ARCH_CAPABILITIES.RSBA by default, unless RSBA is explicitly
+> > > disabled by management software.
+> > > 
+> > Agree. But this seems beyond Icelake CPU model scope. How about I think
+> > about this carefully and compose another patch (set) for this?
 > 
-> > Markus Armbruster <armbru@redhat.com> writes:
-> > 
-> > > Kevin Wolf <kwolf@redhat.com> writes:
-> > >  
-> > >> Am 10.07.2018 um 16:22 hat Cornelia Huck geschrieben:  
-> > >>> On Tue, 10 Jul 2018 07:59:15 +0200
-> > >>> Markus Armbruster <armbru@redhat.com> wrote:
-> > >>>   
-> > >>> > In addition to actively pulling libvirt developers into review of
-> > >>> > deprecation patches, we should pursue the idea to optionally let QEMU
-> > >>> > fail on use of deprecated features, then have libvirt run its test suite
-> > >>> > that way.  
-> > >>> 
-> > >>> What about the following:
-> > >>> 
-> > >>> qemu_deprecated_option("old_option", "modern_option");
-> > >>> 
-> > >>> Which would then print (in normal operation)
-> > >>> 
-> > >>> "WARNING: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
-> > >>> 
-> > >>> to the monitor (or to stderr? to both?).
-> > >>> 
-> > >>> If you start QEMU with a -no-deprecated-options switch, it would print
-> > >>> 
-> > >>> "ERROR: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
-> > >>> 
-> > >>> and do an exit(1).
-> > >>> 
-> > >>> Would that be workable?  
-> > >>
-> > >> I think the function should just take a message:
-> > >>
-> > >>     /* Works like error_report(), except for the WARNING/ERROR prefix
-> > >>      * and exit(1) if -no-deprecated-options is set */
-> > >>     void deprecation_report(const char *fmt, ...);  
-> > >
-> > > I like it.  The contract could use a bit of polish, but that's detail.  
-
-Obviously, this comment wasn't meant to be copied into the source code,
-but just to explain what I'm actually proposing there.
-
-> > Suggest --deprecated={silent,warn,error}, default silent.
+> This plan makes sense to me, as I don't want to make this
+> decision block IceLake from being in QEMU 3.0.
 > 
-> I like that, but I'd prefer to default to warn (so that command line
-> users have a better chance to notice it).
-
-I agree that warn is the better default. (It's also consistent with what
-we have been doing for deprecations so far.)
-
-Kevin
+> However, enabling CPUID_7_0_EDX_ARCH_CAPABILITIES in IceLake but
+> setting the MSR to 0 seems pointless.
+> 
+> I think we should add IceLake without
+> CPUID_7_0_EDX_ARCH_CAPABILITIES first, and later (after deciding
+> on a reasonable default value for MSR_IA32_ARCH_CAPABILITIES),
+> enable the CPUID bit on IceLake (hopefully in time for QEMU 3.0).
+> 
+> 
+> > And you'd like to set  IA32_ARCH_CAPABILITIES.RSBA by default in qemu or
+> > kvm layer?
+> 
+> Probably we need to make this decision in QEMU.  If KVM set RSBA
+> automatically on .get_msr_feature(), QEMU won't be able to
+> differentiate a host with RSBA set from a host with RSBA unset.
+> 
+What's the default value for MSR IA32_ARCH_CAPABILITIES? is it clear
+now?
