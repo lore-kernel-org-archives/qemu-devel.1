@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jonasschievink@gmail.com>) id 1fdNMG-0008Cu-ID
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 18:13:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdQ8E-0008R9-QH
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jonasschievink@gmail.com>) id 1fdNMC-0006UR-IV
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 18:13:12 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:41282)
+	(envelope-from <bounces@canonical.com>) id 1fdQ8A-0000Hq-3a
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:10:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jonasschievink@gmail.com>)
-	id 1fdNMC-0006TR-BW
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 18:13:08 -0400
-Received: by mail-ed1-x543.google.com with SMTP id s24-v6so4114711edr.8
-	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 15:13:08 -0700 (PDT)
-From: Jonas Schievink <jonasschievink@gmail.com>
-Date: Thu, 12 Jul 2018 00:12:44 +0200
-Message-Id: <20180711221244.31869-1-jonasschievink@gmail.com>
-In-Reply-To: <5271d71e-794c-2db0-9046-183fd79dd902@amsat.org>
-References: <5271d71e-794c-2db0-9046-183fd79dd902@amsat.org>
-Subject: [Qemu-devel] [PATCH v2] Zero out the host's `msg_control` buffer
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdQ89-0000GP-5z
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:10:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdQ88-0002nx-0u
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 01:10:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F00842E80C7
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 01:10:47 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jul 2018 01:00:28 -0000
+From: Paul Gear <paul.gear@canonical.com>
+Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
+Message-Id: <153135722822.23692.8750411055591804920.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719339] Re: serial8250: too much work for irq3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +36,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Jonas Schievink <jonasschievink@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-If this is not done, qemu would drop any control message after the first
-one.
+Further update: AWS kernel experienced the same error messages after
+just over 3 hours of runtime.
 
-This is because glibc's `CMSG_NXTHDR` macro accesses the uninitialized
-cmsghdr's length field in order to find out if the message fits into the
-`msg_control` buffer, wrongly assuming that it doesn't because the
-length field contains garbage. Accessing the length field is fine for
-completed messages we receive from the kernel, but is - as far as I know
-- not needed since the kernel won't return such an invalid cmsghdr in
-the first place.
+-- =
 
-This is tracked as this glibc bug:
-https://sourceware.org/bugzilla/show_bug.cgi?id=13500
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719339
 
-It's probably also a good idea to bail with an error if `CMSG_NXTHDR`
-returns NULL but `TARGET_CMSG_NXTHDR` doesn't (ie. we still expect
-cmsgs).
+Title:
+  serial8250: too much work for irq3
 
-Signed-off-by: Jonas Schievink <jonasschievink@gmail.com>
----
-Changes in v2:
-- put the memset right after the msg_control alloca
-- added missing Signed-off-by line
+Status in QEMU:
+  New
 
- linux-user/syscall.c | 2 ++
- 1 file changed, 2 insertions(+)
+Bug description:
+  It's know issue and sometimes mentioned since 2007. But it seems not
+  fixed.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e4b1b7d7da..3c427500ef 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -3843,6 +3843,8 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
-     }
-     msg.msg_controllen = 2 * tswapal(msgp->msg_controllen);
-     msg.msg_control = alloca(msg.msg_controllen);
-+    memset(msg.msg_control, 0, msg.msg_controllen);
-+
-     msg.msg_flags = tswap32(msgp->msg_flags);
- 
-     count = tswapal(msgp->msg_iovlen);
--- 
-2.18.0
+  http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
+  http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/m=
+sg00696.html
+
+  I don't think fixes like increases PASS_LIMIT
+  (/drivers/tty/serial/8250.c) or remove this annoying message
+  (https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix
+  was proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
+
+  Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
+  16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
+  branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
+  if we write a lot of message into console (dmesg or dd if=3D/dev/zero
+  of=3D/dev/ttyS1).
+
+  /usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don
+  -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+7-ultra1
+  /master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+  core=3Doff -cpu Skylake-
+  Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,mon=
+itor=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3D=
+on,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
+  -m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -u=
+uid
+  4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
+  -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/mon=
+itor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
+pet
+  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
+  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7 -drive
+  file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddr=
+ive-
+  ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
+  ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -d=
+evice
+  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,add=
+r=3D0x3
+  -chardev
+  socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719339/+subscriptions
