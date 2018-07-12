@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fda4V-0006jY-JP
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:47:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdaKd-00025d-1Q
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fda4U-0006CK-Ro
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:47:43 -0400
-Date: Thu, 12 Jul 2018 13:47:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180712114733.GE4541@localhost.localdomain>
-References: <20180622112237.2131-1-gersner@gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1fdaKc-0000H5-9A
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:04:23 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
+	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
+Date: Thu, 12 Jul 2018 14:04:12 +0200
+In-Reply-To: <5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com> (Thomas Huth's
+	message of "Tue, 10 Jul 2018 00:03:39 +0200")
+Message-ID: <87601koe2r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180622112237.2131-1-gersner@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] nvme: PCI/e configuration from
- specification
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shimi Gersner <gersner@gmail.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Max Reitz <mreitz@redhat.com>, David Sariel <davidsa@openu.ac.il>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-Am 22.06.2018 um 13:22 hat Shimi Gersner geschrieben:
-> PCI/e configuration currently does not meets specifications.
-> 
-> Patch includes various configuration changes to support specifications
-> - BAR2 to return zero when read and CMD.IOSE is not set.
-> - Expose NVME configuration through IO space (Optional).
-> - PCI Power Management v1.2.
-> - PCIe Function Level Reset.
-> - Disable QEMUs default use of PCIe Link Status (DLLLA).
-> - PCIe missing AOC compliance flag.
-> - Mask PCIe End-to-End TLP as RO (Unspecified by specification).
-> 
-> Change-Id: I9057f56266db16b013fa194730c998d4779cede3
+Thomas Huth <thuth@redhat.com> writes:
 
-What is the meaning of this Change-Id tag?
+> On 09.07.2018 23:42, Peter Maydell wrote:
+>> On 9 July 2018 at 22:03, Thomas Huth <thuth@redhat.com> wrote:
+[...]
+> Hmm, maybe we need a qtest that first executes "info qtree", then runs
+> 'device-list-properties' for all devices and finally checks "info qtree"
+> again ... since 'device-list-properties' should not change the qtree,
+> the output of the "info qtree" should be the same.
 
-> Signed-off-by: Shimi Gersner <gersner@gmail.com>
+Lovely idea.
 
-Keith, can you have a look at this series?
+>                                                    Currently this is not
+> the case :-/
 
-Kevin
+Less than lovely, but I can't claim to be surprised.  As Peter remarked
+elsewhere in this thread, QOM is underdocumented, and is too easy to
+misuse.
+
+On documentation: we sorely lack documentation tying everything
+together.  GDK-Doc function comments alone can't cut it for something as
+complex as QOM.
+
+Even with adequate documentation, bad examples in the source will
+continue to multiply.  We'll have to get rid of them.
