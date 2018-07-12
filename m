@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWO-00077g-5r
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdZWQ-0007AW-T7
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWL-0006pR-CP
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41930 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fdZWM-0006rx-Pl
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49026 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWL-0006oB-02
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWM-0006qu-Ip
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A2B5F34667
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:12:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 363EE40201BF
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:12:26 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 12 Jul 2018 13:12:06 +0200
-Message-Id: <20180712111221.20326-6-armbru@redhat.com>
+Date: Thu, 12 Jul 2018 13:12:20 +0200
+Message-Id: <20180712111221.20326-20-armbru@redhat.com>
 In-Reply-To: <20180712111221.20326-1-armbru@redhat.com>
 References: <20180712111221.20326-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/20] qobject: Replace qobject_from_jsonf() by
- qobject_from_jsonf_nofail()
+Subject: [Qemu-devel] [PATCH 19/20] migration-test: Clean up string
+ interpolation into QMP, part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +31,207 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Commit ab45015a968 "qobject: Let qobject_from_jsonf() fail instead of
-abort" removed only one of two ways qobject_from_jsonf() can abort.
-Wrong.  Its rationale for letting it fail is that all remaining users
-cope fine with failure.  Well, they're just fine with aborting, too;
-it's what they do on failure.
+Leaving interpolation into JSON to qmp() is more robust than building
+QMP input manually, as explained in the recent commit "tests: Clean up
+string interpolation into QMP input (simple cases)".
 
-Simply reverting the broken commit would bring back the unfortunate
-asymmetry between qobject_from_jsonf() and qobject_from_jsonv(): one
-aborts, the other returns null.  So also rename it to
-qobject_from_jsonf_nofail().
+migration-test.c interpolates strings into JSON in a few places:
 
+* migrate_set_parameter() interpolates string parameter @value as a
+  JSON number.  Change it to long long.  This requires changing
+  migrate_check_parameter() similarly.
+
+* migrate_set_capability() interpolates string parameter @value as a
+  JSON boolean.  Change it to bool.
+
+* deprecated_set_speed() interpolates string parameter @value as a
+  JSON number.  Change it to long long.
+
+Bonus: gets rid of non-literal format strings.  A step towards
+compile-time format string checking without triggering
+-Wformat-nonliteral.
+
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/qjson.h |  6 ++++--
- qobject/qjson.c          |  8 +++++++-
- tests/check-qjson.c      | 15 ++++++++-------
- 3 files changed, 19 insertions(+), 10 deletions(-)
+ tests/migration-test.c | 74 +++++++++++++++++-------------------------
+ 1 file changed, 29 insertions(+), 45 deletions(-)
 
-diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
-index 43b2ce2f33..dc509d51ae 100644
---- a/include/qapi/qmp/qjson.h
-+++ b/include/qapi/qmp/qjson.h
-@@ -15,11 +15,13 @@
- #define QJSON_H
- 
- QObject *qobject_from_json(const char *string, Error **errp);
--QObject *qobject_from_jsonf(const char *string, ...) GCC_FMT_ATTR(1, 2);
- QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
-     GCC_FMT_ATTR(1, 0);
- 
--QDict *qdict_from_jsonf_nofail(const char *string, ...) GCC_FMT_ATTR(1, 2);
-+QObject *qobject_from_jsonf_nofail(const char *string, ...)
-+    GCC_FMT_ATTR(1, 2);
-+QDict *qdict_from_jsonf_nofail(const char *string, ...)
-+    GCC_FMT_ATTR(1, 2);
- 
- QString *qobject_to_json(const QObject *obj);
- QString *qobject_to_json_pretty(const QObject *obj);
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 2f6a590e44..4a9dcff343 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -59,7 +59,12 @@ QObject *qobject_from_json(const char *string, Error **errp)
-     return qobject_from_jsonv(string, NULL, errp);
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 4a4db88b61..8359e2ff78 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -315,31 +315,25 @@ static void cleanup(const char *filename)
  }
  
--QObject *qobject_from_jsonf(const char *string, ...)
-+/*
-+ * Parse @string as JSON value with %-escapes interpolated.
-+ * Abort on error.  Do not use with untrusted @string.
-+ * Return the resulting QObject.  It is never null.
-+ */
-+QObject *qobject_from_jsonf_nofail(const char *string, ...)
+ static void migrate_check_parameter(QTestState *who, const char *parameter,
+-                                    const char *value)
++                                    long long value)
  {
-     QObject *obj;
-     va_list ap;
-@@ -68,6 +73,7 @@ QObject *qobject_from_jsonf(const char *string, ...)
-     obj = qobject_from_jsonv(string, &ap, &error_abort);
-     va_end(ap);
+     QDict *rsp_return;
+-    char *result;
  
-+    assert(obj);
-     return obj;
+     rsp_return = wait_command(who,
+                               "{ 'execute': 'query-migrate-parameters' }");
+-    result = g_strdup_printf("%" PRId64,
+-                             qdict_get_try_int(rsp_return,  parameter, -1));
+-    g_assert_cmpstr(result, ==, value);
+-    g_free(result);
++    g_assert_cmpint(qdict_get_int(rsp_return,  parameter), ==, value);
+     qobject_unref(rsp_return);
  }
  
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index da582df3e9..eaf5d20663 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -865,7 +865,8 @@ static void vararg_string(void)
-         QString *str;
+ static void migrate_set_parameter(QTestState *who, const char *parameter,
+-                                  const char *value)
++                                  long long value)
+ {
+     QDict *rsp;
+-    gchar *cmd;
  
-         str = qobject_to(QString,
--                         qobject_from_jsonf("%s", test_cases[i].decoded));
-+                         qobject_from_jsonf_nofail("%s",
-+                                                   test_cases[i].decoded));
-         g_assert(str);
-         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
- 
-@@ -998,17 +999,17 @@ static void vararg_number(void)
-     double valuef = 2.323423423;
-     int64_t val;
- 
--    qnum = qobject_to(QNum, qobject_from_jsonf("%d", value));
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%d", value));
-     g_assert(qnum_get_try_int(qnum, &val));
-     g_assert_cmpint(val, ==, value);
-     qobject_unref(qnum);
- 
--    qnum = qobject_to(QNum, qobject_from_jsonf("%lld", value_ll));
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%lld", value_ll));
-     g_assert(qnum_get_try_int(qnum, &val));
-     g_assert_cmpint(val, ==, value_ll);
-     qobject_unref(qnum);
- 
--    qnum = qobject_to(QNum, qobject_from_jsonf("%f", valuef));
-+    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%f", valuef));
-     g_assert(qnum_get_double(qnum) == valuef);
-     qobject_unref(qnum);
+-    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
+-                          "'arguments': { '%s': %s } }",
+-                          parameter, value);
+-    rsp = qtest_qmp(who, cmd);
+-    g_free(cmd);
++    rsp = qtest_qmp(who,
++                    "{ 'execute': 'migrate-set-parameters',"
++                    "'arguments': { %s: %lld } }",
++                    parameter, value);
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+     migrate_check_parameter(who, parameter, value);
+@@ -366,18 +360,16 @@ static void migrate_recover(QTestState *who, const char *uri)
  }
-@@ -1042,13 +1043,13 @@ static void keyword_literal(void)
  
-     qobject_unref(qbool);
+ static void migrate_set_capability(QTestState *who, const char *capability,
+-                                   const char *value)
++                                   bool value)
+ {
+     QDict *rsp;
+-    gchar *cmd;
  
--    qbool = qobject_to(QBool, qobject_from_jsonf("%i", false));
-+    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", false));
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
-     qobject_unref(qbool);
+-    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
+-                          "'arguments': { "
+-                          "'capabilities': [ { "
+-                          "'capability': '%s', 'state': %s } ] } }",
+-                          capability, value);
+-    rsp = qtest_qmp(who, cmd);
+-    g_free(cmd);
++    rsp = qtest_qmp(who,
++                    "{ 'execute': 'migrate-set-capabilities',"
++                    "'arguments': { "
++                    "'capabilities': [ { "
++                    "'capability': %s, 'state': %i } ] } }",
++                    capability, value);
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+ }
+@@ -521,29 +513,21 @@ static void test_migrate_end(QTestState *from, QTestState *to, bool test_dest)
+ static void deprecated_set_downtime(QTestState *who, const double value)
+ {
+     QDict *rsp;
+-    char *expected;
+-    int64_t result_int;
  
-     /* Test that non-zero values other than 1 get collapsed to true */
--    qbool = qobject_to(QBool, qobject_from_jsonf("%i", 2));
-+    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", 2));
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
-     qobject_unref(qbool);
-@@ -1298,7 +1299,7 @@ static void simple_varargs(void)
-     embedded_obj = qobject_from_json("[32, 42]", &error_abort);
-     g_assert(embedded_obj != NULL);
+     rsp = qtest_qmp(who,
+                     "{ 'execute': 'migrate_set_downtime',"
+                     " 'arguments': { 'value': %f } }", value);
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+-    result_int = value * 1000L;
+-    expected = g_strdup_printf("%" PRId64, result_int);
+-    migrate_check_parameter(who, "downtime-limit", expected);
+-    g_free(expected);
++    migrate_check_parameter(who, "downtime-limit", value * 1000);
+ }
  
--    obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
-+    obj = qobject_from_jsonf_nofail("[%d, 2, %p]", 1, embedded_obj);
-     g_assert(qlit_equal_qobject(&decoded, obj));
+-static void deprecated_set_speed(QTestState *who, const char *value)
++static void deprecated_set_speed(QTestState *who, long long value)
+ {
+     QDict *rsp;
+-    gchar *cmd;
  
-     qobject_unref(obj);
+-    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
+-                          "'arguments': { 'value': %s } }", value);
+-    rsp = qtest_qmp(who, cmd);
+-    g_free(cmd);
++    rsp = qtest_qmp(who, "{ 'execute': 'migrate_set_speed',"
++                          "'arguments': { 'value': %lld } }", value);
+     g_assert(qdict_haskey(rsp, "return"));
+     qobject_unref(rsp);
+     migrate_check_parameter(who, "max-bandwidth", value);
+@@ -556,7 +540,7 @@ static void test_deprecated(void)
+     from = qtest_start("");
+ 
+     deprecated_set_downtime(from, 0.12345);
+-    deprecated_set_speed(from, "12345");
++    deprecated_set_speed(from, 12345);
+ 
+     qtest_quit(from);
+ }
+@@ -572,16 +556,16 @@ static int migrate_postcopy_prepare(QTestState **from_ptr,
+         return -1;
+     }
+ 
+-    migrate_set_capability(from, "postcopy-ram", "true");
+-    migrate_set_capability(to, "postcopy-ram", "true");
+-    migrate_set_capability(to, "postcopy-blocktime", "true");
++    migrate_set_capability(from, "postcopy-ram", true);
++    migrate_set_capability(to, "postcopy-ram", true);
++    migrate_set_capability(to, "postcopy-blocktime", true);
+ 
+     /* We want to pick a speed slow enough that the test completes
+      * quickly, but that it doesn't complete precopy even on a slow
+      * machine, so also set the downtime.
+      */
+-    migrate_set_parameter(from, "max-bandwidth", "100000000");
+-    migrate_set_parameter(from, "downtime-limit", "1");
++    migrate_set_parameter(from, "max-bandwidth", 100000000);
++    migrate_set_parameter(from, "downtime-limit", 1);
+ 
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+@@ -632,7 +616,7 @@ static void test_postcopy_recovery(void)
+     }
+ 
+     /* Turn postcopy speed down, 4K/s is slow enough on any machines */
+-    migrate_set_parameter(from, "max-postcopy-bandwidth", "4096");
++    migrate_set_parameter(from, "max-postcopy-bandwidth", 4096);
+ 
+     /* Now we start the postcopy */
+     migrate_postcopy_start(from, to);
+@@ -673,7 +657,7 @@ static void test_postcopy_recovery(void)
+     g_free(uri);
+ 
+     /* Restore the postcopy bandwidth to unlimited */
+-    migrate_set_parameter(from, "max-postcopy-bandwidth", "0");
++    migrate_set_parameter(from, "max-postcopy-bandwidth", 0);
+ 
+     migrate_postcopy_complete(from, to);
+ }
+@@ -719,9 +703,9 @@ static void test_precopy_unix(void)
+      * machine, so also set the downtime.
+      */
+     /* 1 ms should make it not converge*/
+-    migrate_set_parameter(from, "downtime-limit", "1");
++    migrate_set_parameter(from, "downtime-limit", 1);
+     /* 1GB/s */
+-    migrate_set_parameter(from, "max-bandwidth", "1000000000");
++    migrate_set_parameter(from, "max-bandwidth", 1000000000);
+ 
+     /* Wait for the first serial output from the source */
+     wait_for_serial("src_serial");
+@@ -731,7 +715,7 @@ static void test_precopy_unix(void)
+     wait_for_migration_pass(from);
+ 
+     /* 300 ms should converge */
+-    migrate_set_parameter(from, "downtime-limit", "300");
++    migrate_set_parameter(from, "downtime-limit", 300);
+ 
+     if (!got_stop) {
+         qtest_qmp_eventwait(from, "STOP");
 -- 
 2.17.1
