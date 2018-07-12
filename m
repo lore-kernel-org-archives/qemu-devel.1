@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fdQPU-000295-H0
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:45 -0400
+	(envelope-from <famz@redhat.com>) id 1fdQPX-00029r-R8
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fdQPT-0002le-Gh
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51726 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fdQPW-0002oc-QF
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50294 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fdQPT-0002lC-BC
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:43 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fdQPW-0002oG-JX
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:46 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 12 Jul 2018 09:28:26 +0800
-Message-Id: <20180712012829.20231-2-famz@redhat.com>
+Date: Thu, 12 Jul 2018 09:28:27 +0800
+Message-Id: <20180712012829.20231-3-famz@redhat.com>
 In-Reply-To: <20180712012829.20231-1-famz@redhat.com>
 References: <20180712012829.20231-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] tests: Add an option for snapshot
- (default: off)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 2/4] tests/vm: Pass verbose flag into VM
+ make commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +30,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Not using snapshot has the benefit of automatically persisting useful
-test harnesses, such as docker images and ccache database. Although it
-will lose some cleanness, it is imaginably useful for patchew.
+Our Makefile has:
 
+vm-build-%: tests/vm/%.img
+	$(call quiet-command, \
+		$(SRC_PATH)/tests/vm/$* \
+		$(if $(V)$(DEBUG), --debug) \
+		$(if $(DEBUG), --interactive) \
+
+the intention of which is to let the make command in VM have V=3D1 if
+V=3D1 is set. We pass this to the BUILD_SCRIPT format.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/vm/basevm.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/vm/basevm.py   | 3 ++-
+ tests/vm/freebsd     | 4 ++--
+ tests/vm/netbsd      | 4 ++--
+ tests/vm/openbsd     | 4 ++--
+ tests/vm/ubuntu.i386 | 4 ++--
+ 5 files changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 3643117816..e5d6a328d5 100755
+index e5d6a328d5..25361c6b7d 100755
 --- a/tests/vm/basevm.py
 +++ b/tests/vm/basevm.py
-@@ -216,6 +216,8 @@ def parse_args(vm_name):
-                       help="build QEMU from source in guest")
-     parser.add_option("--interactive", "-I", action="store_true",
-                       help="Interactively run command")
-+    parser.add_option("--snapshot", "-s", action="store_true",
-+                      help="run tests with a snapshot")
-     parser.disable_interspersed_args()
-     return parser.parse_args()
- 
-@@ -241,7 +243,10 @@ def main(vmcls):
-                    jobs=args.jobs)]
+@@ -240,7 +240,8 @@ def main(vmcls):
+             vm.add_source_dir(args.build_qemu)
+             cmd =3D [vm.BUILD_SCRIPT.format(
+                    configure_opts =3D " ".join(argv),
+-                   jobs=3Dargs.jobs)]
++                   jobs=3Dargs.jobs,
++                   verbose=3D"1" if args.debug else "")]
          else:
-             cmd = argv
--        vm.boot(args.image + ",snapshot=on")
-+        img = args.image
-+        if args.snapshot:
-+            img += ",snapshot=on"
-+        vm.boot(img)
-         vm.wait_ssh()
-     except Exception as e:
-         if isinstance(e, SystemExit) and e.code == 0:
--- 
+             cmd =3D argv
+         img =3D args.image
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index 039dad8f69..b20612a6c9 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -23,8 +23,8 @@ class FreeBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/vtbd1;
+         ./configure {configure_opts};
+-        gmake -j{jobs};
+-        gmake check;
++        gmake -j{jobs} V=3D{verbose};
++        gmake check V=3D{verbose};
+     """
+=20
+     def build_image(self, img):
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index 3972d8b45c..3f9d34a208 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -23,8 +23,8 @@ class NetBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/rld1a;
+         ./configure --python=3Dpython2.7 {configure_opts};
+-        gmake -j{jobs};
+-        gmake check;
++        gmake -j{jobs} V=3D{verbose};
++        gmake check V=3D{verbose};
+     """
+=20
+     def build_image(self, img):
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index 6ae16d97fd..3285c1abde 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -23,9 +23,9 @@ class OpenBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/rsd1c;
+         ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3D=
+python2.7 {configure_opts};
+-        gmake -j{jobs};
++        gmake -j{jobs} V=3D{verbose};
+         # XXX: "gmake check" seems to always hang or fail
+-        #gmake check;
++        #gmake check V=3D{verbose};
+     """
+=20
+     def build_image(self, img):
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index fc319e0e6e..b4eaa0dedc 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -25,8 +25,8 @@ class UbuntuX86VM(basevm.BaseVM):
+         sudo chmod a+r /dev/vdb;
+         tar -xf /dev/vdb;
+         ./configure {configure_opts};
+-        make -j{jobs};
+-        make check;
++        make -j{jobs} V=3D{verbose};
++        make check V=3D{verbose};
+     """
+=20
+     def _gen_cloud_init_iso(self):
+--=20
 2.17.1
