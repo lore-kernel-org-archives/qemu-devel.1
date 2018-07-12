@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41459)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcFL-0008BW-6Q
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:04 -0400
+	id 1fdcG4-0000BH-Vp
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcFI-0000mN-0U
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:03 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36874)
+	id 1fdcG1-0001DC-SG
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:48 -0400
+Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:41571)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcFH-0000mA-Qn
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:06:59 -0400
-Received: by mail-qk0-x242.google.com with SMTP id t79-v6so15455890qke.4
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:06:59 -0700 (PDT)
+	id 1fdcG1-0001Cw-Nq
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:45 -0400
+Received: by mail-qt0-x233.google.com with SMTP id e19-v6so9947064qtp.8
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:07:45 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180712111221.20326-1-armbru@redhat.com>
-	<20180712111221.20326-7-armbru@redhat.com>
+	<20180712111221.20326-8-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <23870109-14b6-db8a-e5d8-ac55862ec339@amsat.org>
-Date: Thu, 12 Jul 2018 11:06:54 -0300
+Message-ID: <cf17a832-040c-0581-d1d0-26edb3ba456d@amsat.org>
+Date: Thu, 12 Jul 2018 11:07:40 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180712111221.20326-7-armbru@redhat.com>
+In-Reply-To: <20180712111221.20326-8-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 06/20] qobject: New
- qobject_from_vjsonf_nofail(), qdict_from_vjsonf_nofail()
+Subject: Re: [Qemu-devel] [PATCH 07/20] libqtest: Simplify qmp_fd_vsend() a
+ bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,115 +39,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 On 07/12/2018 08:12 AM, Markus Armbruster wrote:
-> Every printf()-like function sooner or later needs its vprintf()-like
-> buddy.  The next commit will need qobject_from_jsonf_nofail()'s buddy,
-> and qdict_from_jsonf_nofail()'s buddy will be used later in this
-> series.  Add both.
-> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/qmp/qjson.h |  4 ++++
->  qobject/qjson.c          | 44 +++++++++++++++++++++++++++++++++-------
->  2 files changed, 41 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
-> index dc509d51ae..0db121bef9 100644
-> --- a/include/qapi/qmp/qjson.h
-> +++ b/include/qapi/qmp/qjson.h
-> @@ -18,8 +18,12 @@ QObject *qobject_from_json(const char *string, Error **errp);
->  QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
->      GCC_FMT_ATTR(1, 0);
->  
-> +QObject *qobject_from_vjsonf_nofail(const char *string, va_list)
-
-..., va_list ap)?
-
-> +    GCC_FMT_ATTR(1, 0);
->  QObject *qobject_from_jsonf_nofail(const char *string, ...)
->      GCC_FMT_ATTR(1, 2);
-> +QDict *qdict_from_vjsonf_nofail(const char *string, va_list ap)
-> +    GCC_FMT_ATTR(1, 0);
->  QDict *qdict_from_jsonf_nofail(const char *string, ...)
->      GCC_FMT_ATTR(1, 2);
->  
-> diff --git a/qobject/qjson.c b/qobject/qjson.c
-> index 4a9dcff343..2e450231ff 100644
-> --- a/qobject/qjson.c
-> +++ b/qobject/qjson.c
-> @@ -59,6 +59,25 @@ QObject *qobject_from_json(const char *string, Error **errp)
->      return qobject_from_jsonv(string, NULL, errp);
->  }
->  
-> +/*
-> + * Parse @string as JSON value with %-escapes interpolated.
-> + * Abort on error.  Do not use with untrusted @string.
-> + * Return the resulting QObject.  It is never null.
-> + */
-> +QObject *qobject_from_vjsonf_nofail(const char *string, va_list ap)
-> +{
-> +    va_list ap_copy;
-> +    QObject *obj;
-> +
-> +    /* va_copy() is needed when va_list is an array type */
-> +    va_copy(ap_copy, ap);
-> +    obj = qobject_from_jsonv(string, &ap_copy, &error_abort);
-> +    va_end(ap_copy);
-> +
-> +    assert(obj);
-> +    return obj;
-> +}
-> +
->  /*
->   * Parse @string as JSON value with %-escapes interpolated.
->   * Abort on error.  Do not use with untrusted @string.
-> @@ -70,13 +89,26 @@ QObject *qobject_from_jsonf_nofail(const char *string, ...)
->      va_list ap;
->  
->      va_start(ap, string);
-> -    obj = qobject_from_jsonv(string, &ap, &error_abort);
-> +    obj = qobject_from_vjsonf_nofail(string, ap);
->      va_end(ap);
->  
-> -    assert(obj);
->      return obj;
->  }
->  
-> +/*
-> + * Parse @string as JSON object with %-escapes interpolated.
-> + * Abort on error.  Do not use with untrusted @string.
-> + * Return the resulting QDict.  It is never null.
-> + */
-> +QDict *qdict_from_vjsonf_nofail(const char *string, va_list ap)
-> +{
-> +    QDict *qdict;
-> +
-> +    qdict = qobject_to(QDict, qobject_from_vjsonf_nofail(string, ap));
-> +    assert(qdict);
-> +    return qdict;
-> +}
-> +
->  /*
->   * Parse @string as JSON object with %-escapes interpolated.
->   * Abort on error.  Do not use with untrusted @string.
-> @@ -84,15 +116,13 @@ QObject *qobject_from_jsonf_nofail(const char *string, ...)
->   */
->  QDict *qdict_from_jsonf_nofail(const char *string, ...)
->  {
-> -    QDict *obj;
-> +    QDict *qdict;
->      va_list ap;
->  
->      va_start(ap, string);
-> -    obj = qobject_to(QDict, qobject_from_jsonv(string, &ap, &error_abort));
-> +    qdict = qdict_from_vjsonf_nofail(string, ap);
->      va_end(ap);
-> -
-> -    assert(obj);
-> -    return obj;
-> +    return qdict;
->  }
->  
->  typedef struct ToJsonIterState
-> 
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  tests/libqtest.c | 18 +++++++-----------
+>  1 file changed, 7 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index c2c08a890c..3bfb062fcb 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -488,24 +488,20 @@ QDict *qtest_qmp_receive(QTestState *s)
+>   */
+>  void qmp_fd_vsend(int fd, const char *fmt, va_list ap)
+>  {
+> -    va_list ap_copy;
+>      QObject *qobj;
+>  
+> -    /* qobject_from_jsonv() silently eats leading 0xff as invalid
+> -     * JSON, but we want to test sending them over the wire to force
+> -     * resyncs */
+> +    /*
+> +     * qobject_from_vjsonf_nofail() chokes on leading 0xff as invalid
+> +     * JSON, but tests/test-qga.c needs to send that to test QGA
+> +     * synchronization
+> +     */
+>      if (*fmt == '\377') {
+>          socket_send(fd, fmt, 1);
+>          fmt++;
+>      }
+>  
+> -    /* Going through qobject ensures we escape strings properly.
+> -     * This seemingly unnecessary copy is required in case va_list
+> -     * is an array type.
+> -     */
+> -    va_copy(ap_copy, ap);
+> -    qobj = qobject_from_jsonv(fmt, &ap_copy, &error_abort);
+> -    va_end(ap_copy);
+> +    /* Going through qobject ensures we escape strings properly */
+> +    qobj = qobject_from_vjsonf_nofail(fmt, ap);
+>  
+>      /* No need to send anything for an empty QObject.  */
+>      if (qobj) {
+> 
