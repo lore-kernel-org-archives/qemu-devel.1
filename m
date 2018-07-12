@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdaKd-00025d-1Q
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:04:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdaMj-0003Gy-Ih
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdaKc-0000H5-9A
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:04:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdaMi-0001te-IN
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:06:33 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
 	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
 	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-Date: Thu, 12 Jul 2018 14:04:12 +0200
-In-Reply-To: <5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com> (Thomas Huth's
-	message of "Tue, 10 Jul 2018 00:03:39 +0200")
-Message-ID: <87601koe2r.fsf@dusky.pond.sub.org>
+	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
+	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
+	<20180711161216.GV7451@localhost.localdomain>
+	<CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
+Date: Thu, 12 Jul 2018 14:06:25 +0200
+In-Reply-To: <CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
+	(Peter Maydell's message of "Wed, 11 Jul 2018 18:15:01 +0100")
+Message-ID: <87y3egmzem.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
@@ -25,31 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 09.07.2018 23:42, Peter Maydell wrote:
->> On 9 July 2018 at 22:03, Thomas Huth <thuth@redhat.com> wrote:
-[...]
-> Hmm, maybe we need a qtest that first executes "info qtree", then runs
-> 'device-list-properties' for all devices and finally checks "info qtree"
-> again ... since 'device-list-properties' should not change the qtree,
-> the output of the "info qtree" should be the same.
+> On 11 July 2018 at 17:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
+>>> Hm, ok, so how to continue here now? Shall we at least mark the
+>>> bcm2836/7 devices with user_creatable=false, so that users can not crash
+>>> their QEMU so easily with device_add? The problem with introspection via
+>>> device-list-properties would still continue to exist, but I think that's
+>>> less likely used in practice... otherwise we could still move the
+>>> qdev_set_parent_bus() calls to the realize() function instead, and just
+>>> add a big fat FIXME comment in front of the code block, so that we
+>>> remember to clean that up one day...
+>>
+>> Crashing device-list-properties should be a blocker bug, IMO.
 
-Lovely idea.
+Seconded.
 
->                                                    Currently this is not
-> the case :-/
+>> Moving to realize is not the best solution, but I would prefer to
+>> do that in 3.0 instead of leaving the device-list-properties
+>> crash unfixed.
+>
+> I would like to see the crash fixed too. But I'd like to
+> see it fixed:
+>  (a) by having clear documentation about how the QOM
+> system works, what you should do in init and what you
+> should do in realize, when and why you need to manually
+> parent objects, etc
+>  (b) as far as possible making our APIs for doing this
+> easy to use correctly and difficult to use wrongly. At
+> the moment we have APIs that are far too easy to misuse,
+> which means we will continue to get bugs like this and spend
+> a lot of time on one-off fixes for them.
+>
+> In particular I don't understand why we need to manually
+> parent these objects at all.
 
-Less than lovely, but I can't claim to be surprised.  As Peter remarked
-elsewhere in this thread, QOM is underdocumented, and is too easy to
-misuse.
-
-On documentation: we sorely lack documentation tying everything
-together.  GDK-Doc function comments alone can't cut it for something as
-complex as QOM.
-
-Even with adequate documentation, bad examples in the source will
-continue to multiply.  We'll have to get rid of them.
+I want both (a) and (b) as badly as anyone, but we should not hold any
+particular crash bug hostage to get them.
