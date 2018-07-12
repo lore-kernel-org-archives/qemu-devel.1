@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdgS4-000607-Cn
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:36:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fdgoh-0001LF-Mj
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdgRz-00017r-KF
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:36:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:37688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fdgRz-00016e-9d
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:36:23 -0400
-References: <5271d71e-794c-2db0-9046-183fd79dd902@amsat.org>
-	<20180711221244.31869-1-jonasschievink@gmail.com>
-	<5701803b-7f38-2539-fd08-6706d624271d@vivier.eu>
-	<CAJwA7S=wTPy2eY5D9q961-xh9N0bYAiF7LZRKFHqd9XqMnUV5w@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <52bc227d-90f2-665e-19bd-a12205318046@vivier.eu>
-Date: Thu, 12 Jul 2018 20:36:09 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fdgoe-0007I0-Fi
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:59:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60278 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fdgoe-0007H2-8O
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:59:48 -0400
+Date: Thu, 12 Jul 2018 19:59:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180712185942.GF2610@work-vm>
+References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	<20180629080320.320144-8-dplotnikov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJwA7S=wTPy2eY5D9q961-xh9N0bYAiF7LZRKFHqd9XqMnUV5w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] Zero out the host's `msg_control` buffer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180629080320.320144-8-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v0 7/7] migration: add background
+ snapshotting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +28,305 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jonas Schievink <jonasschievink@gmail.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Le 12/07/2018 à 20:22, Jonas Schievink a écrit :
-> Yes, I do.
-> See https://gist.github.com/jonas-schievink/cb6e6584a055539d2113f22d91068e2d
+* Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
+> The patch enables to save vmstate to a migration thread
+> in the background: ram is being saved while vCPUs are running.
+> This is done to reduce downtime on vm snapshotting: the majority
+> of vmstate is ram, the rest of devices consumes only a few MB of
+> memory on a typical vm.
+> By this moment, there were no means to make a snapshot without
+> full vm stopping. From now, one can save a vm state having the vm
+> stopped only for a couple of seconds to save devices' states. Then
+> the vm resumed and ram is written without the vm full stopping.
 > 
-> The problem is that glibc's CMSG_NXTHDR macro will access the header of
-> the *next* message which isn't yet overwritten by QEMU, so it still
-> contains garbage at that point. In particular, it will access the length
-> field of the header to check if the message fits inside the msg_control
-> buffer. If the length contains garbage, it may think that it doesn't fit
-> and returns NULL. This is also mentioned in the glibc bug report I
-> linked in the previous mail
-> (https://sourceware.org/bugzilla/show_bug.cgi?id=13500), and the memset
-> workaround is mentioned there as well.
+> To use async vm state it's needed to enable "background-snapshot"
+> migration capability and start the migration.
+> 
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>  migration/migration.c | 104 +++++++++++++++++++++++++++++++++++++++++-
+>  migration/savevm.c    |  91 +++++++++++++++++++-----------------
+>  migration/savevm.h    |   2 +
+>  3 files changed, 154 insertions(+), 43 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 131d0904e4..b062bd8ddc 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2188,6 +2188,100 @@ bool migrate_colo_enabled(void)
+>      return s->enabled_capabilities[MIGRATION_CAPABILITY_X_COLO];
+>  }
+>  
+> +static void background_snapshot_sigsegv_handler(int unused0, siginfo_t *info, void *unused1)
+> +{
+> +    if (ram_process_page_fault(info->si_addr)) {
+> +        assert(false);
+> +    }
+> +}
+> +
+> +static void *background_snapshot_thread(void *opaque)
+> +{
+> +    MigrationState *m = opaque;
+> +    QIOChannelBuffer *bioc;
+> +    QEMUFile *fb;
+> +    RamBlockList *ram_blocks;
+> +    int res = 0;
+> +
+> +    rcu_register_thread();
+> +
+> +    qemu_file_set_rate_limit(m->to_dst_file, INT64_MAX);
+> +
+> +    qemu_mutex_lock_iothread();
+> +    vm_stop(RUN_STATE_PAUSED);
+> +
+> +    qemu_savevm_state_header(m->to_dst_file);
+> +    qemu_mutex_unlock_iothread();
+> +    qemu_savevm_state_setup(m->to_dst_file);
+> +    qemu_mutex_lock_iothread();
 
-ok, thank you for the advanced explanation.
+That's curiously different locking from the ones in migration.c and
+savevm.c (qemu_savevm_state)
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> +    migrate_set_state(&m->state, MIGRATION_STATUS_SETUP,
+> +                      MIGRATION_STATUS_ACTIVE);
+> +
+> +    // save the device state to the temporary buffer
+> +    bioc = qio_channel_buffer_new(4096);
+> +    qio_channel_set_name(QIO_CHANNEL(bioc), "vmstate-buffer");
+> +    fb = qemu_fopen_channel_output(QIO_CHANNEL(bioc));
+> +    object_unref(OBJECT(bioc));
+> +
+> +    ram_blocks = ram_blocks_get();
+> +    ram_blocks_fill(ram_blocks);
+> +    ram_blocks_set_ro(ram_blocks);
+> +
+> +    if(global_state_store()) {
+> +        goto exit;
+> +    }
+> +
+> +    if (qemu_save_all_device_states(fb, false, true) < 0) {
+> +        migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
+> +                          MIGRATION_STATUS_FAILED);
+> +        goto exit;
+> +    }
+> +
+> +    sigsegv_user_handler_set(background_snapshot_sigsegv_handler);
 
-> On Thu, Jul 12, 2018 at 6:05 PM Laurent Vivier <laurent@vivier.eu
-> <mailto:laurent@vivier.eu>> wrote:
+That's actually a good test if you're write protecting the RAM before
+saving the device state; they *shouldn't* write to ram doing that
+but I don't trust them.
+
+> +    smp_mb();
+
+Comment why that mb is there?
+
+> +    vm_start();
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    while (!res) {
+> +        res = qemu_savevm_state_iterate(m->to_dst_file, false);
+
+I'm surprised it goes around this loop much, given that you've
+set hte bandwidth to max and I assume you never see dirty pages.
+
+> +        if (res < 0 || qemu_file_get_error(m->to_dst_file)) {
+> +            migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
+> +                              MIGRATION_STATUS_FAILED);
+> +            goto exit;
+> +        }
+> +    }
+> +
+> +    // By this moment we have RAM saved into the stream
+> +    // The next step is to flush the device state right after the
+> +    // RAM saved. The rest of device state is stored in
+> +    // the temporary buffer. Let's flush the buffer into the stream.
+> +    qemu_put_buffer(m->to_dst_file, bioc->data, bioc->usage);
+> +    qemu_fflush(m->to_dst_file);
+> +
+> +    if (qemu_file_get_error(m->to_dst_file)) {
+> +        migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
+> +                          MIGRATION_STATUS_FAILED);
+> +        goto exit;
+> +    }
+> +
+> +    migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
+> +                                 MIGRATION_STATUS_COMPLETED);
+> +exit:
+> +    ram_blocks_set_rw(ram_blocks);
+> +    ram_blocks_clear(ram_blocks);
+> +    smp_mb();
+> +    sigsegv_user_handler_reset();
+> +    qemu_fclose(fb);
+> +    qemu_mutex_lock_iothread();
+> +    qemu_savevm_state_cleanup();
+> +    qemu_mutex_unlock_iothread();
+> +    rcu_unregister_thread();
+> +    return NULL;
+> +}
+> +
+>  /*
+>   * Master migration thread on the source VM.
+>   * It drives the migration and pumps the data down the outgoing channel.
+> @@ -2402,8 +2496,14 @@ void migrate_fd_connect(MigrationState *s)
+>          migrate_fd_cleanup(s);
+>          return;
+>      }
+> -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> -                       QEMU_THREAD_JOINABLE);
+> +    if (migrate_background_snapshot()) {
+> +        qemu_thread_create(&s->thread, "bg_snapshot",
+> +                           background_snapshot_thread, s,
+> +                           QEMU_THREAD_JOINABLE);
+> +    } else {
+> +        qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> +                           QEMU_THREAD_JOINABLE);
+> +    }
+>      s->migration_thread_running = true;
+>  }
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index f202c3de3a..641b897ff5 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1107,51 +1107,15 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
+>      qemu_fflush(f);
+>  }
+>  
+> -int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+> -                                       bool inactivate_disks)
+> +int qemu_save_all_device_states(QEMUFile *f, bool inactivate_disks,
+> +                                bool send_eof)
+
+We've got qemu_save_device_state as well; lots of variations.
+
+Dave
+
+>  {
+> -    QJSON *vmdesc;
+>      int vmdesc_len;
+>      SaveStateEntry *se;
+>      int ret;
+> -    bool in_postcopy = migration_in_postcopy();
+> -
+> -    trace_savevm_state_complete_precopy();
+> +    QJSON *vmdesc = qjson_new();
+>  
+>      cpu_synchronize_all_states();
+> -
+> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> -        if (!se->ops ||
+> -            (in_postcopy && se->ops->has_postcopy &&
+> -             se->ops->has_postcopy(se->opaque)) ||
+> -            (in_postcopy && !iterable_only) ||
+> -            !se->ops->save_live_complete_precopy) {
+> -            continue;
+> -        }
+> -
+> -        if (se->ops && se->ops->is_active) {
+> -            if (!se->ops->is_active(se->opaque)) {
+> -                continue;
+> -            }
+> -        }
+> -        trace_savevm_section_start(se->idstr, se->section_id);
+> -
+> -        save_section_header(f, se, QEMU_VM_SECTION_END);
+> -
+> -        ret = se->ops->save_live_complete_precopy(f, se->opaque);
+> -        trace_savevm_section_end(se->idstr, se->section_id, ret);
+> -        save_section_footer(f, se);
+> -        if (ret < 0) {
+> -            qemu_file_set_error(f, ret);
+> -            return -1;
+> -        }
+> -    }
+> -
+> -    if (iterable_only) {
+> -        return 0;
+> -    }
+> -
+> -    vmdesc = qjson_new();
+>      json_prop_int(vmdesc, "page_size", qemu_target_page_size());
+>      json_start_array(vmdesc, "devices");
+>      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> @@ -1193,8 +1157,8 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+>              return ret;
+>          }
+>      }
+> -    if (!in_postcopy) {
+> -        /* Postcopy stream will still be going */
+> +
+> +    if (send_eof) {
+>          qemu_put_byte(f, QEMU_VM_EOF);
+>      }
+>  
+> @@ -1213,6 +1177,51 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+>      return 0;
+>  }
+>  
+> +int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+> +                                       bool inactivate_disks)
+> +{
+> +    SaveStateEntry *se;
+> +    int ret;
+> +    bool in_postcopy = migration_in_postcopy();
+> +
+> +    trace_savevm_state_complete_precopy();
+> +
+> +    cpu_synchronize_all_states();
+> +
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (!se->ops ||
+> +            (in_postcopy && se->ops->has_postcopy &&
+> +             se->ops->has_postcopy(se->opaque)) ||
+> +            (in_postcopy && !iterable_only) ||
+> +            !se->ops->save_live_complete_precopy) {
+> +            continue;
+> +        }
+> +
+> +        if (se->ops && se->ops->is_active) {
+> +            if (!se->ops->is_active(se->opaque)) {
+> +                continue;
+> +            }
+> +        }
+> +        trace_savevm_section_start(se->idstr, se->section_id);
+> +
+> +        save_section_header(f, se, QEMU_VM_SECTION_END);
+> +
+> +        ret = se->ops->save_live_complete_precopy(f, se->opaque);
+> +        trace_savevm_section_end(se->idstr, se->section_id, ret);
+> +        save_section_footer(f, se);
+> +        if (ret < 0) {
+> +            qemu_file_set_error(f, ret);
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    if (iterable_only) {
+> +        return 0;
+> +    }
+> +
+> +    return qemu_save_all_device_states(f, inactivate_disks, !in_postcopy);
+> +}
+> +
+>  /* Give an estimate of the amount left to be transferred,
+>   * the result is split into the amount for units that can and
+>   * for units that can't do postcopy.
+> diff --git a/migration/savevm.h b/migration/savevm.h
+> index 295c4a1f2c..87b278142d 100644
+> --- a/migration/savevm.h
+> +++ b/migration/savevm.h
+> @@ -55,4 +55,6 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+>  int qemu_loadvm_state(QEMUFile *f);
+>  void qemu_loadvm_state_cleanup(void);
+>  
+> +int qemu_save_all_device_states(QEMUFile *f, bool inactivate_disks,
+> +                                bool send_eof);
+>  #endif
+> -- 
+> 2.17.0
 > 
->     Le 12/07/2018 à 00:12, Jonas Schievink a écrit :
->     > If this is not done, qemu would drop any control message after the
->     first
->     > one.
->     >
->     > This is because glibc's `CMSG_NXTHDR` macro accesses the uninitialized
->     > cmsghdr's length field in order to find out if the message fits
->     into the
->     > `msg_control` buffer, wrongly assuming that it doesn't because the
->     > length field contains garbage. Accessing the length field is fine for
->     > completed messages we receive from the kernel, but is - as far as
->     I know
->     > - not needed since the kernel won't return such an invalid cmsghdr in
->     > the first place.
->     >
->     > This is tracked as this glibc bug:
->     > https://sourceware.org/bugzilla/show_bug.cgi?id=13500
->     >
->     > It's probably also a good idea to bail with an error if `CMSG_NXTHDR`
->     > returns NULL but `TARGET_CMSG_NXTHDR` doesn't (ie. we still expect
->     > cmsgs).
->     >
->     > Signed-off-by: Jonas Schievink <jonasschievink@gmail.com
->     <mailto:jonasschievink@gmail.com>>
->     > ---
->     > Changes in v2:
->     > - put the memset right after the msg_control alloca
->     > - added missing Signed-off-by line
->     >
->     >  linux-user/syscall.c | 2 ++
->     >  1 file changed, 2 insertions(+)
->     >
->     > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->     > index e4b1b7d7da..3c427500ef 100644
->     > --- a/linux-user/syscall.c
->     > +++ b/linux-user/syscall.c
->     > @@ -3843,6 +3843,8 @@ static abi_long do_sendrecvmsg_locked(int
->     fd, struct target_msghdr *msgp,
->     >      }
->     >      msg.msg_controllen = 2 * tswapal(msgp->msg_controllen);
->     >      msg.msg_control = alloca(msg.msg_controllen);
->     > +    memset(msg.msg_control, 0, msg.msg_controllen);
->     > +
-> 
->     I'm not sure it is needed as the content of msg.control will be
->     overwritten by target_to_host_cmsg() from the content of msgp->control.
-> 
->     Do you have a test case revealing the bug?
-> 
->     Thanks,
->     Laurent
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
