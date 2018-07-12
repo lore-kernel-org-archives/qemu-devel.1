@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdeNs-00009F-Pj
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1fdeOn-0000nM-Rv
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdeNr-0006yU-Px
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:00 -0400
-Date: Thu, 12 Jul 2018 18:23:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180712162351.GG4541@localhost.localdomain>
-References: <1531400410-27059-1-git-send-email-pl@kamp.de>
+	(envelope-from <thuth@redhat.com>) id 1fdeOn-0008Ae-0t
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59198 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fdeOm-0008AP-Rg
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:24:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 748A74022909
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 16:24:56 +0000 (UTC)
+References: <20180712111221.20326-1-armbru@redhat.com>
+	<20180712111221.20326-4-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5ac2b9b4-3940-eba7-e0f9-9f3f59f6c871@redhat.com>
+Date: Thu, 12 Jul 2018 18:24:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1531400410-27059-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V6] qemu-img: align result of
- is_allocated_sectors
+In-Reply-To: <20180712111221.20326-4-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 03/20] libqtest: Clean up how we read
+ device_del messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +35,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-Am 12.07.2018 um 15:00 hat Peter Lieven geschrieben:
-> We currently don't enforce that the sparse segments we detect during convert are
-> aligned. This leads to unnecessary and costly read-modify-write cycles either
-> internally in Qemu or in the background on the storage device as nearly all
-> modern filesystems or hardware have a 4k alignment internally.
+On 12.07.2018 13:12, Markus Armbruster wrote:
+> qtest_qmp_device_del() still uses the qmp("") hack to receive a
+> message, even though we have qmp_receive() since commit 66e0c7b187e.
+> Put it to use.
 > 
-> This patch modifies is_allocated_sectors so that its *pnum result will always
-> end at an alignment boundary. This way all requests will end at an alignment
-> boundary. The start of all requests will also be aligned as long as the results
-> of get_block_status do not lead to an unaligned offset.
+> Bonus: gets rid of empty format strings.  A step towards compile-time
+> format string checking without triggering -Wformat-zero-length.
 > 
-> The number of RMW cycles when converting an example image [1] to a raw device that
-> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
-> write requests. With this path the additional 4600 read requests are eliminated while
-> the number of total write requests stays constant.
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/libqtest.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
-> 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 9cb4096639..071d7eb7b1 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -1090,7 +1090,7 @@ void qtest_qmp_device_del(const char *id)
+>      g_assert(response1);
+>      g_assert(!qdict_haskey(response1, "error"));
+>  
+> -    response2 = qmp("");
+> +    response2 = qmp_receive();
+>      g_assert(response2);
+>      g_assert(!qdict_haskey(response2, "error"));
 
-Thanks, applied to the block branch.
-
-Kevin
+Reviewed-by: Thomas Huth <thuth@redhat.com>
