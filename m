@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fdQPa-0002Bx-OO
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:54 -0400
+	(envelope-from <famz@redhat.com>) id 1fdQPe-0002EQ-Vb
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fdQPZ-0002sY-U9
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34340 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fdQPd-0002vP-K6
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47914 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fdQPZ-0002sB-Pf
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:49 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fdQPd-0002uw-Ew
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:53 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 12 Jul 2018 09:28:28 +0800
-Message-Id: <20180712012829.20231-4-famz@redhat.com>
+Date: Thu, 12 Jul 2018 09:28:29 +0800
+Message-Id: <20180712012829.20231-5-famz@redhat.com>
 In-Reply-To: <20180712012829.20231-1-famz@redhat.com>
 References: <20180712012829.20231-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/4] tests: Allow overriding archive path
- with SRC_ARCHIVE
+Subject: [Qemu-devel] [PATCH v3 4/4] tests: Add centos VM testing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +26,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-In VM based tests, the source archive is created in host, we don't have
-to run archive-source.sh again, as it complicates the Makefile and
-scripts.
+This one does docker testing in the VM. It is intended to replace the
+native docker testing on patchew testers.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/Makefile.include | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ tests/vm/Makefile.include |  3 +-
+ tests/vm/centos           | 84 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+), 1 deletion(-)
+ create mode 100755 tests/vm/centos
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index b2a7e761cc..f0525b91a7 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -27,8 +27,11 @@ DOCKER_SRC_COPY := $(BUILD_DIR)/docker-src.$(CUR_TIME)
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 5daa2a3b73..af19b7a4e6 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -2,7 +2,7 @@
  
- $(DOCKER_SRC_COPY):
- 	@mkdir $@
--	$(call quiet-command, cd $(SRC_PATH) && scripts/archive-source.sh $@/qemu.tar, \
--		"GEN", "$@/qemu.tar")
-+	$(if $(SRC_ARCHIVE), \
-+		$(call quiet-command, cp "$(SRC_ARCHIVE)" $@/qemu.tar, \
-+			"CP", "$@/qemu.tar"), \
-+		$(call quiet-command, cd $(SRC_PATH) && scripts/archive-source.sh $@/qemu.tar, \
-+			"GEN", "$@/qemu.tar"))
- 	$(call quiet-command, cp $(SRC_PATH)/tests/docker/run $@/run, \
- 		"COPY","RUNNER")
+ .PHONY: vm-build-all
  
+-IMAGES := ubuntu.i386 freebsd netbsd openbsd
++IMAGES := ubuntu.i386 freebsd netbsd openbsd centos
+ IMAGE_FILES := $(patsubst %, tests/vm/%.img, $(IMAGES))
+ 
+ .PRECIOUS: $(IMAGE_FILES)
+@@ -14,6 +14,7 @@ vm-test:
+ 	@echo "  vm-build-freebsd                - Build QEMU in FreeBSD VM"
+ 	@echo "  vm-build-netbsd                 - Build QEMU in NetBSD VM"
+ 	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
++	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, with Docker"
+ 
+ vm-build-all: $(addprefix vm-build-, $(IMAGES))
+ 
+diff --git a/tests/vm/centos b/tests/vm/centos
+new file mode 100755
+index 0000000000..afd560c564
+--- /dev/null
++++ b/tests/vm/centos
+@@ -0,0 +1,84 @@
++#!/usr/bin/env python
++#
++# CentOS image
++#
++# Copyright 2018 Red Hat Inc.
++#
++# Authors:
++#  Fam Zheng <famz@redhat.com>
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
++#
++
++import os
++import sys
++import subprocess
++import basevm
++import time
++
++class CentosVM(basevm.BaseVM):
++    name = "centos"
++    BUILD_SCRIPT = """
++        set -e;
++        cd $(mktemp -d);
++        export SRC_ARCHIVE=/dev/vdb;
++        sudo chmod a+r $SRC_ARCHIVE;
++        tar -xf $SRC_ARCHIVE;
++        make docker-test-block@centos7 V={verbose} J={jobs};
++        make docker-test-quick@centos7 V={verbose} J={jobs};
++        make docker-test-mingw@fedora V={verbose} J={jobs};
++    """
++
++    def _gen_cloud_init_iso(self):
++        cidir = self._tmpdir
++        mdata = open(os.path.join(cidir, "meta-data"), "w")
++        mdata.writelines(["instance-id: centos-vm-0\n",
++                          "local-hostname: centos-guest\n"])
++        mdata.close()
++        udata = open(os.path.join(cidir, "user-data"), "w")
++        udata.writelines(["#cloud-config\n",
++                          "chpasswd:\n",
++                          "  list: |\n",
++                          "    root:%s\n" % self.ROOT_PASS,
++                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
++                          "  expire: False\n",
++                          "users:\n",
++                          "  - name: %s\n" % self.GUEST_USER,
++                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
++                          "    ssh-authorized-keys:\n",
++                          "    - %s\n" % basevm.SSH_PUB_KEY,
++                          "  - name: root\n",
++                          "    ssh-authorized-keys:\n",
++                          "    - %s\n" % basevm.SSH_PUB_KEY,
++                          "locale: en_US.UTF-8\n"])
++        udata.close()
++        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
++                               "-volid", "cidata", "-joliet", "-rock",
++                               "user-data", "meta-data"],
++                               cwd=cidir,
++                               stdin=self._devnull, stdout=self._stdout,
++                               stderr=self._stdout)
++        return os.path.join(cidir, "cloud-init.iso")
++
++    def build_image(self, img):
++        cimg = self._download_with_cache("https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1802.qcow2.xz")
++        img_tmp = img + ".tmp"
++        subprocess.check_call(["cp", "-f", cimg, img_tmp + ".xz"])
++        subprocess.check_call(["xz", "-df", img_tmp + ".xz"])
++        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
++        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
++        self.wait_ssh()
++        self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
++        self.ssh_root_check("yum update -y")
++        self.ssh_root_check("yum install -y docker make git")
++        self.ssh_root_check("systemctl enable docker")
++        self.ssh_root("poweroff")
++        self.wait()
++        if os.path.exists(img):
++            os.remove(img)
++        os.rename(img_tmp, img)
++        return 0
++
++if __name__ == "__main__":
++    sys.exit(basevm.main(CentosVM))
 -- 
 2.17.1
