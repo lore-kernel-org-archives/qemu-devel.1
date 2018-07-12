@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fdXWR-00087z-8M
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:04:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fdXXN-0000Vw-J1
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:05:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fdXWQ-0002Po-Gp
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:04:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37804 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fdXWQ-0002P9-Bp
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:04:22 -0400
-Date: Thu, 12 Jul 2018 11:04:19 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180712110419.685f0d04@redhat.com>
-In-Reply-To: <759f6dde-7350-70b9-1867-d2d1781df16b@redhat.com>
-References: <20180710155037.16834-1-stefanha@redhat.com>
-	<20180710155037.16834-2-stefanha@redhat.com>
-	<20180711172208.288fc0bb@redhat.com>
-	<759f6dde-7350-70b9-1867-d2d1781df16b@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1fdXXJ-0003XG-8A
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:05:21 -0400
+Date: Thu, 12 Jul 2018 11:05:01 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180712090501.GC4541@localhost.localdomain>
+References: <CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
+	<20180706131103.4e713911.cohuck@redhat.com>
+	<20180706145645.GB3939@localhost.localdomain>
+	<20180709072953.GE7755@andariel.pipo.sk>
+	<87k1q3ljgs.fsf@dusky.pond.sub.org>
+	<20180710162208.7b1b5cdc.cohuck@redhat.com>
+	<20180710143807.GJ5852@localhost.localdomain>
+	<871sc9gdr2.fsf@dusky.pond.sub.org>
+	<8736wplzff.fsf@dusky.pond.sub.org>
+	<20180712094834.78852622.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] qdev: add HotplugHandler->post_plug()
- callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180712094834.78852622.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, l00284672 <lizhengui@huawei.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
 
-On Wed, 11 Jul 2018 18:48:21 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 11/07/2018 17:22, Igor Mammedov wrote:
-> > It also seems wrong to call _plug handler on maybe partially
-> > initialized device so perhaps we should first finish devices/children
-> > realization then do reset and only after that call _plug() handler  
+Am 12.07.2018 um 09:48 hat Cornelia Huck geschrieben:
+> On Thu, 12 Jul 2018 08:51:16 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
 > 
-> I agree but this is too dangerous until we look at plug() handlers and
-I'll put on my TODO list for 3.1
+> > Markus Armbruster <armbru@redhat.com> writes:
+> > 
+> > > Kevin Wolf <kwolf@redhat.com> writes:
+> > >  
+> > >> Am 10.07.2018 um 16:22 hat Cornelia Huck geschrieben:  
+> > >>> On Tue, 10 Jul 2018 07:59:15 +0200
+> > >>> Markus Armbruster <armbru@redhat.com> wrote:
+> > >>>   
+> > >>> > In addition to actively pulling libvirt developers into review of
+> > >>> > deprecation patches, we should pursue the idea to optionally let QEMU
+> > >>> > fail on use of deprecated features, then have libvirt run its test suite
+> > >>> > that way.  
+> > >>> 
+> > >>> What about the following:
+> > >>> 
+> > >>> qemu_deprecated_option("old_option", "modern_option");
+> > >>> 
+> > >>> Which would then print (in normal operation)
+> > >>> 
+> > >>> "WARNING: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
+> > >>> 
+> > >>> to the monitor (or to stderr? to both?).
+> > >>> 
+> > >>> If you start QEMU with a -no-deprecated-options switch, it would print
+> > >>> 
+> > >>> "ERROR: 'old_option' is deprecated and will be removed; use 'modern_option' instead"
+> > >>> 
+> > >>> and do an exit(1).
+> > >>> 
+> > >>> Would that be workable?  
+> > >>
+> > >> I think the function should just take a message:
+> > >>
+> > >>     /* Works like error_report(), except for the WARNING/ERROR prefix
+> > >>      * and exit(1) if -no-deprecated-options is set */
+> > >>     void deprecation_report(const char *fmt, ...);  
+> > >
+> > > I like it.  The contract could use a bit of polish, but that's detail.  
 
-> remove the usage of Error **.
-considering we have _per_plug now with all checks, we probably
-would be able to remove Error** from _plug but only after splitting/auditing
-existing _plug callbacks.
+Obviously, this comment wasn't meant to be copied into the source code,
+but just to explain what I'm actually proposing there.
 
->  Introducing a new callback helps the
-> transition.
-sure, we can drop it later
-
-> Paolo
+> > Suggest --deprecated={silent,warn,error}, default silent.
 > 
+> I like that, but I'd prefer to default to warn (so that command line
+> users have a better chance to notice it).
+
+I agree that warn is the better default. (It's also consistent with what
+we have been doing for deprecations so far.)
+
+Kevin
