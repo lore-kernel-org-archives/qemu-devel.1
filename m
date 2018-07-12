@@ -1,28 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddTG-00023k-Pm
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:25:31 -0400
+	(envelope-from <thuth@redhat.com>) id 1fddYl-0005GV-Um
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddTF-0002X8-TR
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:25:30 -0400
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
-	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
-	<20180711161216.GV7451@localhost.localdomain>
-	<CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
-	<87y3egmzem.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1fddYl-0007rc-2X
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:11 -0400
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6cc1c007-4bdf-2b8c-b0b0-d32979a56ecd@redhat.com>
-Date: Thu, 12 Jul 2018 17:25:20 +0200
-MIME-Version: 1.0
-In-Reply-To: <87y3egmzem.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+Date: Thu, 12 Jul 2018 17:30:58 +0200
+Message-Id: <1531409463-3843-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/5] Fix crashes with introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +17,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 12.07.2018 14:06, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> On 11 July 2018 at 17:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>> On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
->>>> Hm, ok, so how to continue here now? Shall we at least mark the
->>>> bcm2836/7 devices with user_creatable=false, so that users can not crash
->>>> their QEMU so easily with device_add? The problem with introspection via
->>>> device-list-properties would still continue to exist, but I think that's
->>>> less likely used in practice... otherwise we could still move the
->>>> qdev_set_parent_bus() calls to the realize() function instead, and just
->>>> add a big fat FIXME comment in front of the code block, so that we
->>>> remember to clean that up one day...
->>>
->>> Crashing device-list-properties should be a blocker bug, IMO.
-> 
-> Seconded.
+As discovered recently, you can crash QEMU with a lot of devices
+that do not get the reference counting of child objects right.
+You just have to run 'device-list-properties' and call 'info qtree'
+afterwards.
+This patch series fixes a bunch of these problems in the ARM code.
+I did not fix all problems yet, since it is quite time consuming
+and I first want to get some feedback whether this is the right
+way to go or not.
 
-Well, maybe I should then not suggest to add a hmp("info qtree") below
-the hmp("info qom-tree") in test_one_device() of
-tests/device-introspect-test.c ... otherwise we'll be quite busy in the
-next weeks...
+Thomas Huth (5):
+  qom/object: Add a new function object_initialize_as_child()
+  hw/core/sysbus: Add a function for creating and attaching an object
+  hw/arm/bcm2836: Fix crash with device_add bcm2837 on unsupported
+    machines
+  hw/arm/armv7: Fix crash when introspecting the "iotkit" device
+  hw/cpu/a15mpcore: Fix introspection problem with the a15mpcore_priv
+    device
 
- Thomas
+ hw/arm/armv7m.c       |  9 ++++---
+ hw/arm/bcm2836.c      | 19 +++++--------
+ hw/arm/iotkit.c       | 74 ++++++++++++++++++++++-----------------------------
+ hw/core/sysbus.c      |  8 ++++++
+ hw/cpu/a15mpcore.c    |  8 +++---
+ hw/intc/armv7m_nvic.c |  5 ++--
+ include/hw/sysbus.h   |  3 +++
+ include/qom/object.h  | 19 +++++++++++++
+ qom/object.c          | 14 ++++++++++
+ 9 files changed, 93 insertions(+), 66 deletions(-)
+
+-- 
+1.8.3.1
