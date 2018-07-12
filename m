@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47378)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdb8l-00088K-Dk
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:56:16 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48382)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1fdbCx-0001Fu-2J
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdb8k-00036M-Ji
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:56:11 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:32814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdb8k-00035v-Ex
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:56:10 -0400
-Received: by mail-oi0-x243.google.com with SMTP id l10-v6so8856296oii.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 05:56:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <87y3egmzem.fsf@dusky.pond.sub.org>
-References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
-	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
-	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
-	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
-	<20180711161216.GV7451@localhost.localdomain>
-	<CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
-	<87y3egmzem.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jul 2018 13:55:49 +0100
-Message-ID: <CAFEAcA-RwRdgr-_YVwEWf0pSNQj_rdEmX_OZf5HFmNoR8LbthA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
- bcm2837 on unsupported machines
+	(envelope-from <pl@kamp.de>) id 1fdbCr-0006RF-BE
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:00:31 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:55481 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fdbCr-0006Pv-1l
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:00:25 -0400
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:00:10 +0200
+From: Peter Lieven <pl@kamp.de>
+Date: Thu, 12 Jul 2018 15:00:10 +0200
+Message-Id: <1531400410-27059-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V6] qemu-img: align result of
+ is_allocated_sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +25,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, Peter Lieven <pl@kamp.de>
 
-On 12 July 2018 at 13:06, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> On 11 July 2018 at 17:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>> On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
->>>> Hm, ok, so how to continue here now? Shall we at least mark the
->>>> bcm2836/7 devices with user_creatable=false, so that users can not crash
->>>> their QEMU so easily with device_add? The problem with introspection via
->>>> device-list-properties would still continue to exist, but I think that's
->>>> less likely used in practice... otherwise we could still move the
->>>> qdev_set_parent_bus() calls to the realize() function instead, and just
->>>> add a big fat FIXME comment in front of the code block, so that we
->>>> remember to clean that up one day...
->>>
->>> Crashing device-list-properties should be a blocker bug, IMO.
->
-> Seconded.
->
->>> Moving to realize is not the best solution, but I would prefer to
->>> do that in 3.0 instead of leaving the device-list-properties
->>> crash unfixed.
->>
->> I would like to see the crash fixed too. But I'd like to
->> see it fixed:
->>  (a) by having clear documentation about how the QOM
->> system works, what you should do in init and what you
->> should do in realize, when and why you need to manually
->> parent objects, etc
->>  (b) as far as possible making our APIs for doing this
->> easy to use correctly and difficult to use wrongly. At
->> the moment we have APIs that are far too easy to misuse,
->> which means we will continue to get bugs like this and spend
->> a lot of time on one-off fixes for them.
->>
->> In particular I don't understand why we need to manually
->> parent these objects at all.
->
-> I want both (a) and (b) as badly as anyone, but we should not hold any
-> particular crash bug hostage to get them.
+We currently don't enforce that the sparse segments we detect during convert are
+aligned. This leads to unnecessary and costly read-modify-write cycles either
+internally in Qemu or in the background on the storage device as nearly all
+modern filesystems or hardware have a 4k alignment internally.
 
-Without at least (a) I can't review this patch or any other
-patch that fixes this kind of crash bug...
+This patch modifies is_allocated_sectors so that its *pnum result will always
+end at an alignment boundary. This way all requests will end at an alignment
+boundary. The start of all requests will also be aligned as long as the results
+of get_block_status do not lead to an unaligned offset.
 
-thanks
--- PMM
+The number of RMW cycles when converting an example image [1] to a raw device that
+has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+write requests. With this path the additional 4600 read requests are eliminated while
+the number of total write requests stays constant.
+
+[1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
+
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+V5->V6: - fix output of iotest 122 [Kevin]
+V4->V5: - is_zero is a bool [Kevin]
+        - treat zero areas as allocated if i <= tail to avoid *pnum underflow [Kevin]
+V3->V4: - only focus on the end offset in is_allocated_sectors [Kevin]
+V2->V3: - ensure that s.alignment is a power of 2
+        - correctly handle n < alignment in is_allocated_sectors if
+          sector_num % alignment > 0.
+V1->V2: - take the current sector offset into account [Max]
+        - try to figure out the target alignment [Max]
+
+ qemu-img.c                 | 44 ++++++++++++++++++++++++++++++++++++++------
+ tests/qemu-iotests/122.out | 18 ++++++++----------
+ 2 files changed, 46 insertions(+), 16 deletions(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index 7651d81..9021ab0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1105,11 +1105,15 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
+  *
+  * 'pnum' is set to the number of sectors (including and immediately following
+  * the first one) that are known to be in the same allocated/unallocated state.
++ * The function will try to align the end offset to alignment boundaries so
++ * that the request will at least end aligned and consequtive requests will
++ * also start at an aligned offset.
+  */
+-static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
++static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
++                                int64_t sector_num, int alignment)
+ {
+     bool is_zero;
+-    int i;
++    int i, tail;
+ 
+     if (n <= 0) {
+         *pnum = 0;
+@@ -1122,6 +1126,23 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+             break;
+         }
+     }
++
++    tail = (sector_num + i) & (alignment - 1);
++    if (tail) {
++        if (is_zero && i <= tail) {
++            /* treat unallocated areas which only consist
++             * of a small tail as allocated. */
++            is_zero = false;
++        }
++        if (!is_zero) {
++            /* align up end offset of allocated areas. */
++            i += alignment - tail;
++            i = MIN(i, n);
++        } else {
++            /* align down end offset of zero areas. */
++            i -= tail;
++        }
++    }
+     *pnum = i;
+     return !is_zero;
+ }
+@@ -1132,7 +1153,7 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+  * breaking up write requests for only small sparse areas.
+  */
+ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+-    int min)
++    int min, int64_t sector_num, int alignment)
+ {
+     int ret;
+     int num_checked, num_used;
+@@ -1141,7 +1162,7 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+         min = n;
+     }
+ 
+-    ret = is_allocated_sectors(buf, n, pnum);
++    ret = is_allocated_sectors(buf, n, pnum, sector_num, alignment);
+     if (!ret) {
+         return ret;
+     }
+@@ -1149,13 +1170,15 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+     num_used = *pnum;
+     buf += BDRV_SECTOR_SIZE * *pnum;
+     n -= *pnum;
++    sector_num += *pnum;
+     num_checked = num_used;
+ 
+     while (n > 0) {
+-        ret = is_allocated_sectors(buf, n, pnum);
++        ret = is_allocated_sectors(buf, n, pnum, sector_num, alignment);
+ 
+         buf += BDRV_SECTOR_SIZE * *pnum;
+         n -= *pnum;
++        sector_num += *pnum;
+         num_checked += *pnum;
+         if (ret) {
+             num_used = num_checked;
+@@ -1560,6 +1583,7 @@ typedef struct ImgConvertState {
+     bool wr_in_order;
+     bool copy_range;
+     int min_sparse;
++    int alignment;
+     size_t cluster_sectors;
+     size_t buf_sectors;
+     long num_coroutines;
+@@ -1724,7 +1748,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+              * zeroed. */
+             if (!s->min_sparse ||
+                 (!s->compressed &&
+-                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
++                 is_allocated_sectors_min(buf, n, &n, s->min_sparse,
++                                          sector_num, s->alignment)) ||
+                 (s->compressed &&
+                  !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)))
+             {
+@@ -2368,6 +2393,13 @@ static int img_convert(int argc, char **argv)
+                                 out_bs->bl.pdiscard_alignment >>
+                                 BDRV_SECTOR_BITS)));
+ 
++    /* try to align the write requests to the destination to avoid unnecessary
++     * RMW cycles. */
++    s.alignment = MAX(pow2floor(s.min_sparse),
++                      DIV_ROUND_UP(out_bs->bl.request_alignment,
++                                   BDRV_SECTOR_SIZE));
++    assert(is_power_of_2(s.alignment));
++
+     if (skip_create) {
+         int64_t output_sectors = blk_nb_sectors(s.target);
+         if (output_sectors < 0) {
+diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
+index 6c7ee1d..c576705 100644
+--- a/tests/qemu-iotests/122.out
++++ b/tests/qemu-iotests/122.out
+@@ -194,12 +194,12 @@ wrote 1024/1024 bytes at offset 17408
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ convert -S 4k
+-[{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+-{ "start": 1024, "length": 7168, "depth": 0, "zero": true, "data": false},
+-{ "start": 8192, "length": 1024, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+-{ "start": 9216, "length": 8192, "depth": 0, "zero": true, "data": false},
+-{ "start": 17408, "length": 1024, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+-{ "start": 18432, "length": 67090432, "depth": 0, "zero": true, "data": false}]
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 4096, "depth": 0, "zero": true, "data": false},
++{ "start": 8192, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 12288, "length": 4096, "depth": 0, "zero": true, "data": false},
++{ "start": 16384, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 20480, "length": 67088384, "depth": 0, "zero": true, "data": false}]
+ 
+ convert -c -S 4k
+ [{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true},
+@@ -210,10 +210,8 @@ convert -c -S 4k
+ { "start": 18432, "length": 67090432, "depth": 0, "zero": true, "data": false}]
+ 
+ convert -S 8k
+-[{ "start": 0, "length": 9216, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+-{ "start": 9216, "length": 8192, "depth": 0, "zero": true, "data": false},
+-{ "start": 17408, "length": 1024, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+-{ "start": 18432, "length": 67090432, "depth": 0, "zero": true, "data": false}]
++[{ "start": 0, "length": 24576, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 24576, "length": 67084288, "depth": 0, "zero": true, "data": false}]
+ 
+ convert -c -S 8k
+ [{ "start": 0, "length": 1024, "depth": 0, "zero": false, "data": true},
+-- 
+2.7.4
