@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWO-000781-JP
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdZYp-0000ry-G3
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWL-0006oq-58
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49020 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWK-0006o0-TG
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 882A640201BF
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:12:24 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fdZYo-0001Gx-HT
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:14:59 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 12 Jul 2018 13:12:09 +0200
-Message-Id: <20180712111221.20326-9-armbru@redhat.com>
-In-Reply-To: <20180712111221.20326-1-armbru@redhat.com>
-References: <20180712111221.20326-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/20] test-qobject-input-visitor: Avoid format
- string ambiguity
+References: <20180703111949.GB24516@redhat.com>
+	<20180703113229.GD3812@localhost.localdomain>
+	<20180704150256.408d4a07.cohuck@redhat.com>
+	<20180704133440.GE4334@localhost.localdomain>
+	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
+	<20180706131103.4e713911.cohuck@redhat.com>
+	<20180706145645.GB3939@localhost.localdomain>
+	<20180709072953.GE7755@andariel.pipo.sk>
+	<87k1q3ljgs.fsf@dusky.pond.sub.org>
+	<20180710162208.7b1b5cdc.cohuck@redhat.com>
+	<20180710143807.GJ5852@localhost.localdomain>
+	<871sc9gdr2.fsf@dusky.pond.sub.org>
+	<8736wplzff.fsf@dusky.pond.sub.org>
+	<20180712094834.78852622.cohuck@redhat.com>
+Date: Thu, 12 Jul 2018 13:14:52 +0200
+In-Reply-To: <20180712094834.78852622.cohuck@redhat.com> (Cornelia Huck's
+	message of "Thu, 12 Jul 2018 09:48:34 +0200")
+Message-ID: <87fu0or9hv.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
+ -drive option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +36,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
 
-When visitor_input_test_init_internal()'s argument @ap is null, then
-@json_string is interpreted literally, else it's gets %-escapes
-interpolated.  This is awkward.
+Cornelia Huck <cohuck@redhat.com> writes:
 
-One caller always passes null @ap, and the others never do.  Lift the
-building of the QObject into the callers, where it can be done without
-such ambiguity.
+> On Thu, 12 Jul 2018 08:51:16 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
+>
+>> Markus Armbruster <armbru@redhat.com> writes:
+>> 
+>> > Kevin Wolf <kwolf@redhat.com> writes:
+>> >  
+>> >> I think the function should just take a message:
+>> >>
+>> >>     /* Works like error_report(), except for the WARNING/ERROR prefix
+>> >>      * and exit(1) if -no-deprecated-options is set */
+>> >>     void deprecation_report(const char *fmt, ...);  
+>> >
+>> > I like it.  The contract could use a bit of polish, but that's detail.  
+>> 
+>> Suggest --deprecated={silent,warn,error}, default silent.
+>
+> I like that, but I'd prefer to default to warn (so that command line
+> users have a better chance to notice it).
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- tests/test-qobject-input-visitor.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 0f4d234c3f..caa90b3d7e 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -47,15 +47,13 @@ static void visitor_input_teardown(TestInputVisitorData *data,
- /* The various test_init functions are provided instead of a test setup
-    function so that the JSON string used by the tests are kept in the test
-    functions (and not in main()). */
--static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
--                                                 bool keyval,
--                                                 const char *json_string,
--                                                 va_list *ap)
-+
-+static Visitor *test_init_internal(TestInputVisitorData *data, bool keyval,
-+                                   QObject *obj)
- {
-     visitor_input_teardown(data, NULL);
- 
--    data->obj = qobject_from_jsonv(json_string, ap, &error_abort);
--    g_assert(data->obj);
-+    data->obj = obj;
- 
-     if (keyval) {
-         data->qiv = qobject_input_visitor_new_keyval(data->obj);
-@@ -75,7 +73,8 @@ Visitor *visitor_input_test_init_full(TestInputVisitorData *data,
-     va_list ap;
- 
-     va_start(ap, json_string);
--    v = visitor_input_test_init_internal(data, keyval, json_string, &ap);
-+    v = test_init_internal(data, keyval,
-+                           qobject_from_vjsonf_nofail(json_string, ap));
-     va_end(ap);
-     return v;
- }
-@@ -88,7 +87,8 @@ Visitor *visitor_input_test_init(TestInputVisitorData *data,
-     va_list ap;
- 
-     va_start(ap, json_string);
--    v = visitor_input_test_init_internal(data, false, json_string, &ap);
-+    v = test_init_internal(data, false,
-+                           qobject_from_vjsonf_nofail(json_string, ap));
-     va_end(ap);
-     return v;
- }
-@@ -103,7 +103,8 @@ Visitor *visitor_input_test_init(TestInputVisitorData *data,
- static Visitor *visitor_input_test_init_raw(TestInputVisitorData *data,
-                                             const char *json_string)
- {
--    return visitor_input_test_init_internal(data, false, json_string, NULL);
-+    return test_init_internal(data, false,
-+                              qobject_from_json(json_string, &error_abort));
- }
- 
- static void test_visitor_in_int(TestInputVisitorData *data,
--- 
-2.17.1
+Fair enough.
