@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fdbtz-0001Fz-NY
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:45:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdbvE-00024W-Pg
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fdbtv-0004uQ-6q
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:44:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41772 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fdbtv-0004t1-1h
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:44:55 -0400
-References: <20180711141829.17406-1-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dc616832-f9ae-ee64-bcce-012d577e2435@redhat.com>
-Date: Thu, 12 Jul 2018 15:44:47 +0200
+	(envelope-from <bounces@canonical.com>) id 1fdbv9-0006XF-To
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:46:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdbv9-0006Wf-Mo
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:46:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdbv8-0005aI-8s
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 13:46:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 246A82E80C9
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 13:46:10 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180711141829.17406-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Add a CentOS test image to run
- docker tests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jul 2018 13:36:55 -0000
+From: Luc <1781281@bugs.launchpad.net>
+Reply-To: Bug 1781281 <1781281@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153134235209.21545.5674967612897238430.malonedeb@soybean.canonical.com>
+Message-Id: <153140261556.4618.6398278357746575689.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1781281] Re: qemu-ppc64le uncaught target signal
+ 4 (Illegal instruction)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,14 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 11/07/2018 16:18, Fam Zheng wrote:
-> The last patch adds the new image that does the job. Two out of three docker
-> tests running on patchew.org are added to the image. I'll wait for Peter to fix
-> the 'docker-test-quick@centos6' hanging (oob test) before adding it too.
+Thanks for the reply.
 
-The last comment is probably obsolete?
+I tried with the -cpu power9 and it works!
 
-Paolo
+However, I tried with -cpu power8 and it does not work. I tried the code
+on a real power8 and it works. So -cpu power8 should work
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781281
+
+Title:
+  qemu-ppc64le uncaught target signal 4 (Illegal instruction)
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-ppc64le version 2.12.0
+  host machine: x86_64 Arch Linux =
+
+
+  I'm currently working on VSX support in libVPX, I'm using qemu to
+  test, on line 723 of vpx_dsp/ppc/loopfilter_vsx.c, when I change the
+  vec_sub to vec_subs I get:
+
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+
+  Thread 1 "qemu-ppc64le" received signal SIGILL, Illegal instruction.
+  0x00007ffff66d1bf6 in sigsuspend () from /usr/lib/libc.so.6
+  (gdb) bt
+  #0  0x00007ffff66d1bf6 in sigsuspend () from /usr/lib/libc.so.6
+  #1  0x000055555567ee68 in ?? ()
+  #2  0x000055555567fd18 in ?? ()
+  #3  0x00005555556805ef in process_pending_signals ()
+  #4  0x0000555555661e69 in cpu_loop ()
+  #5  0x000055555561fd72 in main ()
+
+  This can be reproduced by downloading this patch (patchset 1):
+
+  https://chromium-review.googlesource.com/c/webm/libvpx/+/1134034
+
+  and running
+
+  qemu-ppc64le -L /home/ltrudeau/x-tools/powerpc64le-unknown-linux-gnu
+  /powerpc64le-unknown-linux-gnu/sysroot/  ./test_libvpx
+  --gtest_also_run_disabled_tests "--gtest_filter=3DVSX/*Loop*/*"
+
+  I don't observe any issues when running the code on a POWER9 machine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781281/+subscriptions
