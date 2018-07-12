@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49604)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1fdXru-0006e2-Kz
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:26:36 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51034)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <bounces@canonical.com>) id 1fdXw0-000091-Pa
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1fdXrp-000375-3D
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:26:34 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:49770 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fdXro-000351-PV
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:26:29 -0400
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:26:24 +0200
-References: <1531235146-6048-1-git-send-email-pl@kamp.de>
-	<20180710153155.GM5852@localhost.localdomain>
-	<73DCB217-9027-4248-8C81-A83AD4512927@kamp.de>
-	<20180711082526.GA4266@localhost.localdomain>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <7eaf47f6-c536-0c13-b81e-f5f8f75f440a@kamp.de>
-Date: Thu, 12 Jul 2018 11:26:25 +0200
+	(envelope-from <bounces@canonical.com>) id 1fdXvw-0007Cq-Nx
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:30:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdXvw-0007Bn-HN
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:30:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdXvv-0001pF-8p
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 09:30:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3EE0A2E80C7
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 09:30:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180711082526.GA4266@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V5] qemu-img: align result of
- is_allocated_sectors
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jul 2018 09:23:49 -0000
+From: Andreas Gustafsson <gson@gson.org>
+Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
+Message-Id: <153138742931.21860.12095317805066591122.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-Am 11.07.2018 um 10:25 schrieb Kevin Wolf:
-> Am 10.07.2018 um 22:16 hat Peter Lieven geschrieben:
->>
->>> Am 10.07.2018 um 17:31 schrieb Kevin Wolf <kwolf@redhat.com>:
->>>
->>> Am 10.07.2018 um 17:05 hat Peter Lieven geschrieben:
->>>> We currently don't enforce that the sparse segments we detect during convert are
->>>> aligned. This leads to unnecessary and costly read-modify-write cycles either
->>>> internally in Qemu or in the background on the storage device as nearly all
->>>> modern filesystems or hardware have a 4k alignment internally.
->>>>
->>>> This patch modifies is_allocated_sectors so that its *pnum result will always
->>>> end at an alignment boundary. This way all requests will end at an alignment
->>>> boundary. The start of all requests will also be aligned as long as the results
->>>> of get_block_status do not lead to an unaligned offset.
->>>>
->>>> The number of RMW cycles when converting an example image [1] to a raw device that
->>>> has 4k sector size is about 4600 4k read requests to perform a total of about 15000
->>>> write requests. With this path the additional 4600 read requests are eliminated while
->>>> the number of total write requests stays constant.
->>>>
->>>> [1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
->>>>
->>>> Signed-off-by: Peter Lieven <pl@kamp.de>
->>> It looked convincing, but I'm afraid this is still not correct.
->>> qemu-iotests 122 fails for me with this patch.
->> I will have a look, where and why exactly it fails, but the allocation
->> pattern might be slightly different due to the alignment. What counts
->> is that the output is byte identical or not?
-> Right, I noticed only after sending this email that it's qemu-img map
-> output that changes and this might actually be okay. I didn't check,
-> however, if the exact changes are what is expected and whether we need
-> to add more test cases to cover what the test originally wanted to
-> cover.
->
-> So after all, there's a good chance that all that's missing is just an
-> update to the test case.
->
-> Kevin
+I tested Pavel's patch, applying it to master
+(c447afd5783b9237fa51b7a85777007d8d568bfc), but I'm afraid it only made
+things worse - qemu has now been booting the test kernel for 30 minutes
+but the boot has still not completed.  The last console messages printed
+were:
 
-I checked the output of test 122 and what happens is exactly what is expected.
-The zero areas align to 4k or 8k respectively. If they don't align they are reported
-as allocated. I would just go ahead and include the test update and send V6 if there
-are no objections.
+piix 0000:00:01.1: not 100% native mode: will probe irqs later
+    ide0: BM-DMA at 0xc100-0xc107
+    ide1: BM-DMA at 0xc108-0xc10f
 
-If someone feels that the behaviour is undesired we can also just go ahead
-with a light version of the patch and use only bs->request_alignment as target
-alignment and ignore the value of min_sparse.
+Running strace -p on the qemu process shows it calling ppoll once per
+second:
 
-In this case we could even think about as treating this as a bug fix as it
-avoids these ugly RMW cycles that we were seeing and this is why we created this
-patch.
+ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D8, event=
+s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D11, events=3DPOLLIN}], 5, {t=
+v_sec=3D1, tv_nsec=3D0}, NULL, 8) =3D 0 (Timeout)
+ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D8, event=
+s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D11, events=3DPOLLIN}], 5, {t=
+v_sec=3D1, tv_nsec=3D0}, NULL, 8) =3D 0 (Timeout)
+ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D8, event=
+s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D11, events=3DPOLLIN}], 5, {t=
+v_sec=3D1, tv_nsec=3D0}, NULL, 8) =3D 0 (Timeout)
+ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D8, event=
+s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D11, events=3DPOLLIN}], 5, {t=
+v_sec=3D1, tv_nsec=3D0}, NULL, 8) =3D 0 (Timeout)
+ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D8, event=
+s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D11, events=3DPOLLIN}], 5, {t=
+v_sec=3D1, tv_nsec=3D0}, NULL, 8) =3D 0 (Timeout)
+ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, {fd=3D8, event=
+s=3DPOLLIN}, {fd=3D10, events=3DPOLLIN}, {fd=3D11, events=3DPOLLIN}], 5, {t=
+v_sec=3D1, tv_nsec=3D0}, NULL, 8) =3D 0 (Timeout)
 
-Best,
-Peter
+-- =
 
--- 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1774677
 
-Mit freundlichen Grüßen
+Title:
+  -icount increases boot time by >10x
 
-Peter Lieven
+Status in QEMU:
+  Confirmed
 
-...........................................................
+Bug description:
+  When I specify the -icount option, some guest operations such as
+  booting a Linux kernel take more than 10 times longer than otherwise.
+  For example, the following will boot Aboriginal Linux to the login
+  prompt about 6 seconds on my system (using TCG, not KVM):
 
-   KAMP Netzwerkdienste GmbH
-   Vestische Str. 89-91 | 46117 Oberhausen
-   Tel: +49 (0) 208.89 402-50 | Fax: +49 (0) 208.89 402-40
-   pl@kamp.de | http://www.kamp.de
+  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
+age-i686.tar.gz
+  gunzip <system-image-i686.tar.gz | tar xfv -
+  cd system-image-i686
+  sh run-emulator.sh
 
-   Geschäftsführer: Heiner Lante | Michael Lante
-   Amtsgericht Duisburg | HRB Nr. 12154
-   USt-Id-Nr.: DE 120607556
+  If I replace the last line with
 
-...........................................................
+  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
+
+  booting to the login prompt takes about 1 minute 20 seconds.
+
+  I have tried different values for "shift" other than the "auto" used
+  above, but have not been able to find one that gives reasonable
+  performance.  Specifying "sleep=3Doff" also did not help.
+
+  During the slow boots, qemu appears to spend most of its time
+  sleeping, not using the host CPU.
+
+  I see this with multiple versions of qemu, including current git
+  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
+  host OSes, including Debian 9 on x86_64.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
