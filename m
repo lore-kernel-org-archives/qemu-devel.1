@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fdXA1-0003BG-CT
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:41:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fdXAI-0003Jb-Mi
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:41:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fdX9y-0003S8-7E
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:41:13 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38117)
+	(envelope-from <peter.maydell@linaro.org>) id 1fdXAH-0003bI-Je
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:41:30 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fdX9y-0003Rs-0H
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:41:10 -0400
-Received: by mail-wr1-x443.google.com with SMTP id m1-v6so8076837wrg.5
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 01:41:09 -0700 (PDT)
-References: <20180709152117.21585-1-alex.bennee@linaro.org>
-	<20180709152117.21585-11-alex.bennee@linaro.org>
-	<a90bec68-bce0-f25c-dd28-c36a1a7d2b4f@amsat.org>
-	<87y3eidcpv.fsf@linaro.org>
-	<20180711013123.GA29996@lemon.usersys.redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180711013123.GA29996@lemon.usersys.redhat.com>
-Date: Thu, 12 Jul 2018 09:41:07 +0100
-Message-ID: <87wou0dexo.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fdXAH-0003bC-EU
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 04:41:29 -0400
+Received: by mail-oi0-x242.google.com with SMTP id v8-v6so54360254oie.5
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 01:41:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6233d484-ebfd-3225-92b5-c1c1e07b047e@vivier.eu>
+References: <cover.1467138806.git.riku.voipio@linaro.org>
+	<435da5e7092aa54e12044b9401b42c4a9333c74d.1467138806.git.riku.voipio@linaro.org>
+	<6233d484-ebfd-3225-92b5-c1c1e07b047e@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Jul 2018 09:41:07 +0100
+Message-ID: <CAFEAcA_ccWh_N27nTbMu=C6gkekroHDzDmewbhBXw6SUZgYn-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 3.0 10/10] docker: add expansion for
- docker-test-FOO to Makefile.include
+Subject: Re: [Qemu-devel] [PULL v2 03/24] linux-user: Use safe_syscall
+ wrapper for fcntl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, cota@braap.org, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-Fam Zheng <famz@redhat.com> writes:
-
-> On Tue, 07/10 22:04, Alex Benn=C3=A9e wrote:
+On 12 July 2018 at 08:18, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 28/06/2016 =C3=A0 21:12, riku.voipio@linaro.org a =C3=A9crit :
+>> From: Peter Maydell <peter.maydell@linaro.org>
 >>
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>> Use the safe_syscall wrapper for fcntl. This is straightforward now
+>> that we always use 'struct fcntl64' on the host, as we don't need
+>> to select whether to call the host's fcntl64 or fcntl syscall
+>> (a detail that the libc previously hid for us).
 >>
->> > On 07/09/2018 12:21 PM, Alex Benn=C3=A9e wrote:
->> >> This allows us to run a particular test on all docker images. For
->> >> example:
->> >>
->> >>   make docker-test-unit
->> >>
->> >> Will run the unit tests on every supported image.
->> >>
->> >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> >> ---
->> >>  tests/docker/Makefile.include | 2 ++
->> >>  1 file changed, 2 insertions(+)
->> >>
->> >> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.in=
-clude
->> >> index fe63aacf69..765b2c36f2 100644
->> >> --- a/tests/docker/Makefile.include
->> >> +++ b/tests/docker/Makefile.include
->> >> @@ -152,6 +152,7 @@ $(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES)=
-,$(DOCKER_IMAGES) $(DOCKER_DEPR
->> >>  	) \
->> >>  	$(foreach t,$(DOCKER_TESTS), \
->> >>  		$(eval docker-test: docker-$t@$i) \
->> >> +		$(eval docker-$t: docker-$t@$i) \
->> >>  	) \
->> >>  )
->> >>
->> >> @@ -162,6 +163,7 @@ docker:
->> >>  	@echo
->> >>  	@echo '    docker:              Print this help.'
->> >>  	@echo '    docker-test:         Run all image/test combinations.'
->> >
->> > Can we rename "docker-test" -> "docker-tests" or is it too late?
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+>> ---
+>>  linux-user/syscall.c | 34 +++++++++++++++++++++++-----------
+>>  1 file changed, 23 insertions(+), 11 deletions(-)
+> ...
+>> @@ -10252,7 +10264,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_=
+long arg1,
+>>              if (ret) {
+>>                  break;
+>>              }
+>> -            ret =3D get_errno(fcntl(arg1, cmd, &fl));
+>> +            ret =3D get_errno(safe_fcntl(arg1, cmd, &fl));
+>>           break;
+>>          default:
+>>              ret =3D do_fcntl(arg1, arg2, arg3);
 >>
->> Probably, I don't know how many people were actively using it. Fam?
 >
-> I don't know either. Maybe because I'm not native English speaker, but why
-> bother? "Docker test" sounds like a generic "cover all" test, whereas "do=
-cker
-> tests" sounds like a set of many independent tests based on Docker. Both =
-make
-> sense to me, though I agree the latter describes it better.
+> Peter,
 >
-> On the other hand, maybe we should create a selection instead of "all
-> combinations" and call it docker-test, to make it a bit more useful.
-
-Well allowing the individual docket-test-FOO expansion is a halfway
-house to that.
-
-> Then we can
-> rename the current docker-test to "docker-all" or "docker-test-all".
-
-docker-all-tests might be better in case we ever create and test-all
-test script...
-
+> 435da5e709 linux-user: Use safe_syscall wrapper for fcntl
 >
-> Fam
->
->>
->> >
->> >> +	@echo '    docker-TEST:         Run TEST on all image combinations.'
->> >>  	@echo '    docker-clean:        Kill and remove residual docker tes=
-ting containers.'
->> >>  	@echo '    docker-TEST@IMAGE:   Run "TEST" in container "IMAGE".'
->> >>  	@echo '                         Note: "TEST" is one of the listed t=
-est name,'
->> >>
->>
->>
->> --
->> Alex Benn=C3=A9e
+> do you remember why you only convert to safe_fcntl() the
+> TARGET_F_SETLK64 and TARGET_F_SETLKW64 cases and not the
+> TARGET_F_GETLK64 one (in TARGET_NR_fcntl64)?
 
+I don't recall; I probably just missed that one. I don't
+see any reason why it shouldn't be using safe_fcntl().
 
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
