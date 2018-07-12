@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdiEc-0008L5-EI
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:30:43 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fdiGH-0000hn-ST
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdiEX-0001kI-62
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:30:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fdiEW-0001j2-J3
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:30:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fdiEV-0005Ja-B8
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 20:30:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4F1F72E8019
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 20:30:35 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1fdiGG-0003K8-Mo
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:32:25 -0400
+References: <20180712195120.27394-1-sw@weilnetz.de>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <07226662-e636-2ff7-5cb4-7a64c6020c04@redhat.com>
+Date: Thu, 12 Jul 2018 16:32:17 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Jul 2018 20:24:17 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1779955 <1779955@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153065712229.13372.17157400567540509420.malonedeb@gac.canonical.com>
-Message-Id: <153142705736.23616.14705020349449635933.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1779955] Re: qemu linux-user requires read
- permissions on memory passed to syscalls that should only need write access
+In-Reply-To: <20180712195120.27394-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Fix typos in comments
+ (found by codespell)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, QEMU Developer <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-Oh, yes, I see -- it's mmapping the file specifically in order to write
-the data to the file system. Yes, I agree that's a reasonable thing to
-do.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1779955
+On 07/12/2018 03:51 PM, Stefan Weil wrote:
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>  block.c         | 2 +-
+>  block/backup.c  | 4 ++--
+>  block/curl.c    | 2 +-
+>  block/gluster.c | 2 +-
+>  block/vhdx.c    | 2 +-
+>  5 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block.c b/block.c
+> index a2fe05ea96..39f373e035 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3002,7 +3002,7 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+>   *
+>   * Reopens all BDS specified in the queue, with the appropriate
+>   * flags.  All devices are prepared for reopen, and failure of any
+> - * device will cause all device changes to be abandonded, and intermediate
+> + * device will cause all device changes to be abandoned, and intermediate
+>   * data cleaned up.
+>   *
+>   * If all devices prepare successfully, then the changes are committed
+> diff --git a/block/backup.c b/block/backup.c
+> index 319fc922e8..8630d32926 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -91,7 +91,7 @@ static void cow_request_end(CowRequest *req)
+>  }
+>  
+>  /* Copy range to target with a bounce buffer and return the bytes copied. If
+> - * error occured, return a negative error number */
+> + * error occurred, return a negative error number */
+>  static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+>                                                        int64_t start,
+>                                                        int64_t end,
+> @@ -148,7 +148,7 @@ fail:
+>  
+>  }
+>  
+> -/* Copy range to target and return the bytes copied. If error occured, return a
+> +/* Copy range to target and return the bytes copied. If error occurred, return a
+>   * negative error number. */
+>  static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
+>                                                  int64_t start,
+> diff --git a/block/curl.c b/block/curl.c
+> index aa42535783..229bb84a27 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -804,7 +804,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>      }
+>      /* Prior CURL 7.19.4 return value of 0 could mean that the file size is not
+>       * know or the size is zero. From 7.19.4 CURL returns -1 if size is not
+> -     * known and zero if it is realy zero-length file. */
+> +     * known and zero if it is really zero-length file. */
+>  #if LIBCURL_VERSION_NUM >= 0x071304
+>      if (d < 0) {
+>          pstrcpy(state->errmsg, CURL_ERROR_SIZE,
+> diff --git a/block/gluster.c b/block/gluster.c
+> index a4e1c8ecd8..4fd55a9cc5 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -1326,7 +1326,7 @@ static int qemu_gluster_has_zero_init(BlockDriverState *bs)
+>   * If @start is in a trailing hole or beyond EOF, return -ENXIO.
+>   * If we can't find out, return a negative errno other than -ENXIO.
+>   *
+> - * (Shamefully copied from file-posix.c, only miniscule adaptions.)
+> + * (Shamefully copied from file-posix.c, only minuscule adaptions.)
 
-Title:
-  qemu linux-user requires read permissions on memory passed to syscalls
-  that should only need write access
+Huh!
 
-Status in QEMU:
-  Confirmed
+Merriam-Webster lists miniscule as a "disputed" spelling of minuscule.
+Dictionary.com simply lists it as an acceptable alternative.
 
-Bug description:
-  When read() function takes an mmap'ed address as output buffer, it
-  returns EFAULT. The expected behavior is it should just work.
+Anyway, this is a change from something dubiously correct to something
+unambiguously correct, so it's fine.
 
-  The following code works for qemu-system-arm, but not for qemu-arm-
-  static.
+(Learned something today.)
 
-  QEMU version affected: latest release 2.12.0.
+>   */
+>  static int find_allocation(BlockDriverState *bs, off_t start,
+>                             off_t *data, off_t *hole)
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 4d0819750f..0795ca1985 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -185,7 +185,7 @@ uint32_t vhdx_checksum_calc(uint32_t crc, uint8_t *buf, size_t size,
+>  /* Validates the checksum of the buffer, with an in-place CRC.
+>   *
+>   * Zero is substituted during crc calculation for the original crc field,
+> - * and the crc field is restored afterwards.  But the buffer will be modifed
+> + * and the crc field is restored afterwards.  But the buffer will be modified
+>   * during the calculation, so this may not be not suitable for multi-threaded
+>   * use.
+>   *
+> 
 
-  Steps to reproduce (please substitute /path/to/qemu-arm-static with
-  the path of the binary, and /tmp/a.cpp with the example source code
-  attached):
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-  # First register binfmt_misc
-  [hidden]$ docker run --rm --privileged multiarch/qemu-user-static:registe=
-r --reset
-
-  # Compile the code and run
-  [hidden]$ docker run --rm -it -v /tmp/a.cpp:/tmp/a.cpp -v /path/to/qemu-a=
-rm-static:/usr/bin/qemu-arm-static arm32v7/ubuntu:18.04 bash -c '{ apt upda=
-te -y && apt install -y g++; } >& /dev/null && g++ -std=3Dc++14 /tmp/a.cpp =
--o /tmp/a.out && echo hehe > /tmp/haha.txt && /tmp/a.out'
-  ofd=3D3
-  ftruncate=3D0
-  mmap=3D0xff3f5000
-  fd=3D4
-  0xff3f5023 -1 14
-
-  The expected result in qemu-system-arm as well as natively on x86_64 host:
-  hidden$ ./a.out
-  ofd=3D3
-  ftruncate=3D0
-  mmap=3D0xb6fb7000
-  fd=3D4
-  0xb6fb7023 5 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1779955/+subscriptions
+thanks!
