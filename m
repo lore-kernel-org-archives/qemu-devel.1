@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fdiGH-0000hn-ST
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:32:27 -0400
+	(envelope-from <jcody@redhat.com>) id 1fdiNC-0002Pg-9Y
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fdiGG-0003K8-Mo
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:32:25 -0400
+	(envelope-from <jcody@redhat.com>) id 1fdiNB-0007qS-8i
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:39:34 -0400
+Date: Thu, 12 Jul 2018 16:39:24 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180712203924.GC3729096@localhost.localdomain>
 References: <20180712195120.27394-1-sw@weilnetz.de>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <07226662-e636-2ff7-5cb4-7a64c6020c04@redhat.com>
-Date: Thu, 12 Jul 2018 16:32:17 -0400
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20180712195120.27394-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Fix typos in comments
- (found by codespell)
+Subject: Re: [Qemu-devel] [PATCH] block: Fix typos in comments (found by
+ codespell)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,12 +23,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, QEMU Developer <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-
-
-On 07/12/2018 03:51 PM, Stefan Weil wrote:
+On Thu, Jul 12, 2018 at 09:51:20PM +0200, Stefan Weil wrote:
 > Signed-off-by: Stefan Weil <sw@weilnetz.de>
 > ---
 >  block.c         | 2 +-
@@ -97,17 +94,6 @@ On 07/12/2018 03:51 PM, Stefan Weil wrote:
 >   *
 > - * (Shamefully copied from file-posix.c, only miniscule adaptions.)
 > + * (Shamefully copied from file-posix.c, only minuscule adaptions.)
-
-Huh!
-
-Merriam-Webster lists miniscule as a "disputed" spelling of minuscule.
-Dictionary.com simply lists it as an acceptable alternative.
-
-Anyway, this is a change from something dubiously correct to something
-unambiguously correct, so it's fine.
-
-(Learned something today.)
-
 >   */
 >  static int find_allocation(BlockDriverState *bs, off_t start,
 >                             off_t *data, off_t *hole)
@@ -121,11 +107,15 @@ unambiguously correct, so it's fine.
 >   * Zero is substituted during crc calculation for the original crc field,
 > - * and the crc field is restored afterwards.  But the buffer will be modifed
 > + * and the crc field is restored afterwards.  But the buffer will be modified
+
+Oops, that one was mine.
+
 >   * during the calculation, so this may not be not suitable for multi-threaded
 >   * use.
 >   *
+> -- 
+> 2.11.0
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
 
-thanks!
+Reviewed-by: Jeff Cody <jcody@redhat.com>
