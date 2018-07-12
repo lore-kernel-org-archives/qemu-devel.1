@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdbW8-0006EG-UC
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:20:21 -0400
+	(envelope-from <rdunlap@infradead.org>) id 1fdSa8-0007jz-7K
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 23:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdbW8-0001T7-4f
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:20:20 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdbW7-0001Sf-UN
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 09:20:20 -0400
-Received: by mail-oi0-x241.google.com with SMTP id i12-v6so55714262oik.2
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 06:20:19 -0700 (PDT)
+	(envelope-from <rdunlap@infradead.org>) id 1fdSa3-0000W5-MB
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 23:47:52 -0400
+Received: from bombadil.infradead.org ([2607:7c80:54:e::133]:57598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rdunlap@infradead.org>)
+	id 1fdSa3-0000M1-Bz
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 23:47:47 -0400
+References: <20180709151947.940759-1-arnd@arndb.de>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <f1dcc366-d375-fe1b-771a-bb310fdc1df3@infradead.org>
+Date: Wed, 11 Jul 2018 20:47:27 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180629132954.24269-12-luc.michel@greensocs.com>
-References: <20180629132954.24269-1-luc.michel@greensocs.com>
-	<20180629132954.24269-12-luc.michel@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jul 2018 14:19:58 +0100
-Message-ID: <CAFEAcA_c34WEGeG5OnRZhxhMFLf0AX68RtS__kjo+OJqEWUbMg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 11/20] intc/arm_gic: Implement
- virtualization extensions in gic_acknowledge_irq
+In-Reply-To: <20180709151947.940759-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] headers: fix linux/mod_devicetable.h
+ inclusions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, Jan Kiszka <jan.kiszka@web.de>
+To: Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Jean-Christophe Trotin <jean-christophe.trotin@st.com>, Zha Qipeng <qipeng.zha@intel.com>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org, platform-driver-x86@vger.kernel.org
 
-On 29 June 2018 at 14:29, Luc Michel <luc.michel@greensocs.com> wrote:
-> Implement virtualization extensions in the gic_acknowledge_irq()
-> function. This function changes the state of the highest priority IRQ
-> from pending to active.
->
-> When the current CPU is a vCPU, modifying the state of an IRQ modifies
-> the corresponding LR entry. However if we clear the pending flag before
-> setting the active one, we lose track of the LR entry as it becomes
-> invalid. The next call to gic_get_lr_entry() will fail.
->
-> To overcome this issue, we call gic_activate_irq() before
-> gic_clear_pending(). This does not change the general behaviour of
-> gic_acknowledge_irq.
->
-> We also move the SGI case in gic_clear_pending_sgi() to enhance
-> code readability as the virtualization extensions support adds a if-else
-> level.
->
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+On 07/09/2018 08:19 AM, Arnd Bergmann wrote:
+> A couple of drivers produced build errors after the mod_devicetable.h
+> header was split out from the platform_device one, e.g.
+> 
+> drivers/media/platform/davinci/vpbe_osd.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
+> drivers/media/platform/davinci/vpbe_venc.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
+> 
+> This adds the inclusion where needed.
+> 
+> Fixes: ac3167257b9f ("headers: separate linux/mod_devicetable.h from linux/platform_device.h")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+
+Thanks.
+
 > ---
+>  drivers/firmware/qemu_fw_cfg.c             | 1 +
+>  drivers/media/platform/davinci/vpbe_osd.c  | 1 +
+>  drivers/media/platform/davinci/vpbe_venc.c | 1 +
+>  drivers/media/platform/qcom/venus/vdec.c   | 1 +
+>  drivers/media/platform/qcom/venus/venc.c   | 1 +
+>  drivers/media/platform/sti/hva/hva-v4l2.c  | 1 +
+>  drivers/platform/x86/intel_punit_ipc.c     | 1 +
+>  7 files changed, 7 insertions(+)
+> 
+> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
+> index 14fedbeca724..039e0f91dba8 100644
+> --- a/drivers/firmware/qemu_fw_cfg.c
+> +++ b/drivers/firmware/qemu_fw_cfg.c
+> @@ -28,6 +28,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/acpi.h>
+>  #include <linux/slab.h>
+> diff --git a/drivers/media/platform/davinci/vpbe_osd.c b/drivers/media/platform/davinci/vpbe_osd.c
+> index 7f610320426d..c551a25d90d9 100644
+> --- a/drivers/media/platform/davinci/vpbe_osd.c
+> +++ b/drivers/media/platform/davinci/vpbe_osd.c
+> @@ -18,6 +18,7 @@
+>   *
+>   */
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/kernel.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/platform_device.h>
+> diff --git a/drivers/media/platform/davinci/vpbe_venc.c b/drivers/media/platform/davinci/vpbe_venc.c
+> index ba157827192c..ddcad7b3e76c 100644
+> --- a/drivers/media/platform/davinci/vpbe_venc.c
+> +++ b/drivers/media/platform/davinci/vpbe_venc.c
+> @@ -11,6 +11,7 @@
+>   * GNU General Public License for more details.
+>   */
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/kernel.h>
+>  #include <linux/init.h>
+>  #include <linux/ctype.h>
+> diff --git a/drivers/media/platform/qcom/venus/vdec.c b/drivers/media/platform/qcom/venus/vdec.c
+> index f89a91d43cc9..d4e23c7df347 100644
+> --- a/drivers/media/platform/qcom/venus/vdec.c
+> +++ b/drivers/media/platform/qcom/venus/vdec.c
+> @@ -14,6 +14,7 @@
+>   */
+>  #include <linux/clk.h>
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/slab.h>
+> diff --git a/drivers/media/platform/qcom/venus/venc.c b/drivers/media/platform/qcom/venus/venc.c
+> index f7a87a3dbb46..0522cf202b75 100644
+> --- a/drivers/media/platform/qcom/venus/venc.c
+> +++ b/drivers/media/platform/qcom/venus/venc.c
+> @@ -14,6 +14,7 @@
+>   */
+>  #include <linux/clk.h>
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/slab.h>
+> diff --git a/drivers/media/platform/sti/hva/hva-v4l2.c b/drivers/media/platform/sti/hva/hva-v4l2.c
+> index 15080cb00fa7..5a807c7c5e79 100644
+> --- a/drivers/media/platform/sti/hva/hva-v4l2.c
+> +++ b/drivers/media/platform/sti/hva/hva-v4l2.c
+> @@ -6,6 +6,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/slab.h>
+>  #include <media/v4l2-event.h>
+> diff --git a/drivers/platform/x86/intel_punit_ipc.c b/drivers/platform/x86/intel_punit_ipc.c
+> index b5b890127479..f1afc0ebbc68 100644
+> --- a/drivers/platform/x86/intel_punit_ipc.c
+> +++ b/drivers/platform/x86/intel_punit_ipc.c
+> @@ -12,6 +12,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/acpi.h>
+>  #include <linux/delay.h>
+>  #include <linux/bitops.h>
+> 
 
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+-- 
+~Randy
