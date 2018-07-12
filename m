@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fdi9j-0005uV-PQ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:25:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fdiDX-0007JC-6d
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fdi9i-0005qz-Rw
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:25:39 -0400
-References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
-	<DB6PR0801MB2056B99A8BFC3613E368B2A5C1590@DB6PR0801MB2056.eurprd08.prod.outlook.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <70365880-eb2c-e313-ea11-e16bc302a939@redhat.com>
-Date: Thu, 12 Jul 2018 16:25:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fdiDW-0000e0-80
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:29:35 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:45383)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fdiDV-0000dW-RA
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:29:34 -0400
+Received: by mail-oi0-x243.google.com with SMTP id q11-v6so32659451oic.12
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 13:29:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <DB6PR0801MB2056B99A8BFC3613E368B2A5C1590@DB6PR0801MB2056.eurprd08.prod.outlook.com>
-Content-Type: text/plain; charset=koi8-r
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic
+In-Reply-To: <20180712200152.28569-1-sw@weilnetz.de>
+References: <20180712200152.28569-1-sw@weilnetz.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Jul 2018 21:29:12 +0100
+Message-ID: <CAFEAcA-D_Kw33EeMrCg4k=B0yLB8U_X92OC09BQ1JKH4UiYUNQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] docs: Fix some typos (most found by
+ codespell)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, Eric Blake <eblake@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
+On 12 July 2018 at 21:01, Stefan Weil <sw@weilnetz.de> wrote:
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>  docs/COLO-FT.txt                     | 2 +-
+>  docs/config/mach-virt-graphical.cfg  | 2 +-
+>  docs/config/mach-virt-serial.cfg     | 2 +-
+>  docs/config/q35-emulated.cfg         | 2 +-
+>  docs/config/q35-virtio-graphical.cfg | 2 +-
+>  docs/config/q35-virtio-serial.cfg    | 2 +-
+>  docs/interop/vhost-user.txt          | 4 ++--
+>  docs/replay.txt                      | 2 +-
+>  docs/specs/tpm.txt                   | 2 +-
+>  9 files changed, 10 insertions(+), 10 deletions(-)
 
+Hi. A bunch of these are fixed by this patch posted last month
+https://patchwork.kernel.org/patch/10459487/
 
-On 07/12/2018 03:00 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi, what about this?
-> I'll be on vacation next two weeks.
-> Best regards, Vladimir.
+which seems to have got lost because our qemu-trivial
+patch process has stalled out. I think we should apply
+that and then see what still remains to be fixed
+after that.
 
-By the end of today.
-
-If there are fixes necessary I will take over the series if necessary so
-you can enjoy your vacation, if that's OK with you?
-
---js
-
-> -----------------------------------------------------------------------=
--
-> *=EF=D4:* Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> *=EF=D4=D0=D2=C1=D7=CC=C5=CE=CF:* 26 =C9=C0=CE=D1 2018 =C7. 16:50:29
-> *=EB=CF=CD=D5:* qemu-devel@nongnu.org; qemu-block@nongnu.org
-> *=EB=CF=D0=C9=D1:* dgilbert@redhat.com; quintela@redhat.com; stefanha@r=
-edhat.com;
-> jsnow@redhat.com; famz@redhat.com; mreitz@redhat.com; kwolf@redhat.com;
-> Vladimir Sementsov-Ogievskiy; Denis Lunev
-> *=F4=C5=CD=C1:* [PATCH 0/6] fix persistent bitmaps migration logic
-> =9A
-> Hi all.
->=20
-> To continue talk about correct loading of persistent bitmaps here is
-> a patch (04), with some surrounding.
->=20
-> Patch 04 contains new (and I hope, more clean) logic of bitmaps
-> loading/inactivation/invalidation/migration, with the whole description=
-.
-> Let me not duplicate it here, you can safely start reading from 04
-> commit message and internal big comment.
->=20
-> Vladimir Sementsov-Ogievskiy (6):
-> =9A iotests: 169: drop deprecated 'autoload' parameter
-> =9A block/qcow2: improve error message in qcow2_inactivate
-> =9A bloc/qcow2: drop dirty_bitmaps_loaded state variable
-> =9A dirty-bitmaps: clean-up bitmaps loading and migration logic
-> =9A iotests: improve 169
-> =9A iotests: 169: add cases for source vm resuming
->=20
-> =9Ablock/qcow2.h=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A |=9A=
- 1 -
-> =9Ainclude/block/dirty-bitmap.h=9A=9A |=9A 2 +-
-> =9Ablock.c=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=
-=9A=9A | 11 ++++--
-> =9Ablock/dirty-bitmap.c=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A | 36 +++++++-----=
-------
-> =9Ablock/qcow2-bitmap.c=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A | 16 ++++++++
-> =9Ablock/qcow2.c=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A=9A | 8=
-6
-> ++++++++++++++++++++++++++++++++----------
-> =9Amigration/block-dirty-bitmap.c | 10 ++++-
-> =9Atests/qemu-iotests/169=9A=9A=9A=9A=9A=9A=9A=9A | 70 ++++++++++++++++=
-+++++++++++++++++-
-> =9Atests/qemu-iotests/169.out=9A=9A=9A=9A |=9A 4 +-
-> =9A9 files changed, 182 insertions(+), 54 deletions(-)
->=20
-> --=20
-> 2.11.1
->=20
+thanks
+-- PMM
