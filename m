@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcUM-0006no-Cu
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:22:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fdcZJ-0000H3-OW
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:27:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcUH-0003XK-FQ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:22:34 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34163)
+	(envelope-from <peter.maydell@linaro.org>) id 1fdcZI-0007Fh-To
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:27:41 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcUH-0003X3-Ak
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:22:29 -0400
-Received: by mail-qt0-x244.google.com with SMTP id m13-v6so24208359qth.1
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:22:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180712111221.20326-1-armbru@redhat.com>
-	<20180712111221.20326-4-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9e010f7e-38e0-2680-abfb-30ce9357f7e2@amsat.org>
-Date: Thu, 12 Jul 2018 11:22:19 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fdcZI-0007F2-EF
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:27:40 -0400
+Received: by mail-oi0-x242.google.com with SMTP id w126-v6so56115643oie.7
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:27:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180712111221.20326-4-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/20] libqtest: Clean up how we read
- device_del messages
+In-Reply-To: <20180629132954.24269-18-luc.michel@greensocs.com>
+References: <20180629132954.24269-1-luc.michel@greensocs.com>
+	<20180629132954.24269-18-luc.michel@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Jul 2018 15:27:19 +0100
+Message-ID: <CAFEAcA8-Nf698hVObSyR=nNR2nNKpCcxOXYvaUux9PKX882-Pw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 17/20] intc/arm_gic: Implement
+ maintenance interrupt generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, Jan Kiszka <jan.kiszka@web.de>
 
-On 07/12/2018 08:12 AM, Markus Armbruster wrote:
-> qtest_qmp_device_del() still uses the qmp("") hack to receive a
-> message, even though we have qmp_receive() since commit 66e0c7b187e.
-> Put it to use.
-> 
-> Bonus: gets rid of empty format strings.  A step towards compile-time
-> format string checking without triggering -Wformat-zero-length.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 29 June 2018 at 14:29, Luc Michel <luc.michel@greensocs.com> wrote:
+> Implement the maintenance interrupt generation that is part of the GICv2
+> virtualization extensions.
+>
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> +static void gic_compute_misr(GICState *s, int cpu)
+> +{
+> +    int val;
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This could be a bool.
 
-> ---
->  tests/libqtest.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 9cb4096639..071d7eb7b1 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -1090,7 +1090,7 @@ void qtest_qmp_device_del(const char *id)
->      g_assert(response1);
->      g_assert(!qdict_haskey(response1, "error"));
->  
-> -    response2 = qmp("");
-> +    response2 = qmp_receive();
->      g_assert(response2);
->      g_assert(!qdict_haskey(response2, "error"));
->  
-> 
+> +    int vcpu = cpu + GIC_NCPU;
+> +
+> +    int num_eoi, num_valid, num_pending;
+> +
+> +    gic_extract_lr_info(s, cpu, &num_eoi, &num_valid, &num_pending);
+> +
+> +    /* EOI */
+> +    val = (num_eoi != 0);
+> +    s->h_misr[cpu] = FIELD_DP32(0, GICH_MISR, EOI, val);
+
+Where you're starting with 0 and just ORing in bits, it's
+probably clearer to use
+     value = 0;
+     if (something) {
+         value |= R_GICH_MISR_EOI_MASK;
+     }
+     if (something) {
+         value |= R_GICH_MISR_U_MASK;
+     }
+     etc...
+     s->h_misr[cpu] = value;
+
+
+All the logic here is fine though so
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
