@@ -1,33 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdhc3-000310-2c
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:50:52 -0400
+	(envelope-from <stweil@ub-blade-01.bib.uni-mannheim.de>)
+	id 1fdhwy-0000cJ-Om
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdhc0-0007bm-0W
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:50:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fdhbz-0007aN-Py
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:50:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fdhbw-0006FK-Sm
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 988F82E80CB
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:50:44 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Jul 2018 19:35:03 -0000
-From: David Martins <1781463@bugs.launchpad.net>
-Reply-To: Bug 1781463 <1781463@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153142289132.32266.13097437819271021346.malonedeb@wampee.canonical.com>
-Message-Id: <153142410462.24035.9765241566644960219.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1781463] Re: qemu don't start *.abs firmware files
+	(envelope-from <stweil@ub-blade-01.bib.uni-mannheim.de>)
+	id 1fdhwv-0002jP-Hd
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 16:12:28 -0400
+From: Stefan Weil <sw@weilnetz.de>
+Date: Thu, 12 Jul 2018 22:01:52 +0200
+Message-Id: <20180712200152.28569-1-sw@weilnetz.de>
+Subject: [Qemu-devel] [PATCH] docs: Fix some typos (most found by codespell)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,166 +19,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: QEMU Developer <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Stefan Weil <sw@weilnetz.de>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> David Martins (screamfox)
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ docs/COLO-FT.txt                     | 2 +-
+ docs/config/mach-virt-graphical.cfg  | 2 +-
+ docs/config/mach-virt-serial.cfg     | 2 +-
+ docs/config/q35-emulated.cfg         | 2 +-
+ docs/config/q35-virtio-graphical.cfg | 2 +-
+ docs/config/q35-virtio-serial.cfg    | 2 +-
+ docs/interop/vhost-user.txt          | 4 ++--
+ docs/replay.txt                      | 2 +-
+ docs/specs/tpm.txt                   | 2 +-
+ 9 files changed, 10 insertions(+), 10 deletions(-)
 
-** Tags added: qemu
-
-** Tags added: firmware
-
-** Tags added: abs amiko emulation receiver
-
-** Tags added: satelitereceiver stb
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1781463
-
-Title:
-  qemu don't start *.abs firmware files
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello Devs,
-
-  I'm here to report this bug/issue because i'm using Win64 Qemu but i
-  can't start a *.abs firmware at normally this firmware is based in
-  Linux Kernel and this type of firmware is made for STB Receivers,
-
-  So this is all information i provide to get support.
-
-  Files extracted by ( binwalk -e )
-
-  =
-
-  Terminal output:
-
-  # binwalk -e AMIKO_HD8150_2.4.43_emu.abs
-
-  DECIMAL       HEXADECIMAL     DESCRIPTION
-
-  -------------------------------------------------------------------------=
--------
-  196736        0x30080         LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 11883876 bytes
-  3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 3255512 bytes
-  5636224       0x560080        LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 87904 bytes
-
-  =
-
-  Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
-
-  Windows files output:
-
-  Software used: Ali Main Code Decrypter 8.9
-
-  Files unpacked:
-
-  bootloader
-  MemCfg
-  maincode(AV)
-  seecode
-  default_lang
-  cipluskey
-  countryband
-  logo_user
-  logo_menu
-  logo_radio
-  logo_boot
-  patch
-  defaultdb(PRC)
-  userdb(64+64)
-
-  =
-
-  Terminal OUTPUT:
-
-  # hexdump -C
-
-  part of file
-
-  =
-
-  00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore =
-vers|
-  00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@=
-SDK4|
-  00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_2=
-0161|
-  00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc vers=
-ion |
-  00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssd=
-e-6.|
-  00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-200704=
-20)(|
-  00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrato=
-r@ F|
-  00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, =
-2017|
-  00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM=
-)...|
-  00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0.=
-....|
-
-  =
-
-  When I use readelf it says files isn't an ELF file, so i can't run it lik=
-e a kernel (Bootloader,Maincode, and etc. )
-
-  so this is the cmd output when i use qemu Win64 (I don't whant to use
-  linux to do the emulation about this *.abs extension firmware so
-  please help me for win64 version from Qemu)
-
-  CMD OUTPUT:
-
-   C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
-  mips32r6-generic -drive
-  file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=3Draw
-
-  qemu-system-mips.exe: warning: could not load MIPS bios
-  'mips_bios.bin'
-
-  I also tried a lot of diferents qemu-system... and a lot of diferent
-  configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc...
-  and nothing hapenned
-
-  How can i reproduce this issue ? =
-
-  Reply:. =
-
-
-  Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
-  AliDekompressor in http://www.satedu.cba.pl/
-
-  Direct tools:
-
-  FirmwareDecrypter_v8.9.zip :
-
-  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmw=
-areDecrypter_v8.9.zip&directory=3DTest%20Folder&
-
-  Ali__tools_Console_v4.0__CRC_FIXER.rar :
-
-  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__=
-tools_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
-
-  =
-
-  so if Qemu can explain how can i fix this issue this can be highly helpfu=
-ll.
-
-  With my best regards,
-  David Martins =
-
-  Screamfox
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1781463/+subscriptions
+diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
+index d7c7dcda8f..70cfb9ce7d 100644
+--- a/docs/COLO-FT.txt
++++ b/docs/COLO-FT.txt
+@@ -104,7 +104,7 @@ Primary side.
+ COLO Proxy:
+ Delivers packets to Primary and Seconday, and then compare the responses from
+ both side. Then decide whether to start a checkpoint according to some rules.
+-Please refer to docs/colo-proxy.txt for more informations.
++Please refer to docs/colo-proxy.txt for more information.
+ 
+ Note:
+ HeartBeat has not been implemented yet, so you need to trigger failover process
+diff --git a/docs/config/mach-virt-graphical.cfg b/docs/config/mach-virt-graphical.cfg
+index 0fdf6846dd..d6d31b17f5 100644
+--- a/docs/config/mach-virt-graphical.cfg
++++ b/docs/config/mach-virt-graphical.cfg
+@@ -185,7 +185,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/mach-virt-serial.cfg b/docs/config/mach-virt-serial.cfg
+index aee9f1c5a1..18a7c83731 100644
+--- a/docs/config/mach-virt-serial.cfg
++++ b/docs/config/mach-virt-serial.cfg
+@@ -191,7 +191,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/q35-emulated.cfg b/docs/config/q35-emulated.cfg
+index c6416d6545..99ac918e78 100644
+--- a/docs/config/q35-emulated.cfg
++++ b/docs/config/q35-emulated.cfg
+@@ -130,7 +130,7 @@
+ # it to that controller so that the guest can use it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/q35-virtio-graphical.cfg b/docs/config/q35-virtio-graphical.cfg
+index 28bde2fc57..4207f11e4f 100644
+--- a/docs/config/q35-virtio-graphical.cfg
++++ b/docs/config/q35-virtio-graphical.cfg
+@@ -136,7 +136,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/q35-virtio-serial.cfg b/docs/config/q35-virtio-serial.cfg
+index c33c9cc07a..d2830aec5e 100644
+--- a/docs/config/q35-virtio-serial.cfg
++++ b/docs/config/q35-virtio-serial.cfg
+@@ -141,7 +141,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index d51fd58242..0d8aa3ba7d 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -666,12 +666,12 @@ Master message types
+       Equivalent ioctl: VHOST_SET_VRING_ENDIAN
+       Master payload: vring state description
+ 
+-      Set the endianess of a VQ for legacy devices. Little-endian is indicated
++      Set the endianness of a VQ for legacy devices. Little-endian is indicated
+       with state.num set to 0 and big-endian is indicated with state.num set
+       to 1. Other values are invalid.
+       This request should be sent only when VHOST_USER_PROTOCOL_F_CROSS_ENDIAN
+       has been negotiated.
+-      Backends that negotiated this feature should handle both endianesses
++      Backends that negotiated this feature should handle both endiannesses
+       and expect this message once (per VQ) during device configuration
+       (ie. before the master starts the VQ).
+ 
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 2e21e9ccb0..3497585f5a 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -320,7 +320,7 @@ Here is the list of events that are written into the log:
+    async event id from the following list:
+      - REPLAY_ASYNC_EVENT_BH. Bottom-half callback. This event synchronizes
+        callbacks that affect virtual machine state, but normally called
+-       asyncronously.
++       asynchronously.
+        Argument: 8-byte operation id.
+      - REPLAY_ASYNC_EVENT_INPUT. Input device event. Contains
+        parameters of keyboard and mouse input operations
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+index 70ad4a0cba..0e9bbebe1d 100644
+--- a/docs/specs/tpm.txt
++++ b/docs/specs/tpm.txt
+@@ -252,7 +252,7 @@ swtpm socket --tpmstate dir=/tmp/mytpm1 \
+   --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
+   --log level=20 --tpm2
+ 
+-In the 2nd terminal restore the state of the VM using the additonal
++In the 2nd terminal restore the state of the VM using the additional
+ '-incoming' option.
+ 
+ qemu-system-x86_64 -display sdl -accel kvm \
+-- 
+2.11.0
