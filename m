@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWP-00078P-5I
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1fdZWQ-0007Aa-TR
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fdZWL-0006pa-EW
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47660 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fdZWM-0006rd-JO
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55666 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWL-0006oK-7D
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D0BC140711D3
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:12:24 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fdZWM-0006qg-9j
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 07:12:26 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 12 Jul 2018 13:12:15 +0200
-Message-Id: <20180712111221.20326-15-armbru@redhat.com>
+Date: Thu, 12 Jul 2018 13:12:16 +0200
+Message-Id: <20180712111221.20326-16-armbru@redhat.com>
 In-Reply-To: <20180712111221.20326-1-armbru@redhat.com>
 References: <20180712111221.20326-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 14/20] migration-test: Make wait_command()
- return the "return" member
+Subject: [Qemu-devel] [PATCH 15/20] tests: New helper
+ qtest_qmp_receive_success()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +25,256 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-All callers of wait_command() are only interested in the success
-response's "return" member.  Lift its extraction into wait_command().
+Commit b21373d0713 copied wait_command() from tests/migration-test.c
+to tests/tpm-util.c.  Replace both copies by new libqtest helper
+qtest_qmp_receive_success().  Also use it to simplify
+qtest_qmp_device_del().
 
+Bonus: gets rid of a non-literal format string.  A step towards
+compile-time format string checking without triggering
+-Wformat-nonliteral.
+
+Cc: Thomas Huth <thuth@redhat.com>
 Cc: Juan Quintela <quintela@redhat.com>
 Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/migration-test.c | 38 +++++++++++++++-----------------------
- 1 file changed, 15 insertions(+), 23 deletions(-)
+ tests/libqtest.c       | 69 ++++++++++++++++++++++++++++++------------
+ tests/libqtest.h       | 17 +++++++++++
+ tests/migration-test.c | 29 ++++++------------
+ tests/tpm-util.c       | 32 +++-----------------
+ 4 files changed, 80 insertions(+), 67 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index bbb9d3da31..f9f2c0148a 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -152,7 +152,7 @@ static void wait_for_serial(const char *side)
- static QDict *wait_command(QTestState *who, const char *command)
- {
-     const char *event_string;
--    QDict *response;
-+    QDict *response, *ret;
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index dfca3af89d..ed832cd8e6 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1029,6 +1029,35 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+     qobject_unref(response);
+ }
  
-     response = qtest_qmp(who, command);
- 
-@@ -165,7 +165,12 @@ static QDict *wait_command(QTestState *who, const char *command)
-         qobject_unref(response);
-         response = qtest_qmp_receive(who);
-     }
--    return response;
++QDict *qtest_qmp_receive_success(QTestState *s,
++                                 void (*event_cb)(void *opaque,
++                                                  const char *event,
++                                                  QDict *data),
++                                 void *opaque)
++{
++    QDict *response, *ret, *data;
++    const char *event;
 +
-+    ret = qdict_get_qdict(response, "return");
-+    g_assert(ret);
++    for (;;) {
++        response = qtest_qmp_receive(s);
++        g_assert(!qdict_haskey(response, "error"));
++        ret = qdict_get_qdict(response, "return");
++        if (ret) {
++            break;
++        }
++        event = qdict_get_str(response, "event");
++        data = qdict_get_qdict(response, "data");
++        if (event_cb) {
++            event_cb(opaque, event, data);
++        }
++        qobject_unref(response);
++    }
++
 +    qobject_ref(ret);
 +    qobject_unref(response);
 +    return ret;
- }
- 
++}
++
  /*
-@@ -174,15 +179,7 @@ static QDict *wait_command(QTestState *who, const char *command)
+  * Generic hot-plugging test via the device_add QMP command.
   */
- static QDict *migrate_query(QTestState *who)
+@@ -1053,6 +1082,14 @@ void qtest_qmp_device_add(const char *driver, const char *id,
+     qobject_unref(response);
+ }
+ 
++static void device_deleted_cb(void *opaque, const char *name, QDict *data)
++{
++    bool *got_event = opaque;
++
++    g_assert_cmpstr(name, ==, "DEVICE_DELETED");
++    *got_event = true;
++}
++
+ /*
+  * Generic hot-unplugging test via the device_del QMP command.
+  * Device deletion will get one response and one event. For example:
+@@ -1073,27 +1110,21 @@ void qtest_qmp_device_add(const char *driver, const char *id,
+  */
+ void qtest_qmp_device_del(const char *id)
  {
--    QDict *rsp, *rsp_return;
+-    QDict *response1, *response2, *event = NULL;
++    bool got_event = false;
++    QDict *rsp;
+ 
+-    response1 = qmp("{'execute': 'device_del', 'arguments': {'id': %s}}",
+-                    id);
+-    g_assert(response1);
+-    g_assert(!qdict_haskey(response1, "error"));
 -
--    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
--    rsp_return = qdict_get_qdict(rsp, "return");
--    g_assert(rsp_return);
--    qobject_ref(rsp_return);
--    qobject_unref(rsp);
+-    response2 = qmp_receive();
+-    g_assert(response2);
+-    g_assert(!qdict_haskey(response2, "error"));
 -
--    return rsp_return;
-+    return wait_command(who, "{ 'execute': 'query-migrate' }");
+-    if (qdict_haskey(response1, "event")) {
+-        event = response1;
+-    } else if (qdict_haskey(response2, "event")) {
+-        event = response2;
++    qtest_qmp_send(global_qtest,
++                   "{'execute': 'device_del', 'arguments': {'id': %s}}",
++                   id);
++    rsp = qtest_qmp_receive_success(global_qtest, device_deleted_cb,
++                                    &got_event);
++    qobject_unref(rsp);
++    if (!got_event) {
++        rsp = qmp_receive();
++        g_assert_cmpstr(qdict_get_try_str(rsp, "event"),
++                        ==, "DEVICE_DELETED");
++        qobject_unref(rsp);
+     }
+-    g_assert(event);
+-    g_assert_cmpstr(qdict_get_str(event, "event"), ==, "DEVICE_DELETED");
+-
+-    qobject_unref(response1);
+-    qobject_unref(response2);
+ }
+ 
+ bool qmp_rsp_is_err(QDict *rsp)
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 53364849bf..68b767fc88 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -163,6 +163,23 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+  */
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+ 
++/**
++ * qtest_qmp_receive_success:
++ * @s: #QTestState instance to operate on
++ * @event_cb: Event callback
++ * @opaque: Argument for @event_cb
++ *
++ * Poll QMP messages until a command success response is received.
++ * If @event_cb, call it for each event received, passing @opaque,
++ * the event's name and data.
++ * Return the success response's "return" member.
++ */
++QDict *qtest_qmp_receive_success(QTestState *s,
++                                 void (*event_cb)(void *opaque,
++                                                  const char *name,
++                                                  QDict *data),
++                                 void *opaque);
++
+ /**
+  * qtest_hmp:
+  * @s: #QTestState instance to operate on.
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index f9f2c0148a..267342fd3e 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -146,31 +146,20 @@ static void wait_for_serial(const char *side)
+     } while (true);
+ }
+ 
++static void stop_cb(void *opaque, const char *name, QDict *data)
++{
++    if (!strcmp(name, "STOP")) {
++        got_stop = true;
++    }
++}
++
+ /*
+  * Events can get in the way of responses we are actually waiting for.
+  */
+ static QDict *wait_command(QTestState *who, const char *command)
+ {
+-    const char *event_string;
+-    QDict *response, *ret;
+-
+-    response = qtest_qmp(who, command);
+-
+-    while (qdict_haskey(response, "event")) {
+-        /* OK, it was an event */
+-        event_string = qdict_get_str(response, "event");
+-        if (!strcmp(event_string, "STOP")) {
+-            got_stop = true;
+-        }
+-        qobject_unref(response);
+-        response = qtest_qmp_receive(who);
+-    }
+-
+-    ret = qdict_get_qdict(response, "return");
+-    g_assert(ret);
+-    qobject_ref(ret);
+-    qobject_unref(response);
+-    return ret;
++    qtest_qmp_send(who, command);
++    return qtest_qmp_receive_success(who, stop_cb, NULL);
  }
  
  /*
-@@ -324,16 +321,16 @@ static void cleanup(const char *filename)
- static void migrate_check_parameter(QTestState *who, const char *parameter,
-                                     const char *value)
+diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+index 3bd2887f1e..9f3f156e42 100644
+--- a/tests/tpm-util.c
++++ b/tests/tpm-util.c
+@@ -22,8 +22,6 @@
+ #define TIS_REG(LOCTY, REG) \
+     (TPM_TIS_ADDR_BASE + ((LOCTY) << 12) + REG)
+ 
+-static bool got_stop;
+-
+ void tpm_util_crb_transfer(QTestState *s,
+                            const unsigned char *req, size_t req_size,
+                            unsigned char *rsp, size_t rsp_size)
+@@ -247,41 +245,19 @@ void tpm_util_migrate(QTestState *who, const char *uri)
+     qobject_unref(rsp);
+ }
+ 
+-/*
+- * Events can get in the way of responses we are actually waiting for.
+- */
+-static QDict *tpm_util_wait_command(QTestState *who, const char *command)
+-{
+-    const char *event_string;
+-    QDict *response;
+-
+-    response = qtest_qmp(who, command);
+-
+-    while (qdict_haskey(response, "event")) {
+-        /* OK, it was an event */
+-        event_string = qdict_get_str(response, "event");
+-        if (!strcmp(event_string, "STOP")) {
+-            got_stop = true;
+-        }
+-        qobject_unref(response);
+-        response = qtest_qmp_receive(who);
+-    }
+-    return response;
+-}
+-
+ void tpm_util_wait_for_migration_complete(QTestState *who)
  {
--    QDict *rsp, *rsp_return;
-+    QDict *rsp_return;
-     char *result;
+     while (true) {
+-        QDict *rsp, *rsp_return;
++        QDict *rsp_return;
+         bool completed;
+         const char *status;
  
--    rsp = wait_command(who, "{ 'execute': 'query-migrate-parameters' }");
--    rsp_return = qdict_get_qdict(rsp, "return");
-+    rsp_return = wait_command(who,
-+                              "{ 'execute': 'query-migrate-parameters' }");
-     result = g_strdup_printf("%" PRId64,
-                              qdict_get_try_int(rsp_return,  parameter, -1));
-     g_assert_cmpstr(result, ==, value);
-     g_free(result);
--    qobject_unref(rsp);
-+    qobject_unref(rsp_return);
- }
- 
- static void migrate_set_parameter(QTestState *who, const char *parameter,
-@@ -357,7 +354,6 @@ static void migrate_pause(QTestState *who)
-     QDict *rsp;
- 
-     rsp = wait_command(who, "{ 'execute': 'migrate-pause' }");
--    g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
- }
- 
-@@ -370,7 +366,6 @@ static void migrate_recover(QTestState *who, const char *uri)
-         "  'arguments': { 'uri': '%s' } }", uri);
- 
-     rsp = wait_command(who, cmd);
--    g_assert(qdict_haskey(rsp, "return"));
-     g_free(cmd);
-     qobject_unref(rsp);
- }
-@@ -411,7 +406,6 @@ static void migrate_postcopy_start(QTestState *from, QTestState *to)
-     QDict *rsp;
- 
-     rsp = wait_command(from, "{ 'execute': 'migrate-start-postcopy' }");
--    g_assert(qdict_haskey(rsp, "return"));
-     qobject_unref(rsp);
- 
-     if (!got_stop) {
-@@ -689,7 +683,7 @@ static void test_postcopy_recovery(void)
- static void test_baddest(void)
- {
-     QTestState *from, *to;
--    QDict *rsp, *rsp_return;
-+    QDict *rsp_return;
-     char *status;
-     bool failed;
- 
-@@ -705,12 +699,10 @@ static void test_baddest(void)
-     } while (!failed);
- 
-     /* Is the machine currently running? */
--    rsp = wait_command(from, "{ 'execute': 'query-status' }");
--    g_assert(qdict_haskey(rsp, "return"));
--    rsp_return = qdict_get_qdict(rsp, "return");
-+    rsp_return = wait_command(from, "{ 'execute': 'query-status' }");
-     g_assert(qdict_haskey(rsp_return, "running"));
-     g_assert(qdict_get_bool(rsp_return, "running"));
--    qobject_unref(rsp);
-+    qobject_unref(rsp_return);
- 
-     test_migrate_end(from, to, false);
- }
+-        rsp = tpm_util_wait_command(who, "{ 'execute': 'query-migrate' }");
+-        rsp_return = qdict_get_qdict(rsp, "return");
++        qtest_qmp_send(who, "{ 'execute': 'query-migrate' }");
++        rsp_return = qtest_qmp_receive_success(who, NULL, NULL);
+         status = qdict_get_str(rsp_return, "status");
+         completed = strcmp(status, "completed") == 0;
+         g_assert_cmpstr(status, !=,  "failed");
+-        qobject_unref(rsp);
++        qobject_unref(rsp_return);
+         if (completed) {
+             return;
+         }
 -- 
 2.17.1
