@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddYq-0005L6-9u
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1fddYq-0005Kr-4k
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fddYp-0007xC-B8
+	(envelope-from <thuth@redhat.com>) id 1fddYl-0007st-Uz
 	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:31:16 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 12 Jul 2018 17:31:01 +0200
-Message-Id: <1531409463-3843-4-git-send-email-thuth@redhat.com>
+Date: Thu, 12 Jul 2018 17:30:59 +0200
+Message-Id: <1531409463-3843-2-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531409463-3843-1-git-send-email-thuth@redhat.com>
 References: <1531409463-3843-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] hw/arm/bcm2836: Fix crash with device_add
- bcm2837 on unsupported machines
+Subject: [Qemu-devel] [PATCH 1/5] qom/object: Add a new function
+ object_initialize_as_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +23,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-When trying to "device_add bcm2837" on a machine that is not suitable for
-this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
-
-echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
- "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" | \
- aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
-
-{"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
- "package": "build-all"}, "capabilities": []}}
-{"return": {}}
-{"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
- hotplugged on this machine"}}
-Segmentation fault (core dumped)
-
-The qdev_set_parent_bus() from instance_init adds a link to the child devices
-which is not valid anymore after the bcm2837 instance has been destroyed.
-Unfortunately, the child devices do not get destroyed / unlinked correctly
-because both object_initialize() and object_property_add_child() increase
-the reference count of the child objects by one, but only one reference
-is dropped when the parent gets removed. So let's use the new functions
-object_initialize_as_child() and sysbus_init_child_obj() instead to create
-the objects, which will take care of creating the child objects with the
-correct reference count of one.
+A lot of code is using the object_initialize() function followed by a call to
+object_property_add_child() to add the newly initialized object as a child of
+the current object. Both functions increase the reference counter of the new
+object, but many spots that call these two functions then forget to drop one
+of the superfluous references. So the newly created object is often not cleaned
+up correctly when the parent is destroyed. In the worst case, this can cause
+crashes, e.g. because device objects are not correctly removed from their
+parent_bus.
+Since this is a common pattern between many code spots, let's introdcue a
+new function that takes care of calling all three required initialization
+functions, first object_initialize(), then object_property_add_child() and
+finally object_unref().
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/bcm2836.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ include/qom/object.h | 19 +++++++++++++++++++
+ qom/object.c         | 14 ++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 6805a7d..b62adeb 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -51,25 +51,20 @@ static void bcm2836_init(Object *obj)
-     int n;
+diff --git a/include/qom/object.h b/include/qom/object.h
+index f3d2308..c1b254c 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -749,6 +749,25 @@ int object_set_propv(Object *obj,
+ void object_initialize(void *obj, size_t size, const char *typename);
  
-     for (n = 0; n < BCM283X_NCPUS; n++) {
--        object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
--                          info->cpu_type);
--        object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
--                                  &error_abort);
-+        object_initialize_as_child(obj, "cpu[*]", &s->cpus[n],
-+                                   sizeof(s->cpus[n]), info->cpu_type,
-+                                   &error_abort);
-     }
- 
--    object_initialize(&s->control, sizeof(s->control), TYPE_BCM2836_CONTROL);
--    object_property_add_child(obj, "control", OBJECT(&s->control), NULL);
--    qdev_set_parent_bus(DEVICE(&s->control), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "control", &s->control, sizeof(s->control),
-+                          TYPE_BCM2836_CONTROL);
- 
--    object_initialize(&s->peripherals, sizeof(s->peripherals),
--                      TYPE_BCM2835_PERIPHERALS);
--    object_property_add_child(obj, "peripherals", OBJECT(&s->peripherals),
--                              &error_abort);
-+    sysbus_init_child_obj(obj, "peripherals", &s->peripherals,
-+                          sizeof(s->peripherals), TYPE_BCM2835_PERIPHERALS);
-     object_property_add_alias(obj, "board-rev", OBJECT(&s->peripherals),
-                               "board-rev", &error_abort);
-     object_property_add_alias(obj, "vcram-size", OBJECT(&s->peripherals),
-                               "vcram-size", &error_abort);
--    qdev_set_parent_bus(DEVICE(&s->peripherals), sysbus_get_default());
+ /**
++ * object_initialize_as_child:
++ * @parentobj: The parent object to add a property to
++ * @propname: The name of the property
++ * @childobj: A pointer to the memory to be used for the object.
++ * @size: The maximum size available at @obj for the object.
++ * @type: The name of the type of the object to instantiate.
++ * @errp: If an error occurs, a pointer to an area to store the area
++ *
++ * This function will initialize an object. The memory for the object should
++ * have already been allocated. The object will then be added as child property
++ * to a parent with object_property_add_child() function. The returned object
++ * has a reference count of 1, and will be finalized when the last reference is
++ * dropped.
++ */
++void object_initialize_as_child(Object *parentobj, const char *propname,
++                                void *childobj, size_t size, const char *type,
++                                Error **errp);
++
++/**
+  * object_dynamic_cast:
+  * @obj: The object to cast.
+  * @typename: The @typename to cast to.
+diff --git a/qom/object.c b/qom/object.c
+index 4609e34..de2ded0 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -392,6 +392,20 @@ void object_initialize(void *data, size_t size, const char *typename)
+     object_initialize_with_type(data, size, type);
  }
  
- static void bcm2836_realize(DeviceState *dev, Error **errp)
++void object_initialize_as_child(Object *parentobj, const char *propname,
++                                void *childobj, size_t size, const char *type,
++                                Error **errp)
++{
++    object_initialize(childobj, size, type);
++    object_property_add_child(parentobj, propname, OBJECT(childobj), errp);
++    /*
++     * Since object_property_add_child added a reference to the child object,
++     * we can drop the initial reference from object_initialize now.
++     */
++    object_unref(OBJECT(childobj));
++}
++
++
+ static inline bool object_property_is_child(ObjectProperty *prop)
+ {
+     return strstart(prop->type, "child<", NULL);
 -- 
 1.8.3.1
