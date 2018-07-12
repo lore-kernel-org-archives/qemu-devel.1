@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdeVn-0004hP-HR
+	(envelope-from <kwolf@redhat.com>) id 1fdeVk-0004gV-8b
 	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fdeVk-00067k-FQ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:32:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fdeVj-000678-97
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 12:32:08 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 12 Jul 2018 18:31:46 +0200
-Message-Id: <20180712163152.12521-2-kwolf@redhat.com>
+Date: Thu, 12 Jul 2018 18:31:51 +0200
+Message-Id: <20180712163152.12521-7-kwolf@redhat.com>
 In-Reply-To: <20180712163152.12521-1-kwolf@redhat.com>
 References: <20180712163152.12521-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 1/7] iotests: 153: Fix dead code
+Subject: [Qemu-devel] [PULL 6/7] scsi-disk: Block Device Characteristics
+ emulation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,75 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-This step was left behind my mistake. As suggested by the echoed text,
-the intention was to test two devices with the same image, with
-different options. The behavior should be the same as two QEMU
-processes. Complete it.
+The current BDC VPD page (page 0xb1) is too short. This can be
+seen running sg_utils:
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+$ sg_vpd --page=bdc /dev/sda
+Block device characteristics VPD page (SBC):
+Block device characteristics VPD page length too short=8
+
+By the SCSI spec, the expected size of the SBC page is 0x40.
+There is no telling how the guest will behave with a shorter
+message - it can ignore it, or worse, make (wrong)
+assumptions.
+
+This patch fixes the emulation by setting the size to 0x40.
+This is the output of the previous sg_vpd command after
+applying it:
+
+$ sg_vpd --page=bdc /dev/sda -v
+    inquiry cdb: 12 01 b1 00 fc 00
+Block device characteristics VPD page (SBC):
+   [PQual=0  Peripheral device type: disk]
+  Medium rotation rate is not reported
+  Product type: Not specified
+  WABEREQ=0
+  WACEREQ=0
+  Nominal form factor not reported
+  FUAB=0
+  VBULS=0
+
+To improve readability, this patch also adds the VBULS value
+explictly and add comments on the existing fields we're
+setting.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/153     |  2 ++
- tests/qemu-iotests/153.out | 25 +++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ hw/scsi/scsi-disk.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index 673813cd39..0daeb1b005 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -162,6 +162,7 @@ for opts1 in "" "read-only=on" "read-only=on,force-share=on"; do
-     _cleanup_qemu
- done
- 
-+test_opts="read-only=off read-only=on read-only=on,force-share=on"
- for opt1 in $test_opts; do
-     for opt2 in $test_opts; do
-         echo
-@@ -170,6 +171,7 @@ for opt1 in $test_opts; do
-     done
- done
- 
-+echo
- echo "== Creating ${TEST_IMG}.[abc] ==" | _filter_testdir
- (
-     $QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}"
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 3492ba7a29..93eaf10486 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -369,6 +369,31 @@ _qemu_img_wrapper bench -U -w -c 1 TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': force-share=on can only be used with read-only images
- 
- Round done
-+
-+== Two devices with the same image (read-only=off - read-only=off) ==
-+QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,read-only=off: Failed to get "write" lock
-+Is another process using the image?
-+
-+== Two devices with the same image (read-only=off - read-only=on) ==
-+QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,read-only=on: Failed to get shared "write" lock
-+Is another process using the image?
-+
-+== Two devices with the same image (read-only=off - read-only=on,force-share=on) ==
-+
-+== Two devices with the same image (read-only=on - read-only=off) ==
-+QEMU_PROG: -drive if=none,file=TEST_DIR/t.qcow2,read-only=off: Failed to get "write" lock
-+Is another process using the image?
-+
-+== Two devices with the same image (read-only=on - read-only=on) ==
-+
-+== Two devices with the same image (read-only=on - read-only=on,force-share=on) ==
-+
-+== Two devices with the same image (read-only=on,force-share=on - read-only=off) ==
-+
-+== Two devices with the same image (read-only=on,force-share=on - read-only=on) ==
-+
-+== Two devices with the same image (read-only=on,force-share=on - read-only=on,force-share=on) ==
-+
- == Creating TEST_DIR/t.qcow2.[abc] ==
- Formatting 'TEST_DIR/t.IMGFMT.a', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT
- Formatting 'TEST_DIR/t.IMGFMT.b', fmt=IMGFMT size=33554432 backing_file=TEST_DIR/t.IMGFMT
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index d7df357029..5bb390773b 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -775,11 +775,12 @@ int scsi_disk_emulate_vpd_page(SCSIRequest *req, uint8_t *outbuf)
+     }
+     case 0xb1: /* block device characteristics */
+     {
+-        buflen = 8;
++        buflen = 0x40;
+         outbuf[4] = (s->rotation_rate >> 8) & 0xff;
+         outbuf[5] = s->rotation_rate & 0xff;
+-        outbuf[6] = 0;
+-        outbuf[7] = 0;
++        outbuf[6] = 0; /* PRODUCT TYPE */
++        outbuf[7] = 0; /* WABEREQ | WACEREQ | NOMINAL FORM FACTOR */
++        outbuf[8] = 0; /* VBULS */
+         break;
+     }
+     case 0xb2: /* thin provisioning */
 -- 
 2.13.6
