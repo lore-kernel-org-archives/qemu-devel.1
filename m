@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bergwolf@gmail.com>) id 1fdd74-0005C0-3Y
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:02:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fdd8v-0006Nx-Ik
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bergwolf@gmail.com>) id 1fdd70-0006Yw-4Y
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:02:34 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bergwolf@gmail.com>) id 1fdd6z-0006Y3-VU
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:02:30 -0400
-Received: by mail-wm0-x244.google.com with SMTP id z6-v6so2305691wma.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 08:02:29 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1fdd8u-00009B-Oz
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:04:29 -0400
+Date: Thu, 12 Jul 2018 17:04:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180712150417.GF4541@localhost.localdomain>
+References: <20180711205813.22346-1-danielhb413@gmail.com>
+	<d4353326-28db-0094-e998-f92026d8e7a9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180710134018.GC30635@stefanha-x1.localdomain>
-References: <20180331084500.33313-1-jiangshanlai@gmail.com>
-	<20180702131054.GE2155@stefanha-x1.localdomain>
-	<CA+a=Yy72YN1DAczTnb47b4ZW_vummOVuK3M=F2CF5KF3mRD2Zw@mail.gmail.com>
-	<20180703100555.GG16791@stefanha-x1.localdomain>
-	<CA+a=Yy6NFKky=rBetZp1x7-vn4mRkoPLfCUqpp8L31CJegYTeQ@mail.gmail.com>
-	<20180710134018.GC30635@stefanha-x1.localdomain>
-From: Peng Tao <bergwolf@gmail.com>
-Date: Thu, 12 Jul 2018 23:02:08 +0800
-Message-ID: <CA+a=Yy7rTX3=t1j-77VzSKoknUTu37BPEevY5s6adCc2aEpR6Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] migration: add capability to bypass the
- shared memory
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4353326-28db-0094-e998-f92026d8e7a9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] scsi-disk: Block Device
+ Characteristics emulation fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, Xu Wang <gnawux@gmail.com>, qemu-devel@nongnu.org, "James O . D . Hunt" <james.o.hunt@intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kata-dev@lists.katacontainers.io
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, famz@redhat.com, qemu block <qemu-block@nongnu.org>
 
-Hi Stefan,
+Am 12.07.2018 um 16:53 hat Paolo Bonzini geschrieben:
+> On 11/07/2018 22:58, Daniel Henrique Barboza wrote:
+> > The current BDC VPD page (page 0xb1) is too short. This can be
+> > seen running sg_utils:
+> > 
+> > $ sg_vpd --page=bdc /dev/sda
+> > Block device characteristics VPD page (SBC):
+> > Block device characteristics VPD page length too short=8
+> > 
+> > By the SCSI spec, the expected size of the SBC page is 0x40.
+> > There is no telling how the guest will behave with a shorter
+> > message - it can ignore it, or worse, make (wrong)
+> > assumptions.
+> > 
+> > This patch fixes the emulation by setting the size to 0x40.
+> > This is the output of the previous sg_vpd command after
+> > applying it:
+> > 
+> > $ sg_vpd --page=bdc /dev/sda -v
+> >     inquiry cdb: 12 01 b1 00 fc 00
+> > Block device characteristics VPD page (SBC):
+> >    [PQual=0  Peripheral device type: disk]
+> >   Medium rotation rate is not reported
+> >   Product type: Not specified
+> >   WABEREQ=0
+> >   WACEREQ=0
+> >   Nominal form factor not reported
+> >   FUAB=0
+> >   VBULS=0
+> > 
+> > To improve readability, this patch also adds the VBULS value
+> > explictly and add comments on the existing fields we're
+> > setting.
+> > 
+> > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> 
+> Kevin kindly agreed to take this through the block tree, so
+> 
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Jul 10, 2018 at 9:40 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> Two things come to mind:
->
-> At that point both guest kernel and agent address-space layout
-> randomization (ASLR) is finished.  ALSR makes it harder for memory
-> corruption bugs to lead to real exploits because the attacker does not
-> know the full memory layout of the process.  Cloned VMs will not benefit
-> from ASLR because much of the memory layout of the guest kernel and
-> agent will be identical across all clones.
->
-Yes, indeed. I am not arguing that ASLR is retained with VM
-templating. Just that ASLR is also compromised if one wants to use KSM
-to save memory by sharing among different guests. Kata is already
-shipping with KSM components and we are adding VM templating as a
-better alternative.
+Thanks, applied to the block branch.
 
-> Software random number generators have probably been initialized at this
-> point.  This doesn't mean that all cloned VMs will produce the same
-> sequence of random numbers since they should incorporate entropy sources
-> or use hardware random number generators, but the quality of random
-> numbers might be reduced.  Someone who knows random number generators
-> should take a look at this.
->
-As Andrea pointed out earlier in his comments, we can configure the
-random number generator to printk a warning if it's being used at boot
-before it had its "shutdown" state restored. Then we can add a new
-kata-agent request set the entropy and check for such warning after a
-new VM is cloned and before it is given to the user. This way, we are
-guaranteed that random numbers generated by each guest is created with
-a different seed. Do you have other concern with this method?
-
-Cheers,
-Tao
+Kevin
