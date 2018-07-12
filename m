@@ -1,14 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1fdhEH-0002lo-9I
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:26:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdhT3-0006W0-4C
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:41:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1fdhEC-0003kw-8Z
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:26:17 -0400
-From: Stefan Weil <sw@weilnetz.de>
-Date: Thu, 12 Jul 2018 21:26:03 +0200
-Message-Id: <20180712192603.11599-1-sw@weilnetz.de>
-Subject: [Qemu-devel] [PATCH] configure: Support pkg-config for zlib
+	(envelope-from <bounces@canonical.com>) id 1fdhSz-0005ZV-4o
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:41:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdhSy-0005Xu-TP
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:41:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdhSw-00051A-8E
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:41:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 74E282E818D
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:41:24 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jul 2018 19:26:01 -0000
+From: Ke Liu <1779955@bugs.launchpad.net>
+Reply-To: Bug 1779955 <1779955@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153065712229.13372.17157400567540509420.malonedeb@gac.canonical.com>
+Message-Id: <153142356117.23539.11996526456841397705.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779955] Re: qemu linux-user requires read
+ permissions on memory passed to syscalls that should only need write access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,78 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developer <qemu-devel@nongnu.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>
+To: qemu-devel@nongnu.org
 
-This is needed for builds with the mingw64-* packages from Cygwin,
-but also works for Linux.
+Thanks Peter for your information.
 
-Move the zlib test also more to the end because users should
-get information on the really important missing packages
-(which also require zlib) first.
+I was hit by the bug when trying to compile bazel (a build system open-
+sourced by Google: https://bazel.build) and the code is at
+https://github.com/bazelbuild/bazel/blob/master/third_party/ijar/mapped_fil=
+e_unix.cc#L116
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
----
- configure | 40 +++++++++++++++++++++++-----------------
- 1 file changed, 23 insertions(+), 17 deletions(-)
+Of course I can send PR to fix that in bazel source, but I would say it
+is not true that "in practice no guest binaries set up memory that is
+only writable and can't be read". It is legitimate requirement and
+coding practice.
 
-diff --git a/configure b/configure
-index 2a7796ea80..dcaab01729 100755
---- a/configure
-+++ b/configure
-@@ -2140,23 +2140,6 @@ EOF
-   fi
- fi
- 
--#########################################
--# zlib check
--
--if test "$zlib" != "no" ; then
--    cat > $TMPC << EOF
--#include <zlib.h>
--int main(void) { zlibVersion(); return 0; }
--EOF
--    if compile_prog "" "-lz" ; then
--        :
--    else
--        error_exit "zlib check failed" \
--            "Make sure to have the zlib libs and headers installed."
--    fi
--fi
--LIBS="$LIBS -lz"
--
- ##########################################
- # lzo check
- 
-@@ -3525,6 +3508,29 @@ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
-     fi
- fi
- 
-+#########################################
-+# zlib check
-+
-+if test "$zlib" != "no" ; then
-+    if $pkg_config --exists zlib; then
-+        zlib_cflags=$($pkg_config --cflags zlib)
-+        zlib_libs=$($pkg_config --libs zlib)
-+        QEMU_CFLAGS="$zlib_cflags $QEMU_CFLAGS"
-+        LIBS="$zlib_libs $LIBS"
-+    else
-+        cat > $TMPC << EOF
-+#include <zlib.h>
-+int main(void) { zlibVersion(); return 0; }
-+EOF
-+        if compile_prog "" "-lz" ; then
-+            LIBS="$LIBS -lz"
-+        else
-+            error_exit "zlib check failed" \
-+                "Make sure to have the zlib libs and headers installed."
-+        fi
-+    fi
-+fi
-+
- ##########################################
- # SHA command probe for modules
- if test "$modules" = yes; then
--- 
-2.11.0
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779955
+
+Title:
+  qemu linux-user requires read permissions on memory passed to syscalls
+  that should only need write access
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When read() function takes an mmap'ed address as output buffer, it
+  returns EFAULT. The expected behavior is it should just work.
+
+  The following code works for qemu-system-arm, but not for qemu-arm-
+  static.
+
+  QEMU version affected: latest release 2.12.0.
+
+  Steps to reproduce (please substitute /path/to/qemu-arm-static with
+  the path of the binary, and /tmp/a.cpp with the example source code
+  attached):
+
+  # First register binfmt_misc
+  [hidden]$ docker run --rm --privileged multiarch/qemu-user-static:registe=
+r --reset
+
+  # Compile the code and run
+  [hidden]$ docker run --rm -it -v /tmp/a.cpp:/tmp/a.cpp -v /path/to/qemu-a=
+rm-static:/usr/bin/qemu-arm-static arm32v7/ubuntu:18.04 bash -c '{ apt upda=
+te -y && apt install -y g++; } >& /dev/null && g++ -std=3Dc++14 /tmp/a.cpp =
+-o /tmp/a.out && echo hehe > /tmp/haha.txt && /tmp/a.out'
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xff3f5000
+  fd=3D4
+  0xff3f5023 -1 14
+
+  The expected result in qemu-system-arm as well as natively on x86_64 host:
+  hidden$ ./a.out
+  ofd=3D3
+  ftruncate=3D0
+  mmap=3D0xb6fb7000
+  fd=3D4
+  0xb6fb7023 5 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779955/+subscriptions
