@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcG4-0000BH-Vp
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:49 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fdcGx-0000mu-5o
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcG1-0001DC-SG
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:48 -0400
-Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:41571)
+	(envelope-from <programmingkidx@gmail.com>) id 1fdcGu-0001oh-0N
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:08:43 -0400
+Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:51983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fdcG1-0001Cw-Nq
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:07:45 -0400
-Received: by mail-qt0-x233.google.com with SMTP id e19-v6so9947064qtp.8
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:07:45 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180712111221.20326-1-armbru@redhat.com>
-	<20180712111221.20326-8-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cf17a832-040c-0581-d1d0-26edb3ba456d@amsat.org>
-Date: Thu, 12 Jul 2018 11:07:40 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180712111221.20326-8-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/20] libqtest: Simplify qmp_fd_vsend() a
- bit
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1fdcGt-0001nT-Oq
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 10:08:39 -0400
+Received: by mail-it0-x234.google.com with SMTP id h2-v6so5165473itj.1
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 07:08:39 -0700 (PDT)
+In-Reply-To: <CAFEAcA82ZxENfCU8C9jnOLJx+WOw6QcR1LYYfG7KVB_7Fv7w_w@mail.gmail.com>
+References: <20180709150235.7573-1-programmingkidx@gmail.com>
+	<CAFEAcA82ZxENfCU8C9jnOLJx+WOw6QcR1LYYfG7KVB_7Fv7w_w@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <7332EFA8-5D95-4770-847F-73CB503CC66A@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Thu, 12 Jul 2018 10:08:34 -0400
+Subject: Re: [Qemu-devel] [PATCH v3] ui/cocoa.m: replace scrollingDeltaY
+ with deltaY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +31,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 07/12/2018 08:12 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Jul 11, 2018, at 5:18 PM, Peter Maydell wrote:
 
-> ---
->  tests/libqtest.c | 18 +++++++-----------
->  1 file changed, 7 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index c2c08a890c..3bfb062fcb 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -488,24 +488,20 @@ QDict *qtest_qmp_receive(QTestState *s)
->   */
->  void qmp_fd_vsend(int fd, const char *fmt, va_list ap)
->  {
-> -    va_list ap_copy;
->      QObject *qobj;
->  
-> -    /* qobject_from_jsonv() silently eats leading 0xff as invalid
-> -     * JSON, but we want to test sending them over the wire to force
-> -     * resyncs */
-> +    /*
-> +     * qobject_from_vjsonf_nofail() chokes on leading 0xff as invalid
-> +     * JSON, but tests/test-qga.c needs to send that to test QGA
-> +     * synchronization
-> +     */
->      if (*fmt == '\377') {
->          socket_send(fd, fmt, 1);
->          fmt++;
->      }
->  
-> -    /* Going through qobject ensures we escape strings properly.
-> -     * This seemingly unnecessary copy is required in case va_list
-> -     * is an array type.
-> -     */
-> -    va_copy(ap_copy, ap);
-> -    qobj = qobject_from_jsonv(fmt, &ap_copy, &error_abort);
-> -    va_end(ap_copy);
-> +    /* Going through qobject ensures we escape strings properly */
-> +    qobj = qobject_from_vjsonf_nofail(fmt, ap);
->  
->      /* No need to send anything for an empty QObject.  */
->      if (qobj) {
-> 
+> On 9 July 2018 at 16:02, John Arbuckle <programmingkidx@gmail.com>  
+> wrote:
+>> The NSEvent class method scrollingDeltaY is available
+>> for Mac OS 10.7 and newer. Since QEMU supports Mac OS
+>> 10.5 and up, we need to be using a method that is
+>> available on these version of Mac OS X. The deltaY
+>> method is a method that does the same thing as
+>> scrollingDeltaY and is available on Mac OS 10.5 and
+>> up. So we replace scrollingDeltaY with deltaY.
+>>
+>> We only check deltaY's value if it is not zero
+>> because zero means no scrolling took place.
+>
+> Not quite -- it means that the scrolling was fine enough
+> that it doesn't add up to a big movement. If you use a
+> fine-scrolling input device (I used the trackpad on my
+> macbook air), then you will get a sequence of events
+> like this for a very slow trackpad scroll:
+>
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -3
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -3
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -3
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -3
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY 0 scrollingDeltaY -4
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY -2
+> scroll: deltaY 0 scrollingDeltaY 0
+>
+> (interestingly it does give events with both deltas 0; maybe
+> that event had a horizontal scroll component to it).
+>
+> Larger scroll gestures get you this sort of thing:
+>
+> scroll: deltaY 0 scrollingDeltaY 0
+> scroll: deltaY 0 scrollingDeltaY -1
+> scroll: deltaY -3 scrollingDeltaY -31
+> scroll: deltaY -3 scrollingDeltaY -36
+> scroll: deltaY -2 scrollingDeltaY -30
+> scroll: deltaY 0 scrollingDeltaY 0
+> scroll: deltaY -1 scrollingDeltaY -16
+> scroll: deltaY -3 scrollingDeltaY -32
+> scroll: deltaY -3 scrollingDeltaY -30
+> scroll: deltaY -2 scrollingDeltaY -28
+> scroll: deltaY -2 scrollingDeltaY -25
+> scroll: deltaY -2 scrollingDeltaY -23
+> scroll: deltaY -1 scrollingDeltaY -19
+> scroll: deltaY -1 scrollingDeltaY -15
+> scroll: deltaY -1 scrollingDeltaY -14
+> scroll: deltaY 0 scrollingDeltaY -12
+>
+> where OSX has decided that there's enough movement to
+> report a deltaY change, not just the fine-grained
+> scrollingDeltaY.
+>
+> Anyway, since the QEMU input layer doesn't provide a mechanism
+> for reporting fine-scrolling I guess this patch is OK.
+> If we get complaints about the trackpad no longer being
+> as responsive as it used to be to scrolls then we can
+> look at doing something more complicated then.
+>
+> I'll tweak the comments and put this in for 3.0 rc1.
+>
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>> v3 changes:
+>> - Added a comment explaining why we drop scrolling events in both  
+>> the code and
+>> the patch comment.
+>>
+>> v2 changes:
+>> - Added a condition that drops scroll events that have a deltaY  
+>> value of zero.
+>>
+>>  ui/cocoa.m | 19 ++++++++++++-------
+>>  1 file changed, 12 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/ui/cocoa.m b/ui/cocoa.m
+>> index 2991ed4f19..3bae090101 100644
+>> --- a/ui/cocoa.m
+>> +++ b/ui/cocoa.m
+>> @@ -802,14 +802,19 @@ - (void) handleEvent:(NSEvent *)event
+>>               * This is in-line with standard Mac OS X UI behaviour.
+>>               */
+>>
+>> +            /*
+>> +             * When deltaY is zero, it means the scrolling device  
+>> did not move
+>> +             * for this event. So we drop the event.
+>> +             */
+>> +            if ([event deltaY] != 0) {
+>>              /* Determine if this is a scroll up or scroll down  
+>> event */
+>> -            buttons = ([event scrollingDeltaY] > 0) ?
+>> -                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
+>> -            qemu_input_queue_btn(dcl->con, buttons, true);
+>> -            qemu_input_event_sync();
+>> -            qemu_input_queue_btn(dcl->con, buttons, false);
+>> -            qemu_input_event_sync();
+>> -
+>> +                buttons = ([event deltaY] > 0) ?
+>> +                    INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
+>> +                qemu_input_queue_btn(dcl->con, buttons, true);
+>> +                qemu_input_event_sync();
+>> +                qemu_input_queue_btn(dcl->con, buttons, false);
+>> +                qemu_input_event_sync();
+>> +            }
+>>              /*
+>>               * Since deltaY also reports scroll wheel events we  
+>> prevent mouse
+>>               * movement code from executing.
+>> --
+>> 2.14.3 (Apple Git-98)
+>>
+>
+> thanks
+> -- PMM
+
+Excellent job investing. 
