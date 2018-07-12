@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdg9Q-0001HL-1R
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:17:13 -0400
+	(envelope-from <jonasschievink@gmail.com>) id 1fdgFC-0002rx-T1
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdg9M-0006Zq-Fg
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:17:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48368 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fdg9M-0006Ym-9Z
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:17:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AD59A81A4EA7
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 18:17:07 +0000 (UTC)
-References: <20180712111221.20326-1-armbru@redhat.com>
-	<20180712111221.20326-6-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6e2dbaa9-8b12-581c-059a-3e1e86300202@redhat.com>
-Date: Thu, 12 Jul 2018 20:17:05 +0200
+	(envelope-from <jonasschievink@gmail.com>) id 1fdgFB-0004ZJ-Ab
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:23:10 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jonasschievink@gmail.com>)
+	id 1fdgFB-0004Vz-2T
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 14:23:09 -0400
+Received: by mail-oi0-x244.google.com with SMTP id l10-v6so10861490oii.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 11:23:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180712111221.20326-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/20] qobject: Replace
- qobject_from_jsonf() by qobject_from_jsonf_nofail()
+References: <5271d71e-794c-2db0-9046-183fd79dd902@amsat.org>
+	<20180711221244.31869-1-jonasschievink@gmail.com>
+	<5701803b-7f38-2539-fd08-6706d624271d@vivier.eu>
+In-Reply-To: <5701803b-7f38-2539-fd08-6706d624271d@vivier.eu>
+From: Jonas Schievink <jonasschievink@gmail.com>
+Date: Thu, 12 Jul 2018 20:22:55 +0200
+Message-ID: <CAJwA7S=wTPy2eY5D9q961-xh9N0bYAiF7LZRKFHqd9XqMnUV5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] Zero out the host's `msg_control` buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,15 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
 
-On 12.07.2018 13:12, Markus Armbruster wrote:
-> Commit ab45015a968 "qobject: Let qobject_from_jsonf() fail instead of
-> abort" removed only one of two ways qobject_from_jsonf() can abort.
-> Wrong.
+Yes, I do. See
+https://gist.github.com/jonas-schievink/cb6e6584a055539d2113f22d91068e2d
 
-Wrong because it calls qobject_from_jsonv() with error_abort. Maybe
-mentioned that in the patch description - since it took me a while to
-understand what you mean here.
+The problem is that glibc's CMSG_NXTHDR macro will access the header of the
+*next* message which isn't yet overwritten by QEMU, so it still contains
+garbage at that point. In particular, it will access the length field of
+the header to check if the message fits inside the msg_control buffer. If
+the length contains garbage, it may think that it doesn't fit and returns
+NULL. This is also mentioned in the glibc bug report I linked in the
+previous mail (https://sourceware.org/bugzilla/show_bug.cgi?id=3D13500), an=
+d
+the memset workaround is mentioned there as well.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Regards,
+Jonas
+
+On Thu, Jul 12, 2018 at 6:05 PM Laurent Vivier <laurent@vivier.eu> wrote:
+
+> Le 12/07/2018 =C3=A0 00:12, Jonas Schievink a =C3=A9crit :
+> > If this is not done, qemu would drop any control message after the firs=
+t
+> > one.
+> >
+> > This is because glibc's `CMSG_NXTHDR` macro accesses the uninitialized
+> > cmsghdr's length field in order to find out if the message fits into th=
+e
+> > `msg_control` buffer, wrongly assuming that it doesn't because the
+> > length field contains garbage. Accessing the length field is fine for
+> > completed messages we receive from the kernel, but is - as far as I kno=
+w
+> > - not needed since the kernel won't return such an invalid cmsghdr in
+> > the first place.
+> >
+> > This is tracked as this glibc bug:
+> > https://sourceware.org/bugzilla/show_bug.cgi?id=3D13500
+> >
+> > It's probably also a good idea to bail with an error if `CMSG_NXTHDR`
+> > returns NULL but `TARGET_CMSG_NXTHDR` doesn't (ie. we still expect
+> > cmsgs).
+> >
+> > Signed-off-by: Jonas Schievink <jonasschievink@gmail.com>
+> > ---
+> > Changes in v2:
+> > - put the memset right after the msg_control alloca
+> > - added missing Signed-off-by line
+> >
+> >  linux-user/syscall.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> > index e4b1b7d7da..3c427500ef 100644
+> > --- a/linux-user/syscall.c
+> > +++ b/linux-user/syscall.c
+> > @@ -3843,6 +3843,8 @@ static abi_long do_sendrecvmsg_locked(int fd,
+> struct target_msghdr *msgp,
+> >      }
+> >      msg.msg_controllen =3D 2 * tswapal(msgp->msg_controllen);
+> >      msg.msg_control =3D alloca(msg.msg_controllen);
+> > +    memset(msg.msg_control, 0, msg.msg_controllen);
+> > +
+>
+> I'm not sure it is needed as the content of msg.control will be
+> overwritten by target_to_host_cmsg() from the content of msgp->control.
+>
+> Do you have a test case revealing the bug?
+>
+> Thanks,
+> Laurent
+>
