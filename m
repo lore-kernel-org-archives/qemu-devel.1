@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39825)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1fdgxe-00064t-0t
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:09:06 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41212)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mst@redhat.com>) id 1fdh6S-0008GH-QL
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1fdgxa-0008Jk-0c
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:09:05 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60209 helo=mx01.kamp.de)
+	(envelope-from <mst@redhat.com>) id 1fdh6N-0000wy-OM
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:18:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47046 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fdgxZ-0008Ht-MQ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:09:01 -0400
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:08:55 +0200
-From: Peter Lieven <pl@kamp.de>
-Date: Thu, 12 Jul 2018 21:08:49 +0200
-Message-Id: <1531422529-30153-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH] qemu-img: avoid overflow of min_sparse
- parameter
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fdh6N-0000wA-Iu
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:18:07 -0400
+Date: Thu, 12 Jul 2018 22:18:04 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180712160211-mutt-send-email-mst@kernel.org>
+References: <20180629221907.3662-1-venu.busireddy@oracle.com>
+	<20180702161404.GA2339@rkaganb.sw.ru>
+	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
+	<20180703095825.GC30904@rkaganb.sw.ru>
+	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
+	<20180709130035.GA6271@rkaganb.sw.ru>
+	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
+	<20180710045101-mutt-send-email-mst@kernel.org>
+	<CADGSJ20H1S88S6AsYoLMns3XH+YVKh006Dqu808X7Ug+2Mgdnw@mail.gmail.com>
+	<20180711115344.633eba9e.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180711115344.633eba9e.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
+ identifier for pairing virtio and passthrough devices...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
 
-the min_sparse convert parameter can overflow (e.g. -S 1024G)
-in the conversion from int64_t to int resulting in a negative
-min_sparse parameter. Avoid this by limiting the valid parameters
-to sane values. In fact anything exceeding the convert buffer size
-is also pointless. While at it also forbid values that are non
-multiple of 512 to avoid undesired behaviour. Values between 1 and
-511 were legal, but resulted in full allocation.
+On Wed, Jul 11, 2018 at 11:53:44AM +0200, Cornelia Huck wrote:
+> On Tue, 10 Jul 2018 17:07:37 -0700
+> Siwei Liu <loseweigh@gmail.com> wrote:
+> 
+> > On Mon, Jul 9, 2018 at 6:54 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > On Mon, Jul 09, 2018 at 06:11:53PM -0700, si-wei liu wrote:  
+> > >> The plan is to enable group ID based matching in the first place rather than
+> > >> match by MAC, the latter of which is fragile and problematic.  
+> > >
+> > > It isn't all that fragile - hyperv used same for a while, so if someone
+> > > posts working patches with QEMU support but before this grouping stuff,
+> > > I'll happily apply them.  
+> > 
+> > I wouldn't box the solution to very limited scenario just because of
+> > matching by MAC, the benefit of having generic group ID in the first
+> > place is that we save the effort of maintaining legacy MAC based
+> > pairing that just adds complexity anyway. Currently the VF's MAC
+> > address cannot be changed by either PF or by the guest user is a
+> > severe limitation due to this. The other use case is that PT device
+> > than VF would generally have different MAC than the standby virtio. We
+> > shouldn't limit itself to VF specific scenario from the very
+> > beginning.
+> 
+> So, this brings me to a different concern: the semantics of
+> VIRTIO_NET_F_STANDBY.
+> 
+> * The currently sole user seems to be the virtio-net Linux driver.
+> * The commit messages, code comments and Documentation/ all talk about
+>   matching by MAC.
+> * I could not find any proposed update to the virtio spec. (If there
+>   had been an older proposal with a different feature name, it is not
+>   discoverable.)
+> 
+> VIRTIO_NET_F_STANDBY is a host <-> guest interface. As there's no
+> official spec, you can only go by the Linux implementation, and by that
+> its semantics seem to be 'match by MAC', not 'match by other criteria'.
+> 
+> How is this supposed to work in the long run?
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
- qemu-img.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+We definitely need a spec patch for VIRTIO_NET_F_STANDBY documenting existing
+semantics.  Sridhar, do you plan to take a look?
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 4a7ce43..2896746 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2005,6 +2005,8 @@ static int convert_do_copy(ImgConvertState *s)
-     return s->ret;
- }
- 
-+#define MAX_BUF_SECTORS 32768
-+
- static int img_convert(int argc, char **argv)
- {
-     int c, bs_i, flags, src_flags = 0;
-@@ -2100,8 +2102,12 @@ static int img_convert(int argc, char **argv)
-             int64_t sval;
- 
-             sval = cvtnum(optarg);
--            if (sval < 0) {
--                error_report("Invalid minimum zero buffer size for sparse output specified");
-+            if (sval < 0 || sval & BDRV_SECTOR_BITS ||
-+                sval / BDRV_SECTOR_SIZE > MAX_BUF_SECTORS) {
-+                error_report("Invalid buffer size for sparse output specified. "
-+                             "Valid sizes are multiples of 512 up to %d. Select "
-+                             "0 to disable sparse detection (fully allocates output).",
-+                             MAX_BUF_SECTORS * 512);
-                 goto fail_getopt;
-             }
- 
-@@ -2385,9 +2391,9 @@ static int img_convert(int argc, char **argv)
-     }
- 
-     /* increase bufsectors from the default 4096 (2M) if opt_transfer
--     * or discard_alignment of the out_bs is greater. Limit to 32768 (16MB)
--     * as maximum. */
--    s.buf_sectors = MIN(32768,
-+     * or discard_alignment of the out_bs is greater. Limit to
-+     * MAX_BUF_SECTORS as maximum which is currently 32768 (16MB). */
-+    s.buf_sectors = MIN(MAX_BUF_SECTORS,
-                         MAX(s.buf_sectors,
-                             MAX(out_bs->bl.opt_transfer >> BDRV_SECTOR_BITS,
-                                 out_bs->bl.pdiscard_alignment >>
 -- 
-2.7.4
+MST
