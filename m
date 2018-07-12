@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rdunlap@infradead.org>) id 1fdSa8-0007jz-7K
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 23:47:53 -0400
+	(envelope-from <elijahs@mellanox.com>) id 1fdW6Q-000518-UN
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 03:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rdunlap@infradead.org>) id 1fdSa3-0000W5-MB
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 23:47:52 -0400
-Received: from bombadil.infradead.org ([2607:7c80:54:e::133]:57598)
+	(envelope-from <elijahs@mellanox.com>) id 1fdW6J-0004g8-0c
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 03:33:26 -0400
+Received: from mail-eopbgr20059.outbound.protection.outlook.com
+	([40.107.2.59]:24847
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rdunlap@infradead.org>)
-	id 1fdSa3-0000M1-Bz
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 23:47:47 -0400
-References: <20180709151947.940759-1-arnd@arndb.de>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <f1dcc366-d375-fe1b-771a-bb310fdc1df3@infradead.org>
-Date: Wed, 11 Jul 2018 20:47:27 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180709151947.940759-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
+	(Exim 4.71) (envelope-from <elijahs@mellanox.com>)
+	id 1fdW6I-0004eJ-Cn
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 03:33:18 -0400
+From: Elijah Shakkour <elijahs@mellanox.com>
+Date: Thu, 12 Jul 2018 07:33:14 +0000
+Message-ID: <DB5PR05MB1160093E018FD91787E80A79D5590@DB5PR05MB1160.eurprd05.prod.outlook.com>
+References: <DB5PR05MB11605C65D7D734C9354F0421D54F0@DB5PR05MB1160.eurprd05.prod.outlook.com>
+	<1407239306.11199051.1530240887935.JavaMail.zimbra@redhat.com>
+	<20180705194311-mutt-send-email-mst@kernel.org>
+	<DB5PR05MB1160D84E747DA480435B6605D5440@DB5PR05MB1160.eurprd05.prod.outlook.com>
+	<DB5PR05MB1160BB381473C723C8336EC2D55A0@DB5PR05MB1160.eurprd05.prod.outlook.com>
+	<AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
+In-Reply-To: <AM5PR0501MB2499CB4F2D01BCDA47C0ACB6C95A0@AM5PR0501MB2499.eurprd05.prod.outlook.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] headers: fix linux/mod_devicetable.h
- inclusions
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel] Question: SRIOV support over Win Hyper-V VM running in
+ QEMU process on Linux host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +36,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Jean-Christophe Trotin <jean-christophe.trotin@st.com>, Zha Qipeng <qipeng.zha@intel.com>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org, platform-driver-x86@vger.kernel.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Tal Attaly <talat@mellanox.com>
 
-On 07/09/2018 08:19 AM, Arnd Bergmann wrote:
-> A couple of drivers produced build errors after the mod_devicetable.h
-> header was split out from the platform_device one, e.g.
-> 
-> drivers/media/platform/davinci/vpbe_osd.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
-> drivers/media/platform/davinci/vpbe_venc.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
-> 
-> This adds the inclusion where needed.
-> 
-> Fixes: ac3167257b9f ("headers: separate linux/mod_devicetable.h from linux/platform_device.h")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Hey,
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Our team is adding a NIC functional  emulation to QEMU.
+One of the features we are adding to this NIC is SRIOV.
 
-Thanks.
+Here is the error message I get when checking SRIOV support of  our emulate=
+d NIC on Win2016 server (the hyper-v VM).
+"
+SR-IOV cannot be used on this system as the PCI Express hardware does not s=
+upport Access Control Services (ACS) at any root port. Contact your system =
+vendor for further information.
+"
 
-> ---
->  drivers/firmware/qemu_fw_cfg.c             | 1 +
->  drivers/media/platform/davinci/vpbe_osd.c  | 1 +
->  drivers/media/platform/davinci/vpbe_venc.c | 1 +
->  drivers/media/platform/qcom/venus/vdec.c   | 1 +
->  drivers/media/platform/qcom/venus/venc.c   | 1 +
->  drivers/media/platform/sti/hva/hva-v4l2.c  | 1 +
->  drivers/platform/x86/intel_punit_ipc.c     | 1 +
->  7 files changed, 7 insertions(+)
-> 
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
-> index 14fedbeca724..039e0f91dba8 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -28,6 +28,7 @@
->   */
->  
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/acpi.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/davinci/vpbe_osd.c b/drivers/media/platform/davinci/vpbe_osd.c
-> index 7f610320426d..c551a25d90d9 100644
-> --- a/drivers/media/platform/davinci/vpbe_osd.c
-> +++ b/drivers/media/platform/davinci/vpbe_osd.c
-> @@ -18,6 +18,7 @@
->   *
->   */
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/kernel.h>
->  #include <linux/interrupt.h>
->  #include <linux/platform_device.h>
-> diff --git a/drivers/media/platform/davinci/vpbe_venc.c b/drivers/media/platform/davinci/vpbe_venc.c
-> index ba157827192c..ddcad7b3e76c 100644
-> --- a/drivers/media/platform/davinci/vpbe_venc.c
-> +++ b/drivers/media/platform/davinci/vpbe_venc.c
-> @@ -11,6 +11,7 @@
->   * GNU General Public License for more details.
->   */
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/kernel.h>
->  #include <linux/init.h>
->  #include <linux/ctype.h>
-> diff --git a/drivers/media/platform/qcom/venus/vdec.c b/drivers/media/platform/qcom/venus/vdec.c
-> index f89a91d43cc9..d4e23c7df347 100644
-> --- a/drivers/media/platform/qcom/venus/vdec.c
-> +++ b/drivers/media/platform/qcom/venus/vdec.c
-> @@ -14,6 +14,7 @@
->   */
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/qcom/venus/venc.c b/drivers/media/platform/qcom/venus/venc.c
-> index f7a87a3dbb46..0522cf202b75 100644
-> --- a/drivers/media/platform/qcom/venus/venc.c
-> +++ b/drivers/media/platform/qcom/venus/venc.c
-> @@ -14,6 +14,7 @@
->   */
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/sti/hva/hva-v4l2.c b/drivers/media/platform/sti/hva/hva-v4l2.c
-> index 15080cb00fa7..5a807c7c5e79 100644
-> --- a/drivers/media/platform/sti/hva/hva-v4l2.c
-> +++ b/drivers/media/platform/sti/hva/hva-v4l2.c
-> @@ -6,6 +6,7 @@
->   */
->  
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/slab.h>
->  #include <media/v4l2-event.h>
-> diff --git a/drivers/platform/x86/intel_punit_ipc.c b/drivers/platform/x86/intel_punit_ipc.c
-> index b5b890127479..f1afc0ebbc68 100644
-> --- a/drivers/platform/x86/intel_punit_ipc.c
-> +++ b/drivers/platform/x86/intel_punit_ipc.c
-> @@ -12,6 +12,7 @@
->   */
->  
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/acpi.h>
->  #include <linux/delay.h>
->  #include <linux/bitops.h>
-> 
+Could you please advise about what could be the issue here?
 
+BTW: I use same configuration (VM XML file attached) when running linux VM =
+(RH7.2) image (instead of Win Hyper-V) over the same host and SRIOV is work=
+ing for me there.
 
--- 
-~Randy
+Here the XML file I use to define the VM (our emulated NIC is added at the =
+end of XML):
+"
+<domain type=3D'kvm' xmlns:qemu=3D'http://libvirt.org/schemas/domain/qemu/1=
+.0'>
+  <name>nst105</name>
+  <uuid>0249a525-2ee2-432b-a1f5-a6db83b089a3</uuid>
+  <memory unit=3D'KiB'>8388608</memory>
+  <currentMemory unit=3D'KiB'>8388608</currentMemory>
+  <vcpu placement=3D'static'>8</vcpu>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <os>
+    <type arch=3D'x86_64' machine=3D'pc-q35-2.11'>hvm</type>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <hyperv>
+      <relaxed state=3D'on'/>
+      <vapic state=3D'on'/>
+      <spinlocks state=3D'on' retries=3D'8191'/>
+    </hyperv>
+  </features>
+  <cpu mode=3D'custom' match=3D'exact' check=3D'none'>
+    <model fallback=3D'forbid'>SandyBridge</model>
+    <feature policy=3D'require' name=3D'hypervisor'/>
+    <feature policy=3D'require' name=3D'vmx'/>
+  </cpu>
+  <clock offset=3D'localtime'>
+    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+    <timer name=3D'pit' tickpolicy=3D'delay'/>
+    <timer name=3D'hpet' present=3D'no'/>
+    <timer name=3D'hypervclock' present=3D'yes'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <pm>
+    <suspend-to-mem enabled=3D'no'/>
+    <suspend-to-disk enabled=3D'no'/>
+  </pm>
+  <devices>
+    <emulator>/opt/qemu/bin/qemu-system-x86_64</emulator>
+    <disk type=3D'file' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'qcow2'/>
+      <source file=3D'/images/nst105.qcow2'/>
+      <target dev=3D'sda' bus=3D'sata'/>
+      <boot order=3D'2'/>
+      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
+=3D'0'/>
+    </disk>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1d' fu=
+nction=3D'0x7'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+      <master startport=3D'0'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1d' fu=
+nction=3D'0x0' multifunction=3D'on'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+      <master startport=3D'2'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1d' fu=
+nction=3D'0x1'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+      <master startport=3D'4'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1d' fu=
+nction=3D'0x2'/>
+    </controller>
+    <controller type=3D'sata' index=3D'0'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1f' fu=
+nction=3D'0x2'/>
+    </controller>
+    <controller type=3D'pci' index=3D'0' model=3D'pcie-root'/>
+    <controller type=3D'pci' index=3D'1' model=3D'pcie-root-port'>
+      <model name=3D'pcie-root-port'/>
+      <target chassis=3D'1' port=3D'0x10'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
+nction=3D'0x0' multifunction=3D'on'/>
+    </controller>
+    <controller type=3D'pci' index=3D'2' model=3D'pcie-root-port'>
+      <model name=3D'pcie-root-port'/>
+      <target chassis=3D'2' port=3D'0x11'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
+nction=3D'0x1'/>
+    </controller>
+    <controller type=3D'pci' index=3D'3' model=3D'pcie-root-port'>
+      <model name=3D'pcie-root-port'/>
+      <target chassis=3D'3' port=3D'0x12'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
+nction=3D'0x2'/>
+    </controller>
+    <controller type=3D'pci' index=3D'4' model=3D'dmi-to-pci-bridge'>
+      <model name=3D'i82801b11-bridge'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1e' fu=
+nction=3D'0x0'/>
+    </controller>
+    <controller type=3D'pci' index=3D'5' model=3D'pci-bridge'>
+      <model name=3D'pci-bridge'/>
+      <target chassisNr=3D'5'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x04' slot=3D'0x00' fu=
+nction=3D'0x0'/>
+    </controller>
+    <interface type=3D'bridge'>
+      <mac address=3D'00:50:56:1b:dd:6f'/>
+      <source bridge=3D'br0'/>
+      <model type=3D'virtio'/>
+      <boot order=3D'1'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' fu=
+nction=3D'0x0'/>
+    </interface>
+    <serial type=3D'pty'>
+      <target port=3D'0'/>
+    </serial>
+    <console type=3D'pty'>
+      <target type=3D'serial' port=3D'0'/>
+    </console>
+    <input type=3D'tablet' bus=3D'usb'>
+      <address type=3D'usb' bus=3D'0' port=3D'1'/>
+    </input>
+    <input type=3D'mouse' bus=3D'ps2'/>
+    <input type=3D'keyboard' bus=3D'ps2'/>
+    <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes' listen=3D'127.0.0.1=
+' keymap=3D'en-us'>
+      <listen type=3D'address' address=3D'127.0.0.1'/>
+    </graphics>
+    <video>
+      <model type=3D'vga' vram=3D'16384' heads=3D'1' primary=3D'yes'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' fu=
+nction=3D'0x0'/>
+    </video>
+    <memballoon model=3D'virtio'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x02' slot=3D'0x00' fu=
+nction=3D'0x0'/>
+    </memballoon>
+  </devices>
+  <seclabel type=3D'none' model=3D'none'/>
+  <seclabel type=3D'dynamic' model=3D'dac' relabel=3D'yes'/>
+  <qemu:commandline>
+    <qemu:arg value=3D'-device'/>
+    <qemu:arg value=3D'pcie-root-port,pref64-reserve=3D500M,slot=3D0,id=3Dp=
+cie_port.1'/>
+    <qemu:arg value=3D'-netdev'/>
+    <qemu:arg value=3D'tap,id=3Dtap5,ifname=3Dtap5,script=3Dno,downscript=
+=3Dno'/>
+    <qemu:arg value=3D'-device'/>
+    <qemu:arg value=3D'my_emu_nic,netdev=3Dtap5,bus=3Dpcie_port.1'/>
+  </qemu:commandline>
+</domain>
+"
+______________________
+General info:
+Host OS: RH7.0 (Kernel: 4.14.13)
+QEMU version: 2.11
+libvirt version: 3.2.0
+Running the following on the host shows that both nested and IOMMU are
+enabled:
+~]#: cat /sys/module/kvm_intel/parameters/nested
+Y
+~]# dmesg | grep -e DMAR -e IOMMU
+[    0.000000] DMAR: IOMMU enabled
+
+Thanks,
+Elijah
