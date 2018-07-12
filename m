@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49604)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1fdXp7-0005gG-Ni
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:23:42 -0400
+	id 1fdXru-0006e2-Kz
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1fdXp2-0000Kx-JZ
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:23:41 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:44838 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1fdXrp-000375-3D
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:26:34 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:49770 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fdXp2-0000F6-8m
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:23:36 -0400
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fdXro-000351-PV
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:26:29 -0400
 Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:23:29 +0200
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 11:26:24 +0200
 References: <1531235146-6048-1-git-send-email-pl@kamp.de>
 	<20180710153155.GM5852@localhost.localdomain>
 	<73DCB217-9027-4248-8C81-A83AD4512927@kamp.de>
 	<20180711082526.GA4266@localhost.localdomain>
 From: Peter Lieven <pl@kamp.de>
-Message-ID: <30a8b1e5-d95b-0ca3-2c19-35337349afb6@kamp.de>
-Date: Thu, 12 Jul 2018 11:23:30 +0200
+Message-ID: <7eaf47f6-c536-0c13-b81e-f5f8f75f440a@kamp.de>
+Date: Thu, 12 Jul 2018 11:26:25 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180711082526.GA4266@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Subject: Re: [Qemu-devel] [PATCH V5] qemu-img: align result of
  is_allocated_sectors
@@ -74,6 +74,8 @@ Am 11.07.2018 um 10:25 schrieb Kevin Wolf:
 >
 > So after all, there's a good chance that all that's missing is just an
 > update to the test case.
+>
+> Kevin
 
 I checked the output of test 122 and what happens is exactly what is expected.
 The zero areas align to 4k or 8k respectively. If they don't align they are reported
@@ -90,3 +92,22 @@ patch.
 
 Best,
 Peter
+
+-- 
+
+Mit freundlichen Grüßen
+
+Peter Lieven
+
+...........................................................
+
+   KAMP Netzwerkdienste GmbH
+   Vestische Str. 89-91 | 46117 Oberhausen
+   Tel: +49 (0) 208.89 402-50 | Fax: +49 (0) 208.89 402-40
+   pl@kamp.de | http://www.kamp.de
+
+   Geschäftsführer: Heiner Lante | Michael Lante
+   Amtsgericht Duisburg | HRB Nr. 12154
+   USt-Id-Nr.: DE 120607556
+
+...........................................................
