@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdQui-0000Fo-LL
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 22:01:02 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1fdQup-0000Hw-0q
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 22:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdQuf-0008PJ-J7
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 22:01:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55786)
+	(envelope-from <kernellwp@gmail.com>) id 1fdQul-000067-Ty
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 22:01:07 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:40425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fdQuf-0008MC-8X
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 22:00:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fdQud-00007I-4z
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 02:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 22F4D2E80CB
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 02:00:55 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1fdQul-000057-L0
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 22:01:03 -0400
+Received: by mail-pl0-x242.google.com with SMTP id s17-v6so567949plp.7
+	for <qemu-devel@nongnu.org>; Wed, 11 Jul 2018 19:01:03 -0700 (PDT)
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Thu, 12 Jul 2018 10:00:57 +0800
+Message-Id: <1531360857-32374-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Jul 2018 01:50:14 -0000
-From: Matthew Stapleton <matthew4196@gmail.com>
-Reply-To: Bug 1777969 <1777969@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152954819319.7254.2594756503297361665.malonedeb@wampee.canonical.com>
-Message-Id: <153136021406.31943.13551609340192666954.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777969] Re: Crash with UEFI, q35, AHCI,
- and <= SystemRescueCD 4.3.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] target-i386: coalesced PIO support for RTC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,162 +26,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>
 
-It looks like this crash is fixed with git commit:
-bed9bcfa3275a9cfee82846a9f521c4858a9739a
+From: Peng Hao <peng.hao2@zte.com.cn>
 
--- =
+Windows I/O, such as the real-time clock. The address register (port
+0x70 in the RTC case) can use coalesced I/O, cutting the number of
+userspace exits by half when reading or writing the RTC.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777969
+Guest access rtc like this: write register index to 0x70, then write or 
+read data from 0x71. writing 0x70 port is just as index and do nothing 
+else. So we can use coalesced mmio to handle this scene to reduce VM-EXIT 
+time.
 
-Title:
-  Crash with UEFI, q35, AHCI, and <=3D SystemRescueCD 4.3.0
+In our environment, 12 windows guest running on a Skylake server:
 
-Status in QEMU:
-  New
+Before patch:
 
-Bug description:
-  I am getting a crash when booting <=3D SystemRescueCD 4.3.0 in UEFI mode
-  with q35 machine and from a AHCI device with qemu 2.11.1 and 2.12.0.
-  The crash doesn't occur if I compile with --enable-trace-
-  backends=3Dsimple or if I use virtio-scsi.  The original crash was
-  noticed on Gentoo with hardened gcc 6.4.0 and an Intel CPU, the test
-  system to reproduce the crash is on Gentoo with non-hardened gcc 5.4.0
-  and an Intel CPU.
+IO Port Access  Samples  Samples%   Time%    Avg time
 
-  OVMF version is from Gentoo: edk2-ovmf-2017_p20180211-bin.tar.xz
+0x70:POUT        20675    46.04%    92.72%   67.15us ( +-   7.93% )
 
-  Here is the commands I have run on qemu 2.12.0 to reproduce the issue alt=
-hough it also crashes with accel=3Dkvm removed:
-  ./configure --target-list=3D"x86_64-softmmu"
-  make
-  qemu-system-x86_64 -nodefaults -machine q35,accel=3Dkvm -cpu qemu64 -driv=
-e if=3Dpflash,format=3Draw,unit=3D0,file=3D/usr/share/edk2-ovmf/OVMF_CODE.f=
-d,readonly=3Don -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.f=
-d -m 512 -drive file=3Dsystemrescuecd-x86-4.3.0.iso,if=3Dnone,id=3Dcdrom-sy=
-sresc,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dcdrom-sysre=
-sc,bootindex=3D5 -device VGA -display gtk
+After patch:
 
-  Valgrind says "Bad permissions for mapped region at address
-  0x4C022FE0" for the crash.
+IO Port Access  Samples  Samples%   Time%    Avg time
 
-  Here is a backtrace from gdb:
-  Program received signal SIGSEGV, Segmentation fault.
-  0x00007f42dcbc5833 in malloc () from /lib64/libc.so.6
-  (gdb) bt
-  #0  0x00007f42dcbc5833 in malloc () from /lib64/libc.so.6
-  #1  0x00007f42e10117d9 in g_malloc () from /usr/lib64/libglib-2.0.so.0
-  #2  0x000055a3ff9def8f in qemu_aio_get (aiocb_info=3Daiocb_info@entry=3D0=
-x55a4001b39a0 <thread_pool_aiocb_info>, bs=3Dbs@entry=3D0x0, cb=3Dcb@entry=
-=3D0x55a3ff9dfe20 <thread_pool_co_cb>, opaque=3Dopaque@entry=3D0x7f42961e30=
-b0) at util/aiocb.c:33
-  #3  0x000055a3ff9e0249 in thread_pool_submit_aio (pool=3Dpool@entry=3D0x5=
-5a400c038d0, func=3Dfunc@entry=3D0x55a3ff956620 <aio_worker>, arg=3Darg@ent=
-ry=3D0x55a400bd30b0, cb=3Dcb@entry=3D0x55a3ff9dfe20 <thread_pool_co_cb>, =
+0x70:POUT        17509    45.42%    42.08%   6.37us ( +-  20.37% )
 
-      opaque=3Dopaque@entry=3D0x7f42961e30b0) at util/thread-pool.c:251
-  #4  0x000055a3ff9e0423 in thread_pool_submit_co (pool=3D0x55a400c038d0, f=
-unc=3Dfunc@entry=3D0x55a3ff956620 <aio_worker>, arg=3Darg@entry=3D0x55a400b=
-d30b0) at util/thread-pool.c:289
-  #5  0x000055a3ff956b50 in paio_submit_co (bs=3D0x55a400bff180, fd=3D<opti=
-mized out>, offset=3D362702848, qiov=3D<optimized out>, bytes=3D2048, type=
-=3D1) at block/file-posix.c:1536
-  #6  0x000055a3ff95c82a in bdrv_driver_preadv (bs=3Dbs@entry=3D0x55a400bff=
-180, offset=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3D=
-qiov@entry=3D0x7f42961e3650, flags=3D0) at block/io.c:924
-  #7  0x000055a3ff960154 in bdrv_aligned_preadv (child=3Dchild@entry=3D0x55=
-a400c03a20, req=3Dreq@entry=3D0x7f42961e32e0, offset=3Doffset@entry=3D36270=
-2848, bytes=3Dbytes@entry=3D2048, align=3Dalign@entry=3D1, qiov=3Dqiov@entr=
-y=3D0x7f42961e3650, flags=3D0)
-      at block/io.c:1228
-  #8  0x000055a3ff960434 in bdrv_co_preadv (child=3D0x55a400c03a20, offset=
-=3D362702848, bytes=3D2048, qiov=3D0x7f42961e3650, flags=3D0) at block/io.c=
-:1324
-  #9  0x000055a3ff95c82a in bdrv_driver_preadv (bs=3Dbs@entry=3D0x55a400bf8=
-e50, offset=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3D=
-qiov@entry=3D0x7f42961e3650, flags=3D0) at block/io.c:924
-  #10 0x000055a3ff960154 in bdrv_aligned_preadv (child=3Dchild@entry=3D0x55=
-a400be92c0, req=3Dreq@entry=3D0x7f42961e3510, offset=3Doffset@entry=3D36270=
-2848, bytes=3Dbytes@entry=3D2048, align=3Dalign@entry=3D512, qiov=3Dqiov@en=
-try=3D0x7f42961e3650, flags=3D0)
-      at block/io.c:1228
-  #11 0x000055a3ff960434 in bdrv_co_preadv (child=3D0x55a400be92c0, offset=
-=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3Dqiov@entry=
-=3D0x7f42961e3650, flags=3Dflags@entry=3D0) at block/io.c:1324
-  #12 0x000055a3ff94f4ce in blk_co_preadv (blk=3D0x55a400bf8ba0, offset=3D3=
-62702848, bytes=3D2048, qiov=3D0x7f42961e3650, flags=3D0) at block/block-ba=
-ckend.c:1158
-  #13 0x000055a3ff94f5ac in blk_read_entry (opaque=3D0x7f42961e3670) at blo=
-ck/block-backend.c:1206
-  #14 0x000055a3ff94e000 in blk_prw (blk=3D0x55a400bf8ba0, offset=3D3627028=
-48, buf=3D<optimized out>, bytes=3Dbytes@entry=3D2048, co_entry=3Dco_entry@=
-entry=3D0x55a3ff94f590 <blk_read_entry>, flags=3Dflags@entry=3D0) at block/=
-block-backend.c:1243
-  #15 0x000055a3ff94f076 in blk_pread (blk=3D<optimized out>, offset=3D<opt=
-imized out>, buf=3D<optimized out>, count=3Dcount@entry=3D2048) at block/bl=
-ock-backend.c:1409
-  #16 0x000055a3ff7d8b93 in cd_read_sector_sync (s=3D0x55a401a0faa0) at hw/=
-ide/atapi.c:124
-  #17 ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at hw/ide/atapi.c:269
-  #18 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #19 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #20 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #21 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #22 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #23 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #24 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #25 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #26 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #27 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #28 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #29 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #30 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #31 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #32 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #33 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #34 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #35 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #36 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #37 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #38 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #39 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #40 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #41 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #42 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #43 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
-  #44 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
-w/ide/ahci.c:1325
-  #45 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
- hw/ide/atapi.c:285
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v1 -> v2:
+ * add the original author
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777969/+subscriptions
+ accel/kvm/kvm-all.c       | 56 +++++++++++++++++++++++++++++++++++++++++++----
+ hw/timer/mc146818rtc.c    |  8 +++++++
+ include/exec/memattrs.h   |  1 +
+ include/exec/memory.h     |  5 +++++
+ include/sysemu/kvm.h      |  8 +++++++
+ linux-headers/linux/kvm.h |  5 +++--
+ memory.c                  |  5 +++++
+ 7 files changed, 82 insertions(+), 6 deletions(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index eb7db92..7a12341 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -128,6 +128,7 @@ bool kvm_direct_msi_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
+ static bool kvm_immediate_exit;
++bool kvm_coalesced_pio_allowed;
+ 
+ static const KVMCapabilityInfo kvm_required_capabilites[] = {
+     KVM_CAP_INFO(USER_MEMORY),
+@@ -536,7 +537,7 @@ static void kvm_coalesce_mmio_region(MemoryListener *listener,
+ 
+         zone.addr = start;
+         zone.size = size;
+-        zone.pad = 0;
++        zone.pio = 0;
+ 
+         (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
+     }
+@@ -553,7 +554,7 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
+ 
+         zone.addr = start;
+         zone.size = size;
+-        zone.pad = 0;
++        zone.pio = 0;
+ 
+         (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
+     }
+@@ -877,6 +878,45 @@ static void kvm_io_ioeventfd_del(MemoryListener *listener,
+     }
+ }
+ 
++static void kvm_coalesce_io_add(MemoryListener *listener,
++                                MemoryRegionSection *section,
++                                hwaddr start, hwaddr size)
++{
++    KVMState *s = kvm_state;
++
++    if (kvm_coalesced_pio_allowed) {
++        struct kvm_coalesced_mmio_zone zone;
++
++        zone.addr = start;
++        zone.size = size;
++        zone.pio = 1;
++
++        (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
++    }
++}
++
++static void kvm_coalesce_io_del(MemoryListener *listener,
++                                MemoryRegionSection *section,
++                                hwaddr start, hwaddr size)
++{
++    KVMState *s = kvm_state;
++
++    if (kvm_coalesced_pio_allowed) {
++        struct kvm_coalesced_mmio_zone zone;
++
++        zone.addr = start;
++        zone.size = size;
++        zone.pio = 1;
++
++        (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
++    }
++}
++
++static MemoryListener kvm_coalesced_io_listener = {
++    .coalesced_mmio_add = kvm_coalesce_io_add,
++    .coalesced_mmio_del = kvm_coalesce_io_del,
++    .priority = 10,
++};
+ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+                                   AddressSpace *as, int as_id)
+ {
+@@ -1615,6 +1655,8 @@ static int kvm_init(MachineState *ms)
+     }
+ 
+     s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
++    kvm_coalesced_pio_allowed = s->coalesced_mmio &&
++                        kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
+ 
+ #ifdef KVM_CAP_VCPU_EVENTS
+     s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
+@@ -1694,6 +1736,8 @@ static int kvm_init(MachineState *ms)
+                                  &address_space_memory, 0);
+     memory_listener_register(&kvm_io_listener,
+                              &address_space_io);
++    memory_listener_register(&kvm_coalesced_io_listener,
++                             &address_space_io);
+ 
+     s->many_ioeventfds = kvm_check_many_ioeventfds();
+ 
+@@ -1775,8 +1819,12 @@ void kvm_flush_coalesced_mmio_buffer(void)
+             struct kvm_coalesced_mmio *ent;
+ 
+             ent = &ring->coalesced_mmio[ring->first];
+-
+-            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
++            if (ent->pio) {
++                address_space_rw(&address_space_io, ent->phys_addr,
++                                 MEMTXATTRS_NONE, ent->data, ent->len, true);
++            } else {
++                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
++            }
+             smp_wmb();
+             ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
+         }
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 6f1f723..8bd8682 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -70,6 +70,7 @@ typedef struct RTCState {
+     ISADevice parent_obj;
+ 
+     MemoryRegion io;
++    MemoryRegion coalesced_io;
+     uint8_t cmos_data[128];
+     uint8_t cmos_index;
+     int32_t base_year;
+@@ -990,6 +991,13 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
+     isa_register_ioport(isadev, &s->io, base);
+ 
++    if (memory_allow_coalesced_pio()) {
++        memory_region_set_flush_coalesced(&s->io);
++        memory_region_init_io(&s->coalesced_io, OBJECT(s), &cmos_ops,
++                              s, "rtc1", 1);
++        isa_register_ioport(isadev, &s->coalesced_io, base);
++        memory_region_add_coalescing(&s->coalesced_io, 0, 1);
++    }
+     qdev_set_legacy_instance_id(dev, base, 3);
+     qemu_register_reset(rtc_reset, s);
+ 
+diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+index d4a1642..97884d8 100644
+--- a/include/exec/memattrs.h
++++ b/include/exec/memattrs.h
+@@ -45,6 +45,7 @@ typedef struct MemTxAttrs {
+  * from "didn't specify" if necessary).
+  */
+ #define MEMTXATTRS_UNSPECIFIED ((MemTxAttrs) { .unspecified = 1 })
++#define MEMTXATTRS_NONE ((MemTxAttrs) { 0 })
+ 
+ /* New-style MMIO accessors can indicate that the transaction failed.
+  * A zero (MEMTX_OK) response means success; anything else is a failure
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 448d41a..2854907 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1405,6 +1405,11 @@ void memory_region_set_flush_coalesced(MemoryRegion *mr);
+ void memory_region_clear_flush_coalesced(MemoryRegion *mr);
+ 
+ /**
++ * memory_allow_coalesced_pio: Check whether coalesced pio allowed.
++ */
++bool memory_allow_coalesced_pio(void);
++
++/**
+  * memory_region_clear_global_locking: Declares that access processing does
+  *                                     not depend on the QEMU global lock.
+  *
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 0b64b8e..08366b2 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -45,6 +45,7 @@ extern bool kvm_readonly_mem_allowed;
+ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
++extern bool kvm_coalesced_pio_allowed;
+ 
+ #define kvm_enabled()           (kvm_allowed)
+ /**
+@@ -167,6 +168,12 @@ extern bool kvm_msi_use_devid;
+  */
+ #define kvm_msi_devid_required() (kvm_msi_use_devid)
+ 
++/**
++ * kvm_coalesced_pio_enabled:
++ * Returns: true if KVM allow coalesced pio
++ */
++#define kvm_coalesced_pio_enabled() (kvm_coalesced_pio_allowed)
++
+ #else
+ 
+ #define kvm_enabled()           (0)
+@@ -184,6 +191,7 @@ extern bool kvm_msi_use_devid;
+ #define kvm_direct_msi_enabled() (false)
+ #define kvm_ioeventfd_any_length_enabled() (false)
+ #define kvm_msi_devid_required() (false)
++#define kvm_coalesced_pio_enabled() (false)
+ 
+ #endif  /* CONFIG_KVM_IS_POSSIBLE */
+ 
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 98f389a..747b473 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -420,13 +420,13 @@ struct kvm_run {
+ struct kvm_coalesced_mmio_zone {
+ 	__u64 addr;
+ 	__u32 size;
+-	__u32 pad;
++	__u32 pio;
+ };
+ 
+ struct kvm_coalesced_mmio {
+ 	__u64 phys_addr;
+ 	__u32 len;
+-	__u32 pad;
++	__u32 pio;
+ 	__u8  data[8];
+ };
+ 
+@@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_GET_MSR_FEATURES 153
+ #define KVM_CAP_HYPERV_EVENTFD 154
+ #define KVM_CAP_HYPERV_TLBFLUSH 155
++#define KVM_CAP_COALESCED_PIO 156
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/memory.c b/memory.c
+index e9cd446..4a32817 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2211,6 +2211,11 @@ void memory_region_clear_global_locking(MemoryRegion *mr)
+     mr->global_locking = false;
+ }
+ 
++bool memory_allow_coalesced_pio(void)
++{
++    return kvm_enabled() && kvm_coalesced_pio_enabled();
++}
++
+ static bool userspace_eventfd_warning;
+ 
+ void memory_region_add_eventfd(MemoryRegion *mr,
+-- 
+2.7.4
