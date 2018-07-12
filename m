@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdb7X-0007Tb-UK
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:54:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fdb8l-00088K-Dk
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:56:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdb7X-0002IF-2D
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:54:56 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34893)
+	(envelope-from <peter.maydell@linaro.org>) id 1fdb8k-00036M-Ji
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:56:11 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:32814)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdb7W-0002I3-S8
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:54:54 -0400
-Received: by mail-oi0-x241.google.com with SMTP id i12-v6so55563970oik.2
-	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 05:54:54 -0700 (PDT)
+	id 1fdb8k-00035v-Ex
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 08:56:10 -0400
+Received: by mail-oi0-x243.google.com with SMTP id l10-v6so8856296oii.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 05:56:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180629132954.24269-11-luc.michel@greensocs.com>
-References: <20180629132954.24269-1-luc.michel@greensocs.com>
-	<20180629132954.24269-11-luc.michel@greensocs.com>
+In-Reply-To: <87y3egmzem.fsf@dusky.pond.sub.org>
+References: <1531170180-21199-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-T_d2kEU+Pb72=pJQhpvqvN1owgi4RLNtNY=L4t_1Z2g@mail.gmail.com>
+	<5d0c7195-ffbf-1618-6106-ef6c82df3bd7@redhat.com>
+	<CAFEAcA9GspXJg2ioLrCknBgYHJ9f6qvM=n=y0dLeU12yv_5ETA@mail.gmail.com>
+	<931c0545-e3d8-fc84-9b69-59fab040265c@redhat.com>
+	<20180711161216.GV7451@localhost.localdomain>
+	<CAFEAcA-3aBQPwiwDfZSjspiwv4L-U0LXBKaOQ2m+=OzhqRq3OQ@mail.gmail.com>
+	<87y3egmzem.fsf@dusky.pond.sub.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jul 2018 13:54:33 +0100
-Message-ID: <CAFEAcA_YxdvZGuBTKoMk+Wd4KP0LXfk1i+FvX-=3i=+aautRiA@mail.gmail.com>
+Date: Thu, 12 Jul 2018 13:55:49 +0100
+Message-ID: <CAFEAcA-RwRdgr-_YVwEWf0pSNQj_rdEmX_OZf5HFmNoR8LbthA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 10/20] intc/arm_gic: Implement
- virtualization extensions in gic_(activate_irq|drop_prio)
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm283x: Fix crash with device_add
+ bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, Jan Kiszka <jan.kiszka@web.de>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 29 June 2018 at 14:29, Luc Michel <luc.michel@greensocs.com> wrote:
-> Implement virtualization extensions in gic_activate_irq() and
-> gic_drop_prio() and in gic_get_prio_from_apr_bits() called by
-> gic_drop_prio().
+On 12 July 2018 at 13:06, Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
 >
-> When the current CPU is a vCPU:
->   - Use GIC_VIRT_MIN_BPR and GIC_VIRT_NR_APRS instead of their non-virt
->   counterparts,
->   - the vCPU APR is stored in the virtual interface, in h_apr.
+>> On 11 July 2018 at 17:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>> On Wed, Jul 11, 2018 at 09:21:48AM +0200, Thomas Huth wrote:
+>>>> Hm, ok, so how to continue here now? Shall we at least mark the
+>>>> bcm2836/7 devices with user_creatable=false, so that users can not crash
+>>>> their QEMU so easily with device_add? The problem with introspection via
+>>>> device-list-properties would still continue to exist, but I think that's
+>>>> less likely used in practice... otherwise we could still move the
+>>>> qdev_set_parent_bus() calls to the realize() function instead, and just
+>>>> add a big fat FIXME comment in front of the code block, so that we
+>>>> remember to clean that up one day...
+>>>
+>>> Crashing device-list-properties should be a blocker bug, IMO.
 >
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> ---
->  hw/intc/arm_gic.c | 45 ++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 36 insertions(+), 9 deletions(-)
+> Seconded.
 >
-> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-> index d55a88bb33..d61c2dd557 100644
-> --- a/hw/intc/arm_gic.c
-> +++ b/hw/intc/arm_gic.c
-> @@ -276,16 +276,23 @@ static void gic_activate_irq(GICState *s, int cpu, int irq)
->       * and update the running priority.
->       */
->      int prio = gic_get_group_priority(s, cpu, irq);
-> -    int preemption_level = prio >> (GIC_MIN_BPR + 1);
-> +    int min_bpr = gic_is_vcpu(cpu) ? GIC_VIRT_MIN_BPR : GIC_MIN_BPR;
-> +    int preemption_level = prio >> (min_bpr + 1);
->      int regno = preemption_level / 32;
->      int bitno = preemption_level % 32;
-> +    uint32_t *papr = NULL;
+>>> Moving to realize is not the best solution, but I would prefer to
+>>> do that in 3.0 instead of leaving the device-list-properties
+>>> crash unfixed.
+>>
+>> I would like to see the crash fixed too. But I'd like to
+>> see it fixed:
+>>  (a) by having clear documentation about how the QOM
+>> system works, what you should do in init and what you
+>> should do in realize, when and why you need to manually
+>> parent objects, etc
+>>  (b) as far as possible making our APIs for doing this
+>> easy to use correctly and difficult to use wrongly. At
+>> the moment we have APIs that are far too easy to misuse,
+>> which means we will continue to get bugs like this and spend
+>> a lot of time on one-off fixes for them.
+>>
+>> In particular I don't understand why we need to manually
+>> parent these objects at all.
 >
-> -    if (gic_has_groups(s) && gic_test_group(s, irq, cpu)) {
-> -        s->nsapr[regno][cpu] |= (1 << bitno);
-> +    if (gic_is_vcpu(cpu)) {
-> +        assert(regno == 0);
-> +        papr = &s->h_apr[gic_get_vcpu_real_id(cpu)];
-> +    } else if (gic_has_groups(s) && gic_test_group(s, irq, cpu)) {
-> +        papr = &s->nsapr[regno][cpu];
->      } else {
-> -        s->apr[regno][cpu] |= (1 << bitno);
-> +        papr = &s->apr[regno][cpu];
->      }
->
-> +    *papr |= (1 << bitno);
-> +
->      s->running_priority[cpu] = prio;
->      gic_set_active(s, irq, cpu);
->  }
-> @@ -296,12 +303,22 @@ static int gic_get_prio_from_apr_bits(GICState *s, int cpu)
->       * on the set bits in the Active Priority Registers.
->       */
->      int i;
-> -    for (i = 0; i < GIC_NR_APRS; i++) {
-> -        uint32_t apr = s->apr[i][cpu] | s->nsapr[i][cpu];
-> +    int min_bpr = gic_is_vcpu(cpu) ? GIC_VIRT_MIN_BPR : GIC_MIN_BPR;
-> +    int nr_aprs = gic_is_vcpu(cpu) ? GIC_VIRT_NR_APRS : GIC_NR_APRS;
-> +
-> +    for (i = 0; i < nr_aprs; i++) {
-> +        uint32_t apr;
-> +
-> +        if (gic_is_vcpu(cpu)) {
-> +            apr = s->h_apr[gic_get_vcpu_real_id(cpu)];
-> +        } else {
-> +            apr = s->apr[i][cpu] | s->nsapr[i][cpu];
-> +        }
-> +
->          if (!apr) {
->              continue;
->          }
-> -        return (i * 32 + ctz32(apr)) << (GIC_MIN_BPR + 1);
-> +        return (i * 32 + ctz32(apr)) << (min_bpr + 1);
+> I want both (a) and (b) as badly as anyone, but we should not hold any
+> particular crash bug hostage to get them.
 
-Since GIC_VIRT_NR_APRS is always 1, I think that rather than
-merging the vcpu code into the loop here it would be clearer
-to just special case it at the top of the function:
-
-   if (gic_is_vcpu(cpu)) {
-       uint32_t apr = s->h_apr[gic_get_vcpu_real_id(cpu)];
-       if (apr) {
-           return ctz32(apr) << (GIC_VIRT_MIN_BPR + 1);
-       } else {
-           return 0x100;
-       }
-   }
-
-
->      }
->      return 0x100;
->  }
-> @@ -325,9 +342,19 @@ static void gic_drop_prio(GICState *s, int cpu, int group)
->       * might not do so, and interrupts that should not preempt might do so.
->       */
->      int i;
-> +    int nr_aprs = gic_is_vcpu(cpu) ? GIC_VIRT_NR_APRS : GIC_NR_APRS;
-> +
-> +    for (i = 0; i < nr_aprs; i++) {
-> +        uint32_t *papr = NULL;
-> +
-> +        if (gic_is_vcpu(cpu)) {
-> +            papr = &s->h_apr[gic_get_vcpu_real_id(cpu)];
-> +        } else if (group) {
-> +            papr = &s->nsapr[i][cpu];
-> +        } else {
-> +            papr = &s->apr[i][cpu];
-> +        }
->
-> -    for (i = 0; i < GIC_NR_APRS; i++) {
-> -        uint32_t *papr = group ? &s->nsapr[i][cpu] : &s->apr[i][cpu];
->          if (!*papr) {
->              continue;
->          }
-
-Similarly here.
+Without at least (a) I can't review this patch or any other
+patch that fixes this kind of crash bug...
 
 thanks
 -- PMM
