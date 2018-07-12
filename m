@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fdXVl-0007qk-C2
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:03:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fdXWR-00087z-8M
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fdXVi-0001VB-7n
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:03:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51092 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fdXWQ-0002Po-Gp
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:04:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37804 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fdXVi-0001Tr-1h
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:03:38 -0400
-Date: Thu, 12 Jul 2018 10:03:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180712090333.GB2610@work-vm>
-References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-	<20180629080320.320144-2-dplotnikov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fdXWQ-0002P9-Bp
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 05:04:22 -0400
+Date: Thu, 12 Jul 2018 11:04:19 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180712110419.685f0d04@redhat.com>
+In-Reply-To: <759f6dde-7350-70b9-1867-d2d1781df16b@redhat.com>
+References: <20180710155037.16834-1-stefanha@redhat.com>
+	<20180710155037.16834-2-stefanha@redhat.com>
+	<20180711172208.288fc0bb@redhat.com>
+	<759f6dde-7350-70b9-1867-d2d1781df16b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180629080320.320144-2-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v0 1/7] migration: add background snapshot
- capability
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] qdev: add HotplugHandler->post_plug()
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, l00284672 <lizhengui@huawei.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-* Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
-> The capability is used for the background vmstate saving
-> using the migration infrastructure.
-> Background vmstate saving means that the majority of vmstate
-> (RAM) is saved in the background when VM's vCPUS are running.
-> This helps to reduce the VM downtime on VM snapshotting.
+On Wed, 11 Jul 2018 18:48:21 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 11/07/2018 17:22, Igor Mammedov wrote:
+> > It also seems wrong to call _plug handler on maybe partially
+> > initialized device so perhaps we should first finish devices/children
+> > realization then do reset and only after that call _plug() handler  
 > 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> I agree but this is too dangerous until we look at plug() handlers and
+I'll put on my TODO list for 3.1
 
-(As normal the 'since' will need bumping)
+> remove the usage of Error **.
+considering we have _per_plug now with all checks, we probably
+would be able to remove Error** from _plug but only after splitting/auditing
+existing _plug callbacks.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>  Introducing a new callback helps the
+> transition.
+sure, we can drop it later
 
-> ---
->  migration/migration.c | 35 +++++++++++++++++++++++++++++++++++
->  migration/migration.h |  1 +
->  qapi/migration.json   |  6 +++++-
->  3 files changed, 41 insertions(+), 1 deletion(-)
+> Paolo
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index d780601f0c..87096d23ef 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -697,6 +697,12 @@ static bool migrate_caps_check(bool *cap_list,
->              return false;
->          }
->  
-> +        if (cap_list[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT]) {
-> +            error_setg(errp, "Postcopy is not compatible "
-> +                        "with background snapshot");
-> +            return false;
-> +        }
-> +
->          /* This check is reasonably expensive, so only when it's being
->           * set the first time, also it's only the destination that needs
->           * special support.
-> @@ -711,6 +717,26 @@ static bool migrate_caps_check(bool *cap_list,
->          }
->      }
->  
-> +    if (cap_list[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT]) {
-> +        if (cap_list[MIGRATION_CAPABILITY_RELEASE_RAM]) {
-> +            error_setg(errp, "Background snapshot is not compatible "
-> +                        "with release ram capability");
-> +            return false;
-> +        }
-> +
-> +        if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
-> +            error_setg(errp, "Background snapshot is not "
-> +                        "currently compatible with compression");
-> +            return false;
-> +        }
-> +
-> +        if (cap_list[MIGRATION_CAPABILITY_XBZRLE]) {
-> +            error_setg(errp, "Background snapshot is not "
-> +                        "currently compatible with XBZLRE");
-> +            return false;
-> +        }
-> +    }
-> +
->      return true;
->  }
->  
-> @@ -1635,6 +1661,15 @@ bool migrate_use_block_incremental(void)
->      return s->parameters.block_incremental;
->  }
->  
-> +bool migrate_background_snapshot(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT];
-> +}
-> +
->  /* migration thread support */
->  /*
->   * Something bad happened to the RP stream, mark an error
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 663415fe48..21babbc008 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -201,6 +201,7 @@ int migrate_compress_level(void);
->  int migrate_compress_threads(void);
->  int migrate_decompress_threads(void);
->  bool migrate_use_events(void);
-> +bool migrate_background_snapshot(void);
->  
->  /* Sending on the return path - generic and then for each message type */
->  void migrate_send_rp_shut(MigrationIncomingState *mis,
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 03f57c9616..eb5f52b7ff 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -352,12 +352,16 @@
->  #
->  # @x-multifd: Use more than one fd for migration (since 2.11)
->  #
-> +# @background-snapshot: Using migration infrastructure makes VM snapshot
-> +#         saving its RAM in background. This reduces  VM downtime. (since 2.12)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> -           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
-> +           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
-> +           'background-snapshot' ] }
->  
->  ##
->  # @MigrationCapabilityStatus:
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
