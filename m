@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fdh6S-0008GH-QL
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:18:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdh8w-0000ws-4G
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fdh6N-0000wy-OM
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:18:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47046 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fdh6N-0000wA-Iu
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:18:07 -0400
-Date: Thu, 12 Jul 2018 22:18:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180712160211-mutt-send-email-mst@kernel.org>
-References: <20180629221907.3662-1-venu.busireddy@oracle.com>
-	<20180702161404.GA2339@rkaganb.sw.ru>
-	<449f1449-ddf6-cd95-976c-14d04d8d503a@oracle.com>
-	<20180703095825.GC30904@rkaganb.sw.ru>
-	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
-	<20180709130035.GA6271@rkaganb.sw.ru>
-	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
-	<20180710045101-mutt-send-email-mst@kernel.org>
-	<CADGSJ20H1S88S6AsYoLMns3XH+YVKh006Dqu808X7Ug+2Mgdnw@mail.gmail.com>
-	<20180711115344.633eba9e.cohuck@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fdh8r-0004kl-6V
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:20:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdh8q-0004iS-SQ
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 15:20:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdh8p-0002dh-RM
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CB19A2E8076
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 19:20:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180711115344.633eba9e.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Jul 2018 19:14:51 -0000
+From: David Martins <1781463@bugs.launchpad.net>
+Reply-To: Bug 1781463 <1781463@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153142289132.32266.13097437819271021346.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1781463] [NEW] qemu don't start *.abs firmware
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +36,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
+To: qemu-devel@nongnu.org
 
-On Wed, Jul 11, 2018 at 11:53:44AM +0200, Cornelia Huck wrote:
-> On Tue, 10 Jul 2018 17:07:37 -0700
-> Siwei Liu <loseweigh@gmail.com> wrote:
-> 
-> > On Mon, Jul 9, 2018 at 6:54 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > On Mon, Jul 09, 2018 at 06:11:53PM -0700, si-wei liu wrote:  
-> > >> The plan is to enable group ID based matching in the first place rather than
-> > >> match by MAC, the latter of which is fragile and problematic.  
-> > >
-> > > It isn't all that fragile - hyperv used same for a while, so if someone
-> > > posts working patches with QEMU support but before this grouping stuff,
-> > > I'll happily apply them.  
-> > 
-> > I wouldn't box the solution to very limited scenario just because of
-> > matching by MAC, the benefit of having generic group ID in the first
-> > place is that we save the effort of maintaining legacy MAC based
-> > pairing that just adds complexity anyway. Currently the VF's MAC
-> > address cannot be changed by either PF or by the guest user is a
-> > severe limitation due to this. The other use case is that PT device
-> > than VF would generally have different MAC than the standby virtio. We
-> > shouldn't limit itself to VF specific scenario from the very
-> > beginning.
-> 
-> So, this brings me to a different concern: the semantics of
-> VIRTIO_NET_F_STANDBY.
-> 
-> * The currently sole user seems to be the virtio-net Linux driver.
-> * The commit messages, code comments and Documentation/ all talk about
->   matching by MAC.
-> * I could not find any proposed update to the virtio spec. (If there
->   had been an older proposal with a different feature name, it is not
->   discoverable.)
-> 
-> VIRTIO_NET_F_STANDBY is a host <-> guest interface. As there's no
-> official spec, you can only go by the Linux implementation, and by that
-> its semantics seem to be 'match by MAC', not 'match by other criteria'.
-> 
-> How is this supposed to work in the long run?
+Public bug reported:
 
-We definitely need a spec patch for VIRTIO_NET_F_STANDBY documenting existing
-semantics.  Sridhar, do you plan to take a look?
+Hello Devs,
 
--- 
-MST
+I'm here to report this bug/issue because i'm using Win64 Qemu but i
+can't start a *.abs firmware at normally this firmware is based in Linux
+Kernel and this type of firmware is made for STB Receivers,
+
+So this is all information i provide to get support.
+
+Files extracted by ( binwalk -e )
+
+
+Terminal output:
+
+# binwalk -e AMIKO_HD8150_2.4.43_emu.abs
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+
+---------------------------------------------------------------------------=
+-----
+196736        0x30080         LZMA compressed data, properties: 0x6C, dicti=
+onary size: 8388608 bytes, uncompressed size: 11883876 bytes
+3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dicti=
+onary size: 8388608 bytes, uncompressed size: 3255512 bytes
+5636224       0x560080        LZMA compressed data, properties: 0x6C, dicti=
+onary size: 8388608 bytes, uncompressed size: 87904 bytes
+
+
+Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
+
+Windows files output:
+
+Software used: Ali Main Code Decrypter 8.9
+
+Files unpacked:
+
+bootloader
+MemCfg
+maincode(AV)
+seecode
+default_lang
+cipluskey
+countryband
+logo_user
+logo_menu
+logo_radio
+logo_boot
+patch
+defaultdb(PRC)
+userdb(64+64)
+
+
+Terminal OUTPUT:
+
+# hexdump -C
+
+part of file
+
+
+00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore ve=
+rs|
+00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@SD=
+K4|
+00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_201=
+61|
+00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc versio=
+n |
+00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssde-=
+6.|
+00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-20070420=
+)(|
+00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrator@=
+ F|
+00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, 20=
+17|
+00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM).=
+..|
+00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0...=
+..|
+
+
+When I use readelf it says files isn't an ELF file, so i can't run it like =
+a kernel (Bootloader,Maincode, and etc. )
+
+so this is the cmd output when i use qemu Win64 (I don't whant to use
+linux to do the emulation about this *.abs extension firmware so please
+help me for win64 version from Qemu)
+
+CMD OUTPUT:
+
+ C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
+mips32r6-generic -drive file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=
+=3Draw
+
+qemu-system-mips.exe: warning: could not load MIPS bios 'mips_bios.bin'
+
+I also tried a lot of diferents qemu-system... and a lot of diferent
+configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc... and
+nothing hapenned
+
+How can i reproduce this issue ? =
+
+Reply:. =
+
+
+Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
+AliDekompressor in http://www.satedu.cba.pl/
+
+Direct tools:
+
+FirmwareDecrypter_v8.9.zip :
+
+http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmwar=
+eDecrypter_v8.9.zip&directory=3DTest%20Folder&
+
+Ali__tools_Console_v4.0__CRC_FIXER.rar :
+
+http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__to=
+ols_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
+
+
+so if Qemu can explain how can i fix this issue this can be highly helpfull.
+
+With my best regards,
+David Martins =
+
+Screamfox
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781463
+
+Title:
+  qemu don't start *.abs firmware files
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello Devs,
+
+  I'm here to report this bug/issue because i'm using Win64 Qemu but i
+  can't start a *.abs firmware at normally this firmware is based in
+  Linux Kernel and this type of firmware is made for STB Receivers,
+
+  So this is all information i provide to get support.
+
+  Files extracted by ( binwalk -e )
+
+  =
+
+  Terminal output:
+
+  # binwalk -e AMIKO_HD8150_2.4.43_emu.abs
+
+  DECIMAL       HEXADECIMAL     DESCRIPTION
+
+  -------------------------------------------------------------------------=
+-------
+  196736        0x30080         LZMA compressed data, properties: 0x6C, dic=
+tionary size: 8388608 bytes, uncompressed size: 11883876 bytes
+  3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dic=
+tionary size: 8388608 bytes, uncompressed size: 3255512 bytes
+  5636224       0x560080        LZMA compressed data, properties: 0x6C, dic=
+tionary size: 8388608 bytes, uncompressed size: 87904 bytes
+
+  =
+
+  Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
+
+  Windows files output:
+
+  Software used: Ali Main Code Decrypter 8.9
+
+  Files unpacked:
+
+  bootloader
+  MemCfg
+  maincode(AV)
+  seecode
+  default_lang
+  cipluskey
+  countryband
+  logo_user
+  logo_menu
+  logo_radio
+  logo_boot
+  patch
+  defaultdb(PRC)
+  userdb(64+64)
+
+  =
+
+  Terminal OUTPUT:
+
+  # hexdump -C
+
+  part of file
+
+  =
+
+  00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore =
+vers|
+  00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@=
+SDK4|
+  00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_2=
+0161|
+  00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc vers=
+ion |
+  00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssd=
+e-6.|
+  00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-200704=
+20)(|
+  00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrato=
+r@ F|
+  00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, =
+2017|
+  00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM=
+)...|
+  00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0.=
+....|
+
+  =
+
+  When I use readelf it says files isn't an ELF file, so i can't run it lik=
+e a kernel (Bootloader,Maincode, and etc. )
+
+  so this is the cmd output when i use qemu Win64 (I don't whant to use
+  linux to do the emulation about this *.abs extension firmware so
+  please help me for win64 version from Qemu)
+
+  CMD OUTPUT:
+
+   C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
+  mips32r6-generic -drive
+  file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=3Draw
+
+  qemu-system-mips.exe: warning: could not load MIPS bios
+  'mips_bios.bin'
+
+  I also tried a lot of diferents qemu-system... and a lot of diferent
+  configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc...
+  and nothing hapenned
+
+  How can i reproduce this issue ? =
+
+  Reply:. =
+
+
+  Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
+  AliDekompressor in http://www.satedu.cba.pl/
+
+  Direct tools:
+
+  FirmwareDecrypter_v8.9.zip :
+
+  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmw=
+areDecrypter_v8.9.zip&directory=3DTest%20Folder&
+
+  Ali__tools_Console_v4.0__CRC_FIXER.rar :
+
+  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__=
+tools_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
+
+  =
+
+  so if Qemu can explain how can i fix this issue this can be highly helpfu=
+ll.
+
+  With my best regards,
+  David Martins =
+
+  Screamfox
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781463/+subscriptions
