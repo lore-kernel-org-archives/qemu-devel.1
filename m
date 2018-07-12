@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fdQPX-00029r-R8
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fdQPc-0002Ce-0k
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fdQPW-0002oc-QF
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50294 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fdQPW-0002oG-JX
-	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:46 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 12 Jul 2018 09:28:27 +0800
-Message-Id: <20180712012829.20231-3-famz@redhat.com>
-In-Reply-To: <20180712012829.20231-1-famz@redhat.com>
-References: <20180712012829.20231-1-famz@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fdQPY-0002qn-5K
+	for qemu-devel@nongnu.org; Wed, 11 Jul 2018 21:28:52 -0400
+Date: Thu, 12 Jul 2018 11:01:52 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180712010152.GR22363@umbus.fritz.box>
+References: <20180702062644.48040-1-aik@ozlabs.ru>
+	<20180710122244.7466489f@aik.ozlabs.ibm.com>
+	<20180710064248.GM22363@umbus.fritz.box>
+	<20180710171453.6e3eee34@aik.ozlabs.ibm.com>
+	<20180711062619.GQ22363@umbus.fritz.box>
+	<20180711205305.0f3a42f1@aik.ozlabs.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/4] tests/vm: Pass verbose flag into VM
- make commands
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="PY8tzLeNxmyMVNR3"
+Content-Disposition: inline
+In-Reply-To: <20180711205305.0f3a42f1@aik.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
+ firmware image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Our Makefile has:
 
-vm-build-%: tests/vm/%.img
-	$(call quiet-command, \
-		$(SRC_PATH)/tests/vm/$* \
-		$(if $(V)$(DEBUG), --debug) \
-		$(if $(DEBUG), --interactive) \
+--PY8tzLeNxmyMVNR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-the intention of which is to let the make command in VM have V=3D1 if
-V=3D1 is set. We pass this to the BUILD_SCRIPT format.
+On Wed, Jul 11, 2018 at 08:53:05PM +1000, Alexey Kardashevskiy wrote:
+> On Wed, 11 Jul 2018 16:26:19 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Tue, Jul 10, 2018 at 05:14:53PM +1000, Alexey Kardashevskiy wrote:
+> > > On Tue, 10 Jul 2018 16:42:48 +1000
+> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > >  =20
+> > > > On Tue, Jul 10, 2018 at 12:22:44PM +1000, Alexey Kardashevskiy wrot=
+e: =20
+> > > > > On Mon,  2 Jul 2018 16:26:44 +1000
+> > > > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> > > > >    =20
+> > > > > > The following changes since commit edb1fb337f65f82fe32b989c4f01=
+8efe85c1dddb:
+> > > > > >=20
+> > > > > >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +100=
+0)
+> > > > > >=20
+> > > > > > are available in the git repository at:
+> > > > > >=20
+> > > > > >   git@github.com:aik/qemu.git tags/qemu-slof-20180702
+> > > > > >=20
+> > > > > > for you to fetch changes up to edb1fb337f65f82fe32b989c4f018efe=
+85c1dddb:
+> > > > > >=20
+> > > > > >   pseries: Update SLOF firmware image (2018-07-02 16:21:30 +100=
+0)
+> > > > > >=20
+> > > > > > ----------------------------------------------------------------
+> > > > > >=20
+> > > > > > I just missed a couple of gcc 8.1 fixes and thought I can still=
+ squeeze
+> > > > > > them before the 3.0  soft freeze.
+> > > > > >=20
+> > > > > >=20
+> > > > > > *** Note: this is not for master, this is for pseries   =20
+> > > > >=20
+> > > > >=20
+> > > > > Not good for 3.1 either?   =20
+> > > >=20
+> > > > Ugh.. somehow I missed this SLOF update request, and now we're in 3=
+=2E0
+> > > > hard freeze.
+> > > >=20
+> > > > How bad are the bugs this SLOF update fixes? =20
+> > >=20
+> > > These only fix gcc 8.1 warnings and runtime errors =3D> not really
+> > > bugfixes so it is not a big deal if they miss 3.0. =20
+> >=20
+> > Ok, well, if you want to resend the update, I'll queue it for 3.1.
+>=20
+>=20
+> It is still on github, why resend?
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/vm/basevm.py   | 3 ++-
- tests/vm/freebsd     | 4 ++--
- tests/vm/netbsd      | 4 ++--
- tests/vm/openbsd     | 4 ++--
- tests/vm/ubuntu.i386 | 4 ++--
- 5 files changed, 10 insertions(+), 9 deletions(-)
+Good point, done.
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index e5d6a328d5..25361c6b7d 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -240,7 +240,8 @@ def main(vmcls):
-             vm.add_source_dir(args.build_qemu)
-             cmd =3D [vm.BUILD_SCRIPT.format(
-                    configure_opts =3D " ".join(argv),
--                   jobs=3Dargs.jobs)]
-+                   jobs=3Dargs.jobs,
-+                   verbose=3D"1" if args.debug else "")]
-         else:
-             cmd =3D argv
-         img =3D args.image
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index 039dad8f69..b20612a6c9 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -23,8 +23,8 @@ class FreeBSDVM(basevm.BaseVM):
-         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-         tar -xf /dev/vtbd1;
-         ./configure {configure_opts};
--        gmake -j{jobs};
--        gmake check;
-+        gmake -j{jobs} V=3D{verbose};
-+        gmake check V=3D{verbose};
-     """
-=20
-     def build_image(self, img):
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index 3972d8b45c..3f9d34a208 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -23,8 +23,8 @@ class NetBSDVM(basevm.BaseVM):
-         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-         tar -xf /dev/rld1a;
-         ./configure --python=3Dpython2.7 {configure_opts};
--        gmake -j{jobs};
--        gmake check;
-+        gmake -j{jobs} V=3D{verbose};
-+        gmake check V=3D{verbose};
-     """
-=20
-     def build_image(self, img):
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 6ae16d97fd..3285c1abde 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -23,9 +23,9 @@ class OpenBSDVM(basevm.BaseVM):
-         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-         tar -xf /dev/rsd1c;
-         ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3D=
-python2.7 {configure_opts};
--        gmake -j{jobs};
-+        gmake -j{jobs} V=3D{verbose};
-         # XXX: "gmake check" seems to always hang or fail
--        #gmake check;
-+        #gmake check V=3D{verbose};
-     """
-=20
-     def build_image(self, img):
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-index fc319e0e6e..b4eaa0dedc 100755
---- a/tests/vm/ubuntu.i386
-+++ b/tests/vm/ubuntu.i386
-@@ -25,8 +25,8 @@ class UbuntuX86VM(basevm.BaseVM):
-         sudo chmod a+r /dev/vdb;
-         tar -xf /dev/vdb;
-         ./configure {configure_opts};
--        make -j{jobs};
--        make check;
-+        make -j{jobs} V=3D{verbose};
-+        make check V=3D{verbose};
-     """
-=20
-     def _gen_cloud_init_iso(self):
 --=20
-2.17.1
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--PY8tzLeNxmyMVNR3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltGqH4ACgkQbDjKyiDZ
+s5Kz7g//X4333v1g3A/gUt7HMmGfQQTHYJ5IqYcjelekGZfTXXB2x+msUbeZ0oTp
+H9ef6oESq7536HezDu7geosHRUSrID1UNlKJrdx4PykRG7h3C9EfMA6zY1Yzt7vy
+W17Qf8roE58QBevmkKpGBCRLGtC2qmLozVNzQYVfqtIrWPf/zQEmubQpcsBct49p
+41bn8zgqbjcCpcZTUTI/XbX8jLU19vp9OJFXERdRtARkQ97dE6M4Mq1Iw2Tx41pq
+pl3a9va+uoJRAEkuSE+s0AatYvJMnfTxuZ7FnCt11VV3S8+g5cZCF1Qcy2YTEaWs
+ckhpdTni4G+IXo8N9HaABpn8sBVzm3Fl6WEOUJL85FhuVyRo6dyO3njA7LM6Xz/d
+DdvhSx0YBOlIHMycNMZIu0tYjBPQjNRruzOtr5+gKHg/c+JVNi9XCH+qoIPSc6mI
+/33Mp3eKb5hwk+SgqwhjQhEIEkkwvPz+g60BZ92dHp2b2QKrskAcpYArD7NY8JpN
+cOufAOXhbZg8S8JG2Po6ZnZTtkTArCWFHmPn5o6AqKtp36rtDGm5KKozDcoqTLmt
+irAJfMdmM/X68wHlGz84dK/nOFyWTq4x66MPVem0C2WP9XXArrQLOFlxEU/aMBdf
+bLwbK+Omev8n+sO9Skrj+K+4guzS5SYgYir3O1zIWS/3Yu4SQw4=
+=BznU
+-----END PGP SIGNATURE-----
+
+--PY8tzLeNxmyMVNR3--
