@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fe5a3-0007I4-G0
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:26:24 -0400
+	(envelope-from <afaerber@suse.de>) id 1fe5d2-00080q-BG
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fe5a2-0002WW-H4
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:26:23 -0400
-Date: Fri, 13 Jul 2018 18:26:13 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180713212613.GU31657@localhost.localdomain>
+	(envelope-from <afaerber@suse.de>) id 1fe5d1-0005V2-Lr
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:29:28 -0400
 References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-	<1531470464-21522-4-git-send-email-thuth@redhat.com>
+	<1531470464-21522-2-git-send-email-thuth@redhat.com>
+	<20180713211636.GS31657@localhost.localdomain>
+From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Message-ID: <0a63f154-ac68-b6f0-ab6a-e0951c6ae8d5@suse.de>
+Date: Fri, 13 Jul 2018 23:29:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1531470464-21522-4-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 03/16] hw/arm/bcm2836: Fix crash with
- device_add bcm2837 on unsupported machines
+In-Reply-To: <20180713211636.GS31657@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] qom/object: Add a new function
+ object_initialize_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-On Fri, Jul 13, 2018 at 10:27:31AM +0200, Thomas Huth wrote:
-> When trying to "device_add bcm2837" on a machine that is not suitable for
-> this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
-> 
-> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
->  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
->  "'arguments': {'command-line': 'info qtree'}}" | \
->  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
-> 
-> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
->  "package": "build-all"}, "capabilities": []}}
-> {"return": {}}
-> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
->  hotplugged on this machine"}}
-> Segmentation fault (core dumped)
-> 
-> The qdev_set_parent_bus() from instance_init adds a link to the child devices
-> which is not valid anymore after the bcm2837 instance has been destroyed.
-> Unfortunately, the child devices do not get destroyed / unlinked correctly
-> because both object_initialize() and object_property_add_child() increase
-> the reference count of the child objects by one, but only one reference
-> is dropped when the parent gets removed. So let's use the new functions
-> object_initialize_child() and sysbus_init_child_obj() instead to create
-> the objects, which will take care of creating the child objects with the
-> correct reference count of one.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Am 13.07.2018 um 23:16 schrieb Eduardo Habkost:
+> I wonder if we should deprecate object_initialize() and support
+> only object_initialize_child() later.  Initializing an object
+> contained inside another one without making it a child of the
+> parent object is a recipe for trouble.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+The root container object needs to be initialized, too.
 
-The usage of &error_abort in code that can be triggered from
-device-list-properties still makes me nervous, but that's a
-separate issue.
+Cheers,
+Andreas
 
-
-> ---
->  hw/arm/bcm2836.c | 18 ++++++------------
->  1 file changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> index 6805a7d..af97b2f 100644
-> --- a/hw/arm/bcm2836.c
-> +++ b/hw/arm/bcm2836.c
-> @@ -51,25 +51,19 @@ static void bcm2836_init(Object *obj)
->      int n;
->  
->      for (n = 0; n < BCM283X_NCPUS; n++) {
-> -        object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
-> -                          info->cpu_type);
-> -        object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
-> -                                  &error_abort);
-> +        object_initialize_child(obj, "cpu[*]", &s->cpus[n], sizeof(s->cpus[n]),
-> +                                info->cpu_type, &error_abort);
->      }
->  
-> -    object_initialize(&s->control, sizeof(s->control), TYPE_BCM2836_CONTROL);
-> -    object_property_add_child(obj, "control", OBJECT(&s->control), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->control), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "control", &s->control, sizeof(s->control),
-> +                          TYPE_BCM2836_CONTROL);
->  
-> -    object_initialize(&s->peripherals, sizeof(s->peripherals),
-> -                      TYPE_BCM2835_PERIPHERALS);
-> -    object_property_add_child(obj, "peripherals", OBJECT(&s->peripherals),
-> -                              &error_abort);
-> +    sysbus_init_child_obj(obj, "peripherals", &s->peripherals,
-> +                          sizeof(s->peripherals), TYPE_BCM2835_PERIPHERALS);
->      object_property_add_alias(obj, "board-rev", OBJECT(&s->peripherals),
->                                "board-rev", &error_abort);
->      object_property_add_alias(obj, "vcram-size", OBJECT(&s->peripherals),
->                                "vcram-size", &error_abort);
-> -    qdev_set_parent_bus(DEVICE(&s->peripherals), sysbus_get_default());
->  }
->  
->  static void bcm2836_realize(DeviceState *dev, Error **errp)
-> -- 
-> 1.8.3.1
-> 
-
--- 
-Eduardo
+--=20
+SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
