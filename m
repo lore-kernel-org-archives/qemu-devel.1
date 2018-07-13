@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fdx3C-0006Ky-M3
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:19:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fdxAR-0004IC-RB
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fdx3B-0004tc-MD
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:19:54 -0400
-Date: Fri, 13 Jul 2018 14:19:45 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180713121945.GE1933@paraplu>
-References: <20180704145410.794-1-stefanha@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fdxAP-00024K-AC
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:27:23 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fdxAP-00022p-3c
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:27:21 -0400
+Received: by mail-wm0-x244.google.com with SMTP id s13-v6so4408889wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 05:27:21 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 13 Jul 2018 13:17:40 +0100
+Message-Id: <20180713121741.19262-16-alex.bennee@linaro.org>
+In-Reply-To: <20180713121741.19262-1-alex.bennee@linaro.org>
+References: <20180713121741.19262-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180704145410.794-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] throttle-groups: fix hang
- when group member leaves
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 for 3.0 15/16] docker: add commentary to
+ debian-bootstrap.docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Wed, Jul 04, 2018 at 03:54:10PM +0100, Stefan Hajnoczi wrote:
-> Throttle groups consist of members sharing one throttling state
-> (including bps/iops limits).  Round-robin scheduling is used to ensure
-> fairness.  If a group member already has a timer pending then other
-> groups members do not schedule their own timers.  The next group member
-> will have its turn when the existing timer expires.
-> 
-> A hang may occur when a group member leaves while it had a timer
-> scheduled.  Although the code carefully removes the group member from
-> the round-robin list, it does not schedule the next member.  Therefore
-> remaining members continue to wait for the removed member's timer to
-> expire.
-> 
-> This patch schedules the next request if a timer is pending.
-> Unfortunately the actual bug is a race condition that I've been unable
-> to capture in a test case.
-> 
-> Sometimes drive2 hangs when drive1 is removed from the throttling group:
-> 
->   $ qemu ... -drive if=none,id=drive1,cache=none,format=qcow2,file=data1.qcow2,iops=100,group=foo \
->              -device virtio-blk-pci,id=virtio-blk-pci0,drive=drive1 \
->              -drive if=none,id=drive2,cache=none,format=qcow2,file=data2.qcow2,iops=10,group=foo \
->              -device virtio-blk-pci,id=virtio-blk-pci1,drive=drive2
->   (guest-console1)# fio -filename /dev/vda 4k-seq-read.job
->   (guest-console2)# fio -filename /dev/vdb 4k-seq-read.job
->   (qmp) {"execute": "block_set_io_throttle", "arguments": {"device": "drive1","bps": 0,"bps_rd": 0,"bps_wr": 0,"iops": 0,"iops_rd": 0,"iops_wr": 0}}
+This is just a note that later versions of debootstrap don't
+technically need this hack.
 
-Hi Stefan,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/dockerfiles/debian-bootstrap.docker | 1 +
+ 1 file changed, 1 insertion(+)
 
-I realize you want to preserve the long lines to not break the JSON QMP
-command.  But, FWIW, you might want to format it using one of the
-convenient websites: https://jsonformatter.org/
-
-So your QMP command nicely wraps (for the 'cost' of 11 extra lines):
-
-    {
-      "execute": "block_set_io_throttle",
-      "arguments": {
-        "device": "drive1",
-        "bps": 0,
-        "bps_rd": 0,
-        "bps_wr": 0,
-        "iops": 0,
-        "iops_rd": 0,
-        "iops_wr": 0
-      }
-    }
-
-
-[...]
-
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.docker b/tests/docker/dockerfiles/debian-bootstrap.docker
+index 14212b9cf4..e13c26a7ed 100644
+--- a/tests/docker/dockerfiles/debian-bootstrap.docker
++++ b/tests/docker/dockerfiles/debian-bootstrap.docker
+@@ -9,6 +9,7 @@ FROM scratch
+ ADD . /
+ 
+ # Patch all mounts as docker already has stuff set up
++# (this is not needed for later debootstraps but is harmless atm)
+ RUN sed -i 's/in_target mount/echo not for docker in_target mount/g' /debootstrap/functions
+ 
+ # Run stage 2
 -- 
-/kashyap
+2.17.1
