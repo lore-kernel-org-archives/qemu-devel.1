@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fdx1B-0004mP-IX
+	(envelope-from <alex.bennee@linaro.org>) id 1fdx1E-0004mW-Nx
 	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:17:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fdx1A-0003fc-5U
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:17:49 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39555)
+	(envelope-from <alex.bennee@linaro.org>) id 1fdx1D-0003mo-Ks
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:17:52 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35994)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fdx19-0003eM-Sb
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:17:48 -0400
-Received: by mail-wr1-x436.google.com with SMTP id h10-v6so24913880wre.6
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 05:17:47 -0700 (PDT)
+	id 1fdx1D-0003lk-BI
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:17:51 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h9-v6so24934464wro.3
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 05:17:51 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 13 Jul 2018 13:17:30 +0100
-Message-Id: <20180713121741.19262-6-alex.bennee@linaro.org>
+Date: Fri, 13 Jul 2018 13:17:34 +0100
+Message-Id: <20180713121741.19262-10-alex.bennee@linaro.org>
 In-Reply-To: <20180713121741.19262-1-alex.bennee@linaro.org>
 References: <20180713121741.19262-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 for 3.0 05/16] docker: split configure_qemu
- from build_qemu
+Subject: [Qemu-devel] [PATCH v2 for 3.0 09/16] docker: disable
+ debian-powerpc-user-cross
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +31,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
 
-This allows some tests that just want to configure QEMU's source tree
-to do so.
+While we can build we can't run the unit tests due to a missing system
+call (249 - swapcontext). This could be a code generation issue as
+other architectures don't seem to have this system call.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: qemu-ppc@nongnu.org
 ---
- tests/docker/common.rc | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/docker/Makefile.include | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-index 046f8a5921..ba1f942328 100755
---- a/tests/docker/common.rc
-+++ b/tests/docker/common.rc
-@@ -21,7 +21,7 @@ requires()
-     done
- }
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 09fb7db7fa..fe63aacf69 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -140,6 +140,9 @@ docker-binfmt-image-debian-powerpc-user: QEMU_TARGET = ppc-linux-user
+ docker-binfmt-image-debian-powerpc-user: EXECUTABLE = ${BUILD_DIR}/ppc-linux-user/qemu-ppc
+ docker-image-debian-powerpc-user-cross: docker-binfmt-image-debian-powerpc-user
+ DOCKER_USER_IMAGES += debian-powerpc-user
++# Unfortunalty while we can build with this image we can't run unit
++# tests due to missing system call: 249 which causes an abort
++DOCKER_PARTIAL_IMAGES += debian-powerpc-user-cross
  
--build_qemu()
-+configure_qemu()
- {
-     config_opts="--enable-werror \
-                  ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
-@@ -32,6 +32,11 @@ build_qemu()
-     echo $config_opts
-     $QEMU_SRC/configure $config_opts || \
-         { cat config.log && test_fail "Failed to run 'configure'"; }
-+}
-+
-+build_qemu()
-+{
-+    configure_qemu $@
-     make $MAKEFLAGS
- }
- 
+ # Expand all the pre-requistes for each docker image and test combination
+ $(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES)), \
 -- 
 2.17.1
