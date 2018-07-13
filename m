@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fdrl0-0007K9-7y
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:40:47 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fdrqc-0008T3-Gg
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fdrkz-0002JW-8P
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:40:46 -0400
-References: <20180709154549.7df475b9.cohuck@redhat.com>
-	<20180711130617.GH31228@stefanha-x1.localdomain>
-	<20180711151545.7e55234a.cohuck@redhat.com>
-	<20180711153321.15d2237a.cohuck@redhat.com>
-	<20180712163014.GB23738@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eb3dd1ec-a420-1ede-d42a-4a01c8e9892f@redhat.com>
-Date: Fri, 13 Jul 2018 08:40:19 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fdrqb-0001Xv-Bl
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:46:34 -0400
+References: <20180626135035.133432-1-vsementsov@virtuozzo.com>
+	<DB6PR0801MB2056B99A8BFC3613E368B2A5C1590@DB6PR0801MB2056.eurprd08.prod.outlook.com>
+	<70365880-eb2c-e313-ea11-e16bc302a939@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <69e94126-5c46-aac3-5966-c81a64d20fd4@virtuozzo.com>
+Date: Fri, 13 Jul 2018 09:46:18 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180712163014.GB23738@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9vrbD9XlTPMMYMOfKNUHYBW8MUVxYORKR"
-Subject: Re: [Qemu-devel] qemu-nbd vs 'simple' trace backend vs iotest 147
+In-Reply-To: <70365880-eb2c-e313-ea11-e16bc302a939@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=koi8-r; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/6] fix persistent bitmaps migration logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9vrbD9XlTPMMYMOfKNUHYBW8MUVxYORKR
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <eb3dd1ec-a420-1ede-d42a-4a01c8e9892f@redhat.com>
-Subject: Re: [Qemu-devel] qemu-nbd vs 'simple' trace backend vs iotest 147
-References: <20180709154549.7df475b9.cohuck@redhat.com>
- <20180711130617.GH31228@stefanha-x1.localdomain>
- <20180711151545.7e55234a.cohuck@redhat.com>
- <20180711153321.15d2237a.cohuck@redhat.com>
- <20180712163014.GB23738@stefanha-x1.localdomain>
-In-Reply-To: <20180712163014.GB23738@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+12.07.2018 23:25, John Snow wrote:
+>
+> On 07/12/2018 03:00 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi, what about this?
+>> I'll be on vacation next two weeks.
+>> Best regards, Vladimir.
+> By the end of today.
+>
+> If there are fixes necessary I will take over the series if necessary so
+> you can enjoy your vacation, if that's OK with you?
 
-On 12/07/2018 18:30, Stefan Hajnoczi wrote:
-> On Wed, Jul 11, 2018 at 03:33:21PM +0200, Cornelia Huck wrote:
->> The other qemu-nbds (the inet and the unix socket ones from the first
->> run, the second inet one from the second run) have a single thread wit=
-h
->> the same backtrace I posted above.
->=20
-> We just discussed this on IRC, but for the record:
->=20
-> qemu-nbd --fork will fork the process after the simpletrace write-out
-> thread has been spawned.  The child process lacks this thread (due to
-> how fork(2) handles multithreading).  Either qemu-nbd needs to
-> initialize tracing later (but that means we cannot trace early init) or=
+yes, I just mean that I can discuss it only on this week. Of course, you 
+can discuss/fix/merge it without me, I hope my comments and commit 
+messages are exhaustive.
 
-> simpletrace needs a way to respawn the write-out thread.
+>
+> --js
+>
+>> ------------------------------------------------------------------------
+>> *Ô‘:* Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> *Ô‘–“¡◊Ã≈Œœ:* 26 …¿Œ— 2018 «. 16:50:29
+>> *ÎœÕ’:* qemu-devel@nongnu.org; qemu-block@nongnu.org
+>> *Îœ–…—:* dgilbert@redhat.com; quintela@redhat.com; stefanha@redhat.com;
+>> jsnow@redhat.com; famz@redhat.com; mreitz@redhat.com; kwolf@redhat.com;
+>> Vladimir Sementsov-Ogievskiy; Denis Lunev
+>> *Ù≈Õ¡:* [PATCH 0/6] fix persistent bitmaps migration logic
+>>   
+>> Hi all.
+>>
+>> To continue talk about correct loading of persistent bitmaps here is
+>> a patch (04), with some surrounding.
+>>
+>> Patch 04 contains new (and I hope, more clean) logic of bitmaps
+>> loading/inactivation/invalidation/migration, with the whole description.
+>> Let me not duplicate it here, you can safely start reading from 04
+>> commit message and internal big comment.
+>>
+>> Vladimir Sementsov-Ogievskiy (6):
+>>  ö iotests: 169: drop deprecated 'autoload' parameter
+>>  ö block/qcow2: improve error message in qcow2_inactivate
+>>  ö bloc/qcow2: drop dirty_bitmaps_loaded state variable
+>>  ö dirty-bitmaps: clean-up bitmaps loading and migration logic
+>>  ö iotests: improve 169
+>>  ö iotests: 169: add cases for source vm resuming
+>>
+>>  öblock/qcow2.hööööööööööööööööö |ö 1 -
+>>  öinclude/block/dirty-bitmap.höö |ö 2 +-
+>>  öblock.cööööööööööööööööööööööö | 11 ++++--
+>>  öblock/dirty-bitmap.cöööööööööö | 36 +++++++-----------
+>>  öblock/qcow2-bitmap.cöööööööööö | 16 ++++++++
+>>  öblock/qcow2.cööööööööööööööööö | 86
+>> ++++++++++++++++++++++++++++++++----------
+>>  ömigration/block-dirty-bitmap.c | 10 ++++-
+>>  ötests/qemu-iotests/169öööööööö | 70 +++++++++++++++++++++++++++++++++-
+>>  ötests/qemu-iotests/169.outöööö |ö 4 +-
+>>  ö9 files changed, 182 insertions(+), 54 deletions(-)
+>>
+>> -- 
+>> 2.11.1
+>>
 
-You can use pthread_atfork for this.
 
-Paolo
-
-
---9vrbD9XlTPMMYMOfKNUHYBW8MUVxYORKR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAltISVgACgkQv/vSX3jH
-roN/jAf9EMUJ7USqXfvtvc1T20v7LDx5cANS609FUC9ZuzyPrhQ+f4LSQwLfCtxB
-GrSed1yBj1aaePGB98RhlMuuRA2AFtqX+QlCOypPKqyoRTYvpQ8YrPUaJzrqEibm
-QJhWPOzV18DwtNNSXvOCTpTLWtMhUsBTGfCgnlVt5HVjabTXxTRs6jCVzihtK+En
-5UE/S2ymrGCPfh285sjTQ0eyd5UDJocTOoex+smoakMKlN9FUgA6/niNrEOOBhJN
-eL71Y63dPNKa6SAg4Aew7S91fOKmg0PhUNrDk5r7n5AdGEE/c9nolCWsoqL32qvF
-48rpHXcgn4LHkkAUTzs70nFGdv/NLw==
-=lkw7
------END PGP SIGNATURE-----
-
---9vrbD9XlTPMMYMOfKNUHYBW8MUVxYORKR--
+-- 
+Best regards,
+Vladimir
