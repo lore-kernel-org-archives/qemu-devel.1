@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdtRI-0002mN-Sq
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:28:36 -0400
+	(envelope-from <thuth@redhat.com>) id 1fdtRO-0002s3-AW
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdtRH-00055L-MH
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:28:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1fdtRN-0005C3-EC
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:28:38 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 13 Jul 2018 10:27:40 +0200
-Message-Id: <1531470464-21522-13-git-send-email-thuth@redhat.com>
+Date: Fri, 13 Jul 2018 10:27:43 +0200
+Message-Id: <1531470464-21522-16-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531470464-21522-1-git-send-email-thuth@redhat.com>
 References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 12/16] hw/arm/fsl-imx25: Fix introspection
- problem with the "fsl, imx25" device
+Subject: [Qemu-devel] [PATCH v2 15/16] hw/*/realview: Fix introspection
+ problem with 'realview_mpcore' & 'realview_gic'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-Running QEMU with valgrind indicates a problem here:
-
 echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'fsl,imx25'}}" \
+ "'arguments':{'typename':'realview_mpcore'}}" \
  "{'execute': 'human-monitor-command', " \
  "'arguments': {'command-line': 'info qtree'}}" | \
  valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
 [...]
-==26724== Invalid read of size 8
-==26724==    at 0x6190DA: qdev_print (qdev-monitor.c:686)
-==26724==    by 0x6190DA: qbus_print (qdev-monitor.c:719)
+==2654== Invalid read of size 8
+==2654==    at 0x61878A: qdev_print (qdev-monitor.c:686)
+==2654==    by 0x61878A: qbus_print (qdev-monitor.c:719)
+==2654==    by 0x452B38: handle_hmp_command (monitor.c:3446)
+==2654==    by 0x452D70: qmp_human_monitor_command (monitor.c:821)
 [...]
 
-Use the new sysbus_init_child_obj() to make sure that the objects are
-cleaned up correctly when the parent gets destroyed.
+Use sysbus_init_child_obj() to fix it.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/fsl-imx25.c | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+ hw/cpu/realview_mpcore.c | 8 ++++----
+ hw/intc/realview_gic.c   | 7 ++-----
+ 2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 37056f9..bd07040 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -39,38 +39,36 @@ static void fsl_imx25_init(Object *obj)
+diff --git a/hw/cpu/realview_mpcore.c b/hw/cpu/realview_mpcore.c
+index 39d4ebe..9d3f837 100644
+--- a/hw/cpu/realview_mpcore.c
++++ b/hw/cpu/realview_mpcore.c
+@@ -101,14 +101,14 @@ static void mpcore_rirq_init(Object *obj)
+     SysBusDevice *privbusdev;
+     int i;
  
-     object_initialize(&s->cpu, sizeof(s->cpu), "arm926-" TYPE_ARM_CPU);
+-    object_initialize(&s->priv, sizeof(s->priv), TYPE_ARM11MPCORE_PRIV);
+-    qdev_set_parent_bus(DEVICE(&s->priv), sysbus_get_default());
++    sysbus_init_child_obj(obj, "a11priv", &s->priv, sizeof(s->priv),
++                          TYPE_ARM11MPCORE_PRIV);
+     privbusdev = SYS_BUS_DEVICE(&s->priv);
+     sysbus_init_mmio(sbd, sysbus_mmio_get_region(privbusdev, 0));
  
--    object_initialize(&s->avic, sizeof(s->avic), TYPE_IMX_AVIC);
--    qdev_set_parent_bus(DEVICE(&s->avic), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "avic", &s->avic, sizeof(s->avic),
-+                          TYPE_IMX_AVIC);
- 
--    object_initialize(&s->ccm, sizeof(s->ccm), TYPE_IMX25_CCM);
--    qdev_set_parent_bus(DEVICE(&s->ccm), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "ccm", &s->ccm, sizeof(s->ccm), TYPE_IMX25_CCM);
- 
-     for (i = 0; i < FSL_IMX25_NUM_UARTS; i++) {
--        object_initialize(&s->uart[i], sizeof(s->uart[i]), TYPE_IMX_SERIAL);
--        qdev_set_parent_bus(DEVICE(&s->uart[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "uart[*]", &s->uart[i], sizeof(s->uart[i]),
-+                              TYPE_IMX_SERIAL);
-     }
- 
-     for (i = 0; i < FSL_IMX25_NUM_GPTS; i++) {
--        object_initialize(&s->gpt[i], sizeof(s->gpt[i]), TYPE_IMX25_GPT);
--        qdev_set_parent_bus(DEVICE(&s->gpt[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "gpt[*]", &s->gpt[i], sizeof(s->gpt[i]),
-+                              TYPE_IMX25_GPT);
-     }
- 
-     for (i = 0; i < FSL_IMX25_NUM_EPITS; i++) {
--        object_initialize(&s->epit[i], sizeof(s->epit[i]), TYPE_IMX_EPIT);
--        qdev_set_parent_bus(DEVICE(&s->epit[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "epit[*]", &s->epit[i], sizeof(s->epit[i]),
-+                              TYPE_IMX_EPIT);
-     }
- 
--    object_initialize(&s->fec, sizeof(s->fec), TYPE_IMX_FEC);
--    qdev_set_parent_bus(DEVICE(&s->fec), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "fec", &s->fec, sizeof(s->fec), TYPE_IMX_FEC);
- 
-     for (i = 0; i < FSL_IMX25_NUM_I2CS; i++) {
--        object_initialize(&s->i2c[i], sizeof(s->i2c[i]), TYPE_IMX_I2C);
--        qdev_set_parent_bus(DEVICE(&s->i2c[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "i2c[*]", &s->i2c[i], sizeof(s->i2c[i]),
-+                              TYPE_IMX_I2C);
-     }
- 
-     for (i = 0; i < FSL_IMX25_NUM_GPIOS; i++) {
--        object_initialize(&s->gpio[i], sizeof(s->gpio[i]), TYPE_IMX_GPIO);
--        qdev_set_parent_bus(DEVICE(&s->gpio[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "gpio[*]", &s->gpio[i], sizeof(s->gpio[i]),
-+                              TYPE_IMX_GPIO);
+     for (i = 0; i < 4; i++) {
+-        object_initialize(&s->gic[i], sizeof(s->gic[i]), TYPE_REALVIEW_GIC);
+-        qdev_set_parent_bus(DEVICE(&s->gic[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "gic[*]", &s->gic[i], sizeof(s->gic[i]),
++                              TYPE_REALVIEW_GIC);
      }
  }
  
+diff --git a/hw/intc/realview_gic.c b/hw/intc/realview_gic.c
+index 50bbab6..7f2ff85 100644
+--- a/hw/intc/realview_gic.c
++++ b/hw/intc/realview_gic.c
+@@ -54,16 +54,13 @@ static void realview_gic_init(Object *obj)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     RealViewGICState *s = REALVIEW_GIC(obj);
+-    DeviceState *gicdev;
+ 
+     memory_region_init(&s->container, OBJECT(s),
+                        "realview-gic-container", 0x2000);
+     sysbus_init_mmio(sbd, &s->container);
+ 
+-    object_initialize(&s->gic, sizeof(s->gic), TYPE_ARM_GIC);
+-    gicdev = DEVICE(&s->gic);
+-    qdev_set_parent_bus(gicdev, sysbus_get_default());
+-    qdev_prop_set_uint32(gicdev, "num-cpu", 1);
++    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic), TYPE_ARM_GIC);
++    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", 1);
+ }
+ 
+ static void realview_gic_class_init(ObjectClass *oc, void *data)
 -- 
 1.8.3.1
