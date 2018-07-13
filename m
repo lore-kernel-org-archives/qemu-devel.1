@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fe5wC-00046N-LD
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:49:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fe60Q-0005Y3-AK
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fe5wC-0007Lq-1a
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:49:16 -0400
-Date: Fri, 13 Jul 2018 18:49:08 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fe60P-0002PT-KI
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:53:38 -0400
+Date: Fri, 13 Jul 2018 18:53:29 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180713214908.GY31657@localhost.localdomain>
+Message-ID: <20180713215329.GZ31657@localhost.localdomain>
 References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-	<1531470464-21522-8-git-send-email-thuth@redhat.com>
+	<1531470464-21522-9-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1531470464-21522-8-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 07/16] hw/arm/xlnx-zynqmp: Fix crash
- when introspecting the "xlnx, zynqmp" device
+In-Reply-To: <1531470464-21522-9-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 08/16] hw/arm/msf2-soc: Fix
+ introspection problem with the "msf2-soc" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +27,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-On Fri, Jul 13, 2018 at 10:27:35AM +0200, Thomas Huth wrote:
-> QEMU currently crashes when e.g. doing something like this:
+On Fri, Jul 13, 2018 at 10:27:36AM +0200, Thomas Huth wrote:
+> Valgrind currently reports a problem when running QEMU like this:
 > 
 > echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
->  "'arguments':{'typename':'xlnx,zynqmp'}}" \
+>  "'arguments':{'typename':'msf2-soc'}}" \
 >  "{'execute': 'human-monitor-command', " \
->  "'arguments': {'command-line': 'info qtree'}}" \
->  |  aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
+>  "'arguments': {'command-line': 'info qtree'}}" | \
+>  valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
+> [...]
+> ==23097== Invalid read of size 8
+> ==23097==    at 0x6192AA: qdev_print (qdev-monitor.c:686)
+> ==23097==    by 0x6192AA: qbus_print (qdev-monitor.c:719)
+> [...]
 > 
-> Use the new object_initialize_child() and sysbus_init_child_obj()
-> functions to get the refernce counting of the child objects right, so
-> that they are properly cleaned up when the parent gets destroyed.
+> Use the new sysbus_init_child_obj() function to make sure that the child
+> objects are cleaned up correctly when the parent gets destroyed.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
