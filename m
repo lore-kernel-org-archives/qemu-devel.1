@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fdw1y-0005lP-3M
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fdw1y-0005lf-8c
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fdw1x-0002cN-AH
+	(envelope-from <mreitz@redhat.com>) id 1fdw1x-0002cZ-Bk
 	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:34 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 13 Jul 2018 13:14:21 +0200
-Message-Id: <20180713111424.23670-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/3] qemu-img: Allow rebase with no input base
+Date: Fri, 13 Jul 2018 13:14:23 +0200
+Message-Id: <20180713111424.23670-3-mreitz@redhat.com>
+In-Reply-To: <20180713111424.23670-1-mreitz@redhat.com>
+References: <20180713111424.23670-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/3] qemu-img: Use zero writes after source
+ backing EOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This series allows using qemu-img rebase on images that do not have a
-backing file.  Right now, this fails with the rather cryptic error
-message:
+Past the end of the source backing file, we memset() buf_old to zero, so
+it is clearly easy to use blk_pwrite_zeroes() instead of blk_pwrite()
+then.
 
-$ qemu-img rebase -b base.qcow2 foo.qcow2
-qemu-img: Could not open old backing file '': The 'file' block driver req=
-uires a file name
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ qemu-img.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Yeah, well, OK.
-
-With how rebase currently works, this would lead to the overlay being
-filled with zeroes, however.  This is where patch 2 comes in and instead
-makes rebase use blk_pwrite_zeroes() whenever it handles an area past
-the input=E2=80=99s backing file=E2=80=99s EOF.
-
-(Note that additionally we could try to punch holes in the overlay
-whenever it matches the new backing file, but that=E2=80=99s something I=E2=
-=80=99ll put
-off for later.  (We don=E2=80=99t even have a reliable method for punchin=
-g holes
-into an overlay yet, although I would like to have such because it could
-make active commit more efficient.))
-
-
-And patch 3 adds the usual test.
-
-
-Max Reitz (3):
-  qemu-img: Allow rebase with no input base
-  qemu-img: Use zero writes after source backing EOF
-  iotests: Add test for rebase without input base
-
- qemu-img.c                 | 72 +++++++++++++++++++++++---------------
- tests/qemu-iotests/024     | 70 ++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/024.out | 37 ++++++++++++++++++++
- 3 files changed, 150 insertions(+), 29 deletions(-)
-
---=20
+diff --git a/qemu-img.c b/qemu-img.c
+index dd684d8bf0..2552e7dad6 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3403,6 +3403,8 @@ static int img_rebase(int argc, char **argv)
+         }
+ 
+         for (offset = 0; offset < size; offset += n) {
++            bool buf_old_is_zero = false;
++
+             /* How many bytes can we handle with the next read? */
+             n = MIN(IO_BUF_SIZE, size - offset);
+ 
+@@ -3423,6 +3425,7 @@ static int img_rebase(int argc, char **argv)
+              */
+             if (offset >= old_backing_size) {
+                 memset(buf_old, 0, n);
++                buf_old_is_zero = true;
+             } else {
+                 if (offset + n > old_backing_size) {
+                     n = old_backing_size - offset;
+@@ -3458,8 +3461,12 @@ static int img_rebase(int argc, char **argv)
+                 if (compare_buffers(buf_old + written, buf_new + written,
+                                     n - written, &pnum))
+                 {
+-                    ret = blk_pwrite(blk, offset + written,
+-                                     buf_old + written, pnum, 0);
++                    if (buf_old_is_zero) {
++                        ret = blk_pwrite_zeroes(blk, offset + written, pnum, 0);
++                    } else {
++                        ret = blk_pwrite(blk, offset + written,
++                                         buf_old + written, pnum, 0);
++                    }
+                     if (ret < 0) {
+                         error_report("Error while writing to COW image: %s",
+                             strerror(-ret));
+-- 
 2.17.1
