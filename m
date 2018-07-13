@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdvIG-0002hg-T4
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:27:22 -0400
+	(envelope-from <jusual@mail.ru>) id 1fdvME-0003rv-VQ
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fdvIC-0006Bh-R5
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:27:20 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:42030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fdvIC-0006Aw-Ef
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:27:16 -0400
-References: <153146249729.58730.14937110422578573377.stgit@lep8c.aus.stglabs.ibm.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b0a08ad3-93b3-d441-3ad8-ccc74029db45@vivier.eu>
-Date: Fri, 13 Jul 2018 12:26:53 +0200
-MIME-Version: 1.0
-In-Reply-To: <153146249729.58730.14937110422578573377.stgit@lep8c.aus.stglabs.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: ppc64: use the correct
- values for F_*LK64s
+	(envelope-from <jusual@mail.ru>) id 1fdvM8-0001Ra-LS
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:31:26 -0400
+Received: from smtp63.i.mail.ru ([217.69.128.43]:59418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fdvM8-0001Q6-8R
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:31:20 -0400
+From: Julia Suvorova <jusual@mail.ru>
+Date: Fri, 13 Jul 2018 13:30:59 +0300
+Message-Id: <20180713103059.12539-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH] arm: Add ARMv6-M programmer's model support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,208 +21,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, riku.voipio@iki.fi
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-Le 13/07/2018 à 08:16, Shivaprasad G Bhat a écrit :
-> Qemu includes the glibc headers for the host defines and target headers are
-> part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
-> and F_SETLKW64 defined to 12, 13 and 14 for all archs in
-> sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
-> definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
-> include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
-> assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
-> can be seen in include/linux/fcntl.h in linux source.
-> 
-> On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
-> explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
-> Whereas, a PPC64 host doesn't have such a definition in
-> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
-> the sources on PPC64 host sees the default value of F_*LK64*
-> as 12, 13 & 14(fcntl-linux.h).
-> 
-> Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
-> implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
-> convertion back to F_*LK* values on PPC64 as seen in
-> sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
-> macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
-> and no adjustments are needed.
-> 
-> Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
-> own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
-> adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
-> fail by all pplications run on PPC64 host user emulation.
-> 
-> The fix here could be to see why on PPC64 the glibc is still keeping
-> F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
-> the syscall for PPC only. See if we can make the
-> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
-> 5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That
-> way, qemu sources see the kernel supported values in glibc headers.
-> 
-> OR
-> 
-> On PPC64 host, qemu sources see both F_*LK & F_*LK64* as same and set to
-> 12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
-> sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
-> Do the value adjustment just like it is done by glibc source by using
-> F_GETLK value of 5. That way, we make the syscalls with the actual
-> supported values in Qemu. The patch is taking this approach.
-> 
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-> ---
->  v2 - https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02920.html
->  Changes from v2:
->     - Fixed the braces, and indentation for comments.
->  v1 - https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02567.html
->  Changes from v1:
->     - Changed the overwrite of F*LK64* with 5, 6 and 7 in using #define
->       instead using the adjustment code similar to glibc as suggested.
->     - Dropped __linux__ check for the adjustment code as suggested.
->     - Moved the adjustment code inside target_to_host_fcntl_cmd to address
->       all possible|future cases.
-> 
->  linux-user/syscall.c |   74 ++++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 53 insertions(+), 21 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 643b8833de..7fb595269f 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6475,63 +6475,95 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
->  /* warning : doesn't handle linux specific flags... */
->  static int target_to_host_fcntl_cmd(int cmd)
->  {
-> +    int ret = -TARGET_EINVAL;
+Forbid stack alignment change. (CCR)
+Reserve FAULTMASK, BASEPRI registers.
+Report any fault as HardFault. Disable MemManage, BusFault and
+UsageFault, so they always escalated to HardFault. (SHCSR)
 
-as you have a default case in the switch, you don't need to initialize
-it here.
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+---
+This is the last cortex-m0 patch.
 
->      switch(cmd) {
->  	case TARGET_F_DUPFD:
->  	case TARGET_F_GETFD:
->  	case TARGET_F_SETFD:
->  	case TARGET_F_GETFL:
->  	case TARGET_F_SETFL:
-> -            return cmd;
-> +            ret = cmd;
-> +            break;
+ hw/intc/armv7m_nvic.c | 10 ++++++++++
+ target/arm/cpu.c      | 10 ++++++++++
+ target/arm/helper.c   | 13 +++++++++++--
+ 3 files changed, 31 insertions(+), 2 deletions(-)
 
-As you change all the entries of the switch, could you modify the
-indentation to follow the coding style of QEMU:
-  - don't use tabulation
-  - switch and case at the same indent
-  - indentation increment is four spaces
-
->          case TARGET_F_GETLK:
-> -            return F_GETLK64;
-> +            ret = F_GETLK64;
-> +            break;
->          case TARGET_F_SETLK:
-> -            return F_SETLK64;
-> +            ret = F_SETLK64;
-> +            break;
->          case TARGET_F_SETLKW:
-> -            return F_SETLKW64;
-> +            ret = F_SETLKW64;
-> +            break;
->  	case TARGET_F_GETOWN:
-> -	    return F_GETOWN;
-> +            ret = F_GETOWN;
-> +            break;
->  	case TARGET_F_SETOWN:
-> -	    return F_SETOWN;
-> +            ret = F_SETOWN;
-> +            break;
->  	case TARGET_F_GETSIG:
-> -	    return F_GETSIG;
-> +            ret = F_GETSIG;
-> +            break;
->  	case TARGET_F_SETSIG:
-> -	    return F_SETSIG;
-> +            ret = F_SETSIG;
-> +            break;
->  #if TARGET_ABI_BITS == 32
->          case TARGET_F_GETLK64:
-> -	    return F_GETLK64;
-> +            ret = F_GETLK64;
-> +            break;
->  	case TARGET_F_SETLK64:
-> -	    return F_SETLK64;
-> +            ret = F_SETLK64;
-> +            break;
->  	case TARGET_F_SETLKW64:
-> -	    return F_SETLKW64;
-> +            ret = F_SETLKW64;
-> +            break;
->  #endif
->          case TARGET_F_SETLEASE:
-> -            return F_SETLEASE;
-> +            ret = F_SETLEASE;
-> +            break;
->          case TARGET_F_GETLEASE:
-> -            return F_GETLEASE;
-> +            ret = F_GETLEASE;
-> +            break;
->  #ifdef F_DUPFD_CLOEXEC
->          case TARGET_F_DUPFD_CLOEXEC:
-> -            return F_DUPFD_CLOEXEC;
-> +            ret = F_DUPFD_CLOEXEC;
-> +            break;
->  #endif
->          case TARGET_F_NOTIFY:
-> -            return F_NOTIFY;
-> +            ret = F_NOTIFY;
-> +            break;
->  #ifdef F_GETOWN_EX
->  	case TARGET_F_GETOWN_EX:
-> -	    return F_GETOWN_EX;
-> +            ret = F_GETOWN_EX;
-> +            break;
->  #endif
->  #ifdef F_SETOWN_EX
->  	case TARGET_F_SETOWN_EX:
-> -	    return F_SETOWN_EX;
-> +            ret = F_SETOWN_EX;
-> +            break;
->  #endif
->  #ifdef F_SETPIPE_SZ
->          case TARGET_F_SETPIPE_SZ:
-> -            return F_SETPIPE_SZ;
-> +            ret = F_SETPIPE_SZ;
-> +            break;
->          case TARGET_F_GETPIPE_SZ:
-> -            return F_GETPIPE_SZ;
-> +            ret = F_GETPIPE_SZ;
-> +            break;
->  #endif
->  	default:
-> -            return -TARGET_EINVAL;
-> +            ret = -TARGET_EINVAL;
-
-Could you add the "break" here, even if it is useless, we always add it.
-
-> +    }
-> +
-> +#if defined(__powerpc64__)
-> +    /* On PPC64, glibc headers has the F_*LK* defined to 12, 13 and 14 and
-> +     * is not supported by kernel. The glibc fcntl call actually adjusts
-> +     * them to 5, 6 and 7 before making the syscall(). Since we make the
-> +     * syscall directly, adjust to what is supported by the kernel.
-> +     */
-> +    if (ret >= F_GETLK64 && ret <= F_SETLKW64) {
-> +        ret -= F_GETLK64 - 5;
->      }
-> -    return -TARGET_EINVAL;
-> +#endif
-> +
-> +    return ret;
->  }
->  
->  #define TRANSTBL_CONVERT(a) { -1, TARGET_##a, -1, a }
-> 
-
-otherwise, the patch looks good.
-
-Thanks,
-Laurent
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index dbc0061b2d..5eec07342e 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -885,6 +885,9 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+         val |= cpu->env.v7m.ccr[M_REG_NS] & R_V7M_CCR_BFHFNMIGN_MASK;
+         return val;
+     case 0xd24: /* System Handler Control and State (SHCSR) */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
++            goto bad_offset;
++        }
+         val = 0;
+         if (attrs.secure) {
+             if (s->sec_vectors[ARMV7M_EXCP_MEM].active) {
+@@ -1322,6 +1325,10 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         cpu->env.v7m.scr[attrs.secure] = value;
+         break;
+     case 0xd14: /* Configuration Control.  */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
++            goto bad_offset;
++        }
++
+         /* Enforce RAZ/WI on reserved and must-RAZ/WI bits */
+         value &= (R_V7M_CCR_STKALIGN_MASK |
+                   R_V7M_CCR_BFHFNMIGN_MASK |
+@@ -1346,6 +1353,9 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         cpu->env.v7m.ccr[attrs.secure] = value;
+         break;
+     case 0xd24: /* System Handler Control and State (SHCSR) */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
++            goto bad_offset;
++        }
+         if (attrs.secure) {
+             s->sec_vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
+             /* Secure HardFault active bit cannot be written */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index a914ce4e8c..3788cb773d 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -220,6 +220,11 @@ static void arm_cpu_reset(CPUState *s)
+             env->v7m.aircr = R_V7M_AIRCR_BFHFNMINS_MASK;
+         }
+ 
++        if (!arm_feature(env, ARM_FEATURE_V7)) {
++            env->v7m.ccr[M_REG_NS] = 0x3f8;
++            env->v7m.ccr[M_REG_S] = 0x3f8;
++        }
++
+         /* In v7M the reset value of this bit is IMPDEF, but ARM recommends
+          * that it resets to 1, so QEMU always does that rather than making
+          * it dependent on CPU model. In v8M it is RES1.
+@@ -230,6 +235,11 @@ static void arm_cpu_reset(CPUState *s)
+             /* in v8M the NONBASETHRDENA bit [0] is RES1 */
+             env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_NONBASETHRDENA_MASK;
+             env->v7m.ccr[M_REG_S] |= R_V7M_CCR_NONBASETHRDENA_MASK;
++
++            if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
++                env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_UNALIGN_TRP_MASK;
++                env->v7m.ccr[M_REG_S] |= R_V7M_CCR_UNALIGN_TRP_MASK;
++            }
+         }
+ 
+         /* Unlike A/R profile, M profile defines the reset LR value */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 2e45dda4e1..fdb481a51d 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10670,13 +10670,13 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+             env->v7m.primask[M_REG_NS] = val & 1;
+             return;
+         case 0x91: /* BASEPRI_NS */
+-            if (!env->v7m.secure) {
++            if (!env->v7m.secure || !arm_feature(env, ARM_FEATURE_M_MAIN)) {
+                 return;
+             }
+             env->v7m.basepri[M_REG_NS] = val & 0xff;
+             return;
+         case 0x93: /* FAULTMASK_NS */
+-            if (!env->v7m.secure) {
++            if (!env->v7m.secure || !arm_feature(env, ARM_FEATURE_M_MAIN)) {
+                 return;
+             }
+             env->v7m.faultmask[M_REG_NS] = val & 1;
+@@ -10760,9 +10760,15 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         env->v7m.primask[env->v7m.secure] = val & 1;
+         break;
+     case 17: /* BASEPRI */
++        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
++            goto bad_reg;
++        }
+         env->v7m.basepri[env->v7m.secure] = val & 0xff;
+         break;
+     case 18: /* BASEPRI_MAX */
++        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
++            goto bad_reg;
++        }
+         val &= 0xff;
+         if (val != 0 && (val < env->v7m.basepri[env->v7m.secure]
+                          || env->v7m.basepri[env->v7m.secure] == 0)) {
+@@ -10770,6 +10776,9 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         }
+         break;
+     case 19: /* FAULTMASK */
++        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
++            goto bad_reg;
++        }
+         env->v7m.faultmask[env->v7m.secure] = val & 1;
+         break;
+     case 20: /* CONTROL */
+-- 
+2.17.1
