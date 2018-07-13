@@ -1,37 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fdmlS-0008IV-Hk
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:20:55 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fdmzs-0001pc-ES
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fdmlP-0002IO-ED
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:20:54 -0400
-Received: from mga17.intel.com ([192.55.52.151]:34609)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sridhar.samudrala@intel.com>)
-	id 1fdmlP-0002Dp-3k
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:20:51 -0400
-References: <20180703095825.GC30904@rkaganb.sw.ru>
-	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
-	<20180709130035.GA6271@rkaganb.sw.ru>
-	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
-	<20180710045101-mutt-send-email-mst@kernel.org>
-	<CADGSJ20H1S88S6AsYoLMns3XH+YVKh006Dqu808X7Ug+2Mgdnw@mail.gmail.com>
-	<20180711115344.633eba9e.cohuck@redhat.com>
-	<CADGSJ20A=sbwQQ-_YQEVwoCXwTvosCEnD2iKa0kS6ZGvbgy4rg@mail.gmail.com>
-	<20180712133121.3b5f2bae.cohuck@redhat.com>
-	<CADGSJ214vdTGC=-hj9pMOTqQNcZ0NaYu_r4cy2=2BB4CausWdw@mail.gmail.com>
-	<20180712235500-mutt-send-email-mst@kernel.org>
-	<CADGSJ23c4hHAoAwG61xmrRd-OO6EpsHgH9Fd-9R69XQAVkduCA@mail.gmail.com>
-From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Message-ID: <77823ff9-a02a-808b-e919-b4950a64ae3c@intel.com>
-Date: Thu, 12 Jul 2018 21:20:41 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fdmzo-00069o-VC
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:35:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fdmzo-00069F-Lq
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 21:35:44 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6CNsQbD126020
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 21:35:42 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k6gq9k9s8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 12 Jul 2018 21:35:42 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 12 Jul 2018 21:35:41 -0400
+References: <20180712111221.20326-1-armbru@redhat.com>
+	<20180712111221.20326-16-armbru@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 12 Jul 2018 21:35:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <CADGSJ23c4hHAoAwG61xmrRd-OO6EpsHgH9Fd-9R69XQAVkduCA@mail.gmail.com>
+In-Reply-To: <20180712111221.20326-16-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+Content-Language: en-MW
+Message-Id: <f12936d6-7415-b089-5ba5-baf8ebc09d75@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 15/20] tests: New helper
+ qtest_qmp_receive_success()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,55 +43,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Siwei Liu <loseweigh@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 7/12/2018 6:19 PM, Siwei Liu wrote:
-> On Thu, Jul 12, 2018 at 2:00 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Thu, Jul 12, 2018 at 01:52:53PM -0700, Siwei Liu wrote:
->>> The definition is incomplete due to lack of spec. There's no "host"
->>> part defined yet in the host-guest interface. If match by MAC is an
->>> interface, the same must be done on the host(device) side as well,
->>> which has been agreed not the way to go. However, I don't think that's
->>> what the author intends to do by interpreting his QEMU patch - it
->>> missed the other parts as well, such as the feature negotiation and
->>> how it interacts with the paired device.
->>>
->>> What I said is that match by MAC is just a guest implementation that
->>> one can change at any time. We now have the group ID on QEMU, why
->>> still sticking to matching by MAC? It shoulnd't be a host-guest
->>> interface in the first place anyway.
->> I think that match by MAC is a simple portable way to match devices.
->> E.g. it will work seamlessly with niche things like zPCI. However
-> That's a good point. I'm not sure if it's a valid assumption that zPCI
-> should always use the same MAC address as that of virtio. Someone
-> who's more familiar with the use case may decide and work on that. It
-> means VFIO device has to take in the MAC address as an identifier to
-> the "-device vfio-pci,.." QEMU option. I think there's no point to
-> match device using group ID in QEMU while using MAC in the guest.
-> Based on that assumption, I'd go with making VIRTIO_NET_F_STANDBY to
-> match device based on group ID, while someone may come up with another
-> feature bit later, say VIRTIO_NET_F_STANDBY_BY_MAC when its QEMU
-> support is available. Would it make sense?
-
-VIRTIO_NET_F_STANDBY as defined in the guest virtio_net driver supports match
-by MAC address. I think we should add support for this feature bit in QEMU.
-If submitting a patch to update the spec is a pre-requisite to add this
-feature bit to QEMU, i can do that.
-
-As far as i understand, group id patches to QEMU are still under review.
-Matching by group ID can be another feature bit that could support matching
-by group id as well as MAC.
-
-
-> -Siwei
+On 07/12/2018 07:12 AM, Markus Armbruster wrote:
+> Commit b21373d0713 copied wait_command() from tests/migration-test.c
+> to tests/tpm-util.c.  Replace both copies by new libqtest helper
+> qtest_qmp_receive_success().  Also use it to simplify
+> qtest_qmp_device_del().
 >
->> there are other niche use-cases that aren't addressed by match by MAC
->> such as PF pass-through as a primary, and the pci bridge trick addresses
->> that at cost of some portability.
->>
->> So I see no issues supporting both mechanisms, but others on the TC
->> might feel differently.
->>
->> --
->> MST
+> Bonus: gets rid of a non-literal format string.  A step towards
+> compile-time format string checking without triggering
+> -Wformat-nonliteral.
+>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/libqtest.c       | 69 ++++++++++++++++++++++++++++++------------
+>   tests/libqtest.h       | 17 +++++++++++
+>   tests/migration-test.c | 29 ++++++------------
+>   tests/tpm-util.c       | 32 +++-----------------
+>   4 files changed, 80 insertions(+), 67 deletions(-)
+>
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index dfca3af89d..ed832cd8e6 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -1029,6 +1029,35 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+>       qobject_unref(response);
+>   }
+>
+> +QDict *qtest_qmp_receive_success(QTestState *s,
+> +                                 void (*event_cb)(void *opaque,
+> +                                                  const char *event,
+> +                                                  QDict *data),
+> +                                 void *opaque)
+> +{
+> +    QDict *response, *ret, *data;
+> +    const char *event;
+> +
+> +    for (;;) {
+> +        response = qtest_qmp_receive(s);
+> +        g_assert(!qdict_haskey(response, "error"));
+> +        ret = qdict_get_qdict(response, "return");
+> +        if (ret) {
+> +            break;
+> +        }
+> +        event = qdict_get_str(response, "event");
+> +        data = qdict_get_qdict(response, "data");
+> +        if (event_cb) {
+> +            event_cb(opaque, event, data);
+> +        }
+> +        qobject_unref(response);
+> +    }
+> +
+> +    qobject_ref(ret);
+> +    qobject_unref(response);
+> +    return ret;
+> +}
+> +
+>   /*
+>    * Generic hot-plugging test via the device_add QMP command.
+>    */
+> @@ -1053,6 +1082,14 @@ void qtest_qmp_device_add(const char *driver, const char *id,
+>       qobject_unref(response);
+>   }
+>
+> +static void device_deleted_cb(void *opaque, const char *name, QDict *data)
+> +{
+> +    bool *got_event = opaque;
+> +
+> +    g_assert_cmpstr(name, ==, "DEVICE_DELETED");
+> +    *got_event = true;
+> +}
+> +
+>   /*
+>    * Generic hot-unplugging test via the device_del QMP command.
+>    * Device deletion will get one response and one event. For example:
+> @@ -1073,27 +1110,21 @@ void qtest_qmp_device_add(const char *driver, const char *id,
+>    */
+>   void qtest_qmp_device_del(const char *id)
+>   {
+> -    QDict *response1, *response2, *event = NULL;
+> +    bool got_event = false;
+> +    QDict *rsp;
+>
+> -    response1 = qmp("{'execute': 'device_del', 'arguments': {'id': %s}}",
+> -                    id);
+> -    g_assert(response1);
+> -    g_assert(!qdict_haskey(response1, "error"));
+> -
+> -    response2 = qmp_receive();
+> -    g_assert(response2);
+> -    g_assert(!qdict_haskey(response2, "error"));
+> -
+> -    if (qdict_haskey(response1, "event")) {
+> -        event = response1;
+> -    } else if (qdict_haskey(response2, "event")) {
+> -        event = response2;
+> +    qtest_qmp_send(global_qtest,
+> +                   "{'execute': 'device_del', 'arguments': {'id': %s}}",
+> +                   id);
+> +    rsp = qtest_qmp_receive_success(global_qtest, device_deleted_cb,
+> +                                    &got_event);
+> +    qobject_unref(rsp);
+> +    if (!got_event) {
+> +        rsp = qmp_receive();
+> +        g_assert_cmpstr(qdict_get_try_str(rsp, "event"),
+> +                        ==, "DEVICE_DELETED");
+> +        qobject_unref(rsp);
+>       }
+> -    g_assert(event);
+> -    g_assert_cmpstr(qdict_get_str(event, "event"), ==, "DEVICE_DELETED");
+> -
+> -    qobject_unref(response1);
+> -    qobject_unref(response2);
+>   }
+>
+>   bool qmp_rsp_is_err(QDict *rsp)
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 53364849bf..68b767fc88 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -163,6 +163,23 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+>    */
+>   QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+>
+> +/**
+> + * qtest_qmp_receive_success:
+> + * @s: #QTestState instance to operate on
+> + * @event_cb: Event callback
+> + * @opaque: Argument for @event_cb
+> + *
+> + * Poll QMP messages until a command success response is received.
+> + * If @event_cb, call it for each event received, passing @opaque,
+> + * the event's name and data.
+> + * Return the success response's "return" member.
+> + */
+> +QDict *qtest_qmp_receive_success(QTestState *s,
+> +                                 void (*event_cb)(void *opaque,
+> +                                                  const char *name,
+> +                                                  QDict *data),
+> +                                 void *opaque);
+> +
+>   /**
+>    * qtest_hmp:
+>    * @s: #QTestState instance to operate on.
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index f9f2c0148a..267342fd3e 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -146,31 +146,20 @@ static void wait_for_serial(const char *side)
+>       } while (true);
+>   }
+>
+> +static void stop_cb(void *opaque, const char *name, QDict *data)
+> +{
+> +    if (!strcmp(name, "STOP")) {
+> +        got_stop = true;
+> +    }
+> +}
+> +
+>   /*
+>    * Events can get in the way of responses we are actually waiting for.
+>    */
+>   static QDict *wait_command(QTestState *who, const char *command)
+>   {
+> -    const char *event_string;
+> -    QDict *response, *ret;
+> -
+> -    response = qtest_qmp(who, command);
+> -
+> -    while (qdict_haskey(response, "event")) {
+> -        /* OK, it was an event */
+> -        event_string = qdict_get_str(response, "event");
+> -        if (!strcmp(event_string, "STOP")) {
+> -            got_stop = true;
+> -        }
+> -        qobject_unref(response);
+> -        response = qtest_qmp_receive(who);
+> -    }
+> -
+> -    ret = qdict_get_qdict(response, "return");
+> -    g_assert(ret);
+> -    qobject_ref(ret);
+> -    qobject_unref(response);
+> -    return ret;
+> +    qtest_qmp_send(who, command);
+> +    return qtest_qmp_receive_success(who, stop_cb, NULL);
+>   }
+>
+>   /*
+> diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+> index 3bd2887f1e..9f3f156e42 100644
+> --- a/tests/tpm-util.c
+> +++ b/tests/tpm-util.c
+> @@ -22,8 +22,6 @@
+>   #define TIS_REG(LOCTY, REG) \
+>       (TPM_TIS_ADDR_BASE + ((LOCTY) << 12) + REG)
+>
+> -static bool got_stop;
+> -
+>   void tpm_util_crb_transfer(QTestState *s,
+>                              const unsigned char *req, size_t req_size,
+>                              unsigned char *rsp, size_t rsp_size)
+> @@ -247,41 +245,19 @@ void tpm_util_migrate(QTestState *who, const char *uri)
+>       qobject_unref(rsp);
+>   }
+>
+> -/*
+> - * Events can get in the way of responses we are actually waiting for.
+> - */
+> -static QDict *tpm_util_wait_command(QTestState *who, const char *command)
+> -{
+> -    const char *event_string;
+> -    QDict *response;
+> -
+> -    response = qtest_qmp(who, command);
+> -
+> -    while (qdict_haskey(response, "event")) {
+> -        /* OK, it was an event */
+> -        event_string = qdict_get_str(response, "event");
+> -        if (!strcmp(event_string, "STOP")) {
+> -            got_stop = true;
+> -        }
+> -        qobject_unref(response);
+> -        response = qtest_qmp_receive(who);
+> -    }
+> -    return response;
+> -}
+> -
+>   void tpm_util_wait_for_migration_complete(QTestState *who)
+>   {
+>       while (true) {
+> -        QDict *rsp, *rsp_return;
+> +        QDict *rsp_return;
+>           bool completed;
+>           const char *status;
+>
+> -        rsp = tpm_util_wait_command(who, "{ 'execute': 'query-migrate' }");
+> -        rsp_return = qdict_get_qdict(rsp, "return");
+> +        qtest_qmp_send(who, "{ 'execute': 'query-migrate' }");
+> +        rsp_return = qtest_qmp_receive_success(who, NULL, NULL);
+>           status = qdict_get_str(rsp_return, "status");
+>           completed = strcmp(status, "completed") == 0;
+>           g_assert_cmpstr(status, !=,  "failed");
+> -        qobject_unref(rsp);
+> +        qobject_unref(rsp_return);
+>           if (completed) {
+>               return;
+>           }
