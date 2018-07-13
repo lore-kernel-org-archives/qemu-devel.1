@@ -1,35 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdr3J-0005Hh-SU
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:55:39 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdr5e-0005x1-1e
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdr3G-0003Om-Or
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:55:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41450)
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdr5a-0006Di-V9
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:58:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49022
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
-	id 1fdr3G-0002WU-F5
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:55:34 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1fdr5a-0006DK-OD
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:57:58 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6D5s4bb129133
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:54:32 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k6krqvthw-1
+	w6D5sXjX070931
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:57:58 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k6m65417q-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:54:32 -0400
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:57:57 -0400
 Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
-	Fri, 13 Jul 2018 06:54:29 +0100
+	Fri, 13 Jul 2018 06:57:56 +0100
+References: <153130635623.17872.6735154721391367314.stgit@lep8c.aus.stglabs.ibm.com>
+	<a6e06c37-5fe8-589c-f0c4-dcffef0b4c60@vivier.eu>
+	<96fc62a8-2369-05b6-17de-c10b52795f53@vivier.eu>
+	<07a9ce33-1a1a-a997-e99d-ebb89ef6e5e0@linux.vnet.ibm.com>
+	<36ca4564-3d16-85e0-6391-c85f058f747b@vivier.eu>
 From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-Date: Fri, 13 Jul 2018 00:54:25 -0500
+Date: Fri, 13 Jul 2018 11:27:50 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <153146124589.56005.13899878058836206262.stgit@lep8c.aus.stglabs.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] linux-user: ppc64: use the correct values
+In-Reply-To: <36ca4564-3d16-85e0-6391-c85f058f747b@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <66db5df6-4b19-8c33-0095-dcdd61a7c976@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] linux-user: ppc64: use the correct values
  for F_*LK64s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,182 +47,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: riku.voipio@iki.fi, laurent@vivier.eu
+To: Laurent Vivier <laurent@vivier.eu>, riku.voipio@iki.fi
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Qemu includes the glibc headers for the host defines and target headers are
-part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
-and F_SETLKW64 defined to 12, 13 and 14 for all archs in
-sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
-definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
-include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
-assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
-can be seen in include/linux/fcntl.h in linux source.
 
-On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
-explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
-Whereas, a PPC64 host doesn't have such a definition in
-/usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
-the sources on PPC64 host sees the default value of F_*LK64*
-as 12, 13 & 14(fcntl-linux.h).
 
-Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
-implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
-convertion back to F_*LK* values on PPC64 as seen in
-sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
-macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
-and no adjustments are needed.
+On 07/12/2018 12:36 PM, Laurent Vivier wrote:
+> Le 12/07/2018 =C3=A0 09:00, Shivaprasad G Bhat a =C3=A9crit=C2=A0:
+>>
+>> On 07/12/2018 02:21 AM, Laurent Vivier wrote:
+>>> Le 11/07/2018 =C3=A0 15:04, Laurent Vivier a =C3=A9crit=C2=A0:
+>>>> Le 11/07/2018 =C3=A0 12:55, Shivaprasad G Bhat a =C3=A9crit=C2=A0:
+>>>>> Qemu includes the glibc headers for the host defines and target
+>>>>> headers are
+>>>>> part of the qemu source themselves. The glibc has the F_GETLK64,
+>>>>> F_SETLK64
+>>>>> and F_SETLKW64 defined to 12, 13 and 14 for all archs(generic) in
+>>>>> sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generi=
+c
+>>>>> definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as
+>>>>> seen in
+>>>>> include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the
+>>>>> kernel
+>>>>> assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64*=
+ as
+>>>>> can be seen in include/linux/fcntl.h in linux source.
+>>>>>
+>>>>> On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
+>>>>> explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the gli=
+bc.
+>>>>> Whereas, a PPC64 host doesn't have such a definition in
+>>>>> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
+>>>>> the sources on PPC64 host sees the default value of F_*LK64*
+>>>>> as 12, 13 & 14(fcntl-linux.h).
+>>>>>
+>>>>> Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl
+>>>>> syscall
+>>>>> implementation(__libc_fcntl*(), __fcntl64_nocancel) does the
+>>>>> F_*LK64* value
+>>>>> convertion back to F_*LK* values on PPC64 as seen in
+>>>>> sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with
+>>>>> FCNTL_ADJUST_CMD()
+>>>>> macro. Whereas on x86_64 host the values for F_*LK64* are set to 5,
+>>>>> 6 and 7
+>>>>> and no adjustments are needed.
+>>>>>
+>>>>> Since qemu doesnt use the glibc fcntl, but makes the safe_syscall*
+>>>>> on its
+>>>>> own, the PPC64 qemu is calling the syscall with 12, 13, and 14(with=
+out
+>>>>> adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W=
+ all
+>>>>> fail by all pplications run on PPC64 host user emulation.
+>>>>>
+>>>>> The fix here could be to see why on PPC64 the glibc is still keepin=
+g
+>>>>> F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7
+>>>>> before
+>>>>> the syscall for PPC only. See if we can make the
+>>>>> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
+>>>>> 5, 6 & 7 just like x86_64 and remove the adjustment code in glibc.
+>>>>> That way,
+>>>>> qemu sources see the kernel supported values in glibc headers.
+>>>>>
+>>>>> OR
+>>>>>
+>>>>> On PPC64 host, qemu sources see both F_LK* & F_LK64* as same and se=
+t to
+>>>>> 12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
+>>>>> sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
+>>>>> Since F_*LK and F_*LK64 are same, the value adjument like done by
+>>>>> glibc in
+>>>>> qemu sources is difficult. So, Overwrite the glibc defaults with th=
+e
+>>>>> actual
+>>>>> supported values in Qemu. The current patch is doing this.
+>>>>>
+>>>>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+>>>>> ---
+>>>>>  =C2=A0 linux-user/syscall.c |=C2=A0=C2=A0 14 ++++++++++++++
+>>>>>  =C2=A0 1 file changed, 14 insertions(+)
+>>>>>
+>>>>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>>>>> index 7b9ac3b408..1693e69ce0 100644
+>>>>> --- a/linux-user/syscall.c
+>>>>> +++ b/linux-user/syscall.c
+>>>>> @@ -250,6 +250,20 @@ static type name (type1 arg1,type2 arg2,type3
+>>>>> arg3,type4 arg4,type5 arg5,=C2=A0=C2=A0=C2=A0 \
+>>>>>  =C2=A0 #define TARGET_NR__llseek TARGET_NR_llseek
+>>>>>  =C2=A0 #endif
+>>>>>  =C2=A0 +/* glibc headers has these defined to 12, 13 and 14 and is=
+ not
+>>>>> supported
+>>>>> + * by kernel. The glibc fcntl call actually adjusts them back to 5=
+,
+>>>>> 6 and 7
+>>>>> + * before making the syscall(). Since we make the syscall directly=
+,
+>>>>> + * overwite/adjust to what is supported by the kernel.
+>>>>> + */
+>>>>> +#if defined(__linux__) && defined(__powerpc64__)
+>>>>> +#undef F_GETLK64
+>>>>> +#define F_GETLK64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 /* Get record locking info.=C2=A0 */
+>>>>> +#undef F_SETLK64
+>>>>> +#define F_SETLK64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 6=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 /* Set record locking info
+>>>>> (non-blocking).=C2=A0 */
+>>>>> +#undef F_SETLKW64
+>>>>> +#define F_SETLKW64=C2=A0=C2=A0=C2=A0=C2=A0 7=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 /* Set record locking info
+>>>>> (blocking).=C2=A0 */
+>>>>> +#endif
+>>>>> +
+>>>>>  =C2=A0 #ifdef __NR_gettid
+>>>>>  =C2=A0 _syscall0(int, gettid)
+>>>>>  =C2=A0 #else
+>>>>>
+>>>> These macros are used in target_to_host_fcntl_cmd(), and this functi=
+on
+>>>> is used with safe_fcntl() and fcntl().
+>>>>
+>>>> So I think it would be cleaner to do the change after
+>>>> target_to_host_fcntl_cmd() in do_fcntl() as it is done in glibc inst=
+ead
+>>>> of redefining system values. Something like:
+>>>>
+>>>> --- a/linux-user/syscall.c
+>>>> +++ b/linux-user/syscall.c
+>>>> @@ -6782,6 +6782,12 @@ static abi_long do_fcntl(int fd, int cmd,
+>>>> abi_ulong arg)
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (host_cmd =3D=3D -TARGET_EINVAL)
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 return host_cmd;
+>>>>
+>>>> +#if defined(__linux__) && defined(__powerpc64__)
+>>>> +=C2=A0=C2=A0=C2=A0 if (host_cmd >=3D F_GETLK64 && host_cmd <=3D F_S=
+ETLKW64) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 host_cmd -=3D F_GETLK64 =
+- F_GETLK;
+>>> But as you said, __USE_FILE_OFFSET64 is defined in qemu, and F_GETLK =
+is
+>>> equal to F_GETLK64, so we should use something like:
+>>>
+>>> ...
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 host_cmd -=3D F_GETLK64 - 5;
+>>> ...
+> Hi Shivaprasad,
+>
+>> Hi Laurent, Thanks for the comments. I agree to the comments,
+>> sending the v2 accordingly.
+> Thank you.
+>
+> I did some tests, (qemu-hppa on ppc64 with dpkg), and we need the
+> conversion with TARGET_NR_fcntl64 too because it also calls safe_fcntl(=
+)
+> for TARGET_F_SETLK64 and TARGET_F_SETLKW64.
+I moved the adjustment code inside target_to_host_fcntl_cmd() to address=20
+all cases for
+future too. Just sent the v2.
 
-Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
-own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
-adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
-fail by all pplications run on PPC64 host user emulation.
+Couldn't get the hppa config to work on my setup, and that part is not=20
+tested.
 
-The fix here could be to see why on PPC64 the glibc is still keeping
-F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
-the syscall for PPC only. See if we can make the
-/usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
-5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That
-way, qemu sources see the kernel supported values in glibc headers.
-
-OR
-
-On PPC64 host, qemu sources see both F_*LK & F_*LK64* as same and set to
-12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
-sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
-Do the value adjustment just like it is done by glibc source by using
-F_GETLK value of 5. That way, we make the syscalls with the actual
-supported values in Qemu. The patch is taking this approach.
-
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
----
- Changes from v1:
-    - Changed the overwrite of F*LK64* with 5, 6 and 7 in using #define
-      instead using the adjustment code similar to glibc as suggested.
-    - Dropped __linux__ check for the adjustment code as suggested.
-    - Moved the adjustment code inside target_to_host_fcntl_cmd to address
-      all possible|future cases.
-
- linux-user/syscall.c |   73 ++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 52 insertions(+), 21 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 643b8833de..38c2f1e90f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6475,63 +6475,94 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
- /* warning : doesn't handle linux specific flags... */
- static int target_to_host_fcntl_cmd(int cmd)
- {
-+    int ret = -TARGET_EINVAL;
-     switch(cmd) {
- 	case TARGET_F_DUPFD:
- 	case TARGET_F_GETFD:
- 	case TARGET_F_SETFD:
- 	case TARGET_F_GETFL:
- 	case TARGET_F_SETFL:
--            return cmd;
-+            ret = cmd;
-+            break;
-         case TARGET_F_GETLK:
--            return F_GETLK64;
-+            ret = F_GETLK64;
-+            break;
-         case TARGET_F_SETLK:
--            return F_SETLK64;
-+            ret = F_SETLK64;
-+            break;
-         case TARGET_F_SETLKW:
--            return F_SETLKW64;
-+            ret = F_SETLKW64;
-+            break;
- 	case TARGET_F_GETOWN:
--	    return F_GETOWN;
-+            ret = F_GETOWN;
-+            break;
- 	case TARGET_F_SETOWN:
--	    return F_SETOWN;
-+            ret = F_SETOWN;
-+            break;
- 	case TARGET_F_GETSIG:
--	    return F_GETSIG;
-+            ret = F_GETSIG;
-+            break;
- 	case TARGET_F_SETSIG:
--	    return F_SETSIG;
-+            ret = F_SETSIG;
-+            break;
- #if TARGET_ABI_BITS == 32
-         case TARGET_F_GETLK64:
--	    return F_GETLK64;
-+            ret = F_GETLK64;
-+            break;
- 	case TARGET_F_SETLK64:
--	    return F_SETLK64;
-+            ret = F_SETLK64;
-+            break;
- 	case TARGET_F_SETLKW64:
--	    return F_SETLKW64;
-+            ret = F_SETLKW64;
-+            break;
- #endif
-         case TARGET_F_SETLEASE:
--            return F_SETLEASE;
-+            ret = F_SETLEASE;
-+            break;
-         case TARGET_F_GETLEASE:
--            return F_GETLEASE;
-+            ret = F_GETLEASE;
-+            break;
- #ifdef F_DUPFD_CLOEXEC
-         case TARGET_F_DUPFD_CLOEXEC:
--            return F_DUPFD_CLOEXEC;
-+            ret = F_DUPFD_CLOEXEC;
-+            break;
- #endif
-         case TARGET_F_NOTIFY:
--            return F_NOTIFY;
-+            ret = F_NOTIFY;
-+            break;
- #ifdef F_GETOWN_EX
- 	case TARGET_F_GETOWN_EX:
--	    return F_GETOWN_EX;
-+            ret = F_GETOWN_EX;
-+            break;
- #endif
- #ifdef F_SETOWN_EX
- 	case TARGET_F_SETOWN_EX:
--	    return F_SETOWN_EX;
-+            ret = F_SETOWN_EX;
-+            break;
- #endif
- #ifdef F_SETPIPE_SZ
-         case TARGET_F_SETPIPE_SZ:
--            return F_SETPIPE_SZ;
-+            ret = F_SETPIPE_SZ;
-+            break;
-         case TARGET_F_GETPIPE_SZ:
--            return F_GETPIPE_SZ;
-+            ret = F_GETPIPE_SZ;
-+            break;
- #endif
- 	default:
--            return -TARGET_EINVAL;
-+            ret = -TARGET_EINVAL;
-     }
--    return -TARGET_EINVAL;
-+
-+#if defined(__powerpc64__)
-+/* On PPC64, glibc headers has the F_*LK* defined to 12, 13 and 14 and
-+ * is not supported by kernel. The glibc fcntl call actually adjusts
-+ * them to 5, 6 and 7 before making the syscall(). Since we make the
-+ * syscall directly, adjust to what is supported by the kernel.
-+ */
-+    if (ret >= F_GETLK64 && ret <= F_SETLKW64) {
-+        ret -= F_GETLK64 - 5;
-+#endif
-+
-+    return ret;
- }
- 
- #define TRANSTBL_CONVERT(a) { -1, TARGET_##a, -1, a }
+Regards,
+Shivaprasad
+>
+> Thanks,
+> Laurent
+>
