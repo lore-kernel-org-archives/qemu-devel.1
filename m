@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fdqVp-0001Hx-22
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:21:04 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdr3J-0005Hh-SU
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fdqVl-0001XN-PG
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:21:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37070 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fdqVl-0001Tm-Ig
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:20:57 -0400
-Date: Fri, 13 Jul 2018 13:20:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180713052051.GC2379@xz-mi>
-References: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdr3G-0003Om-Or
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:55:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
+	id 1fdr3G-0002WU-F5
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 01:55:34 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6D5s4bb129133
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:54:32 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k6krqvthw-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:54:32 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
+	Fri, 13 Jul 2018 06:54:29 +0100
+From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Date: Fri, 13 Jul 2018 00:54:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180629080320.320144-1-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v0 0/7] Background snapshots
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <153146124589.56005.13899878058836206262.stgit@lep8c.aus.stglabs.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] linux-user: ppc64: use the correct values
+ for F_*LK64s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +39,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: riku.voipio@iki.fi, laurent@vivier.eu
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Fri, Jun 29, 2018 at 11:03:13AM +0300, Denis Plotnikov wrote:
-> The patch set adds the ability to make external snapshots while VM is running.
-> 
-> The workflow to make a snapshot is the following:
-> 1. Pause the vm
-> 2. Make a snapshot of block devices using the scheme of your choice
-> 3. Turn on background-snapshot migration capability
-> 4. Start the migration using the destination (migration stream) of your choice.
->    The migration will resume the vm execution by itself
->    when it has the devices' states saved  and is ready to start ram writing
->    to the migration stream.
-> 5. Listen to the migration finish event
-> 
-> The feature relies on KVM unapplied ability to report the faulting address.
-> Please find the KVM patch snippet to make the patchset work below:
-> 
-> +++ b/arch/x86/kvm/vmx.c
-> @@ -XXXX,X +XXXX,XX @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
->  
->         vcpu->arch.exit_qualification = exit_qualification;
->  
-> -       return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> +       r = kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> +        if (r == -EFAULT) {
-> +               unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gpa >> PAGE_SHIFT);
-> +
-> +               vcpu->run->exit_reason = KVM_EXIT_FAIL_MEM_ACCESS;
-> +               vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_VIOLATION;
-> +               vcpu->run->fail_mem_access.hva = hva | (gpa & (PAGE_SIZE-1));
-> +               r = 0;
-> +
-> +       }
-> +       return r;
-> 
-> The patch to KVM can be sent if the patch set approved
+Qemu includes the glibc headers for the host defines and target headers are
+part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
+and F_SETLKW64 defined to 12, 13 and 14 for all archs in
+sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
+definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
+include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
+assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
+can be seen in include/linux/fcntl.h in linux source.
 
-Hi, Denis,
+On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
+explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
+Whereas, a PPC64 host doesn't have such a definition in
+/usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
+the sources on PPC64 host sees the default value of F_*LK64*
+as 12, 13 & 14(fcntl-linux.h).
 
-If the work will definitely require KVM to cooperate, AFAIU the thing
-we normally do is that we first propose the kernel counterpart on kvm
-list, then it'll be easier to review the QEMU counterpart (or, propose
-both kvm/qemu changes at the same time, always the QEMU changes can be
-RFC, as a reference to prove the kvm change is valid and useful).  Not
-sure whether you should do this as well for this live snapshot work.
+Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
+implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
+convertion back to F_*LK* values on PPC64 as seen in
+sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
+macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
+and no adjustments are needed.
 
-Since we might have two backends in the future, my major question for
-that counterpart series would be whether we need to support both in
-the future (mprotect, and userfaultfd), and the differences between
-the two methods from kernel's point of view.  I would vaguely guess
-that we can at least firstly have mprotect work then userfaultfd then
-we can automatically choose the backend when both are provided, but I
-guess that discussion might still better happen on the kvm list.  Also
-I would also guess that in that work you'd better consider no-ept case
-as well for Intel, even for AMD.  But not sure we can at least start a
-RFC with the simplest scenario and prove its validity.
+Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
+own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
+adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
+fail by all pplications run on PPC64 host user emulation.
 
-Regards,
+The fix here could be to see why on PPC64 the glibc is still keeping
+F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
+the syscall for PPC only. See if we can make the
+/usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
+5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That
+way, qemu sources see the kernel supported values in glibc headers.
 
--- 
-Peter Xu
+OR
+
+On PPC64 host, qemu sources see both F_*LK & F_*LK64* as same and set to
+12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
+sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
+Do the value adjustment just like it is done by glibc source by using
+F_GETLK value of 5. That way, we make the syscalls with the actual
+supported values in Qemu. The patch is taking this approach.
+
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+---
+ Changes from v1:
+    - Changed the overwrite of F*LK64* with 5, 6 and 7 in using #define
+      instead using the adjustment code similar to glibc as suggested.
+    - Dropped __linux__ check for the adjustment code as suggested.
+    - Moved the adjustment code inside target_to_host_fcntl_cmd to address
+      all possible|future cases.
+
+ linux-user/syscall.c |   73 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 52 insertions(+), 21 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 643b8833de..38c2f1e90f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6475,63 +6475,94 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
+ /* warning : doesn't handle linux specific flags... */
+ static int target_to_host_fcntl_cmd(int cmd)
+ {
++    int ret = -TARGET_EINVAL;
+     switch(cmd) {
+ 	case TARGET_F_DUPFD:
+ 	case TARGET_F_GETFD:
+ 	case TARGET_F_SETFD:
+ 	case TARGET_F_GETFL:
+ 	case TARGET_F_SETFL:
+-            return cmd;
++            ret = cmd;
++            break;
+         case TARGET_F_GETLK:
+-            return F_GETLK64;
++            ret = F_GETLK64;
++            break;
+         case TARGET_F_SETLK:
+-            return F_SETLK64;
++            ret = F_SETLK64;
++            break;
+         case TARGET_F_SETLKW:
+-            return F_SETLKW64;
++            ret = F_SETLKW64;
++            break;
+ 	case TARGET_F_GETOWN:
+-	    return F_GETOWN;
++            ret = F_GETOWN;
++            break;
+ 	case TARGET_F_SETOWN:
+-	    return F_SETOWN;
++            ret = F_SETOWN;
++            break;
+ 	case TARGET_F_GETSIG:
+-	    return F_GETSIG;
++            ret = F_GETSIG;
++            break;
+ 	case TARGET_F_SETSIG:
+-	    return F_SETSIG;
++            ret = F_SETSIG;
++            break;
+ #if TARGET_ABI_BITS == 32
+         case TARGET_F_GETLK64:
+-	    return F_GETLK64;
++            ret = F_GETLK64;
++            break;
+ 	case TARGET_F_SETLK64:
+-	    return F_SETLK64;
++            ret = F_SETLK64;
++            break;
+ 	case TARGET_F_SETLKW64:
+-	    return F_SETLKW64;
++            ret = F_SETLKW64;
++            break;
+ #endif
+         case TARGET_F_SETLEASE:
+-            return F_SETLEASE;
++            ret = F_SETLEASE;
++            break;
+         case TARGET_F_GETLEASE:
+-            return F_GETLEASE;
++            ret = F_GETLEASE;
++            break;
+ #ifdef F_DUPFD_CLOEXEC
+         case TARGET_F_DUPFD_CLOEXEC:
+-            return F_DUPFD_CLOEXEC;
++            ret = F_DUPFD_CLOEXEC;
++            break;
+ #endif
+         case TARGET_F_NOTIFY:
+-            return F_NOTIFY;
++            ret = F_NOTIFY;
++            break;
+ #ifdef F_GETOWN_EX
+ 	case TARGET_F_GETOWN_EX:
+-	    return F_GETOWN_EX;
++            ret = F_GETOWN_EX;
++            break;
+ #endif
+ #ifdef F_SETOWN_EX
+ 	case TARGET_F_SETOWN_EX:
+-	    return F_SETOWN_EX;
++            ret = F_SETOWN_EX;
++            break;
+ #endif
+ #ifdef F_SETPIPE_SZ
+         case TARGET_F_SETPIPE_SZ:
+-            return F_SETPIPE_SZ;
++            ret = F_SETPIPE_SZ;
++            break;
+         case TARGET_F_GETPIPE_SZ:
+-            return F_GETPIPE_SZ;
++            ret = F_GETPIPE_SZ;
++            break;
+ #endif
+ 	default:
+-            return -TARGET_EINVAL;
++            ret = -TARGET_EINVAL;
+     }
+-    return -TARGET_EINVAL;
++
++#if defined(__powerpc64__)
++/* On PPC64, glibc headers has the F_*LK* defined to 12, 13 and 14 and
++ * is not supported by kernel. The glibc fcntl call actually adjusts
++ * them to 5, 6 and 7 before making the syscall(). Since we make the
++ * syscall directly, adjust to what is supported by the kernel.
++ */
++    if (ret >= F_GETLK64 && ret <= F_SETLKW64) {
++        ret -= F_GETLK64 - 5;
++#endif
++
++    return ret;
+ }
+ 
+ #define TRANSTBL_CONVERT(a) { -1, TARGET_##a, -1, a }
