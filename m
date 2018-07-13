@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fdtjL-00087H-Qo
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:47:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1fdu2y-0002gu-9H
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:07:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fdtjI-00068e-PG
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:47:11 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:39148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fdtjI-00067k-Gx
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:47:08 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id h10-v6so24284800wre.6
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 01:47:08 -0700 (PDT)
-References: <20180713054755.23323-1-sw@weilnetz.de>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180713054755.23323-1-sw@weilnetz.de>
-Date: Fri, 13 Jul 2018 09:47:05 +0100
-Message-ID: <877elzcyk6.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1fdu2s-0007sZ-Ic
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:07:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45350 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fdu2s-0007sD-Bd
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:07:22 -0400
+References: <20180712194522.31063-1-ehabkost@redhat.com>
+	<20180712194522.31063-2-ehabkost@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <62728fab-c201-b212-98e9-5a5b1af315a4@redhat.com>
+Date: Fri, 13 Jul 2018 11:07:15 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180712194522.31063-2-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: Fix typos in comments and help
- message (found by codespell)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/3] qom: Document reference count ownership
+ rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-
-Stefan Weil <sw@weilnetz.de> writes:
-
-> Fix also a grammar issue.
->
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-
-*blush* 5 of those are my spelling mistakes, so have an embarrassed:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 12.07.2018 21:45, Eduardo Habkost wrote:
+> The documentation for QOM is not clear about who owns references
+> to objects (i.e. who is responsible for calling object_unref()
+> later).
+> 
+> This is important considering there are a few inconsistencies in
+> the API (e.g. callers of object_new() need to call object_unref()
+> later, but callers of object_new_with_props() must not do it).
+> 
+> Update the documentation so that every mention of object
+> references also mention who exactly owns the reference.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  tests/bios-tables-test.c              | 2 +-
->  tests/docker/Makefile.include         | 2 +-
->  tests/docker/docker.py                | 4 ++--
->  tests/guest-debug/test-gdbstub.py     | 2 +-
->  tests/qemu-iotests/common.qemu        | 2 +-
->  tests/tcg/Makefile.include            | 2 +-
->  tests/tcg/Makefile.probe              | 2 +-
->  tests/tcg/mips/mips64-dsp/subq_s_pw.c | 2 +-
->  8 files changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 4e24930c4b..af4b1fb6bd 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -390,7 +390,7 @@ try_again:
->          if (g_file_test(aml_file, G_FILE_TEST_EXISTS)) {
->              exp_sdt.aml_file =3D aml_file;
->          } else if (*ext !=3D '\0') {
-> -            /* try fallback to generic (extention less) expected file */
-> +            /* try fallback to generic (extension less) expected file */
->              ext =3D "";
->              g_free(aml_file);
->              goto try_again;
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index b2a7e761cc..d865dcfdaa 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -37,7 +37,7 @@ docker-qemu-src: $(DOCKER_SRC_COPY)
->  docker-image: ${DOCKER_TARGETS}
->
->  # General rule for building docker images. If we are a sub-make
-> -# invoked with SKIP_DOCKER_BUILD we still check the image is upto date
-> +# invoked with SKIP_DOCKER_BUILD we still check the image is up to date
->  # though
->  ifdef SKIP_DOCKER_BUILD
->  docker-image-%: $(DOCKER_FILES_DIR)/%.docker
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 69e7130db7..b82926596c 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -99,7 +99,7 @@ def _get_so_libs(executable):
->      return libs
->
->  def _copy_binary_with_libs(src, dest_dir):
-> -    """Copy a binary executable and all its dependant libraries.
-> +    """Copy a binary executable and all its dependent libraries.
->
->      This does rely on the host file-system being fairly multi-arch
->      aware so the file don't clash with the guests layout."""
-> @@ -261,7 +261,7 @@ class SubCommand(object):
->      name =3D None # Subcommand name
->      def shared_args(self, parser):
->          parser.add_argument("--quiet", action=3D"store_true",
-> -                            help=3D"Run quietly unless an error occured")
-> +                            help=3D"Run quietly unless an error occurred=
-")
->
->      def args(self, parser):
->          """Setup argument parser"""
-> diff --git a/tests/guest-debug/test-gdbstub.py b/tests/guest-debug/test-g=
-dbstub.py
-> index 474d2c5c65..0e4ac01426 100644
-> --- a/tests/guest-debug/test-gdbstub.py
-> +++ b/tests/guest-debug/test-gdbstub.py
-> @@ -122,7 +122,7 @@ class CatchBreakpoint(gdb.Breakpoint):
->
->
->  def run_test():
-> -    "Run throught the tests one by one"
-> +    "Run through the tests one by one"
->
->      print ("Checking we can step the first few instructions")
->      step_ok =3D 0
-> diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.q=
-emu
-> index f285484951..dadde2a266 100644
-> --- a/tests/qemu-iotests/common.qemu
-> +++ b/tests/qemu-iotests/common.qemu
-> @@ -257,7 +257,7 @@ function _launch_qemu()
->  }
->
->
-> -# Silenty kills the QEMU process
-> +# Silently kills the QEMU process
->  #
->  # If $wait is set to anything other than the empty string, the process w=
-ill not
->  # be killed but only waited for, and any output will be forwarded to std=
-out. If
-> diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
-> index 57470b2a2c..c581bd6ffc 100644
-> --- a/tests/tcg/Makefile.include
-> +++ b/tests/tcg/Makefile.include
-> @@ -2,7 +2,7 @@
->  #
->  # TCG tests (per-target rules)
->  #
-> -# This Makefile fragement is included from the per-target
-> +# This Makefile fragment is included from the per-target
->  # Makefile.target so will be invoked for each linux-user program we
->  # build. We have two options for compiling, either using a configured
->  # guest compiler or calling one of our docker images to do it for us.
-> diff --git a/tests/tcg/Makefile.probe b/tests/tcg/Makefile.probe
-> index 15c0412657..9dc654663d 100644
-> --- a/tests/tcg/Makefile.probe
-> +++ b/tests/tcg/Makefile.probe
-> @@ -2,7 +2,7 @@
->  #
->  # TCG Compiler Probe
->  #
-> -# This Makefile fragement is included multiple times in the main make
-> +# This Makefile fragment is included multiple times in the main make
->  # script to probe for available compilers. This is used to build up a
->  # selection of required docker targets before we invoke a sub-make for
->  # each target.
-> diff --git a/tests/tcg/mips/mips64-dsp/subq_s_pw.c b/tests/tcg/mips/mips6=
-4-dsp/subq_s_pw.c
-> index e8e0b0567e..4c080b785a 100644
-> --- a/tests/tcg/mips/mips64-dsp/subq_s_pw.c
-> +++ b/tests/tcg/mips/mips64-dsp/subq_s_pw.c
-> @@ -24,7 +24,7 @@ int main(void)
->      rt =3D 0x123456789ABCDEF1;
->      rs =3D 0x123456789ABCDEF2;
->      result =3D  0x0000000000000001;
-> -    /* This time we do not set dspctrl, but it setted in pre-action. */
-> +    /* This time we do not set dspctrl, but set it in pre-action. */
->      dspresult =3D 0x1;
->
->      __asm
+>  include/qom/object.h | 73 +++++++++++++++++++++++++-------------------
+>  1 file changed, 42 insertions(+), 31 deletions(-)
+> 
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index f3d2308d56..08a1bbba7d 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -376,7 +376,7 @@ typedef void (ObjectUnparent)(Object *obj);
+>   * ObjectFree:
+>   * @obj: the object being freed
+>   *
+> - * Called when an object's last reference is removed.
+> + * Called when an object's last reference is dropped using object_unref().
+>   */
+>  typedef void (ObjectFree)(void *obj);
+>  
+> @@ -601,8 +601,8 @@ struct InterfaceClass
+>   * @typename: The name of the type of the object to instantiate.
+>   *
+>   * This function will initialize a new object using heap allocated memory.
+> - * The returned object has a reference count of 1, and will be freed when
+> - * the last reference is dropped.
+> + * The returned object has a reference count of 1, and the reference will be
+> + * owned by the caller.
+>   *
+>   * Returns: The newly allocated and instantiated object.
+>   */
+> @@ -617,8 +617,8 @@ Object *object_new(const char *typename);
+>   * @...: list of property names and values
+>   *
+>   * This function will initialize a new object using heap allocated memory.
+> - * The returned object has a reference count of 1, and will be freed when
+> - * the last reference is dropped.
+> + * The returned object has a reference count of 1, and the reference will
+> + * be owned by the caller.
 
+That's the description of object_new_with_props here already, isn't it?
+So the reference will be owned by the parent object, not by the caller.
 
---
-Alex Benn=C3=A9e
+>   * The @id parameter will be used when registering the object as a
+>   * child of @parent in the composition tree.
+> @@ -652,8 +652,8 @@ Object *object_new(const char *typename);
+>   *   </programlisting>
+>   * </example>
+>   *
+> - * The returned object will have one stable reference maintained
+> - * for as long as it is present in the object hierarchy.
+> + * The returned object will have one reference, <emphasis>owned by the
+> + * parent object</emphasis> (not by the caller).
+
+... and then this information here is somewhat redundant. I suggest to
+remove one of the two spots.
+
+ Thomas
