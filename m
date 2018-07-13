@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdnr5-00032Y-BN
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 22:30:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdpZS-0000CV-Ts
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 00:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fdnr0-0007sI-DM
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 22:30:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43676)
+	(envelope-from <bounces@canonical.com>) id 1fdpZP-0003mt-O5
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 00:20:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fdnr0-0007s4-71
-	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 22:30:42 -0400
+	id 1fdpZP-0003mV-Ha
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 00:20:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fdnqy-0006XK-Qg
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 02:30:40 +0000
+	id 1fdpZO-0007Es-CW
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 04:20:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC9842E8052
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 02:30:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A01F2E8076
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 04:20:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Jul 2018 02:16:57 -0000
-From: Diego Viola <diego.viola@gmail.com>
+Date: Fri, 13 Jul 2018 04:06:43 -0000
+From: =?utf-8?q?Francisco_de_la_Pe=C3=B1a?= <fran@fran.cr>
 Reply-To: Bug 1781515 <1781515@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153144791597.24345.4188684272748961598.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153144821716.23804.5319121004648467630.malone@chaenomeles.canonical.com>
+Message-Id: <153145480325.4037.3734767939067856049.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1781515] Re: Resolution switch leads to the
  screen/image being corrupted
@@ -39,11 +39,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Switching the resolution with -vga std was working fine before, I'm not
-sure on which version it started having this issue, but it should be on
-a recent version.
+Hi Diego,
 
-I use the intel i915 drivers on the host OS.
+It seems this is a known limitation[1] because horizontal width is not a
+multiple of 8, try 1360x768 as the nearest resolution, which works for
+me on guests not supporting QXL drivers.
+
+Regards.
+
+[1] Proposed patch from 2013: https://lists.gnu.org/archive/html/qemu-
+devel/2013-03/msg02732.html
 
 -- =
 
