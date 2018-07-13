@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdxX4-0006Vq-E3
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:50:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fdxfc-0000BE-O6
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdxX3-0004Sm-Ia
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:50:46 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:40453)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdxX3-0004QW-DI
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:50:45 -0400
-Received: by mail-oi0-x244.google.com with SMTP id w126-v6so61970636oie.7
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 05:50:45 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <8a05e6cb-dd76-58c4-8069-956b3e95161d@linaro.org>
-References: <20180702160546.31969-1-richard.henderson@linaro.org>
-	<20180702160546.31969-5-richard.henderson@linaro.org>
-	<CAFEAcA8qtHmWt9Zhnhqcc6J-hgbxucq-gU1V5=uZa727kqKSvg@mail.gmail.com>
-	<8a05e6cb-dd76-58c4-8069-956b3e95161d@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Jul 2018 13:50:23 +0100
-Message-ID: <CAFEAcA_U9qhTZayGS9W56H+1MmM3wfVj4r1K1vSV11pLKFAp3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 4/6] accel/tcg: Don't treat invalid TLB
- entries as needing recheck
+	(envelope-from <laurent@vivier.eu>) id 1fdxfY-0005AZ-So
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:59:36 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:33887)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fdxfY-00057v-IG
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 08:59:32 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 13 Jul 2018 14:58:05 +0200
+Message-Id: <20180713125805.10749-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] linux-user: convert remaining fcntl() to
+ safe_fcntl()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-On 13 July 2018 at 13:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 07/13/2018 06:05 AM, Peter Maydell wrote:
->>> -    if (unlikely(env->tlb_table[mmu_idx][index].addr_code & TLB_RECHECK)) {
->>> +    if (unlikely((env->tlb_table[mmu_idx][index].addr_code &
->>> +                  (TLB_RECHECK | TLB_INVALID_MASK)) == TLB_RECHECK)) {
->>>          /*
->>>           * This is a TLB_RECHECK access, where the MMU protection
->>>           * covers a smaller range than a target page, and we must
->>
->> Looking again at this code, I think that now we have the code to
->> ensure that there's only ever one entry in the TLB/victim TLB for
->> a given guest address...
->
-> Which probably wasn't the case the first time you wrote this, no?
-> Fixing that single entry condition was just a few weeks ago.
+Commit 435da5e709 didn't convert a fcntl() call to safe_fcntl()
+for TARGET_NR_fcntl64 case. There is no reason to not use it
+in this case.
 
-Yes, exactly.
+Fixes: 435da5e709 linux-user: Use safe_syscall wrapper for fcntl
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-OTOH with Laurent's m68k test case I'm finding that the assert
-is firing, and I'm not entirely sure why yet...
-
-thanks
--- PMM
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e4b1b7d7da..a997ba914f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11730,7 +11730,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             if (ret) {
+                 break;
+             }
+-            ret = get_errno(fcntl(arg1, cmd, &fl));
++            ret = get_errno(safe_fcntl(arg1, cmd, &fl));
+             if (ret == 0) {
+                 ret = copyto(arg3, &fl);
+             }
+-- 
+2.17.1
