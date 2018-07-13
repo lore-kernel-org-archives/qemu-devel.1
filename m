@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdvSp-0006I3-7u
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:38:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fdvkQ-00014M-6e
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fdvSo-00071N-AF
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:38:15 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36738)
+	(envelope-from <richard.henderson@linaro.org>) id 1fdvkN-0000fL-61
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:56:26 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:44190)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fdvSo-00070m-3g
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:38:14 -0400
-Received: by mail-oi0-x244.google.com with SMTP id r16-v6so61414980oie.3
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 03:38:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fdvkN-0000f1-0b
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 06:56:23 -0400
+Received: by mail-io0-x242.google.com with SMTP id q19-v6so30943145ioh.11
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 03:56:22 -0700 (PDT)
+References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <453b2e89-9fa5-6bbf-9fdb-32f144949dd1@linaro.org>
+Date: Fri, 13 Jul 2018 05:56:16 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-D_Kw33EeMrCg4k=B0yLB8U_X92OC09BQ1JKH4UiYUNQ@mail.gmail.com>
-References: <20180712200152.28569-1-sw@weilnetz.de>
-	<CAFEAcA-D_Kw33EeMrCg4k=B0yLB8U_X92OC09BQ1JKH4UiYUNQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Jul 2018 11:37:52 +0100
-Message-ID: <CAFEAcA8eEMH6dT_+w+u9woFr9oovFA3NuU4L475qFQ=O2q1kfQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] docs: Fix some typos (most found by
- codespell)
+In-Reply-To: <1531470464-21522-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Fix crashes with introspection of
+ ARM devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Markus Armbruster <armbru@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-On 12 July 2018 at 21:29, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 12 July 2018 at 21:01, Stefan Weil <sw@weilnetz.de> wrote:
->> Signed-off-by: Stefan Weil <sw@weilnetz.de>
->> ---
->>  docs/COLO-FT.txt                     | 2 +-
->>  docs/config/mach-virt-graphical.cfg  | 2 +-
->>  docs/config/mach-virt-serial.cfg     | 2 +-
->>  docs/config/q35-emulated.cfg         | 2 +-
->>  docs/config/q35-virtio-graphical.cfg | 2 +-
->>  docs/config/q35-virtio-serial.cfg    | 2 +-
->>  docs/interop/vhost-user.txt          | 4 ++--
->>  docs/replay.txt                      | 2 +-
->>  docs/specs/tpm.txt                   | 2 +-
->>  9 files changed, 10 insertions(+), 10 deletions(-)
->
-> Hi. A bunch of these are fixed by this patch posted last month
-> https://patchwork.kernel.org/patch/10459487/
+On 07/13/2018 03:27 AM, Thomas Huth wrote:
+> v2:
+>  - Updated the first patch according to the review feedback from v1
+>  - Added more patches with additional fixes
+> 
+> Thomas Huth (16):
+>   qom/object: Add a new function object_initialize_child()
+>   hw/core/sysbus: Add a function for creating and attaching an object
+>   hw/arm/bcm2836: Fix crash with device_add bcm2837 on unsupported
+>     machines
+>   hw/arm/armv7: Fix crash when introspecting the "iotkit" device
+>   hw/cpu/a15mpcore: Fix introspection problem with the a15mpcore_priv
+>     device
+>   hw/display/xlnx_dp: Move problematic code from instance_init to
+>     realize
+>   hw/arm/xlnx-zynqmp: Fix crash when introspecting the "xlnx,zynqmp"
+>     device
+>   hw/arm/msf2-soc: Fix introspection problem with the "msf2-soc" device
+>   hw/cpu/a9mpcore: Fix introspection problems with the "a9mpcore_priv"
+>     device
+>   hw/arm/fsl-imx6: Fix introspection problems with the "fsl,imx6" device
+>   hw/arm/fsl-imx7: Fix introspection problems with the "fsl,imx7" device
+>   hw/arm/fsl-imx25: Fix introspection problem with the "fsl,imx25"
+>     device
+>   hw/arm/fsl-imx31: Fix introspection problem with the "fsl,imx31"
+>     device
+>   hw/cpu/arm11mpcore: Fix introspection problem with 'arm11mpcore_priv'
+>   hw/*/realview: Fix introspection problem with 'realview_mpcore' &
+>     'realview_gic'
+>   hw/arm/allwinner-a10: Fix introspection problem with 'allwinner-a10'
 
-I've now applied that patch to master, so if you rebase this
-I think the remaining changes left in this patch will be
+That is a great cleanup.
 
-docs/COLO-FT.txt                     | 2 +-
-docs/interop/vhost-user.txt          | 4 ++--
-docs/replay.txt                      | 2 +-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-thanks
--- PMM
+
+r~
