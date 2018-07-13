@@ -1,17 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stweil@ub-blade-01.bib.uni-mannheim.de>)
-	id 1fdrBJ-00072f-DO
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:03:54 -0400
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdrNa-0000wB-5E
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stweil@ub-blade-01.bib.uni-mannheim.de>)
-	id 1fdrBG-0002Uv-5u
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:03:53 -0400
-From: Stefan Weil <sw@weilnetz.de>
-Date: Fri, 13 Jul 2018 07:47:55 +0200
-Message-Id: <20180713054755.23323-1-sw@weilnetz.de>
-Subject: [Qemu-devel] [PATCH] tests: Fix typos in comments and help message
- (found by codespell)
+	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fdrNV-00045c-5G
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:16:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
+	id 1fdrNU-00045J-SL
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 02:16:29 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6D6EPpw100124
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 02:16:27 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2k6p5xs46d-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 02:16:27 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
+	Fri, 13 Jul 2018 07:16:24 +0100
+From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Date: Fri, 13 Jul 2018 01:16:20 -0500
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <153146249729.58730.14937110422578573377.stgit@lep8c.aus.stglabs.ibm.com>
+Subject: [Qemu-devel] [PATCH v3] linux-user: ppc64: use the correct values
+ for F_*LK64s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,135 +39,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developer <qemu-devel@nongnu.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Weil <sw@weilnetz.de>
+To: riku.voipio@iki.fi, laurent@vivier.eu
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Fix also a grammar issue.
+Qemu includes the glibc headers for the host defines and target headers are
+part of the qemu source themselves. The glibc has the F_GETLK64, F_SETLK64
+and F_SETLKW64 defined to 12, 13 and 14 for all archs in
+sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
+definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen in
+include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the kernel
+assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as
+can be seen in include/linux/fcntl.h in linux source.
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
+On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
+explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.
+Whereas, a PPC64 host doesn't have such a definition in
+/usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
+the sources on PPC64 host sees the default value of F_*LK64*
+as 12, 13 & 14(fcntl-linux.h).
+
+Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl syscall
+implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* value
+convertion back to F_*LK* values on PPC64 as seen in
+sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_CMD()
+macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 and 7
+and no adjustments are needed.
+
+Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on its
+own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without
+adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W all
+fail by all pplications run on PPC64 host user emulation.
+
+The fix here could be to see why on PPC64 the glibc is still keeping
+F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 before
+the syscall for PPC only. See if we can make the
+/usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
+5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. That
+way, qemu sources see the kernel supported values in glibc headers.
+
+OR
+
+On PPC64 host, qemu sources see both F_*LK & F_*LK64* as same and set to
+12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
+sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
+Do the value adjustment just like it is done by glibc source by using
+F_GETLK value of 5. That way, we make the syscalls with the actual
+supported values in Qemu. The patch is taking this approach.
+
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
 ---
- tests/bios-tables-test.c              | 2 +-
- tests/docker/Makefile.include         | 2 +-
- tests/docker/docker.py                | 4 ++--
- tests/guest-debug/test-gdbstub.py     | 2 +-
- tests/qemu-iotests/common.qemu        | 2 +-
- tests/tcg/Makefile.include            | 2 +-
- tests/tcg/Makefile.probe              | 2 +-
- tests/tcg/mips/mips64-dsp/subq_s_pw.c | 2 +-
- 8 files changed, 9 insertions(+), 9 deletions(-)
+ v2 - https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02920.html
+ Changes from v2:
+    - Fixed the braces, and indentation for comments.
+ v1 - https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02567.html
+ Changes from v1:
+    - Changed the overwrite of F*LK64* with 5, 6 and 7 in using #define
+      instead using the adjustment code similar to glibc as suggested.
+    - Dropped __linux__ check for the adjustment code as suggested.
+    - Moved the adjustment code inside target_to_host_fcntl_cmd to address
+      all possible|future cases.
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 4e24930c4b..af4b1fb6bd 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -390,7 +390,7 @@ try_again:
-         if (g_file_test(aml_file, G_FILE_TEST_EXISTS)) {
-             exp_sdt.aml_file = aml_file;
-         } else if (*ext != '\0') {
--            /* try fallback to generic (extention less) expected file */
-+            /* try fallback to generic (extension less) expected file */
-             ext = "";
-             g_free(aml_file);
-             goto try_again;
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index b2a7e761cc..d865dcfdaa 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -37,7 +37,7 @@ docker-qemu-src: $(DOCKER_SRC_COPY)
- docker-image: ${DOCKER_TARGETS}
- 
- # General rule for building docker images. If we are a sub-make
--# invoked with SKIP_DOCKER_BUILD we still check the image is upto date
-+# invoked with SKIP_DOCKER_BUILD we still check the image is up to date
- # though
- ifdef SKIP_DOCKER_BUILD
- docker-image-%: $(DOCKER_FILES_DIR)/%.docker
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 69e7130db7..b82926596c 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -99,7 +99,7 @@ def _get_so_libs(executable):
-     return libs
- 
- def _copy_binary_with_libs(src, dest_dir):
--    """Copy a binary executable and all its dependant libraries.
-+    """Copy a binary executable and all its dependent libraries.
- 
-     This does rely on the host file-system being fairly multi-arch
-     aware so the file don't clash with the guests layout."""
-@@ -261,7 +261,7 @@ class SubCommand(object):
-     name = None # Subcommand name
-     def shared_args(self, parser):
-         parser.add_argument("--quiet", action="store_true",
--                            help="Run quietly unless an error occured")
-+                            help="Run quietly unless an error occurred")
- 
-     def args(self, parser):
-         """Setup argument parser"""
-diff --git a/tests/guest-debug/test-gdbstub.py b/tests/guest-debug/test-gdbstub.py
-index 474d2c5c65..0e4ac01426 100644
---- a/tests/guest-debug/test-gdbstub.py
-+++ b/tests/guest-debug/test-gdbstub.py
-@@ -122,7 +122,7 @@ class CatchBreakpoint(gdb.Breakpoint):
- 
- 
- def run_test():
--    "Run throught the tests one by one"
-+    "Run through the tests one by one"
- 
-     print ("Checking we can step the first few instructions")
-     step_ok = 0
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index f285484951..dadde2a266 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -257,7 +257,7 @@ function _launch_qemu()
+ linux-user/syscall.c |   74 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 53 insertions(+), 21 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 643b8833de..7fb595269f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6475,63 +6475,95 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
+ /* warning : doesn't handle linux specific flags... */
+ static int target_to_host_fcntl_cmd(int cmd)
+ {
++    int ret = -TARGET_EINVAL;
+     switch(cmd) {
+ 	case TARGET_F_DUPFD:
+ 	case TARGET_F_GETFD:
+ 	case TARGET_F_SETFD:
+ 	case TARGET_F_GETFL:
+ 	case TARGET_F_SETFL:
+-            return cmd;
++            ret = cmd;
++            break;
+         case TARGET_F_GETLK:
+-            return F_GETLK64;
++            ret = F_GETLK64;
++            break;
+         case TARGET_F_SETLK:
+-            return F_SETLK64;
++            ret = F_SETLK64;
++            break;
+         case TARGET_F_SETLKW:
+-            return F_SETLKW64;
++            ret = F_SETLKW64;
++            break;
+ 	case TARGET_F_GETOWN:
+-	    return F_GETOWN;
++            ret = F_GETOWN;
++            break;
+ 	case TARGET_F_SETOWN:
+-	    return F_SETOWN;
++            ret = F_SETOWN;
++            break;
+ 	case TARGET_F_GETSIG:
+-	    return F_GETSIG;
++            ret = F_GETSIG;
++            break;
+ 	case TARGET_F_SETSIG:
+-	    return F_SETSIG;
++            ret = F_SETSIG;
++            break;
+ #if TARGET_ABI_BITS == 32
+         case TARGET_F_GETLK64:
+-	    return F_GETLK64;
++            ret = F_GETLK64;
++            break;
+ 	case TARGET_F_SETLK64:
+-	    return F_SETLK64;
++            ret = F_SETLK64;
++            break;
+ 	case TARGET_F_SETLKW64:
+-	    return F_SETLKW64;
++            ret = F_SETLKW64;
++            break;
+ #endif
+         case TARGET_F_SETLEASE:
+-            return F_SETLEASE;
++            ret = F_SETLEASE;
++            break;
+         case TARGET_F_GETLEASE:
+-            return F_GETLEASE;
++            ret = F_GETLEASE;
++            break;
+ #ifdef F_DUPFD_CLOEXEC
+         case TARGET_F_DUPFD_CLOEXEC:
+-            return F_DUPFD_CLOEXEC;
++            ret = F_DUPFD_CLOEXEC;
++            break;
+ #endif
+         case TARGET_F_NOTIFY:
+-            return F_NOTIFY;
++            ret = F_NOTIFY;
++            break;
+ #ifdef F_GETOWN_EX
+ 	case TARGET_F_GETOWN_EX:
+-	    return F_GETOWN_EX;
++            ret = F_GETOWN_EX;
++            break;
+ #endif
+ #ifdef F_SETOWN_EX
+ 	case TARGET_F_SETOWN_EX:
+-	    return F_SETOWN_EX;
++            ret = F_SETOWN_EX;
++            break;
+ #endif
+ #ifdef F_SETPIPE_SZ
+         case TARGET_F_SETPIPE_SZ:
+-            return F_SETPIPE_SZ;
++            ret = F_SETPIPE_SZ;
++            break;
+         case TARGET_F_GETPIPE_SZ:
+-            return F_GETPIPE_SZ;
++            ret = F_GETPIPE_SZ;
++            break;
+ #endif
+ 	default:
+-            return -TARGET_EINVAL;
++            ret = -TARGET_EINVAL;
++    }
++
++#if defined(__powerpc64__)
++    /* On PPC64, glibc headers has the F_*LK* defined to 12, 13 and 14 and
++     * is not supported by kernel. The glibc fcntl call actually adjusts
++     * them to 5, 6 and 7 before making the syscall(). Since we make the
++     * syscall directly, adjust to what is supported by the kernel.
++     */
++    if (ret >= F_GETLK64 && ret <= F_SETLKW64) {
++        ret -= F_GETLK64 - 5;
+     }
+-    return -TARGET_EINVAL;
++#endif
++
++    return ret;
  }
  
- 
--# Silenty kills the QEMU process
-+# Silently kills the QEMU process
- #
- # If $wait is set to anything other than the empty string, the process will not
- # be killed but only waited for, and any output will be forwarded to stdout. If
-diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
-index 57470b2a2c..c581bd6ffc 100644
---- a/tests/tcg/Makefile.include
-+++ b/tests/tcg/Makefile.include
-@@ -2,7 +2,7 @@
- #
- # TCG tests (per-target rules)
- #
--# This Makefile fragement is included from the per-target
-+# This Makefile fragment is included from the per-target
- # Makefile.target so will be invoked for each linux-user program we
- # build. We have two options for compiling, either using a configured
- # guest compiler or calling one of our docker images to do it for us.
-diff --git a/tests/tcg/Makefile.probe b/tests/tcg/Makefile.probe
-index 15c0412657..9dc654663d 100644
---- a/tests/tcg/Makefile.probe
-+++ b/tests/tcg/Makefile.probe
-@@ -2,7 +2,7 @@
- #
- # TCG Compiler Probe
- #
--# This Makefile fragement is included multiple times in the main make
-+# This Makefile fragment is included multiple times in the main make
- # script to probe for available compilers. This is used to build up a
- # selection of required docker targets before we invoke a sub-make for
- # each target.
-diff --git a/tests/tcg/mips/mips64-dsp/subq_s_pw.c b/tests/tcg/mips/mips64-dsp/subq_s_pw.c
-index e8e0b0567e..4c080b785a 100644
---- a/tests/tcg/mips/mips64-dsp/subq_s_pw.c
-+++ b/tests/tcg/mips/mips64-dsp/subq_s_pw.c
-@@ -24,7 +24,7 @@ int main(void)
-     rt = 0x123456789ABCDEF1;
-     rs = 0x123456789ABCDEF2;
-     result =  0x0000000000000001;
--    /* This time we do not set dspctrl, but it setted in pre-action. */
-+    /* This time we do not set dspctrl, but set it in pre-action. */
-     dspresult = 0x1;
- 
-     __asm
--- 
-2.11.0
+ #define TRANSTBL_CONVERT(a) { -1, TARGET_##a, -1, a }
