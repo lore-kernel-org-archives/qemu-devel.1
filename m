@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fduAe-0005UM-GP
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:15:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fduha-0003ad-Io
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:49:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fduAd-0007oO-D6
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:15:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57618 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fduAd-0007nf-6a
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:15:23 -0400
-Date: Fri, 13 Jul 2018 11:15:17 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180713111517.70462e8b.cohuck@redhat.com>
-In-Reply-To: <77823ff9-a02a-808b-e919-b4950a64ae3c@intel.com>
-References: <20180703095825.GC30904@rkaganb.sw.ru>
-	<d5db37d0-5eaf-8942-8ab7-d73057a67e6f@oracle.com>
-	<20180709130035.GA6271@rkaganb.sw.ru>
-	<9136094e-a510-4201-7c71-d1c49226fa5f@oracle.com>
-	<20180710045101-mutt-send-email-mst@kernel.org>
-	<CADGSJ20H1S88S6AsYoLMns3XH+YVKh006Dqu808X7Ug+2Mgdnw@mail.gmail.com>
-	<20180711115344.633eba9e.cohuck@redhat.com>
-	<CADGSJ20A=sbwQQ-_YQEVwoCXwTvosCEnD2iKa0kS6ZGvbgy4rg@mail.gmail.com>
-	<20180712133121.3b5f2bae.cohuck@redhat.com>
-	<CADGSJ214vdTGC=-hj9pMOTqQNcZ0NaYu_r4cy2=2BB4CausWdw@mail.gmail.com>
-	<20180712235500-mutt-send-email-mst@kernel.org>
-	<CADGSJ23c4hHAoAwG61xmrRd-OO6EpsHgH9Fd-9R69XQAVkduCA@mail.gmail.com>
-	<77823ff9-a02a-808b-e919-b4950a64ae3c@intel.com>
+	(envelope-from <mreitz@redhat.com>) id 1fduhZ-00035S-5r
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 05:49:26 -0400
+References: <20180628000745.4477-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <86ba537d-3b77-c7d1-ac46-c85f18faf5ca@redhat.com>
+Date: Fri, 13 Jul 2018 11:49:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/3] Use of unique
- identifier for pairing virtio and passthrough devices...
+In-Reply-To: <20180628000745.4477-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u45TnSjS6V6LcXmDbubxE0cOpGxJG4LWU"
+Subject: Re: [Qemu-devel] [PATCH v9 00/31] block: Fix some filename
+ generation issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,56 +24,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, si-wei liu <si-wei.liu@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Alexander Duyck <alexander.h.duyck@intel.com>, Netdev <netdev@vger.kernel.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Thu, 12 Jul 2018 21:20:41 -0400
-"Samudrala, Sridhar" <sridhar.samudrala@intel.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u45TnSjS6V6LcXmDbubxE0cOpGxJG4LWU
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <86ba537d-3b77-c7d1-ac46-c85f18faf5ca@redhat.com>
+Subject: Re: [PATCH v9 00/31] block: Fix some filename generation issues
+References: <20180628000745.4477-1-mreitz@redhat.com>
+In-Reply-To: <20180628000745.4477-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 7/12/2018 6:19 PM, Siwei Liu wrote:
-> > On Thu, Jul 12, 2018 at 2:00 PM, Michael S. Tsirkin <mst@redhat.com> wrote:  
-> >> On Thu, Jul 12, 2018 at 01:52:53PM -0700, Siwei Liu wrote:  
-> >>> The definition is incomplete due to lack of spec. There's no "host"
-> >>> part defined yet in the host-guest interface. If match by MAC is an
-> >>> interface, the same must be done on the host(device) side as well,
-> >>> which has been agreed not the way to go. However, I don't think that's
-> >>> what the author intends to do by interpreting his QEMU patch - it
-> >>> missed the other parts as well, such as the feature negotiation and
-> >>> how it interacts with the paired device.
-> >>>
-> >>> What I said is that match by MAC is just a guest implementation that
-> >>> one can change at any time. We now have the group ID on QEMU, why
-> >>> still sticking to matching by MAC? It shoulnd't be a host-guest
-> >>> interface in the first place anyway.  
-> >> I think that match by MAC is a simple portable way to match devices.
-> >> E.g. it will work seamlessly with niche things like zPCI. However  
-> > That's a good point. I'm not sure if it's a valid assumption that zPCI
-> > should always use the same MAC address as that of virtio. Someone
+Ping =E2=80=93 any thoughts on the design, Kevin?
 
-I think we can mostly disregard the weirdness that is zPCI right now.
-There should be no fundamental reasons that matching by MAC would not
-work, though.
 
-> > who's more familiar with the use case may decide and work on that. It
-> > means VFIO device has to take in the MAC address as an identifier to
-> > the "-device vfio-pci,.." QEMU option. I think there's no point to
-> > match device using group ID in QEMU while using MAC in the guest.
-> > Based on that assumption, I'd go with making VIRTIO_NET_F_STANDBY to
-> > match device based on group ID, while someone may come up with another
-> > feature bit later, say VIRTIO_NET_F_STANDBY_BY_MAC when its QEMU
-> > support is available. Would it make sense?  
-> 
-> VIRTIO_NET_F_STANDBY as defined in the guest virtio_net driver supports match
-> by MAC address. I think we should add support for this feature bit in QEMU.
-> If submitting a patch to update the spec is a pre-requisite to add this
-> feature bit to QEMU, i can do that.
+(Continuing to see how much of a mess our backing filename handling is
+(half of the time, bs->backing_file is seen as a value in the image
+header (so relative paths are interpreted relatively to the overlay),
+half of the time it is seen as a cache of bs->backing->bs->filename (so
+relative paths are given relatively to qemu)), I am nearly inclined to
+move off the first part of this series that deals with detecting changed
+backing files until later, when I try to tackle that bs->backing_file
+issue.)
 
-Doing a spec patch and implementing matching by MAC in QEMU sounds like
-a good plan to me.
 
-> 
-> As far as i understand, group id patches to QEMU are still under review.
-> Matching by group ID can be another feature bit that could support matching
-> by group id as well as MAC.
+On 2018-06-28 02:07, Max Reitz wrote:
+> Once more, I=E2=80=99ll spare both me and you another iteration of the =
+cover
+> letter, so see here:
+>=20
+> http://lists.nongnu.org/archive/html/qemu-block/2017-09/msg01030.html
+>=20
+> (Although this series no longer includes a @base-directory option.)
+>=20
+> In regards to the last version, the biggest change is that I dropped
+> backing_overridden and instead try to compare the filename from the
+> image header with the filename of the actual backing BDS to find out
+> whether the backing file has been overridden.
+>=20
+> In order that this doesn=E2=80=99t break whenever the header contains a=
+ slightly
+> unusual (=E2=80=9Cnon-canonical=E2=80=9D) backing filename (e.g. =E2=80=
+=9Cfile:foo.qcow2=E2=80=9D or
+> =E2=80=9Cnbd:localhost:10809=E2=80=9D instead of =E2=80=9Cnbd://localho=
+st:10809=E2=80=9D, i.e. something
+> different from what bdrv_refresh_filename() would generate), when the
+> reference filename in the BDS (auto_backing_file) is used to open the
+> backing file, it is updated from the backing BDS's resulting filename.
+>=20
+>=20
+> All (I hope) changes in v9:
+> - Rebase (warranting an NVME patch)
+>=20
+> - Dropped backing_overridden, switched to the comparison described abov=
+e
+>   (and dealt with the fallout, for example test 191 can now stay
+>   unchanged)
+>=20
+> - Removed all existing bdrv_refresh_filename() calls and moved them to
+>   the users of BDS.filename (first patch) -- otherwise, I got iotest
+>   failure (because it's hard to reflect all graph changes properly with=
 
-That plan sounds good to me as well.
+>   a =E2=80=9Cpushing=E2=80=9D bdrv_refresh_filename()), and I don't eve=
+n want to
+>   remember how 191 broke without this change.
+>=20
+> - Renamed =E2=80=9Csignificant options=E2=80=9D to =E2=80=9Cstrong opti=
+ons=E2=80=9D
+>=20
+> - Implicit nodes should be completely skipped in
+>   bdrv_refresh_filename(), including setting of bs->full_open_options
+>   (patch 3)
+>=20
+> - vmdk_gather_child_options() failed to set backing=3Dnull when the ima=
+ge
+>   header asked for a backing file, but the user forbid its use
+>=20
+> - Added the penultimate patch which makes json:{} filenames for explici=
+t
+>   internal nodes kind of working?
+>   (When you specify @filter-node e.g. for block-commit, the node should=
+
+>   be visible, so it may appear in a json:{} filename; but creating that=
+
+>   node did not take a real options QDict, so it was lacking the @driver=
+
+>   option, and that was a bit sad.)
+>=20
+> - Dropped a superfluous =E2=80=9Csuspend.=E2=80=9D in blkdebug
+>=20
+> - Dropped the first patch of v8
+>=20
+> - Restyled some comments (=E2=80=9C/*=E2=80=9D on its own line where =E2=
+=80=9C*/=E2=80=9D is on its own
+>   line)
+>=20
+> - Fixed mention of "NBD" in the NFS patch (18)
+>=20
+>=20
+> git-backport-diff against v8:
+>=20
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream p=
+atch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+>=20
+> 001/31:[down] 'block: Use bdrv_refresh_filename() to pull'
+> 002/31:[----] [--] 'block: Use children list in bdrv_refresh_filename'
+> 003/31:[down] 'block: Skip implicit nodes for filename info'
+> 004/31:[down] 'block: Add BDS.auto_backing_file'
+> 005/31:[0052] [FC] 'block: Respect backing bs in bdrv_refresh_filename'=
+
+> 006/31:[down] 'iotests.py: Add filter_imgfmt()'
+> 007/31:[down] 'iotests.py: Add node_info()'
+> 008/31:[down] 'iotests: Add test for backing file overrides'
+> 009/31:[----] [--] 'block: Make path_combine() return the path'
+> 010/31:[0016] [FC] 'block: bdrv_get_full_backing_filename_from_...'s re=
+t. val.'
+> 011/31:[0001] [FC] 'block: bdrv_get_full_backing_filename's ret. val.'
+> 012/31:[0022] [FC] 'block: Add bdrv_make_absolute_filename()'
+> 013/31:[0003] [FC] 'block: Fix bdrv_find_backing_image()'
+> 014/31:[0001] [FC] 'block: Add bdrv_dirname()'
+> 015/31:[----] [--] 'blkverify: Make bdrv_dirname() return NULL'
+> 016/31:[----] [-C] 'quorum: Make bdrv_dirname() return NULL'
+> 017/31:[----] [-C] 'block/nbd: Make bdrv_dirname() return NULL'
+> 018/31:[0003] [FC] 'block/nfs: Implement bdrv_dirname()'
+> 019/31:[0014] [FC] 'block: Use bdrv_dirname() for relative filenames'
+> 020/31:[----] [--] 'iotests: Add quorum case to test 110'
+> 021/31:[down] 'block: Add strong_runtime_opts to BlockDriver'
+> 022/31:[0037] [FC] 'block: Add BlockDriver.bdrv_gather_child_options'
+> 023/31:[0084] [FC] 'block: Generically refresh runtime options'
+> 024/31:[0076] [FC] 'block: Purify .bdrv_refresh_filename()'
+> 025/31:[0005] [FC] 'block: Do not copy exact_filename from format file'=
+
+> 026/31:[down] 'block/nvme: Fix bdrv_refresh_filename()'
+> 027/31:[----] [--] 'block/curl: Harmonize option defaults'
+> 028/31:[----] [-C] 'block/curl: Implement bdrv_refresh_filename()'
+> 029/31:[----] [--] 'block/null: Generate filename even with latency-ns'=
+
+> 030/31:[down] 'block: BDS options may lack the "driver" option'
+> 031/31:[down] 'iotests: Test json:{} filenames of internal BDSs'
+>=20
+>=20
+> Max Reitz (31):
+>   block: Use bdrv_refresh_filename() to pull
+>   block: Use children list in bdrv_refresh_filename
+>   block: Skip implicit nodes for filename info
+>   block: Add BDS.auto_backing_file
+>   block: Respect backing bs in bdrv_refresh_filename
+>   iotests.py: Add filter_imgfmt()
+>   iotests.py: Add node_info()
+>   iotests: Add test for backing file overrides
+>   block: Make path_combine() return the path
+>   block: bdrv_get_full_backing_filename_from_...'s ret. val.
+>   block: bdrv_get_full_backing_filename's ret. val.
+>   block: Add bdrv_make_absolute_filename()
+>   block: Fix bdrv_find_backing_image()
+>   block: Add bdrv_dirname()
+>   blkverify: Make bdrv_dirname() return NULL
+>   quorum: Make bdrv_dirname() return NULL
+>   block/nbd: Make bdrv_dirname() return NULL
+>   block/nfs: Implement bdrv_dirname()
+>   block: Use bdrv_dirname() for relative filenames
+>   iotests: Add quorum case to test 110
+>   block: Add strong_runtime_opts to BlockDriver
+>   block: Add BlockDriver.bdrv_gather_child_options
+>   block: Generically refresh runtime options
+>   block: Purify .bdrv_refresh_filename()
+>   block: Do not copy exact_filename from format file
+>   block/nvme: Fix bdrv_refresh_filename()
+>   block/curl: Harmonize option defaults
+>   block/curl: Implement bdrv_refresh_filename()
+>   block/null: Generate filename even with latency-ns
+>   block: BDS options may lack the "driver" option
+>   iotests: Test json:{} filenames of internal BDSs
+>=20
+>  include/block/block.h         |  16 +-
+>  include/block/block_int.h     |  48 +++-
+>  block.c                       | 505 ++++++++++++++++++++++------------=
+
+>  block/blkdebug.c              |  70 ++---
+>  block/blkverify.c             |  29 +-
+>  block/commit.c                |   3 +-
+>  block/crypto.c                |   8 +
+>  block/curl.c                  |  55 +++-
+>  block/gluster.c               |  19 ++
+>  block/iscsi.c                 |  18 ++
+>  block/mirror.c                |   3 +-
+>  block/nbd.c                   |  46 ++--
+>  block/nfs.c                   |  54 ++--
+>  block/null.c                  |  32 ++-
+>  block/nvme.c                  |  27 +-
+>  block/qapi.c                  |  16 +-
+>  block/qcow.c                  |  14 +-
+>  block/qcow2.c                 |  17 +-
+>  block/qed.c                   |   7 +-
+>  block/quorum.c                |  71 +++--
+>  block/raw-format.c            |  11 +-
+>  block/rbd.c                   |  14 +
+>  block/replication.c           |  10 +-
+>  block/sheepdog.c              |  12 +
+>  block/ssh.c                   |  12 +
+>  block/throttle.c              |   7 +
+>  block/vhdx-log.c              |   1 +
+>  block/vmdk.c                  |  43 ++-
+>  block/vpc.c                   |  11 +-
+>  block/vvfat.c                 |  12 +
+>  block/vxhs.c                  |  11 +
+>  blockdev.c                    |   8 +
+>  qemu-img.c                    |  12 +-
+>  tests/qemu-iotests/051.out    |   8 +-
+>  tests/qemu-iotests/051.pc.out |   8 +-
+>  tests/qemu-iotests/110        |  29 +-
+>  tests/qemu-iotests/110.out    |   9 +-
+>  tests/qemu-iotests/223        | 235 ++++++++++++++++
+>  tests/qemu-iotests/223.out    |  84 ++++++
+>  tests/qemu-iotests/224        | 139 ++++++++++
+>  tests/qemu-iotests/224.out    |  18 ++
+>  tests/qemu-iotests/group      |   2 +
+>  tests/qemu-iotests/iotests.py |  10 +
+>  43 files changed, 1374 insertions(+), 390 deletions(-)
+>  create mode 100755 tests/qemu-iotests/223
+>  create mode 100644 tests/qemu-iotests/223.out
+>  create mode 100755 tests/qemu-iotests/224
+>  create mode 100644 tests/qemu-iotests/224.out
+>=20
+
+
+
+--u45TnSjS6V6LcXmDbubxE0cOpGxJG4LWU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAltIdZsACgkQ9AfbAGHV
+z0DpSQf/dX/N8/pvjhn8mHsuPUsd3/VZQFOtkB3Khe4NwMBnRnaovR1SnB7UUtJ5
+oRxzXRhC6O51MoPb2tBbqO/a9nADAIB/CqN9zDPZ2HjvNSjOgZDA36cu91P5EIz0
+mWuOnleoSiPUMuGXYyBuc1U5TV0QD5V3P0ht9ZLlIjL93D6I23/0LorKzyhwrwx9
+8FQS0EAJjkK8vX9DCAxzWpT5K2YxIYhREKxEWzZaW7BYC5YfFTOO841pbUALSd5Z
+8FpPWyt8zGTeNQCgUv+1vgJLwhd6WbIKIRK27aL3bKvQ2gu2jAjc6AuTCcv3UR6a
+qhCvHb/oaUWP14OyTwMRycedKwJcVQ==
+=wimH
+-----END PGP SIGNATURE-----
+
+--u45TnSjS6V6LcXmDbubxE0cOpGxJG4LWU--
