@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fdysK-0006pZ-Np
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 10:16:49 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fdz01-0000HO-KD
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 10:24:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fdysJ-0003az-Pj
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 10:16:48 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fdz00-0001R4-Nu
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 10:24:45 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Jul 2018 15:16:35 +0100
-Message-Id: <20180713141636.18665-2-peter.maydell@linaro.org>
+Date: Fri, 13 Jul 2018 15:16:36 +0100
+Message-Id: <20180713141636.18665-3-peter.maydell@linaro.org>
 In-Reply-To: <20180713141636.18665-1-peter.maydell@linaro.org>
 References: <20180713141636.18665-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-3.0 1/2] accel/tcg: Use correct test when
- looking in victim TLB for code
+Subject: [Qemu-devel] [PATCH for-3.0 2/2] accel/tcg: Assert that tlb fill
+ gave us a valid TLB entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-In get_page_addr_code(), we were incorrectly looking in the victim
-TLB for an entry which matched the target address for reads, not
-for code accesses. This meant that we could hit on a victim TLB
-entry that indicated that the address was readable but not
-executable, and incorrectly bypass the call to tlb_fill() which
-should generate the guest MMU exception. Fix this bug.
+In commit 4b1a3e1e34ad97 we added a check for whether the TLB entry
+we had following a tlb_fill had the INVALID bit set.  This could
+happen in some circumstances because a stale or wrong TLB entry was
+pulled out of the victim cache.  However, after commit
+68fea038553039e (which prevents stale entries being in the victim
+cache) and the previous commit (which ensures we don't incorrectly
+hit in the victim cache)) this should never be possible.
+
+Drop the check on TLB_INVALID_MASK from the "is this a TLB_RECHECK?"
+condition, and instead assert that the tlb fill procedure has given
+us a valid TLB entry (or longjumped out with a guest exception).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- accel/tcg/cputlb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ accel/tcg/cputlb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 20c147d6554..2d5fb15d9a3 100644
+index 2d5fb15d9a3..563fa30117e 100644
 --- a/accel/tcg/cputlb.c
 +++ b/accel/tcg/cputlb.c
-@@ -967,7 +967,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
-     index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-     mmu_idx = cpu_mmu_index(env, true);
-     if (unlikely(!tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr))) {
--        if (!VICTIM_TLB_HIT(addr_read, addr)) {
-+        if (!VICTIM_TLB_HIT(addr_code, addr)) {
+@@ -970,10 +970,10 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+         if (!VICTIM_TLB_HIT(addr_code, addr)) {
              tlb_fill(ENV_GET_CPU(env), addr, 0, MMU_INST_FETCH, mmu_idx, 0);
          }
++        assert(tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr));
      }
+ 
+-    if (unlikely((env->tlb_table[mmu_idx][index].addr_code &
+-                  (TLB_RECHECK | TLB_INVALID_MASK)) == TLB_RECHECK)) {
++    if (unlikely(env->tlb_table[mmu_idx][index].addr_code & TLB_RECHECK)) {
+         /*
+          * This is a TLB_RECHECK access, where the MMU protection
+          * covers a smaller range than a target page, and we must
 -- 
 2.17.1
