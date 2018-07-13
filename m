@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fe31H-0001b0-UM
+	(envelope-from <stefanha@redhat.com>) id 1fe31I-0001b1-1t
 	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 14:42:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fe31D-000378-Vx
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 14:42:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46734 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fe31H-00038E-6L
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 14:42:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53200 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fe31D-00036N-QG
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 14:42:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fe31H-000388-0S
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 14:42:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 807B540073B7
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 18:42:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C3ED72632
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 18:42:18 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 13 Jul 2018 19:41:24 +0100
-Message-Id: <20180713184124.25029-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH] trace/simple: fix hang in child after fork(2)
+Date: Fri, 13 Jul 2018 19:42:13 +0100
+Message-Id: <20180713184213.25301-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] trace/simple: fix hang in child after
+ fork(2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 The simple trace backend spawns a write-out thread which is used to
 asynchronously flush the in-memory ring buffer to disk.
