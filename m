@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fdw21-0005nn-LA
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fdw27-0005tJ-5R
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fdw20-0002es-BE
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:37 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 13 Jul 2018 13:14:24 +0200
-Message-Id: <20180713111424.23670-4-mreitz@redhat.com>
-In-Reply-To: <20180713111424.23670-1-mreitz@redhat.com>
-References: <20180713111424.23670-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] iotests: Add test for rebase without input
- base
+	(envelope-from <pbonzini@redhat.com>) id 1fdw22-0002ge-4H
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 07:14:43 -0400
+References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
+	<1531470464-21522-2-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <31f1708a-d4cc-fdee-c47b-3b64ea514978@redhat.com>
+Date: Fri, 13 Jul 2018 13:14:30 +0200
+MIME-Version: 1.0
+In-Reply-To: <1531470464-21522-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] qom/object: Add a new function
+ object_initialize_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,144 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-This patch adds a test for rebasing an image that currently does not
-have a backing file.
+On 13/07/2018 10:27, Thomas Huth wrote:
+> A lot of code is using the object_initialize() function followed by a call
+> to object_property_add_child() to add the newly initialized object as a child
+> of the current object. Both functions increase the reference counter of the
+> new object, but many spots that call these two functions then forget to drop
+> one of the superfluous references. So the newly created object is often not
+> cleaned up correctly when the parent is destroyed. In the worst case, this
+> can cause crashes, e.g. because device objects are not correctly removed from
+> their parent_bus.
+> 
+> Since this is a common pattern between many code spots, let's introdcue a
+> new function that takes care of calling all three required initialization
+> functions, first object_initialize(), then object_property_add_child() and
+> finally object_unref().
+> 
+> And while we're at object.h, also fix some copy-n-paste errors in the
+> comments there ("to store the area" --> "to store the error").
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/024     | 70 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/024.out | 37 ++++++++++++++++++++
- 2 files changed, 107 insertions(+)
+Even though I'd prefer the full cleanup, I can live with this. :)
 
-diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index 4071ed6093..471fa629ac 100755
---- a/tests/qemu-iotests/024
-+++ b/tests/qemu-iotests/024
-@@ -199,6 +199,76 @@ echo
- # $BASE_OLD and $BASE_NEW)
- $QEMU_IMG map "$OVERLAY" | _filter_qemu_img_map
- 
-+echo
-+echo "=== Test rebase without input base ==="
-+echo
-+
-+# Cluster allocations to be tested:
-+#
-+# Backing (new) 11 -- 11 -- 11 --
-+# COW image     22 22 11 11 -- --
-+#
-+# Expected result:
-+#
-+# COW image     22 22 11 11 00 --
-+#
-+# (Cluster 2 might be "--" after the rebase, too, but rebase just
-+#  compares the new backing file to the old one and disregards the
-+#  overlay.  Therefore, it will never discard overlay clusters.)
-+
-+_make_test_img $((6 * CLUSTER_SIZE))
-+TEST_IMG="$TEST_IMG_SAVE.base_new" _make_test_img $((6 * CLUSTER_SIZE))
-+
-+echo
-+
-+$QEMU_IO "$TEST_IMG" \
-+    -c "write -P 0x22 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "write -P 0x11 $((2 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+$QEMU_IO "$TEST_IMG.base_new" \
-+    -c "write -P 0x11 $((0 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "write -P 0x11 $((2 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "write -P 0x11 $((4 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+# This should be a no-op
-+$QEMU_IMG rebase -b "" "$TEST_IMG"
-+
-+# Verify the data is correct
-+$QEMU_IO "$TEST_IMG" \
-+    -c "read -P 0x22 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "read -P 0x11 $((2 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "read -P 0x00 $((4 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+# Verify the allocation status (first four cluster should be allocated
-+# in TEST_IMG, clusters 4 and 5 should be unallocated (marked as zero
-+# clusters here because there is no backing file))
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+echo
-+
-+$QEMU_IMG rebase -b "$TEST_IMG.base_new" "$TEST_IMG"
-+
-+# Verify the data is correct
-+$QEMU_IO "$TEST_IMG" \
-+    -c "read -P 0x22 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "read -P 0x11 $((2 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "read -P 0x00 $((4 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+# Verify the allocation status (first four cluster should be allocated
-+# in TEST_IMG, cluster 4 should be zero, and cluster 5 should be
-+# unallocated (signified by '"depth": 1'))
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/024.out b/tests/qemu-iotests/024.out
-index 024dc786b3..830abe013d 100644
---- a/tests/qemu-iotests/024.out
-+++ b/tests/qemu-iotests/024.out
-@@ -171,4 +171,41 @@ read 65536/65536 bytes at offset 196608
- Offset          Length          File
- 0               0x30000         TEST_DIR/subdir/t.IMGFMT
- 0x30000         0x10000         TEST_DIR/subdir/t.IMGFMT.base_new
-+
-+=== Test rebase without input base ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=393216
-+Formatting 'TEST_DIR/t.IMGFMT.base_new', fmt=IMGFMT size=393216
-+
-+wrote 131072/131072 bytes at offset 0
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 131072
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 131072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 262144
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 131072/131072 bytes at offset 0
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 131072
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 262144
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+[{ "start": 0, "length": 262144, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 262144, "length": 131072, "depth": 0, "zero": true, "data": false}]
-+
-+read 131072/131072 bytes at offset 0
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 131072
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 262144
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+[{ "start": 0, "length": 262144, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 262144, "length": 65536, "depth": 0, "zero": true, "data": false},
-+{ "start": 327680, "length": 65536, "depth": 1, "zero": true, "data": false}]
- *** done
--- 
-2.17.1
+Series
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+except for patch 6 for which I've sent a replacement.
+
+Paolo
+
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/qom/object.h | 23 +++++++++++++++++++++--
+>  qom/object.c         | 15 +++++++++++++++
+>  2 files changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index f3d2308..3362db0 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -749,6 +749,25 @@ int object_set_propv(Object *obj,
+>  void object_initialize(void *obj, size_t size, const char *typename);
+>  
+>  /**
+> + * object_initialize_child:
+> + * @parentobj: The parent object to add a property to
+> + * @propname: The name of the property
+> + * @childobj: A pointer to the memory to be used for the object.
+> + * @size: The maximum size available at @obj for the object.
+> + * @type: The name of the type of the object to instantiate.
+> + * @errp: If an error occurs, a pointer to an area to store the error
+> + *
+> + * This function will initialize an object. The memory for the object should
+> + * have already been allocated. The object will then be added as child property
+> + * to a parent with object_property_add_child() function. The returned object
+> + * has a reference count of 1 (for the "child<...>" property from the parent),
+> + * so the object will get finalized automatically when the parent gets removed.
+> + */
+> +void object_initialize_child(Object *parentobj, const char *propname,
+> +                             void *childobj, size_t size, const char *type,
+> +                             Error **errp);
+> +
+> +/**
+>   * object_dynamic_cast:
+>   * @obj: The object to cast.
+>   * @typename: The @typename to cast to.
+> @@ -1382,7 +1401,7 @@ Object *object_resolve_path_component(Object *parent, const gchar *part);
+>   * @obj: the object to add a property to
+>   * @name: the name of the property
+>   * @child: the child object
+> - * @errp: if an error occurs, a pointer to an area to store the area
+> + * @errp: if an error occurs, a pointer to an area to store the error
+>   *
+>   * Child properties form the composition tree.  All objects need to be a child
+>   * of another object.  Objects can only be a child of one object.
+> @@ -1420,7 +1439,7 @@ void object_property_allow_set_link(const Object *, const char *,
+>   * @child: a pointer to where the link object reference is stored
+>   * @check: callback to veto setting or NULL if the property is read-only
+>   * @flags: additional options for the link
+> - * @errp: if an error occurs, a pointer to an area to store the area
+> + * @errp: if an error occurs, a pointer to an area to store the error
+>   *
+>   * Links establish relationships between objects.  Links are unidirectional
+>   * although two links can be combined to form a bidirectional relationship
+> diff --git a/qom/object.c b/qom/object.c
+> index 4609e34..7be7638 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -392,6 +392,21 @@ void object_initialize(void *data, size_t size, const char *typename)
+>      object_initialize_with_type(data, size, type);
+>  }
+>  
+> +void object_initialize_child(Object *parentobj, const char *propname,
+> +                             void *childobj, size_t size, const char *type,
+> +                             Error **errp)
+> +{
+> +    object_initialize(childobj, size, type);
+> +    object_property_add_child(parentobj, propname, OBJECT(childobj), errp);
+> +    /*
+> +     * Since object_property_add_child added a reference to the child object,
+> +     * we can drop the reference added by object_initialize(), so the child
+> +     * property will own the only reference to the object.
+> +     */
+> +    object_unref(OBJECT(childobj));
+> +}
+> +
+> +
+>  static inline bool object_property_is_child(ObjectProperty *prop)
+>  {
+>      return strstart(prop->type, "child<", NULL);
+> 
