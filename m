@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fdxpl-0004Fu-Dd
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 09:10:06 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fdxpn-0004Hs-Bg
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 09:10:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fdxpk-0004dk-8R
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 09:10:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40336 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fdxpl-0004kV-R9
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 09:10:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50108 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fdxpk-0004av-2B
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 09:10:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	id 1fdxpl-0004j9-Kl
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 09:10:05 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF6177DAC8
-	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 13:10:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 520F7818F71A
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 13:10:05 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 13 Jul 2018 15:09:05 +0200
-Message-Id: <20180713130916.4153-19-marcandre.lureau@redhat.com>
+Date: Fri, 13 Jul 2018 15:09:06 +0200
+Message-Id: <20180713130916.4153-20-marcandre.lureau@redhat.com>
 In-Reply-To: <20180713130916.4153-1-marcandre.lureau@redhat.com>
 References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 18/29] virtio: add virtio-gpu bswap helpers
- header
+Subject: [Qemu-devel] [PATCH v4 19/29] util: promote
+ qemu_egl_rendernode_open() to libqemuutil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,148 +37,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: airlied@redhat.com, kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The helper functions are useful to build the vhost-user-gpu backend.
+vhost-user-gpu will share the same code to open a DRM node.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/virtio/virtio-gpu-bswap.h | 61 ++++++++++++++++++++++++++++
- hw/display/virtio-gpu.c              | 43 +-------------------
- 2 files changed, 62 insertions(+), 42 deletions(-)
- create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
+ include/qemu/drm.h |  6 +++++
+ ui/egl-helpers.c   | 51 ++---------------------------------
+ util/drm.c         | 66 ++++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS        |  1 +
+ util/Makefile.objs |  1 +
+ 5 files changed, 76 insertions(+), 49 deletions(-)
+ create mode 100644 include/qemu/drm.h
+ create mode 100644 util/drm.c
 
-diff --git a/include/hw/virtio/virtio-gpu-bswap.h b/include/hw/virtio/vir=
-tio-gpu-bswap.h
+diff --git a/include/qemu/drm.h b/include/qemu/drm.h
 new file mode 100644
-index 0000000000..38d12160f6
+index 0000000000..4c3e622f5c
 --- /dev/null
-+++ b/include/hw/virtio/virtio-gpu-bswap.h
-@@ -0,0 +1,61 @@
-+/*
-+ * Virtio GPU Device
-+ *
-+ * Copyright Red Hat, Inc. 2013-2014
-+ *
-+ * Authors:
-+ *     Dave Airlie <airlied@redhat.com>
-+ *     Gerd Hoffmann <kraxel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
++++ b/include/qemu/drm.h
+@@ -0,0 +1,6 @@
++#ifndef QEMU_DRM_H_
++#define QEMU_DRM_H_
 +
-+#ifndef HW_VIRTIO_GPU_BSWAP_H
-+#define HW_VIRTIO_GPU_BSWAP_H
-+
-+#include "qemu/bswap.h"
-+
-+static inline void
-+virtio_gpu_ctrl_hdr_bswap(struct virtio_gpu_ctrl_hdr *hdr)
-+{
-+    le32_to_cpus(&hdr->type);
-+    le32_to_cpus(&hdr->flags);
-+    le64_to_cpus(&hdr->fence_id);
-+    le32_to_cpus(&hdr->ctx_id);
-+    le32_to_cpus(&hdr->padding);
-+}
-+
-+static inline void
-+virtio_gpu_bswap_32(void *ptr, size_t size)
-+{
-+#ifdef HOST_WORDS_BIGENDIAN
-+
-+    size_t i;
-+    struct virtio_gpu_ctrl_hdr *hdr =3D (struct virtio_gpu_ctrl_hdr *) p=
-tr;
-+
-+    virtio_gpu_ctrl_hdr_bswap(hdr);
-+
-+    i =3D sizeof(struct virtio_gpu_ctrl_hdr);
-+    while (i < size) {
-+        le32_to_cpus((uint32_t *)(ptr + i));
-+        i =3D i + sizeof(uint32_t);
-+    }
++int qemu_drm_rendernode_open(const char *rendernode);
 +
 +#endif
-+}
-+
-+static inline void
-+virtio_gpu_t2d_bswap(struct virtio_gpu_transfer_to_host_2d *t2d)
-+{
-+    virtio_gpu_ctrl_hdr_bswap(&t2d->hdr);
-+    le32_to_cpus(&t2d->r.x);
-+    le32_to_cpus(&t2d->r.y);
-+    le32_to_cpus(&t2d->r.width);
-+    le32_to_cpus(&t2d->r.height);
-+    le64_to_cpus(&t2d->offset);
-+    le32_to_cpus(&t2d->resource_id);
-+    le32_to_cpus(&t2d->padding);
-+}
-+
-+#endif
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index ec366f4c35..28602c1a35 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -19,6 +19,7 @@
- #include "trace.h"
- #include "hw/virtio/virtio.h"
- #include "hw/virtio/virtio-gpu.h"
-+#include "hw/virtio/virtio-gpu-bswap.h"
- #include "hw/virtio/virtio-bus.h"
- #include "migration/blocker.h"
- #include "qemu/log.h"
-@@ -31,48 +32,6 @@ virtio_gpu_find_resource(VirtIOGPU *g, uint32_t resour=
-ce_id);
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 71b6a97bd1..4f475142fc 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -15,9 +15,7 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+ #include "qemu/osdep.h"
+-#include <glob.h>
+-#include <dirent.h>
+-
++#include "qemu/drm.h"
+ #include "qemu/error-report.h"
+ #include "ui/console.h"
+ #include "ui/egl-helpers.h"
+@@ -147,57 +145,12 @@ int qemu_egl_rn_fd;
+ struct gbm_device *qemu_egl_rn_gbm_dev;
+ EGLContext qemu_egl_rn_ctx;
 =20
- static void virtio_gpu_cleanup_mapping(struct virtio_gpu_simple_resource=
- *res);
-=20
--static void
--virtio_gpu_ctrl_hdr_bswap(struct virtio_gpu_ctrl_hdr *hdr)
+-static int qemu_egl_rendernode_open(const char *rendernode)
 -{
--    le32_to_cpus(&hdr->type);
--    le32_to_cpus(&hdr->flags);
--    le64_to_cpus(&hdr->fence_id);
--    le32_to_cpus(&hdr->ctx_id);
--    le32_to_cpus(&hdr->padding);
--}
+-    DIR *dir;
+-    struct dirent *e;
+-    int r, fd;
+-    char *p;
 -
--static void virtio_gpu_bswap_32(void *ptr,
--                                size_t size)
--{
--#ifdef HOST_WORDS_BIGENDIAN
--
--    size_t i;
--    struct virtio_gpu_ctrl_hdr *hdr =3D (struct virtio_gpu_ctrl_hdr *) p=
-tr;
--
--    virtio_gpu_ctrl_hdr_bswap(hdr);
--
--    i =3D sizeof(struct virtio_gpu_ctrl_hdr);
--    while (i < size) {
--        le32_to_cpus((uint32_t *)(ptr + i));
--        i =3D i + sizeof(uint32_t);
+-    if (rendernode) {
+-        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLO=
+CK);
 -    }
 -
--#endif
+-    dir =3D opendir("/dev/dri");
+-    if (!dir) {
+-        return -1;
+-    }
+-
+-    fd =3D -1;
+-    while ((e =3D readdir(dir))) {
+-        if (e->d_type !=3D DT_CHR) {
+-            continue;
+-        }
+-
+-        if (strncmp(e->d_name, "renderD", 7)) {
+-            continue;
+-        }
+-
+-        p =3D g_strdup_printf("/dev/dri/%s", e->d_name);
+-
+-        r =3D open(p, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLOCK);
+-        if (r < 0) {
+-            g_free(p);
+-            continue;
+-        }
+-        fd =3D r;
+-        g_free(p);
+-        break;
+-    }
+-
+-    closedir(dir);
+-    if (fd < 0) {
+-        return -1;
+-    }
+-    return fd;
 -}
 -
--static void
--virtio_gpu_t2d_bswap(struct virtio_gpu_transfer_to_host_2d *t2d)
--{
--    virtio_gpu_ctrl_hdr_bswap(&t2d->hdr);
--    le32_to_cpus(&t2d->r.x);
--    le32_to_cpus(&t2d->r.y);
--    le32_to_cpus(&t2d->r.width);
--    le32_to_cpus(&t2d->r.height);
--    le64_to_cpus(&t2d->offset);
--    le32_to_cpus(&t2d->resource_id);
--    le32_to_cpus(&t2d->padding);
--}
--
- #ifdef CONFIG_VIRGL
- #include <virglrenderer.h>
- #define VIRGL(_g, _virgl, _simple, ...)                     \
+ int egl_rendernode_init(const char *rendernode, DisplayGLMode mode)
+ {
+     qemu_egl_rn_fd =3D -1;
+     int rc;
+=20
+-    qemu_egl_rn_fd =3D qemu_egl_rendernode_open(rendernode);
++    qemu_egl_rn_fd =3D qemu_drm_rendernode_open(rendernode);
+     if (qemu_egl_rn_fd =3D=3D -1) {
+         error_report("egl: no drm render node available");
+         goto err;
+diff --git a/util/drm.c b/util/drm.c
+new file mode 100644
+index 0000000000..a23ff24538
+--- /dev/null
++++ b/util/drm.c
+@@ -0,0 +1,66 @@
++/*
++ * Copyright (C) 2015-2016 Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu/drm.h"
++
++#include <glob.h>
++#include <dirent.h>
++
++int qemu_drm_rendernode_open(const char *rendernode)
++{
++    DIR *dir;
++    struct dirent *e;
++    int r, fd;
++    char *p;
++
++    if (rendernode) {
++        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLO=
+CK);
++    }
++
++    dir =3D opendir("/dev/dri");
++    if (!dir) {
++        return -1;
++    }
++
++    fd =3D -1;
++    while ((e =3D readdir(dir))) {
++        if (e->d_type !=3D DT_CHR) {
++            continue;
++        }
++
++        if (strncmp(e->d_name, "renderD", 7)) {
++            continue;
++        }
++
++        p =3D g_strdup_printf("/dev/dri/%s", e->d_name);
++
++        r =3D open(p, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLOCK);
++        if (r < 0) {
++            g_free(p);
++            continue;
++        }
++        fd =3D r;
++        g_free(p);
++        break;
++    }
++
++    closedir(dir);
++    if (fd < 0) {
++        return -1;
++    }
++    return fd;
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5a83bf56a3..01e2b47c34 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1565,6 +1565,7 @@ S: Odd Fixes
+ F: ui/
+ F: include/ui/
+ F: qapi/ui.json
++F: util/drm.c
+=20
+ Cocoa graphics
+ M: Peter Maydell <peter.maydell@linaro.org>
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index e1c3fed4dc..1810f970ef 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -49,3 +49,4 @@ util-obj-y +=3D stats64.o
+ util-obj-y +=3D systemd.o
+ util-obj-y +=3D iova-tree.o
+ util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
++util-obj-$(CONFIG_LINUX) +=3D drm.o
 --=20
 2.18.0.129.ge3331758f1
