@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdtRP-0002tf-Oz
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:28:40 -0400
+	(envelope-from <smarkovic@wavecomp.com>) id 1fdtZa-0001NN-RJ
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fdtRO-0005Dq-OZ
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:28:39 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 13 Jul 2018 10:27:44 +0200
-Message-Id: <1531470464-21522-17-git-send-email-thuth@redhat.com>
-In-Reply-To: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 16/16] hw/arm/allwinner-a10: Fix
- introspection problem with 'allwinner-a10'
+	(envelope-from <smarkovic@wavecomp.com>) id 1fdtZX-0004Uf-Kd
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:37:06 -0400
+Received: from mail-dm3nam03on0704.outbound.protection.outlook.com
+	([2a01:111:f400:fe49::704]:37437
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1fdtZX-0004Sa-AY
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 04:37:03 -0400
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Fri, 13 Jul 2018 08:36:59 +0000
+Message-ID: <DM6PR08MB487315EEAC9505B7E0392743D4580@DM6PR08MB4873.namprd08.prod.outlook.com>
+References: <1531169431-10772-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1531169431-10772-33-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<BN7PR08MB48688AF8EF3E3BCAC2D8F7FAC65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+In-Reply-To: <BN7PR08MB48688AF8EF3E3BCAC2D8F7FAC65B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 32/33] gdbstub: Add XML support for GDB
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,63 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "f4bug@amsat.org" <f4bug@amsat.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
 
-Valgrind complains:
 
-echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'allwinner-a10'}}" \
- "{'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" | \
- valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
-[...]
-==32519== Invalid read of size 8
-==32519==    at 0x61869A: qdev_print (qdev-monitor.c:686)
-==32519==    by 0x61869A: qbus_print (qdev-monitor.c:719)
-==32519==    by 0x452B38: handle_hmp_command (monitor.c:3446)
-[...]
+Stefan,
 
-Use sysbus_init_child_obj() to fix the issue.
+Can you clarify here:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/arm/allwinner-a10.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+- Was the intention to implement XML support for nanoMIPS only?
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index c5fbc65..9da00f9 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -27,20 +27,19 @@ static void aw_a10_init(Object *obj)
- {
-     AwA10State *s = AW_A10(obj);
- 
--    object_initialize(&s->cpu, sizeof(s->cpu), "cortex-a8-" TYPE_ARM_CPU);
--    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-+    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
-+                            "cortex-a8-" TYPE_ARM_CPU, NULL);
- 
--    object_initialize(&s->intc, sizeof(s->intc), TYPE_AW_A10_PIC);
--    qdev_set_parent_bus(DEVICE(&s->intc), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "intc", &s->intc, sizeof(s->intc),
-+                          TYPE_AW_A10_PIC);
- 
--    object_initialize(&s->timer, sizeof(s->timer), TYPE_AW_A10_PIT);
--    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "timer", &s->timer, sizeof(s->timer),
-+                          TYPE_AW_A10_PIT);
- 
--    object_initialize(&s->emac, sizeof(s->emac), TYPE_AW_EMAC);
--    qdev_set_parent_bus(DEVICE(&s->emac), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "emac", &s->emac, sizeof(s->emac), TYPE_AW_EMAC);
- 
--    object_initialize(&s->sata, sizeof(s->sata), TYPE_ALLWINNER_AHCI);
--    qdev_set_parent_bus(DEVICE(&s->sata), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
-+                          TYPE_ALLWINNER_AHCI);
- }
- 
- static void aw_a10_realize(DeviceState *dev, Error **errp)
--- 
-1.8.3.1
+- In any case, is there a way to support pre-nanoMIPS MIPS configurations t=
+hat would require only a reasonable implementation time?
+
+
+Thanks,
+Aleksandar
+
+
+AFAIR, only nanoMIPS XML support was intended at the time.
+
+However, I believe It shouldn't take much time and effort to support pre-na=
+noMIPS configurations.
+
+
+Regards,
+
+Stefan
+
+________________________________
+From: Aleksandar Markovic
+Sent: Tuesday, July 10, 2018 8:48:49 PM
+To: Aleksandar Markovic; qemu-devel@nongnu.org
+Cc: f4bug@amsat.org; aurelien@aurel32.net; Stefan Markovic; Petar Jovanovic=
+; Paul Burton
+Subject: Re: [PATCH v2 32/33] gdbstub: Add XML support for GDB for nanoMIPS
+
+> Subject: [PATCH v2 32/33] gdbstub: Add XML support for GDB for nanoMIPS
+>
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>
+> Add XML support files for GDB for nanoMIPS.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  MAINTAINERS                |  3 ++-
+>  gdb-xml/nanomips-cp0.xml   | 13 +++++++++++++
+>  gdb-xml/nanomips-cpu.xml   | 44 ++++++++++++++++++++++++++++++++++++++++=
+++++
+>  gdb-xml/nanomips-dsp.xml   | 20 ++++++++++++++++++++
+>  gdb-xml/nanomips-fpu.xml   | 45 ++++++++++++++++++++++++++++++++++++++++=
++++++
+>  gdb-xml/nanomips-linux.xml | 20 ++++++++++++++++++++
+>  6 files changed, 144 insertions(+), 1 deletion(-)
+>  create mode 100644 gdb-xml/nanomips-cp0.xml
+>  create mode 100644 gdb-xml/nanomips-cpu.xml
+>  create mode 100644 gdb-xml/nanomips-dsp.xml
+>  create mode 100644 gdb-xml/nanomips-fpu.xml
+>  create mode 100644 gdb-xml/nanomips-linux.xml
+>
+
+Stefan,
+
+Can you clarify here:
+
+- Was the intention to implement XML support for nanoMIPS only?
+
+- In any case, is there a way to support pre-nanoMIPS MIPS configurations t=
+hat would require only a reasonable implementation time?
+
+
+Thanks,
+Aleksandar
