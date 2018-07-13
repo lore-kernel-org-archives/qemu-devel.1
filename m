@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fe3wE-0001t2-Oh
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 15:41:11 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fe4SI-0000Kz-40
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 16:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fe3wE-0000v4-2D
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 15:41:10 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 13 Jul 2018 21:41:00 +0200
-Message-Id: <20180713194100.7511-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH] iotest: Fix filtering order in 226
+	(envelope-from <jsnow@redhat.com>) id 1fe4SH-00036x-Bh
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 16:14:18 -0400
+References: <20180713194100.7511-1-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4347078d-5854-ac6e-f0cd-7512cbd9f419@redhat.com>
+Date: Fri, 13 Jul 2018 16:14:11 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180713194100.7511-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] iotest: Fix filtering order in 226
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,39 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-The test directory should be filtered before the image format, otherwise
-the test will fail if the image format is part of the test directory,
-like so:
 
-[...]
--can't open: Could not open 'TEST_DIR/t.IMGFMT': Is a directory
-+can't open: Could not open '/tmp/test-IMGFMT/t.IMGFMT': Is a directory
-[...]
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/226 | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 07/13/2018 03:41 PM, Max Reitz wrote:
+> The test directory should be filtered before the image format, otherwise
+> the test will fail if the image format is part of the test directory,
+> like so:
+> 
+> [...]
+> -can't open: Could not open 'TEST_DIR/t.IMGFMT': Is a directory
+> +can't open: Could not open '/tmp/test-IMGFMT/t.IMGFMT': Is a directory
+> [...]
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-diff --git a/tests/qemu-iotests/226 b/tests/qemu-iotests/226
-index 460aea2fc9..a5a1f6720a 100755
---- a/tests/qemu-iotests/226
-+++ b/tests/qemu-iotests/226
-@@ -52,10 +52,10 @@ for PROTO in "file" "host_device" "host_cdrom"; do
-     echo "=== Testing with driver:$PROTO ==="
-     echo
-     echo "== Testing RO =="
--    $QEMU_IO -c "open -r -o driver=$PROTO,filename=$TEST_IMG" 2>&1 | _filter_imgfmt | _filter_testdir
-+    $QEMU_IO -c "open -r -o driver=$PROTO,filename=$TEST_IMG" 2>&1 | _filter_testdir | _filter_imgfmt
-     $QEMU_IO -c "open -r -o driver=$PROTO,filename=/dev/null" 2>&1 | _filter_imgfmt
-     echo "== Testing RW =="
--    $QEMU_IO -c "open -o driver=$PROTO,filename=$TEST_IMG" 2>&1 | _filter_imgfmt | _filter_testdir
-+    $QEMU_IO -c "open -o driver=$PROTO,filename=$TEST_IMG" 2>&1 | _filter_testdir | _filter_imgfmt
-     $QEMU_IO -c "open -o driver=$PROTO,filename=/dev/null" 2>&1 | _filter_imgfmt
- done
- 
--- 
-2.17.1
+Too many gotchas in our test suite.
+
+Thanks :(
+
+Reviewed-by: John Snow <jsnow@redhat.com>
