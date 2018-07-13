@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fe5Ro-0005Ya-Ru
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:17:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fe5a3-0007I4-G0
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fe5Ro-0004Ur-1k
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:17:52 -0400
-Date: Fri, 13 Jul 2018 18:17:40 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fe5a2-0002WW-H4
+	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 17:26:23 -0400
+Date: Fri, 13 Jul 2018 18:26:13 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180713211740.GT31657@localhost.localdomain>
+Message-ID: <20180713212613.GU31657@localhost.localdomain>
 References: <1531470464-21522-1-git-send-email-thuth@redhat.com>
-	<1531470464-21522-3-git-send-email-thuth@redhat.com>
+	<1531470464-21522-4-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1531470464-21522-3-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/16] hw/core/sysbus: Add a function
- for creating and attaching an object
+In-Reply-To: <1531470464-21522-4-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/16] hw/arm/bcm2836: Fix crash with
+ device_add bcm2837 on unsupported machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-On Fri, Jul 13, 2018 at 10:27:30AM +0200, Thomas Huth wrote:
-> A lot of functions are initializing an object and attach it immediately
-> afterwards to the system bus. Provide a common function for this, which
-> also uses object_initialize_child() to make sure that the reference
-> counter is correctly initialized to 1 afterwards.
+On Fri, Jul 13, 2018 at 10:27:31AM +0200, Thomas Huth wrote:
+> When trying to "device_add bcm2837" on a machine that is not suitable for
+> this device, you can quickly crash QEMU afterwards, e.g. with "info qtree":
+> 
+> echo "{'execute':'qmp_capabilities'} {'execute':'device_add', " \
+>  "'arguments':{'driver':'bcm2837'}} {'execute': 'human-monitor-command', " \
+>  "'arguments': {'command-line': 'info qtree'}}" | \
+>  aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest -S -qmp stdio
+> 
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> {"return": {}}
+> {"error": {"class": "GenericError", "desc": "Device 'bcm2837' can not be
+>  hotplugged on this machine"}}
+> Segmentation fault (core dumped)
+> 
+> The qdev_set_parent_bus() from instance_init adds a link to the child devices
+> which is not valid anymore after the bcm2837 instance has been destroyed.
+> Unfortunately, the child devices do not get destroyed / unlinked correctly
+> because both object_initialize() and object_property_add_child() increase
+> the reference count of the child objects by one, but only one reference
+> is dropped when the parent gets removed. So let's use the new functions
+> object_initialize_child() and sysbus_init_child_obj() instead to create
+> the objects, which will take care of creating the child objects with the
+> correct reference count of one.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/core/sysbus.c    | 8 ++++++++
->  include/hw/sysbus.h | 3 +++
->  2 files changed, 11 insertions(+)
-> 
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index ecfb0cf..e2436ce 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -376,6 +376,14 @@ BusState *sysbus_get_default(void)
->      return main_system_bus;
->  }
->  
-> +void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
-> +                           size_t childsize, const char *childtype)
-> +{
-> +    object_initialize_child(parent, childname, child, childsize, childtype,
-> +                            &error_abort);
-> +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-> +}
-> +
->  static void sysbus_register_types(void)
->  {
->      type_register_static(&system_bus_info);
-> diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-> index e88bb6d..e405232 100644
-> --- a/include/hw/sysbus.h
-> +++ b/include/hw/sysbus.h
-> @@ -96,6 +96,9 @@ void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
->                     MemoryRegion *mem);
->  MemoryRegion *sysbus_address_space(SysBusDevice *dev);
->  
-> +void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
-> +                           size_t childsize, const char *childtype);
-> +
-
-Documentation about the reference ownership rules would be nice,
-but I don't think this should block the bug fixes.
 
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+The usage of &error_abort in code that can be triggered from
+device-list-properties still makes me nervous, but that's a
+separate issue.
+
+
+> ---
+>  hw/arm/bcm2836.c | 18 ++++++------------
+>  1 file changed, 6 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 6805a7d..af97b2f 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -51,25 +51,19 @@ static void bcm2836_init(Object *obj)
+>      int n;
+>  
+>      for (n = 0; n < BCM283X_NCPUS; n++) {
+> -        object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
+> -                          info->cpu_type);
+> -        object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
+> -                                  &error_abort);
+> +        object_initialize_child(obj, "cpu[*]", &s->cpus[n], sizeof(s->cpus[n]),
+> +                                info->cpu_type, &error_abort);
+>      }
+>  
+> -    object_initialize(&s->control, sizeof(s->control), TYPE_BCM2836_CONTROL);
+> -    object_property_add_child(obj, "control", OBJECT(&s->control), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->control), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "control", &s->control, sizeof(s->control),
+> +                          TYPE_BCM2836_CONTROL);
+>  
+> -    object_initialize(&s->peripherals, sizeof(s->peripherals),
+> -                      TYPE_BCM2835_PERIPHERALS);
+> -    object_property_add_child(obj, "peripherals", OBJECT(&s->peripherals),
+> -                              &error_abort);
+> +    sysbus_init_child_obj(obj, "peripherals", &s->peripherals,
+> +                          sizeof(s->peripherals), TYPE_BCM2835_PERIPHERALS);
+>      object_property_add_alias(obj, "board-rev", OBJECT(&s->peripherals),
+>                                "board-rev", &error_abort);
+>      object_property_add_alias(obj, "vcram-size", OBJECT(&s->peripherals),
+>                                "vcram-size", &error_abort);
+> -    qdev_set_parent_bus(DEVICE(&s->peripherals), sysbus_get_default());
+>  }
+>  
+>  static void bcm2836_realize(DeviceState *dev, Error **errp)
+> -- 
+> 1.8.3.1
+> 
 
 -- 
 Eduardo
