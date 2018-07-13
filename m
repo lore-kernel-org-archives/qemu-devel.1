@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davidsa.openu@gmail.com>) id 1fdsgZ-0005NI-8t
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 03:40:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdnr5-00032Y-BN
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 22:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davidsa.openu@gmail.com>) id 1fdsgX-0001Ts-Te
-	for qemu-devel@nongnu.org; Fri, 13 Jul 2018 03:40:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1fdnr0-0007sI-DM
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 22:30:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fdnr0-0007s4-71
+	for qemu-devel@nongnu.org; Thu, 12 Jul 2018 22:30:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fdnqy-0006XK-Qg
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 02:30:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BC9842E8052
+	for <qemu-devel@nongnu.org>; Fri, 13 Jul 2018 02:30:40 +0000 (UTC)
 MIME-Version: 1.0
-Reply-To: davidsa@openu.ac.il
-Sender: davidsa.openu@gmail.com
-In-Reply-To: <20180712114733.GE4541@localhost.localdomain>
-References: <20180622112237.2131-1-gersner@gmail.com>
-	<20180712114733.GE4541@localhost.localdomain>
-From: David Sariel <davidsa@openu.ac.il>
-Date: Fri, 13 Jul 2018 10:40:06 +0300
-Message-ID: <CAKhp91ERm-Hc7fUwi4V-BB2o5GCJKDWZyNssS-HfHARZkGX2hQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/5] nvme: PCI/e configuration from
- specification
+Date: Fri, 13 Jul 2018 02:16:57 -0000
+From: Diego Viola <diego.viola@gmail.com>
+Reply-To: Bug 1781515 <1781515@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153144791597.24345.4188684272748961598.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153144821716.23804.5319121004648467630.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1781515] Re: Resolution switch leads to the
+ screen/image being corrupted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Shimi Gersner <gersner@gmail.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-Our bad. Change-Id tag snuck into those from gerrit
-(https://review.gerrithub.io/c/davidsaOpenu/qemu/+/415434).
+Switching the resolution with -vga std was working fine before, I'm not
+sure on which version it started having this issue, but it should be on
+a recent version.
 
-Took a note to replace this line with "[PATCH v2]" but, I guess, it makes
-sense
-if additional comments will follow, right?
+I use the intel i915 drivers on the host OS.
 
-Thanks for taking a look.
+-- =
 
-On 12 July 2018 at 14:47, Kevin Wolf <kwolf@redhat.com> wrote:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781515
 
-> Am 22.06.2018 um 13:22 hat Shimi Gersner geschrieben:
-> > PCI/e configuration currently does not meets specifications.
-> >
-> > Patch includes various configuration changes to support specifications
-> > - BAR2 to return zero when read and CMD.IOSE is not set.
-> > - Expose NVME configuration through IO space (Optional).
-> > - PCI Power Management v1.2.
-> > - PCIe Function Level Reset.
-> > - Disable QEMUs default use of PCIe Link Status (DLLLA).
-> > - PCIe missing AOC compliance flag.
-> > - Mask PCIe End-to-End TLP as RO (Unspecified by specification).
-> >
-> > Change-Id: I9057f56266db16b013fa194730c998d4779cede3
->
-> What is the meaning of this Change-Id tag?
->
-> > Signed-off-by: Shimi Gersner <gersner@gmail.com>
->
-> Keith, can you have a look at this series?
->
-> Kevin
->
+Title:
+  Resolution switch leads to the screen/image being corrupted
 
+Status in QEMU:
+  New
 
+Bug description:
+  I am currently using QEMU on a Arch Linux host, the guest OS is also
+  Arch Linux.
 
---=20
+  The QEMU version is currently 2.12.0-2 packaged by Arch Linux, the
+  command line I'm using to fire an Arch VM is:
 
-=D7=9E=D7=93=D7=A2=D7=99 =D7=94=D7=9E=D7=97=D7=A9=D7=91, =D7=94=D7=90=D7=95=
-=D7=A0=D7=99=D7=91=D7=A8=D7=A1=D7=99=D7=98=D7=94 =D7=94=D7=A4=D7=AA=D7=95=
-=D7=97=D7=94
-CS Dept, Open University of Israel
+  $ qemu-system-x86_64 -enable-kvm -hda archlinux.qcow2 -m 4G -smp 4
+
+  The problem I'm currently having is, after firing the VM and running
+  startx I want to change the resolution to the native resolution, which
+  is 1366x768 on my ThinkPad T450, however, after changing the
+  resolution the image on the guest gets corrupted and it's impossible
+  to see anything.
+
+  At this point I can only turn off the VM. The only workaround I found
+  is to start the VM with -vga virtio.
+
+  The problem in this case occurs with -vga std which is the default
+  video driver.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781515/+subscriptions
