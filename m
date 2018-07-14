@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0005mO-NG
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:38 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9v-0005oc-8w
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9o-0004Y4-Gd
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:34 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9r-0004cF-DK
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:39 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:15:45 +0200
-Message-Id: <20180714171601.5734-5-luc.michel@greensocs.com>
+Date: Sat, 14 Jul 2018 19:15:54 +0200
+Message-Id: <20180714171601.5734-14-luc.michel@greensocs.com>
 In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
 References: <20180714171601.5734-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v4 04/20] vmstate.h: Provide
- VMSTATE_UINT16_SUB_ARRAY
+Subject: [Qemu-devel] [PATCH v4 13/20] intc/arm_gic: Implement
+ virtualization extensions in gic_cpu_(read|write)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +23,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Provide a VMSTATE_UINT16_SUB_ARRAY macro to save a uint16_t sub-array in
-a VMState.
+Implement virtualization extensions in the gic_cpu_read() and
+gic_cpu_write() functions. Those are the last bits missing to fully
+support virtualization extensions in the CPU interface path.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/migration/vmstate.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/intc/arm_gic.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 42b946ce90..2b501d0466 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -923,6 +923,9 @@ extern const VMStateInfo vmstate_info_qtailq;
- #define VMSTATE_UINT16_ARRAY(_f, _s, _n)                               \
-     VMSTATE_UINT16_ARRAY_V(_f, _s, _n, 0)
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 50cbbfbe24..28ecf0c1fc 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -1360,9 +1360,12 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+     case 0xd0: case 0xd4: case 0xd8: case 0xdc:
+     {
+         int regno = (offset - 0xd0) / 4;
++        int nr_aprs = gic_is_vcpu(cpu) ? GIC_VIRT_NR_APRS : GIC_NR_APRS;
  
-+#define VMSTATE_UINT16_SUB_ARRAY(_f, _s, _start, _num)                \
-+    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint16, uint16_t)
-+
- #define VMSTATE_UINT16_2DARRAY(_f, _s, _n1, _n2)                      \
-     VMSTATE_UINT16_2DARRAY_V(_f, _s, _n1, _n2, 0)
+-        if (regno >= GIC_NR_APRS || s->revision != 2) {
++        if (regno >= nr_aprs || s->revision != 2) {
+             *data = 0;
++        } else if (gic_is_vcpu(cpu)) {
++            *data = s->h_apr[gic_get_vcpu_real_id(cpu)];
+         } else if (gic_cpu_ns_access(s, cpu, attrs)) {
+             /* NS view of GICC_APR<n> is the top half of GIC_NSAPR<n> */
+             *data = gic_apr_ns_view(s, regno, cpu);
+@@ -1376,7 +1379,7 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+         int regno = (offset - 0xe0) / 4;
  
+         if (regno >= GIC_NR_APRS || s->revision != 2 || !gic_has_groups(s) ||
+-            gic_cpu_ns_access(s, cpu, attrs)) {
++            gic_cpu_ns_access(s, cpu, attrs) || gic_is_vcpu(cpu)) {
+             *data = 0;
+         } else {
+             *data = s->nsapr[regno][cpu];
+@@ -1411,7 +1414,8 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+                 s->abpr[cpu] = MAX(value & 0x7, GIC_MIN_ABPR);
+             }
+         } else {
+-            s->bpr[cpu] = MAX(value & 0x7, GIC_MIN_BPR);
++            int min_bpr = gic_is_vcpu(cpu) ? GIC_VIRT_MIN_BPR : GIC_MIN_BPR;
++            s->bpr[cpu] = MAX(value & 0x7, min_bpr);
+         }
+         break;
+     case 0x10: /* End Of Interrupt */
+@@ -1428,11 +1432,14 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+     case 0xd0: case 0xd4: case 0xd8: case 0xdc:
+     {
+         int regno = (offset - 0xd0) / 4;
++        int nr_aprs = gic_is_vcpu(cpu) ? GIC_VIRT_NR_APRS : GIC_NR_APRS;
+ 
+-        if (regno >= GIC_NR_APRS || s->revision != 2) {
++        if (regno >= nr_aprs || s->revision != 2) {
+             return MEMTX_OK;
+         }
+-        if (gic_cpu_ns_access(s, cpu, attrs)) {
++        if (gic_is_vcpu(cpu)) {
++            s->h_apr[gic_get_vcpu_real_id(cpu)] = value;
++        } else if (gic_cpu_ns_access(s, cpu, attrs)) {
+             /* NS view of GICC_APR<n> is the top half of GIC_NSAPR<n> */
+             gic_apr_write_ns_view(s, regno, cpu, value);
+         } else {
+@@ -1447,6 +1454,9 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+         if (regno >= GIC_NR_APRS || s->revision != 2) {
+             return MEMTX_OK;
+         }
++        if (gic_is_vcpu(cpu)) {
++            return MEMTX_OK;
++        }
+         if (!gic_has_groups(s) || (gic_cpu_ns_access(s, cpu, attrs))) {
+             return MEMTX_OK;
+         }
 -- 
 2.18.0
