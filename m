@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1feCDJ-0007xf-1z
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 00:31:22 -0400
+	(envelope-from <laurent@vivier.eu>) id 1feDG0-0007nY-N8
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 01:38:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1feCDF-0001m6-1a
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 00:31:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54910)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1feCDE-0001bo-QW
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 00:31:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1feCD9-0005dt-LX
-	for <qemu-devel@nongnu.org>; Sat, 14 Jul 2018 04:31:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C5B252E81A0
-	for <qemu-devel@nongnu.org>; Sat, 14 Jul 2018 04:31:07 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1feDFv-0002CC-RY
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 01:38:12 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:37433)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1feDFv-00029A-FD
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 01:38:07 -0400
+References: <153148521235.87746.14142430397318741182.stgit@lep8c.aus.stglabs.ibm.com>
+	<20180714010700.GA2599@umbus.fritz.box>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <eb7a52ea-57ce-46eb-c84e-96b5887d6e71@vivier.eu>
+Date: Sat, 14 Jul 2018 07:37:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 14 Jul 2018 04:17:54 -0000
-From: Launchpad Bug Tracker <1575607@bugs.launchpad.net>
-Reply-To: Bug 1575607 <1575607@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160427111619.24836.70047.malonedeb@wampee.canonical.com>
-Message-Id: <153154187504.6644.2164973363441634380.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1575607] Re:  vm startup failed,
- qemu returned "kvm run failed Bad address"
+In-Reply-To: <20180714010700.GA2599@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3jvlA0LpMs06QHlH1prNwGdPSYfOAtIG1"
+Subject: Re: [Qemu-devel] [PATCH v4] linux-user: ppc64: use the correct
+ values for F_*LK64s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,80 +29,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3jvlA0LpMs06QHlH1prNwGdPSYfOAtIG1
+From: Laurent Vivier <laurent@vivier.eu>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org
+Message-ID: <eb7a52ea-57ce-46eb-c84e-96b5887d6e71@vivier.eu>
+Subject: Re: [PATCH v4] linux-user: ppc64: use the correct values for F_*LK64s
+References: <153148521235.87746.14142430397318741182.stgit@lep8c.aus.stglabs.ibm.com>
+ <20180714010700.GA2599@umbus.fritz.box>
+In-Reply-To: <20180714010700.GA2599@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Le 14/07/2018 =C3=A0 03:07, David Gibson a =C3=A9crit=C2=A0:
+> On Fri, Jul 13, 2018 at 07:34:46AM -0500, Shivaprasad G Bhat wrote:
+>> Qemu includes the glibc headers for the host defines and target header=
+s are
+>> part of the qemu source themselves. The glibc has the F_GETLK64, F_SET=
+LK64
+>> and F_SETLKW64 defined to 12, 13 and 14 for all archs in
+>> sysdeps/unix/sysv/linux/bits/fcntl-linux.h. The linux kernel generic
+>> definition for F_*LK is 5, 6 & 7 and F_*LK64* is 12,13, and 14 as seen=
+ in
+>> include/uapi/asm-generic/fcntl.h. On 64bit machine, by default the ker=
+nel
+>> assumes all F_*LK to 64bit calls and doesnt support use of F_*LK64* as=
 
--- =
+>> can be seen in include/linux/fcntl.h in linux source.
+>>
+>> On x86_64 host, the values for F_*LK64* are set to 5, 6 and 7
+>> explicitly in /usr/include/x86_64-linux-gnu/bits/fcntl.h by the glibc.=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1575607
+>> Whereas, a PPC64 host doesn't have such a definition in
+>> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h by the glibc. So,
+>> the sources on PPC64 host sees the default value of F_*LK64*
+>> as 12, 13 & 14(fcntl-linux.h).
+>>
+>> Since the 64bit kernel doesnt support 12, 13 & 14; the glibc fcntl sys=
+call
+>> implementation(__libc_fcntl*(), __fcntl64_nocancel) does the F_*LK64* =
+value
+>> convertion back to F_*LK* values on PPC64 as seen in
+>> sysdeps/unix/sysv/linux/powerpc/powerpc64/sysdep.h with FCNTL_ADJUST_C=
+MD()
+>> macro. Whereas on x86_64 host the values for F_*LK64* are set to 5, 6 =
+and 7
+>> and no adjustments are needed.
+>>
+>> Since qemu doesnt use the glibc fcntl, but makes the safe_syscall* on =
+its
+>> own, the PPC64 qemu is calling the syscall with 12, 13, and 14(without=
 
-Title:
-   vm startup failed, qemu returned "kvm run failed Bad address"
+>> adjustment) and they all fail. The fcntl calls to F_GETLK/F_SETLK|W al=
+l
+>> fail by all pplications run on PPC64 host user emulation.
+>>
+>> The fix here could be to see why on PPC64 the glibc is still keeping
+>> F_*LK64* different from F_*LK and why adjusting them to 5, 6 and 7 bef=
+ore
+>> the syscall for PPC only. See if we can make the
+>> /usr/include/powerpc64le-linux-gnu/bits/fcntl.h to have the values
+>> 5, 6 & 7 just like x86_64 and remove the adjustment code in glibc. Tha=
+t
+>> way, qemu sources see the kernel supported values in glibc headers.
+>>
+>> OR
+>>
+>> On PPC64 host, qemu sources see both F_*LK & F_*LK64* as same and set =
+to
+>> 12, 13 and 14 because __USE_FILE_OFFSET64 is defined in qemu
+>> sources(also refer sysdeps/unix/sysv/linux/bits/fcntl-linux.h).
+>> Do the value adjustment just like it is done by glibc source by using
+>> F_GETLK value of 5. That way, we make the syscalls with the actual
+>> supported values in Qemu. The patch is taking this approach.
+>>
+>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+>=20
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> I'm not sure if this should go in through my tree or not.
 
-Status in QEMU:
-  Expired
+I will take it through my linux-user tree, I have some fixes to send for
+the next -rc.
 
-Bug description:
-    create a virtual machine and start by libvirt. vm startup failed, qemu =
-returned "kvm run failed Bad address"
-    the error log is :
+Thanks,
+Laurent
 
-  error: kvm run failed Bad address
 
-  EAX=3D7ffc0000 EBX=3D7ffbffd0 ECX=3Dfffffff0 EDX=3D0000002c
 
-  ESI=3D00006f5c EDI=3D7ffbffd0 EBP=3D7ffc0000 ESP=3D00006f34
+--3jvlA0LpMs06QHlH1prNwGdPSYfOAtIG1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  EIP=3D000dec7b EFL=3D00010046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
+-----BEGIN PGP SIGNATURE-----
 
-  ES =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+iQIzBAEBCAAdFiEEzS913cjjpNwuT1Fz8ww4vT8vvjwFAltJjCcACgkQ8ww4vT8v
+vjwAKg//YSqW3vCDbnIQhqjKGIRAqc+4u22SPFkm1qfZ+MEBy5BID7Ey5/QCCfWk
+emsB7/13spvtkiTX8pHL53pEND5ozkf9mJv9TVOgURdndx73CnRXugXQwurXjJ3/
+sLiDtVtP+JAil1mHlrtJQvhcD1ryQp2vPzY/sGnojAGT9xjITGDFQTNu7XkBKb2E
+VU+dKeqyGGNcEJxvxQlYOLX0WzBXf3Bpc926E/MSNv+RVqf2vbAyoBhDHV/4YTNy
+wj+DMknj2XCfnF0mksRdBDR9KMUxvGS5wV7Y8JpsuudR2Qkve4sw86QI1A1U+kC4
+KOAr6AFdPHSDwVkK7VKbEYq2sWjrVMrEloyYX/5ro+OrQ+ypjYVatUYl8JkNTXfU
+mfirFtiXtTEI4y8gd2xehSVZgvBN5qlIfrP9F2PI3p5P8cW987rE0FXQHFxXWHGB
+fZX1A6KaJS8f4CJ0M2klBdIPYlPjna09XQ+2qCm5Krvagwv7R+fr5sY/Jvtc+hfb
+n1ywgy+OBY85ThW+nOWHR9Ul1F287n22ntDQbYJpYlmqxthhoN66GKV1WtZBtS3p
+fXgfR68khNDyE5RUGPVljOZLZcnRkNO0Jcn/ntkWFGqAmihl02LII9C64xaTPP2k
+6vm1b9TBmh57uW4S7x2FRNL2CY38MTgUSKDz5/Pb2iYOh/G+9vE=
+=zN4K
+-----END PGP SIGNATURE-----
 
-  CS =3D0008 00000000 ffffffff 00c09b00 DPL=3D0 CS32 [-RA]
-
-  SS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  DS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  FS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  GS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
-
-  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
-
-  GDT=3D     000f6a80 00000037
-
-  IDT=3D     000f6abe 00000000
-
-  CR0=3D60000011 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
-  DR3=3D0000000000000000
-
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-
-  EFER=3D0000000000000000
-
-  Code=3Dc3 29 d3 21 cb 39 c3 77 27 3b 5e 0c 72 22 85 ff 75 02 89 df <89>
-  5f 08 01 da 89 57 0c 89 47 10 89 5e 10 8b 56 04 89 f8 e8 8c fc ff ff
-  89 d8 eb 06 8b 36
-
-    we add numa in the vm, the numatune info is:
-    <numatune>
-
-      <memory mode=3D'strict' placement=3D'auto'/>
-
-    </numatune>
-
-   the version of qemu is 2.5.0.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1575607/+subscriptions
+--3jvlA0LpMs06QHlH1prNwGdPSYfOAtIG1--
