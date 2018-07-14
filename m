@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9u-0005nH-CV
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9u-0005nJ-Cg
 	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0004aR-53
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9p-0004ZW-9z
 	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:36 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:15:41 +0200
-Message-Id: <20180714171601.5734-1-luc.michel@greensocs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 00/20] arm_gic: add virtualization
- extensions support
+Date: Sat, 14 Jul 2018 19:15:50 +0200
+Message-Id: <20180714171601.5734-10-luc.michel@greensocs.com>
+In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
+References: <20180714171601.5734-1-luc.michel@greensocs.com>
+Subject: [Qemu-devel] [PATCH v4 09/20] intc/arm_gic: Add virtualization
+ enabled IRQ helper functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +23,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-v2:
-  - Add VMSTATE_UINT16_SUB_ARRAY to vmstate.h
-  - Keep backward compatibility on the GIC VMState by storing vCPUs
-    state in the virt VMState subsection.
-  - Use h_apr to store APR value for vCPUs, instead of increasing apr 2D
-    array. This adds a little complexity to the implementation (a bunch
-    of `if (gic_is_vcpu(cpu))'), but avoid ugly VMState description for
-    the apr array.
+Add some helper functions to gic_internal.h to get or change the state
+of an IRQ. When the current CPU is not a vCPU, the call is forwarded to
+the GIC distributor. Otherwise, it acts on the list register matching
+the IRQ in the current CPU virtual interface.
 
-v3:
-  - Remove the LR caching mechanism as it is probably not worse it.
-  - Remove the forced secure access hack and replace it with a proper
-    check (commit 8, function gic_cpu_ns_access()).
-  - Split the Implementation patch for easier review.
-  - Misc modifications following the review from Peter on v2.
-  - Add GICv2 virt extensions support to the arm virt machine.
-  - Fix vCPU running prio not being recomputed after a write to H_APR.
-  - Fix group0 hw interrupts deactivation request not being forwarded to
-    distributor when the GIC is not secure.
-  - Implement GICD_ISACTIVERn and GICD_ICACTIVERn because KVM uses them.
+gic_clear_active can have a side effect on the distributor, even in the
+vCPU case, when the correponding LR has the HW field set.
 
-v4:
-  - Patch 2: check GICD_ISACTIVERn and GICD_ICACTIVERn access (exist
-    only in GICv2) [Peter]
-  - Patch 2: moved after patch 1 to ensure compilation success across
-    patches [Peter]
-  - Patch 2: implement GICD_ICACTIVERn reads on GICv2 [Peter]
-  - Patch 7: Integrated Peter rational about LRs helpers, added
-    comments to explain what's going on [Peter]
-  - Patch 9: gic_clear_active(): check that the given PhysicalID is a
-    valid IRQ [Peter]
-  - Patch 10: refactor to move out the virt cases for more clarity [Peter=
-]
-  - Patch 12: Add a validity check on the given vIRQ [Peter]
-  - Patch 14: Fix a comment on memory region creation [Peter]
-  - Patch 14: Fix per-core alias creation, that should target the
-    virtual interfaces, and not the vCPU interfaces [Peter]
-  - Patch 16: gic_update_internal(): Move the CPU interface enable test
-    in gic_irq_signaling_enabled() [Peter]
-  - Patch 17: Stylistic [Peter]
-  - Patch 20: Rebase onto master
-  - Patch 20: Merge the two GIC maintenance IRQ constants into one
-    [Peter]
-  - Patch 20: Fix Memory region size for GICv2 virtual interface and
-    vCPU iface. [Peter]
+Use those functions in the CPU interface code path to prepare for the
+vCPU interface implementation.
 
-Luc Michel (20):
-  intc/arm_gic: Refactor operations on the distributor
-  intc/arm_gic: Implement GICD_ISACTIVERn and GICD_ICACTIVERn registers
-  intc/arm_gic: Remove some dead code and put some functions static
-  vmstate.h: Provide VMSTATE_UINT16_SUB_ARRAY
-  intc/arm_gic: Add the virtualization extensions to the GIC state
-  intc/arm_gic: Add virtual interface register definitions
-  intc/arm_gic: Add virtualization extensions helper macros and
-    functions
-  intc/arm_gic: Refactor secure/ns access check in the CPU interface
-  intc/arm_gic: Add virtualization enabled IRQ helper functions
-  intc/arm_gic: Implement virtualization extensions in
-    gic_(activate_irq|drop_prio)
-  intc/arm_gic: Implement virtualization extensions in
-    gic_acknowledge_irq
-  intc/arm_gic: Implement virtualization extensions in
-    gic_(deactivate|complete_irq)
-  intc/arm_gic: Implement virtualization extensions in
-    gic_cpu_(read|write)
-  intc/arm_gic: Wire the vCPU interface
-  intc/arm_gic: Implement the virtual interface registers
-  intc/arm_gic: Implement gic_update_virt() function
-  intc/arm_gic: Implement maintenance interrupt generation
-  intc/arm_gic: Improve traces
-  xlnx-zynqmp: Improve GIC wiring and MMIO mapping
-  arm/virt: Add support for GICv2 virtualization extensions
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+---
+ hw/intc/arm_gic.c      | 32 +++++++---------
+ hw/intc/gic_internal.h | 83 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+), 18 deletions(-)
 
- hw/arm/virt-acpi-build.c         |   6 +-
- hw/arm/virt.c                    |  52 +-
- hw/arm/xlnx-zynqmp.c             |  92 ++-
- hw/intc/arm_gic.c                | 967 +++++++++++++++++++++++++------
- hw/intc/arm_gic_common.c         | 154 ++++-
- hw/intc/arm_gic_kvm.c            |  31 +-
- hw/intc/gic_internal.h           | 283 ++++++++-
- hw/intc/trace-events             |  12 +-
- include/hw/arm/virt.h            |   4 +-
- include/hw/arm/xlnx-zynqmp.h     |   4 +-
- include/hw/intc/arm_gic_common.h |  43 +-
- include/migration/vmstate.h      |   3 +
- 12 files changed, 1370 insertions(+), 281 deletions(-)
-
---=20
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 53cc257ed8..ad241d12c2 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -222,7 +222,8 @@ static uint16_t gic_get_current_pending_irq(GICState *s, int cpu,
+     uint16_t pending_irq = s->current_pending[cpu];
+ 
+     if (pending_irq < GIC_MAXIRQ && gic_has_groups(s)) {
+-        int group = GIC_DIST_TEST_GROUP(pending_irq, (1 << cpu));
++        int group = gic_test_group(s, pending_irq, cpu);
++
+         /* On a GIC without the security extensions, reading this register
+          * behaves in the same way as a secure access to a GIC with them.
+          */
+@@ -253,7 +254,7 @@ static int gic_get_group_priority(GICState *s, int cpu, int irq)
+ 
+     if (gic_has_groups(s) &&
+         !(s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) &&
+-        GIC_DIST_TEST_GROUP(irq, (1 << cpu))) {
++        gic_test_group(s, irq, cpu)) {
+         bpr = s->abpr[cpu] - 1;
+         assert(bpr >= 0);
+     } else {
+@@ -266,7 +267,7 @@ static int gic_get_group_priority(GICState *s, int cpu, int irq)
+      */
+     mask = ~0U << ((bpr & 7) + 1);
+ 
+-    return GIC_DIST_GET_PRIORITY(irq, cpu) & mask;
++    return gic_get_priority(s, irq, cpu) & mask;
+ }
+ 
+ static void gic_activate_irq(GICState *s, int cpu, int irq)
+@@ -279,14 +280,14 @@ static void gic_activate_irq(GICState *s, int cpu, int irq)
+     int regno = preemption_level / 32;
+     int bitno = preemption_level % 32;
+ 
+-    if (gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, (1 << cpu))) {
++    if (gic_has_groups(s) && gic_test_group(s, irq, cpu)) {
+         s->nsapr[regno][cpu] |= (1 << bitno);
+     } else {
+         s->apr[regno][cpu] |= (1 << bitno);
+     }
+ 
+     s->running_priority[cpu] = prio;
+-    GIC_DIST_SET_ACTIVE(irq, 1 << cpu);
++    gic_set_active(s, irq, cpu);
+ }
+ 
+ static int gic_get_prio_from_apr_bits(GICState *s, int cpu)
+@@ -355,7 +356,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+         return irq;
+     }
+ 
+-    if (GIC_DIST_GET_PRIORITY(irq, cpu) >= s->running_priority[cpu]) {
++    if (gic_get_priority(s, irq, cpu) >= s->running_priority[cpu]) {
+         DPRINTF("ACK, pending interrupt (%d) has insufficient priority\n", irq);
+         return 1023;
+     }
+@@ -364,8 +365,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+         /* Clear pending flags for both level and edge triggered interrupts.
+          * Level triggered IRQs will be reasserted once they become inactive.
+          */
+-        GIC_DIST_CLEAR_PENDING(irq, GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
+-                                                             : cm);
++        gic_clear_pending(s, irq, cpu);
+         ret = irq;
+     } else {
+         if (irq < GIC_NR_SGIS) {
+@@ -377,9 +377,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+             src = ctz32(s->sgi_pending[irq][cpu]);
+             s->sgi_pending[irq][cpu] &= ~(1 << src);
+             if (s->sgi_pending[irq][cpu] == 0) {
+-                GIC_DIST_CLEAR_PENDING(irq,
+-                                       GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
+-                                                                : cm);
++                gic_clear_pending(s, irq, cpu);
+             }
+             ret = irq | ((src & 0x7) << 10);
+         } else {
+@@ -387,8 +385,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+              * interrupts. (level triggered interrupts with an active line
+              * remain pending, see gic_test_pending)
+              */
+-            GIC_DIST_CLEAR_PENDING(irq, GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
+-                                                                 : cm);
++            gic_clear_pending(s, irq, cpu);
+             ret = irq;
+         }
+     }
+@@ -544,8 +541,7 @@ static bool gic_eoi_split(GICState *s, int cpu, MemTxAttrs attrs)
+ 
+ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+ {
+-    int cm = 1 << cpu;
+-    int group = gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, cm);
++    int group = gic_has_groups(s) && gic_test_group(s, irq, cpu);
+ 
+     if (!gic_eoi_split(s, cpu, attrs)) {
+         /* This is UNPREDICTABLE; we choose to ignore it */
+@@ -559,7 +555,7 @@ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+         return;
+     }
+ 
+-    GIC_DIST_CLEAR_ACTIVE(irq, cm);
++    gic_clear_active(s, irq, cpu);
+ }
+ 
+ static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+@@ -594,7 +590,7 @@ static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+         }
+     }
+ 
+-    group = gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, cm);
++    group = gic_has_groups(s) && gic_test_group(s, irq, cpu);
+ 
+     if (gic_cpu_ns_access(s, cpu, attrs) && !group) {
+         DPRINTF("Non-secure EOI for Group0 interrupt %d ignored\n", irq);
+@@ -610,7 +606,7 @@ static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+ 
+     /* In GICv2 the guest can choose to split priority-drop and deactivate */
+     if (!gic_eoi_split(s, cpu, attrs)) {
+-        GIC_DIST_CLEAR_ACTIVE(irq, cm);
++        gic_clear_active(s, irq, cpu);
+     }
+     gic_update(s);
+ }
+diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
+index 56e203aeb9..d772d621fd 100644
+--- a/hw/intc/gic_internal.h
++++ b/hw/intc/gic_internal.h
+@@ -143,6 +143,13 @@ REG32(GICH_LR63, 0x1fc)
+ #define GICH_LR_GROUP(entry) (FIELD_EX32(entry, GICH_LR0, Grp1))
+ #define GICH_LR_HW(entry) (FIELD_EX32(entry, GICH_LR0, HW))
+ 
++#define GICH_LR_CLEAR_PENDING(entry) \
++        ((entry) &= ~(GICH_LR_STATE_PENDING << R_GICH_LR0_State_SHIFT))
++#define GICH_LR_SET_ACTIVE(entry) \
++        ((entry) |= (GICH_LR_STATE_ACTIVE << R_GICH_LR0_State_SHIFT))
++#define GICH_LR_CLEAR_ACTIVE(entry) \
++        ((entry) &= ~(GICH_LR_STATE_ACTIVE << R_GICH_LR0_State_SHIFT))
++
+ /* Valid bits for GICC_CTLR for GICv1, v1 with security extensions,
+  * GICv2 and GICv2 with security extensions:
+  */
+@@ -239,4 +246,80 @@ static inline uint32_t *gic_get_lr_entry(GICState *s, int irq, int vcpu)
+     return NULL;
+ }
+ 
++static inline bool gic_test_group(GICState *s, int irq, int cpu)
++{
++    if (gic_is_vcpu(cpu)) {
++        uint32_t *entry = gic_get_lr_entry(s, irq, cpu);
++        return GICH_LR_GROUP(*entry);
++    } else {
++        return GIC_DIST_TEST_GROUP(irq, 1 << cpu);
++    }
++}
++
++static inline void gic_clear_pending(GICState *s, int irq, int cpu)
++{
++    if (gic_is_vcpu(cpu)) {
++        uint32_t *entry = gic_get_lr_entry(s, irq, cpu);
++        GICH_LR_CLEAR_PENDING(*entry);
++    } else {
++        /* Clear pending state for both level and edge triggered
++         * interrupts. (level triggered interrupts with an active line
++         * remain pending, see gic_test_pending)
++         */
++        GIC_DIST_CLEAR_PENDING(irq, GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
++                                                             : (1 << cpu));
++    }
++}
++
++static inline void gic_set_active(GICState *s, int irq, int cpu)
++{
++    if (gic_is_vcpu(cpu)) {
++        uint32_t *entry = gic_get_lr_entry(s, irq, cpu);
++        GICH_LR_SET_ACTIVE(*entry);
++    } else {
++        GIC_DIST_SET_ACTIVE(irq, 1 << cpu);
++    }
++}
++
++static inline void gic_clear_active(GICState *s, int irq, int cpu)
++{
++    if (gic_is_vcpu(cpu)) {
++        uint32_t *entry = gic_get_lr_entry(s, irq, cpu);
++        GICH_LR_CLEAR_ACTIVE(*entry);
++
++        if (GICH_LR_HW(*entry)) {
++            /* Hardware interrupt. We must forward the deactivation request to
++             * the distributor.
++             */
++            int phys_irq = GICH_LR_PHYS_ID(*entry);
++            int rcpu = gic_get_vcpu_real_id(cpu);
++
++            if (phys_irq < GIC_NR_SGIS || phys_irq >= GIC_MAXIRQ) {
++                /* UNPREDICTABLE behaviour, we choose to ignore the request */
++                return;
++            }
++
++            /* This is equivalent to a NS write to DIR on the physical CPU
++             * interface. Hence group0 interrupt deactivation is ignored if
++             * the GIC is secure.
++             */
++            if (!s->security_extn || GIC_DIST_TEST_GROUP(phys_irq, 1 << rcpu)) {
++                GIC_DIST_CLEAR_ACTIVE(phys_irq, 1 << rcpu);
++            }
++        }
++    } else {
++        GIC_DIST_CLEAR_ACTIVE(irq, 1 << cpu);
++    }
++}
++
++static inline int gic_get_priority(GICState *s, int irq, int cpu)
++{
++    if (gic_is_vcpu(cpu)) {
++        uint32_t *entry = gic_get_lr_entry(s, irq, cpu);
++        return GICH_LR_PRIORITY(*entry);
++    } else {
++        return GIC_DIST_GET_PRIORITY(irq, cpu);
++    }
++}
++
+ #endif /* QEMU_ARM_GIC_INTERNAL_H */
+-- 
 2.18.0
