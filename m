@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9y-0005tN-H6
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:43 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9z-0005uZ-SM
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9w-0004in-QY
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:42 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9y-0004kv-6A
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:43 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:15:58 +0200
-Message-Id: <20180714171601.5734-18-luc.michel@greensocs.com>
+Date: Sat, 14 Jul 2018 19:16:01 +0200
+Message-Id: <20180714171601.5734-21-luc.michel@greensocs.com>
 In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
 References: <20180714171601.5734-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v4 17/20] intc/arm_gic: Implement maintenance
- interrupt generation
+Subject: [Qemu-devel] [PATCH v4 20/20] arm/virt: Add support for GICv2
+ virtualization extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +23,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Implement the maintenance interrupt generation that is part of the GICv2
-virtualization extensions.
+Add support for GICv2 virtualization extensions by mapping the necessary
+I/O regions and connecting the maintenance IRQ lines.
+
+Declare those additions in the device tree and in the ACPI tables.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+ hw/arm/virt-acpi-build.c |  6 +++--
+ hw/arm/virt.c            | 52 +++++++++++++++++++++++++++++++++-------
+ include/hw/arm/virt.h    |  4 +++-
+ 3 files changed, 50 insertions(+), 12 deletions(-)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 85f1a03147..4155fbe667 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -240,9 +240,106 @@ static inline bool gic_lr_entry_is_eoi(uint32_t entry)
-         && !GICH_LR_HW(entry) && GICH_LR_EOI(entry);
- }
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 6ea47e2588..ce31abd62c 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -659,6 +659,8 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         gicc->length = sizeof(*gicc);
+         if (vms->gic_version == 2) {
+             gicc->base_address = cpu_to_le64(memmap[VIRT_GIC_CPU].base);
++            gicc->gich_base_address = cpu_to_le64(memmap[VIRT_GIC_HYP].base);
++            gicc->gicv_base_address = cpu_to_le64(memmap[VIRT_GIC_VCPU].base);
+         }
+         gicc->cpu_interface_number = cpu_to_le32(i);
+         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
+@@ -668,8 +670,8 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+         }
+-        if (vms->virt && vms->gic_version == 3) {
+-            gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GICV3_MAINT_IRQ));
++        if (vms->virt) {
++            gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GIC_MAINT_IRQ));
+         }
+     }
  
-+static inline void gic_extract_lr_info(GICState *s, int cpu,
-+                                int *num_eoi, int *num_valid, int *num_pending)
-+{
-+    int lr_idx;
-+
-+    *num_eoi = 0;
-+    *num_valid = 0;
-+    *num_pending = 0;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if (gic_lr_entry_is_eoi(*entry)) {
-+            (*num_eoi)++;
-+        }
-+
-+        if (GICH_LR_STATE(*entry) != GICH_LR_STATE_INVALID) {
-+            (*num_valid)++;
-+        }
-+
-+        if (GICH_LR_STATE(*entry) == GICH_LR_STATE_PENDING) {
-+            (*num_pending)++;
-+        }
-+    }
-+}
-+
-+static void gic_compute_misr(GICState *s, int cpu)
-+{
-+    uint32_t value = 0;
-+    int vcpu = cpu + GIC_NCPU;
-+
-+    int num_eoi, num_valid, num_pending;
-+
-+    gic_extract_lr_info(s, cpu, &num_eoi, &num_valid, &num_pending);
-+
-+    /* EOI */
-+    if (num_eoi) {
-+        value |= R_GICH_MISR_EOI_MASK;
-+    }
-+
-+    /* U: true if only 0 or 1 LR entry is valid */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_UIE_MASK) && (num_valid < 2)) {
-+        value |= R_GICH_MISR_U_MASK;
-+    }
-+
-+    /* LRENP: EOICount is not 0 */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_LRENPIE_MASK) &&
-+        ((s->h_hcr[cpu] & R_GICH_HCR_EOICount_MASK) != 0)) {
-+        value |= R_GICH_MISR_LRENP_MASK;
-+    }
-+
-+    /* NP: no pending interrupts */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_NPIE_MASK) && (num_pending == 0)) {
-+        value |= R_GICH_MISR_NP_MASK;
-+    }
-+
-+    /* VGrp0E: group0 virq signaling enabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP0EIE_MASK) &&
-+        (s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP0)) {
-+        value |= R_GICH_MISR_VGrp0E_MASK;
-+    }
-+
-+    /* VGrp0D: group0 virq signaling disabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP0DIE_MASK) &&
-+        !(s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP0)) {
-+        value |= R_GICH_MISR_VGrp0D_MASK;
-+    }
-+
-+    /* VGrp1E: group1 virq signaling enabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP1EIE_MASK) &&
-+        (s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP1)) {
-+        value |= R_GICH_MISR_VGrp1E_MASK;
-+    }
-+
-+    /* VGrp1D: group1 virq signaling disabled */
-+    if ((s->h_hcr[cpu] & R_GICH_HCR_VGRP1DIE_MASK) &&
-+        !(s->cpu_ctlr[vcpu] & GICC_CTLR_EN_GRP1)) {
-+        value |= R_GICH_MISR_VGrp1D_MASK;
-+    }
-+
-+    s->h_misr[cpu] = value;
-+}
-+
-+static void gic_update_maintenance(GICState *s)
-+{
-+    int cpu = 0;
-+    int maint_level;
-+
-+    for (cpu = 0; cpu < s->num_cpu; cpu++) {
-+        gic_compute_misr(s, cpu);
-+        maint_level = (s->h_hcr[cpu] & R_GICH_HCR_EN_MASK) && s->h_misr[cpu];
-+
-+        qemu_set_irq(s->maintenance_irq[cpu], maint_level);
-+    }
-+}
-+
- static void gic_update_virt(GICState *s)
- {
-     gic_update_internal(s, true);
-+    gic_update_maintenance(s);
- }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 281ddcdf6e..0807be985c 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -131,6 +131,8 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_GIC_DIST] =           { 0x08000000, 0x00010000 },
+     [VIRT_GIC_CPU] =            { 0x08010000, 0x00010000 },
+     [VIRT_GIC_V2M] =            { 0x08020000, 0x00001000 },
++    [VIRT_GIC_HYP] =            { 0x08030000, 0x00010000 },
++    [VIRT_GIC_VCPU] =           { 0x08040000, 0x00010000 },
+     /* The space in between here is reserved for GICv3 CPU/vCPU/HYP */
+     [VIRT_GIC_ITS] =            { 0x08080000, 0x00020000 },
+     /* This redistributor space allows up to 2*64kB*123 CPUs */
+@@ -440,18 +442,33 @@ static void fdt_add_gic_node(VirtMachineState *vms)
  
- static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
+         if (vms->virt) {
+             qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
+-                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
++                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GIC_MAINT_IRQ,
+                                    GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+         }
+     } else {
+         /* 'cortex-a15-gic' means 'GIC v2' */
+         qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
+                                 "arm,cortex-a15-gic");
+-        qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+-                                      2, vms->memmap[VIRT_GIC_DIST].base,
+-                                      2, vms->memmap[VIRT_GIC_DIST].size,
+-                                      2, vms->memmap[VIRT_GIC_CPU].base,
+-                                      2, vms->memmap[VIRT_GIC_CPU].size);
++        if (!vms->virt) {
++            qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
++                                         2, vms->memmap[VIRT_GIC_DIST].base,
++                                         2, vms->memmap[VIRT_GIC_DIST].size,
++                                         2, vms->memmap[VIRT_GIC_CPU].base,
++                                         2, vms->memmap[VIRT_GIC_CPU].size);
++        } else {
++            qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
++                                         2, vms->memmap[VIRT_GIC_DIST].base,
++                                         2, vms->memmap[VIRT_GIC_DIST].size,
++                                         2, vms->memmap[VIRT_GIC_CPU].base,
++                                         2, vms->memmap[VIRT_GIC_CPU].size,
++                                         2, vms->memmap[VIRT_GIC_HYP].base,
++                                         2, vms->memmap[VIRT_GIC_HYP].size,
++                                         2, vms->memmap[VIRT_GIC_VCPU].base,
++                                         2, vms->memmap[VIRT_GIC_VCPU].size);
++            qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
++                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GIC_MAINT_IRQ,
++                                   GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++        }
+     }
+ 
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", vms->gic_phandle);
+@@ -573,6 +590,11 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+             qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
+                 MIN(smp_cpus - redist0_count, redist1_capacity));
+         }
++    } else {
++        if (!kvm_irqchip_in_kernel()) {
++            qdev_prop_set_bit(gicdev, "has-virtualization-extensions",
++                              vms->virt);
++        }
+     }
+     qdev_init_nofail(gicdev);
+     gicbusdev = SYS_BUS_DEVICE(gicdev);
+@@ -584,6 +606,10 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+         }
+     } else {
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
++        if (vms->virt) {
++            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_HYP].base);
++            sysbus_mmio_map(gicbusdev, 3, vms->memmap[VIRT_GIC_VCPU].base);
++        }
+     }
+ 
+     /* Wire the outputs from each CPU's generic timer and the GICv3
+@@ -610,9 +636,17 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+                                                    ppibase + timer_irq[irq]));
+         }
+ 
+-        qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt", 0,
+-                                    qdev_get_gpio_in(gicdev, ppibase
+-                                                     + ARCH_GICV3_MAINT_IRQ));
++        if (type == 3) {
++            qemu_irq irq = qdev_get_gpio_in(gicdev,
++                                            ppibase + ARCH_GIC_MAINT_IRQ);
++            qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt",
++                                        0, irq);
++        } else if (vms->virt) {
++            qemu_irq irq = qdev_get_gpio_in(gicdev,
++                                            ppibase + ARCH_GIC_MAINT_IRQ);
++            sysbus_connect_irq(gicbusdev, i + 4 * smp_cpus, irq);
++        }
++
+         qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
+                                     qdev_get_gpio_in(gicdev, ppibase
+                                                      + VIRTUAL_PMU_IRQ));
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 9a870ccb6a..4cc57a7ef6 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -42,7 +42,7 @@
+ #define NUM_VIRTIO_TRANSPORTS 32
+ #define NUM_SMMU_IRQS          4
+ 
+-#define ARCH_GICV3_MAINT_IRQ  9
++#define ARCH_GIC_MAINT_IRQ  9
+ 
+ #define ARCH_TIMER_VIRT_IRQ   11
+ #define ARCH_TIMER_S_EL1_IRQ  13
+@@ -60,6 +60,8 @@ enum {
+     VIRT_GIC_DIST,
+     VIRT_GIC_CPU,
+     VIRT_GIC_V2M,
++    VIRT_GIC_HYP,
++    VIRT_GIC_VCPU,
+     VIRT_GIC_ITS,
+     VIRT_GIC_REDIST,
+     VIRT_GIC_REDIST2,
 -- 
 2.18.0
