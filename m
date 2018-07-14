@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9u-0005nK-CZ
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:40 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9u-0005nH-CV
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0004ak-5i
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:37 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0004aR-53
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:36 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:15:48 +0200
-Message-Id: <20180714171601.5734-8-luc.michel@greensocs.com>
-In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
-References: <20180714171601.5734-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v4 07/20] intc/arm_gic: Add virtualization
- extensions helper macros and functions
+Date: Sat, 14 Jul 2018 19:15:41 +0200
+Message-Id: <20180714171601.5734-1-luc.michel@greensocs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 00/20] arm_gic: add virtualization
+ extensions support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +24,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Add some helper macros and functions related to the virtualization
-extensions to gic_internal.h.
+v2:
+  - Add VMSTATE_UINT16_SUB_ARRAY to vmstate.h
+  - Keep backward compatibility on the GIC VMState by storing vCPUs
+    state in the virt VMState subsection.
+  - Use h_apr to store APR value for vCPUs, instead of increasing apr 2D
+    array. This adds a little complexity to the implementation (a bunch
+    of `if (gic_is_vcpu(cpu))'), but avoid ugly VMState description for
+    the apr array.
 
-The GICH_LR_* macros help extracting specific fields of a list register
-value. The only tricky one is the priority field as only the MSB are
-stored. The value must be shifted accordingly to obtain the correct
-priority value.
+v3:
+  - Remove the LR caching mechanism as it is probably not worse it.
+  - Remove the forced secure access hack and replace it with a proper
+    check (commit 8, function gic_cpu_ns_access()).
+  - Split the Implementation patch for easier review.
+  - Misc modifications following the review from Peter on v2.
+  - Add GICv2 virt extensions support to the arm virt machine.
+  - Fix vCPU running prio not being recomputed after a write to H_APR.
+  - Fix group0 hw interrupts deactivation request not being forwarded to
+    distributor when the GIC is not secure.
+  - Implement GICD_ISACTIVERn and GICD_ICACTIVERn because KVM uses them.
 
-gic_is_vcpu() and gic_get_vcpu_real_id() help with (v)CPU id manipulation
-to abstract the fact that vCPU id are in the range
-[ GIC_NCPU; (GIC_NCPU + num_cpu) [.
+v4:
+  - Patch 2: check GICD_ISACTIVERn and GICD_ICACTIVERn access (exist
+    only in GICv2) [Peter]
+  - Patch 2: moved after patch 1 to ensure compilation success across
+    patches [Peter]
+  - Patch 2: implement GICD_ICACTIVERn reads on GICv2 [Peter]
+  - Patch 7: Integrated Peter rational about LRs helpers, added
+    comments to explain what's going on [Peter]
+  - Patch 9: gic_clear_active(): check that the given PhysicalID is a
+    valid IRQ [Peter]
+  - Patch 10: refactor to move out the virt cases for more clarity [Peter=
+]
+  - Patch 12: Add a validity check on the given vIRQ [Peter]
+  - Patch 14: Fix a comment on memory region creation [Peter]
+  - Patch 14: Fix per-core alias creation, that should target the
+    virtual interfaces, and not the vCPU interfaces [Peter]
+  - Patch 16: gic_update_internal(): Move the CPU interface enable test
+    in gic_irq_signaling_enabled() [Peter]
+  - Patch 17: Stylistic [Peter]
+  - Patch 20: Rebase onto master
+  - Patch 20: Merge the two GIC maintenance IRQ constants into one
+    [Peter]
+  - Patch 20: Fix Memory region size for GICv2 virtual interface and
+    vCPU iface. [Peter]
 
-gic_lr_* and gic_virq_is_valid() help with the list registers.
-gic_get_lr_entry() returns the LR entry for a given (vCPU, irq) pair. It
-is meant to be used in contexts where we know for sure that the entry
-exists, so we assert that entry is actually found, and the caller can
-avoid the NULL check on the returned pointer.
+Luc Michel (20):
+  intc/arm_gic: Refactor operations on the distributor
+  intc/arm_gic: Implement GICD_ISACTIVERn and GICD_ICACTIVERn registers
+  intc/arm_gic: Remove some dead code and put some functions static
+  vmstate.h: Provide VMSTATE_UINT16_SUB_ARRAY
+  intc/arm_gic: Add the virtualization extensions to the GIC state
+  intc/arm_gic: Add virtual interface register definitions
+  intc/arm_gic: Add virtualization extensions helper macros and
+    functions
+  intc/arm_gic: Refactor secure/ns access check in the CPU interface
+  intc/arm_gic: Add virtualization enabled IRQ helper functions
+  intc/arm_gic: Implement virtualization extensions in
+    gic_(activate_irq|drop_prio)
+  intc/arm_gic: Implement virtualization extensions in
+    gic_acknowledge_irq
+  intc/arm_gic: Implement virtualization extensions in
+    gic_(deactivate|complete_irq)
+  intc/arm_gic: Implement virtualization extensions in
+    gic_cpu_(read|write)
+  intc/arm_gic: Wire the vCPU interface
+  intc/arm_gic: Implement the virtual interface registers
+  intc/arm_gic: Implement gic_update_virt() function
+  intc/arm_gic: Implement maintenance interrupt generation
+  intc/arm_gic: Improve traces
+  xlnx-zynqmp: Improve GIC wiring and MMIO mapping
+  arm/virt: Add support for GICv2 virtualization extensions
 
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
----
- hw/intc/arm_gic.c      |  5 +++
- hw/intc/gic_internal.h | 75 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 80 insertions(+)
+ hw/arm/virt-acpi-build.c         |   6 +-
+ hw/arm/virt.c                    |  52 +-
+ hw/arm/xlnx-zynqmp.c             |  92 ++-
+ hw/intc/arm_gic.c                | 967 +++++++++++++++++++++++++------
+ hw/intc/arm_gic_common.c         | 154 ++++-
+ hw/intc/arm_gic_kvm.c            |  31 +-
+ hw/intc/gic_internal.h           | 283 ++++++++-
+ hw/intc/trace-events             |  12 +-
+ include/hw/arm/virt.h            |   4 +-
+ include/hw/arm/xlnx-zynqmp.h     |   4 +-
+ include/hw/intc/arm_gic_common.h |  43 +-
+ include/migration/vmstate.h      |   3 +
+ 12 files changed, 1370 insertions(+), 281 deletions(-)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index aaa34426a1..1ac0fe740c 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -61,6 +61,11 @@ static inline int gic_get_current_cpu(GICState *s)
-     return 0;
- }
- 
-+static inline int gic_get_current_vcpu(GICState *s)
-+{
-+    return gic_get_current_cpu(s) + GIC_NCPU;
-+}
-+
- /* Return true if this GIC config has interrupt groups, which is
-  * true if we're a GICv2, or a GICv1 with the security extensions.
-  */
-diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-index 1aa888a576..56e203aeb9 100644
---- a/hw/intc/gic_internal.h
-+++ b/hw/intc/gic_internal.h
-@@ -129,6 +129,20 @@ REG32(GICH_LR63, 0x1fc)
-      R_GICH_LR0_Priority_MASK | R_GICH_LR0_State_MASK | \
-      R_GICH_LR0_Grp1_MASK | R_GICH_LR0_HW_MASK)
- 
-+#define GICH_LR_STATE_INVALID         0
-+#define GICH_LR_STATE_PENDING         1
-+#define GICH_LR_STATE_ACTIVE          2
-+#define GICH_LR_STATE_ACTIVE_PENDING  3
-+
-+#define GICH_LR_VIRT_ID(entry) (FIELD_EX32(entry, GICH_LR0, VirtualID))
-+#define GICH_LR_PHYS_ID(entry) (FIELD_EX32(entry, GICH_LR0, PhysicalID))
-+#define GICH_LR_CPUID(entry) (FIELD_EX32(entry, GICH_LR0, CPUID))
-+#define GICH_LR_EOI(entry) (FIELD_EX32(entry, GICH_LR0, EOI))
-+#define GICH_LR_PRIORITY(entry) (FIELD_EX32(entry, GICH_LR0, Priority) << 3)
-+#define GICH_LR_STATE(entry) (FIELD_EX32(entry, GICH_LR0, State))
-+#define GICH_LR_GROUP(entry) (FIELD_EX32(entry, GICH_LR0, Grp1))
-+#define GICH_LR_HW(entry) (FIELD_EX32(entry, GICH_LR0, HW))
-+
- /* Valid bits for GICC_CTLR for GICv1, v1 with security extensions,
-  * GICv2 and GICv2 with security extensions:
-  */
-@@ -164,4 +178,65 @@ static inline bool gic_is_vcpu(int cpu)
-     return cpu >= GIC_NCPU;
- }
- 
-+static inline int gic_get_vcpu_real_id(int cpu)
-+{
-+    return (cpu >= GIC_NCPU) ? (cpu - GIC_NCPU) : cpu;
-+}
-+
-+/* Return true if the given vIRQ state exists in a LR and is either active or
-+ * pending and active.
-+ *
-+ * This function is used to check that a guest's `end of interrupt' or
-+ * `interrupts deactivation' request is valid, and matches with a LR of an
-+ * already acknowledged vIRQ (i.e. has the active bit set in its state).
-+ */
-+static inline bool gic_virq_is_valid(GICState *s, int irq, int vcpu)
-+{
-+    int cpu = gic_get_vcpu_real_id(vcpu);
-+    int lr_idx;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if ((GICH_LR_VIRT_ID(*entry) == irq) &&
-+            (GICH_LR_STATE(*entry) & GICH_LR_STATE_ACTIVE)) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+/* Return a pointer on the LR entry matching the given vIRQ.
-+ *
-+ * This function is used to retrieve an LR for which we know for sure that the
-+ * corresponding vIRQ exists in the current context (i.e. its current state is
-+ * not `invalid'):
-+ *   - Either the corresponding vIRQ has been validated with gic_virq_is_valid()
-+ *     so it is `active' or `active and pending',
-+ *   - Or it was pending and has been selected by gic_get_best_virq(). It is now
-+ *     `pending', `active' or `active and pending', depending on what the guest
-+ *     already did with this vIRQ.
-+ *
-+ * Having multiple LRs with the same VirtualID leads to UNPREDICTABLE
-+ * behaviour in the GIC. We choose to return the first one that matches.
-+ */
-+static inline uint32_t *gic_get_lr_entry(GICState *s, int irq, int vcpu)
-+{
-+    int cpu = gic_get_vcpu_real_id(vcpu);
-+    int lr_idx;
-+
-+    for (lr_idx = 0; lr_idx < s->num_lrs; lr_idx++) {
-+        uint32_t *entry = &s->h_lr[lr_idx][cpu];
-+
-+        if ((GICH_LR_VIRT_ID(*entry) == irq) &&
-+            (GICH_LR_STATE(*entry) != GICH_LR_STATE_INVALID)) {
-+            return entry;
-+        }
-+    }
-+
-+    g_assert_not_reached();
-+    return NULL;
-+}
-+
- #endif /* QEMU_ARM_GIC_INTERNAL_H */
--- 
+--=20
 2.18.0
