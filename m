@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0005mX-SH
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0005lm-71
 	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9o-0004Xz-G0
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9o-0004Xp-6k
 	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:34 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:15:43 +0200
-Message-Id: <20180714171601.5734-3-luc.michel@greensocs.com>
+Date: Sat, 14 Jul 2018 19:15:47 +0200
+Message-Id: <20180714171601.5734-7-luc.michel@greensocs.com>
 In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
 References: <20180714171601.5734-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v4 02/20] intc/arm_gic: Implement
- GICD_ISACTIVERn and GICD_ICACTIVERn registers
+Subject: [Qemu-devel] [PATCH v4 06/20] intc/arm_gic: Add virtual interface
+ register definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Implement GICD_ISACTIVERn and GICD_ICACTIVERn registers in the GICv2.
-Those registers allow to set or clear the active state of an IRQ in the
-distributor.
+Add the register definitions for the virtual interface of the GICv2.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c | 61 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 57 insertions(+), 4 deletions(-)
+ hw/intc/gic_internal.h | 65 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 6f3074ba88..accc03523b 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -711,8 +711,16 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
-             }
-         }
-     } else if (offset < 0x400) {
--        /* Interrupt Active.  */
--        irq = (offset - 0x300) * 8 + GIC_BASE_IRQ;
-+        /* Interrupt Set/Clear Active.  */
-+        if (offset < 0x380) {
-+            irq = (offset - 0x300) * 8;
-+        } else if (s->revision == 2) {
-+            irq = (offset - 0x380) * 8;
-+        } else {
-+            goto bad_reg;
-+        }
+diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
+index c85427c8e3..1aa888a576 100644
+--- a/hw/intc/gic_internal.h
++++ b/hw/intc/gic_internal.h
+@@ -21,6 +21,7 @@
+ #ifndef QEMU_ARM_GIC_INTERNAL_H
+ #define QEMU_ARM_GIC_INTERNAL_H
+ 
++#include "hw/registerfields.h"
+ #include "hw/intc/arm_gic.h"
+ 
+ #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+@@ -64,6 +65,70 @@
+ #define GICC_CTLR_EOIMODE    (1U << 9)
+ #define GICC_CTLR_EOIMODE_NS (1U << 10)
+ 
++REG32(GICH_HCR, 0x0)
++    FIELD(GICH_HCR, EN, 0, 1)
++    FIELD(GICH_HCR, UIE, 1, 1)
++    FIELD(GICH_HCR, LRENPIE, 2, 1)
++    FIELD(GICH_HCR, NPIE, 3, 1)
++    FIELD(GICH_HCR, VGRP0EIE, 4, 1)
++    FIELD(GICH_HCR, VGRP0DIE, 5, 1)
++    FIELD(GICH_HCR, VGRP1EIE, 6, 1)
++    FIELD(GICH_HCR, VGRP1DIE, 7, 1)
++    FIELD(GICH_HCR, EOICount, 27, 5)
 +
-+        irq += GIC_BASE_IRQ;
-         if (irq >= s->num_irq)
-             goto bad_reg;
-         res = 0;
-@@ -991,9 +999,54 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
-                 GIC_DIST_CLEAR_PENDING(irq + i, ALL_CPU_MASK);
-             }
-         }
-+    } else if (offset < 0x380) {
-+        /* Interrupt Set Active.  */
-+        if (s->revision != 2) {
-+            goto bad_reg;
-+        }
++#define GICH_HCR_MASK \
++    (R_GICH_HCR_EN_MASK | R_GICH_HCR_UIE_MASK | \
++     R_GICH_HCR_LRENPIE_MASK | R_GICH_HCR_NPIE_MASK | \
++     R_GICH_HCR_VGRP0EIE_MASK | R_GICH_HCR_VGRP0DIE_MASK | \
++     R_GICH_HCR_VGRP1EIE_MASK | R_GICH_HCR_VGRP1DIE_MASK | \
++     R_GICH_HCR_EOICount_MASK)
 +
-+        irq = (offset - 0x300) * 8 + GIC_BASE_IRQ;
-+        if (irq >= s->num_irq) {
-+            goto bad_reg;
-+        }
++REG32(GICH_VTR, 0x4)
++    FIELD(GICH_VTR, ListRegs, 0, 6)
++    FIELD(GICH_VTR, PREbits, 26, 3)
++    FIELD(GICH_VTR, PRIbits, 29, 3)
 +
-+        /* This register is banked per-cpu for PPIs */
-+        int cm = irq < GIC_INTERNAL ? (1 << cpu) : ALL_CPU_MASK;
++REG32(GICH_VMCR, 0x8)
++    FIELD(GICH_VMCR, VMCCtlr, 0, 10)
++    FIELD(GICH_VMCR, VMABP, 18, 3)
++    FIELD(GICH_VMCR, VMBP, 21, 3)
++    FIELD(GICH_VMCR, VMPriMask, 27, 5)
 +
-+        for (i = 0; i < 8; i++) {
-+            if (s->security_extn && !attrs.secure &&
-+                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
-+                continue; /* Ignore Non-secure access of Group0 IRQ */
-+            }
++REG32(GICH_MISR, 0x10)
++    FIELD(GICH_MISR, EOI, 0, 1)
++    FIELD(GICH_MISR, U, 1, 1)
++    FIELD(GICH_MISR, LRENP, 2, 1)
++    FIELD(GICH_MISR, NP, 3, 1)
++    FIELD(GICH_MISR, VGrp0E, 4, 1)
++    FIELD(GICH_MISR, VGrp0D, 5, 1)
++    FIELD(GICH_MISR, VGrp1E, 6, 1)
++    FIELD(GICH_MISR, VGrp1D, 7, 1)
 +
-+            if (value & (1 << i)) {
-+                GIC_DIST_SET_ACTIVE(irq + i, cm);
-+            }
-+        }
-     } else if (offset < 0x400) {
--        /* Interrupt Active.  */
--        goto bad_reg;
-+        /* Interrupt Clear Active.  */
-+        if (s->revision != 2) {
-+            goto bad_reg;
-+        }
++REG32(GICH_EISR0, 0x20)
++REG32(GICH_EISR1, 0x24)
++REG32(GICH_ELRSR0, 0x30)
++REG32(GICH_ELRSR1, 0x34)
++REG32(GICH_APR, 0xf0)
 +
-+        irq = (offset - 0x380) * 8 + GIC_BASE_IRQ;
-+        if (irq >= s->num_irq) {
-+            goto bad_reg;
-+        }
++REG32(GICH_LR0, 0x100)
++    FIELD(GICH_LR0, VirtualID, 0, 10)
++    FIELD(GICH_LR0, PhysicalID, 10, 10)
++    FIELD(GICH_LR0, CPUID, 10, 3)
++    FIELD(GICH_LR0, EOI, 19, 1)
++    FIELD(GICH_LR0, Priority, 23, 5)
++    FIELD(GICH_LR0, State, 28, 2)
++    FIELD(GICH_LR0, Grp1, 30, 1)
++    FIELD(GICH_LR0, HW, 31, 1)
 +
-+        /* This register is banked per-cpu for PPIs */
-+        int cm = irq < GIC_INTERNAL ? (1 << cpu) : ALL_CPU_MASK;
++/* Last LR register */
++REG32(GICH_LR63, 0x1fc)
 +
-+        for (i = 0; i < 8; i++) {
-+            if (s->security_extn && !attrs.secure &&
-+                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
-+                continue; /* Ignore Non-secure access of Group0 IRQ */
-+            }
++#define GICH_LR_MASK \
++    (R_GICH_LR0_VirtualID_MASK | R_GICH_LR0_PhysicalID_MASK | \
++     R_GICH_LR0_CPUID_MASK | R_GICH_LR0_EOI_MASK | \
++     R_GICH_LR0_Priority_MASK | R_GICH_LR0_State_MASK | \
++     R_GICH_LR0_Grp1_MASK | R_GICH_LR0_HW_MASK)
 +
-+            if (value & (1 << i)) {
-+                GIC_DIST_CLEAR_ACTIVE(irq + i, cm);
-+            }
-+        }
-     } else if (offset < 0x800) {
-         /* Interrupt Priority.  */
-         irq = (offset - 0x400) + GIC_BASE_IRQ;
+ /* Valid bits for GICC_CTLR for GICv1, v1 with security extensions,
+  * GICv2 and GICv2 with security extensions:
+  */
 -- 
 2.18.0
