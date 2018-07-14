@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9q-0005m7-JM
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:38 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9r-0005mr-8s
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9o-0004YJ-Jx
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:34 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9p-0004ZP-8v
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:35 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:15:44 +0200
-Message-Id: <20180714171601.5734-4-luc.michel@greensocs.com>
+Date: Sat, 14 Jul 2018 19:15:51 +0200
+Message-Id: <20180714171601.5734-11-luc.michel@greensocs.com>
 In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
 References: <20180714171601.5734-1-luc.michel@greensocs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 03/20] intc/arm_gic: Remove some dead code
- and put some functions static
+Subject: [Qemu-devel] [PATCH v4 10/20] intc/arm_gic: Implement
+ virtualization extensions in gic_(activate_irq|drop_prio)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +23,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Some functions are now only used in arm_gic.c, put them static. Some of
-them where only used by the NVIC implementation and are not used
-anymore, so remove them.
+Implement virtualization extensions in gic_activate_irq() and
+gic_drop_prio() and in gic_get_prio_from_apr_bits() called by
+gic_drop_prio().
+
+When the current CPU is a vCPU:
+  - Use GIC_VIRT_MIN_BPR and GIC_VIRT_NR_APRS instead of their non-virt
+  counterparts,
+  - the vCPU APR is stored in the virtual interface, in h_apr.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gic.c      | 23 ++---------------------
- hw/intc/gic_internal.h |  4 ----
- 2 files changed, 2 insertions(+), 25 deletions(-)
+ hw/intc/arm_gic.c | 50 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
 diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index accc03523b..9fe70e5519 100644
+index ad241d12c2..60704cabbb 100644
 --- a/hw/intc/arm_gic.c
 +++ b/hw/intc/arm_gic.c
-@@ -71,7 +71,7 @@ static inline bool gic_has_groups(GICState *s)
-=20
- /* TODO: Many places that call this routine could be optimized.  */
- /* Update interrupt status after enabled or pending bits have been chang=
-ed.  */
--void gic_update(GICState *s)
-+static void gic_update(GICState *s)
- {
-     int best_irq;
-     int best_prio;
-@@ -137,19 +137,6 @@ void gic_update(GICState *s)
+@@ -276,16 +276,23 @@ static void gic_activate_irq(GICState *s, int cpu, int irq)
+      * and update the running priority.
+      */
+     int prio = gic_get_group_priority(s, cpu, irq);
+-    int preemption_level = prio >> (GIC_MIN_BPR + 1);
++    int min_bpr = gic_is_vcpu(cpu) ? GIC_VIRT_MIN_BPR : GIC_MIN_BPR;
++    int preemption_level = prio >> (min_bpr + 1);
+     int regno = preemption_level / 32;
+     int bitno = preemption_level % 32;
++    uint32_t *papr = NULL;
+ 
+-    if (gic_has_groups(s) && gic_test_group(s, irq, cpu)) {
+-        s->nsapr[regno][cpu] |= (1 << bitno);
++    if (gic_is_vcpu(cpu)) {
++        assert(regno == 0);
++        papr = &s->h_apr[gic_get_vcpu_real_id(cpu)];
++    } else if (gic_has_groups(s) && gic_test_group(s, irq, cpu)) {
++        papr = &s->nsapr[regno][cpu];
+     } else {
+-        s->apr[regno][cpu] |= (1 << bitno);
++        papr = &s->apr[regno][cpu];
      }
+ 
++    *papr |= (1 << bitno);
++
+     s->running_priority[cpu] = prio;
+     gic_set_active(s, irq, cpu);
  }
-=20
--void gic_set_pending_private(GICState *s, int cpu, int irq)
--{
--    int cm =3D 1 << cpu;
--
--    if (gic_test_pending(s, irq, cm)) {
--        return;
--    }
--
--    DPRINTF("Set %d pending cpu %d\n", irq, cpu);
--    GIC_DIST_SET_PENDING(irq, cm);
--    gic_update(s);
--}
--
- static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
-                                  int cm, int target)
- {
-@@ -565,7 +552,7 @@ static void gic_deactivate_irq(GICState *s, int cpu, =
-int irq, MemTxAttrs attrs)
-     GIC_DIST_CLEAR_ACTIVE(irq, cm);
- }
-=20
--void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
-+static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs a=
-ttrs)
- {
-     int cm =3D 1 << cpu;
-     int group;
-@@ -1472,12 +1459,6 @@ static const MemoryRegionOps gic_cpu_ops =3D {
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
- };
-=20
--/* This function is used by nvic model */
--void gic_init_irqs_and_distributor(GICState *s)
--{
--    gic_init_irqs_and_mmio(s, gic_set_irq, gic_ops);
--}
--
- static void arm_gic_realize(DeviceState *dev, Error **errp)
- {
-     /* Device instance realize function for the GIC sysbus device */
-diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-index 6f8d242904..a2075a94db 100644
---- a/hw/intc/gic_internal.h
-+++ b/hw/intc/gic_internal.h
-@@ -75,11 +75,7 @@
- /* The special cases for the revision property: */
- #define REV_11MPCORE 0
-=20
--void gic_set_pending_private(GICState *s, int cpu, int irq);
- uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
--void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs);
--void gic_update(GICState *s);
--void gic_init_irqs_and_distributor(GICState *s);
- void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-                            MemTxAttrs attrs);
-=20
---=20
+@@ -296,6 +303,16 @@ static int gic_get_prio_from_apr_bits(GICState *s, int cpu)
+      * on the set bits in the Active Priority Registers.
+      */
+     int i;
++
++    if (gic_is_vcpu(cpu)) {
++        uint32_t apr = s->h_apr[gic_get_vcpu_real_id(cpu)];
++        if (apr) {
++            return ctz32(apr) << (GIC_VIRT_MIN_BPR + 1);
++        } else {
++            return 0x100;
++        }
++    }
++
+     for (i = 0; i < GIC_NR_APRS; i++) {
+         uint32_t apr = s->apr[i][cpu] | s->nsapr[i][cpu];
+         if (!apr) {
+@@ -324,16 +341,25 @@ static void gic_drop_prio(GICState *s, int cpu, int group)
+      * running priority will be wrong, so interrupts that should preempt
+      * might not do so, and interrupts that should not preempt might do so.
+      */
+-    int i;
++    if (gic_is_vcpu(cpu)) {
++        int rcpu = gic_get_vcpu_real_id(cpu);
+ 
+-    for (i = 0; i < GIC_NR_APRS; i++) {
+-        uint32_t *papr = group ? &s->nsapr[i][cpu] : &s->apr[i][cpu];
+-        if (!*papr) {
+-            continue;
++        if (s->h_apr[rcpu]) {
++            /* Clear lowest set bit */
++            s->h_apr[rcpu] &= s->h_apr[rcpu] - 1;
++        }
++    } else {
++        int i;
++
++        for (i = 0; i < GIC_NR_APRS; i++) {
++            uint32_t *papr = group ? &s->nsapr[i][cpu] : &s->apr[i][cpu];
++            if (!*papr) {
++                continue;
++            }
++            /* Clear lowest set bit */
++            *papr &= *papr - 1;
++            break;
+         }
+-        /* Clear lowest set bit */
+-        *papr &= *papr - 1;
+-        break;
+     }
+ 
+     s->running_priority[cpu] = gic_get_prio_from_apr_bits(s, cpu);
+-- 
 2.18.0
