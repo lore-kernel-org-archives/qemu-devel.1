@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9z-0005uZ-SM
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:45 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9z-0005uC-6e
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1feO9y-0004kv-6A
+	(envelope-from <luc.michel@greensocs.com>) id 1feO9x-0004jj-Aq
 	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:16:43 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 14 Jul 2018 19:16:01 +0200
-Message-Id: <20180714171601.5734-21-luc.michel@greensocs.com>
+Date: Sat, 14 Jul 2018 19:16:00 +0200
+Message-Id: <20180714171601.5734-20-luc.michel@greensocs.com>
 In-Reply-To: <20180714171601.5734-1-luc.michel@greensocs.com>
 References: <20180714171601.5734-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH v4 20/20] arm/virt: Add support for GICv2
- virtualization extensions
+Subject: [Qemu-devel] [PATCH v4 19/20] xlnx-zynqmp: Improve GIC wiring and
+ MMIO mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,160 +23,205 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
-Add support for GICv2 virtualization extensions by mapping the necessary
-I/O regions and connecting the maintenance IRQ lines.
+This commit improve the way the GIC is realized and connected in the
+ZynqMP SoC. The security extensions are enabled only if requested in the
+machine state. The same goes for the virtualization extensions.
 
-Declare those additions in the device tree and in the ACPI tables.
+All the GIC to APU CPU(s) IRQ lines are now connected, including FIQ,
+vIRQ and vFIQ. The missing CPU to GIC timers IRQ connections are also
+added (HYP and SEC timers).
+
+The GIC maintenance IRQs are back-wired to the correct GIC PPIs.
+
+Finally, the MMIO mappings are reworked to take into account the ZynqMP
+specifics. The GIC (v)CPU interface is aliased 16 times:
+  * for the first 0x1000 bytes from 0xf9010000 to 0xf901f000
+  * for the second 0x1000 bytes from 0xf9020000 to 0xf902f000
+Mappings of the virtual interface and virtual CPU interface are mapped
+only when virtualization extensions are requested. The
+XlnxZynqMPGICRegion struct has been enhanced to be able to catch all
+this information.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- hw/arm/virt-acpi-build.c |  6 +++--
- hw/arm/virt.c            | 52 +++++++++++++++++++++++++++++++++-------
- include/hw/arm/virt.h    |  4 +++-
- 3 files changed, 50 insertions(+), 12 deletions(-)
+ hw/arm/xlnx-zynqmp.c         | 92 ++++++++++++++++++++++++++++++++----
+ include/hw/arm/xlnx-zynqmp.h |  4 +-
+ 2 files changed, 86 insertions(+), 10 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 6ea47e2588..ce31abd62c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -659,6 +659,8 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         gicc->length = sizeof(*gicc);
-         if (vms->gic_version == 2) {
-             gicc->base_address = cpu_to_le64(memmap[VIRT_GIC_CPU].base);
-+            gicc->gich_base_address = cpu_to_le64(memmap[VIRT_GIC_HYP].base);
-+            gicc->gicv_base_address = cpu_to_le64(memmap[VIRT_GIC_VCPU].base);
-         }
-         gicc->cpu_interface_number = cpu_to_le32(i);
-         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
-@@ -668,8 +670,8 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
-         }
--        if (vms->virt && vms->gic_version == 3) {
--            gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GICV3_MAINT_IRQ));
-+        if (vms->virt) {
-+            gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GIC_MAINT_IRQ));
-         }
-     }
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 29df35fb75..42c29b8d06 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -29,12 +29,17 @@
  
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 281ddcdf6e..0807be985c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -131,6 +131,8 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_GIC_DIST] =           { 0x08000000, 0x00010000 },
-     [VIRT_GIC_CPU] =            { 0x08010000, 0x00010000 },
-     [VIRT_GIC_V2M] =            { 0x08020000, 0x00001000 },
-+    [VIRT_GIC_HYP] =            { 0x08030000, 0x00010000 },
-+    [VIRT_GIC_VCPU] =           { 0x08040000, 0x00010000 },
-     /* The space in between here is reserved for GICv3 CPU/vCPU/HYP */
-     [VIRT_GIC_ITS] =            { 0x08080000, 0x00020000 },
-     /* This redistributor space allows up to 2*64kB*123 CPUs */
-@@ -440,18 +442,33 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+ #define ARM_PHYS_TIMER_PPI  30
+ #define ARM_VIRT_TIMER_PPI  27
++#define ARM_HYP_TIMER_PPI   26
++#define ARM_SEC_TIMER_PPI   29
++#define GIC_MAINTENANCE_PPI 25
  
-         if (vms->virt) {
-             qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
--                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
-+                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GIC_MAINT_IRQ,
-                                    GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-         }
-     } else {
-         /* 'cortex-a15-gic' means 'GIC v2' */
-         qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-                                 "arm,cortex-a15-gic");
--        qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
--                                      2, vms->memmap[VIRT_GIC_DIST].base,
--                                      2, vms->memmap[VIRT_GIC_DIST].size,
--                                      2, vms->memmap[VIRT_GIC_CPU].base,
--                                      2, vms->memmap[VIRT_GIC_CPU].size);
-+        if (!vms->virt) {
-+            qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                         2, vms->memmap[VIRT_GIC_DIST].base,
-+                                         2, vms->memmap[VIRT_GIC_DIST].size,
-+                                         2, vms->memmap[VIRT_GIC_CPU].base,
-+                                         2, vms->memmap[VIRT_GIC_CPU].size);
-+        } else {
-+            qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                         2, vms->memmap[VIRT_GIC_DIST].base,
-+                                         2, vms->memmap[VIRT_GIC_DIST].size,
-+                                         2, vms->memmap[VIRT_GIC_CPU].base,
-+                                         2, vms->memmap[VIRT_GIC_CPU].size,
-+                                         2, vms->memmap[VIRT_GIC_HYP].base,
-+                                         2, vms->memmap[VIRT_GIC_HYP].size,
-+                                         2, vms->memmap[VIRT_GIC_VCPU].base,
-+                                         2, vms->memmap[VIRT_GIC_VCPU].size);
-+            qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
-+                                   GIC_FDT_IRQ_TYPE_PPI, ARCH_GIC_MAINT_IRQ,
-+                                   GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+        }
-     }
+ #define GEM_REVISION        0x40070106
  
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", vms->gic_phandle);
-@@ -573,6 +590,11 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-             qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
-                 MIN(smp_cpus - redist0_count, redist1_capacity));
-         }
-+    } else {
-+        if (!kvm_irqchip_in_kernel()) {
-+            qdev_prop_set_bit(gicdev, "has-virtualization-extensions",
-+                              vms->virt);
-+        }
-     }
-     qdev_init_nofail(gicdev);
-     gicbusdev = SYS_BUS_DEVICE(gicdev);
-@@ -584,6 +606,10 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-         }
-     } else {
-         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
-+        if (vms->virt) {
-+            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_HYP].base);
-+            sysbus_mmio_map(gicbusdev, 3, vms->memmap[VIRT_GIC_VCPU].base);
-+        }
-     }
+ #define GIC_BASE_ADDR       0xf9000000
+ #define GIC_DIST_ADDR       0xf9010000
+ #define GIC_CPU_ADDR        0xf9020000
++#define GIC_VIFACE_ADDR     0xf9040000
++#define GIC_VCPU_ADDR       0xf9060000
  
-     /* Wire the outputs from each CPU's generic timer and the GICv3
-@@ -610,9 +636,17 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-                                                    ppibase + timer_irq[irq]));
-         }
+ #define SATA_INTR           133
+ #define SATA_ADDR           0xFD0C0000
+@@ -111,11 +116,54 @@ static const int adma_ch_intr[XLNX_ZYNQMP_NUM_ADMA_CH] = {
+ typedef struct XlnxZynqMPGICRegion {
+     int region_index;
+     uint32_t address;
++    uint32_t offset;
++    bool virt;
+ } XlnxZynqMPGICRegion;
  
--        qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt", 0,
--                                    qdev_get_gpio_in(gicdev, ppibase
--                                                     + ARCH_GICV3_MAINT_IRQ));
-+        if (type == 3) {
-+            qemu_irq irq = qdev_get_gpio_in(gicdev,
-+                                            ppibase + ARCH_GIC_MAINT_IRQ);
-+            qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt",
-+                                        0, irq);
-+        } else if (vms->virt) {
-+            qemu_irq irq = qdev_get_gpio_in(gicdev,
-+                                            ppibase + ARCH_GIC_MAINT_IRQ);
-+            sysbus_connect_irq(gicbusdev, i + 4 * smp_cpus, irq);
-+        }
+ static const XlnxZynqMPGICRegion xlnx_zynqmp_gic_regions[] = {
+-    { .region_index = 0, .address = GIC_DIST_ADDR, },
+-    { .region_index = 1, .address = GIC_CPU_ADDR,  },
++    /* Distributor */
++    {
++        .region_index = 0,
++        .address = GIC_DIST_ADDR,
++        .offset = 0,
++        .virt = false
++    },
 +
-         qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
-                                     qdev_get_gpio_in(gicdev, ppibase
-                                                      + VIRTUAL_PMU_IRQ));
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 9a870ccb6a..4cc57a7ef6 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -42,7 +42,7 @@
- #define NUM_VIRTIO_TRANSPORTS 32
- #define NUM_SMMU_IRQS          4
++    /* CPU interface */
++    {
++        .region_index = 1,
++        .address = GIC_CPU_ADDR,
++        .offset = 0,
++        .virt = false
++    },
++    {
++        .region_index = 1,
++        .address = GIC_CPU_ADDR + 0x10000,
++        .offset = 0x1000,
++        .virt = false
++    },
++
++    /* Virtual interface */
++    {
++        .region_index = 2,
++        .address = GIC_VIFACE_ADDR,
++        .offset = 0,
++        .virt = true
++    },
++
++    /* Virtual CPU interface */
++    {
++        .region_index = 3,
++        .address = GIC_VCPU_ADDR,
++        .offset = 0,
++        .virt = true
++    },
++    {
++        .region_index = 3,
++        .address = GIC_VCPU_ADDR + 0x10000,
++        .offset = 0x1000,
++        .virt = true
++    },
+ };
  
--#define ARCH_GICV3_MAINT_IRQ  9
-+#define ARCH_GIC_MAINT_IRQ  9
+ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
+@@ -286,6 +334,9 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
++    qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->secure);
++    qdev_prop_set_bit(DEVICE(&s->gic),
++                      "has-virtualization-extensions", s->virt);
  
- #define ARCH_TIMER_VIRT_IRQ   11
- #define ARCH_TIMER_S_EL1_IRQ  13
-@@ -60,6 +60,8 @@ enum {
-     VIRT_GIC_DIST,
-     VIRT_GIC_CPU,
-     VIRT_GIC_V2M,
-+    VIRT_GIC_HYP,
-+    VIRT_GIC_VCPU,
-     VIRT_GIC_ITS,
-     VIRT_GIC_REDIST,
-     VIRT_GIC_REDIST2,
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
+     for (i = 0; i < num_apus; i++) {
+@@ -330,19 +381,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < XLNX_ZYNQMP_GIC_REGIONS; i++) {
+         SysBusDevice *gic = SYS_BUS_DEVICE(&s->gic);
+         const XlnxZynqMPGICRegion *r = &xlnx_zynqmp_gic_regions[i];
+-        MemoryRegion *mr = sysbus_mmio_get_region(gic, r->region_index);
++        MemoryRegion *mr;
+         uint32_t addr = r->address;
+         int j;
+ 
+-        sysbus_mmio_map(gic, r->region_index, addr);
++        if (r->virt && !s->virt) {
++            continue;
++        }
+ 
++        mr = sysbus_mmio_get_region(gic, r->region_index);
+         for (j = 0; j < XLNX_ZYNQMP_GIC_ALIASES; j++) {
+             MemoryRegion *alias = &s->gic_mr[i][j];
+ 
+-            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
+             memory_region_init_alias(alias, OBJECT(s), "zynqmp-gic-alias", mr,
+-                                     0, XLNX_ZYNQMP_GIC_REGION_SIZE);
++                                     r->offset, XLNX_ZYNQMP_GIC_REGION_SIZE);
+             memory_region_add_subregion(system_memory, addr, alias);
++
++            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
+         }
+     }
+ 
+@@ -352,12 +407,33 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
+                            qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
+                                             ARM_CPU_IRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_FIQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 2,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_VIRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 3,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_VFIQ));
+         irq = qdev_get_gpio_in(DEVICE(&s->gic),
+                                arm_gic_ppi_index(i, ARM_PHYS_TIMER_PPI));
+-        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 0, irq);
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_PHYS, irq);
+         irq = qdev_get_gpio_in(DEVICE(&s->gic),
+                                arm_gic_ppi_index(i, ARM_VIRT_TIMER_PPI));
+-        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 1, irq);
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_VIRT, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_HYP_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_HYP, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_SEC_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_SEC, irq);
++
++        if (s->virt) {
++            irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                                   arm_gic_ppi_index(i, GIC_MAINTENANCE_PPI));
++            sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 4, irq);
++        }
+     }
+ 
+     if (s->has_rpu) {
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 82b6ec2486..98f925ab84 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -53,7 +53,7 @@
+ #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
+ #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
+ 
+-#define XLNX_ZYNQMP_GIC_REGIONS 2
++#define XLNX_ZYNQMP_GIC_REGIONS 6
+ 
+ /* ZynqMP maps the ARM GIC regions (GICC, GICD ...) at consecutive 64k offsets
+  * and under-decodes the 64k region. This mirrors the 4k regions to every 4k
+@@ -62,7 +62,7 @@
+  */
+ 
+ #define XLNX_ZYNQMP_GIC_REGION_SIZE 0x1000
+-#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE - 1)
++#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE)
+ 
+ #define XLNX_ZYNQMP_MAX_LOW_RAM_SIZE    0x80000000ull
+ 
 -- 
 2.18.0
