@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1feOZR-0005J5-0X
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:43:02 -0400
+	(envelope-from <laurent@vivier.eu>) id 1feQLE-0004jn-LX
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 15:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1feOZM-0006Ti-Nr
-	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 13:43:01 -0400
-Date: Sat, 14 Jul 2018 19:42:51 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20180714174251.4tzpqrtdioemp3vx@toto>
-References: <20180714171601.5734-1-luc.michel@greensocs.com>
-	<20180714171601.5734-20-luc.michel@greensocs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180714171601.5734-20-luc.michel@greensocs.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 19/20] xlnx-zynqmp: Improve
- GIC wiring and MMIO mapping
+	(envelope-from <laurent@vivier.eu>) id 1feQL9-0005tS-OK
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 15:36:28 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:57785)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1feQL9-0005s7-Dz
+	for qemu-devel@nongnu.org; Sat, 14 Jul 2018 15:36:23 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Sat, 14 Jul 2018 21:35:53 +0200
+Message-Id: <20180714193553.30846-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v3] linux-user: fix mmap_find_vma_reserved()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,218 +21,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, mark.burton@greensocs.com, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>
 
-On Sat, Jul 14, 2018 at 07:16:00PM +0200, Luc Michel wrote:
-> This commit improve the way the GIC is realized and connected in the
-> ZynqMP SoC. The security extensions are enabled only if requested in the
-> machine state. The same goes for the virtualization extensions.
-> 
-> All the GIC to APU CPU(s) IRQ lines are now connected, including FIQ,
-> vIRQ and vFIQ. The missing CPU to GIC timers IRQ connections are also
-> added (HYP and SEC timers).
-> 
-> The GIC maintenance IRQs are back-wired to the correct GIC PPIs.
-> 
-> Finally, the MMIO mappings are reworked to take into account the ZynqMP
-> specifics. The GIC (v)CPU interface is aliased 16 times:
->   * for the first 0x1000 bytes from 0xf9010000 to 0xf901f000
->   * for the second 0x1000 bytes from 0xf9020000 to 0xf902f000
-> Mappings of the virtual interface and virtual CPU interface are mapped
-> only when virtualization extensions are requested. The
-> XlnxZynqMPGICRegion struct has been enhanced to be able to catch all
-> this information.
-> 
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+The value given by mmap_find_vma_reserved() is used with mmap(),
+so it is needed to be aligned with the host page size.
 
-Looks good to me!
+Since commit 18e80c55bb, reserved_va is only aligned to TARGET_PAGE_SIZE,
+and it works well if this size is greater or equal to the host page size.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+But ppc64 hosts have 64kB page size and when we start a 4kiB page size
+guest (like i386), it fails when it tries to mmap the stack:
 
+    mmap stack: Invalid argument
 
+Fixes: 18e80c55bb (linux-user: Tidy and enforce reserved_va initialization)
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
 
-> ---
->  hw/arm/xlnx-zynqmp.c         | 92 ++++++++++++++++++++++++++++++++----
->  include/hw/arm/xlnx-zynqmp.h |  4 +-
->  2 files changed, 86 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 29df35fb75..42c29b8d06 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -29,12 +29,17 @@
->  
->  #define ARM_PHYS_TIMER_PPI  30
->  #define ARM_VIRT_TIMER_PPI  27
-> +#define ARM_HYP_TIMER_PPI   26
-> +#define ARM_SEC_TIMER_PPI   29
-> +#define GIC_MAINTENANCE_PPI 25
->  
->  #define GEM_REVISION        0x40070106
->  
->  #define GIC_BASE_ADDR       0xf9000000
->  #define GIC_DIST_ADDR       0xf9010000
->  #define GIC_CPU_ADDR        0xf9020000
-> +#define GIC_VIFACE_ADDR     0xf9040000
-> +#define GIC_VCPU_ADDR       0xf9060000
->  
->  #define SATA_INTR           133
->  #define SATA_ADDR           0xFD0C0000
-> @@ -111,11 +116,54 @@ static const int adma_ch_intr[XLNX_ZYNQMP_NUM_ADMA_CH] = {
->  typedef struct XlnxZynqMPGICRegion {
->      int region_index;
->      uint32_t address;
-> +    uint32_t offset;
-> +    bool virt;
->  } XlnxZynqMPGICRegion;
->  
->  static const XlnxZynqMPGICRegion xlnx_zynqmp_gic_regions[] = {
-> -    { .region_index = 0, .address = GIC_DIST_ADDR, },
-> -    { .region_index = 1, .address = GIC_CPU_ADDR,  },
-> +    /* Distributor */
-> +    {
-> +        .region_index = 0,
-> +        .address = GIC_DIST_ADDR,
-> +        .offset = 0,
-> +        .virt = false
-> +    },
-> +
-> +    /* CPU interface */
-> +    {
-> +        .region_index = 1,
-> +        .address = GIC_CPU_ADDR,
-> +        .offset = 0,
-> +        .virt = false
-> +    },
-> +    {
-> +        .region_index = 1,
-> +        .address = GIC_CPU_ADDR + 0x10000,
-> +        .offset = 0x1000,
-> +        .virt = false
-> +    },
-> +
-> +    /* Virtual interface */
-> +    {
-> +        .region_index = 2,
-> +        .address = GIC_VIFACE_ADDR,
-> +        .offset = 0,
-> +        .virt = true
-> +    },
-> +
-> +    /* Virtual CPU interface */
-> +    {
-> +        .region_index = 3,
-> +        .address = GIC_VCPU_ADDR,
-> +        .offset = 0,
-> +        .virt = true
-> +    },
-> +    {
-> +        .region_index = 3,
-> +        .address = GIC_VCPU_ADDR + 0x10000,
-> +        .offset = 0x1000,
-> +        .virt = true
-> +    },
->  };
->  
->  static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
-> @@ -286,6 +334,9 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->      qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
->      qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
->      qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
-> +    qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->secure);
-> +    qdev_prop_set_bit(DEVICE(&s->gic),
-> +                      "has-virtualization-extensions", s->virt);
->  
->      /* Realize APUs before realizing the GIC. KVM requires this.  */
->      for (i = 0; i < num_apus; i++) {
-> @@ -330,19 +381,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->      for (i = 0; i < XLNX_ZYNQMP_GIC_REGIONS; i++) {
->          SysBusDevice *gic = SYS_BUS_DEVICE(&s->gic);
->          const XlnxZynqMPGICRegion *r = &xlnx_zynqmp_gic_regions[i];
-> -        MemoryRegion *mr = sysbus_mmio_get_region(gic, r->region_index);
-> +        MemoryRegion *mr;
->          uint32_t addr = r->address;
->          int j;
->  
-> -        sysbus_mmio_map(gic, r->region_index, addr);
-> +        if (r->virt && !s->virt) {
-> +            continue;
-> +        }
->  
-> +        mr = sysbus_mmio_get_region(gic, r->region_index);
->          for (j = 0; j < XLNX_ZYNQMP_GIC_ALIASES; j++) {
->              MemoryRegion *alias = &s->gic_mr[i][j];
->  
-> -            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
->              memory_region_init_alias(alias, OBJECT(s), "zynqmp-gic-alias", mr,
-> -                                     0, XLNX_ZYNQMP_GIC_REGION_SIZE);
-> +                                     r->offset, XLNX_ZYNQMP_GIC_REGION_SIZE);
->              memory_region_add_subregion(system_memory, addr, alias);
-> +
-> +            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
->          }
->      }
->  
-> @@ -352,12 +407,33 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->          sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
->                             qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
->                                              ARM_CPU_IRQ));
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus,
-> +                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
-> +                                            ARM_CPU_FIQ));
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 2,
-> +                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
-> +                                            ARM_CPU_VIRQ));
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 3,
-> +                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
-> +                                            ARM_CPU_VFIQ));
->          irq = qdev_get_gpio_in(DEVICE(&s->gic),
->                                 arm_gic_ppi_index(i, ARM_PHYS_TIMER_PPI));
-> -        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 0, irq);
-> +        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_PHYS, irq);
->          irq = qdev_get_gpio_in(DEVICE(&s->gic),
->                                 arm_gic_ppi_index(i, ARM_VIRT_TIMER_PPI));
-> -        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 1, irq);
-> +        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_VIRT, irq);
-> +        irq = qdev_get_gpio_in(DEVICE(&s->gic),
-> +                               arm_gic_ppi_index(i, ARM_HYP_TIMER_PPI));
-> +        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_HYP, irq);
-> +        irq = qdev_get_gpio_in(DEVICE(&s->gic),
-> +                               arm_gic_ppi_index(i, ARM_SEC_TIMER_PPI));
-> +        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_SEC, irq);
-> +
-> +        if (s->virt) {
-> +            irq = qdev_get_gpio_in(DEVICE(&s->gic),
-> +                                   arm_gic_ppi_index(i, GIC_MAINTENANCE_PPI));
-> +            sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 4, irq);
-> +        }
->      }
->  
->      if (s->has_rpu) {
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index 82b6ec2486..98f925ab84 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -53,7 +53,7 @@
->  #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
->  #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
->  
-> -#define XLNX_ZYNQMP_GIC_REGIONS 2
-> +#define XLNX_ZYNQMP_GIC_REGIONS 6
->  
->  /* ZynqMP maps the ARM GIC regions (GICC, GICD ...) at consecutive 64k offsets
->   * and under-decodes the 64k region. This mirrors the 4k regions to every 4k
-> @@ -62,7 +62,7 @@
->   */
->  
->  #define XLNX_ZYNQMP_GIC_REGION_SIZE 0x1000
-> -#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE - 1)
-> +#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE)
->  
->  #define XLNX_ZYNQMP_MAX_LOW_RAM_SIZE    0x80000000ull
->  
-> -- 
-> 2.18.0
-> 
-> 
+Notes:
+    v3:
+      move initialization of reserved_va to main()
+    
+    v2:
+      fix typo s/has/as/
+
+ linux-user/main.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 52b5a618fe..ea00dd9057 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -78,14 +78,7 @@ int have_guest_base;
+ # endif
+ #endif
+ 
+-/* That said, reserving *too* much vm space via mmap can run into problems
+-   with rlimits, oom due to page table creation, etc.  We will still try it,
+-   if directed by the command-line option, but not by default.  */
+-#if HOST_LONG_BITS == 64 && TARGET_VIRT_ADDR_SPACE_BITS <= 32
+-unsigned long reserved_va = MAX_RESERVED_VA;
+-#else
+ unsigned long reserved_va;
+-#endif
+ 
+ static void usage(int exitcode);
+ 
+@@ -672,6 +665,18 @@ int main(int argc, char **argv, char **envp)
+     /* init tcg before creating CPUs and to get qemu_host_page_size */
+     tcg_exec_init(0);
+ 
++    /* Reserving *too* much vm space via mmap can run into problems
++       with rlimits, oom due to page table creation, etc.  We will still try it,
++       if directed by the command-line option, but not by default.  */
++    if (HOST_LONG_BITS == 64 &&
++        TARGET_VIRT_ADDR_SPACE_BITS <= 32 &&
++        reserved_va == 0) {
++        /* reserved_va must be aligned with the host page size
++         * as it is used with mmap()
++         */
++        reserved_va = MAX_RESERVED_VA & qemu_host_page_mask;
++    }
++
+     cpu = cpu_create(cpu_type);
+     env = cpu->env_ptr;
+     cpu_reset(cpu);
+-- 
+2.17.1
