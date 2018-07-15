@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1feoPl-0007jb-Pg
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:18:46 -0400
+	(envelope-from <groeck7@gmail.com>) id 1fep9t-0005ym-PF
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 18:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1feoPk-0006DG-Qw
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:18:45 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38267)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1feoPk-0006Co-Kv
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:18:44 -0400
-Received: by mail-oi0-x242.google.com with SMTP id v8-v6so71290492oie.5
-	for <qemu-devel@nongnu.org>; Sun, 15 Jul 2018 14:18:44 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAG48ez2Rq18M+a84Ae+N5_=eS2A6zZNrG9r19MWS6hddq=x4Rw@mail.gmail.com>
-References: <CAG48ez2Rq18M+a84Ae+N5_=eS2A6zZNrG9r19MWS6hddq=x4Rw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 15 Jul 2018 22:18:23 +0100
-Message-ID: <CAFEAcA_+oq2H=-_7+AxqpXb_VhUsSAgVgN8K7Q+ffeKXxs5gWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] insecure git submodule URLs
+	(envelope-from <groeck7@gmail.com>) id 1fep9s-0005PM-4e
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 18:06:25 -0400
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Date: Sun, 15 Jul 2018 15:06:09 -0700
+Message-Id: <1531692369-1511-1-git-send-email-linux@roeck-us.net>
+Subject: [Qemu-devel] [RFC PATCH] hw: arm: Add basic support for cprman
+ (clock subsystem)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +19,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jann Horn <jannh@google.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>
 
-On 15 July 2018 at 20:50, Jann Horn via Qemu-devel
-<qemu-devel@nongnu.org> wrote:
-> I noticed that when I build QEMU from git for the first time, it pulls
-> in submodules over the insecure git:// protocol - in other words, as
-> far as I can tell, if I'm e.g. on an open wifi network while building
-> QEMU for the first time, even if I cloned the main repository over
-> https, anyone could smuggle in malicious code as part of e.g. a
-> submodule's makefile.
+Add basic support for BCM283x CPRMAN. Provide support for reading and
+writing CPRMAN registers and initialize registers with sensible default
+values. During runtime retain any written values.
 
-Yes, this came up the other week.
+Basic CPRMAN support is necessary and sufficient to boot Linux on raspi2
+and raspi3 systems.
 
-> I'm not sure what your preferred fix for this is, so I'm not sending a
-> patch yet. As far as I can tell, the two options are:
->
->  - change .gitmodules to use https for everything
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+I don't seriously expect this patch to get accepted, but I thought
+it might be valuable enough for others to use it when playing with
+raspi2 and raspi3 emulations.
 
-We should probably do this...
+ hw/arm/bcm2835_peripherals.c         |  15 +++++
+ hw/misc/Makefile.objs                |   1 +
+ hw/misc/bcm2835_cprman.c             | 126 +++++++++++++++++++++++++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |   2 +
+ include/hw/arm/raspi_platform.h      |   1 +
+ include/hw/misc/bcm2835_cprman.h     |  28 ++++++++
+ 6 files changed, 173 insertions(+)
+ create mode 100644 hw/misc/bcm2835_cprman.c
+ create mode 100644 include/hw/misc/bcm2835_cprman.h
 
->  - change .gitmodules to use relative URLs
->
-> If you want, I'll send a patch that does one of these, although it's
-> probably faster if you just do it yourselves.
->
-> Relative URLs would have the advantage that if someone is cloning from
-> a mirror (in other words, github), the submodules will also
-> automatically come from the same mirror.
-
-Do we mirror all our submodules to github?
-
-> As far as I can tell, the QEMU git server only supports the "dumb" git
-> protocol when accessed over HTTPS, not the "smart" protocol. I'm not
-> sure whether that might be why QEMU is currently still using the
-> insecure git protocol instead of git over HTTPS?
-
-This is why we haven't switched over the submodules yet, yes.
-It's on Jeff's todo list for the server, though.
-
-thanks
--- PMM
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 6be7660..1a8993f 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -85,6 +85,11 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_const_link(OBJECT(&s->property), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr), &error_abort);
+ 
++    /* Clock subsystem */
++    object_initialize(&s->cprman, sizeof(s->cprman), TYPE_BCM2835_CPRMAN);
++    object_property_add_child(obj, "cprman", OBJECT(&s->cprman), NULL);
++    qdev_set_parent_bus(DEVICE(&s->cprman), sysbus_get_default());
++
+     /* Random Number Generator */
+     object_initialize(&s->rng, sizeof(s->rng), TYPE_BCM2835_RNG);
+     object_property_add_child(obj, "rng", OBJECT(&s->rng), NULL);
+@@ -244,6 +249,13 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->property), 0,
+                       qdev_get_gpio_in(DEVICE(&s->mboxes), MBOX_CHAN_PROPERTY));
+ 
++    /* Clock subsystem */
++    object_property_set_bool(OBJECT(&s->cprman), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
+     /* Random Number Generator */
+     object_property_set_bool(OBJECT(&s->rng), true, "realized", &err);
+     if (err) {
+@@ -251,6 +263,9 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    memory_region_add_subregion(&s->peri_mr, CPRMAN_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cprman), 0));
++
+     memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
+                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
+ 
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 9350900..ae5fc8a 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -52,6 +52,7 @@ obj-$(CONFIG_OMAP) += omap_tap.o
+ obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+ obj-$(CONFIG_RASPI) += bcm2835_property.o
+ obj-$(CONFIG_RASPI) += bcm2835_rng.o
++obj-$(CONFIG_RASPI) += bcm2835_cprman.o
+ obj-$(CONFIG_SLAVIO) += slavio_misc.o
+ obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+ obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+new file mode 100644
+index 0000000..4051f2b
+--- /dev/null
++++ b/hw/misc/bcm2835_cprman.c
+@@ -0,0 +1,126 @@
++/*
++ * BCM2835 Clock subsystem (poor man's version)
++ *
++ * Copyright (C) 2018 Guenter Roeck <linux@roeck-us.net>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "crypto/random.h"
++#include "hw/misc/bcm2835_cprman.h"
++
++static uint64_t bcm2835_cprman_read(void *opaque, hwaddr offset,
++                                 unsigned size)
++{
++    BCM2835CprmanState *s = (BCM2835CprmanState *)opaque;
++    uint32_t res = 0;
++
++    assert(size == 4);
++
++    if (offset / 4 < CPRMAN_NUM_REGS) {
++        res = s->regs[offset / 4];
++    }
++
++    return res;
++}
++
++#define CM_PASSWORD             0x5a000000
++#define CM_PASSWORD_MASK        0xff000000
++
++static void bcm2835_cprman_write(void *opaque, hwaddr offset,
++                              uint64_t value, unsigned size)
++{
++    BCM2835CprmanState *s = (BCM2835CprmanState *)opaque;
++
++    assert(size == 4);
++
++    if ((value & 0xff000000) == CM_PASSWORD &&
++        offset / 4 < CPRMAN_NUM_REGS)
++            s->regs[offset / 4] = value & ~CM_PASSWORD_MASK;
++}
++
++static const MemoryRegionOps bcm2835_cprman_ops = {
++    .read = bcm2835_cprman_read,
++    .write = bcm2835_cprman_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription vmstate_bcm2835_cprman = {
++    .name = TYPE_BCM2835_CPRMAN,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, BCM2835CprmanState, CPRMAN_NUM_REGS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void bcm2835_cprman_init(Object *obj)
++{
++    BCM2835CprmanState *s = BCM2835_CPRMAN(obj);
++
++    memory_region_init_io(&s->iomem, obj, &bcm2835_cprman_ops, s,
++                          TYPE_BCM2835_CPRMAN, 0x2000);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++}
++
++#define CM_GNRICCTL        (0x000 / 4)
++#define CM_VECCTL        (0x0f8 / 4)
++#define CM_DFTCTL        (0x168 / 4)
++#define CM_EMMCCTL        (0x1c0 / 4)
++#define A2W_PLLA_CTRL        (0x1100 / 4)
++#define A2W_PLLB_CTRL        (0x11e0 / 4)
++
++static void bcm2835_cprman_reset(DeviceState *dev)
++{
++    BCM2835CprmanState *s = BCM2835_CPRMAN(dev);
++    int i;
++
++    /*
++     * Available information suggests that CPRMAN registers have default
++     * values which are not overwritten by ROMMON (u-boot). The hardware
++     * default values are unknown at this time.
++     * The default values selected here are necessary and sufficient
++     * to boot Linux directly (on raspi2 and raspi3). The selected
++     * values enable all clocks and set clock rates to match their
++     * parent rates.
++     */
++    for (i = CM_GNRICCTL; i <= CM_VECCTL; i += 2) {
++        s->regs[i] = 0x11;
++        s->regs[i + 1] = 0x1000;
++    }
++    for (i = CM_DFTCTL; i <= CM_EMMCCTL; i += 2) {
++        s->regs[i] = 0x11;
++        s->regs[i + 1] = 0x1000;
++    }
++    for (i = A2W_PLLA_CTRL; i <= A2W_PLLB_CTRL; i += 8) {
++        s->regs[i] = 0x10001;
++    }
++}
++
++static void bcm2835_cprman_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = bcm2835_cprman_reset;
++    dc->vmsd = &vmstate_bcm2835_cprman;
++}
++
++static TypeInfo bcm2835_cprman_info = {
++    .name          = TYPE_BCM2835_CPRMAN,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(BCM2835CprmanState),
++    .class_init    = bcm2835_cprman_class_init,
++    .instance_init = bcm2835_cprman_init,
++};
++
++static void bcm2835_cprman_register_types(void)
++{
++    type_register_static(&bcm2835_cprman_info);
++}
++
++type_init(bcm2835_cprman_register_types)
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index f5b193f..f9f53e3 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -19,6 +19,7 @@
+ #include "hw/intc/bcm2835_ic.h"
+ #include "hw/misc/bcm2835_property.h"
+ #include "hw/misc/bcm2835_rng.h"
++#include "hw/misc/bcm2835_cprman.h"
+ #include "hw/misc/bcm2835_mbox.h"
+ #include "hw/sd/sdhci.h"
+ #include "hw/sd/bcm2835_sdhost.h"
+@@ -44,6 +45,7 @@ typedef struct BCM2835PeripheralState {
+     BCM2835ICState ic;
+     BCM2835PropertyState property;
+     BCM2835RngState rng;
++    BCM2835CprmanState cprman;
+     BCM2835MboxState mboxes;
+     SDHCIState sdhci;
+     BCM2835SDHostState sdhost;
+diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
+index 6467e88..412d010 100644
+--- a/include/hw/arm/raspi_platform.h
++++ b/include/hw/arm/raspi_platform.h
+@@ -36,6 +36,7 @@
+                                                       * Doorbells & Mailboxes */
+ #define PM_OFFSET               0x100000 /* Power Management, Reset controller
+                                           * and Watchdog registers */
++#define CPRMAN_OFFSET           0x101000
+ #define PCM_CLOCK_OFFSET        0x101098
+ #define RNG_OFFSET              0x104000
+ #define GPIO_OFFSET             0x200000
+diff --git a/include/hw/misc/bcm2835_cprman.h b/include/hw/misc/bcm2835_cprman.h
+new file mode 100644
+index 0000000..db250b3
+--- /dev/null
++++ b/include/hw/misc/bcm2835_cprman.h
+@@ -0,0 +1,28 @@
++/*
++ * BCM2835 Poor-man's version of CPRMAN
++ *
++ * Copyright (C) 2018 Guenter Roeck <linux@roeck-us.net>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef BCM2835_CPRMAN_H
++#define BCM2835_CPRMAN_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_BCM2835_CPRMAN "bcm2835-cprman"
++#define BCM2835_CPRMAN(obj) \
++        OBJECT_CHECK(BCM2835CprmanState, (obj), TYPE_BCM2835_CPRMAN)
++
++#define CPRMAN_NUM_REGS         (0x1200 / 4)
++
++typedef struct {
++    SysBusDevice busdev;
++    MemoryRegion iomem;
++
++    uint32_t regs[CPRMAN_NUM_REGS];
++} BCM2835CprmanState;
++
++#endif
+-- 
+2.7.4
