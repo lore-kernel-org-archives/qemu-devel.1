@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <daniel@drv.nu>) id 1feaP7-0005ZU-2q
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 02:21:10 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fedM4-00025C-Le
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 05:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <daniel@drv.nu>) id 1feaP6-00031m-70
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 02:21:09 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fedLz-00036x-Km
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 05:30:12 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:28190)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fedLz-0002oG-Ck
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 05:30:07 -0400
+Date: Sun, 15 Jul 2018 11:29:56 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <20180622112237.2131-1-gersner@gmail.com>
-References: <20180622112237.2131-1-gersner@gmail.com>
-From: Daniel Verkamp <daniel@drv.nu>
-Date: Sat, 14 Jul 2018 23:20:56 -0700
-Message-ID: <CAGFXeQL4FPVeFrEiQpRjGnBMBs5oCjxjXFJ_NGWsGmOjvk75pg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/5] nvme: PCI/e configuration from
- specification
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: [Qemu-devel] hw/display/sm501* status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shimi Gersner <gersner@gmail.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, David Sariel <davidsa@openu.ac.il>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jun 22, 2018 at 4:22 AM, Shimi Gersner <gersner@gmail.com> wrote:
-> PCI/e configuration currently does not meets specifications.
->
-> Patch includes various configuration changes to support specifications
-> - BAR2 to return zero when read and CMD.IOSE is not set.
-> - Expose NVME configuration through IO space (Optional).
-> - PCI Power Management v1.2.
-> - PCIe Function Level Reset.
-> - Disable QEMUs default use of PCIe Link Status (DLLLA).
-> - PCIe missing AOC compliance flag.
-> - Mask PCIe End-to-End TLP as RO (Unspecified by specification).
-[...]
->      n->num_namespaces = 1;
->      n->num_queues = 64;
-> -    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-> +    n->reg_size = pow2ceil(0x2000 + 2 * (n->num_queues + 1) * 4);
+Hello,
 
-The existing math looks OK to me (maybe already 4 bytes larger than
-necessary?). The controller registers should be 0x1000 bytes for the
-fixed register set, then 2 * 4 bytes for each doorbell pair (+ 1 is
-for the admin queue, and CAP.DSTRD is set to 0, so there is no extra
-padding between queues). The result is also rounded up to a power of
-two, so the result will typically be 8 KB.  What is the rationale for
-this change?
+I plan to make more changes to sm501 emulation to make it more usable for 
+AmigaOS and other Amiga like OSes. This would include first cleaning up of 
+current state, then trying to optimise 2D ops and display updates because 
+it was found these are currently quite slow. (Especially when using 8bit 
+or 16bit screen modes as AmigaOS does where every screen update does pixel 
+format conversion with a simple loop in a suboptimal way. Maybe we can use 
+more optimal pixman routines for these.)
 
->      n->ns_size = bs_size / (uint64_t)n->num_namespaces;
->
->      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
-> @@ -1245,6 +1295,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->      pci_register_bar(&n->parent_obj, 0,
->          PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
->          &n->iomem);
-> +
-> +    // Expose the NVME memory through Address Space IO (Optional by spec)
-> +    pci_register_bar(&n->parent_obj, 2, PCI_BASE_ADDRESS_SPACE_IO, &n->iomem);
+We have found while merging previous patches that the status of sm501 is 
+not clear. It was originally part of SH emulation added for the R2D board 
+but now it's also used by PPC sam460ex board (and can be used with mac99 
+as well to run MorphOS that does not yet boot on sam460ex). David Gibson, 
+the PPC maintainer has indicated that he can't review changes to this 
+device and it is not really related to PPC so the practice of merging 
+sm501 patches via his PPC tree is not preferred.
 
-This looks like it will register the whole 4KB+ NVMe register set
-(n->iomem) as an I/O space BAR, but this doesn't match the spec (see
-NVMe 1.3c section 3.2, "Index/Data Pair registers"). The I/O BAR (if
-implemented) should just contain two 4-byte registers, Index and Data,
-that can be used to indirectly access the NVMe register set.  (Just
-for curiosity, do you know of any software that uses this feature? It
-could be useful for testing the implementation.)
+So before sending more patches I'd like to clear who can review and merge 
+patches for sm501 in the future and what is the maintainership of this 
+device?
 
-Other minor nitpicks:
-- Comment style is inconsistent with the rest of the file (// vs /* */)
-- PCIe and NVMe are incorrectly capitalized a few times in comments
-
-Thanks,
--- Daniel
+Regards,
+BALATON Zoltan
