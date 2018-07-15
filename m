@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1feoOe-0007H9-GH
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:17:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1feoPl-0007jb-Pg
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1feoOb-0004sC-Hs
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:17:36 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:25834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1feoOb-0004qb-Ad
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:17:33 -0400
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Sun, 15 Jul 2018 22:59:21 +0200
-Message-Id: <20180715211731.311B67456B5@zero.eik.bme.hu>
-Subject: [Qemu-devel] [PATCH for 3.0] sm501: Fix warning about unreachable
- code
+	(envelope-from <peter.maydell@linaro.org>) id 1feoPk-0006DG-Qw
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:18:45 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38267)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1feoPk-0006Co-Kv
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 17:18:44 -0400
+Received: by mail-oi0-x242.google.com with SMTP id v8-v6so71290492oie.5
+	for <qemu-devel@nongnu.org>; Sun, 15 Jul 2018 14:18:44 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAG48ez2Rq18M+a84Ae+N5_=eS2A6zZNrG9r19MWS6hddq=x4Rw@mail.gmail.com>
+References: <CAG48ez2Rq18M+a84Ae+N5_=eS2A6zZNrG9r19MWS6hddq=x4Rw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 15 Jul 2018 22:18:23 +0100
+Message-ID: <CAFEAcA_+oq2H=-_7+AxqpXb_VhUsSAgVgN8K7Q+ffeKXxs5gWQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] insecure git submodule URLs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+To: Jann Horn <jannh@google.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Coverity warned that the false arm of conditional expression is
-unreachable when it is inside an if with the same condition.
-Remove the unreachable code to avoid the warning.
+On 15 July 2018 at 20:50, Jann Horn via Qemu-devel
+<qemu-devel@nongnu.org> wrote:
+> I noticed that when I build QEMU from git for the first time, it pulls
+> in submodules over the insecure git:// protocol - in other words, as
+> far as I can tell, if I'm e.g. on an open wifi network while building
+> QEMU for the first time, even if I cloned the main repository over
+> https, anyone could smuggle in malicious code as part of e.g. a
+> submodule's makefile.
 
-Fixes: CID 1394215
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/display/sm501.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes, this came up the other week.
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 9ab29d3..874260a 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1024,7 +1024,7 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-                         if (res) {
-                             SM501_DPRINTF("sm501 i2c : transfer failed"
-                                           " i=%d, res=%d\n", i, res);
--                            s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-+                            s->i2c_status |= SM501_I2C_STATUS_ERROR;
-                             return;
-                         }
-                     }
--- 
-2.7.6
+> I'm not sure what your preferred fix for this is, so I'm not sending a
+> patch yet. As far as I can tell, the two options are:
+>
+>  - change .gitmodules to use https for everything
+
+We should probably do this...
+
+>  - change .gitmodules to use relative URLs
+>
+> If you want, I'll send a patch that does one of these, although it's
+> probably faster if you just do it yourselves.
+>
+> Relative URLs would have the advantage that if someone is cloning from
+> a mirror (in other words, github), the submodules will also
+> automatically come from the same mirror.
+
+Do we mirror all our submodules to github?
+
+> As far as I can tell, the QEMU git server only supports the "dumb" git
+> protocol when accessed over HTTPS, not the "smart" protocol. I'm not
+> sure whether that might be why QEMU is currently still using the
+> insecure git protocol instead of git over HTTPS?
+
+This is why we haven't switched over the submodules yet, yes.
+It's on Jeff's todo list for the server, though.
+
+thanks
+-- PMM
