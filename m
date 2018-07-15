@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fen51-00036j-UA
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 15:53:17 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fen4x-00065C-8n
+	(envelope-from <laurent@vivier.eu>) id 1fen51-00036g-Pm
 	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 15:53:16 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:36305)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1fen4w-00064n-Ut
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 15:53:15 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:54105)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fen4w-00061B-UI
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 15:53:11 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fen4w-000610-Kd
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 15:53:10 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sun, 15 Jul 2018 21:52:40 +0200
-Message-Id: <20180715195242.6645-3-laurent@vivier.eu>
-In-Reply-To: <20180715195242.6645-1-laurent@vivier.eu>
-References: <20180715195242.6645-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 2/4] linux-user: convert remaining fcntl() to
- safe_fcntl()
+Date: Sun, 15 Jul 2018 21:52:38 +0200
+Message-Id: <20180715195242.6645-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 0/4] Linux user for 3.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +24,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Commit 435da5e709 didn't convert a fcntl() call to safe_fcntl()
-for TARGET_NR_fcntl64 case. There is no reason to not use it
-in this case.
+The following changes since commit 9277d81f5c2c6f4d0b5e47c8476eb7ee7e5c0beb:
 
-Fixes: 435da5e709 linux-user: Use safe_syscall wrapper for fcntl
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180713125805.10749-1-laurent@vivier.eu>
----
- linux-user/syscall.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  docs: Grammar and spelling fixes (2018-07-13 10:16:04 +0100)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b8b7bced9f..aa4f3eb1c8 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -11764,7 +11764,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-             if (ret) {
-                 break;
-             }
--            ret = get_errno(fcntl(arg1, cmd, &fl));
-+            ret = get_errno(safe_fcntl(arg1, cmd, &fl));
-             if (ret == 0) {
-                 ret = copyto(arg3, &fl);
-             }
+are available in the Git repository at:
+
+  git://github.com/vivier/qemu.git tags/linux-user-for-3.0-pull-request
+
+for you to fetch changes up to 1d3d1b23e1c8f52ec431ddaa8deea1322bc25cbf:
+
+  Zero out the host's `msg_control` buffer (2018-07-15 16:04:38 +0200)
+
+----------------------------------------------------------------
+Some fixes for linux-user:
+- workaround for CMSG_NXTHDR bug
+- two patches for ppc64/ppc64le host:
+  fix fcntl() with *LK64 commands
+  (seen when dpkg wants to lock the DB)
+  fix reserved_va alignment (ppc64 needs
+  a 64kB alignment)
+- convert a forgotten fcntl() to safe_fcntl()
+
+----------------------------------------------------------------
+
+Jonas Schievink (1):
+  Zero out the host's `msg_control` buffer
+
+Laurent Vivier (2):
+  linux-user: convert remaining fcntl() to safe_fcntl()
+  linux-user: fix mmap_find_vma_reserved()
+
+Shivaprasad G Bhat (1):
+  linux-user: ppc64: use the correct values for F_*LK64s
+
+ linux-user/main.c    |  19 ++++---
+ linux-user/syscall.c | 130 +++++++++++++++++++++++++++----------------
+ 2 files changed, 95 insertions(+), 54 deletions(-)
+
 -- 
 2.17.1
