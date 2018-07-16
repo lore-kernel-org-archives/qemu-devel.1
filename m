@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ff00N-0008Tu-24
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:41:20 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1ff0Gg-0003zr-Ax
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ff00J-0004Jo-VF
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:41:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41924 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ff00J-0004Je-Pa
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:41:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CE7081663C2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 09:41:15 +0000 (UTC)
-Date: Mon, 16 Jul 2018 10:41:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180716094110.GM5616@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180716073226.21127-1-armbru@redhat.com>
-	<20180716073226.21127-2-armbru@redhat.com>
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1ff0Gd-00088g-9z
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:58:10 -0400
+From: =?utf-8?B?0K7RgNC40Lkg0JrQvtGC0L7Qsg==?= <yury-kotov@yandex-team.ru>
+In-Reply-To: <20180713191451-mutt-send-email-mst@kernel.org>
+References: <1531490645-10989-1-git-send-email-yury-kotov@yandex-team.ru>
+	<20180713191451-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
+Date: Mon, 16 Jul 2018 12:58:02 +0300
+Message-Id: <55231531735082@iva4-ed922e5c836e.qloud-c.yandex.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180716073226.21127-2-armbru@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-doc: Move appendix "Deprecated
- features" to its own file
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix invalid downcast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, thuth@redhat.com, cohuck@redhat.com, pkrempa@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Jia He <hejianet@gmail.com>, qemu-stable@nongnu.org
 
-On Mon, Jul 16, 2018 at 09:32:25AM +0200, Markus Armbruster wrote:
-> Consumers of QEMU need to track feature deprecation.  Keeping
-> deprecation documentation in its own file helps in two small ways:
->=20
-> * You can track changes the easy and obvious way, with git-log.
->   Before, you had to resort to more complex gittery like "git-log
->   --oneline -L '/@node Deprecated features/,/@node Supported build
->   platforms/:qemu-doc.texi'"
->=20
-> * It lets us use MAINTAINERS to copy interested parties on deprecation
->   patches, so they can advise or object before they're a done deal.
->   The next commit will do that for libvirt.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  qemu-deprecated.texi | 234 ++++++++++++++++++++++++++++++++++++++++++
->  qemu-doc.texi        | 235 +------------------------------------------
->  2 files changed, 235 insertions(+), 234 deletions(-)
->  create mode 100644 qemu-deprecated.texi
++ qemu-stable@
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+13.07.2018, 19:16, "Michael S. Tsirkin" <mst@redhat.com>:
+> On Fri, Jul 13, 2018 at 05:04:05PM +0300, Yury Kotov wrote:
+>> =C2=A0virtio_queue_get_desc_addr returns 64-bit hwaddr while int is us=
+ually 32-bit.
+>> =C2=A0If returned hwaddr is not equal to 0 but least-significant 32 bi=
+ts are
+>> =C2=A0equal to 0 then this code will not actually stop running queue.
+>>
+>> =C2=A0Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+>
+> So IIUC
+>
+> Fixes: fb20fbb764aa1 ("vhost: avoid to start/stop virtqueue which is no=
+t ready")
+> And
+> Cc: qemu-stable@nongnu.org
+>
 
+Ok, done. Or did you mean I have to resend the patch-message to qemu-stab=
+le?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>> =C2=A0---
+>> =C2=A0=C2=A0hw/virtio/vhost.c | 4 +---
+>> =C2=A0=C2=A01 file changed, 1 insertion(+), 3 deletions(-)
+>>
+>> =C2=A0diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>> =C2=A0index b129cb9..7edeee7 100644
+>> =C2=A0--- a/hw/virtio/vhost.c
+>> =C2=A0+++ b/hw/virtio/vhost.c
+>> =C2=A0@@ -1071,10 +1071,8 @@ static void vhost_virtqueue_stop(struct v=
+host_dev *dev,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.index =3D=
+ vhost_vq_index,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0};
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int r;
+>> =C2=A0- int a;
+>>
+>> =C2=A0- a =3D virtio_queue_get_desc_addr(vdev, idx);
+>> =C2=A0- if (a =3D=3D 0) {
+>> =C2=A0+ if (virtio_queue_get_desc_addr(vdev, idx) =3D=3D 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Don't s=
+top the virtqueue which might have not been started */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+>> =C2=A0--
+>> =C2=A02.7.4
