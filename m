@@ -1,18 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ff9Zz-0004hc-4D
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:54:44 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1ff9e6-0005bq-Tz
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ff9Zu-0008Ki-8X
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:54:43 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:37104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ff9Zt-0008KJ-T2
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:54:38 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 16 Jul 2018 21:53:49 +0200
-Message-Id: <20180716195349.29959-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH] linux-user: fix ELF load alignment error
+	(envelope-from <balaton@eik.bme.hu>) id 1ff9e3-000119-2Z
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:58:59 -0400
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Mon, 16 Jul 2018 21:47:37 +0200
+Message-Id: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+Subject: [Qemu-devel] [PATCH] Do not enable QOM debugging by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,79 +17,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Alexander Graf <agraf@suse.de>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-When we try to use some targets on ppc64, it can happen the target
-doesn't support the host page size to align ELF load sections and
-fails with:
+Commit 3556c233d 5 years ago added an option to disable QOM debugging,
+noting that it can have high performance cost but left the default to on.
+Change the default to off and only enable it when debugging is requested
+to avoid the performance penalty for those compiling without debug options.
 
-  ELF load command alignment not page-aligned
-
-Since commit a70daba3771 ("linux-user: Tell guest about big host
-page sizes") the host page size is used to align ELF sections, but
-this doesn't work if the alignment required by the load section is
-smaller than the host one.  For these cases, we continue to use the
-TARGET_PAGE_SIZE instead of the host one.
-
-I have tested this change on ppc64, and it fixes qemu linux-user for:
-  s390x, m68k, i386, arm, aarch64, hppa
-and I have tested it doesn't break the following targets:
-  x86_64, mips64el, sh4
-mips and mipsel abort, but I think for another reason.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- linux-user/elfload.c | 10 +++++++++-
- linux-user/qemu.h    |  1 +
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ configure | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 942a1b661f..3a42fbd89d 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1875,7 +1875,13 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-     NEW_AUX_ENT(AT_PHDR, (abi_ulong)(info->load_addr + exec->e_phoff));
-     NEW_AUX_ENT(AT_PHENT, (abi_ulong)(sizeof (struct elf_phdr)));
-     NEW_AUX_ENT(AT_PHNUM, (abi_ulong)(exec->e_phnum));
--    NEW_AUX_ENT(AT_PAGESZ, (abi_ulong)(MAX(TARGET_PAGE_SIZE, getpagesize())));
-+    if ((info->alignment & ~qemu_host_page_mask) != 0) {
-+        /* Target doesn't support host page size alignment */
-+        NEW_AUX_ENT(AT_PAGESZ, (abi_ulong)(TARGET_PAGE_SIZE));
-+    } else {
-+        NEW_AUX_ENT(AT_PAGESZ, (abi_ulong)(MAX(TARGET_PAGE_SIZE,
-+                                               qemu_host_page_size)));
-+    }
-     NEW_AUX_ENT(AT_BASE, (abi_ulong)(interp_info ? interp_info->load_addr : 0));
-     NEW_AUX_ENT(AT_FLAGS, (abi_ulong)0);
-     NEW_AUX_ENT(AT_ENTRY, info->entry);
-@@ -2202,6 +2208,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-     /* Find the maximum size of the image and allocate an appropriate
-        amount of memory to handle that.  */
-     loaddr = -1, hiaddr = 0;
-+    info->alignment |=  0;
-     for (i = 0; i < ehdr->e_phnum; ++i) {
-         if (phdr[i].p_type == PT_LOAD) {
-             abi_ulong a = phdr[i].p_vaddr - phdr[i].p_offset;
-@@ -2213,6 +2220,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-                 hiaddr = a;
-             }
-             ++info->nsegs;
-+            info->alignment |= phdr[i].p_align;
-         }
-     }
- 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index bb85c81aa4..7b16a1cdea 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -51,6 +51,7 @@ struct image_info {
-         abi_ulong       file_string;
-         uint32_t        elf_flags;
- 	int		personality;
-+        abi_ulong       alignment;
- 
-         /* The fields below are used in FDPIC mode.  */
-         abi_ulong       loadmap_addr;
+diff --git a/configure b/configure
+index 2a7796e..a8fc1ed 100755
+--- a/configure
++++ b/configure
+@@ -415,7 +415,7 @@ bsd_user="no"
+ blobs="yes"
+ pkgversion=""
+ pie=""
+-qom_cast_debug="yes"
++qom_cast_debug="no"
+ trace_backends="log"
+ trace_file="trace"
+ spice=""
+@@ -1062,6 +1062,7 @@ for opt do
+       debug_tcg="yes"
+       debug_mutex="yes"
+       debug="yes"
++      qom_cast_debug="yes"
+       strip_opt="no"
+       fortify_source="no"
+   ;;
 -- 
-2.17.1
+2.7.6
