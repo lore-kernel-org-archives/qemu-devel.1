@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ff1Nw-0008Db-Uq
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:09:45 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1ff1PC-0000Yv-Fn
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ff1Nr-00044V-TC
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:09:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33104 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ff1Nr-00044F-OD
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:09:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F1B37B2B3
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 11:09:39 +0000 (UTC)
-Date: Mon, 16 Jul 2018 13:09:34 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180716130934.084b7bc8.cohuck@redhat.com>
-In-Reply-To: <36833724-11e5-42b9-e2bc-8f52734bd640@redhat.com>
-References: <20180713184213.25301-1-stefanha@redhat.com>
-	<36833724-11e5-42b9-e2bc-8f52734bd640@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1ff1P7-0005V9-Eq
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:11:02 -0400
+Received: from mail-eopbgr700135.outbound.protection.outlook.com
+	([40.107.70.135]:22992
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1ff1P7-0005Ty-2X
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:10:57 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 16 Jul 2018 11:10:54 +0000
+Message-ID: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] trace/simple: fix hang in child after
- fork(2)
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] tcg_register_jit_int() interface problem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>Petar Jovanovic <pjovanovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>
 
-On Sun, 15 Jul 2018 14:42:23 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hello, all.
 
-> On 13/07/2018 20:42, Stefan Hajnoczi wrote:
-> > +#ifndef _WIN32
-> > +static void stop_writeout_thread(void)
-> > +{
-> > +    g_mutex_lock(&trace_lock);
-> > +    trace_writeout_running = false;
-> > +    g_cond_signal(&trace_available_cond);
-> > +    g_mutex_unlock(&trace_lock);
-> > +
-> > +    g_thread_join(trace_writeout_thread);
-> > +    trace_writeout_thread = NULL;
-> > +}  
-> 
-> After stop_writeout_thread returns, another could start a write to the
-> shared data structure---and the write would never finish, because the
-> thread disappears after fork(2) returns.  This would leave the mutex
-> locked, causing a deadlock soon after the fork.  So you need to lock
-> trace_lock again here, and unlock it in restart_writeout_thread.
 
-So, I suppose there will be a v3, right?
+Just a little background:
 
-> 
-> Apart from this, it looks good!
 
-Did a quick run and it fixed the problems for me.
+One of the fields in an ELF header is e_machine. It is meant to contain "ma=
+chine architecture". The numerical value is approved by a committee. Some v=
+alues for common targets are: EM_PPC, EM_PPC64, EM_ARM, EM_AARCH64, etc.
+
+
+The TCG function tcg_register_jit_int() expects that the preprocessor const=
+ant ELF_HOST_MACHINE is defined, and uses internally the value of that cons=
+tant.
+
+
+Consider, let's say, ARM: It defines ELF_HOST_MACHINE in tcg/arm/tcg-target=
+.inc.c as
+
+
+#define ELF_HOST_MACHINE EM_ARM
+
+
+while in tcg/aarch64/tcg-target.inc.c it defines it as
+
+
+#define ELF_HOST_MACHINE EM_AARCH64
+
+
+For MIPS, the situation is different: Up until recently, MIPS had only one =
+value for e_machine: that was EM_MIPS (used for both 32-bit and 64-bit MIPS=
+ systems). However, new nanoMIPS systems have a new value in that field: EM=
+_NANOMIPS (that is to be applied for both 32-bit and 64-bit nanoMIPS system=
+s).
+
+
+The situation described above represent a problem for us developing nanoMIP=
+S support, forcing us to have different compilations (and executables) for =
+MIPS and nanoMIPS.
+
+
+Is there a possibility to refactor tcg_register_jit_int() to receive "e_mac=
+hine" value as an argument, instead of expecting preprocessor constant to b=
+e set?
+
+
+Please advice if you have something better in mind.
+
+
+Yours,
+
+Aleksandar
+
+
+(cc. Laurent and Riku since this is also indirectly related to handling ELF=
+ headers linux user mode, and there will be a couple other nanoMIPS patches=
+ comming related to that.)
