@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ff54t-00031y-FN
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:06:20 -0400
+	(envelope-from <pagupta@redhat.com>) id 1ff5AH-0004Dt-O9
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:11:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ff54q-0004Kb-Bt
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:06:19 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:46743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ff54q-0004KI-2f
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:06:16 -0400
-Received: by mail-pf0-x231.google.com with SMTP id l123-v6so26407136pfl.13
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 08:06:16 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-	<5368d20b-2b39-2fee-8851-f749f97071f8@vivier.eu>
-	<BN7PR08MB4868A93EDEAA419282D376D9C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-	<CAFEAcA9muPW8d6QTwzyFc+364fzhy9s0J9ok1FgJEjbP1vQicQ@mail.gmail.com>
-	<BN7PR08MB4868051FE8DADE7A1CA8A62AC65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-	<945b2112-83e6-47eb-a70f-190846b4150e@vivier.eu>
-	<BN7PR08MB486816E87B50793B872E0E84C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d166f0fe-0b22-6deb-8c91-505950191b76@twiddle.net>
-Date: Mon, 16 Jul 2018 08:06:12 -0700
+	(envelope-from <pagupta@redhat.com>) id 1ff5AE-00074J-Fu
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:11:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ff5AE-000749-50
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:11:50 -0400
+Date: Mon, 16 Jul 2018 11:11:48 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <105687791.51263265.1531753908161.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180716100311.0149c873@doriath>
+References: <20180713075232.9575-1-pagupta@redhat.com>
+	<20180713075232.9575-3-pagupta@redhat.com>
+	<20180713163827.74e9fc91@doriath>
+	<633297685.51039804.1531741590092.JavaMail.zimbra@redhat.com>
+	<20180716100311.0149c873@doriath>
 MIME-Version: 1.0
-In-Reply-To: <BN7PR08MB486816E87B50793B872E0E84C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] tcg_register_jit_int() interface problem
+Subject: Re: [Qemu-devel] [RFC v3 2/2] virtio-pmem: Add virtio pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +30,472 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Markovic <smarkovic@wavecomp.com>
-
-On 07/16/2018 06:23 AM, Aleksandar Markovic wrote:
-> No, EM_NANOMIPS is meant to be run on EM_NANOMIPS only, and EM_MIPS on EM_MIPS
-> only.
-
-Exactly.  So why do you imagine a problem with separate binaries.
-
-Recall -- this is not depending on *targeting* QEMU, but *hosting* QEMU.
+To: Luiz Capitulino <lcapitulino@redhat.com>
+Cc: kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, pbonzini@redhat.com, mst@redhat.com, stefanha@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
 
-r~
+> 
+> > >   
+> > > > This patch adds virtio-pmem driver for KVM guest.
+> > > > 
+> > > > Guest reads the persistent memory range information from Qemu over
+> > > > VIRTIO and registers it on nvdimm_bus. It also creates a nd_region
+> > > > object with the persistent memory range information so that existing
+> > > > 'nvdimm/pmem' driver can reserve this into system memory map. This way
+> > > > 'virtio-pmem' driver uses existing functionality of pmem driver to
+> > > > register persistent memory compatible for DAX capable filesystems.
+> > > > 
+> > > > This also provides function to perform guest flush over VIRTIO from
+> > > > 'pmem' driver when userspace performs flush on DAX memory range.
+> > > > 
+> > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > > > ---
+> > > >  drivers/virtio/Kconfig           |   9 ++
+> > > >  drivers/virtio/Makefile          |   1 +
+> > > >  drivers/virtio/virtio_pmem.c     | 190
+> > > >  +++++++++++++++++++++++++++++++++++++++
+> > > >  include/linux/virtio_pmem.h      |  44 +++++++++
+> > > >  include/uapi/linux/virtio_ids.h  |   1 +
+> > > >  include/uapi/linux/virtio_pmem.h |  40 +++++++++
+> > > >  6 files changed, 285 insertions(+)
+> > > >  create mode 100644 drivers/virtio/virtio_pmem.c
+> > > >  create mode 100644 include/linux/virtio_pmem.h
+> > > >  create mode 100644 include/uapi/linux/virtio_pmem.h
+> > > > 
+> > > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> > > > index 3589764..a331e23 100644
+> > > > --- a/drivers/virtio/Kconfig
+> > > > +++ b/drivers/virtio/Kconfig
+> > > > @@ -42,6 +42,15 @@ config VIRTIO_PCI_LEGACY
+> > > >  
+> > > >            If unsure, say Y.
+> > > >  
+> > > > +config VIRTIO_PMEM
+> > > > +        tristate "Support for virtio pmem driver"
+> > > > +        depends on VIRTIO
+> > > > +        help
+> > > > +        This driver provides support for virtio based flushing interface
+> > > > +        for persistent memory range.
+> > > > +
+> > > > +        If unsure, say M.
+> > > > +
+> > > >  config VIRTIO_BALLOON
+> > > >          tristate "Virtio balloon driver"
+> > > >          depends on VIRTIO
+> > > > diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
+> > > > index 3a2b5c5..cbe91c6 100644
+> > > > --- a/drivers/virtio/Makefile
+> > > > +++ b/drivers/virtio/Makefile
+> > > > @@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
+> > > >  virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
+> > > >  obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
+> > > >  obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
+> > > > +obj-$(CONFIG_VIRTIO_PMEM) += virtio_pmem.o
+> > > > diff --git a/drivers/virtio/virtio_pmem.c
+> > > > b/drivers/virtio/virtio_pmem.c
+> > > > new file mode 100644
+> > > > index 0000000..6200b5e
+> > > > --- /dev/null
+> > > > +++ b/drivers/virtio/virtio_pmem.c
+> > > > @@ -0,0 +1,190 @@
+> > > > +// SPDX-License-Identifier: GPL-2.0
+> > > > +/*
+> > > > + * virtio_pmem.c: Virtio pmem Driver
+> > > > + *
+> > > > + * Discovers persistent memory range information
+> > > > + * from host and provides a virtio based flushing
+> > > > + * interface.
+> > > > + */
+> > > > +#include <linux/virtio.h>
+> > > > +#include <linux/module.h>
+> > > > +#include <linux/virtio_pmem.h>
+> > > > +
+> > > > +static struct virtio_device_id id_table[] = {
+> > > > +        { VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> > > > +        { 0 },
+> > > > +};
+> > > > +
+> > > > + /* The interrupt handler */
+> > > > +static void host_ack(struct virtqueue *vq)
+> > > > +{
+> > > > +        unsigned int len;
+> > > > +        unsigned long flags;
+> > > > +        struct virtio_pmem_request *req;
+> > > > +        struct virtio_pmem *vpmem = vq->vdev->priv;
+> > > > +
+> > > > +        spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > > > +        while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
+> > > > +                req->done = true;
+> > > > +                wake_up(&req->acked);
+> > > > +        }
+> > > > +        spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > > 
+> > > Honest question: why do you need to disable interrupts here?
+> > 
+> > To avoid interrupt for VQ trying to take same spinlock already taken by
+> > process
+> > context and resulting in deadlock. Looks like interrupts are already
+> > disabled in
+> > function call, see [1]. But still to protect with any future work.
+> > 
+> > [1]
+> >    vp_interrupt
+> >        vp_vring_interrupt
+> >            vring_interrupt
+> 
+> I think you're right, and I think I may have caused some confusion. See
+> below.
+> 
+> > >   
+> > > > +}
+> > > > + /* Initialize virt queue */
+> > > > +static int init_vq(struct virtio_pmem *vpmem)
+> > > > +{
+> > > > +        struct virtqueue *vq;
+> > > > +
+> > > > +        /* single vq */
+> > > > +        vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
+> > > > +                                host_ack, "flush_queue");
+> > > > +        if (IS_ERR(vq))
+> > > > +                return PTR_ERR(vq);
+> > > > +        spin_lock_init(&vpmem->pmem_lock);
+> > > > +
+> > > > +        return 0;
+> > > > +};
+> > > > +
+> > > > + /* The request submission function */
+> > > > +static int virtio_pmem_flush(struct device *dev)
+> > > > +{
+> > > > +        int err;
+> > > > +        unsigned long flags;
+> > > > +        struct scatterlist *sgs[2], sg, ret;
+> > > > +        struct virtio_device *vdev = dev_to_virtio(dev->parent->parent);
+> > > > +        struct virtio_pmem *vpmem = vdev->priv;
+> > > > +        struct virtio_pmem_request *req = kmalloc(sizeof(*req), GFP_KERNEL);
+> > > 
+> > > Not checking kmalloc() return.
+> > 
+> > Will add it.
+> > >   
+> > > > +
+> > > > +        req->done = false;
+> > > > +        init_waitqueue_head(&req->acked);
+> > > > +        spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > > 
+> > > Why do you need spin_lock_irqsave()? There are two points consider:
+> > > 
+> > > 1. Will virtio_pmem_flush() ever be called with interrupts disabled?
+> > >    If yes, then it's broken since you should be using GFP_ATOMIC in the
+> > >    kmalloc() call and you can't call wait_event()
+> > 
+> > Yes, GFP_ATOMIC should be right thing.
+> > 
+> > > 
+> > > 2. If virtio_pmem_flush() is never called with interrupts disabled, do
+> > >    you really need to disable interrupts? If yes, why?
+> > 
+> > Same reason as discussed above. Data is shared between interrupt handler
+> > and process context 'virtio-pmem_flush' function. To avoid a deadlock
+> > resulting
+> > between interrupt context and process context on same spinlock.
+> > 
+> > > 
+> > > Another point to consider is whether or not virtio_pmem_flush()
+> > > can be called from atomic context. nvdimm_flush() itself is called
+> > > from a few atomic sites, but I can't tell if virtio_pmem_flush()
+> > > will ever be called from those sites. If it can be called atomic
+> > > context, then item 1 applies here. If you're sure it can't, then
+> > > you should probably call might_sleep().
+> > 
+> > I think 'virtio_pmem_flush' can be called from atomic context.
+> 
+> If you're certain of this, then everything I said in my previous
+> email should be correct (ie. GFP_ATOMIC in kmalloc() and the fact
+> that you can't sleep).
+
+A correction:
+AFAICS for virtio_pmem there is no atomic path so this can sleep. wait_event 
+is doing same thing outside spinlock.
+
+> 
+> Now, if for some reason virtio_pmem_flush() is not called from
+> atomic context (say, because it's never called from the ACPI code),
+> then my review was wrong and I think your code is correct, since
+> you're disabling irqs to protect the virtqueue against the interrupt
+> handler. In this case you can sleep outside the atomic context.
+
+yes, we are sleeping outside the spinlock.
+
+Thanks,
+Pankaj
+
+> 
+> > 
+> > Thanks,
+> > Pankaj
+> > 
+> > >   
+> > > > +
+> > > > +        sg_init_one(&sg, req, sizeof(req));
+> > > > +        sgs[0] = &sg;
+> > > > +        sg_init_one(&ret, &req->ret, sizeof(req->ret));
+> > > > +        sgs[1] = &ret;
+> > > > +        err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+> > > > +        if (err) {
+> > > > +                dev_err(&vdev->dev, "failed to send command to virtio pmem
+> > > > device\n");
+> > > > +                spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > > > +                return -ENOSPC;
+> > > > +        }
+> > > > +        virtqueue_kick(vpmem->req_vq);
+> > > > +        spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > > > +
+> > > > +        /* When host has read buffer, this completes via host_ack */
+> > > > +        wait_event(req->acked, req->done);
+> > > > +        err = req->ret;
+> > > > +        kfree(req);
+> > > > +
+> > > > +        return err;
+> > > > +};
+> > > > +
+> > > > +static int virtio_pmem_probe(struct virtio_device *vdev)
+> > > > +{
+> > > > +        int err = 0;
+> > > > +        struct resource res;
+> > > > +        struct virtio_pmem *vpmem;
+> > > > +        struct nvdimm_bus *nvdimm_bus;
+> > > > +        struct nd_region_desc ndr_desc;
+> > > > +        int nid = dev_to_node(&vdev->dev);
+> > > > +        struct nd_region *nd_region;
+> > > > +
+> > > > +        if (!vdev->config->get) {
+> > > > +                dev_err(&vdev->dev, "%s failure: config disabled\n",
+> > > > +                        __func__);
+> > > > +                return -EINVAL;
+> > > > +        }
+> > > > +
+> > > > +        vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
+> > > > +                        GFP_KERNEL);
+> > > > +        if (!vpmem) {
+> > > > +                err = -ENOMEM;
+> > > > +                goto out_err;
+> > > > +        }
+> > > > +
+> > > > +        vpmem->vdev = vdev;
+> > > > +        err = init_vq(vpmem);
+> > > > +        if (err)
+> > > > +                goto out_err;
+> > > > +
+> > > > +        virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > > > +                        start, &vpmem->start);
+> > > > +        virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > > > +                        size, &vpmem->size);
+> > > > +
+> > > > +        res.start = vpmem->start;
+> > > > +        res.end   = vpmem->start + vpmem->size-1;
+> > > > +        vpmem->nd_desc.provider_name = "virtio-pmem";
+> > > > +        vpmem->nd_desc.module = THIS_MODULE;
+> > > > +
+> > > > +        vpmem->nvdimm_bus = nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> > > > +                                                &vpmem->nd_desc);
+> > > > +        if (!nvdimm_bus)
+> > > > +                goto out_vq;
+> > > > +
+> > > > +        dev_set_drvdata(&vdev->dev, nvdimm_bus);
+> > > > +        memset(&ndr_desc, 0, sizeof(ndr_desc));
+> > > > +
+> > > > +        ndr_desc.res = &res;
+> > > > +        ndr_desc.numa_node = nid;
+> > > > +        ndr_desc.flush = virtio_pmem_flush;
+> > > > +        set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> > > > +        nd_region = nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc);
+> > > > +
+> > > > +        if (!nd_region)
+> > > > +                goto out_nd;
+> > > > +
+> > > > +        virtio_device_ready(vdev);
+> > > > +        return 0;
+> > > > +out_nd:
+> > > > +        err = -ENXIO;
+> > > > +        nvdimm_bus_unregister(nvdimm_bus);
+> > > > +out_vq:
+> > > > +        vdev->config->del_vqs(vdev);
+> > > > +out_err:
+> > > > +        dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
+> > > > +        return err;
+> > > > +}
+> > > > +
+> > > > +static void virtio_pmem_remove(struct virtio_device *vdev)
+> > > > +{
+> > > > +        struct virtio_pmem *vpmem = vdev->priv;
+> > > > +        struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> > > > +
+> > > > +        nvdimm_bus_unregister(nvdimm_bus);
+> > > > +        vdev->config->del_vqs(vdev);
+> > > > +        kfree(vpmem);
+> > > > +}
+> > > > +
+> > > > +#ifdef CONFIG_PM_SLEEP
+> > > > +static int virtio_pmem_freeze(struct virtio_device *vdev)
+> > > > +{
+> > > > +        /* todo: handle freeze function */
+> > > > +        return -EPERM;
+> > > > +}
+> > > > +
+> > > > +static int virtio_pmem_restore(struct virtio_device *vdev)
+> > > > +{
+> > > > +        /* todo: handle restore function */
+> > > > +        return -EPERM;
+> > > > +}
+> > > > +#endif
+> > > > +
+> > > > +
+> > > > +static struct virtio_driver virtio_pmem_driver = {
+> > > > +        .driver.name                = KBUILD_MODNAME,
+> > > > +        .driver.owner                = THIS_MODULE,
+> > > > +        .id_table                = id_table,
+> > > > +        .probe                        = virtio_pmem_probe,
+> > > > +        .remove                        = virtio_pmem_remove,
+> > > > +#ifdef CONFIG_PM_SLEEP
+> > > > +        .freeze                 = virtio_pmem_freeze,
+> > > > +        .restore                = virtio_pmem_restore,
+> > > > +#endif
+> > > > +};
+> > > > +
+> > > > +module_virtio_driver(virtio_pmem_driver);
+> > > > +MODULE_DEVICE_TABLE(virtio, id_table);
+> > > > +MODULE_DESCRIPTION("Virtio pmem driver");
+> > > > +MODULE_LICENSE("GPL");
+> > > > diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
+> > > > new file mode 100644
+> > > > index 0000000..0f83d9c
+> > > > --- /dev/null
+> > > > +++ b/include/linux/virtio_pmem.h
+> > > > @@ -0,0 +1,44 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > > +/*
+> > > > + * virtio_pmem.h: virtio pmem Driver
+> > > > + *
+> > > > + * Discovers persistent memory range information
+> > > > + * from host and provides a virtio based flushing
+> > > > + * interface.
+> > > > + */
+> > > > +#ifndef _LINUX_VIRTIO_PMEM_H
+> > > > +#define _LINUX_VIRTIO_PMEM_H
+> > > > +
+> > > > +#include <linux/virtio_ids.h>
+> > > > +#include <linux/virtio_config.h>
+> > > > +#include <uapi/linux/virtio_pmem.h>
+> > > > +#include <linux/libnvdimm.h>
+> > > > +#include <linux/spinlock.h>
+> > > > +
+> > > > +struct virtio_pmem_request {
+> > > > +        /* Host return status corresponding to flush request */
+> > > > +        int ret;
+> > > > +
+> > > > +        /* Wait queue to process deferred work after ack from host */
+> > > > +        wait_queue_head_t acked;
+> > > > +        bool done;
+> > > > +};
+> > > > +
+> > > > +struct virtio_pmem {
+> > > > +        struct virtio_device *vdev;
+> > > > +
+> > > > +        /* Virtio pmem request queue */
+> > > > +        struct virtqueue *req_vq;
+> > > > +
+> > > > +        /* nvdimm bus registers virtio pmem device */
+> > > > +        struct nvdimm_bus *nvdimm_bus;
+> > > > +        struct nvdimm_bus_descriptor nd_desc;
+> > > > +
+> > > > +        /* Synchronize virtqueue data */
+> > > > +        spinlock_t pmem_lock;
+> > > > +
+> > > > +        /* Memory region information */
+> > > > +        uint64_t start;
+> > > > +        uint64_t size;
+> > > > +};
+> > > > +#endif
+> > > > diff --git a/include/uapi/linux/virtio_ids.h
+> > > > b/include/uapi/linux/virtio_ids.h
+> > > > index 6d5c3b2..3463895 100644
+> > > > --- a/include/uapi/linux/virtio_ids.h
+> > > > +++ b/include/uapi/linux/virtio_ids.h
+> > > > @@ -43,5 +43,6 @@
+> > > >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> > > >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> > > >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > > > +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+> > > >  
+> > > >  #endif /* _LINUX_VIRTIO_IDS_H */
+> > > > diff --git a/include/uapi/linux/virtio_pmem.h
+> > > > b/include/uapi/linux/virtio_pmem.h
+> > > > new file mode 100644
+> > > > index 0000000..c7c22a5
+> > > > --- /dev/null
+> > > > +++ b/include/uapi/linux/virtio_pmem.h
+> > > > @@ -0,0 +1,40 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > > +/*
+> > > > + * This header, excluding the #ifdef __KERNEL__ part, is BSD licensed
+> > > > so
+> > > > + * anyone can use the definitions to implement compatible
+> > > > drivers/servers:
+> > > > + *
+> > > > + *
+> > > > + * Redistribution and use in source and binary forms, with or without
+> > > > + * modification, are permitted provided that the following conditions
+> > > > + * are met:
+> > > > + * 1. Redistributions of source code must retain the above copyright
+> > > > + *    notice, this list of conditions and the following disclaimer.
+> > > > + * 2. Redistributions in binary form must reproduce the above
+> > > > copyright
+> > > > + *    notice, this list of conditions and the following disclaimer in
+> > > > the
+> > > > + *    documentation and/or other materials provided with the
+> > > > distribution.
+> > > > + * 3. Neither the name of IBM nor the names of its contributors
+> > > > + *    may be used to endorse or promote products derived from this
+> > > > software
+> > > > + *    without specific prior written permission.
+> > > > + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+> > > > ``AS IS''
+> > > > + * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+> > > > TO,
+> > > > THE
+> > > > + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+> > > > PURPOSE
+> > > > + * ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR CONTRIBUTORS BE LIABLE
+> > > > + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+> > > > CONSEQUENTIAL
+> > > > + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+> > > > GOODS
+> > > > + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+> > > > INTERRUPTION)
+> > > > + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+> > > > STRICT
+> > > > + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+> > > > ANY
+> > > > WAY
+> > > > + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+> > > > OF
+> > > > + * SUCH DAMAGE.
+> > > > + *
+> > > > + * Copyright (C) Red Hat, Inc., 2018-2019
+> > > > + * Copyright (C) Pankaj Gupta <pagupta@redhat.com>, 2018
+> > > > + */
+> > > > +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
+> > > > +#define _UAPI_LINUX_VIRTIO_PMEM_H
+> > > > +
+> > > > +struct virtio_pmem_config {
+> > > > +        __le64 start;
+> > > > +        __le64 size;
+> > > > +};
+> > > > +#endif
+> > > 
+> > > 
+> > >   
+> > 
+> 
+> 
+> 
