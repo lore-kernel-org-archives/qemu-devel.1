@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ff36s-0001a6-JY
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff36i-0001Ox-Dx
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ff36r-0002RP-Hc
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35470 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ff36r-0002RE-Bu
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:13 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 16 Jul 2018 14:59:48 +0200
-Message-Id: <20180716125948.11666-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20180716125948.11666-1-marcandre.lureau@redhat.com>
-References: <20180716125948.11666-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 5/5] PoC: tpm: add ACPI memory clear
- interface
+	(envelope-from <thuth@redhat.com>) id 1ff36h-0002Cm-0Y
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:04 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 16 Jul 2018 14:59:26 +0200
+Message-Id: <1531745974-17187-10-git-send-email-thuth@redhat.com>
+In-Reply-To: <1531745974-17187-1-git-send-email-thuth@redhat.com>
+References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 09/17] hw/arm/fsl-imx7: Fix introspection
+ problems with the "fsl, imx7" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,173 +20,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-This allows to pass the last failing test from the Windows HLK TPM 2.0
-TCG PPI 1.3 tests.
+Running QEMU with valgrind indicates a problem here:
 
-The interface is described in the "TCG Platform Reset Attack
-Mitigation Specification", chapter 6 "ACPI _DSM Function". According
-to Laszlo, it's not so easy to implement in OVMF, he suggested to do
-it in qemu instead. It is relatively simple to implement in QEMU, but
-make this a proof-of-concept PATCH for discussion, since this is not
-a conventional approach.
+echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
+ "'arguments':{'typename':'fsl,imx7'}}" \
+ "{'execute': 'human-monitor-command', " \
+ "'arguments': {'command-line': 'info qtree'}}" | \
+ valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
+[...]
+==27284== Invalid read of size 8
+==27284==    at 0x618F7A: qdev_print (qdev-monitor.c:686)
+==27284==    by 0x618F7A: qbus_print (qdev-monitor.c:719)
+==27284==    by 0x452B38: handle_hmp_command (monitor.c:3446)
+[...]
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Use the new sysbus_init_child_obj() and object_initialize_child() to make
+sure that the objects are removed correctly when the parent gets destroyed.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/tpm_ppi.c     | 25 ++++++++++++++++++++++++
- docs/specs/tpm.txt   |  2 ++
- hw/tpm/trace-events  |  3 +++
- 4 files changed, 76 insertions(+)
+ hw/arm/fsl-imx7.c | 97 +++++++++++++++++++------------------------------------
+ 1 file changed, 33 insertions(+), 64 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 882fc27846..7e3c217076 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
-     pprq =3D aml_name("PPRQ");
-     pprm =3D aml_name("PPRM");
-=20
-+    aml_append(dev,
-+               aml_operation_region("TPP3", AML_SYSTEM_MEMORY,
-+                                    aml_int(TPM_PPI_ADDR_BASE + 0x200),
-+                                    0x1));
-+    field =3D aml_field("TPP3", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
-+    aml_append(field, aml_named_field("MOVV", 8));
-+    aml_append(dev, field);
-     /*
-      * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
-      * operation region inside of a method for getting FUNC[op].
-@@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
-             aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
-         }
-         aml_append(method, ifctx);
-+
-+        ifctx =3D aml_if(
-+            aml_equal(uuid,
-+                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
-));
-+        {
-+            /* standard DSM query function */
-+            ifctx2 =3D aml_if(aml_equal(function, zero));
-+            {
-+                uint8_t byte_list[1] =3D { 0x03 };
-+                aml_append(ifctx2, aml_return(aml_buffer(1, byte_list)))=
-;
-+            }
-+            aml_append(ifctx, ifctx2);
-+
-+            /*
-+             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
-.6
-+             *
-+             * Arg 2 (Integer): Function Index =3D 1
-+             * Arg 3 (Package): Arguments =3D Package: Type: Integer
-+             *                  Operation Value of the Request
-+             * Returns: Type: Integer
-+             *          0: Success
-+             *          1: General Failure
-+             */
-+            ifctx2 =3D aml_if(aml_equal(function, one));
-+            {
-+                aml_append(ifctx2,
-+                           aml_store(aml_derefof(aml_index(arguments, ze=
-ro)),
-+                                     op));
-+                {
-+                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
-+
-+                    /* 0: success */
-+                    aml_append(ifctx2, aml_return(zero));
-+                }
-+            }
-+            aml_append(ifctx, ifctx2);
-+        }
-+        aml_append(method, ifctx);
+diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+index 44fde03..d5e2685 100644
+--- a/hw/arm/fsl-imx7.c
++++ b/hw/arm/fsl-imx7.c
+@@ -30,157 +30,126 @@
+ 
+ static void fsl_imx7_init(Object *obj)
+ {
+-    BusState *sysbus = sysbus_get_default();
+     FslIMX7State *s = FSL_IMX7(obj);
+     char name[NAME_SIZE];
+     int i;
+ 
+ 
+     for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
+-        object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
+-                          ARM_CPU_TYPE_NAME("cortex-a7"));
+         snprintf(name, NAME_SIZE, "cpu%d", i);
+-        object_property_add_child(obj, name, OBJECT(&s->cpu[i]),
+-                                  &error_fatal);
++        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
++                                ARM_CPU_TYPE_NAME("cortex-a7"), &error_abort,
++                                NULL);
      }
-+
-     aml_append(dev, method);
+ 
+     /*
+      * A7MPCORE
+      */
+-    object_initialize(&s->a7mpcore, sizeof(s->a7mpcore), TYPE_A15MPCORE_PRIV);
+-    qdev_set_parent_bus(DEVICE(&s->a7mpcore), sysbus);
+-    object_property_add_child(obj, "a7mpcore",
+-                              OBJECT(&s->a7mpcore), &error_fatal);
++    sysbus_init_child_obj(obj, "a7mpcore", &s->a7mpcore, sizeof(s->a7mpcore),
++                          TYPE_A15MPCORE_PRIV);
+ 
+     /*
+      * GPIOs 1 to 7
+      */
+     for (i = 0; i < FSL_IMX7_NUM_GPIOS; i++) {
+-        object_initialize(&s->gpio[i], sizeof(s->gpio[i]),
+-                          TYPE_IMX_GPIO);
+-        qdev_set_parent_bus(DEVICE(&s->gpio[i]), sysbus);
+         snprintf(name, NAME_SIZE, "gpio%d", i);
+-        object_property_add_child(obj, name,
+-                                  OBJECT(&s->gpio[i]), &error_fatal);
++        sysbus_init_child_obj(obj, name, &s->gpio[i], sizeof(s->gpio[i]),
++                          TYPE_IMX_GPIO);
+     }
+ 
+     /*
+      * GPT1, 2, 3, 4
+      */
+     for (i = 0; i < FSL_IMX7_NUM_GPTS; i++) {
+-        object_initialize(&s->gpt[i], sizeof(s->gpt[i]), TYPE_IMX7_GPT);
+-        qdev_set_parent_bus(DEVICE(&s->gpt[i]), sysbus);
+         snprintf(name, NAME_SIZE, "gpt%d", i);
+-        object_property_add_child(obj, name, OBJECT(&s->gpt[i]),
+-                                  &error_fatal);
++        sysbus_init_child_obj(obj, name, &s->gpt[i], sizeof(s->gpt[i]),
++                              TYPE_IMX7_GPT);
+     }
+ 
+     /*
+      * CCM
+      */
+-    object_initialize(&s->ccm, sizeof(s->ccm), TYPE_IMX7_CCM);
+-    qdev_set_parent_bus(DEVICE(&s->ccm), sysbus);
+-    object_property_add_child(obj, "ccm", OBJECT(&s->ccm), &error_fatal);
++    sysbus_init_child_obj(obj, "ccm", &s->ccm, sizeof(s->ccm), TYPE_IMX7_CCM);
+ 
+     /*
+      * Analog
+      */
+-    object_initialize(&s->analog, sizeof(s->analog), TYPE_IMX7_ANALOG);
+-    qdev_set_parent_bus(DEVICE(&s->analog), sysbus);
+-    object_property_add_child(obj, "analog", OBJECT(&s->analog), &error_fatal);
++    sysbus_init_child_obj(obj, "analog", &s->analog, sizeof(s->analog),
++                          TYPE_IMX7_ANALOG);
+ 
+     /*
+      * GPCv2
+      */
+-    object_initialize(&s->gpcv2, sizeof(s->gpcv2), TYPE_IMX_GPCV2);
+-    qdev_set_parent_bus(DEVICE(&s->gpcv2), sysbus);
+-    object_property_add_child(obj, "gpcv2", OBJECT(&s->gpcv2), &error_fatal);
++    sysbus_init_child_obj(obj, "gpcv2", &s->gpcv2, sizeof(s->gpcv2),
++                          TYPE_IMX_GPCV2);
+ 
+     for (i = 0; i < FSL_IMX7_NUM_ECSPIS; i++) {
+-        object_initialize(&s->spi[i], sizeof(s->spi[i]), TYPE_IMX_SPI);
+-        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+         snprintf(name, NAME_SIZE, "spi%d", i + 1);
+-        object_property_add_child(obj, name, OBJECT(&s->spi[i]), NULL);
++        sysbus_init_child_obj(obj, name, &s->spi[i], sizeof(s->spi[i]),
++                              TYPE_IMX_SPI);
+     }
+ 
+ 
+     for (i = 0; i < FSL_IMX7_NUM_I2CS; i++) {
+-        object_initialize(&s->i2c[i], sizeof(s->i2c[i]), TYPE_IMX_I2C);
+-        qdev_set_parent_bus(DEVICE(&s->i2c[i]), sysbus_get_default());
+         snprintf(name, NAME_SIZE, "i2c%d", i + 1);
+-        object_property_add_child(obj, name, OBJECT(&s->i2c[i]), NULL);
++        sysbus_init_child_obj(obj, name, &s->i2c[i], sizeof(s->i2c[i]),
++                              TYPE_IMX_I2C);
+     }
+ 
+     /*
+      * UART
+      */
+     for (i = 0; i < FSL_IMX7_NUM_UARTS; i++) {
+-            object_initialize(&s->uart[i], sizeof(s->uart[i]), TYPE_IMX_SERIAL);
+-            qdev_set_parent_bus(DEVICE(&s->uart[i]), sysbus);
+             snprintf(name, NAME_SIZE, "uart%d", i);
+-            object_property_add_child(obj, name, OBJECT(&s->uart[i]),
+-                                      &error_fatal);
++            sysbus_init_child_obj(obj, name, &s->uart[i], sizeof(s->uart[i]),
++                                  TYPE_IMX_SERIAL);
+     }
+ 
+     /*
+      * Ethernet
+      */
+     for (i = 0; i < FSL_IMX7_NUM_ETHS; i++) {
+-            object_initialize(&s->eth[i], sizeof(s->eth[i]), TYPE_IMX_ENET);
+-            qdev_set_parent_bus(DEVICE(&s->eth[i]), sysbus);
+             snprintf(name, NAME_SIZE, "eth%d", i);
+-            object_property_add_child(obj, name, OBJECT(&s->eth[i]),
+-                                      &error_fatal);
++            sysbus_init_child_obj(obj, name, &s->eth[i], sizeof(s->eth[i]),
++                                  TYPE_IMX_ENET);
+     }
+ 
+     /*
+      * SDHCI
+      */
+     for (i = 0; i < FSL_IMX7_NUM_USDHCS; i++) {
+-            object_initialize(&s->usdhc[i], sizeof(s->usdhc[i]),
+-                              TYPE_IMX_USDHC);
+-            qdev_set_parent_bus(DEVICE(&s->usdhc[i]), sysbus);
+             snprintf(name, NAME_SIZE, "usdhc%d", i);
+-            object_property_add_child(obj, name, OBJECT(&s->usdhc[i]),
+-                                      &error_fatal);
++            sysbus_init_child_obj(obj, name, &s->usdhc[i], sizeof(s->usdhc[i]),
++                              TYPE_IMX_USDHC);
+     }
+ 
+     /*
+      * SNVS
+      */
+-    object_initialize(&s->snvs, sizeof(s->snvs), TYPE_IMX7_SNVS);
+-    qdev_set_parent_bus(DEVICE(&s->snvs), sysbus);
+-    object_property_add_child(obj, "snvs", OBJECT(&s->snvs), &error_fatal);
++    sysbus_init_child_obj(obj, "snvs", &s->snvs, sizeof(s->snvs),
++                          TYPE_IMX7_SNVS);
+ 
+     /*
+      * Watchdog
+      */
+     for (i = 0; i < FSL_IMX7_NUM_WDTS; i++) {
+-            object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_IMX2_WDT);
+-            qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus);
+             snprintf(name, NAME_SIZE, "wdt%d", i);
+-            object_property_add_child(obj, name, OBJECT(&s->wdt[i]),
+-                                      &error_fatal);
++            sysbus_init_child_obj(obj, name, &s->wdt[i], sizeof(s->wdt[i]),
++                                  TYPE_IMX2_WDT);
+     }
+ 
+     /*
+      * GPR
+      */
+-    object_initialize(&s->gpr, sizeof(s->gpr), TYPE_IMX7_GPR);
+-    qdev_set_parent_bus(DEVICE(&s->gpr), sysbus);
+-    object_property_add_child(obj, "gpr", OBJECT(&s->gpr), &error_fatal);
++    sysbus_init_child_obj(obj, "gpr", &s->gpr, sizeof(s->gpr), TYPE_IMX7_GPR);
+ 
+-    object_initialize(&s->pcie, sizeof(s->pcie), TYPE_DESIGNWARE_PCIE_HOST);
+-    qdev_set_parent_bus(DEVICE(&s->pcie), sysbus);
+-    object_property_add_child(obj, "pcie", OBJECT(&s->pcie), &error_fatal);
++    sysbus_init_child_obj(obj, "pcie", &s->pcie, sizeof(s->pcie),
++                          TYPE_DESIGNWARE_PCIE_HOST);
+ 
+     for (i = 0; i < FSL_IMX7_NUM_USBS; i++) {
+-        object_initialize(&s->usb[i],
+-                          sizeof(s->usb[i]), TYPE_CHIPIDEA);
+-        qdev_set_parent_bus(DEVICE(&s->usb[i]), sysbus);
+         snprintf(name, NAME_SIZE, "usb%d", i);
+-        object_property_add_child(obj, name,
+-                                  OBJECT(&s->usb[i]), &error_fatal);
++        sysbus_init_child_obj(obj, name, &s->usb[i], sizeof(s->usb[i]),
++                              TYPE_CHIPIDEA);
+     }
  }
-=20
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index 8b46b9dd4b..64e8d828e8 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -16,8 +16,31 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
-+#include "sysemu/reset.h"
- #include "migration/vmstate.h"
- #include "tpm_ppi.h"
-+#include "trace.h"
-+
-+static void tpm_ppi_reset(void *opaque)
-+{
-+    TPMPPI *tpmppi =3D opaque;
-+    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
-+
-+    if (ptr[0x200] & 0x1) {
-+        GuestPhysBlockList guest_phys_blocks;
-+        GuestPhysBlock *block;
-+
-+        guest_phys_blocks_init(&guest_phys_blocks);
-+        guest_phys_blocks_append(&guest_phys_blocks);
-+        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
-+            trace_tpm_ppi_memset(block->host_addr,
-+                             block->target_end - block->target_start);
-+            memset(block->host_addr, 0,
-+                   block->target_end - block->target_start);
-+        }
-+        guest_phys_blocks_free(&guest_phys_blocks);
-+    }
-+}
-=20
- bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj, Error **errp)
-@@ -27,5 +50,7 @@ bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *=
-m,
-     vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
-=20
-     memory_region_add_subregion(m, addr, &tpmppi->ram);
-+    qemu_register_reset(tpm_ppi_reset, tpmppi);
-+
-     return true;
- }
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 16b210c1f2..9c44384315 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -121,6 +121,8 @@ layout:
-  +----------+--------+--------+-----------------------------------------=
---+
-  | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
-  |
-  |          |        |        | firmware. Used by firmware.             =
-  |
-+ +----------+--------+--------+-----------------------------------------=
---+
-+ | movv     |   0x1  |  0x200 | Memory overwrite variable               =
-  |
-  +----------+--------+--------+-----------------------------------------=
---+
-=20
-    The following values are supported for the 'func' field. They corresp=
-ond
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 25bee0cecf..920d32ad55 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
- tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
- tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
- tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
-+
-+# hw/tpm/tpm_ppi.c
-+tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
---=20
-2.18.0.129.ge3331758f1
+ 
+-- 
+1.8.3.1
