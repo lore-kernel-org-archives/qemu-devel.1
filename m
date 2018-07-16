@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffA4b-0003OZ-V5
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:26:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffAJK-0005vT-EC
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffA4Y-0002m7-Ot
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:26:21 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:22938)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ffA4Y-0002lc-C3
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:26:18 -0400
-Date: Mon, 16 Jul 2018 22:26:16 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180716025346.GF2599@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1807162207210.15021@zero.eik.bme.hu>
-References: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
-	<20180716025346.GF2599@umbus.fritz.box>
+	(envelope-from <peter.maydell@linaro.org>) id 1ffAJJ-000077-NS
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:41:34 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ffAJJ-00006l-Hm
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:41:33 -0400
+Received: by mail-oi0-x242.google.com with SMTP id s198-v6so77383892oih.11
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 13:41:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] hw/display/sm501* status
+In-Reply-To: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Jul 2018 21:41:12 +0100
+Message-ID: <CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Do not enable QOM debugging by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 16 Jul 2018, David Gibson wrote:
-> On Sun, Jul 15, 2018 at 11:29:56AM +0200, BALATON Zoltan wrote:
->> So before sending more patches I'd like to clear who can review and merge
->> patches for sm501 in the future and what is the maintainership of this
->> device?
+On 16 July 2018 at 20:47, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> Commit 3556c233d 5 years ago added an option to disable QOM debugging,
+> noting that it can have high performance cost but left the default to on.
+> Change the default to off and only enable it when debugging is requested
+> to avoid the performance penalty for those compiling without debug options.
 >
-> The unfortunate answer is that there isn't any great choice: that's
-> basically what having no maintainer means.
->
-> I suspect Gerd is the most qualified to review patches to this
-> technically, but even then that's only by general familiarity with
-> display devices.
->
-> At Peter's request, I'm willing to take sm501 patches through the ppc
-> tree.  Since I can't review the patches in depth, I'd be pretty much
-> taking anything you send unless there's something obviously bogus.
->
-> .. which would make you de facto sub-maintainer of sm501.  Given
-> which, I encourage you again to become *actual* maintainer; there
-> really is no-one better qualified at this point.  I realize that you
-> don't want to make a big ongoing job of thise, but AFAIK that's
-> exactly what the "Odd Fixes" maintainership status exists for.
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-There's already a section for sam460ex in MAINTAINERS where I've claimed 
-some devices that I've added and used by this machine. I did not take 
-sm501 because it was part of SH4 R2D but surprisingly it's not listed 
-there either and the maintainer listed there remained silent so far so it 
-seems that is not maintained any more.
+Looking at the code, doesn't this disable all the type checking
+on the QOM casts? That is not something I think we should drop,
+in the same way that we do not disable assert()s even in the
+non-debug build.
 
-I could list sm501 in the sam460ex section thus formally taking 
-sub-maintainership but this would only go as far that I'll get cc-d on 
-changes and try to review them. I still can't (and don't want to) maintain 
-my own tree and send pull requests directly so I'd need someone's help 
-with that who can take my patches and merge them via their tree. If it's 
-OK to continue to use the PPC tree for that I'm fine with that if David 
-agrees (which I think he did above).
+Is this coming up as significant in profiling? In the past we've
+done some special casing if there are particular QOM casts in
+hot paths that use significant runtime.
 
-So is it OK to add sm501 to sam460ex section so I claim responsibility for 
-changes and will continue sending patches cc-ing David (and maybe Gerd to 
-help spotting problems) then David could take these via the PPC tree?
-
-Regards,
-BALATON Zoltan
+thanks
+-- PMM
