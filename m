@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ffAiJ-0002iz-LP
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:07:24 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1ffAj0-000340-MU
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:08:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ffAiI-0005Yq-Nb
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:07:23 -0400
-Date: Mon, 16 Jul 2018 18:07:15 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180716210715.GT31657@localhost.localdomain>
-References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-	<1531745974-17187-16-git-send-email-thuth@redhat.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1ffAix-0005mA-Gt
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:08:06 -0400
+Date: Mon, 16 Jul 2018 23:08:01 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.1807162300430.15021@zero.eik.bme.hu>
+References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1531745974-17187-16-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 15/17] hw/arm/stm32f205_soc: Fix
- introspection problem with 'stm32f205-soc' device
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH] Do not enable QOM debugging by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Jul 16, 2018 at 02:59:32PM +0200, Thomas Huth wrote:
-> Valgrind complains:
-> 
-> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
->  "'arguments':{'typename':'stm32f205-soc'}}" \
->  "{'execute': 'human-monitor-command', " \
->  "'arguments': {'command-line': 'info qtree'}}" | \
->  valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
-> [...]
-> ==28531== Invalid read of size 8
-> ==28531==    at 0x6185BA: qdev_print (qdev-monitor.c:686)
-> ==28531==    by 0x6185BA: qbus_print (qdev-monitor.c:719)
-> ==28531==    by 0x452B38: handle_hmp_command (monitor.c:3446)
-> [...]
-> 
-> Fix it with the new sysbus_init_child_obj() function.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Mon, 16 Jul 2018, Peter Maydell wrote:
+> On 16 July 2018 at 20:47, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> Commit 3556c233d 5 years ago added an option to disable QOM debugging,
+>> noting that it can have high performance cost but left the default to on.
+>> Change the default to off and only enable it when debugging is requested
+>> to avoid the performance penalty for those compiling without debug options.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> Looking at the code, doesn't this disable all the type checking
+> on the QOM casts? That is not something I think we should drop,
+> in the same way that we do not disable assert()s even in the
+> non-debug build.
+>
+> Is this coming up as significant in profiling? In the past we've
+> done some special casing if there are particular QOM casts in
+> hot paths that use significant runtime.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+My profiling results are not very accurate (could only gather sample based 
+results with oprofile as --enable-gprof haven't worked for me) so I don't 
+have numbers but I did see object_class_dynamic_cast_assert coming out 
+among the top few without disabling this option but I don't know which 
+call sites are responsible.
 
--- 
-Eduardo
+Are there any recommendations for profiling QEMU (especially TCG) 
+somewhere that I should be aware of?
+
+Regards,
+BALATON Zoltan
