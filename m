@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36Z-0001GA-TJ
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ff36a-0001Gl-F9
 	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36Y-000289-Rc
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ff36Z-00028X-HN
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:59:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48594 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ff36Z-00028P-Bc
 	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:59:55 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Jul 2018 14:59:24 +0200
-Message-Id: <1531745974-17187-8-git-send-email-thuth@redhat.com>
-In-Reply-To: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 07/17] hw/cpu/a9mpcore: Fix introspection
- problems with the "a9mpcore_priv" device
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 16 Jul 2018 14:59:44 +0200
+Message-Id: <20180716125948.11666-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180716125948.11666-1-marcandre.lureau@redhat.com>
+References: <20180716125948.11666-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v8 1/5] tpm: add a "ppi" boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,66 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Running QEMU with valgrind indicates a problem here:
+The following patches implement the TPM Physical Presence Interface,
+make use of a new memory region and a fw_cfg entry. Enable PPI by
+default with >2.12 machine type, to avoid migration issues.
 
-echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'a9mpcore_priv'}}" \
- "{'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" | \
- valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
-[...]
-==30996== Invalid read of size 8
-==30996==    at 0x6185DA: qdev_print (qdev-monitor.c:686)
-==30996==    by 0x6185DA: qbus_print (qdev-monitor.c:719)
-==30996==    by 0x452B38: handle_hmp_command (monitor.c:3446)
-[...]
-
-Use the new sysbus_init_child_obj() function to make sure that the objects
-are cleaned up correctly when the parent gets destroyed.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/cpu/a9mpcore.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ include/hw/compat.h | 10 ++++++++++
+ hw/tpm/tpm_crb.c    |  3 +++
+ hw/tpm/tpm_tis.c    |  3 +++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
-index f17f292..a5b8678 100644
---- a/hw/cpu/a9mpcore.c
-+++ b/hw/cpu/a9mpcore.c
-@@ -27,20 +27,18 @@ static void a9mp_priv_initfn(Object *obj)
-     memory_region_init(&s->container, obj, "a9mp-priv-container", 0x2000);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->container);
- 
--    object_initialize(&s->scu, sizeof(s->scu), TYPE_A9_SCU);
--    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "scu", &s->scu, sizeof(s->scu), TYPE_A9_SCU);
- 
--    object_initialize(&s->gic, sizeof(s->gic), TYPE_ARM_GIC);
--    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic), TYPE_ARM_GIC);
- 
--    object_initialize(&s->gtimer, sizeof(s->gtimer), TYPE_A9_GTIMER);
--    qdev_set_parent_bus(DEVICE(&s->gtimer), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "gtimer", &s->gtimer, sizeof(s->gtimer),
-+                          TYPE_A9_GTIMER);
- 
--    object_initialize(&s->mptimer, sizeof(s->mptimer), TYPE_ARM_MPTIMER);
--    qdev_set_parent_bus(DEVICE(&s->mptimer), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "mptimer", &s->mptimer, sizeof(s->mptimer),
-+                          TYPE_ARM_MPTIMER);
- 
--    object_initialize(&s->wdt, sizeof(s->wdt), TYPE_ARM_MPTIMER);
--    qdev_set_parent_bus(DEVICE(&s->wdt), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "wdt", &s->wdt, sizeof(s->wdt),
-+                          TYPE_ARM_MPTIMER);
- }
- 
- static void a9mp_priv_realize(DeviceState *dev, Error **errp)
--- 
-1.8.3.1
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index c08f4040bb..92fdac360b 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -2,6 +2,16 @@
+ #define HW_COMPAT_H
+=20
+ #define HW_COMPAT_2_12 \
++    {\
++        .driver   =3D "tpm-crb",\
++        .property =3D "ppi",\
++        .value    =3D "false",\
++    },\
++    {\
++        .driver   =3D "tpm-tis",\
++        .property =3D "ppi",\
++        .value    =3D "false",\
++    },\
+     {\
+         .driver   =3D "migration",\
+         .property =3D "decompress-error-check",\
+diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+index a92dd50437..d5b0ac5920 100644
+--- a/hw/tpm/tpm_crb.c
++++ b/hw/tpm/tpm_crb.c
+@@ -41,6 +41,8 @@ typedef struct CRBState {
+     MemoryRegion cmdmem;
+=20
+     size_t be_buffer_size;
++
++    bool ppi_enabled;
+ } CRBState;
+=20
+ #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+@@ -221,6 +223,7 @@ static const VMStateDescription vmstate_tpm_crb =3D {
+=20
+ static Property tpm_crb_properties[] =3D {
+     DEFINE_PROP_TPMBE("tpmdev", CRBState, tpmbe),
++    DEFINE_PROP_BOOL("ppi", CRBState, ppi_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 12f5c9a759..d9ddf9b723 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -81,6 +81,8 @@ typedef struct TPMState {
+     TPMVersion be_tpm_version;
+=20
+     size_t be_buffer_size;
++
++    bool ppi_enabled;
+ } TPMState;
+=20
+ #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+@@ -950,6 +952,7 @@ static const VMStateDescription vmstate_tpm_tis =3D {
+ static Property tpm_tis_properties[] =3D {
+     DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
+     DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
++    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+--=20
+2.18.0.129.ge3331758f1
