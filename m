@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1feztC-0004uf-HM
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:33:55 -0400
+	(envelope-from <berrange@redhat.com>) id 1fezuu-0006AR-TU
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1feztB-0005XN-Jb
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:33:54 -0400
-Date: Mon, 16 Jul 2018 10:33:40 +0100
+	(envelope-from <berrange@redhat.com>) id 1fezur-0006uQ-NH
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:35:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42022 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fezur-0006tq-0z
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:35:37 -0400
+Date: Mon, 16 Jul 2018 10:35:32 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180716093340.GJ5616@redhat.com>
+Message-ID: <20180716093532.GK5616@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180704133440.GE4334@localhost.localdomain>
-	<CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<CAFEAcA9J=Jmd=+9vEo4LLdk0LcL42fchHcAp3fp_+9q1tsCoNg@mail.gmail.com>
-	<87tvp8or4u.fsf@dusky.pond.sub.org>
-	<20180709130838.16f011a4.cohuck@redhat.com>
-	<20180709111701.GF23731@redhat.com>
-	<87601lge0i.fsf@dusky.pond.sub.org>
-	<751b33cb-d7da-ef47-415d-86b0e3c31129@redhat.com>
+References: <20180710145557.12902-1-marcandre.lureau@redhat.com>
+	<20180711144855.GE14423@vader>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <751b33cb-d7da-ef47-415d-86b0e3c31129@redhat.com>
+In-Reply-To: <20180711144855.GE14423@vader>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Subject: Re: [Qemu-devel] [PATCH] seccomp: allow sched_setscheduler() with
+ SCHED_IDLE policy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
+To: Eduardo Otubo <otubo@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, eskultet@redhat.com, kraxel@redhat.com, gschafer@gmail.com
 
-On Thu, Jul 12, 2018 at 05:47:00PM +0200, Thomas Huth wrote:
-> On 12.07.2018 08:32, Markus Armbruster wrote:
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-> [...]
-> >> For libvirt, I think whenever something is proposed for deprecation
-> >> we could just CC libvir-list, or ask one of the libvirt people to
-> >> confirm its not being used. If it is, then we should file BZ against
-> >> libvirt.
+On Wed, Jul 11, 2018 at 04:48:55PM +0200, Eduardo Otubo wrote:
+> On 10/07/2018 - 16:55:57, Marc-Andr=C3=A9 Lureau wrote:
+> > Current and upcoming mesa releases rely on a shader disk cash. It use=
+s
+> > a thread job queue with low priority, set with
+> > sched_setscheduler(SCHED_IDLE). However, that syscall is rejected by
+> > the "resourcecontrol" seccomp qemu filter.
 > >=20
-> > Makes sense, but relying on developers getting their cc: right every
-> > time is a setting us up for failure.
+> > Since it should be safe to allow lowering thread priority, let's allo=
+w
+> > scheduling thread to idle policy.
 > >=20
-> > Our tool to help with getting cc: wrong less often is the MAINTAINERS
-> > file.  Could one of the libvirt developers watch changes to qemu-doc
-> > appendix "Deprecated features"?  Would putting the appendix in its ow=
-n
-> > .texi help with that?
+> > Related to:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  qemu-seccomp.c | 12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> > index 148e4c6f24..9cd8eb9499 100644
+> > --- a/qemu-seccomp.c
+> > +++ b/qemu-seccomp.c
+> > @@ -34,6 +34,12 @@
+> >  struct QemuSeccompSyscall {
+> >      int32_t num;
+> >      uint8_t set;
+> > +    uint8_t narg;
+> > +    const struct scmp_arg_cmp *arg_cmp;
+> > +};
+> > +
+> > +const struct scmp_arg_cmp sched_setscheduler_arg[] =3D {
+> > +    SCMP_A1(SCMP_CMP_NE, SCHED_IDLE)
+> >  };
+> > =20
+> >  static const struct QemuSeccompSyscall blacklist[] =3D {
+> > @@ -92,7 +98,8 @@ static const struct QemuSeccompSyscall blacklist[] =
+=3D {
+> >      { SCMP_SYS(setpriority),            QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> >      { SCMP_SYS(sched_setparam),         QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> >      { SCMP_SYS(sched_getparam),         QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> > -    { SCMP_SYS(sched_setscheduler),     QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> > +    { SCMP_SYS(sched_setscheduler),     QEMU_SECCOMP_SET_RESOURCECTL=
+,
+> > +      ARRAY_SIZE(sched_setscheduler_arg), sched_setscheduler_arg },
+> >      { SCMP_SYS(sched_getscheduler),     QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> >      { SCMP_SYS(sched_setaffinity),      QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> >      { SCMP_SYS(sched_getaffinity),      QEMU_SECCOMP_SET_RESOURCECTL=
+ },
+> > @@ -118,7 +125,8 @@ static int seccomp_start(uint32_t seccomp_opts)
+> >              continue;
+> >          }
+> > =20
+> > -        rc =3D seccomp_rule_add(ctx, SCMP_ACT_KILL, blacklist[i].num=
+, 0);
+> > +        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_KILL, blacklist[=
+i].num,
+> > +                                    blacklist[i].narg, blacklist[i].=
+arg_cmp);
+> >          if (rc < 0) {
+> >              goto seccomp_return;
+> >          }
+> > --=20
+> > 2.18.0.129.ge3331758f1
+> >=20
 >=20
-> Sound like a good idea to put the appendix in its own texi file. Then
-> add an "R: libvir-list" entry for that file to MAINTAINERS and we shoul=
-d
-> be fine (at least for the people who use the get_maintainers.pl script)=
-.
+> Acked-by: Eduardo Otubo <otubo@redhat.com>
+>=20
+> Patch looks safe enough for me. If everyone else is OK with this I'll s=
+end a
+> pull-request tomorrow morning.
 
-That's a neat idea and gets my vote.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
 
 Regards,
 Daniel
