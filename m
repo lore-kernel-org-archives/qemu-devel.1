@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1feroV-000082-8C
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 20:56:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fesB7-0003VT-CG
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 21:19:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1feroT-0002rv-TB
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 20:56:31 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:44601)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jannh@google.com>) id 1feroT-0002rd-Lz
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 20:56:29 -0400
-Received: by mail-oi0-x244.google.com with SMTP id s198-v6so71762439oih.11
-	for <qemu-devel@nongnu.org>; Sun, 15 Jul 2018 17:56:29 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1fesB3-0003wB-5m
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 21:19:53 -0400
+Date: Mon, 16 Jul 2018 11:18:56 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180716011856.GD2599@umbus.fritz.box>
+References: <20180715211731.2EBA27456B1@zero.eik.bme.hu>
 MIME-Version: 1.0
-References: <CAG48ez2Rq18M+a84Ae+N5_=eS2A6zZNrG9r19MWS6hddq=x4Rw@mail.gmail.com>
-	<CAFEAcA_+oq2H=-_7+AxqpXb_VhUsSAgVgN8K7Q+ffeKXxs5gWQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA_+oq2H=-_7+AxqpXb_VhUsSAgVgN8K7Q+ffeKXxs5gWQ@mail.gmail.com>
-From: Jann Horn <jannh@google.com>
-Date: Mon, 16 Jul 2018 02:56:01 +0200
-Message-ID: <CAG48ez2CkA4jS8WiJ7Yj6dTsvoC_ozNdoQeOXxfg7JmRaK8srw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] insecure git submodule URLs
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="q9KOos5vDmpwPx9o"
+Content-Disposition: inline
+In-Reply-To: <20180715211731.2EBA27456B1@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH for 3.0] sam460ex: Correct use after free
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, jcody@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Sun, Jul 15, 2018 at 11:18 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On 15 July 2018 at 20:50, Jann Horn via Qemu-devel
-> <qemu-devel@nongnu.org> wrote:
-> > I noticed that when I build QEMU from git for the first time, it pulls
-> > in submodules over the insecure git:// protocol - in other words, as
-> > far as I can tell, if I'm e.g. on an open wifi network while building
-> > QEMU for the first time, even if I cloned the main repository over
-> > https, anyone could smuggle in malicious code as part of e.g. a
-> > submodule's makefile.
->
-> Yes, this came up the other week.
->
-> > I'm not sure what your preferred fix for this is, so I'm not sending a
-> > patch yet. As far as I can tell, the two options are:
-> >
-> >  - change .gitmodules to use https for everything
->
-> We should probably do this...
->
-> >  - change .gitmodules to use relative URLs
-> >
-> > If you want, I'll send a patch that does one of these, although it's
-> > probably faster if you just do it yourselves.
-> >
-> > Relative URLs would have the advantage that if someone is cloning from
-> > a mirror (in other words, github), the submodules will also
-> > automatically come from the same mirror.
->
-> Do we mirror all our submodules to github?
 
-Looks that way - I cloned from github, patched my .submodules to use
-relative URLs for everything, then tested:
+--q9KOos5vDmpwPx9o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-$ git submodule init
-Submodule 'capstone' (capstone.git) registered for path 'capstone'
-Submodule 'dtc' (dtc.git) registered for path 'dtc'
-Submodule 'roms/QemuMacDrivers' (QemuMacDrivers.git) registered for
-path 'roms/QemuMacDrivers'
-Submodule 'roms/SLOF' (SLOF.git) registered for path 'roms/SLOF'
-Submodule 'roms/ipxe' (ipxe.git) registered for path 'roms/ipxe'
-Submodule 'roms/openbios' (openbios.git) registered for path 'roms/openbios'
-Submodule 'roms/openhackware' (openhackware.git) registered for path
-'roms/openhackware'
-Submodule 'roms/qemu-palcode' (qemu-palcode.git) registered for path
-'roms/qemu-palcode'
-Submodule 'roms/seabios' (seabios.git) registered for path 'roms/seabios'
-Submodule 'roms/seabios-hppa'
-(https://github.com/hdeller/seabios-hppa.git) registered for path
-'roms/seabios-hppa'
-Submodule 'roms/sgabios' (sgabios.git) registered for path 'roms/sgabios'
-Submodule 'roms/skiboot' (skiboot.git) registered for path 'roms/skiboot'
-Submodule 'roms/u-boot' (u-boot.git) registered for path 'roms/u-boot'
-Submodule 'roms/u-boot-sam460ex' (u-boot-sam460ex.git) registered for
-path 'roms/u-boot-sam460ex'
-Submodule 'ui/keycodemapdb' (keycodemapdb.git) registered for path
-'ui/keycodemapdb'
-$ git submodule update
-Submodule path 'capstone': checked out
-'22ead3e0bfdb87516656453336160e0a37b066bf'
-Submodule path 'dtc': checked out 'e54388015af1fb4bf04d0bca99caba1074d9cc42'
-Submodule path 'roms/QemuMacDrivers': checked out
-'d4e7d7ac663fcb55f1b93575445fcbca372f17a7'
-Submodule path 'roms/SLOF': checked out
-'7d37babcfa48a6eb08e726a8d13b745cb2eebe1c'
-Submodule path 'roms/ipxe': checked out
-'0600d3ae94f93efd10fc6b3c7420a9557a3a1670'
-Submodule path 'roms/openbios': checked out
-'8fe6f5f96f6ca39f1f62200be7fa130e929f13f2'
-Submodule path 'roms/openhackware': checked out
-'c559da7c8eec5e45ef1f67978827af6f0b9546f5'
-Submodule path 'roms/qemu-palcode': checked out
-'f3c7e44c70254975df2a00af39701eafbac4d471'
-Submodule path 'roms/seabios': checked out
-'f9626ccb91e771f990fbb2da92e427a399d7d918'
-Submodule path 'roms/seabios-hppa': checked out
-'1ef99a01572c2581c30e16e6fe69e9ea2ef92ce0'
-Submodule path 'roms/sgabios': checked out
-'cbaee52287e5f32373181cff50a00b6c4ac9015a'
-Submodule path 'roms/skiboot': checked out
-'e0ee24c27a172bcf482f6f2bc905e6211c134bcc'
-Submodule path 'roms/u-boot': checked out
-'d85ca029f257b53a96da6c2fb421e78a003a9943'
-Submodule path 'roms/u-boot-sam460ex': checked out
-'60b3916f33e617a815973c5a6df77055b2e3a588'
-Submodule path 'ui/keycodemapdb': checked out
-'6b3d716e2b6472eb7189d3220552280ef3d832ce'
+On Sun, Jul 15, 2018 at 10:47:26PM +0200, BALATON Zoltan wrote:
+> Commit 51b0d834c changed error handling to report file name in error
+> message but forgot to move freeing it after usage. Noticed by Coverity.
+>=20
+> Fixes: CID 1394217
+> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-> > As far as I can tell, the QEMU git server only supports the "dumb" git
-> > protocol when accessed over HTTPS, not the "smart" protocol. I'm not
-> > sure whether that might be why QEMU is currently still using the
-> > insecure git protocol instead of git over HTTPS?
->
-> This is why we haven't switched over the submodules yet, yes.
-> It's on Jeff's todo list for the server, though.
->
-> thanks
-> -- PMM
+Applied to ppc-for-3.0, thanks.
+
+> ---
+>  hw/ppc/sam460ex.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index e2b7028..0999efc 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -269,11 +269,12 @@ static int sam460ex_load_device_tree(hwaddr addr,
+>          exit(1);
+>      }
+>      fdt =3D load_device_tree(filename, &fdt_size);
+> -    g_free(filename);
+>      if (!fdt) {
+>          error_report("Couldn't load dtb file `%s'", filename);
+> +        g_free(filename);
+>          exit(1);
+>      }
+> +    g_free(filename);
+> =20
+>      /* Manipulate device tree in memory. */
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--q9KOos5vDmpwPx9o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltL8n0ACgkQbDjKyiDZ
+s5JBuhAAjobXzcgDgfeVLOGOReyBjcwJUdb6dllRKd1IqGiXNiZnaJ/EBoAAni8o
+zd0Ll2rE8etcj86tkwKVKeMcEKQQk7MhV7g4cFGQASSjTuSCz9KzVvdmcJGTs6NX
+U4gAoYSr8RMBPHDIg2w0bk36V5gk+fm7YZ3CUmLMFnzLAxaJ6pzskXPFG5Ej9Dvr
+cguH98Y8mJQrWmWU4aNWPvEjZXCwJkUruzEI9ZRnc1U2R5Mm1nli+uyjWGvXL+N2
+X+c6jySyuYetTHNT+cr0/9WwgIx++ZMXS+F+Ve7ZEx/cUTkmxIZFX0Aq1z3Nqx+/
+VWzYfaQOxsAsTYReUMF+EBeTmCj3Zu9Z7qUrawBKqzRSfGFGlSj7aBASS8ItzsgR
+bKOed7szz0V8kcX4MJ2gtyetLRTrTcXwKBY8bl7qUhDFpdDamma0r2qUr6+idHbA
+DPYuN3lHOW/aAgO6tmYfuQip8VhP96aUCQrSozkaY2qwt0Q3ZwcaK2aKPm59zcUQ
+mnptyTsT9+COfAz1csss+Kp0KNz53sWle3MUv95IssOX4fein1lCddjIzVIx3Lnz
+Yf7DcB1OQWJUtJrEuhtIUfteYl2a8EBee0X3K2rlu4WOC5ZHgohjzR3FE0XudhVA
+2Di4NlMlSVxgPvR6a86syhnUs42CAM00y999vSAydkOtA/N0M3w=
+=7IH2
+-----END PGP SIGNATURE-----
+
+--q9KOos5vDmpwPx9o--
