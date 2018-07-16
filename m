@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff375-0001nW-E2
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff374-0001mB-00
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36z-0002U1-BR
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff36x-0002TL-4v
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:26 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Jul 2018 14:59:32 +0200
-Message-Id: <1531745974-17187-16-git-send-email-thuth@redhat.com>
+Date: Mon, 16 Jul 2018 14:59:34 +0200
+Message-Id: <1531745974-17187-18-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531745974-17187-1-git-send-email-thuth@redhat.com>
 References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 15/17] hw/arm/stm32f205_soc: Fix
- introspection problem with 'stm32f205-soc' device
+Subject: [Qemu-devel] [PATCH v3 17/17] hw/arm/xlnx-zynqmp: Fix crash when
+ introspecting the "xlnx, zynqmp" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +23,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-Valgrind complains:
+QEMU currently crashes when e.g. doing something like this:
 
 echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'stm32f205-soc'}}" \
+ "'arguments':{'typename':'xlnx,zynqmp'}}" \
  "{'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" | \
- valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
-[...]
-==28531== Invalid read of size 8
-==28531==    at 0x6185BA: qdev_print (qdev-monitor.c:686)
-==28531==    by 0x6185BA: qbus_print (qdev-monitor.c:719)
-==28531==    by 0x452B38: handle_hmp_command (monitor.c:3446)
-[...]
+ "'arguments': {'command-line': 'info qtree'}}" \
+ |  aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
 
-Fix it with the new sysbus_init_child_obj() function.
+Use the new object_initialize_child() and sysbus_init_child_obj()
+functions to get the refernce counting of the child objects right, so
+that they are properly cleaned up when the parent gets destroyed.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/stm32f205_soc.c | 28 ++++++++++++----------------
- 1 file changed, 12 insertions(+), 16 deletions(-)
+ hw/arm/xlnx-zynqmp.c | 61 ++++++++++++++++++++++++----------------------------
+ 1 file changed, 28 insertions(+), 33 deletions(-)
 
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index 2b2135d..c486d06 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -49,36 +49,32 @@ static void stm32f205_soc_initfn(Object *obj)
-     STM32F205State *s = STM32F205_SOC(obj);
-     int i;
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 29df35f..8de4868 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -166,64 +166,59 @@ static void xlnx_zynqmp_init(Object *obj)
+     int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
  
--    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
--    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-+                          TYPE_ARMV7M);
- 
--    object_initialize(&s->syscfg, sizeof(s->syscfg), TYPE_STM32F2XX_SYSCFG);
--    qdev_set_parent_bus(DEVICE(&s->syscfg), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
-+                          TYPE_STM32F2XX_SYSCFG);
- 
-     for (i = 0; i < STM_NUM_USARTS; i++) {
--        object_initialize(&s->usart[i], sizeof(s->usart[i]),
--                          TYPE_STM32F2XX_USART);
--        qdev_set_parent_bus(DEVICE(&s->usart[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
-+                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
+     for (i = 0; i < num_apus; i++) {
+-        object_initialize(&s->apu_cpu[i], sizeof(s->apu_cpu[i]),
+-                          "cortex-a53-" TYPE_ARM_CPU);
+-        object_property_add_child(obj, "apu-cpu[*]", OBJECT(&s->apu_cpu[i]),
+-                                  &error_abort);
++        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
++                                sizeof(s->apu_cpu[i]),
++                                "cortex-a53-" TYPE_ARM_CPU, &error_abort, NULL);
      }
  
-     for (i = 0; i < STM_NUM_TIMERS; i++) {
--        object_initialize(&s->timer[i], sizeof(s->timer[i]),
--                          TYPE_STM32F2XX_TIMER);
--        qdev_set_parent_bus(DEVICE(&s->timer[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
-+                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
+-    object_initialize(&s->gic, sizeof(s->gic), gic_class_name());
+-    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
++    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
++                          gic_class_name());
+ 
+     for (i = 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
+-        object_initialize(&s->gem[i], sizeof(s->gem[i]), TYPE_CADENCE_GEM);
+-        qdev_set_parent_bus(DEVICE(&s->gem[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "gem[*]", &s->gem[i], sizeof(s->gem[i]),
++                              TYPE_CADENCE_GEM);
      }
  
-     s->adc_irqs = OR_IRQ(object_new(TYPE_OR_IRQ));
- 
-     for (i = 0; i < STM_NUM_ADCS; i++) {
--        object_initialize(&s->adc[i], sizeof(s->adc[i]),
--                          TYPE_STM32F2XX_ADC);
--        qdev_set_parent_bus(DEVICE(&s->adc[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
-+                              TYPE_STM32F2XX_ADC);
+     for (i = 0; i < XLNX_ZYNQMP_NUM_UARTS; i++) {
+-        object_initialize(&s->uart[i], sizeof(s->uart[i]), TYPE_CADENCE_UART);
+-        qdev_set_parent_bus(DEVICE(&s->uart[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "uart[*]", &s->uart[i], sizeof(s->uart[i]),
++                              TYPE_CADENCE_UART);
      }
  
-     for (i = 0; i < STM_NUM_SPIS; i++) {
+-    object_initialize(&s->sata, sizeof(s->sata), TYPE_SYSBUS_AHCI);
+-    qdev_set_parent_bus(DEVICE(&s->sata), sysbus_get_default());
++    sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
++                          TYPE_SYSBUS_AHCI);
+ 
+     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
+-        object_initialize(&s->sdhci[i], sizeof(s->sdhci[i]),
+-                          TYPE_SYSBUS_SDHCI);
+-        qdev_set_parent_bus(DEVICE(&s->sdhci[i]),
+-                            sysbus_get_default());
++        sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci[i],
++                              sizeof(s->sdhci[i]), TYPE_SYSBUS_SDHCI);
+     }
+ 
+     for (i = 0; i < XLNX_ZYNQMP_NUM_SPIS; i++) {
 -        object_initialize(&s->spi[i], sizeof(s->spi[i]),
--                          TYPE_STM32F2XX_SPI);
+-                          TYPE_XILINX_SPIPS);
 -        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
 +        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
-+                              TYPE_STM32F2XX_SPI);
++                              TYPE_XILINX_SPIPS);
+     }
+ 
+-    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
+-    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
++    sysbus_init_child_obj(obj, "qspi", &s->qspi, sizeof(s->qspi),
++                          TYPE_XLNX_ZYNQMP_QSPIPS);
+ 
+-    object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
+-    qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
++    sysbus_init_child_obj(obj, "xxxdp", &s->dp, sizeof(s->dp), TYPE_XLNX_DP);
+ 
+-    object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
+-    qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
++    sysbus_init_child_obj(obj, "dp-dma", &s->dpdma, sizeof(s->dpdma),
++                          TYPE_XLNX_DPDMA);
+ 
+-    object_initialize(&s->ipi, sizeof(s->ipi), TYPE_XLNX_ZYNQMP_IPI);
+-    qdev_set_parent_bus(DEVICE(&s->ipi), sysbus_get_default());
++    sysbus_init_child_obj(obj, "ipi", &s->ipi, sizeof(s->ipi),
++                          TYPE_XLNX_ZYNQMP_IPI);
+ 
+-    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_XLNX_ZYNQMP_RTC);
+-    qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
++    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
++                          TYPE_XLNX_ZYNQMP_RTC);
+ 
+     for (i = 0; i < XLNX_ZYNQMP_NUM_GDMA_CH; i++) {
+-        object_initialize(&s->gdma[i], sizeof(s->gdma[i]), TYPE_XLNX_ZDMA);
+-        qdev_set_parent_bus(DEVICE(&s->gdma[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "gdma[*]", &s->gdma[i], sizeof(s->gdma[i]),
++                              TYPE_XLNX_ZDMA);
+     }
+ 
+     for (i = 0; i < XLNX_ZYNQMP_NUM_ADMA_CH; i++) {
+-        object_initialize(&s->adma[i], sizeof(s->adma[i]), TYPE_XLNX_ZDMA);
+-        qdev_set_parent_bus(DEVICE(&s->adma[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "adma[*]", &s->adma[i], sizeof(s->adma[i]),
++                              TYPE_XLNX_ZDMA);
      }
  }
  
