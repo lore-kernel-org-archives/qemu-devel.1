@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff4A3-0003VA-PQ
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:07:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ff4CZ-0005wt-Al
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff4A2-0000Bt-Kz
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:07:35 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ff4A2-0000Bh-Du
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:07:34 -0400
-Received: by mail-oi0-x243.google.com with SMTP id i12-v6so75023088oik.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 07:07:34 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1ff4CY-0000to-5n
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:10:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51202 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ff4CY-0000tW-0N
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:10:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C870401EF11
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 14:10:09 +0000 (UTC)
+References: <20180716110755.12499-1-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <badb00ab-d382-6836-ca7f-ad250f0f2cb5@redhat.com>
+Date: Mon, 16 Jul 2018 16:10:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <e893ae38-9294-4b54-e950-6632b6b73532@roeck-us.net>
-References: <1531692369-1511-1-git-send-email-linux@roeck-us.net>
-	<CAFEAcA9W88G8rd4iMq7qsNd2C2fRiYJ32dVooZLyzY10__5piw@mail.gmail.com>
-	<e893ae38-9294-4b54-e950-6632b6b73532@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jul 2018 15:07:13 +0100
-Message-ID: <CAFEAcA_Vd46APz_czOP+OfB1nkGvGjuf=EPbB57TkkXKWkNxwQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH] hw: arm: Add basic support for cprman
- (clock subsystem)
+In-Reply-To: <20180716110755.12499-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/char/serial: retry write if EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Pekka Enberg <penberg@iki.fi>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On 16 July 2018 at 14:51, Guenter Roeck <linux@roeck-us.net> wrote:
-> In this context, I can't get mmc to work with ToT Linux on raspi3.
->
-> / # mount /dev/mmcblk0 /mnt
-> [   47.099074] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
-> interrupt.
-> [   57.339803] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
-> interrupt.
-> [   57.390449] mmc0: Problem switching card into high-speed mode!
-> [   67.581559] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
-> interrupt.
-> [   67.587832] print_req_error: I/O error, dev mmcblk0, sector 2
-> [   67.588908] Buffer I/O error on dev mmcblk0, logical block 1, lost sync
-> page write
-> [   67.610307] EXT4-fs (mmcblk0): I/O error while writing superblock
-> [   67.620842] EXT4-fs (mmcblk0): mount failed
-> [   77.819114] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
-> interrupt.
-> [   88.058917] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
-> interrupt.
-> [   98.298937] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
-> interrupt.
-> [   98.303554] print_req_error: I/O error, dev mmcblk0, sector 2
-> [   98.306044] Buffer I/O error on dev mmcblk0, logical block 1, lost sync
-> page write
->
-> Any idea what the problem might be ?
+On 16/07/2018 13:07, Marc-Andr=C3=A9 Lureau wrote:
+> If the chardev returns -1 with EAGAIN errno on write(), it should try
+> to send it again (EINTR is handled by the chardev itself).
+>=20
+> This fixes commit 019288bf137183bf3407c9824655b753bfafc99f
+> "hw/char/serial: Only retry if qemu_chr_fe_write returns 0"
+>=20
+> Tested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/char/serial.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index cd7d747c68..8bd1da2fa3 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -261,15 +261,20 @@ static void serial_xmit(SerialState *s)
+>          if (s->mcr & UART_MCR_LOOP) {
+>              /* in loopback mode, say that we just received a char */
+>              serial_receive1(s, &s->tsr, 1);
+> -        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) =3D=3D 0 &&
+> -                   s->tsr_retry < MAX_XMIT_RETRY) {
+> -            assert(s->watch_tag =3D=3D 0);
+> -            s->watch_tag =3D
+> -                qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
+> -                                      serial_watch_cb, s);
+> -            if (s->watch_tag > 0) {
+> -                s->tsr_retry++;
+> -                return;
+> +        } else {
+> +            int rc =3D qemu_chr_fe_write(&s->chr, &s->tsr, 1);
+> +
+> +            if ((rc =3D=3D 0 ||
+> +                 (rc =3D=3D -1 && errno =3D=3D EAGAIN)) &&
+> +                s->tsr_retry < MAX_XMIT_RETRY) {
+> +                assert(s->watch_tag =3D=3D 0);
+> +                s->watch_tag =3D
+> +                    qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP=
+,
+> +                                          serial_watch_cb, s);
+> +                if (s->watch_tag > 0) {
+> +                    s->tsr_retry++;
+> +                    return;
+> +                }
+>              }
+>          }
+>          s->tsr_retry =3D 0;
+>=20
 
-Same thing again -- no hardware documentation for that sd controller.
-We took our best guess about what the behaviour is supposed to be
-for raising hardware interrupts in commit f3d9fe8f959643 earlier
-this year, but that was (as the commit message notes) pure guesswork
-based largely on what the Linux driver was doing. Somebody would have
-to look at what exactly this version of the kernel is expecting the
-hardware to do and try to reverse-engineer what the model needs to do
-that it isn't currently...
+Queued, thanks.
 
-thanks
--- PMM
+Paolo
