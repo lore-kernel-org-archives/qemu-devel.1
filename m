@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff6Cp-00021D-Vd
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:18:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ff6Lp-0004le-Qr
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:27:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff6Cp-0004PZ-0k
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:18:35 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40660)
+	(envelope-from <peter.maydell@linaro.org>) id 1ff6Lp-0007mo-21
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:27:53 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ff6Co-0004PR-Q8
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:18:34 -0400
-Received: by mail-oi0-x243.google.com with SMTP id w126-v6so75860012oie.7
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 09:18:34 -0700 (PDT)
+	id 1ff6Lo-0007mM-Rg
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:27:52 -0400
+Received: by mail-oi0-x241.google.com with SMTP id 13-v6so75941246ois.1
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 09:27:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180716140514.1490-1-armbru@redhat.com>
-References: <20180716140514.1490-1-armbru@redhat.com>
+In-Reply-To: <20180713141636.18665-1-peter.maydell@linaro.org>
+References: <20180713141636.18665-1-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jul 2018 17:18:13 +0100
-Message-ID: <CAFEAcA-kawsUaj9dNTKmtd210pMSDBC-HFA8W-7DExwzb7NaBA@mail.gmail.com>
+Date: Mon, 16 Jul 2018 17:27:31 +0100
+Message-ID: <CAFEAcA_CHjuAbe3QgcL+SEc4xi=HQM6TCpY=5gkxt61_+LQVYQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] Miscellaneous patches for 2018-07-16
- (3.0.0-rc1)
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-3.0 0/2] accel/tcg: fix
+ get_page_addr_code() victim TLB lookups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
 
-On 16 July 2018 at 15:05, Markus Armbruster <armbru@redhat.com> wrote:
-> The following changes since commit 633e824037210a60c0b23d6c0e42420db1fe4c08:
+On 13 July 2018 at 15:16, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This patchset fixes a bug in get_page_addr_code()'s
+> lookup of the address in the victim TLB, which was another
+> source of "we end up with an invalid TLB entry even after
+> we've done a TLB fill for it".
 >
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-3.0-20180716' into staging (2018-07-16 11:04:24 +0100)
+> The second patch then removes a check that we had that was
+> working around the existence of the bug patch 1 fixes and
+> the bug that commit 68fea038553039e fixes, and instead
+> puts in an assertion that we definitely do have a valid TLB.
 >
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-07-16
->
-> for you to fetch changes up to 8720e63e09fa1e48dbd244d89d6fed6b5c50889d:
->
->   monitor: Fix tracepoint crash on JSON syntax error (2018-07-16 15:46:57 +0200)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2018-07-16 (3.0.0-rc1)
->
-> This pull request consists of a late but necessary external interface
-> update, a documentation rearrangement to make tracking feature
-> deprecation easier, and a crash bug fix.
->
-> ----------------------------------------------------------------
-Applied, thanks.
+> Tested with Laurent's m68k image to check we didn't regress that.
+
+Thanks for the review -- I'll take these via target-arm.next
+since RTH doesn't have any other tcg patches for rc1.
 
 -- PMM
