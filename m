@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ff0Wn-00017z-Ug
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:14:51 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1ff0oZ-0003ci-5K
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:33:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ff0Wj-0000LN-01
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:14:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53338 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ff0Wi-0000KP-Qb
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:14:44 -0400
-Date: Mon, 16 Jul 2018 12:14:39 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180716101439.GJ16479@paraplu>
-References: <CAP102pQw0exv6vn-KurCD3_fRF50LhvXjKMa_wak4GFttu-Zvg@mail.gmail.com>
-	<ca3ca8f9-8e28-b938-ce01-cc23a636696b@tuxfamily.org>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1ff0oV-0001wS-79
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:33:11 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1ff0oU-0001w6-Ui
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:33:07 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id y22-v6so796461wma.0
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 03:33:06 -0700 (PDT)
+References: <20180712194522.31063-1-ehabkost@redhat.com>
+	<20180712194522.31063-4-ehabkost@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <c8ec6d82-9d1c-056b-2b27-1c4c48ad72ff@gmail.com>
+Date: Mon, 16 Jul 2018 13:33:01 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca3ca8f9-8e28-b938-ce01-cc23a636696b@tuxfamily.org>
-Subject: Re: [Qemu-devel] QEMU advent calendar
+In-Reply-To: <20180712194522.31063-4-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC 3/3] pci: Document ownership rules of
+ pci_root_bus_new*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>
-Cc: Richard Jansson <richard.j.jansson@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alberto Garcia <berto@igalia.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Jul 16, 2018 at 11:15:43AM +0200, Thomas Huth wrote:
-> On 13.07.2018 10:34, Richard Jansson wrote:
-> > Hi
-> > 
-> > I checked in on the QEMU advent calendar side of which I have very fond
-> > memories. I'm very impressed and grateful for the work that you've put into
-> > this site. My question to you is the following, what are your plans for the
-> > continuation of the program?
-> 
->  Hi Richard,
-> 
-> thanks for the kind words and your interest in the QEMU advent calendar!
-> This year, QEMU had its 15th anniversary, so we indeed already thought
-> about doing a third round of the QEMU advent calendar this year...
-> 
-> > In case there's anything I can do I'll gladly put in some work to help you
-> > out to support you in your noble cause :)
-> 
-> The problem is to come up with ideas for 24 suitable images [1], and to
-> prepare them (it's quite time-consuming). So far, we're not certain yet
-> whether we could do a 2018 edition of the calendar since we hardly have
-> any images yet. So if you've got ideas for some images, and/or could
-> help to prepare some, that would be very appreciated! Please get in
-> touch with us off-list in that case (to avoid to spoil the surprise for
-> the public).
 
-Yeah, what Thomas said above.
 
-That said, I've been on the fence for the 2018 edition.  As Thomas said,
-we've been thinking about it for some months, and I've jotted down some
-ideas and images; just haven't gotten around to make images and other
-related tasks.  I've been trying to make time, but was consumed with
-several things work and non-work related, that it was hard so far.  :-(
+On 07/12/2018 10:45 PM, Eduardo Habkost wrote:
+> The ownership rules of pci_root_bus_new*() aren't trivial: the
+> caller owns the new object if parent is NULL, otherwise ownership
+> is transferred to the parent.  Clarify that on comments.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>   include/hw/pci/pci.h | 15 +++++++++++++++
+>   1 file changed, 15 insertions(+)
+>
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 990d6fcbde..5d445c431c 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -396,15 +396,30 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
+>   
+>   bool pci_bus_is_express(PCIBus *bus);
+>   bool pci_bus_is_root(PCIBus *bus);
+> +
+> +/**
+> + * pci_root_bus_new_inplace:
+> + *
+> +* If @parent is not NULL the returned object will be owned by @parent,
+> +* otherwise it will be owned by the caller.
+> +*/
+>   void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+>                                 const char *name,
+>                                 MemoryRegion *address_space_mem,
+>                                 MemoryRegion *address_space_io,
+>                                 uint8_t devfn_min, const char *typename);
+> +
+> +/**
+> + * pci_root_bus_new:
+> + *
+> +* If @parent is not NULL the returned object will be owned by @parent,
+> +* otherwise it will be owned by the caller.
+> +*/
+>   PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
+>                            MemoryRegion *address_space_mem,
+>                            MemoryRegion *address_space_io,
+>                            uint8_t devfn_min, const char *typename);
+> +
+>   void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
+>                     void *irq_opaque, int nirq);
+>   int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
 
-Still, there is time, and I don't want to "give up" -- it'll be nice to
-do a 15-year edition.  Maybe I'll get renewed energy after discussions
-at the KVM Forum in Edinburgh later this year (in October) and make
-time.  And it's also nice to see renewed interest here!
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
--- 
-/kashyap
+Thanks,
+Marcel
