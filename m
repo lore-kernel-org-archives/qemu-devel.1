@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yasmins@linux.ibm.com>) id 1ff8mJ-0002Ln-Eu
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:03:24 -0400
+	(envelope-from <groeck7@gmail.com>) id 1ffBtT-0002ql-Hh
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 18:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yasmins@linux.ibm.com>) id 1ff8mG-0004xb-BU
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:03:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46356
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yasmins@linux.ibm.com>)
-	id 1ff8mG-0004x0-6J
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 15:03:20 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6GIruua017442
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 15:03:18 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2k8xemerbm-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 15:03:18 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <yasmins@linux.ibm.com>;
-	Mon, 16 Jul 2018 15:03:17 -0400
-From: Yasmin Beatriz <yasmins@linux.ibm.com>
-Date: Mon, 16 Jul 2018 19:03:12 +0000
-Message-Id: <1531767792-17705-1-git-send-email-yasmins@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] target/ppc: bcdsub fix sign when result is zero
+	(envelope-from <groeck7@gmail.com>) id 1ffBtS-0005nH-KS
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 18:22:59 -0400
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Mon, 16 Jul 2018 15:22:50 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180716222250.GA20320@roeck-us.net>
+References: <1531692369-1511-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA9W88G8rd4iMq7qsNd2C2fRiYJ32dVooZLyzY10__5piw@mail.gmail.com>
+	<e893ae38-9294-4b54-e950-6632b6b73532@roeck-us.net>
+	<CAFEAcA_Vd46APz_czOP+OfB1nkGvGjuf=EPbB57TkkXKWkNxwQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_Vd46APz_czOP+OfB1nkGvGjuf=EPbB57TkkXKWkNxwQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] hw: arm: Add basic support for cprman
+ (clock subsystem)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Pekka Enberg <penberg@iki.fi>
 
-When the result of bcdsub is equal to zero, the result sign may be
-set to negative in some cases, and this does not follow the Power ISA
-specifications as to decimal integer arithmetic instructions.
+On Mon, Jul 16, 2018 at 03:07:13PM +0100, Peter Maydell wrote:
+> On 16 July 2018 at 14:51, Guenter Roeck <linux@roeck-us.net> wrote:
+> > In this context, I can't get mmc to work with ToT Linux on raspi3.
+> >
+> > / # mount /dev/mmcblk0 /mnt
+> > [   47.099074] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
+> > interrupt.
+> > [   57.339803] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
+> > interrupt.
+> > [   57.390449] mmc0: Problem switching card into high-speed mode!
+> > [   67.581559] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
+> > interrupt.
+> > [   67.587832] print_req_error: I/O error, dev mmcblk0, sector 2
+> > [   67.588908] Buffer I/O error on dev mmcblk0, logical block 1, lost sync
+> > page write
+> > [   67.610307] EXT4-fs (mmcblk0): I/O error while writing superblock
+> > [   67.620842] EXT4-fs (mmcblk0): mount failed
+> > [   77.819114] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
+> > interrupt.
+> > [   88.058917] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
+> > interrupt.
+> > [   98.298937] sdhost-bcm2835 3f202000.mmc: timeout waiting for hardware
+> > interrupt.
+> > [   98.303554] print_req_error: I/O error, dev mmcblk0, sector 2
+> > [   98.306044] Buffer I/O error on dev mmcblk0, logical block 1, lost sync
+> > page write
+> >
+> > Any idea what the problem might be ?
+> 
+> Same thing again -- no hardware documentation for that sd controller.
+> We took our best guess about what the behaviour is supposed to be
+> for raising hardware interrupts in commit f3d9fe8f959643 earlier
+> this year, but that was (as the commit message notes) pure guesswork
+> based largely on what the Linux driver was doing. Somebody would have
+> to look at what exactly this version of the kernel is expecting the
+> hardware to do and try to reverse-engineer what the model needs to do
+> that it isn't currently...
+> 
 
-Signed-off-by: Yasmin Beatriz <yasmins@linux.ibm.com>
----
- target/ppc/int_helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+This failed for me with all kernel versions I tried, starting with 4.14.y.
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 03d37da..fa18e6e 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -2747,6 +2747,9 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
-             zero = bcd_sub_mag(&result, a, b, &invalid, &overflow);
-             cr = (sgna > 0) ? CRF_GT : CRF_LT;
-+        } else if (bcd_cmp_mag(a, b) == 0) {
-+            result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(0, ps);
-+            zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
-         } else {
-             result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgnb, ps);
-             zero = bcd_sub_mag(&result, b, a, &invalid, &overflow);
--- 
-1.8.3.1
+I'll send a patch in a minute. It is just as much guesswork as before,
+but AFAICS it does work.
+
+Guenter
