@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ff6aW-0008Sm-LK
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:43:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ff6aY-0008Th-02
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ff6aV-0005Yh-Pm
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:43:04 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43586)
+	(envelope-from <pm215@archaic.org.uk>) id 1ff6aX-0005ZC-2B
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:43:06 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:43588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ff6aV-0005YP-HG
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:43:03 -0400
+	id 1ff6aW-0005Yr-R4
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 12:43:04 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ff6aT-0000yY-Je
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:43:01 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ff6aV-0000zr-Qe
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:43:03 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jul 2018 17:42:52 +0100
-Message-Id: <20180716164300.6731-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/8] target-arm queue
+Date: Mon, 16 Jul 2018 17:42:55 +0100
+Message-Id: <20180716164300.6731-4-peter.maydell@linaro.org>
+In-Reply-To: <20180716164300.6731-1-peter.maydell@linaro.org>
+References: <20180716164300.6731-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 3/8] hw/intc/arm_gic: Check interrupt number in
+ gic_deactivate_irq()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-target-arm queue: a smallish set of patches for rc1 tomorrow.
-I've included the tcg patches because RTH has no others that
-would merit a pullreq.
+In gic_deactivate_irq() the interrupt number comes from the guest
+(on a write to the GICC_DIR register), so we need to sanity check
+that it isn't out of range before we use it as an array index.
+Handle this in a similar manner to the check we do in
+gic_complete_irq() for the GICC_EOI register.
 
-I haven't included Thomas Huth's 17-patch set to deal with
-the introspection crashes, to give that a little more time
-on-list for review.
+The array overrun is not disastrous because the calling code
+uses (value & 0x3ff) to extract the interrupt field, so the
+only out-of-range values possible are 1020..1023, which allow
+overrunning only from irq_state[] into the following
+irq_target[] array which the guest can already manipulate.
 
-thanks
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Message-id: 20180712154152.32183-2-peter.maydell@linaro.org
+---
+ hw/intc/arm_gic.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-The following changes since commit 102ad0a80f5110483efd06877c29c4236be267f9:
-
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2018-07-16' into staging (2018-07-16 15:34:38 +0100)
-
-are available in the Git repository at:
-
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180716
-
-for you to fetch changes up to 3474c98a2a2afcefa7c665f02ad2bed2a43ab0f7:
-
-  accel/tcg: Assert that tlb fill gave us a valid TLB entry (2018-07-16 17:26:01 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * accel/tcg: Use correct test when looking in victim TLB for code
- * bcm2835_aux: Swap RX and TX interrupt assignments
- * hw/arm/bcm2836: Mark the bcm2836 / bcm2837 devices with user_creatable = false
- * hw/intc/arm_gic: Fix handling of GICD_ITARGETSR
- * hw/intc/arm_gic: Check interrupt number in gic_deactivate_irq()
- * aspeed: Implement write-1-{set, clear} for AST2500 strapping
- * target/arm: Fix LD1W and LDFF1W (scalar plus vector)
-
-----------------------------------------------------------------
-Andrew Jeffery (1):
-      aspeed: Implement write-1-{set, clear} for AST2500 strapping
-
-Guenter Roeck (1):
-      bcm2835_aux: Swap RX and TX interrupt assignments
-
-Peter Maydell (4):
-      hw/intc/arm_gic: Check interrupt number in gic_deactivate_irq()
-      hw/intc/arm_gic: Fix handling of GICD_ITARGETSR
-      accel/tcg: Use correct test when looking in victim TLB for code
-      accel/tcg: Assert that tlb fill gave us a valid TLB entry
-
-Richard Henderson (1):
-      target/arm: Fix LD1W and LDFF1W (scalar plus vector)
-
-Thomas Huth (1):
-      hw/arm/bcm2836: Mark the bcm2836 / bcm2837 devices with user_creatable = false
-
- include/hw/misc/aspeed_scu.h |  2 ++
- accel/tcg/cputlb.c           |  6 +++---
- hw/arm/bcm2836.c             |  2 ++
- hw/char/bcm2835_aux.c        |  4 ++--
- hw/intc/arm_gic.c            | 22 +++++++++++++++++++---
- hw/misc/aspeed_scu.c         | 19 +++++++++++++++++--
- target/arm/sve_helper.c      |  4 ++--
- 7 files changed, 47 insertions(+), 12 deletions(-)
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index ea0323f9691..b0a69d6386e 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -543,7 +543,21 @@ static bool gic_eoi_split(GICState *s, int cpu, MemTxAttrs attrs)
+ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+ {
+     int cm = 1 << cpu;
+-    int group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
++    int group;
++
++    if (irq >= s->num_irq) {
++        /*
++         * This handles two cases:
++         * 1. If software writes the ID of a spurious interrupt [ie 1023]
++         * to the GICC_DIR, the GIC ignores that write.
++         * 2. If software writes the number of a non-existent interrupt
++         * this must be a subcase of "value written is not an active interrupt"
++         * and so this is UNPREDICTABLE. We choose to ignore it.
++         */
++        return;
++    }
++
++    group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
+ 
+     if (!gic_eoi_split(s, cpu, attrs)) {
+         /* This is UNPREDICTABLE; we choose to ignore it */
+-- 
+2.17.1
