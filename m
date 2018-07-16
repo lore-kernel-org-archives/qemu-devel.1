@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1ff9pc-0000Av-H6
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:10:53 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1ffA4b-0003OZ-V5
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1ff9pY-0006nD-FF
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:10:52 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:39406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1ff9pY-0006n9-8t
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:10:48 -0400
-Received: by mail-yw0-x242.google.com with SMTP id r184-v6so9271218ywg.6
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 13:10:47 -0700 (PDT)
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <balaton@eik.bme.hu>) id 1ffA4Y-0002m7-Ot
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:26:21 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:22938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ffA4Y-0002lc-C3
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 16:26:18 -0400
+Date: Mon, 16 Jul 2018 22:26:16 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180716025346.GF2599@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1807162207210.15021@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
+	<20180716025346.GF2599@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180626151038.24771-3-sameeh@daynix.com>
-References: <20180626151038.24771-1-sameeh@daynix.com>
-	<20180626151038.24771-3-sameeh@daynix.com>
-Message-ID: <153177149044.7766.17760513270449969196@sif>
-Date: Mon, 16 Jul 2018 15:04:50 -0500
-Subject: Re: [Qemu-devel] [PATCH 2/2] qga-win: fsinfo: pci-info: allow
- partial info
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] hw/display/sm501* status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,158 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, qemu-devel@nongnu.org
 
-Quoting Sameeh Jubran (2018-06-26 10:10:38)
-> From: Sameeh Jubran <sjubran@redhat.com>
-> =
+On Mon, 16 Jul 2018, David Gibson wrote:
+> On Sun, Jul 15, 2018 at 11:29:56AM +0200, BALATON Zoltan wrote:
+>> So before sending more patches I'd like to clear who can review and merge
+>> patches for sm501 in the future and what is the maintainership of this
+>> device?
+>
+> The unfortunate answer is that there isn't any great choice: that's
+> basically what having no maintainer means.
+>
+> I suspect Gerd is the most qualified to review patches to this
+> technically, but even then that's only by general familiarity with
+> display devices.
+>
+> At Peter's request, I'm willing to take sm501 patches through the ppc
+> tree.  Since I can't review the patches in depth, I'd be pretty much
+> taking anything you send unless there's something obviously bogus.
+>
+> .. which would make you de facto sub-maintainer of sm501.  Given
+> which, I encourage you again to become *actual* maintainer; there
+> really is no-one better qualified at this point.  I realize that you
+> don't want to make a big ongoing job of thise, but AFAIK that's
+> exactly what the "Odd Fixes" maintainership status exists for.
 
-> The call to SetupDiGetDeviceRegistryProperty might fail because the
-> value doesn't exist in the registry, in this case we shouldn't exit from
-> the loop but instead continue to look for other available values in the
-> registry and set this value as unavailable (-1).
-> =
+There's already a section for sam460ex in MAINTAINERS where I've claimed 
+some devices that I've added and used by this machine. I did not take 
+sm501 because it was part of SH4 R2D but surprisingly it's not listed 
+there either and the maintainer listed there remained silent so far so it 
+seems that is not maintained any more.
 
-> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+I could list sm501 in the sam460ex section thus formally taking 
+sub-maintainership but this would only go as far that I'll get cc-d on 
+changes and try to review them. I still can't (and don't want to) maintain 
+my own tree and send pull requests directly so I'd need someone's help 
+with that who can take my patches and merge them via their tree. If it's 
+OK to continue to use the PPC tree for that I'm fine with that if David 
+agrees (which I think he did above).
 
-The values I'm seeing look off:
+So is it OK to add sm501 to sam460ex section so I claim responsibility for 
+changes and will continue sending patches cc-ing David (and maybe Gerd to 
+help spotting problems) then David could take these via the PPC tree?
 
-win7:
-
-{'execute':'guest-get-fsinfo','arguments':{}}
-
-{"return": [{"name":
-"\\\\?\\Volume{2823bc2b-b90f-11e7-9ea5-806e6f6e6963}\\", "total-bytes":
-316628992, "mountpoint": "E:\\", "disk": [{"bus-type": "ide", "bus": 0,
-"unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": -1,
-"function": -1}, "target": 0}], "used-bytes": 316628992, "type":
-"CDFS"}, {"name":
-"\\\\?\\Volume{a1ed8064-3f4a-11e1-972d-806e6f6e6963}\\", "total-bytes":
-21367877632, "mountpoint": "C:\\", "disk": [{"bus-type": "scsi", "bus":
-0, "unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": 0,
-"function": 2}, "target": 0}], "used-bytes": 19656269824, "type":
-"NTFS"}, {"name":
-"\\\\?\\Volume{a1ed8063-3f4a-11e1-972d-806e6f6e6963}\\", "mountpoint":
-"System Reserved", "disk": [{"bus-type": "scsi", "bus": 0, "unit": 0,
-"pci-controller": {"bus": -1, "slot": -1, "domain": 0, "function": 1},
-"target": 0}], "type": "NTFS"}]}
-
-win10:
-
-{'execute':'guest-get-fsinfo','arguments':{}}
-
-{"return": [{"name":
-"\\\\?\\Volume{83835b2d-0032-11e6-a84f-806e6f6e6963}\\", "total-bytes":
-160755712, "mountpoint": "D:\\", "disk": [{"bus-type": "ide", "bus": 0,
-"unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": -1,
-"function": -1}, "target": 0}], "used-bytes": 160755712, "type":
-"CDFS"}, {"name":
-"\\\\?\\Volume{2ea839c6-0000-0000-0000-80620c000000}\\", "mountpoint":
-"System Reserved", "disk": [{"bus-type": "scsi", "bus": 0, "unit": 0,
-"pci-controller": {"bus": -1, "slot": -1, "domain": 0, "function": 3},
-"target": 0}], "type": "NTFS"}, {"name":
-"\\\\?\\Volume{2ea839c6-0000-0000-0000-501f00000000}\\", "total-bytes":
-52665839616, "mountpoint": "C:\\", "disk": [{"bus-type": "scsi", "bus":
-0, "unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": 0,
-"function": 2}, "target": 0}], "used-bytes": 29645811712, "type":
-"NTFS"}, {"name":
-"\\\\?\\Volume{2ea839c6-0000-0000-0000-100000000000}\\", "mountpoint":
-"System Reserved", "disk": [{"bus-type": "scsi", "bus": 0, "unit": 0,
-"pci-controller": {"bus": -1, "slot": -1, "domain": 0, "function": 1},
-"target": 0}], "type": "NTFS"}]}
-
-If any one of domain/bus/slot/func fail, we should initialize everything
-to -1 since we can't partially report a PCI address. The fact that we
-get partial success makes me think SPDRP_ADDRESS, SPDRP_UI_NUMBER, etc.
-aren't reporting what we expect they should. The documentation seems
-a bit nebulous. Also I'm not using multifunction to the non-0 function
-values seem off.
-
-Do you know of anyone manually setting CONFIG_QGA_NTDDSCSI in practice?
-It's been left disabled in configure (left misnamed as CONFIG_QGA_NTDDDISK
-due to some problems that popped up when we tried to enable it that I
-don't quite recall, maybe similar issues to what you're seeing). I'm
-starting to think it's better to leave this for 3.1 since it's not
-technically a supported feature yet and may need some reworking outside
-of the issue you were originally addressing.
-
-> ---
->  qga/commands-win32.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> =
-
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index c5f1c884e1..55e460dee3 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -505,7 +505,8 @@ static GuestPCIAddress *get_pci_info(char *guid, Erro=
-r **errp)
-> =
-
->      dev_info_data.cbSize =3D sizeof(SP_DEVINFO_DATA);
->      for (i =3D 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i+=
-+) {
-> -        DWORD addr, bus, slot, func, dev, data, size2;
-> +        DWORD addr, bus, slot, data, size2;
-> +        int func, dev;
->          while (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_dat=
-a,
->                                              SPDRP_PHYSICAL_DEVICE_OBJECT=
-_NAME,
->                                              &data, (PBYTE)buffer, size,
-> @@ -535,21 +536,21 @@ static GuestPCIAddress *get_pci_info(char *guid, Er=
-ror **errp)
->           */
->          if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
->                     SPDRP_BUSNUMBER, &data, (PBYTE)&bus, size, NULL)) {
-> -            break;
-> +            bus =3D -1;
->          }
-> =
-
->          /* The function retrieves the device's address. This value will =
-be
->           * transformed into device function and number */
->          if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
->                     SPDRP_ADDRESS, &data, (PBYTE)&addr, size, NULL)) {
-> -            break;
-> +            addr =3D -1;
->          }
-> =
-
->          /* This call returns UINumber of DEVICE_CAPABILITIES structure.
->           * This number is typically a user-perceived slot number. */
->          if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
->                     SPDRP_UI_NUMBER, &data, (PBYTE)&slot, size, NULL)) {
-> -            break;
-> +            slot =3D -1;
->          }
-> =
-
->          /* SetupApi gives us the same information as driver with
-> @@ -559,12 +560,12 @@ static GuestPCIAddress *get_pci_info(char *guid, Er=
-ror **errp)
->           * DeviceNumber =3D (USHORT)(((propertyAddress) >> 16) & 0x0000F=
-FFF);
->           * SPDRP_ADDRESS is propertyAddress, so we do the same.*/
-> =
-
-> -        func =3D addr & 0x0000FFFF;
-> -        dev =3D (addr >> 16) & 0x0000FFFF;
-> +        func =3D ((int) addr =3D=3D -1) ? -1 : addr & 0x0000FFFF;
-> +        dev =3D ((int) addr =3D=3D -1) ? -1 : (addr >> 16) & 0x0000FFFF;
->          pci->domain =3D dev;
-> -        pci->slot =3D slot;
-> +        pci->slot =3D (int) slot;
->          pci->function =3D func;
-> -        pci->bus =3D bus;
-> +        pci->bus =3D (int) bus;
->          break;
->      }
-> =
-
-> -- =
-
-> 2.13.6
->=20
+Regards,
+BALATON Zoltan
