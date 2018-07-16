@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff26o-0002GQ-Lp
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:56:07 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ff2BL-0003pX-Aj
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff26k-0005Si-Th
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:56:06 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:38502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ff26k-0005SW-My
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:56:02 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id v8-v6so74224396oie.5
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 04:56:02 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1ff2BD-0007HG-4F
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:00:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32892 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ff2BC-0007GT-TB
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:00:39 -0400
+Date: Mon, 16 Jul 2018 14:00:35 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180716140035.0345db39@redhat.com>
+In-Reply-To: <1529421657-14969-1-git-send-email-jingqi.liu@intel.com>
+References: <1529421657-14969-1-git-send-email-jingqi.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <BN7PR08MB4868A93EDEAA419282D376D9C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-	<5368d20b-2b39-2fee-8851-f749f97071f8@vivier.eu>
-	<BN7PR08MB4868A93EDEAA419282D376D9C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jul 2018 12:55:41 +0100
-Message-ID: <CAFEAcA9muPW8d6QTwzyFc+364fzhy9s0J9ok1FgJEjbP1vQicQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] tcg_register_jit_int() interface problem
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V1 RESEND 0/6] Build ACPI Heterogeneous
+ Memory Attribute Table (HMAT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Markovic <smarkovic@wavecomp.com>
+To: Liu Jingqi <jingqi.liu@intel.com>
+Cc: ehabkost@redhat.com, eblake@redhat.com, pbonzini@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, rth@twiddle.net, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 16 July 2018 at 12:36, Aleksandar Markovic <amarkovic@wavecomp.com> wrot=
-e:
->> From: Laurent Vivier <laurent@vivier.eu>
->> Le 16/07/2018 =C3=A0 13:10, Aleksandar Markovic a =C3=A9crit :
->> > For MIPS, the situation is different: Up until recently, MIPS had only
->> > one value for e_machine: that was EM_MIPS (used for both 32-bit and
->> > 64-bit MIPS systems). However, new nanoMIPS systems have a new value i=
-n
->> > that field: EM_NANOMIPS (that is to be applied for both 32-bit and
->> > 64-bit nanoMIPS systems).
->> >
->> >
->> > The situation described above represent a problem for us developing
->> > nanoMIPS support, forcing us to have different compilations (and
->> > executables) for MIPS and nanoMIPS.
->> >
->> >
->> > Is there a possibility to refactor tcg_register_jit_int() to receive
->> > "e_machine" value as an argument, instead of expecting preprocessor
->> > constant to be set?
->>
->> I don't know this par of code, but for PPC we have:
->>
->> #if TCG_TARGET_REG_BITS =3D=3D 64
->> # define ELF_HOST_MACHINE EM_PPC64
->> #else
->> # define ELF_HOST_MACHINE EM_PPC
->> #endif
->>
->> So perhaps you could have something like:
->>
->> #if defined(HOST_NANOMIPS)
->> # define ELF_HOST_MACHINE EM_NANOMIPS
->> #else
->> # define ELF_HOST_MACHINE EM_MIPS
->> #endif
->
-> The problem is, this means there will be separate executables for QEMU fo=
-r
-> MIPS and QEMU for nanoMIPS. Would that be acceptable from overall QEMU
-> design point of view? Peter, Richard?
+On Tue, 19 Jun 2018 23:20:51 +0800
+Liu Jingqi <jingqi.liu@intel.com> wrote:
 
-The assumption has previously been that there must be a value known
-at compile time (because it would be the value of whatever is in the
-ELF header for the QEMU executable itself, effectively). I'm not
-sure why this doesn't work for MIPS still -- if you're building
-on a host with the new nanoMIPS stuff and with that support enabled,
-then report EM_NANOMIPS; if you're building a binary that works with
-the older MIPS CPUs, report EM_MIPS ?
+> This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
+> according to the command line. The ACPI HMAT describes the memory attributes,
+> such as memory side cache attributes and bandwidth and latency details,
+> related to the System Physical Address (SPA) Memory Ranges.
+> The software is expected to use this information as hint for optimization.
+> 
+> OSPM evaluates HMAT only during system initialization. Any changes to the HMAT
+> state at runtime or information regarding HMAT for hot plug are communicated
+> using the _HMA method.
+> 
+> Liu Jingqi (6):
+>   hmat acpi: Build Memory Subsystem Address Range Structure(s) in ACPI
+>     HMAT
+you've converted this patch to build_append_int_noprefix() API as requested
 
-That said, if this doesn't work for MIPS, then it would be a trivial
-refactor to allow the tcg per-target code to do
-#define ELF_HOST_MACHINE mips_get_elf_host_machine()
-so you could compute the value at runtime.
+>   hmat acpi: Build System Locality Latency and Bandwidth Information
+>     Structure(s) in ACPI HMAT
+>   hmat acpi: Build Memory Side Cache Information Structure(s) in ACPI
+>     HMAT
+but left out above 2 with the same issues.
+So I'd repeat,
+using "struct FOO {} packed" is discouraged, you should use
+build_append_int_noprefix() API to build ACPI tables
 
-thanks
--- PMM
+>   numa: Extend the command-line to provide memory latency and bandwidth
+>     information
+>   numa: Extend the command-line to provide memory side cache information
+>   hmat acpi: Implement _HMA method to update HMAT at runtime
+> 
+>  default-configs/x86_64-softmmu.mak |   1 +
+>  hw/acpi/Makefile.objs              |   1 +
+>  hw/acpi/hmat.c                     | 649 +++++++++++++++++++++++++++++++++++++
+>  hw/acpi/hmat.h                     | 264 +++++++++++++++
+>  hw/i386/acpi-build.c               | 122 ++++---
+>  hw/i386/acpi-build.h               |  10 +
+>  hw/i386/pc.c                       |   2 +
+>  hw/i386/pc_piix.c                  |   3 +
+>  hw/i386/pc_q35.c                   |   3 +
+>  include/hw/i386/pc.h               |   2 +
+>  include/sysemu/numa.h              |   2 +
+>  numa.c                             | 202 ++++++++++++
+>  qapi/misc.json                     | 160 ++++++++-
+>  qemu-options.hx                    |  28 +-
+>  14 files changed, 1401 insertions(+), 48 deletions(-)
+>  create mode 100644 hw/acpi/hmat.c
+>  create mode 100644 hw/acpi/hmat.h
+> 
