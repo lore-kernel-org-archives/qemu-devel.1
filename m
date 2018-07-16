@@ -1,37 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ffBJ4-00063S-EB
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:45:23 -0400
+	(envelope-from <alistair23@gmail.com>) id 1ffBRi-0008MT-Jn
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ffBJ1-00042r-Ax
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:45:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1ffBJ1-00042e-0R
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:45:19 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6GLdRjJ101711
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 17:45:17 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2k8xhtb9bv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 17:45:17 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 16 Jul 2018 17:45:16 -0400
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 16 Jul 2018 16:44:50 -0500
-In-Reply-To: <20180716214450.17758-1-mdroth@linux.vnet.ibm.com>
-References: <20180716214450.17758-1-mdroth@linux.vnet.ibm.com>
+	(envelope-from <alistair23@gmail.com>) id 1ffBRh-0006fN-Bk
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:54:18 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180716214450.17758-3-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-3.0 2/2] qga: fix file descriptor leak
+In-Reply-To: <1531745974-17187-3-git-send-email-thuth@redhat.com>
+References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
+	<1531745974-17187-3-git-send-email-thuth@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 16 Jul 2018 14:53:44 -0700
+Message-ID: <CAKmqyKPz-PCmPcd2xtRe+1Oi-FHxSKEdMN8qnskMXd-JvV5+jw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 02/17] hw/core/sysbus: Add a function
+ for creating and attaching an object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,33 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Markus Armbruster <armbru@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+On Mon, Jul 16, 2018 at 5:59 AM, Thomas Huth <thuth@redhat.com> wrote:
+> A lot of functions are initializing an object and attach it immediately
+> afterwards to the system bus. Provide a common function for this, which
+> also uses object_initialize_child() to make sure that the reference
+> counter is correctly initialized to 1 afterwards.
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-The file descriptor for /sys/power/state was never closed.  Reported
-by Coverity.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-posix.c | 1 +
- 1 file changed, 1 insertion(+)
+Alistair
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index c46767b0dd..37e8a2d791 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -1652,6 +1652,7 @@ static bool linux_sys_state_supports_mode(SuspendMo=
-de mode, Error **errp)
-     }
-=20
-     ret =3D read(fd, buf, sizeof(buf) - 1);
-+    close(fd);
-     if (ret <=3D 0) {
-         return false;
-     }
---=20
-2.11.0
+> ---
+>  hw/core/sysbus.c    |  8 ++++++++
+>  include/hw/sysbus.h | 17 +++++++++++++++++
+>  2 files changed, 25 insertions(+)
+>
+> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+> index ecfb0cf..3c8e53b 100644
+> --- a/hw/core/sysbus.c
+> +++ b/hw/core/sysbus.c
+> @@ -376,6 +376,14 @@ BusState *sysbus_get_default(void)
+>      return main_system_bus;
+>  }
+>
+> +void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
+> +                           size_t childsize, const char *childtype)
+> +{
+> +    object_initialize_child(parent, childname, child, childsize, childtype,
+> +                            &error_abort, NULL);
+> +    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
+> +}
+> +
+>  static void sysbus_register_types(void)
+>  {
+>      type_register_static(&system_bus_info);
+> diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+> index e88bb6d..0b59a3b 100644
+> --- a/include/hw/sysbus.h
+> +++ b/include/hw/sysbus.h
+> @@ -96,6 +96,23 @@ void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+>                     MemoryRegion *mem);
+>  MemoryRegion *sysbus_address_space(SysBusDevice *dev);
+>
+> +/**
+> + * sysbus_init_child_obj:
+> + * @parent: The parent object
+> + * @childname: Used as name of the "child<>" property in the parent
+> + * @child: A pointer to the memory to be used for the object.
+> + * @childsize: The maximum size available at @child for the object.
+> + * @childtype: The name of the type of the object to instantiate.
+> + *
+> + * This function will initialize an object and attach it to the main system
+> + * bus. The memory for the object should have already been allocated. The
+> + * object will then be added as child to the given parent. The returned object
+> + * has a reference count of 1 (for the "child<...>" property from the parent),
+> + * so the object will be finalized automatically when the parent gets removed.
+> + */
+> +void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
+> +                           size_t childsize, const char *childtype);
+> +
+>  /* Call func for every dynamically created sysbus device in the system */
+>  void foreach_dynamic_sysbus_device(FindSysbusDeviceFunc *func, void *opaque);
+>
+> --
+> 1.8.3.1
+>
+>
