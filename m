@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1feye3-0006lk-H6
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 04:14:40 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fez0o-0000sK-Gf
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 04:37:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1feydm-0008Cz-3M
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 04:14:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34910)
+	(envelope-from <stefanha@redhat.com>) id 1fez0j-0004YZ-34
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 04:37:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53142 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1feydk-0008BB-Fb
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 04:13:53 -0400
-Date: Mon, 16 Jul 2018 04:13:47 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <9008103.50980761.1531728827436.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180713163559.692aca30@doriath>
-References: <20180713075232.9575-1-pagupta@redhat.com>
-	<20180713075232.9575-2-pagupta@redhat.com>
-	<20180713163559.692aca30@doriath>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 1/2] libnvdimm: Add flush callback for
- virtio pmem
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fez0i-0004Y8-MM
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 04:37:36 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 16 Jul 2018 09:37:31 +0100
+Message-Id: <20180716083732.3347-2-stefanha@redhat.com>
+In-Reply-To: <20180716083732.3347-1-stefanha@redhat.com>
+References: <20180716083732.3347-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] qdev: add HotplugHandler->post_plug()
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,170 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luiz Capitulino <lcapitulino@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, jack@suse.cz, stefanha@redhat.com, dan j williams <dan.j.williams@intel.com>, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross zwisler <ross.zwisler@intel.com>, david@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, hch@infradead.org, mst@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: l00284672 <lizhengui@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+The ->pre_plug() callback is invoked before the device is realized.  The
+->plug() callback is invoked when the device is being realized but
+before it is reset.
 
-Hi Luiz,
+This patch adds a ->post_plug() callback which is invoked after the
+device has been reset.  This callback is needed by HotplugHandlers that
+need to wait until after ->reset().
 
-> 
-> > This patch adds functionality to perform flush from guest to host
-> > over VIRTIO. We are registering a callback based on 'nd_region' type.
-> > As virtio_pmem driver requires this special flush interface, for rest
-> > of the region types we are registering existing flush function.
-> > Also report the error returned by virtio flush interface.
-> 
-> This patch doesn't apply against latest upstream. A few more comments
-> below.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/hw/hotplug.h | 11 +++++++++++
+ hw/core/hotplug.c    | 10 ++++++++++
+ hw/core/qdev.c       |  4 ++++
+ 3 files changed, 25 insertions(+)
 
-My bad, I tested it with 4.17-rc1. Will rebase it.
-
-> 
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  drivers/nvdimm/nd.h          |  1 +
-> >  drivers/nvdimm/pmem.c        |  4 ++--
-> >  drivers/nvdimm/region_devs.c | 24 ++++++++++++++++++------
-> >  include/linux/libnvdimm.h    |  5 ++++-
-> >  4 files changed, 25 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
-> > index 32e0364..1b62f79 100644
-> > --- a/drivers/nvdimm/nd.h
-> > +++ b/drivers/nvdimm/nd.h
-> > @@ -159,6 +159,7 @@ struct nd_region {
-> >  	struct badblocks bb;
-> >  	struct nd_interleave_set *nd_set;
-> >  	struct nd_percpu_lane __percpu *lane;
-> > +	int (*flush)(struct device *dev);
-> >  	struct nd_mapping mapping[0];
-> >  };
-> >  
-> > diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-> > index 9d71492..29fd2cd 100644
-> > --- a/drivers/nvdimm/pmem.c
-> > +++ b/drivers/nvdimm/pmem.c
-> > @@ -180,7 +180,7 @@ static blk_qc_t pmem_make_request(struct request_queue
-> > *q, struct bio *bio)
-> >  	struct nd_region *nd_region = to_region(pmem);
-> >  
-> >  	if (bio->bi_opf & REQ_FLUSH)
-> > -		nvdimm_flush(nd_region);
-> > +		bio->bi_status = nvdimm_flush(nd_region);
-> >  
-> >  	do_acct = nd_iostat_start(bio, &start);
-> >  	bio_for_each_segment(bvec, bio, iter) {
-> > @@ -196,7 +196,7 @@ static blk_qc_t pmem_make_request(struct request_queue
-> > *q, struct bio *bio)
-> >  		nd_iostat_end(bio, start);
-> >  
-> >  	if (bio->bi_opf & REQ_FUA)
-> > -		nvdimm_flush(nd_region);
-> > +		bio->bi_status = nvdimm_flush(nd_region);
-> >  
-> >  	bio_endio(bio);
-> >  	return BLK_QC_T_NONE;
-> > diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-> > index a612be6..124aae7 100644
-> > --- a/drivers/nvdimm/region_devs.c
-> > +++ b/drivers/nvdimm/region_devs.c
-> > @@ -1025,6 +1025,7 @@ static struct nd_region *nd_region_create(struct
-> > nvdimm_bus *nvdimm_bus,
-> >  	dev->of_node = ndr_desc->of_node;
-> >  	nd_region->ndr_size = resource_size(ndr_desc->res);
-> >  	nd_region->ndr_start = ndr_desc->res->start;
-> > +	nd_region->flush = ndr_desc->flush;
-> >  	nd_device_register(dev);
-> >  
-> >  	return nd_region;
-> > @@ -1065,13 +1066,10 @@ struct nd_region
-> > *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
-> >  }
-> >  EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
-> >  
-> > -/**
-> > - * nvdimm_flush - flush any posted write queues between the cpu and pmem
-> > media
-> > - * @nd_region: blk or interleaved pmem region
-> > - */
-> > -void nvdimm_flush(struct nd_region *nd_region)
-> > +void pmem_flush(struct device *dev)
-> >  {
-> > -	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
-> > +	struct nd_region_data *ndrd = dev_get_drvdata(dev);
-> > +	struct nd_region *nd_region = to_nd_region(dev);
-> >  	int i, idx;
-> >  
-> >  	/*
-> > @@ -1094,6 +1092,20 @@ void nvdimm_flush(struct nd_region *nd_region)
-> >  			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
-> >  	wmb();
-> >  }
-> > +
-> > +/**
-> > + * nvdimm_flush - flush any posted write queues between the cpu and pmem
-> > media
-> > + * @nd_region: blk or interleaved pmem region
-> > + */
-> > +int nvdimm_flush(struct nd_region *nd_region)
-> > +{
-> > +	if (nd_region->flush)
-> > +		return(nd_region->flush(&nd_region->dev));
-> > +
-> > +	pmem_flush(&nd_region->dev);
-> 
-> IMHO, a better way of doing this would be to allow nvdimm_flush() to
-> be overridden. That is, in nd_region_create() you set nd_region->flush
-> to the original nvdimm_flush() if ndr_desc->flush is NULL. And then
-> always call nd_region->flush() where nvdimm_flush() is called today.
-
-I wanted to do minimal changes for actual 'nvdimm_flush' function because it
-does not return an error or return status for fsync. So, I needed to differentiate
-between 'fake DAX' & 'NVDIMM' at the time of calling 'flush', otherwise I need to 
-change 'nvdimm_flush' to return zero for all the calls.
-
-Looks like I am already doing this, will change as suggested.  
+diff --git a/include/hw/hotplug.h b/include/hw/hotplug.h
+index 1a0516a479..51541d63e1 100644
+--- a/include/hw/hotplug.h
++++ b/include/hw/hotplug.h
+@@ -47,6 +47,8 @@ typedef void (*hotplug_fn)(HotplugHandler *plug_handler,
+  * @parent: Opaque parent interface.
+  * @pre_plug: pre plug callback called at start of device.realize(true)
+  * @plug: plug callback called at end of device.realize(true).
++ * @post_plug: post plug callback called after device.realize(true) and device
++ *             reset
+  * @unplug_request: unplug request callback.
+  *                  Used as a means to initiate device unplug for devices that
+  *                  require asynchronous unplug handling.
+@@ -61,6 +63,7 @@ typedef struct HotplugHandlerClass {
+     /* <public> */
+     hotplug_fn pre_plug;
+     hotplug_fn plug;
++    void (*post_plug)(HotplugHandler *plug_handler, DeviceState *plugged_dev);
+     hotplug_fn unplug_request;
+     hotplug_fn unplug;
+ } HotplugHandlerClass;
+@@ -83,6 +86,14 @@ void hotplug_handler_pre_plug(HotplugHandler *plug_handler,
+                               DeviceState *plugged_dev,
+                               Error **errp);
  
-> 
-> > +
-> > +	return 0;
-> > +}
-> >  EXPORT_SYMBOL_GPL(nvdimm_flush);
-> >  
-> >  /**
-> > diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
-> > index 097072c..33b617f 100644
-> > --- a/include/linux/libnvdimm.h
-> > +++ b/include/linux/libnvdimm.h
-> > @@ -126,6 +126,7 @@ struct nd_region_desc {
-> >  	int numa_node;
-> >  	unsigned long flags;
-> >  	struct device_node *of_node;
-> > +	int (*flush)(struct device *dev);
-> >  };
-> >  
-> >  struct device;
-> > @@ -201,7 +202,9 @@ unsigned long nd_blk_memremap_flags(struct
-> > nd_blk_region *ndbr);
-> >  unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
-> >  void nd_region_release_lane(struct nd_region *nd_region, unsigned int
-> >  lane);
-> >  u64 nd_fletcher64(void *addr, size_t len, bool le);
-> > -void nvdimm_flush(struct nd_region *nd_region);
-> > +int nvdimm_flush(struct nd_region *nd_region);
-> > +void pmem_set_flush(struct nd_region *nd_region, void (*flush)
-> > +					(struct device *));
-> 
-> It seems pmem_set_flush() doesn't exist.
-
-Sorry! will remove it.
-> 
-> >  int nvdimm_has_flush(struct nd_region *nd_region);
-> >  int nvdimm_has_cache(struct nd_region *nd_region);
-> >  
-> 
-> 
-
-Thanks,
-Pankaj
++/**
++ * hotplug_handler_post_plug:
++ *
++ * Call #HotplugHandlerClass.post_plug callback of @plug_handler.
++ */
++void hotplug_handler_post_plug(HotplugHandler *plug_handler,
++                               DeviceState *plugged_dev);
++
+ /**
+  * hotplug_handler_unplug_request:
+  *
+diff --git a/hw/core/hotplug.c b/hw/core/hotplug.c
+index 17ac986685..2253072d0e 100644
+--- a/hw/core/hotplug.c
++++ b/hw/core/hotplug.c
+@@ -35,6 +35,16 @@ void hotplug_handler_plug(HotplugHandler *plug_handler,
+     }
+ }
+ 
++void hotplug_handler_post_plug(HotplugHandler *plug_handler,
++                               DeviceState *plugged_dev)
++{
++    HotplugHandlerClass *hdc = HOTPLUG_HANDLER_GET_CLASS(plug_handler);
++
++    if (hdc->post_plug) {
++        hdc->post_plug(plug_handler, plugged_dev);
++    }
++}
++
+ void hotplug_handler_unplug_request(HotplugHandler *plug_handler,
+                                     DeviceState *plugged_dev,
+                                     Error **errp)
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index cf0db4b6da..529b82de18 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -867,6 +867,10 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+             device_reset(dev);
+         }
+         dev->pending_deleted_event = false;
++
++        if (hotplug_ctrl) {
++            hotplug_handler_post_plug(hotplug_ctrl, dev);
++        }
+     } else if (!value && dev->realized) {
+         Error **local_errp = NULL;
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+-- 
+2.17.1
