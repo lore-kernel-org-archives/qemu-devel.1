@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff374-0001mB-00
+	(envelope-from <thuth@redhat.com>) id 1ff375-0001nj-O3
 	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36x-0002TL-4v
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff370-0002UV-J5
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:27 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Jul 2018 14:59:34 +0200
-Message-Id: <1531745974-17187-18-git-send-email-thuth@redhat.com>
+Date: Mon, 16 Jul 2018 14:59:33 +0200
+Message-Id: <1531745974-17187-17-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531745974-17187-1-git-send-email-thuth@redhat.com>
 References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 17/17] hw/arm/xlnx-zynqmp: Fix crash when
- introspecting the "xlnx, zynqmp" device
+Subject: [Qemu-devel] [PATCH v3 16/17] hw/display/xlnx_dp: Move problematic
+ code from instance_init to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,122 +23,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-QEMU currently crashes when e.g. doing something like this:
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'xlnx,zynqmp'}}" \
- "{'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" \
- |  aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
+aux_create_slave() calls qdev_init_nofail() which in turn "realizes"
+the corresponding object. This is unlike qdev_create(), and it is wrong
+because qdev_init_nofail() must not be called from an instance_init
+function.  Move qdev_init_nofail() and the subsequent aux_map_slave into
+the caller's realize function.
 
-Use the new object_initialize_child() and sysbus_init_child_obj()
-functions to get the refernce counting of the child objects right, so
-that they are properly cleaned up when the parent gets destroyed.
+There are two more bugs that needs to be fixed here, too, where the
+objects are created but not added as children.  Therefore when
+you call object_unparent on them, nothing happens.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+In particular dpcd and edid give you an infinite loop in bus_unparent,
+because device_unparent is not called and does not remove them from
+the list of devices on the bus.
+
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[thuth: Added Paolo's fixup for the dpcd and edid unparenting]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/xlnx-zynqmp.c | 61 ++++++++++++++++++++++++----------------------------
- 1 file changed, 28 insertions(+), 33 deletions(-)
+ hw/display/xlnx_dp.c     |  8 +++++++-
+ hw/misc/auxbus.c         | 18 ++++++++++++------
+ include/hw/misc/auxbus.h | 14 +++++++++++++-
+ 3 files changed, 32 insertions(+), 8 deletions(-)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 29df35f..8de4868 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -166,64 +166,59 @@ static void xlnx_zynqmp_init(Object *obj)
-     int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index 5130122..6439bd0 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -1234,9 +1234,12 @@ static void xlnx_dp_init(Object *obj)
+     /*
+      * Initialize DPCD and EDID..
+      */
+-    s->dpcd = DPCD(aux_create_slave(s->aux_bus, "dpcd", 0x00000));
++    s->dpcd = DPCD(aux_create_slave(s->aux_bus, "dpcd"));
++    object_property_add_child(OBJECT(s), "dpcd", OBJECT(s->dpcd), NULL);
++
+     s->edid = I2CDDC(qdev_create(BUS(aux_get_i2c_bus(s->aux_bus)), "i2c-ddc"));
+     i2c_set_slave_address(I2C_SLAVE(s->edid), 0x50);
++    object_property_add_child(OBJECT(s), "edid", OBJECT(s->edid), NULL);
  
-     for (i = 0; i < num_apus; i++) {
--        object_initialize(&s->apu_cpu[i], sizeof(s->apu_cpu[i]),
--                          "cortex-a53-" TYPE_ARM_CPU);
--        object_property_add_child(obj, "apu-cpu[*]", OBJECT(&s->apu_cpu[i]),
--                                  &error_abort);
-+        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
-+                                sizeof(s->apu_cpu[i]),
-+                                "cortex-a53-" TYPE_ARM_CPU, &error_abort, NULL);
-     }
+     fifo8_create(&s->rx_fifo, 16);
+     fifo8_create(&s->tx_fifo, 16);
+@@ -1248,6 +1251,9 @@ static void xlnx_dp_realize(DeviceState *dev, Error **errp)
+     DisplaySurface *surface;
+     struct audsettings as;
  
--    object_initialize(&s->gic, sizeof(s->gic), gic_class_name());
--    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
-+                          gic_class_name());
++    qdev_init_nofail(DEVICE(s->dpcd));
++    aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
++
+     s->console = graphic_console_init(dev, 0, &xlnx_dp_gfx_ops, s);
+     surface = qemu_console_surface(s->console);
+     xlnx_dpdma_set_host_data_location(s->dpdma, DP_GRAPHIC_DMA_CHANNEL,
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index b8a8721..0e56d9a 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -32,6 +32,7 @@
+ #include "hw/misc/auxbus.h"
+ #include "hw/i2c/i2c.h"
+ #include "monitor/monitor.h"
++#include "qapi/error.h"
  
-     for (i = 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
--        object_initialize(&s->gem[i], sizeof(s->gem[i]), TYPE_CADENCE_GEM);
--        qdev_set_parent_bus(DEVICE(&s->gem[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "gem[*]", &s->gem[i], sizeof(s->gem[i]),
-+                              TYPE_CADENCE_GEM);
-     }
+ #ifndef DEBUG_AUX
+ #define DEBUG_AUX 0
+@@ -63,9 +64,14 @@ static void aux_bus_class_init(ObjectClass *klass, void *data)
+ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+ {
+     AUXBus *bus;
++    Object *auxtoi2c;
  
-     for (i = 0; i < XLNX_ZYNQMP_NUM_UARTS; i++) {
--        object_initialize(&s->uart[i], sizeof(s->uart[i]), TYPE_CADENCE_UART);
--        qdev_set_parent_bus(DEVICE(&s->uart[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "uart[*]", &s->uart[i], sizeof(s->uart[i]),
-+                              TYPE_CADENCE_UART);
-     }
+     bus = AUX_BUS(qbus_create(TYPE_AUX_BUS, parent, name));
+-    bus->bridge = AUXTOI2C(qdev_create(BUS(bus), TYPE_AUXTOI2C));
++    auxtoi2c = object_new_with_props(TYPE_AUXTOI2C, OBJECT(bus), "i2c",
++                                     &error_abort, NULL);
++    qdev_set_parent_bus(DEVICE(auxtoi2c), BUS(bus));
++
++    bus->bridge = AUXTOI2C(auxtoi2c);
  
--    object_initialize(&s->sata, sizeof(s->sata), TYPE_SYSBUS_AHCI);
--    qdev_set_parent_bus(DEVICE(&s->sata), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
-+                          TYPE_SYSBUS_AHCI);
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
--        object_initialize(&s->sdhci[i], sizeof(s->sdhci[i]),
--                          TYPE_SYSBUS_SDHCI);
--        qdev_set_parent_bus(DEVICE(&s->sdhci[i]),
--                            sysbus_get_default());
-+        sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci[i],
-+                              sizeof(s->sdhci[i]), TYPE_SYSBUS_SDHCI);
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SPIS; i++) {
--        object_initialize(&s->spi[i], sizeof(s->spi[i]),
--                          TYPE_XILINX_SPIPS);
--        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
-+                              TYPE_XILINX_SPIPS);
-     }
- 
--    object_initialize(&s->qspi, sizeof(s->qspi), TYPE_XLNX_ZYNQMP_QSPIPS);
--    qdev_set_parent_bus(DEVICE(&s->qspi), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "qspi", &s->qspi, sizeof(s->qspi),
-+                          TYPE_XLNX_ZYNQMP_QSPIPS);
- 
--    object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
--    qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "xxxdp", &s->dp, sizeof(s->dp), TYPE_XLNX_DP);
- 
--    object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
--    qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "dp-dma", &s->dpdma, sizeof(s->dpdma),
-+                          TYPE_XLNX_DPDMA);
- 
--    object_initialize(&s->ipi, sizeof(s->ipi), TYPE_XLNX_ZYNQMP_IPI);
--    qdev_set_parent_bus(DEVICE(&s->ipi), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "ipi", &s->ipi, sizeof(s->ipi),
-+                          TYPE_XLNX_ZYNQMP_IPI);
- 
--    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_XLNX_ZYNQMP_RTC);
--    qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-+                          TYPE_XLNX_ZYNQMP_RTC);
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_GDMA_CH; i++) {
--        object_initialize(&s->gdma[i], sizeof(s->gdma[i]), TYPE_XLNX_ZDMA);
--        qdev_set_parent_bus(DEVICE(&s->gdma[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "gdma[*]", &s->gdma[i], sizeof(s->gdma[i]),
-+                              TYPE_XLNX_ZDMA);
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_ADMA_CH; i++) {
--        object_initialize(&s->adma[i], sizeof(s->adma[i]), TYPE_XLNX_ZDMA);
--        qdev_set_parent_bus(DEVICE(&s->adma[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "adma[*]", &s->adma[i], sizeof(s->adma[i]),
-+                              TYPE_XLNX_ZDMA);
-     }
+     /* Memory related. */
+     bus->aux_io = g_malloc(sizeof(*bus->aux_io));
+@@ -74,9 +80,11 @@ AUXBus *aux_init_bus(DeviceState *parent, const char *name)
+     return bus;
  }
  
+-static void aux_bus_map_device(AUXBus *bus, AUXSlave *dev, hwaddr addr)
++void aux_map_slave(AUXSlave *aux_dev, hwaddr addr)
+ {
+-    memory_region_add_subregion(bus->aux_io, addr, dev->mmio);
++    DeviceState *dev = DEVICE(aux_dev);
++    AUXBus *bus = AUX_BUS(qdev_get_parent_bus(dev));
++    memory_region_add_subregion(bus->aux_io, addr, aux_dev->mmio);
+ }
+ 
+ static bool aux_bus_is_bridge(AUXBus *bus, DeviceState *dev)
+@@ -260,15 +268,13 @@ static void aux_slave_dev_print(Monitor *mon, DeviceState *dev, int indent)
+                    memory_region_size(s->mmio));
+ }
+ 
+-DeviceState *aux_create_slave(AUXBus *bus, const char *type, uint32_t addr)
++DeviceState *aux_create_slave(AUXBus *bus, const char *type)
+ {
+     DeviceState *dev;
+ 
+     dev = DEVICE(object_new(type));
+     assert(dev);
+     qdev_set_parent_bus(dev, &bus->qbus);
+-    qdev_init_nofail(dev);
+-    aux_bus_map_device(AUX_BUS(qdev_get_parent_bus(dev)), AUX_SLAVE(dev), addr);
+     return dev;
+ }
+ 
+diff --git a/include/hw/misc/auxbus.h b/include/hw/misc/auxbus.h
+index 68ade8a..c15b444 100644
+--- a/include/hw/misc/auxbus.h
++++ b/include/hw/misc/auxbus.h
+@@ -123,6 +123,18 @@ I2CBus *aux_get_i2c_bus(AUXBus *bus);
+  */
+ void aux_init_mmio(AUXSlave *aux_slave, MemoryRegion *mmio);
+ 
+-DeviceState *aux_create_slave(AUXBus *bus, const char *name, uint32_t addr);
++/* aux_create_slave: Create a new device on an AUX bus
++ *
++ * @bus The AUX bus for the new device.
++ * @name The type of the device to be created.
++ */
++DeviceState *aux_create_slave(AUXBus *bus, const char *name);
++
++/* aux_map_slave: Map the mmio for an AUX slave on the bus.
++ *
++ * @dev The AUX slave.
++ * @addr The address for the slave's mmio.
++ */
++void aux_map_slave(AUXSlave *dev, hwaddr addr);
+ 
+ #endif /* HW_MISC_AUXBUS_H */
 -- 
 1.8.3.1
