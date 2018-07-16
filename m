@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36Z-0001G9-SW
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:59:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff36Z-0001GA-TJ
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36Y-00028G-Tl
+	(envelope-from <thuth@redhat.com>) id 1ff36Y-000289-Rc
 	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:59:55 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Jul 2018 14:59:23 +0200
-Message-Id: <1531745974-17187-7-git-send-email-thuth@redhat.com>
+Date: Mon, 16 Jul 2018 14:59:24 +0200
+Message-Id: <1531745974-17187-8-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531745974-17187-1-git-send-email-thuth@redhat.com>
 References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 06/17] hw/arm/msf2-soc: Fix introspection
- problem with the "msf2-soc" device
+Subject: [Qemu-devel] [PATCH v3 07/17] hw/cpu/a9mpcore: Fix introspection
+ problems with the "a9mpcore_priv" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-Valgrind currently reports a problem when running QEMU like this:
+Running QEMU with valgrind indicates a problem here:
 
 echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'msf2-soc'}}" \
+ "'arguments':{'typename':'a9mpcore_priv'}}" \
  "{'execute': 'human-monitor-command', " \
  "'arguments': {'command-line': 'info qtree'}}" | \
  valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
 [...]
-==23097== Invalid read of size 8
-==23097==    at 0x6192AA: qdev_print (qdev-monitor.c:686)
-==23097==    by 0x6192AA: qbus_print (qdev-monitor.c:719)
+==30996== Invalid read of size 8
+==30996==    at 0x6185DA: qdev_print (qdev-monitor.c:686)
+==30996==    by 0x6185DA: qbus_print (qdev-monitor.c:719)
+==30996==    by 0x452B38: handle_hmp_command (monitor.c:3446)
 [...]
 
-Use the new sysbus_init_child_obj() function to make sure that the child
-objects are cleaned up correctly when the parent gets destroyed.
+Use the new sysbus_init_child_obj() function to make sure that the objects
+are cleaned up correctly when the parent gets destroyed.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/msf2-soc.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ hw/cpu/a9mpcore.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-index edb3ba8..dbefade 100644
---- a/hw/arm/msf2-soc.c
-+++ b/hw/arm/msf2-soc.c
-@@ -68,19 +68,18 @@ static void m2sxxx_soc_initfn(Object *obj)
-     MSF2State *s = MSF2_SOC(obj);
-     int i;
+diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
+index f17f292..a5b8678 100644
+--- a/hw/cpu/a9mpcore.c
++++ b/hw/cpu/a9mpcore.c
+@@ -27,20 +27,18 @@ static void a9mp_priv_initfn(Object *obj)
+     memory_region_init(&s->container, obj, "a9mp-priv-container", 0x2000);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->container);
  
--    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
--    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-+                          TYPE_ARMV7M);
+-    object_initialize(&s->scu, sizeof(s->scu), TYPE_A9_SCU);
+-    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
++    sysbus_init_child_obj(obj, "scu", &s->scu, sizeof(s->scu), TYPE_A9_SCU);
  
--    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
--    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sysreg", &s->sysreg, sizeof(s->sysreg),
-+                          TYPE_MSF2_SYSREG);
+-    object_initialize(&s->gic, sizeof(s->gic), TYPE_ARM_GIC);
+-    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
++    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic), TYPE_ARM_GIC);
  
--    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
--    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "timer", &s->timer, sizeof(s->timer),
-+                          TYPE_MSS_TIMER);
+-    object_initialize(&s->gtimer, sizeof(s->gtimer), TYPE_A9_GTIMER);
+-    qdev_set_parent_bus(DEVICE(&s->gtimer), sysbus_get_default());
++    sysbus_init_child_obj(obj, "gtimer", &s->gtimer, sizeof(s->gtimer),
++                          TYPE_A9_GTIMER);
  
-     for (i = 0; i < MSF2_NUM_SPIS; i++) {
--        object_initialize(&s->spi[i], sizeof(s->spi[i]),
-+        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
-                           TYPE_MSS_SPI);
--        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-     }
+-    object_initialize(&s->mptimer, sizeof(s->mptimer), TYPE_ARM_MPTIMER);
+-    qdev_set_parent_bus(DEVICE(&s->mptimer), sysbus_get_default());
++    sysbus_init_child_obj(obj, "mptimer", &s->mptimer, sizeof(s->mptimer),
++                          TYPE_ARM_MPTIMER);
+ 
+-    object_initialize(&s->wdt, sizeof(s->wdt), TYPE_ARM_MPTIMER);
+-    qdev_set_parent_bus(DEVICE(&s->wdt), sysbus_get_default());
++    sysbus_init_child_obj(obj, "wdt", &s->wdt, sizeof(s->wdt),
++                          TYPE_ARM_MPTIMER);
  }
  
+ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
 -- 
 1.8.3.1
