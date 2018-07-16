@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ff2o6-0002V8-VF
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:40:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ff2xv-0006r3-35
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:51:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ff2o3-0001GS-Qm
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:40:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34404 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1ff2xr-0006MK-An
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:50:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48144 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ff2o3-00019H-J0
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:40:47 -0400
-Date: Mon, 16 Jul 2018 15:40:40 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180716153955-mutt-send-email-mst@kernel.org>
-References: <20180716083732.3347-1-stefanha@redhat.com>
-	<20180716083732.3347-3-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ff2xr-0006MA-2S
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:50:55 -0400
+Date: Mon, 16 Jul 2018 14:50:51 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180716145051.65a1f603@redhat.com>
+In-Reply-To: <1531218620-14645-5-git-send-email-junyan.he@gmx.com>
+References: <1531218620-14645-1-git-send-email-junyan.he@gmx.com>
+	<1531218620-14645-5-git-send-email-junyan.he@gmx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180716083732.3347-3-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: fix hotplug ->reset()
- vs event race
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/7 V9] hostmem-file: add the 'pmem' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +27,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, l00284672 <lizhengui@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: junyan.he@gmx.com
+Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-On Mon, Jul 16, 2018 at 09:37:32AM +0100, Stefan Hajnoczi wrote:
-> There is a race condition during hotplug when iothread is used.  It
-> occurs because virtio-scsi may be processing command queues in the
-> iothread while the monitor performs SCSI device hotplug.
-> 
-> When a SCSI device is hotplugged the HotplugHandler->plug() callback is
-> invoked and virtio-scsi emits a rescan event to the guest.
-> 
-> If the guest submits a SCSI command at this point then it may be
-> cancelled before hotplug completes.  This happens because ->reset() is
-> called by hw/core/qdev.c:device_set_realized() after
-> HotplugHandler->plug() has been called and
-> hw/scsi/scsi-disk.c:scsi_disk_reset() purges all requests.
-> 
-> This patch uses the new HotplugHandler->post_plug() callback to emit the
-> rescan event after ->reset().  This eliminates the race conditions where
-> requests could be cancelled.
-> 
-> Reported-by: l00284672 <lizhengui@huawei.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Tue, 10 Jul 2018 18:30:17 +0800
+junyan.he@gmx.com wrote:
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> From: Junyan He <junyan.he@intel.com>
+> 
+> When QEMU emulates vNVDIMM labels and migrates vNVDIMM devices, it
+> needs to know whether the backend storage is a real persistent memory,
+> in order to decide whether special operations should be performed to
+> ensure the data persistence.
+> 
+> This boolean option 'pmem' allows users to specify whether the backend
+> storage of memory-backend-file is a real persistent memory. If
+> 'pmem=on', QEMU will set the flag RAM_PMEM in the RAM block of the
+> corresponding memory region. If 'pmem' is set while lack of libpmem
+> support, a error is generated.
+> 
+> Signed-off-by: Junyan He <junyan.he@intel.com>
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+See a nit below, with it fixed:
 
-Pls merge through scsi tree.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > ---
->  hw/scsi/virtio-scsi.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+>  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  docs/nvdimm.txt         | 22 ++++++++++++++++++++++
+>  exec.c                  |  8 ++++++++
+>  include/exec/memory.h   |  4 ++++
+>  include/exec/ram_addr.h |  3 +++
+>  qemu-options.hx         |  7 +++++++
+>  6 files changed, 84 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index 3aa99717e2..5a3057d1f8 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -797,8 +797,16 @@ static void virtio_scsi_hotplug(HotplugHandler *hotplug_dev, DeviceState *dev,
->          virtio_scsi_acquire(s);
->          blk_set_aio_context(sd->conf.blk, s->ctx);
->          virtio_scsi_release(s);
-> -
->      }
-> +}
-> +
-> +/* Announce the new device after it has been plugged */
-> +static void virtio_scsi_post_hotplug(HotplugHandler *hotplug_dev,
-> +                                     DeviceState *dev)
-> +{
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(hotplug_dev);
-> +    VirtIOSCSI *s = VIRTIO_SCSI(vdev);
-> +    SCSIDevice *sd = SCSI_DEVICE(dev);
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index 34c68bb..b1a2453 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -12,6 +12,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+> +#include "qemu/error-report.h"
+>  #include "sysemu/hostmem.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qom/object_interfaces.h"
+> @@ -34,6 +35,7 @@ struct HostMemoryBackendFile {
+>      bool discard_data;
+>      char *mem_path;
+>      uint64_t align;
+> +    bool is_pmem;
+>  };
 >  
->      if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
->          virtio_scsi_acquire(s);
-> @@ -968,6 +976,7 @@ static void virtio_scsi_class_init(ObjectClass *klass, void *data)
->      vdc->start_ioeventfd = virtio_scsi_dataplane_start;
->      vdc->stop_ioeventfd = virtio_scsi_dataplane_stop;
->      hc->plug = virtio_scsi_hotplug;
-> +    hc->post_plug = virtio_scsi_post_hotplug;
->      hc->unplug = virtio_scsi_hotunplug;
+>  static void
+> @@ -59,7 +61,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+>          memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+>                                   path,
+>                                   backend->size, fb->align,
+> -                                 backend->share ? RAM_SHARED : 0,
+> +                                 (backend->share ? RAM_SHARED : 0) |
+> +                                 (fb->is_pmem ? RAM_PMEM : 0),
+>                                   fb->mem_path, errp);
+>          g_free(path);
+>      }
+> @@ -131,6 +134,39 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+>      error_propagate(errp, local_err);
 >  }
 >  
-> -- 
-> 2.17.1
+> +static bool file_memory_backend_get_pmem(Object *o, Error **errp)
+> +{
+> +    return MEMORY_BACKEND_FILE(o)->is_pmem;
+> +}
+> +
+> +static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> +
+> +    if (host_memory_backend_mr_inited(backend)) {
+> +        error_setg(errp, "cannot change property 'pmem' of %s '%s'",
+> +                   object_get_typename(o),
+> +                   object_get_canonical_path_component(o));
+> +        return;
+> +    }
+> +
+> +#ifndef CONFIG_LIBPMEM
+> +    if (value) {
+> +        Error *local_err = NULL;
+> +        error_setg(&local_err,
+> +                   "Lack of libpmem support while setting the 'pmem=on'"
+> +                   " of %s '%s'. We can't ensure data persistence.",
+> +                   object_get_typename(o),
+> +                   object_get_canonical_path_component(o));
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +#endif
+> +
+> +    fb->is_pmem = value;
+> +}
+> +
+>  static void file_backend_unparent(Object *obj)
+>  {
+>      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> @@ -162,6 +198,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
+>          file_memory_backend_get_align,
+>          file_memory_backend_set_align,
+>          NULL, NULL, &error_abort);
+> +    object_class_property_add_bool(oc, "pmem",
+> +        file_memory_backend_get_pmem, file_memory_backend_set_pmem,
+> +        &error_abort);
+>  }
+>  
+>  static void file_backend_instance_finalize(Object *o)
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 24b443b..8c83baf 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -173,3 +173,25 @@ There are currently two valid values for this option:
+>               the NVDIMMs in the event of power loss.  This implies that the
+>               platform also supports flushing dirty data through the memory
+>               controller on power loss.
+> +
+> +If the vNVDIMM backend is on the host persistent memory that can be
+> +accessed in SNIA NVM Programming Model [1] (e.g., Intel NVDIMM), it's
+> +suggested to set the 'pmem' option of memory-backend-file to 'on'. When
+> +'pmem' is 'on' and QEMU is built with libpmem [2] support (configured with
+> +--enable-libpmem), QEMU will take necessary operations to guarantee the
+> +persistence of its own writes to the vNVDIMM backend(e.g., in vNVDIMM label
+> +emulation and live migration). If 'pmem' is 'on' while there is no libpmem
+> +support, qemu will exit and report a "lack of libpmem support" message to
+> +ensure the persistence is available. For example, if we want to ensure the
+> +persistence for some backend file, use the QEMU command line:
+> +
+> +    -object memory-backend-file,id=nv_mem,mem-path=/XXX/yyy,size=4G,pmem
+shouldn't it be:
+
+   ...,pmem=on
+
+> +
+> +References
+> +----------
+> +
+> +[1] NVM Programming Model (NPM)
+> +	Version 1.2
+> +    https://www.snia.org/sites/default/files/technical_work/final/NVMProgrammingModel_v1.2.pdf
+> +[2] Persistent Memory Development Kit (PMDK), formerly known as NVML project, home page:
+> +    http://pmem.io/pmdk/
+> diff --git a/exec.c b/exec.c
+> index 1ec539d..815acc7 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2245,6 +2245,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>      Error *local_err = NULL;
+>      int64_t file_size;
+>  
+> +    /* Just support these ram flags by now. */
+> +    assert(ram_flags == 0 || (ram_flags & (RAM_SHARED | RAM_PMEM)));
+> +
+>      if (xen_enabled()) {
+>          error_setg(errp, "-mem-path not supported with Xen");
+>          return NULL;
+> @@ -4072,6 +4075,11 @@ err:
+>      return ret;
+>  }
+>  
+> +bool ramblock_is_pmem(RAMBlock *rb)
+> +{
+> +    return rb->flags & RAM_PMEM;
+> +}
+> +
+>  #endif
+>  
+>  void page_size_init(void)
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 513ec8d..a3baa2a 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -123,6 +123,9 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+>  /* RAM can be migrated */
+>  #define RAM_MIGRATABLE (1 << 4)
+>  
+> +/* RAM is a persistent kind memory */
+> +#define RAM_PMEM (1 << 5)
+> +
+>  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+>                                         IOMMUNotifierFlag flags,
+>                                         hwaddr start, hwaddr end,
+> @@ -654,6 +657,7 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+>   *         (getpagesize()) will be used.
+>   * @ram_flags: Memory region features:
+>   *             - RAM_SHARED: memory must be mmaped with the MAP_SHARED flag
+> + *             - RAM_PMEM: the memory is persistent memory
+>   *             Other bits are ignored now.
+>   * @path: the path in which to allocate the RAM.
+>   * @errp: pointer to Error*, to store an error if it happens.
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index bb0a09b..f1f8ac0 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -70,6 +70,8 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
+>      return host_addr_offset >> TARGET_PAGE_BITS;
+>  }
+>  
+> +bool ramblock_is_pmem(RAMBlock *rb);
+> +
+>  long qemu_getrampagesize(void);
+>  
+>  /**
+> @@ -83,6 +85,7 @@ long qemu_getrampagesize(void);
+>   *  @ram_flags: specify the properties of the ram block, which can be one
+>   *              or bit-or of following values
+>   *              - RAM_SHARED: mmap the backing file or device with MAP_SHARED
+> + *              - RAM_PMEM: the backend @mem_path or @fd is persistent memory
+>   *              Other bits are ignored.
+>   *  @mem_path or @fd: specify the backing file or device
+>   *  @errp: pointer to Error*, to store an error if it happens
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 16208f6..67b1034 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4057,6 +4057,13 @@ requires an alignment different than the default one used by QEMU, eg
+>  the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
+>  such cases, users can specify the required alignment via this option.
+>  
+> +The @option{pmem} option specifies whether the backing file specified
+> +by @option{mem-path} is on the persistent memory that can be accessed
+> +using the SNIA NVM programming model (e.g. Intel NVDIMM).
+> +If @option{pmem} is set to 'on', QEMU will take necessary operations to
+> +guarantee the persistence of its own writes to @option{mem-path}
+> +(e.g. in vNVDIMM label emulation and live migration).
+> +
+>  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+>  
+>  Creates a memory backend object, which can be used to back the guest RAM.
