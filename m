@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ff4CZ-0005wt-Al
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:10:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ff4Dt-00074W-Fv
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ff4CY-0000to-5n
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:10:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51202 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1ff4Dq-0001iI-8n
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:11:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39488 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ff4CY-0000tW-0N
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:10:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C870401EF11
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 14:10:09 +0000 (UTC)
-References: <20180716110755.12499-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ff4Dq-0001i8-2W
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:11:30 -0400
+References: <20180716083732.3347-1-stefanha@redhat.com>
+	<20180716083732.3347-3-stefanha@redhat.com>
+	<20180716153955-mutt-send-email-mst@kernel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <badb00ab-d382-6836-ca7f-ad250f0f2cb5@redhat.com>
-Date: Mon, 16 Jul 2018 16:10:03 +0200
+Message-ID: <652371e6-15d4-45ba-354d-ed2cebf8fa77@redhat.com>
+Date: Mon, 16 Jul 2018 16:11:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180716110755.12499-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180716153955-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/char/serial: retry write if EAGAIN
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: fix hotplug ->reset()
+ vs event race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, l00284672 <lizhengui@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 16/07/2018 13:07, Marc-Andr=C3=A9 Lureau wrote:
-> If the chardev returns -1 with EAGAIN errno on write(), it should try
-> to send it again (EINTR is handled by the chardev itself).
->=20
-> This fixes commit 019288bf137183bf3407c9824655b753bfafc99f
-> "hw/char/serial: Only retry if qemu_chr_fe_write returns 0"
->=20
-> Tested-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/char/serial.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index cd7d747c68..8bd1da2fa3 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -261,15 +261,20 @@ static void serial_xmit(SerialState *s)
->          if (s->mcr & UART_MCR_LOOP) {
->              /* in loopback mode, say that we just received a char */
->              serial_receive1(s, &s->tsr, 1);
-> -        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) =3D=3D 0 &&
-> -                   s->tsr_retry < MAX_XMIT_RETRY) {
-> -            assert(s->watch_tag =3D=3D 0);
-> -            s->watch_tag =3D
-> -                qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-> -                                      serial_watch_cb, s);
-> -            if (s->watch_tag > 0) {
-> -                s->tsr_retry++;
-> -                return;
-> +        } else {
-> +            int rc =3D qemu_chr_fe_write(&s->chr, &s->tsr, 1);
-> +
-> +            if ((rc =3D=3D 0 ||
-> +                 (rc =3D=3D -1 && errno =3D=3D EAGAIN)) &&
-> +                s->tsr_retry < MAX_XMIT_RETRY) {
-> +                assert(s->watch_tag =3D=3D 0);
-> +                s->watch_tag =3D
-> +                    qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP=
-,
-> +                                          serial_watch_cb, s);
-> +                if (s->watch_tag > 0) {
-> +                    s->tsr_retry++;
-> +                    return;
-> +                }
->              }
->          }
->          s->tsr_retry =3D 0;
->=20
+On 16/07/2018 14:40, Michael S. Tsirkin wrote:
+> On Mon, Jul 16, 2018 at 09:37:32AM +0100, Stefan Hajnoczi wrote:
+>> There is a race condition during hotplug when iothread is used.  It
+>> occurs because virtio-scsi may be processing command queues in the
+>> iothread while the monitor performs SCSI device hotplug.
+>>
+>> When a SCSI device is hotplugged the HotplugHandler->plug() callback is
+>> invoked and virtio-scsi emits a rescan event to the guest.
+>>
+>> If the guest submits a SCSI command at this point then it may be
+>> cancelled before hotplug completes.  This happens because ->reset() is
+>> called by hw/core/qdev.c:device_set_realized() after
+>> HotplugHandler->plug() has been called and
+>> hw/scsi/scsi-disk.c:scsi_disk_reset() purges all requests.
+>>
+>> This patch uses the new HotplugHandler->post_plug() callback to emit the
+>> rescan event after ->reset().  This eliminates the race conditions where
+>> requests could be cancelled.
+>>
+>> Reported-by: l00284672 <lizhengui@huawei.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Fam Zheng <famz@redhat.com>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Pls merge through scsi tree.
 
-Queued, thanks.
+Will do, thanks Stefan.
 
 Paolo
+
+> 
+>> ---
+>>  hw/scsi/virtio-scsi.c | 11 ++++++++++-
+>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+>> index 3aa99717e2..5a3057d1f8 100644
+>> --- a/hw/scsi/virtio-scsi.c
+>> +++ b/hw/scsi/virtio-scsi.c
+>> @@ -797,8 +797,16 @@ static void virtio_scsi_hotplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>          virtio_scsi_acquire(s);
+>>          blk_set_aio_context(sd->conf.blk, s->ctx);
+>>          virtio_scsi_release(s);
+>> -
+>>      }
+>> +}
+>> +
+>> +/* Announce the new device after it has been plugged */
+>> +static void virtio_scsi_post_hotplug(HotplugHandler *hotplug_dev,
+>> +                                     DeviceState *dev)
+>> +{
+>> +    VirtIODevice *vdev = VIRTIO_DEVICE(hotplug_dev);
+>> +    VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+>> +    SCSIDevice *sd = SCSI_DEVICE(dev);
+>>  
+>>      if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
+>>          virtio_scsi_acquire(s);
+>> @@ -968,6 +976,7 @@ static void virtio_scsi_class_init(ObjectClass *klass, void *data)
+>>      vdc->start_ioeventfd = virtio_scsi_dataplane_start;
+>>      vdc->stop_ioeventfd = virtio_scsi_dataplane_stop;
+>>      hc->plug = virtio_scsi_hotplug;
+>> +    hc->post_plug = virtio_scsi_post_hotplug;
+>>      hc->unplug = virtio_scsi_hotunplug;
+>>  }
+>>  
+>> -- 
+>> 2.17.1
