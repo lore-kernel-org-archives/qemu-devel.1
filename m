@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ff3cs-0006Lw-HL
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:33:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ff3j6-0000OG-6U
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:39:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ff3cr-00021Y-Gw
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:33:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ff3j5-0005Ue-BY
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:39:44 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36599)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ff3j5-0005Tm-4T
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:39:43 -0400
+Received: by mail-oi0-x244.google.com with SMTP id r16-v6so74840640oie.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 06:39:42 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1531415537-26037-1-git-send-email-thuth@redhat.com>
+References: <1531415537-26037-1-git-send-email-thuth@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jul 2018 14:33:02 +0100
-Message-Id: <20180716133302.25989-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-3.0] target/arm: Correctly handle
- overlapping small MPU regions
+Date: Mon, 16 Jul 2018 14:39:22 +0100
+Message-ID: <CAFEAcA9_TrSTrcHBGS1mAd0-w2VSQ0AP3z=EPM_U3dTF3k_R1w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/bcm2836: Mark the bcm2836 / bcm2837
+ devices with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,111 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Adithya Baglody <adithya.nagaraj.baglody@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-To correctly handle small (less than TARGET_PAGE_SIZE) MPU regions,
-we must correctly handle the case where the address being looked
-up hits in an MPU region that is not small but the address is
-in the same page as a small region. For instance if MPU region
-1 covers an entire page from 0x2000 to 0x2400 and MPU region
-2 is small and covers only 0x2200 to 0x2280, then for an access
-to 0x2000 we must not return a result covering the full page
-even though we hit the page-sized region 1. Otherwise we will
-then cache that result in the TLB and accesses that should
-hit region 2 will incorrectly find the region 1 information.
+On 12 July 2018 at 18:12, Thomas Huth <thuth@redhat.com> wrote:
+> These devices are currently causing some problems when a user is trying
+> to hot-plug or introspect them during runtime. Since these devices can
+> not be instantiated by the user at all (they need to be wired up in code
+> instead), we should mark them with user_creatable = false anyway, then we
+> avoid at least the crashes with the hot-plugging. The introspection problem
+> will be handled by a separate patch.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
 
-Check for the case where we miss an MPU region but it is still
-within the same page, and in that case narrow the size we will
-pass to tlb_set_page_with_attrs() for whatever the final
-outcome is of the MPU lookup.
+I thought we'd changed things so all sysbus devices defaulted
+to not-user-createable? Am I confusing that with something else?
+(The set of user-creatable sysbus devices must be very small...)
 
-Reported-by: Adithya Baglody <adithya.nagaraj.baglody@intel.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This should go into 3.0 as it fixes a corner case in the newly added
-small-MPU-region handling.
-
- target/arm/helper.c | 46 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
-
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 0604a0efbe2..22d812240af 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -17,6 +17,7 @@
- #include "exec/semihost.h"
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
-+#include "qemu/range.h"
- 
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
-@@ -9669,6 +9670,20 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
-             }
- 
-             if (address < base || address > base + rmask) {
-+                /*
-+                 * Address not in this region. We must check whether the
-+                 * region covers addresses in the same page as our address.
-+                 * In that case we must not report a size that covers the
-+                 * whole page for a subsequent hit against a different MPU
-+                 * region or the background region, because it would result in
-+                 * incorrect TLB hits for subsequent accesses to addresses that
-+                 * are in this MPU region.
-+                 */
-+                if (ranges_overlap(base, rmask,
-+                                   address & TARGET_PAGE_MASK,
-+                                   TARGET_PAGE_SIZE)) {
-+                    *page_size = 1;
-+                }
-                 continue;
-             }
- 
-@@ -9888,6 +9903,22 @@ static void v8m_security_lookup(CPUARMState *env, uint32_t address,
-                         sattrs->srvalid = true;
-                         sattrs->sregion = r;
-                     }
-+                } else {
-+                    /*
-+                     * Address not in this region. We must check whether the
-+                     * region covers addresses in the same page as our address.
-+                     * In that case we must not report a size that covers the
-+                     * whole page for a subsequent hit against a different MPU
-+                     * region or the background region, because it would result
-+                     * in incorrect TLB hits for subsequent accesses to
-+                     * addresses that are in this MPU region.
-+                     */
-+                    if (limit >= base &&
-+                        ranges_overlap(base, limit - base + 1,
-+                                       addr_page_base,
-+                                       TARGET_PAGE_SIZE)) {
-+                        sattrs->subpage = true;
-+                    }
-                 }
-             }
-         }
-@@ -9963,6 +9994,21 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
-             }
- 
-             if (address < base || address > limit) {
-+                /*
-+                 * Address not in this region. We must check whether the
-+                 * region covers addresses in the same page as our address.
-+                 * In that case we must not report a size that covers the
-+                 * whole page for a subsequent hit against a different MPU
-+                 * region or the background region, because it would result in
-+                 * incorrect TLB hits for subsequent accesses to addresses that
-+                 * are in this MPU region.
-+                 */
-+                if (limit >= base &&
-+                    ranges_overlap(base, limit - base + 1,
-+                                   addr_page_base,
-+                                   TARGET_PAGE_SIZE)) {
-+                    *is_subpage = true;
-+                }
-                 continue;
-             }
- 
--- 
-2.17.1
+thanks
+-- PMM
