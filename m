@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ff3pz-0003Ta-Gb
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:46:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ff3rb-000478-M6
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:48:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ff3pu-0000gt-K2
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:46:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ff3pu-0000gn-Fb
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:46:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C8B1A7D84D
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 13:46:45 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180716073226.21127-1-armbru@redhat.com>
-	<20180716073226.21127-3-armbru@redhat.com>
-	<c2d21b05-0065-80ae-6863-c06f27b448bf@redhat.com>
-	<20180716100213.25c44c16.cohuck@redhat.com>
-Date: Mon, 16 Jul 2018 15:46:41 +0200
-In-Reply-To: <20180716100213.25c44c16.cohuck@redhat.com> (Cornelia Huck's
-	message of "Mon, 16 Jul 2018 10:02:13 +0200")
-Message-ID: <87pnzncmym.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1ff3ra-0001H9-Rk
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:48:31 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42979)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ff3ra-0001Gz-Cl
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:48:30 -0400
+Received: by mail-oi0-x244.google.com with SMTP id n84-v6so74849652oib.9
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 06:48:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] MAINTAINERS: New section "Incompatible
- changes", copy libvir-list
+In-Reply-To: <1529355846-25102-1-git-send-email-linux@roeck-us.net>
+References: <1529355846-25102-1-git-send-email-linux@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Jul 2018 14:48:09 +0100
+Message-ID: <CAFEAcA9fvZbZGjm8Z5nJKi37J7Qma+bSFd0mRQ7tZ1X2NDRqQg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] bcm2835_aux: Swap RX and TX interrupt
+ assignments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com, pkrempa@redhat.com, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Cornelia Huck <cohuck@redhat.com> writes:
-
-> On Mon, 16 Jul 2018 09:54:12 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+On 18 June 2018 at 22:04, Guenter Roeck <linux@roeck-us.net> wrote:
+> RX and TX interrupt bits were reversed, resulting in an endless sequence
+> of serial interupts in the emulated system and the following repeated
+> error message when booting Linux.
 >
->> On 16.07.2018 09:32, Markus Armbruster wrote:
->> > Libvirt developers would like to be copied on patches to qemu-doc
->> > appendix "Deprecated features".  Do them the favor.
->> > 
->> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> > ---
->> >  MAINTAINERS | 4 ++++
->> >  1 file changed, 4 insertions(+)
->> > 
->> > diff --git a/MAINTAINERS b/MAINTAINERS
->> > index 20eef3cb61..666e936812 100644
->> > --- a/MAINTAINERS
->> > +++ b/MAINTAINERS
->> > @@ -2194,6 +2194,10 @@ M: Daniel P. Berrange <berrange@redhat.com>
->> >  S: Odd Fixes
->> >  F: docs/devel/build-system.txt
->> >  
->> > +Incompatible changes
->> > +R: libvir-list@redhat.com
->> > +F: qemu-deprecated.texi  
->> 
->> Should we have a maintainer for the file, too? (I guess not, because
->> deprecation patches should go through the specific subsystems...)
+> serial8250: too much work for irq61
 >
-> I don't think adding a maintainer makes sense for this file.
-
-This MAINTAINERS entry doesn't declare maintainers, only reviewers.
-
-We can change that if a maintainer steps up.
-
->> And what about a "S:" line?
+> This results in a boot failure most of the time.
 >
-> I don't think that makes too much sense, either.
+> Qemu command line used to reproduce the problem:
 >
-> If anything, qemu-deprecated.texi should be in a category 'maintained
-> by everybody', i.e. qemu-devel. Just like qemu-doc.texi, which does not
-> have an entry in MAINTAINERS at all.
+>         qemu-system-aarch64 -M raspi3 -m 1024 \
+>         -kernel arch/arm64/boot/Image \
+>         --append "rdinit=/sbin/init console=ttyS1,115200"
+>         -initrd rootfs.cpio \
+>         -dtb arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dtb \
+>         -nographic -monitor null -serial null -serial stdio
+>
+> This is with arm64:defconfig. The root file system was generated using
+> buildroot.
 
-Just like all the other files that lack a maintainer.
+Worth mentioning in the commit message that there is an
+error in the BCM2835 datasheet for the TX_INT and RX_INT
+bits in the AUX_MU_IER_REG description (as per
+https://elinux.org/BCM2835_datasheet_errata)
+
+thanks
+-- PMM
