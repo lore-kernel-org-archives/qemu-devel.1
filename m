@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fesya-0004U0-JE
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 22:11:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fetzI-0003NX-0o
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 23:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fesyX-0005fX-C3
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 22:11:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40872 helo=mx1.redhat.com)
+	(envelope-from <dgibson@ozlabs.org>) id 1fetzG-0004zJ-TM
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 23:15:48 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:53675)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fesyX-0005f9-5q
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 22:10:57 -0400
-Date: Mon, 16 Jul 2018 10:10:35 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180716015812.GC27844@lemon.usersys.redhat.com>
-References: <20180712012829.20231-1-famz@redhat.com>
-	<20180712012829.20231-5-famz@redhat.com>
-	<b36d6fb7-a6fb-ffaf-43fe-736f80f3e9f3@amsat.org>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fetzF-0004xX-PQ
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 23:15:46 -0400
+Date: Mon, 16 Jul 2018 12:53:46 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180716025346.GF2599@umbus.fritz.box>
+References: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dgjlcl3Tl+kb3YDk"
 Content-Disposition: inline
-In-Reply-To: <b36d6fb7-a6fb-ffaf-43fe-736f80f3e9f3@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] tests: Add centos VM testing
+In-Reply-To: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] hw/display/sm501* status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,187 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, qemu-devel@nongnu.org
 
-On Sun, 07/15 22:34, Philippe Mathieu-Daud=E9 wrote:
-> Hi Fam,
+
+--dgjlcl3Tl+kb3YDk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Jul 15, 2018 at 11:29:56AM +0200, BALATON Zoltan wrote:
+> Hello,
 >=20
-> On 07/11/2018 10:28 PM, Fam Zheng wrote:
-> > This one does docker testing in the VM. It is intended to replace the
-> > native docker testing on patchew testers.
-> >=20
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  tests/vm/Makefile.include |  3 +-
-> >  tests/vm/centos           | 84 +++++++++++++++++++++++++++++++++++++=
-++
-> >  2 files changed, 86 insertions(+), 1 deletion(-)
-> >  create mode 100755 tests/vm/centos
-> >=20
-> > diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> > index 5daa2a3b73..af19b7a4e6 100644
-> > --- a/tests/vm/Makefile.include
-> > +++ b/tests/vm/Makefile.include
-> > @@ -2,7 +2,7 @@
-> > =20
-> >  .PHONY: vm-build-all
+> I plan to make more changes to sm501 emulation to make it more usable for
+> AmigaOS and other Amiga like OSes. This would include first cleaning up of
+> current state, then trying to optimise 2D ops and display updates because=
+ it
+> was found these are currently quite slow. (Especially when using 8bit or
+> 16bit screen modes as AmigaOS does where every screen update does pixel
+> format conversion with a simple loop in a suboptimal way. Maybe we can use
+> more optimal pixman routines for these.)
 >=20
-> Can we have a vm-clean-all rule too?
-
-Yes, sure!
-
+> We have found while merging previous patches that the status of sm501 is =
+not
+> clear. It was originally part of SH emulation added for the R2D board but
+> now it's also used by PPC sam460ex board (and can be used with mac99 as w=
+ell
+> to run MorphOS that does not yet boot on sam460ex). David Gibson, the PPC
+> maintainer has indicated that he can't review changes to this device and =
+it
+> is not really related to PPC so the practice of merging sm501 patches via
+> his PPC tree is not preferred.
 >=20
-> > =20
-> > -IMAGES :=3D ubuntu.i386 freebsd netbsd openbsd
-> > +IMAGES :=3D ubuntu.i386 freebsd netbsd openbsd centos
-> >  IMAGE_FILES :=3D $(patsubst %, tests/vm/%.img, $(IMAGES))
-> > =20
-> >  .PRECIOUS: $(IMAGE_FILES)
-> > @@ -14,6 +14,7 @@ vm-test:
-> >  	@echo "  vm-build-freebsd                - Build QEMU in FreeBSD VM=
-"
-> >  	@echo "  vm-build-netbsd                 - Build QEMU in NetBSD VM"
-> >  	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM=
-"
-> > +	@echo "  vm-build-centos                 - Build QEMU in CentOS VM,=
- with Docker"
-> > =20
-> >  vm-build-all: $(addprefix vm-build-, $(IMAGES))
-> > =20
-> > diff --git a/tests/vm/centos b/tests/vm/centos
-> > new file mode 100755
-> > index 0000000000..afd560c564
-> > --- /dev/null
-> > +++ b/tests/vm/centos
-> > @@ -0,0 +1,84 @@
-> > +#!/usr/bin/env python
-> > +#
-> > +# CentOS image
-> > +#
-> > +# Copyright 2018 Red Hat Inc.
-> > +#
-> > +# Authors:
-> > +#  Fam Zheng <famz@redhat.com>
-> > +#
-> > +# This code is licensed under the GPL version 2 or later.  See
-> > +# the COPYING file in the top-level directory.
-> > +#
-> > +
-> > +import os
-> > +import sys
-> > +import subprocess
-> > +import basevm
-> > +import time
-> > +
-> > +class CentosVM(basevm.BaseVM):
-> > +    name =3D "centos"
-> > +    BUILD_SCRIPT =3D """
-> > +        set -e;
-> > +        cd $(mktemp -d);
-> > +        export SRC_ARCHIVE=3D/dev/vdb;
-> > +        sudo chmod a+r $SRC_ARCHIVE;
-> > +        tar -xf $SRC_ARCHIVE;
-> > +        make docker-test-block@centos7 V=3D{verbose} J=3D{jobs};
-> > +        make docker-test-quick@centos7 V=3D{verbose} J=3D{jobs};
-> > +        make docker-test-mingw@fedora V=3D{verbose} J=3D{jobs};
-> > +    """
-> > +
-> > +    def _gen_cloud_init_iso(self):
-> > +        cidir =3D self._tmpdir
-> > +        mdata =3D open(os.path.join(cidir, "meta-data"), "w")
-> > +        mdata.writelines(["instance-id: centos-vm-0\n",
-> > +                          "local-hostname: centos-guest\n"])
-> > +        mdata.close()
-> > +        udata =3D open(os.path.join(cidir, "user-data"), "w")
-> > +        udata.writelines(["#cloud-config\n",
-> > +                          "chpasswd:\n",
-> > +                          "  list: |\n",
-> > +                          "    root:%s\n" % self.ROOT_PASS,
-> > +                          "    %s:%s\n" % (self.GUEST_USER, self.GUE=
-ST_PASS),
-> > +                          "  expire: False\n",
-> > +                          "users:\n",
-> > +                          "  - name: %s\n" % self.GUEST_USER,
-> > +                          "    sudo: ALL=3D(ALL) NOPASSWD:ALL\n",
-> > +                          "    ssh-authorized-keys:\n",
-> > +                          "    - %s\n" % basevm.SSH_PUB_KEY,
-> > +                          "  - name: root\n",
-> > +                          "    ssh-authorized-keys:\n",
-> > +                          "    - %s\n" % basevm.SSH_PUB_KEY,
-> > +                          "locale: en_US.UTF-8\n"])
-> > +        udata.close()
-> > +        subprocess.check_call(["genisoimage", "-output", "cloud-init=
-.iso",
-> > +                               "-volid", "cidata", "-joliet", "-rock=
-",
-> > +                               "user-data", "meta-data"],
-> > +                               cwd=3Dcidir,
-> > +                               stdin=3Dself._devnull, stdout=3Dself.=
-_stdout,
-> > +                               stderr=3Dself._stdout)
-> > +        return os.path.join(cidir, "cloud-init.iso")
-> > +
-> > +    def build_image(self, img):
-> > +        cimg =3D self._download_with_cache("https://cloud.centos.org=
-/centos/7/images/CentOS-7-x86_64-GenericCloud-1802.qcow2.xz")
-> > +        img_tmp =3D img + ".tmp"
-> > +        subprocess.check_call(["cp", "-f", cimg, img_tmp + ".xz"])
-> > +        subprocess.check_call(["xz", "-df", img_tmp + ".xz"])
->=20
-> Not related to this patch, but I noticed when building out-of-tree (i.e=
-.
-> different ./configure options, or applying on different branches) we
-> create the vm image in each out-of-tree directory, and never clean them
-> (I ran out of disk space).
+> So before sending more patches I'd like to clear who can review and merge
+> patches for sm501 in the future and what is the maintainership of this
+> device?
 
-Buy more disks. :)
+The unfortunate answer is that there isn't any great choice: that's
+basically what having no maintainer means.
 
-The image files are added as .PRECIOUS: targets. Cleaning them up from Ma=
-kefile
-automatically is the opposite of it.
+I suspect Gerd is the most qualified to review patches to this
+technically, but even then that's only by general familiarity with
+display devices.
 
->=20
-> Since we use the same vm image, shouldn't we use the cache dir to store=
- it?
+At Peter's request, I'm willing to take sm501 patches through the ppc
+tree.  Since I can't review the patches in depth, I'd be pretty much
+taking anything you send unless there's something obviously bogus.
 
-Each has pros and cons. I think using the cache dir makes it behave more =
-like
-Docker images where you have a global one and switching git branches or r=
-epos
-may result in a rebuild. Docker has the checksum so even after you touch =
-the
-Dockerfile, it knows NOT to rebuild the Docker image if the definition ha=
-sn't
-changed. In VM tests we don't have that, so I'm expecting more image rebu=
-ilds
-than necessary can happen and it's a waste of time.
+=2E. which would make you de facto sub-maintainer of sm501.  Given
+which, I encourage you again to become *actual* maintainer; there
+really is no-one better qualified at this point.  I realize that you
+don't want to make a big ongoing job of thise, but AFAIK that's
+exactly what the "Odd Fixes" maintainership status exists for.
 
-I use in-tree make for VM and Docker tests, and one out-of-tree for build=
-ing
-QEMU. I think the point of having multiple out-of-tree dir is to have mul=
-tiple
-copies of whatever artifacts the source tree creates, no?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->=20
-> > +        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"]=
-)
-> > +        self.boot(img_tmp, extra_args =3D ["-cdrom", self._gen_cloud=
-_init_iso()])
-> > +        self.wait_ssh()
-> > +        self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-> > +        self.ssh_root_check("yum update -y")
-> > +        self.ssh_root_check("yum install -y docker make git")
-> > +        self.ssh_root_check("systemctl enable docker")
-> > +        self.ssh_root("poweroff")
-> > +        self.wait()
-> > +        if os.path.exists(img):
-> > +            os.remove(img)
-> > +        os.rename(img_tmp, img)
-> > +        return 0
-> > +
-> > +if __name__ =3D=3D "__main__":
-> > +    sys.exit(basevm.main(CentosVM))
-> >=20
+--dgjlcl3Tl+kb3YDk
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Fam
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltMCLgACgkQbDjKyiDZ
+s5KPJhAAi+NPvdyUlqP09e4JTIYqxIQGyyuplLerLchg21LBP9hkVzZEXI79Y5A5
+cdi03Gtz6IV8N87hy/cC9umVSIlqh+5W4Q91xurTAKozL3pNFwox+V+JpUympHrw
+z/eCRewvDjUG4UlXISN7MAemzzTP2YeUAFhTmzt91sgq8jco48uWX/Rz67dJKQb7
+j6UmyWJe5xCJRZv8qN5V0YdxPJKk6tspaezVE1uZx9mQZgL/+NivFM55t701eXxP
+T3ghkh7JvCRObK7ZRiVH95UB8Ku4azIYAH2BmIUQv2ZYydCNYD8vxkUe6LBBUDGR
+n/9Hv2dUtf1Uf9DzLKsjWrA4g+bp+pKF+tLxe8iToa0ZjVnN75t+XZ018gl/9QxL
+2Oog/XaChV1mdoAzrv2snWBJboFhkS8y4HIyvCRGJ0k7DzKnXA06Z82gn3NP1DEX
+1hYqIOEG6UkZNPaJ3kxq/qCbB3i/j0o2e4kgK+zuOTDyKBPDcmFm+BfGAbgkB2zU
+Kjm8L+dQfmLGIc2yySLTy7CnGWGC60OlHehKD/b2Q7KsM6SQpynPPlc4sQlWVlaU
+jwFlkCgQtVZ/xEgMkDE7tF6qxXvAh3S0rOFAqBDP7i8qxaxi+ZniIOTYboXfix3w
+NIqyUQSSTXKbdaBXYH+fWTKqRYYCmXYcvqyWdAOSUWI2b12m0Ac=
+=nGde
+-----END PGP SIGNATURE-----
+
+--dgjlcl3Tl+kb3YDk--
