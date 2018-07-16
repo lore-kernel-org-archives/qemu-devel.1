@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1ff2eN-0000TH-2W
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:30:50 -0400
+	(envelope-from <mst@redhat.com>) id 1ff2o6-0002V8-VF
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1ff2eL-00049F-SN
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:30:47 -0400
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <e9073530-a6ef-0e93-dcef-f3c3e91df01f@adacore.com>
-Date: Mon, 16 Jul 2018 14:30:34 +0200
+	(envelope-from <mst@redhat.com>) id 1ff2o3-0001GS-Qm
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:40:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34404 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ff2o3-00019H-J0
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 08:40:47 -0400
+Date: Mon, 16 Jul 2018 15:40:40 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180716153955-mutt-send-email-mst@kernel.org>
+References: <20180716083732.3347-1-stefanha@redhat.com>
+	<20180716083732.3347-3-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/6] accel/tcg: Support execution from MMIO
- and small MMU regions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180716083732.3347-3-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: fix hotplug ->reset()
+ vs event race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, l00284672 <lizhengui@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Peter,
+On Mon, Jul 16, 2018 at 09:37:32AM +0100, Stefan Hajnoczi wrote:
+> There is a race condition during hotplug when iothread is used.  It
+> occurs because virtio-scsi may be processing command queues in the
+> iothread while the monitor performs SCSI device hotplug.
+> 
+> When a SCSI device is hotplugged the HotplugHandler->plug() callback is
+> invoked and virtio-scsi emits a rescan event to the guest.
+> 
+> If the guest submits a SCSI command at this point then it may be
+> cancelled before hotplug completes.  This happens because ->reset() is
+> called by hw/core/qdev.c:device_set_realized() after
+> HotplugHandler->plug() has been called and
+> hw/scsi/scsi-disk.c:scsi_disk_reset() purges all requests.
+> 
+> This patch uses the new HotplugHandler->post_plug() callback to emit the
+> rescan event after ->reset().  This eliminates the race conditions where
+> requests could be cancelled.
+> 
+> Reported-by: l00284672 <lizhengui@huawei.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Nice! Thanks for that.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-A little question though.. What will happen in the case where the
-CPU start executing code at random place because of eg: a badly
-configured kernel?
+Pls merge through scsi tree.
 
-Seeing the patch 5 I guess it will really execute stuff.. So
-maybe this is less user-friendly?
-
-Cheers,
-Fred
-
-On 07/10/2018 06:00 PM, Peter Maydell wrote:
-> This series adds support to TCG for executing from MMIO regions
-> and small MMU regions. The basic principle is that if get_page_addr_code()
-> finds that the region is not backed by a full page of RAM then it
-> returns -1, and tb_gen_code() then generates a non-cached TB
-> containing a single instruction. Execution from these regions
-> thus performs the instruction fetch every time, ensuring that we
-> get the read-from-MMIO and check-small-MMU-region permissions
-> checks right.
+> ---
+>  hw/scsi/virtio-scsi.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
-> This means that the code path for "generate bus fault for failing
-> to load an instruction" no longer goes through get_page_addr_code(),
-> but instead via each target's translate code and its calls to
-> the cpu_ld*_code() or similar functions. Patch 1 makes sure we
-> can distinguish insn fetches from data loads when generating the
-> bus fault exceptions. (Aside: I have assumed that all cpu_ld*_code()
-> loads should trigger iside faults rather than dside. Hopefully this
-> is true...)
-> 
-> Patches 2 and 3 make trivial fixes to various callers of
-> get_page_addr_code(); patch 4 does the work of generating our
-> single-insn TBs. Patch 5 can then remove all the code that
-> (mis)handles MMIO regions from get_page_addr_code(). Finally
-> patch 6 drops the target/arm workarounds for not having support
-> for executing from small MPU regions.
-> 
-> Note for the Xilinx folks: this patchset makes the mmio-exec
-> testcase for running from the SPI flash pass. Cedric: you might
-> like to test the aspeed image you had that relies on execution
-> from an MMIO region too.
-> 
-> The diffstat is pretty satisfying for a patchset that adds
-> a feature, but it actually undersells it: this code renders the
-> hw/misc/mmio_interface.c and the mmio_ptr related code in memory.c
-> and the xilinx-spips device all obsolete, so there are another
-> couple of hundred lines of code to be deleted there. I opted not
-> to include that in this patchset, for ease of review.
-> 
-> NB: I tested this with icount, but there are potentially
-> some weird things that could happen with interactions between
-> icount's io-recompile and execution from an MMIO device
-> that returns different instructions each time it's read.
-> 
-> thanks
-> -- PMM
-> 
-> 
-> Peter Maydell (6):
->    accel/tcg: Pass read access type through to io_readx()
->    accel/tcg: Handle get_page_addr_code() returning -1 in hashtable
->      lookups
->    accel/tcg: Handle get_page_addr_code() returning -1 in
->      tb_check_watchpoint()
->    accel/tcg: tb_gen_code(): Create single-insn TB for execution from
->      non-RAM
->    accel/tcg: Return -1 for execution from MMIO regions in
->      get_page_addr_code()
->    target/arm: Allow execution from small regions
-> 
->   accel/tcg/softmmu_template.h |  11 ++--
->   include/qom/cpu.h            |   6 +++
->   accel/tcg/cpu-exec.c         |   3 ++
->   accel/tcg/cputlb.c           | 100 +++++------------------------------
->   accel/tcg/translate-all.c    |  23 +++++++-
->   memory.c                     |   3 +-
->   target/arm/helper.c          |  23 --------
->   7 files changed, 52 insertions(+), 117 deletions(-)
-> 
+> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+> index 3aa99717e2..5a3057d1f8 100644
+> --- a/hw/scsi/virtio-scsi.c
+> +++ b/hw/scsi/virtio-scsi.c
+> @@ -797,8 +797,16 @@ static void virtio_scsi_hotplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          virtio_scsi_acquire(s);
+>          blk_set_aio_context(sd->conf.blk, s->ctx);
+>          virtio_scsi_release(s);
+> -
+>      }
+> +}
+> +
+> +/* Announce the new device after it has been plugged */
+> +static void virtio_scsi_post_hotplug(HotplugHandler *hotplug_dev,
+> +                                     DeviceState *dev)
+> +{
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(hotplug_dev);
+> +    VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+> +    SCSIDevice *sd = SCSI_DEVICE(dev);
+>  
+>      if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
+>          virtio_scsi_acquire(s);
+> @@ -968,6 +976,7 @@ static void virtio_scsi_class_init(ObjectClass *klass, void *data)
+>      vdc->start_ioeventfd = virtio_scsi_dataplane_start;
+>      vdc->stop_ioeventfd = virtio_scsi_dataplane_stop;
+>      hc->plug = virtio_scsi_hotplug;
+> +    hc->post_plug = virtio_scsi_post_hotplug;
+>      hc->unplug = virtio_scsi_hotunplug;
+>  }
+>  
+> -- 
+> 2.17.1
