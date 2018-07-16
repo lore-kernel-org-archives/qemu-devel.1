@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fewPc-0006En-8w
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 01:51:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1fewoc-0001bs-I7
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 02:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fewPY-0001sB-0m
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 01:51:08 -0400
-Received: from ozlabs.org ([203.11.71.1]:44989)
+	(envelope-from <armbru@redhat.com>) id 1fewoX-0000VC-J7
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 02:16:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49588 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fewPW-0001r1-U8
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 01:51:03 -0400
-Date: Mon, 16 Jul 2018 14:25:44 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180716042544.GH2599@umbus.fritz.box>
-References: <20180705182001.16537-1-mdavidsaver@gmail.com>
-	<20180705182001.16537-6-mdavidsaver@gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fewoX-0000Sn-FN
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 02:16:53 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 92ADA41C31
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 06:16:51 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180712111221.20326-1-armbru@redhat.com>
+	<20180712111221.20326-5-armbru@redhat.com>
+	<cb32f9bb-3725-22ab-1462-0abac3f76f4f@redhat.com>
+Date: Mon, 16 Jul 2018 08:16:50 +0200
+In-Reply-To: <cb32f9bb-3725-22ab-1462-0abac3f76f4f@redhat.com> (Thomas Huth's
+	message of "Thu, 12 Jul 2018 18:26:56 +0200")
+Message-ID: <87601fk8ml.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="fmEUq8M7S0s+Fl0V"
-Content-Disposition: inline
-In-Reply-To: <20180705182001.16537-6-mdavidsaver@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 05/14] timer: ds1338 change write handling
- and fix wday_offset handling
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 04/20] libqtest: Clean up how we read the
+ QMP greeting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,197 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Davidsaver <mdavidsaver@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Antoine Mathys <barsamin@gmail.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Thomas Huth <thuth@redhat.com> writes:
 
---fmEUq8M7S0s+Fl0V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 12.07.2018 13:12, Markus Armbruster wrote:
+>> qtest_init() still uses the qtest_qmp_discard_response(s, "") hack to
+>> receive the greeting, even though we have qtest_qmp_receive() since
+>> commit 66e0c7b187e.  Put it to use.
+>> 
+>> Bonus: gets rid of an empty format string.  A step towards
+>> compile-time format string checking without triggering
+>> -Wformat-zero-length.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  tests/libqtest.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+>> index 071d7eb7b1..c2c08a890c 100644
+>> --- a/tests/libqtest.c
+>> +++ b/tests/libqtest.c
+>> @@ -249,9 +249,11 @@ QTestState *qtest_init_without_qmp_handshake(bool use_oob,
+>>  QTestState *qtest_init(const char *extra_args)
+>>  {
+>>      QTestState *s = qtest_init_without_qmp_handshake(false, extra_args);
+>> +    QDict *greeting;
+>>  
+>>      /* Read the QMP greeting and then do the handshake */
+>> -    qtest_qmp_discard_response(s, "");
+>> +    greeting = qtest_qmp_receive(s);
+>> +    qobject_unref(greeting);
+>>      qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
+>>  
+>>      return s;
+>
+> I wonder whether we should actually check the greeting for some expected
+> information? Anyway, that's something for later, and not related to your
+> patch.
 
-On Thu, Jul 05, 2018 at 11:19:52AM -0700, Michael Davidsaver wrote:
-> instead of a read-modify-write, do direct translation
-> of device registers to struct tm members.
->=20
-> This new ds1338_update() is the reverse of
-> the existing capture_current_time().
->=20
-> Simplifies later handling of CENTURY bit in
-> similar Dallas RTC chips.
->=20
-> Correctly handle different real weekday in
-> guest and host timezones.
-> Allow guest to use any day as start of week
-> (day 1).  eg. Monday instead of Sunday.
->=20
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-> ---
->  hw/timer/ds1338.c | 95 ++++++++++++++++++++++++++++---------------------=
-------
->  1 file changed, 48 insertions(+), 47 deletions(-)
->=20
-> diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
-> index 637a0f4246..0134ffd72a 100644
-> --- a/hw/timer/ds1338.c
-> +++ b/hw/timer/ds1338.c
-> @@ -110,7 +110,10 @@ static void capture_current_time(DS1338State *s)
->          /* 24 hour mode. */
->          s->nvram[R_HOUR] =3D to_bcd(now.tm_hour);
->      }
-> -    s->nvram[R_WDAY] =3D (now.tm_wday + s->wday_offset) % 7 + 1;
-> +    s->nvram[R_WDAY] =3D (now.tm_wday + s->wday_offset) % 7;
-> +    if (s->nvram[R_WDAY] =3D=3D 0) {
-> +        s->nvram[R_WDAY] =3D 7;
-> +    }
+This kind of sloppy testing is quite common.
 
-This looks a bit odd - you've removed the + 1 here, but...
+Checking test results manually in code maximizes flexibility.  It also
+maximizes temptation to cut corners, because doing a complete job is so
+tedious.  One reason I prefer "normalize and diff against expected
+results".  The closest we got to support for that way of testing is
+qlit_equal_qobject().
 
->      s->nvram[R_DATE] =3D to_bcd(now.tm_mday);
->      s->nvram[R_MONTH] =3D to_bcd(now.tm_mon + 1);
->      s->nvram[R_YEAR] =3D to_bcd(now.tm_year - 100);
-> @@ -161,6 +164,46 @@ static int ds1338_recv(I2CSlave *i2c)
->      return res;
->  }
-> =20
-> +/* call after guest writes to current time registers
-> + * to re-compute our offset from host time.
-> + */
-> +static void ds1338_update(DS1338State *s)
-> +{
-> +
-> +    struct tm now =3D {};
-> +
-> +    /* TODO: Implement CH (stop) bit?  */
-> +    now.tm_sec =3D from_bcd(s->nvram[R_SEC] & 0x7f);
-> +    now.tm_min =3D from_bcd(s->nvram[R_MIN] & 0x7f);
-> +    if (ARRAY_FIELD_EX32(s->nvram, HOUR, SET12)) {
-> +        /* 12 hour (1-12) */
-> +        /* read and wrap 1-12 -> 0-11 */
-> +        now.tm_hour =3D from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR12=
-)) % 12u;
-> +        if (ARRAY_FIELD_EX32(s->nvram, HOUR, AMPM)) {
-> +            now.tm_hour +=3D 12;
-> +        }
-> +
-> +    } else {
-> +        now.tm_hour =3D from_bcd(ARRAY_FIELD_EX32(s->nvram, HOUR, HOUR24=
-));
-> +    }
-> +    now.tm_wday =3D from_bcd(s->nvram[R_WDAY]) - 1u;
+Digression: QOM also maximizes flexibility by doing stuff in code rather
+than data.  The two go back to the same stratum of QEMU development.
+Hardly coincidence, in my opinion.  We've since extended QOM to support
+doing more in data, but there's still plenty of old code doing it in
+code, and plenty of new code following that old code's lead.  Recovering
+from such damage is hard work.
 
-=2E. you still have the -1 here.  Am I missing something?
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> +    now.tm_mday =3D from_bcd(s->nvram[R_DATE] & 0x3f);
-> +    now.tm_mon =3D from_bcd(s->nvram[R_MONTH] & 0x1f) - 1;
-> +    now.tm_year =3D from_bcd(s->nvram[R_YEAR]) + 100;
-> +    s->offset =3D qemu_timedate_diff(&now);
-> +
-> +    {
-> +        /* Round trip to get real wday_offset based on time delta and
-> +         * ref. timezone.
-> +         * Race if midnight (in ref. timezone) happens here.
-> +         */
-> +        int user_wday =3D now.tm_wday;
-> +        qemu_get_timedate(&now, s->offset);
-> +
-> +        s->wday_offset =3D (user_wday - now.tm_wday) % 7 + 1;
-> +    }
-> +}
-> +
->  static int ds1338_send(I2CSlave *i2c, uint8_t data)
->  {
->      DS1338State *s =3D DS1338(i2c);
-> @@ -170,52 +213,7 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
->          s->addr_byte =3D false;
->          return 0;
->      }
-> -    if (s->ptr < 7) {
-> -        /* Time register. */
-> -        struct tm now;
-> -        qemu_get_timedate(&now, s->offset);
-> -        switch(s->ptr) {
-> -        case R_SEC:
-> -            /* TODO: Implement CH (stop) bit.  */
-> -            now.tm_sec =3D from_bcd(data & 0x7f);
-> -            break;
-> -        case R_MIN:
-> -            now.tm_min =3D from_bcd(data & 0x7f);
-> -            break;
-> -        case R_HOUR:
-> -            if (FIELD_EX32(data, HOUR, SET12)) {
-> -                /* 12 hour (1-12) */
-> -                /* read and wrap 1-12 -> 0-11 */
-> -                now.tm_hour =3D from_bcd(FIELD_EX32(data, HOUR, HOUR12))=
- % 12u;
-> -                if (FIELD_EX32(data, HOUR, AMPM)) {
-> -                    now.tm_hour +=3D 12;
-> -                }
-> -
-> -            } else {
-> -                now.tm_hour =3D from_bcd(FIELD_EX32(data, HOUR, HOUR24));
-> -            }
-> -            break;
-> -        case R_WDAY:
-> -            {
-> -                /* The day field is supposed to contain a value in
-> -                   the range 1-7. Otherwise behavior is undefined.
-> -                 */
-> -                int user_wday =3D (data & 7) - 1;
-> -                s->wday_offset =3D (user_wday - now.tm_wday + 7) % 7;
-> -            }
-> -            break;
-> -        case R_DATE:
-> -            now.tm_mday =3D from_bcd(data & 0x3f);
-> -            break;
-> -        case R_MONTH:
-> -            now.tm_mon =3D from_bcd(data & 0x1f) - 1;
-> -            break;
-> -        case R_YEAR:
-> -            now.tm_year =3D from_bcd(data) + 100;
-> -            break;
-> -        }
-> -        s->offset =3D qemu_timedate_diff(&now);
-> -    } else if (s->ptr =3D=3D R_CTRL) {
-> +    if (s->ptr =3D=3D R_CTRL) {
->          /* Control register. */
-> =20
->          /* Ensure bits 2, 3 and 6 will read back as zero. */
-> @@ -227,6 +225,9 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
-> =20
->      }
->      s->nvram[s->ptr] =3D data;
-> +    if (s->ptr <=3D R_YEAR) {
-> +        ds1338_update(s);
-> +    }
->      inc_regptr(s);
->      return 0;
->  }
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---fmEUq8M7S0s+Fl0V
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltMHkgACgkQbDjKyiDZ
-s5KBqhAAlKw3b2vJjfIheKYrJ0K+BXfJknAHU7Fgwp/Iwqmr8XgSeT4jOARxS9OC
-5vdJHiLymj9bIKRj4pof8P6TuqbSYa92UmZ8IF6o1aZQwX0+YCdUehlhYwnqwMAp
-VvIhcfXdXxsY2iVXFhTH5UYb3zm2qdxlscFjsKFhDnrjAiX7HdGCHcFc1ucjuUDr
-v6e4Rt+Y62N93RbgA2VEbtc2LTp6ifDVaKOk6WWnVGbcWKA8W8njjBrbo/0PdLPY
-N5xMHJ5ozx8vgmEIlCd51GMNk9roIw4km5CY5yrQ7+ZgEQBA76zbcB9vYk2T0/pG
-2R3FD2yxW2SLCvJ950llXpj+NMnYF+bwICJGP681fFV+LM0iGJP3ArCZAnbIbwRV
-4qf1XZUHuOe3pTDV9YbHmlFJZxamotCpgnaDW2tHVplQXy5n7S7H8qG2qLM03kU/
-Lr9TVm4jO3SwPmVGaqXO5i5ne5aTa7N6YYF9dwpBIMhAaYkRAM/0Kazdwdmkrtx4
-68Z3YZJRs/7GiFQEE1gQZH1f6rWStNSwyBIEYCWaiTmIencBPnp/6H9yvV7JSsCA
-CFmdlqzqjeAybHc5F9Q3iOBU09FQLVE58kHe6NYy7kttzs3dWyWbfkfElXm1mBRg
-/Vgkau7PTYhHRMFMy1EfxRxp/+2LM1vfMzNH/4ooIBjzz8X/smw=
-=2fOg
------END PGP SIGNATURE-----
-
---fmEUq8M7S0s+Fl0V--
+Thanks!
