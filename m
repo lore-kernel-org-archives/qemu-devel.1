@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ff5MX-0008Ka-P5
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:24:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ff5Pk-0001NF-Ky
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ff5MS-0004cp-Qz
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:24:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44406)
+	(envelope-from <richard.henderson@linaro.org>) id 1ff5Ph-0006CK-IG
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:27:52 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ff5MS-0004cG-Je
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:24:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ff5MR-00076Q-Ck
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 15:24:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 19B402E80C3
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 15:15:33 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ff5Ph-0006Bc-B9
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 11:27:49 -0400
+Received: by mail-pf0-x243.google.com with SMTP id d14-v6so2696710pfo.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 08:27:49 -0700 (PDT)
+References: <20180713141636.18665-1-peter.maydell@linaro.org>
+	<20180713141636.18665-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bb637742-827f-1189-5da8-1fc6ee2b9c23@linaro.org>
+Date: Mon, 16 Jul 2018 08:27:45 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Jul 2018 15:10:04 -0000
-From: Greg Kurz <groug@kaod.org>
-Reply-To: Bug 1780928 <1780928@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153121318079.13203.2840846134376544024.malonedeb@gac.canonical.com>
-Message-Id: <153175380480.11706.14760583453256517809.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780928] Re: v2.12.0-2321-gb34181056c: vcpu
- hotplug crashes qemu-kvm with segfault
+In-Reply-To: <20180713141636.18665-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0 1/2] accel/tcg: Use correct test
+ when looking in victim TLB for code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-Fixed by:
+On 07/13/2018 07:16 AM, Peter Maydell wrote:
+> @@ -967,7 +967,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+>      index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+>      mmu_idx = cpu_mmu_index(env, true);
+>      if (unlikely(!tlb_hit(env->tlb_table[mmu_idx][index].addr_code, addr))) {
+> -        if (!VICTIM_TLB_HIT(addr_read, addr)) {
+> +        if (!VICTIM_TLB_HIT(addr_code, addr)) {
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Db585395b655a6c1f9d9eb=
-f1f0890e76d0708eed6
+Oh geez.
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780928
-
-Title:
-  v2.12.0-2321-gb34181056c: vcpu hotplug crashes qemu-kvm with segfault
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  vcpu hotplug crashes upstream qemu(v2.12.0-2321-gb34181056c), vcpu
-  hotplug works fine in v2.12.0-rc4.
-
-  Host: Power8, kernel: 4.18.0-rc2-00037-g6f0d349d922b
-  Guest: Power8, kernel: 4.18.0-rc3-00183-gc42c12a90545 (base image: fedora=
-27 ppc64le)
-
-  /usr/share/avocado-plugins-vt/build/qemu/ppc64-softmmu/qemu-system-ppc64 =
--M pseries,accel=3Dkvm,max-cpu-compat=3Dpower8 -m 8192 -device virtio-scsi-=
-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/var/lib/avocado/data/a=
-vocado-vt/images/jeos-27-ppc64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive1=
- -device scsi-hd,drive=3Ddrive1,bus=3Dscsi0.0 -smp 1,cores=3D1,threads=3D1,=
-sockets=3D1,maxcpus=3D8 -serial /dev/pts/0 -monitor stdio -vga none -nograp=
-hic -kernel /home/kvmci/linux/vmlinux -append 'root=3D/dev/sda2 rw console=
-=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug' -nic user,=
-model=3Dvirtio-net-pci =
-
-  QEMU 2.12.50 monitor - type 'help' for more information
-  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-  Segmentation fault (core dumped)
-
-  =
-
-  Guest initial cpu:
-  # lscpu
-  Architecture:        ppc64le
-  Byte Order:          Little Endian
-  CPU(s):              1
-  On-line CPU(s) list: 0
-  Thread(s) per core:  1
-  Core(s) per socket:  1
-  Socket(s):           1
-  NUMA node(s):        1
-  Model:               2.1 (pvr 004b 0201)
-  Model name:          POWER8 (architected), altivec supported
-  Hypervisor vendor:   KVM
-  Virtualization type: para
-  L1d cache:           64K
-  L1i cache:           32K
-  NUMA node0 CPU(s):   0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780928/+subscriptions
+r~
