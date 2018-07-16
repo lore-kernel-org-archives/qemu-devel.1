@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ff6tz-0000Fq-N9
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 13:03:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1ff78s-0004VF-1Q
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 13:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ff6tw-0005tM-JM
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 13:03:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48940 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1ff78o-0003DT-TT
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 13:18:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44520 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ff6tw-0005sy-D8
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 13:03:08 -0400
-Date: Mon, 16 Jul 2018 18:03:03 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180716170303.GC5616@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180704111118.7241-1-berrange@redhat.com>
-	<f56b799f-7f30-391f-c2d8-15f95524758c@redhat.com>
-	<20180704120826.GD32267@redhat.com>
-	<CAJ+F1CK+eywam7LSvOCW2YcHO9S4GL5n7+9yta9_t3j+9hN-cQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ff78o-0003DA-NY
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 13:18:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FD654022414
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 17:18:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180704084507.14560-1-peterx@redhat.com>
+Date: Mon, 16 Jul 2018 19:18:28 +0200
+In-Reply-To: <20180704084507.14560-1-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 4 Jul 2018 16:44:58 +0800")
+Message-ID: <87o9f7jdzv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CK+eywam7LSvOCW2YcHO9S4GL5n7+9yta9_t3j+9hN-cQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] chardev: unconditionally set FD_PASS
- feature for socket type=fd
+Subject: Re: [Qemu-devel] [PATCH 0/9] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Mon, Jul 16, 2018 at 06:57:48PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Wed, Jul 4, 2018 at 2:08 PM, Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> > On Wed, Jul 04, 2018 at 01:53:03PM +0200, Paolo Bonzini wrote:
-> >> On 04/07/2018 13:11, Daniel P. Berrang=C3=A9 wrote:
-> >> > The vhostuser network backend requires the chardev it is using to =
-have
-> >> > the FD passing feature. It checks this upfront when initializing t=
-he
-> >> > network backend and reports an error if not set.
-> >> >
-> >> > The socket chardev has to set the FD_PASS feature during early
-> >> > initialization to satisfy the vhostuser backend, and at this point
-> >> > the socket has not been initialized. It is thus unable to do a liv=
-e
-> >> > check on the socket to see if it supports FD passing (aka is a UNI=
-X
-> >> > socket). As a result it has to blindly set FD_PASS feature based
-> >> > solely on info in the SocketAddress struct, such as address type.
-> >> >
-> >> > Unfortunately libvirt wishes to use FD passing to provide the UNIX
-> >> > domain socket listener, and as a result the FD_PASS feature is no
-> >> > longer set, which breaks vhostuser's checks, despite the fact that
-> >> > FD passing will in fact work later.
-> >> >
-> >> > This unconditionally sets FD_PASS feature for any socket address
-> >> > which has type=3D=3Dfd. Thus will be wrong if the passed in FD was=
- not
-> >> > a UNIX socket, but if an attempt is later made to use FD passing
-> >> > we'll still get an error reported by the QIOChannelSocket class.
-> >> > So the effective of setting the chardev FD_PASS feature early
-> >> > is merely to delay error reporting.
-> >>
-> >> Could you query with getsockopt or getsockname in tcp_chr_connect?
-> >
-> > That potentially executes asynchronously in the backend and vhostuser
-> > checks it when it first resolves the chardev ID. IOW the point where
-> > vhostuser checks, all we have is the SocketAddress struct - in some
-> > case we might be lucky & have connected, but we can't assume it :-(
->=20
-> In which case is it executed asynchronously?
->=20
-> Chardev creation is happening before vhost-user net,
-> qemu_chardev_new() and qemu_char_open() calls
-> qio_channel_socket_connect_sync().
+Peter Xu <peterx@redhat.com> writes:
 
-The qmp_chardev_open_socket() method is not guaranteed to complete
-synchronously. If the "reconnect" property is set everything happens
-asynchronously, so we're not able to set the feature flag by the time
-qemu_char_open() returns.
+> Based-on: <20180703085358.13941-1-armbru@redhat.com>
 
+Now in master.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> This work is based on Markus's latest out-of-band fixes:
+>   "[PATCH v2 00/32] ] qmp: Fixes and cleanups around OOB commands"
+>
+> Major stuff: some cleanups that were previously suggested by Markus or
+> Eric.  Meanwhile fix up the flow control issue.  Since my proposal
+> here is to drop COMMAND_DROPPED event, then we don't need to introduce
+> per-monitor event emission API any more.  Though Markus told me that
+> he might use that code somewhere else, so I'll post that per-monitor
+> event code out separately as RFC later.
+>
+> Patch 1-3: cleanups.
+
+I expect these to be ready in the next version.
+
+Since it's just cleanup, there's no need to rush these into 3.0 unless
+they enable something we want in 3.0.
+
+> Patch 4-7: solve the flow control issue reported by Markus that
+> response queue might overflow even if we have limitation on the
+> request queue.  Firstly we drop the COMMAND_DROP event since that
+> won't work for response queue (since queuing an event will need to
+> append to the response queue itself), then we use monitor suspend and
+> resume to control the flow.  Last, we apply that to response queue
+> too.
+
+These need work.  We need to agree on how exactly flow control should
+work.  Moreover, we need to reconcile your work with Marc-Andr=C3=A9's
+"[PATCH 00/12] RFC: monitor: various code simplification and fixes"
+(which I haven't fully reviewed yet).
+
+> Patch 8-9: the original patches to enable out-of-band by default.
+
+I figure these patches are good; we just need to decide whether we're
+ready to enable OOB.  Let's review the known issues.
+
+* We might want to make "id" mandatory with exec-oob
+
+  Best to do that right in the first release that fully supports OOB.
+
+* OOB offered but rejected by client is not obviously the same as
+  OOB not offered
+
+  I still need to digest and reply to your
+  Message-ID: <20180629090115.GH2455@xz-mi>
+
+* COMMAND_DROPPED is broken by design, and
+* Flow control limits only request queue; response buffer can still
+  grow without bounds
+
+  You proposed to drop COMMAND_DROPPED, and do flow control by corking
+  input, see above.
+
+  Getting rid of broken COMMAND_DROPPED is a blocker.  Fully functional
+  flow control isn't, since the QMP client is trusted.
+
+* We lack test coverage for flow control
+* test-qmp-cmds neglects to cover the OOB additions to qmp-dispatch.c
+
+  I'm inclined to treating lack of test coverage as a blocker.
+
+* scripts/qmp/ doesn't support OOB, yet.  qmp-shell.py in particular.
+
+  Not a blocker.
+
+Whatever we don't address right away we should at least mark FIXME in
+the source code.
+
+Assuming my list is complete, and my assessments correct, then we're
+quite close to the point where we can enable OOB.  But since rc1 is
+tomorrow already, I feel enabling it in 3.0 has become unrealistic.  I
+understand we need it sooner rather than later for postcopy recovery.
+However, the current state should be servicable for teaching OOB to
+libvirt: just follow the recommendation to supply "id" (libvirt always
+does anyway), pretend COMMAND_DROPPED doesn't exist, and pretend flow
+control isn't an issue.
+
+[...]
