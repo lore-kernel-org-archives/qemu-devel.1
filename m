@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ff0On-0006zB-TN
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:06:35 -0400
+	(envelope-from <kchamart@redhat.com>) id 1ff0Wn-00017z-Ug
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ff0Om-0004WF-Uj
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:06:33 -0400
-Date: Mon, 16 Jul 2018 12:06:23 +0200
+	(envelope-from <kchamart@redhat.com>) id 1ff0Wj-0000LN-01
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:14:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53338 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ff0Wi-0000KP-Qb
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 06:14:44 -0400
+Date: Mon, 16 Jul 2018 12:14:39 +0200
 From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180716100623.GP18181@paraplu>
-References: <CAFEAcA-RVBXBj=+nr_D=bexLP4Rwgs+xyjJQ8VoOM9aOOVUJ3A@mail.gmail.com>
-	<20180706131103.4e713911.cohuck@redhat.com>
-	<20180706145645.GB3939@localhost.localdomain>
-	<CAFEAcA9J=Jmd=+9vEo4LLdk0LcL42fchHcAp3fp_+9q1tsCoNg@mail.gmail.com>
-	<87tvp8or4u.fsf@dusky.pond.sub.org>
-	<20180709130838.16f011a4.cohuck@redhat.com>
-	<20180709111701.GF23731@redhat.com>
-	<87601lge0i.fsf@dusky.pond.sub.org>
-	<751b33cb-d7da-ef47-415d-86b0e3c31129@redhat.com>
-	<20180713133502.4e257017.cohuck@redhat.com>
+Message-ID: <20180716101439.GJ16479@paraplu>
+References: <CAP102pQw0exv6vn-KurCD3_fRF50LhvXjKMa_wak4GFttu-Zvg@mail.gmail.com>
+	<ca3ca8f9-8e28-b938-ce01-cc23a636696b@tuxfamily.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180713133502.4e257017.cohuck@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+In-Reply-To: <ca3ca8f9-8e28-b938-ce01-cc23a636696b@tuxfamily.org>
+Subject: Re: [Qemu-devel] QEMU advent calendar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Krempa <pkrempa@redhat.com>
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: Richard Jansson <richard.j.jansson@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alberto Garcia <berto@igalia.com>
 
-On Fri, Jul 13, 2018 at 01:35:02PM +0200, Cornelia Huck wrote:
-> On Thu, 12 Jul 2018 17:47:00 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> > On 12.07.2018 08:32, Markus Armbruster wrote:
-> > > Daniel P. Berrang=E9 <berrange@redhat.com> writes: =20
+On Mon, Jul 16, 2018 at 11:15:43AM +0200, Thomas Huth wrote:
+> On 13.07.2018 10:34, Richard Jansson wrote:
+> > Hi
+> > 
+> > I checked in on the QEMU advent calendar side of which I have very fond
+> > memories. I'm very impressed and grateful for the work that you've put into
+> > this site. My question to you is the following, what are your plans for the
+> > continuation of the program?
+> 
+>  Hi Richard,
+> 
+> thanks for the kind words and your interest in the QEMU advent calendar!
+> This year, QEMU had its 15th anniversary, so we indeed already thought
+> about doing a third round of the QEMU advent calendar this year...
+> 
+> > In case there's anything I can do I'll gladly put in some work to help you
+> > out to support you in your noble cause :)
+> 
+> The problem is to come up with ideas for 24 suitable images [1], and to
+> prepare them (it's quite time-consuming). So far, we're not certain yet
+> whether we could do a 2018 edition of the calendar since we hardly have
+> any images yet. So if you've got ideas for some images, and/or could
+> help to prepare some, that would be very appreciated! Please get in
+> touch with us off-list in that case (to avoid to spoil the surprise for
+> the public).
 
-[...]
+Yeah, what Thomas said above.
 
-> > > Our tool to help with getting cc: wrong less often is the MAINTAINE=
-RS
-> > > file.  Could one of the libvirt developers watch changes to qemu-do=
-c
-> > > appendix "Deprecated features"?  Would putting the appendix in its =
-own
-> > > .texi help with that? =20
-> >=20
-> > Sound like a good idea to put the appendix in its own texi file. Then
-> > add an "R: libvir-list" entry for that file to MAINTAINERS and we sho=
-uld
-> > be fine (at least for the people who use the get_maintainers.pl scrip=
-t).
->=20
-> +1, like that idea
->=20
-> Are there other consumers of QEMU's interfaces which should be cc:ed in
-> a similar way?
+That said, I've been on the fence for the 2018 edition.  As Thomas said,
+we've been thinking about it for some months, and I've jotted down some
+ideas and images; just haven't gotten around to make images and other
+related tasks.  I've been trying to make time, but was consumed with
+several things work and non-work related, that it was hard so far.  :-(
 
-Perhaps starting with libvirt is fine -- as most of the open source
-management applications rely on it.  (But if we do know other consumers,
-then they can be trivially added.)
+Still, there is time, and I don't want to "give up" -- it'll be nice to
+do a 15-year edition.  Maybe I'll get renewed energy after discussions
+at the KVM Forum in Edinburgh later this year (in October) and make
+time.  And it's also nice to see renewed interest here!
 
---=20
+-- 
 /kashyap
