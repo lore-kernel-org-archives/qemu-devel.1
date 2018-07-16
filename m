@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffAj0-000340-MU
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:08:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ffArX-0006EE-Gc
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffAix-0005mA-Gt
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:08:06 -0400
-Date: Mon, 16 Jul 2018 23:08:01 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1807162300430.15021@zero.eik.bme.hu>
-References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
-	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+	(envelope-from <ehabkost@redhat.com>) id 1ffArS-0000tp-JP
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:16:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ffArS-0000tQ-CY
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 17:16:50 -0400
+Date: Mon, 16 Jul 2018 18:16:47 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180716211647.GQ914@localhost.localdomain>
+References: <20180714123000.11326-1-viktor.prutyanov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] Do not enable QOM debugging by default
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180714123000.11326-1-viktor.prutyanov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3] dump: add kernel_gs_base to QEMU CPU
+ state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rkagan@virtuozzo.com, rth@twiddle.net
 
-On Mon, 16 Jul 2018, Peter Maydell wrote:
-> On 16 July 2018 at 20:47, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> Commit 3556c233d 5 years ago added an option to disable QOM debugging,
->> noting that it can have high performance cost but left the default to on.
->> Change the default to off and only enable it when debugging is requested
->> to avoid the performance penalty for those compiling without debug options.
->>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->
-> Looking at the code, doesn't this disable all the type checking
-> on the QOM casts? That is not something I think we should drop,
-> in the same way that we do not disable assert()s even in the
-> non-debug build.
->
-> Is this coming up as significant in profiling? In the past we've
-> done some special casing if there are particular QOM casts in
-> hot paths that use significant runtime.
+On Sat, Jul 14, 2018 at 03:30:00PM +0300, Viktor Prutyanov wrote:
+> This patch adds field with content of KERNEL_GS_BASE MSR to QEMU note in
+> ELF dump.
+> 
+> On Windows, if all vCPUs are running usermode tasks at the time the dump is
+> created, this can be helpful in the discovery of guest system structures
+> during conversion ELF dump to MEMORY.DMP dump.
+> 
+> Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-My profiling results are not very accurate (could only gather sample based 
-results with oprofile as --enable-gprof haven't worked for me) so I don't 
-have numbers but I did see object_class_dynamic_cast_assert coming out 
-among the top few without disabling this option but I don't know which 
-call sites are responsible.
+Queued for 3.1, thanks.
 
-Are there any recommendations for profiling QEMU (especially TCG) 
-somewhere that I should be aware of?
-
-Regards,
-BALATON Zoltan
+-- 
+Eduardo
