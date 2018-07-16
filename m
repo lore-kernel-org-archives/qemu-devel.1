@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1ff1PC-0000Yv-Fn
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:11:06 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ff1iM-0003TJ-SY
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1ff1P7-0005V9-Eq
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:11:02 -0400
-Received: from mail-eopbgr700135.outbound.protection.outlook.com
-	([40.107.70.135]:22992
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1ff1P7-0005Ty-2X
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:10:57 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 16 Jul 2018 11:10:54 +0000
-Message-ID: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
-Content-Language: en-US
+	(envelope-from <laurent@vivier.eu>) id 1ff1iJ-0001JY-QU
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:30:50 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:37729)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ff1iJ-0001IW-GW
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 07:30:47 -0400
+References: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <5368d20b-2b39-2fee-8851-f749f97071f8@vivier.eu>
+Date: Mon, 16 Jul 2018 13:30:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] tcg_register_jit_int() interface problem
+In-Reply-To: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] tcg_register_jit_int() interface problem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>Petar Jovanovic <pjovanovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Markovic <smarkovic@wavecomp.com>
 
-Hello, all.
+Le 16/07/2018 à 13:10, Aleksandar Markovic a écrit :
+> Hello, all.
+> 
+> 
+> Just a little background:
+> 
+> 
+> One of the fields in an ELF header is e_machine. It is meant to contain
+> "machine architecture". The numerical value is approved by a committee.
+> Some values for common targets are: EM_PPC, EM_PPC64, EM_ARM,
+> EM_AARCH64, etc.
+> 
+> 
+> The TCG function tcg_register_jit_int() expects that the preprocessor
+> constant ELF_HOST_MACHINE is defined, and uses internally the value of
+> that constant.
+> 
+> 
+> Consider, let's say, ARM: It definesELF_HOST_MACHINE in
+> tcg/arm/tcg-target.inc.c as
+> 
+> 
+> #define ELF_HOST_MACHINE EM_ARM
+> 
+> 
+> while in tcg/aarch64/tcg-target.inc.c it defines it as
+> 
+> 
+> #define ELF_HOST_MACHINE EM_AARCH64
+> 
+> 
+> For MIPS, the situation is different: Up until recently, MIPS had only
+> one value for e_machine: that was EM_MIPS (used for both 32-bit and
+> 64-bit MIPS systems). However, new nanoMIPS systems have a new value in
+> that field: EM_NANOMIPS (that is to be applied for both 32-bit and
+> 64-bit nanoMIPS systems).
+> 
+> 
+> The situation described above represent a problem for us developing
+> nanoMIPS support, forcing us to have different compilations (and
+> executables) for MIPS and nanoMIPS.
+> 
+> 
+> Is there a possibility to refactor tcg_register_jit_int() to receive
+> "e_machine" value as an argument, instead of expecting preprocessor
+> constant to be set?
 
+I don't know this par of code, but for PPC we have:
 
-Just a little background:
+#if TCG_TARGET_REG_BITS == 64
+# define ELF_HOST_MACHINE EM_PPC64
+#else
+# define ELF_HOST_MACHINE EM_PPC
+#endif
 
+So perhaps you could have something like:
 
-One of the fields in an ELF header is e_machine. It is meant to contain "ma=
-chine architecture". The numerical value is approved by a committee. Some v=
-alues for common targets are: EM_PPC, EM_PPC64, EM_ARM, EM_AARCH64, etc.
+#if defined(HOST_NANOMIPS)
+# define ELF_HOST_MACHINE EM_NANOMIPS
+#else
+# define ELF_HOST_MACHINE EM_MIPS
+#endif
 
-
-The TCG function tcg_register_jit_int() expects that the preprocessor const=
-ant ELF_HOST_MACHINE is defined, and uses internally the value of that cons=
-tant.
-
-
-Consider, let's say, ARM: It defines ELF_HOST_MACHINE in tcg/arm/tcg-target=
-.inc.c as
-
-
-#define ELF_HOST_MACHINE EM_ARM
-
-
-while in tcg/aarch64/tcg-target.inc.c it defines it as
-
-
-#define ELF_HOST_MACHINE EM_AARCH64
-
-
-For MIPS, the situation is different: Up until recently, MIPS had only one =
-value for e_machine: that was EM_MIPS (used for both 32-bit and 64-bit MIPS=
- systems). However, new nanoMIPS systems have a new value in that field: EM=
-_NANOMIPS (that is to be applied for both 32-bit and 64-bit nanoMIPS system=
-s).
-
-
-The situation described above represent a problem for us developing nanoMIP=
-S support, forcing us to have different compilations (and executables) for =
-MIPS and nanoMIPS.
-
-
-Is there a possibility to refactor tcg_register_jit_int() to receive "e_mac=
-hine" value as an argument, instead of expecting preprocessor constant to b=
-e set?
-
-
-Please advice if you have something better in mind.
-
-
-Yours,
-
-Aleksandar
-
-
-(cc. Laurent and Riku since this is also indirectly related to handling ELF=
- headers linux user mode, and there will be a couple other nanoMIPS patches=
- comming related to that.)
+Thanks,
+Laurent
