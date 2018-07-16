@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fesWq-0008Ci-Eg
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 21:42:21 -0400
+	(envelope-from <famz@redhat.com>) id 1fesoK-0002aD-MS
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 22:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fesWn-0001DK-2f
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 21:42:20 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:44597)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fesWm-0001Cj-UK
-	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 21:42:17 -0400
-Received: by mail-vk0-x242.google.com with SMTP id 125-v6so20860415vke.11
-	for <qemu-devel@nongnu.org>; Sun, 15 Jul 2018 18:42:16 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180713121741.19262-1-alex.bennee@linaro.org>
-	<20180713121741.19262-12-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <27bc62f7-919b-7d81-55b0-15cf4f9517e4@amsat.org>
-Date: Sun, 15 Jul 2018 22:42:08 -0300
+	(envelope-from <famz@redhat.com>) id 1fesoH-00009z-5W
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 22:00:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40406 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fesoH-00007W-0e
+	for qemu-devel@nongnu.org; Sun, 15 Jul 2018 22:00:21 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 16 Jul 2018 10:00:08 +0800
+Message-Id: <20180716020008.31468-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180713121741.19262-12-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 11/16] docker: add expansion for
- docker-test-FOO to Makefile.include
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] tests: vm: Add vm-clean-all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com
-Cc: cota@braap.org, famz@redhat.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Hi Alex,
+The images are big. Add a rule to clean up easily.
 
-On 07/13/2018 09:17 AM, Alex Bennée wrote:
-> This allows us to run a particular test on all docker images. For
-> example:
-> 
->   make docker-test-unit
-> 
-> Will run the unit tests on every supported image. At the same time
-> rename docker-test to docker-all-tests to be clearer.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v2
->   - docker-test -> docker-all-tests
-> ---
->  tests/docker/Makefile.include | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index fe63aacf69..e32c35be0d 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -151,7 +151,8 @@ $(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPR
->  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
->  	) \
->  	$(foreach t,$(DOCKER_TESTS), \
-> -		$(eval docker-test: docker-$t@$i) \
-> +		$(eval docker-all-tests: docker-$t@$i) \
-> +		$(eval docker-$t: docker-$t@$i) \
+Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/vm/Makefile.include | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Is this supposed to work this way?
-
-$ make docker-test-quick@debian-alpha-cross
-make: *** No rule to make target 'docker-test-quick@debian-alpha-cross'.
- Stop.
-
->  	) \
->  )
->  
-> @@ -161,7 +162,8 @@ docker:
->  	@echo 'Available targets:'
->  	@echo
->  	@echo '    docker:              Print this help.'
-> -	@echo '    docker-test:         Run all image/test combinations.'
-> +	@echo '    docker-all-tests:    Run all image/test combinations.'
-> +	@echo '    docker-TEST:         Run TEST on all image combinations.'
->  	@echo '    docker-clean:        Kill and remove residual docker testing containers.'
->  	@echo '    docker-TEST@IMAGE:   Run "TEST" in container "IMAGE".'
->  	@echo '                         Note: "TEST" is one of the listed test name,'
-> 
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 5daa2a3b73..79e7866c8b 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -1,6 +1,6 @@
+ # Makefile for VM tests
+=20
+-.PHONY: vm-build-all
++.PHONY: vm-build-all vm-clean-all
+=20
+ IMAGES :=3D ubuntu.i386 freebsd netbsd openbsd
+ IMAGE_FILES :=3D $(patsubst %, tests/vm/%.img, $(IMAGES))
+@@ -17,6 +17,9 @@ vm-test:
+=20
+ vm-build-all: $(addprefix vm-build-, $(IMAGES))
+=20
++vm-clean-all:
++	rm -f $(IMAGE_FILES)
++
+ tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
+ 		$(SRC_PATH)/tests/vm/basevm.py \
+ 		$(SRC_PATH)/tests/vm/Makefile.include
+--=20
+2.17.1
