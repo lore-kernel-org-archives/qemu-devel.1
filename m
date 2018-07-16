@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff396-0003EC-TF
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:02:33 -0400
+	(envelope-from <laurent@vivier.eu>) id 1ff3Bp-0005Pq-TC
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ff391-0003QS-4V
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:02:32 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ff390-0003Q3-U0
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:02:27 -0400
-Received: by mail-oi0-x242.google.com with SMTP id 13-v6so74589141ois.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 06:02:26 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1ff3Bk-00052V-VG
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:05:21 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:60639)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ff3Bk-000518-Ha
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:05:16 -0400
+References: <BN7PR08MB4868F5BE2EBF580CE8F1C244C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+	<5368d20b-2b39-2fee-8851-f749f97071f8@vivier.eu>
+	<BN7PR08MB4868A93EDEAA419282D376D9C65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+	<CAFEAcA9muPW8d6QTwzyFc+364fzhy9s0J9ok1FgJEjbP1vQicQ@mail.gmail.com>
+	<BN7PR08MB4868051FE8DADE7A1CA8A62AC65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <945b2112-83e6-47eb-a70f-190846b4150e@vivier.eu>
+Date: Mon, 16 Jul 2018 15:04:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <e9073530-a6ef-0e93-dcef-f3c3e91df01f@adacore.com>
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-	<e9073530-a6ef-0e93-dcef-f3c3e91df01f@adacore.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Jul 2018 14:02:05 +0100
-Message-ID: <CAFEAcA-b7nzcjAyofRh5S6RxjZ08==PdN83e2sgKW9d=1Za2xA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/6] accel/tcg: Support execution from MMIO
- and small MMU regions
+In-Reply-To: <BN7PR08MB4868051FE8DADE7A1CA8A62AC65D0@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] tcg_register_jit_int() interface problem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>, "Emilio G . Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Petar Jovanovic <pjovanovic@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Markovic <smarkovic@wavecomp.com>
 
-On 16 July 2018 at 13:30, KONRAD Frederic <frederic.konrad@adacore.com> wrote:
-> Hi Peter,
->
-> Nice! Thanks for that.
->
-> A little question though.. What will happen in the case where the
-> CPU start executing code at random place because of eg: a badly
-> configured kernel?
->
-> Seeing the patch 5 I guess it will really execute stuff.. So
-> maybe this is less user-friendly?
+Le 16/07/2018 à 14:55, Aleksandar Markovic a écrit :
+>> From: Peter Maydell <peter.maydell@linaro.org>
+>> Sent: Monday, July 16, 2018 1:55 PM
+>>  
+>> On 16 July 2018 at 12:36, Aleksandar Markovic <amarkovic@wavecomp.com>
+> wrote:
+>> >> From: Laurent Vivier <laurent@vivier.eu>
+>> >> Le 16/07/2018 à 13:10, Aleksandar Markovic a écrit :
+>> >> > For MIPS, the situation is different: Up until recently, MIPS had
+> only
+>> >> > one value for e_machine: that was EM_MIPS (used for both 32-bit and
+>> >> > 64-bit MIPS systems). However, new nanoMIPS systems have a new
+> value in
+>> >> > that field: EM_NANOMIPS (that is to be applied for both 32-bit and
+>> >> > 64-bit nanoMIPS systems).
+>> >> >
+>> >> >
+>> >> > The situation described above represent a problem for us developing
+>> >> > nanoMIPS support, forcing us to have different compilations (and
+>> >> > executables) for MIPS and nanoMIPS.
+>> >> >
+>> >> >
+>> >> > Is there a possibility to refactor tcg_register_jit_int() to receive
+>> >> > "e_machine" value as an argument, instead of expecting preprocessor
+>> >> > constant to be set?
+>> >>
+>> >> I don't know this par of code, but for PPC we have:
+>> >>
+>> >> #if TCG_TARGET_REG_BITS == 64
+>> >> # define ELF_HOST_MACHINE EM_PPC64
+>> >> #else
+>> >> # define ELF_HOST_MACHINE EM_PPC
+>> >> #endif
+>> >>
+>> >> So perhaps you could have something like:
+>> >>
+>> >> #if defined(HOST_NANOMIPS)
+>> >> # define ELF_HOST_MACHINE EM_NANOMIPS
+>> >> #else
+>> >> # define ELF_HOST_MACHINE EM_MIPS
+>> >> #endif
+>> >
+>> > The problem is, this means there will be separate executables for
+> QEMU for
+>> > MIPS and QEMU for nanoMIPS. Would that be acceptable from overall QEMU
+>> > design point of view? Peter, Richard?
+>>
+>> The assumption has previously been that there must be a value known
+>> at compile time (because it would be the value of whatever is in the
+>> ELF header for the QEMU executable itself, effectively). I'm not
+>> sure why this doesn't work for MIPS still -- if you're building
+>> on a host with the new nanoMIPS stuff and with that support enabled,
+>> then report EM_NANOMIPS; if you're building a binary that works with
+>> the older MIPS CPUs, report EM_MIPS ?
+>>
+>> That said, if this doesn't work for MIPS, then it would be a trivial
+>> refactor to allow the tcg per-target code to do
+>> #define ELF_HOST_MACHINE mips_get_elf_host_machine()
+>> so you could compute the value at runtime.
+>>
+> 
+> Thanks for hints and suggestions. I will have to revisit the code and
+> find the most suitable solution.
 
-Yes, it's true that we will now happily execute from anything
-(device, unassigned memory, etc), and do what the real hardware
-would do in that situation (random unhelpful things, infinite
-loop of taking exceptions). That's a bit unavoidable though I
-think, and there are already lots of cases where QEMU will just
-sit there with a black screen because the user has loaded in
-a bad guest image that goes off into the weeds without printing
-anything to a UART.
+Does this mean an EM_NANOMIPS binary can be run on an EM_MIPS machine
+and vice-versa?
 
-It's possible we could devise a user-friendliness option that
-tried to pick up symptoms of guests being stuck (eg tracking
-whether we're continuously taking exceptions) but that gets
-into heuristics a bit.
-
-thanks
--- PMM
+Thanks,
+Laurent
