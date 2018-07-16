@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1feyKu-0001vW-0j
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 03:54:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1feyLP-0002Dk-M0
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 03:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1feyKo-0006Ur-Ib
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 03:54:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51894 helo=mx1.redhat.com)
+	(envelope-from <cohuck@redhat.com>) id 1feyLN-00073B-GP
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 03:54:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38204 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1feyKo-0006UR-31
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 03:54:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1feyLN-00072f-4B
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 03:54:53 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 65D59402315B
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 07:54:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0269281A4EAA
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 07:54:52 +0000 (UTC)
+Date: Mon, 16 Jul 2018 09:54:47 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180716095447.1bf741c7.cohuck@redhat.com>
+In-Reply-To: <20180716073226.21127-2-armbru@redhat.com>
 References: <20180716073226.21127-1-armbru@redhat.com>
-	<20180716073226.21127-3-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c2d21b05-0065-80ae-6863-c06f27b448bf@redhat.com>
-Date: Mon, 16 Jul 2018 09:54:12 +0200
+	<20180716073226.21127-2-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180716073226.21127-3-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] MAINTAINERS: New section "Incompatible
- changes", copy libvir-list
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-doc: Move appendix "Deprecated
+ features" to its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, cohuck@redhat.com, pkrempa@redhat.com, berrange@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, thuth@redhat.com, pkrempa@redhat.com, berrange@redhat.com
 
-On 16.07.2018 09:32, Markus Armbruster wrote:
-> Libvirt developers would like to be copied on patches to qemu-doc
-> appendix "Deprecated features".  Do them the favor.
+On Mon, 16 Jul 2018 09:32:25 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Consumers of QEMU need to track feature deprecation.  Keeping
+> deprecation documentation in its own file helps in two small ways:
+> 
+> * You can track changes the easy and obvious way, with git-log.
+>   Before, you had to resort to more complex gittery like "git-log
+>   --oneline -L '/@node Deprecated features/,/@node Supported build
+>   platforms/:qemu-doc.texi'"
+> 
+> * It lets us use MAINTAINERS to copy interested parties on deprecation
+>   patches, so they can advise or object before they're a done deal.
+>   The next commit will do that for libvirt.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  MAINTAINERS | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 20eef3cb61..666e936812 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2194,6 +2194,10 @@ M: Daniel P. Berrange <berrange@redhat.com>
->  S: Odd Fixes
->  F: docs/devel/build-system.txt
->  
-> +Incompatible changes
-> +R: libvir-list@redhat.com
-> +F: qemu-deprecated.texi
+>  qemu-deprecated.texi | 234 ++++++++++++++++++++++++++++++++++++++++++
+>  qemu-doc.texi        | 235 +------------------------------------------
+>  2 files changed, 235 insertions(+), 234 deletions(-)
+>  create mode 100644 qemu-deprecated.texi
 
-Should we have a maintainer for the file, too? (I guess not, because
-deprecation patches should go through the specific subsystems...)
-And what about a "S:" line?
-
-Anyway:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
