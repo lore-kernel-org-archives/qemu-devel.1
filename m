@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fezPy-000307-1O
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:03:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fezUC-0004QI-47
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fezPu-0001ry-O3
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:03:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51242 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fezPu-0001rW-EU
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:03:38 -0400
-Date: Mon, 16 Jul 2018 11:03:30 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180716110330.7caa7448@redhat.com>
-In-Reply-To: <CAJ+F1CJVQn5zucYgn9dUFOu76MZkqd2Vaep52c89AORWF=sOrA@mail.gmail.com>
-References: <1528185295-14199-1-git-send-email-slp@redhat.com>
-	<4e35ea24-147d-1b51-fa1b-0f1cc32966e0@redhat.com>
-	<20180710154800.7ea50b73@redhat.com>
-	<CAJ+F1CJVQn5zucYgn9dUFOu76MZkqd2Vaep52c89AORWF=sOrA@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fezU8-0004N7-3P
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:08:04 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43517)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fezU7-0004MQ-SO
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 05:08:00 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b15-v6so31093232wrv.10
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 02:07:59 -0700 (PDT)
+References: <20180713121741.19262-1-alex.bennee@linaro.org>
+	<20180713121741.19262-12-alex.bennee@linaro.org>
+	<27bc62f7-919b-7d81-55b0-15cf4f9517e4@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <27bc62f7-919b-7d81-55b0-15cf4f9517e4@amsat.org>
+Date: Mon, 16 Jul 2018 10:07:57 +0100
+Message-ID: <87efg35z0y.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/char/serial: Only retry if
- qemu_chr_fe_write returns 0
+Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 11/16] docker: add expansion for
+ docker-test-FOO to Makefile.include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-
-On Fri, 13 Jul 2018 16:55:15 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
-
-> Hi
->=20
-> On Tue, Jul 10, 2018 at 3:48 PM, Igor Mammedov <imammedo@redhat.com> wrot=
-e:
-> > On Tue, 5 Jun 2018 11:18:35 +0200
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > =20
-> >> On 05/06/2018 09:54, Sergio Lopez wrote: =20
-> >> > Only retry on serial_xmit if qemu_chr_fe_write returns 0, as this is=
- the
-> >> > only recoverable error.
-> >> >
-> >> > Retrying with any other scenario, in addition to being a waste of CPU
-> >> > cycles, can compromise the Guest stability if by the vCPU issuing the
-> >> > write and the main loop thread are, by chance or explicit pinning,
-> >> > running on the same pCPU.
-> >> >
-> >> > Previous discussion:
-> >> >
-> >> > https://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06998.ht=
-ml
-> >> >
-> >> > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> >> > ---
-> >> >  hw/char/serial.c | 2 +-
-> >> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >> >
-> >> > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> >> > index 605b0d0..6de6c29 100644
-> >> > --- a/hw/char/serial.c
-> >> > +++ b/hw/char/serial.c
-> >> > @@ -260,7 +260,7 @@ static void serial_xmit(SerialState *s)
-> >> >          if (s->mcr & UART_MCR_LOOP) {
-> >> >              /* in loopback mode, say that we just received a char */
-> >> >              serial_receive1(s, &s->tsr, 1);
-> >> > -        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) !=3D 1 &&
-> >> > +        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) =3D=3D 0 =
-&&
-> >> >                     s->tsr_retry < MAX_XMIT_RETRY) {
-> >> >              assert(s->watch_tag =3D=3D 0);
-> >> >              s->watch_tag =3D
-> >> > =20
-> > Hi Sergio, Paolo,
-> >
-> > it looks like commit
-> > commit 019288bf137183bf3407c9824655b753bfafc99f
-> > Author: Sergio Lopez <slp@redhat.com>
-> > Date:   Tue Jun 5 03:54:55 2018 -0400
-> >
-> >     hw/char/serial: Only retry if qemu_chr_fe_write returns 0
-> >
-> > introduced regression wrt 2.12 and broke windows guest remote kernel de=
-bug over
-> > serial, where windbg can't connect to target and target hangs when wind=
-bg tries
-> > to connect to it.
-> >
-> > Reverting the commit fixes issue
-> > =20
->=20
-> is this a possible solution?
-it fixes windbg over serial (with and without EINTR)
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, cota@braap.org, famz@redhat.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
 
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index cd7d747c68..046c4684ff 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -261,15 +261,20 @@ static void serial_xmit(SerialState *s)
->          if (s->mcr & UART_MCR_LOOP) {
->              /* in loopback mode, say that we just received a char */
->              serial_receive1(s, &s->tsr, 1);
-> -        } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) =3D=3D 0 &&
-> -                   s->tsr_retry < MAX_XMIT_RETRY) {
-> -            assert(s->watch_tag =3D=3D 0);
-> -            s->watch_tag =3D
-> -                qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-> -                                      serial_watch_cb, s);
-> -            if (s->watch_tag > 0) {
-> -                s->tsr_retry++;
-> -                return;
-> +        } else {
-> +            int rc =3D qemu_chr_fe_write(&s->chr, &s->tsr, 1);
-> +
-> +            if ((rc =3D=3D 0 ||
-> +                 (rc =3D=3D -1 && (errno =3D=3D EAGAIN || errno =3D=3D E=
-INTR))) &&
-> +                s->tsr_retry < MAX_XMIT_RETRY) {
-> +                assert(s->watch_tag =3D=3D 0);
-> +                s->watch_tag =3D
-> +                    qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-> +                                          serial_watch_cb, s);
-> +                if (s->watch_tag > 0) {
-> +                    s->tsr_retry++;
-> +                    return;
-> +                }
->              }
->          }
->          s->tsr_retry =3D 0;
->=20
->=20
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Hi Alex,
+>
+> On 07/13/2018 09:17 AM, Alex Benn=C3=A9e wrote:
+>> This allows us to run a particular test on all docker images. For
+>> example:
+>>
+>>   make docker-test-unit
+>>
+>> Will run the unit tests on every supported image. At the same time
+>> rename docker-test to docker-all-tests to be clearer.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> ---
+>> v2
+>>   - docker-test -> docker-all-tests
+>> ---
+>>  tests/docker/Makefile.include | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.inclu=
+de
+>> index fe63aacf69..e32c35be0d 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -151,7 +151,8 @@ $(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(=
+DOCKER_IMAGES) $(DOCKER_DEPR
+>>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+>>  	) \
+>>  	$(foreach t,$(DOCKER_TESTS), \
+>> -		$(eval docker-test: docker-$t@$i) \
+>> +		$(eval docker-all-tests: docker-$t@$i) \
+>> +		$(eval docker-$t: docker-$t@$i) \
+>
+> Is this supposed to work this way?
+>
+> $ make docker-test-quick@debian-alpha-cross
+> make: *** No rule to make target
+> 'docker-test-quick@debian-alpha-cross'.
+
+No
+
+  make docker-test-quick
+
+will make the test-quick on all images.
+
+Your example fails because debian-alpha-cross is a PARTIAL image, good
+for building test cases but not QEMU so it's not expanded in the above
+bit: $(eval docker-$t@$i: docker-image-$i docker-run-$t@$i)
+
+>  Stop.
+>
+>>  	) \
+>>  )
+>>
+>> @@ -161,7 +162,8 @@ docker:
+>>  	@echo 'Available targets:'
+>>  	@echo
+>>  	@echo '    docker:              Print this help.'
+>> -	@echo '    docker-test:         Run all image/test combinations.'
+>> +	@echo '    docker-all-tests:    Run all image/test combinations.'
+>> +	@echo '    docker-TEST:         Run TEST on all image combinations.'
+>>  	@echo '    docker-clean:        Kill and remove residual docker testin=
+g containers.'
+>>  	@echo '    docker-TEST@IMAGE:   Run "TEST" in container "IMAGE".'
+>>  	@echo '                         Note: "TEST" is one of the listed test=
+ name,'
+>>
+
+
+--
+Alex Benn=C3=A9e
