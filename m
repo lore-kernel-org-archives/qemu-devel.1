@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36z-0001i1-Fm
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff375-0001nW-E2
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ff36t-0002SM-RN
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1ff36z-0002U1-BR
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 09:00:27 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Jul 2018 14:59:30 +0200
-Message-Id: <1531745974-17187-14-git-send-email-thuth@redhat.com>
+Date: Mon, 16 Jul 2018 14:59:32 +0200
+Message-Id: <1531745974-17187-16-git-send-email-thuth@redhat.com>
 In-Reply-To: <1531745974-17187-1-git-send-email-thuth@redhat.com>
 References: <1531745974-17187-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 13/17] hw/*/realview: Fix introspection
- problem with 'realview_mpcore' & 'realview_gic'
+Subject: [Qemu-devel] [PATCH v3 15/17] hw/arm/stm32f205_soc: Fix
+ introspection problem with 'stm32f205-soc' device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +23,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-arm@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
+Valgrind complains:
+
 echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'realview_mpcore'}}" \
+ "'arguments':{'typename':'stm32f205-soc'}}" \
  "{'execute': 'human-monitor-command', " \
  "'arguments': {'command-line': 'info qtree'}}" | \
  valgrind -q aarch64-softmmu/qemu-system-aarch64 -M none,accel=qtest -qmp stdio
 [...]
-==2654== Invalid read of size 8
-==2654==    at 0x61878A: qdev_print (qdev-monitor.c:686)
-==2654==    by 0x61878A: qbus_print (qdev-monitor.c:719)
-==2654==    by 0x452B38: handle_hmp_command (monitor.c:3446)
-==2654==    by 0x452D70: qmp_human_monitor_command (monitor.c:821)
+==28531== Invalid read of size 8
+==28531==    at 0x6185BA: qdev_print (qdev-monitor.c:686)
+==28531==    by 0x6185BA: qbus_print (qdev-monitor.c:719)
+==28531==    by 0x452B38: handle_hmp_command (monitor.c:3446)
 [...]
 
-Use sysbus_init_child_obj() to fix it.
+Fix it with the new sysbus_init_child_obj() function.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/cpu/realview_mpcore.c | 8 ++++----
- hw/intc/realview_gic.c   | 7 ++-----
- 2 files changed, 6 insertions(+), 9 deletions(-)
+ hw/arm/stm32f205_soc.c | 28 ++++++++++++----------------
+ 1 file changed, 12 insertions(+), 16 deletions(-)
 
-diff --git a/hw/cpu/realview_mpcore.c b/hw/cpu/realview_mpcore.c
-index 39d4ebe..9d3f837 100644
---- a/hw/cpu/realview_mpcore.c
-+++ b/hw/cpu/realview_mpcore.c
-@@ -101,14 +101,14 @@ static void mpcore_rirq_init(Object *obj)
-     SysBusDevice *privbusdev;
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index 2b2135d..c486d06 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -49,36 +49,32 @@ static void stm32f205_soc_initfn(Object *obj)
+     STM32F205State *s = STM32F205_SOC(obj);
      int i;
  
--    object_initialize(&s->priv, sizeof(s->priv), TYPE_ARM11MPCORE_PRIV);
--    qdev_set_parent_bus(DEVICE(&s->priv), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "a11priv", &s->priv, sizeof(s->priv),
-+                          TYPE_ARM11MPCORE_PRIV);
-     privbusdev = SYS_BUS_DEVICE(&s->priv);
-     sysbus_init_mmio(sbd, sysbus_mmio_get_region(privbusdev, 0));
+-    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
+-    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
++    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
++                          TYPE_ARMV7M);
  
-     for (i = 0; i < 4; i++) {
--        object_initialize(&s->gic[i], sizeof(s->gic[i]), TYPE_REALVIEW_GIC);
--        qdev_set_parent_bus(DEVICE(&s->gic[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "gic[*]", &s->gic[i], sizeof(s->gic[i]),
-+                              TYPE_REALVIEW_GIC);
+-    object_initialize(&s->syscfg, sizeof(s->syscfg), TYPE_STM32F2XX_SYSCFG);
+-    qdev_set_parent_bus(DEVICE(&s->syscfg), sysbus_get_default());
++    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
++                          TYPE_STM32F2XX_SYSCFG);
+ 
+     for (i = 0; i < STM_NUM_USARTS; i++) {
+-        object_initialize(&s->usart[i], sizeof(s->usart[i]),
+-                          TYPE_STM32F2XX_USART);
+-        qdev_set_parent_bus(DEVICE(&s->usart[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
++                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
+     }
+ 
+     for (i = 0; i < STM_NUM_TIMERS; i++) {
+-        object_initialize(&s->timer[i], sizeof(s->timer[i]),
+-                          TYPE_STM32F2XX_TIMER);
+-        qdev_set_parent_bus(DEVICE(&s->timer[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
++                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
+     }
+ 
+     s->adc_irqs = OR_IRQ(object_new(TYPE_OR_IRQ));
+ 
+     for (i = 0; i < STM_NUM_ADCS; i++) {
+-        object_initialize(&s->adc[i], sizeof(s->adc[i]),
+-                          TYPE_STM32F2XX_ADC);
+-        qdev_set_parent_bus(DEVICE(&s->adc[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
++                              TYPE_STM32F2XX_ADC);
+     }
+ 
+     for (i = 0; i < STM_NUM_SPIS; i++) {
+-        object_initialize(&s->spi[i], sizeof(s->spi[i]),
+-                          TYPE_STM32F2XX_SPI);
+-        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
++        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
++                              TYPE_STM32F2XX_SPI);
      }
  }
  
-diff --git a/hw/intc/realview_gic.c b/hw/intc/realview_gic.c
-index 50bbab6..7f2ff85 100644
---- a/hw/intc/realview_gic.c
-+++ b/hw/intc/realview_gic.c
-@@ -54,16 +54,13 @@ static void realview_gic_init(Object *obj)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     RealViewGICState *s = REALVIEW_GIC(obj);
--    DeviceState *gicdev;
- 
-     memory_region_init(&s->container, OBJECT(s),
-                        "realview-gic-container", 0x2000);
-     sysbus_init_mmio(sbd, &s->container);
- 
--    object_initialize(&s->gic, sizeof(s->gic), TYPE_ARM_GIC);
--    gicdev = DEVICE(&s->gic);
--    qdev_set_parent_bus(gicdev, sysbus_get_default());
--    qdev_prop_set_uint32(gicdev, "num-cpu", 1);
-+    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic), TYPE_ARM_GIC);
-+    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", 1);
- }
- 
- static void realview_gic_class_init(ObjectClass *oc, void *data)
 -- 
 1.8.3.1
