@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ff4Dt-00074W-Fv
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:11:34 -0400
+	(envelope-from <groeck7@gmail.com>) id 1ff4Fv-0000Eg-VC
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ff4Dq-0001iI-8n
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:11:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39488 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ff4Dq-0001i8-2W
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:11:30 -0400
-References: <20180716083732.3347-1-stefanha@redhat.com>
-	<20180716083732.3347-3-stefanha@redhat.com>
-	<20180716153955-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <652371e6-15d4-45ba-354d-ed2cebf8fa77@redhat.com>
-Date: Mon, 16 Jul 2018 16:11:26 +0200
+	(envelope-from <groeck7@gmail.com>) id 1ff4Fr-0002V4-0G
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:13:39 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39934)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1ff4Fq-0002Ue-P9
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 10:13:34 -0400
+Received: by mail-pf0-x242.google.com with SMTP id j8-v6so1716434pff.6
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 07:13:34 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+References: <1529355846-25102-1-git-send-email-linux@roeck-us.net>
+	<CAFEAcA9fvZbZGjm8Z5nJKi37J7Qma+bSFd0mRQ7tZ1X2NDRqQg@mail.gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <050c8913-5fb3-6044-c145-f83b1c02a6b7@roeck-us.net>
+Date: Mon, 16 Jul 2018 07:13:32 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180716153955-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA9fvZbZGjm8Z5nJKi37J7Qma+bSFd0mRQ7tZ1X2NDRqQg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: fix hotplug ->reset()
- vs event race
+Subject: Re: [Qemu-devel] [PATCH] bcm2835_aux: Swap RX and TX interrupt
+ assignments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, l00284672 <lizhengui@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 16/07/2018 14:40, Michael S. Tsirkin wrote:
-> On Mon, Jul 16, 2018 at 09:37:32AM +0100, Stefan Hajnoczi wrote:
->> There is a race condition during hotplug when iothread is used.  It
->> occurs because virtio-scsi may be processing command queues in the
->> iothread while the monitor performs SCSI device hotplug.
+On 07/16/2018 06:48 AM, Peter Maydell wrote:
+> On 18 June 2018 at 22:04, Guenter Roeck <linux@roeck-us.net> wrote:
+>> RX and TX interrupt bits were reversed, resulting in an endless sequence
+>> of serial interupts in the emulated system and the following repeated
+>> error message when booting Linux.
 >>
->> When a SCSI device is hotplugged the HotplugHandler->plug() callback is
->> invoked and virtio-scsi emits a rescan event to the guest.
+>> serial8250: too much work for irq61
 >>
->> If the guest submits a SCSI command at this point then it may be
->> cancelled before hotplug completes.  This happens because ->reset() is
->> called by hw/core/qdev.c:device_set_realized() after
->> HotplugHandler->plug() has been called and
->> hw/scsi/scsi-disk.c:scsi_disk_reset() purges all requests.
+>> This results in a boot failure most of the time.
 >>
->> This patch uses the new HotplugHandler->post_plug() callback to emit the
->> rescan event after ->reset().  This eliminates the race conditions where
->> requests could be cancelled.
+>> Qemu command line used to reproduce the problem:
 >>
->> Reported-by: l00284672 <lizhengui@huawei.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Fam Zheng <famz@redhat.com>
->> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>          qemu-system-aarch64 -M raspi3 -m 1024 \
+>>          -kernel arch/arm64/boot/Image \
+>>          --append "rdinit=/sbin/init console=ttyS1,115200"
+>>          -initrd rootfs.cpio \
+>>          -dtb arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dtb \
+>>          -nographic -monitor null -serial null -serial stdio
+>>
+>> This is with arm64:defconfig. The root file system was generated using
+>> buildroot.
 > 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Worth mentioning in the commit message that there is an
+> error in the BCM2835 datasheet for the TX_INT and RX_INT
+> bits in the AUX_MU_IER_REG description (as per
+> https://elinux.org/BCM2835_datasheet_errata)
 > 
-> Pls merge through scsi tree.
 
-Will do, thanks Stefan.
+I didn't know that ;-). I found out the hard way.
 
-Paolo
-
-> 
->> ---
->>  hw/scsi/virtio-scsi.c | 11 ++++++++++-
->>  1 file changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
->> index 3aa99717e2..5a3057d1f8 100644
->> --- a/hw/scsi/virtio-scsi.c
->> +++ b/hw/scsi/virtio-scsi.c
->> @@ -797,8 +797,16 @@ static void virtio_scsi_hotplug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>          virtio_scsi_acquire(s);
->>          blk_set_aio_context(sd->conf.blk, s->ctx);
->>          virtio_scsi_release(s);
->> -
->>      }
->> +}
->> +
->> +/* Announce the new device after it has been plugged */
->> +static void virtio_scsi_post_hotplug(HotplugHandler *hotplug_dev,
->> +                                     DeviceState *dev)
->> +{
->> +    VirtIODevice *vdev = VIRTIO_DEVICE(hotplug_dev);
->> +    VirtIOSCSI *s = VIRTIO_SCSI(vdev);
->> +    SCSIDevice *sd = SCSI_DEVICE(dev);
->>  
->>      if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
->>          virtio_scsi_acquire(s);
->> @@ -968,6 +976,7 @@ static void virtio_scsi_class_init(ObjectClass *klass, void *data)
->>      vdc->start_ioeventfd = virtio_scsi_dataplane_start;
->>      vdc->stop_ioeventfd = virtio_scsi_dataplane_stop;
->>      hc->plug = virtio_scsi_hotplug;
->> +    hc->post_plug = virtio_scsi_post_hotplug;
->>      hc->unplug = virtio_scsi_hotunplug;
->>  }
->>  
->> -- 
->> 2.17.1
+Guenter
