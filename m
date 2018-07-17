@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ffVza-0001Av-27
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:50:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ffW4n-00031Y-Sz
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ffVzV-0000HO-5o
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:50:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ffVzU-0000FK-V6
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:50:33 -0400
-Date: Tue, 17 Jul 2018 16:50:28 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180717195028.GA6691@localhost.localdomain>
+	(envelope-from <alex.bennee@linaro.org>) id 1ffW4j-0004ZB-8x
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:01 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ffW4i-0004XE-Ld
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:55:57 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r16-v6so2374310wrt.11
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 12:55:56 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 17 Jul 2018 20:55:36 +0100
+Message-Id: <20180717195553.9111-2-alex.bennee@linaro.org>
+In-Reply-To: <20180717195553.9111-1-alex.bennee@linaro.org>
+References: <20180717195553.9111-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] Why do we typedef every struct on QEMU?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 for 3.0 01/18] tests/.gitignore: don't
+ ignore docker tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-I have been looking at patches that touch typedefs.h and
-wondering: why do we make typedefs.h necessary at all?  Why do we
-always add typedefs for every struct and union type in QEMU?
+The .gitignore was being a little over enthusiastic hiding files.
 
-Why do we prefer to write this:
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
------ qemu/typedefs.h:
-typedef struct SomeType SomeType;
-----------------------
+---
+v2
+  - minor wording tweak for more explicitness
+---
+ tests/.gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
------ qemu/somecode.h:
-#include <qemu/typedefs.h>
-
-int some_function(SomeType *a);
-----------------------
-
-
-...instead of simply writing this:?
-
------ qemu/somecode.h:
-struct SomeType;
-int some_function(struct SomeType *a);
-----------------------
-
-Is the maintenance burden of typedefs.h worth it?
-
+diff --git a/tests/.gitignore b/tests/.gitignore
+index 08e2df1ce1..72c18aaab0 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -9,6 +9,7 @@ qht-bench
+ rcutorture
+ test-*
+ !test-*.c
++!docker/test-*
+ test-qapi-commands.[ch]
+ test-qapi-events.[ch]
+ test-qapi-types.[ch]
 -- 
-Eduardo
+2.17.1
