@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49183)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffG2Z-00004y-Sv
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:40 -0400
+	id 1ffG2b-00005n-89
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffG2Y-0008Ry-8c
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:39 -0400
-Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:37911)
+	id 1ffG2a-0008Tk-IP
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:41 -0400
+Received: from mail-vk0-x229.google.com ([2607:f8b0:400c:c05::229]:41027)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffG2Y-0008Ri-40
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:38 -0400
-Received: by mail-vk0-x244.google.com with SMTP id b77-v6so22797078vkb.5
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 19:48:37 -0700 (PDT)
+	id 1ffG2a-0008TP-Dp
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:40 -0400
+Received: by mail-vk0-x229.google.com with SMTP id j11-v6so22782985vke.8
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 19:48:40 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Jul 2018 23:48:23 -0300
-Message-Id: <20180717024827.27897-2-f4bug@amsat.org>
+Date: Mon, 16 Jul 2018 23:48:24 -0300
+Message-Id: <20180717024827.27897-3-f4bug@amsat.org>
 In-Reply-To: <20180717024827.27897-1-f4bug@amsat.org>
 References: <20180717024827.27897-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/5] tests/vm: Extract the kvm_available()
- handy function
+Subject: [Qemu-devel] [PATCH 2/5] tests/vm: Use 'host' cpu when KVM is
+ available, else default to 'max'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,33 +39,31 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/vm/basevm.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/vm/basevm.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 3643117816..04089cd545 100755
+index 04089cd545..1f4ad04c32 100755
 --- a/tests/vm/basevm.py
 +++ b/tests/vm/basevm.py
-@@ -33,6 +33,11 @@ SSH_KEY = open(os.path.join(os.path.dirname(__file__),
- SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
-                    "..", "keys", "id_rsa.pub")).read()
- 
-+
-+def kvm_available():
-+    return os.access("/dev/kvm", os.R_OK | os.W_OK)
-+
-+
- class BaseVM(object):
-     GUEST_USER = "qemu"
-     GUEST_PASS = "qemupass"
-@@ -72,7 +77,7 @@ class BaseVM(object):
-             "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-         if vcpus:
+@@ -70,7 +70,6 @@ class BaseVM(object):
+             self._stdout = self._devnull
+         self._args = [ \
+             "-nodefaults", "-m", "2G",
+-            "-cpu", "host",
+             "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
+             "-device", "virtio-net-pci,netdev=vnet",
+             "-vnc", "127.0.0.1:0,to=20",
+@@ -79,8 +78,10 @@ class BaseVM(object):
              self._args += ["-smp", str(vcpus)]
--        if os.access("/dev/kvm", os.R_OK | os.W_OK):
-+        if kvm_available():
+         if kvm_available():
              self._args += ["-enable-kvm"]
++            self._args += ["-cpu", "host"]
          else:
              logging.info("KVM not available, not using -enable-kvm")
++            self._args += ["-cpu", "max"]
+         self._data_args = []
+ 
+     def _download_with_cache(self, url, sha256sum=None):
 -- 
 2.18.0
