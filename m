@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffWBX-0000cP-R9
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:03:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ffWBX-0000cV-Sk
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffWBT-0001gx-RX
+	(envelope-from <alex.bennee@linaro.org>) id 1ffWBS-0001gK-WD
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:59 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40081)
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ffWBT-0001gF-Kd
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:55 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t6-v6so2394444wrn.7
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:02:55 -0700 (PDT)
+	id 1ffWBS-0001fn-On
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:54 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id h10-v6so2397349wre.6
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:02:54 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 17 Jul 2018 20:55:51 +0100
-Message-Id: <20180717195553.9111-17-alex.bennee@linaro.org>
+Date: Tue, 17 Jul 2018 20:55:52 +0100
+Message-Id: <20180717195553.9111-18-alex.bennee@linaro.org>
 In-Reply-To: <20180717195553.9111-1-alex.bennee@linaro.org>
 References: <20180717195553.9111-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 for 3.0 16/18] docker: ignore distro
- versioning of debootstrap
+Subject: [Qemu-devel] [PATCH v3 for 3.0 17/18] docker: perform basic
+ binfmt_misc validation in docker.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-We do a minimum version check for the debootstrap but if the distro
-has added their own minor version tick it would fail and fall-back to
-the SCM version. This is sub-optimal as the latest/greatest version
-may be broken at any one particular time. We fix that with a little
-sed magic on the version string before passing to our ugly shell
-versioning check.
+Setting up binfmt_misc is outside of the scope of the docker.py script
+but we can at least validate it with any given executable so we have a
+more useful error message than the sed line of deboostrap failing
+cryptically.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reported-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/docker/dockerfiles/debian-bootstrap.pre | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ tests/docker/docker.py | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
-index ea324d6e4a..3b0ef95374 100755
---- a/tests/docker/dockerfiles/debian-bootstrap.pre
-+++ b/tests/docker/dockerfiles/debian-bootstrap.pre
-@@ -56,10 +56,13 @@ if [ -z $DEBOOTSTRAP_DIR ]; then
-     if [ -z $DEBOOTSTRAP ]; then
-         echo "No debootstrap installed, attempting to install from SCM"
-         NEED_DEBOOTSTRAP=true
--    elif ! (echo "${MIN_DEBOOTSTRAP_VERSION}" ; "${DEBOOTSTRAP}" --version \
--            | cut -d ' ' -f 2) | sort -t . -n -k 1,1 -k 2,2 -k 3,3 -c &>/dev/null; then
--        echo "debootstrap too old, attempting to install from SCM"
--        NEED_DEBOOTSTRAP=true
-+    else
-+        INSTALLED_VERSION=$(${DEBOOTSTRAP} --version | sed 's/debootstrap \([0-9\.]*\)[^0-9\.]*.*/\1/')
-+        if ! (echo "${MIN_DEBOOTSTRAP_VERSION}" ; echo "${INSTALLED_VERSION}") \
-+                | sort -t . -n -k 1,1 -k 2,2 -k 3,3 -C ; then
-+            echo "debootstrap too old, attempting to install from SCM"
-+            NEED_DEBOOTSTRAP=true
-+        fi
-     fi
-     if $NEED_DEBOOTSTRAP; then
-         DEBOOTSTRAP_SOURCE=https://salsa.debian.org/installer-team/debootstrap.git
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 523f4b95a2..a3f5b0c1b0 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -112,6 +112,31 @@ def _copy_binary_with_libs(src, dest_dir):
+             so_path = os.path.dirname(l)
+             _copy_with_mkdir(l , dest_dir, so_path)
+ 
++
++def _check_binfmt_misc(executable):
++    """Check binfmt_misc has entry for executable in the right place.
++
++    The details of setting up binfmt_misc are outside the scope of
++    this script but we should at least fail early with a useful
++    message if it won't work."""
++
++    binary = os.path.basename(executable)
++    binfmt_entry = "/proc/sys/fs/binfmt_misc/%s" % (binary)
++
++    if not os.path.exists(binfmt_entry):
++        print ("No binfmt_misc entry for %s" % (binary))
++        return False
++
++    with open(binfmt_entry) as x: entry = x.read()
++
++    qpath = "/usr/bin/%s" % (binary)
++    if not re.search("interpreter %s\n" % (qpath), entry):
++        print ("binfmt_misc for %s does not point to %s" % (binary, qpath))
++        return False
++
++    return True
++
++
+ def _read_qemu_dockerfile(img_name):
+     # special case for Debian linux-user images
+     if img_name.startswith("debian") and img_name.endswith("user"):
+@@ -315,6 +340,11 @@ class BuildCommand(SubCommand):
+             # Create a docker context directory for the build
+             docker_dir = tempfile.mkdtemp(prefix="docker_build")
+ 
++            # Validate binfmt_misc will work
++            if args.include_executable:
++                if not _check_binfmt_misc(args.include_executable):
++                    return 1
++
+             # Is there a .pre file to run in the build context?
+             docker_pre = os.path.splitext(args.dockerfile)[0]+".pre"
+             if os.path.exists(docker_pre):
 -- 
 2.17.1
