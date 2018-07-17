@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=7295ac877=Alistair.Francis@wdc.com>)
-	id 1ffWac-0000LB-Ve
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:28:55 -0400
+	(envelope-from <david@redhat.com>) id 1ffWoq-00017j-3i
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=7295ac877=Alistair.Francis@wdc.com>)
-	id 1ffWaZ-0005pP-OH
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:28:55 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:52367)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=7295ac877=Alistair.Francis@wdc.com>)
-	id 1ffWaZ-0005on-B9
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:28:51 -0400
-From: Alistair Francis <alistair.francis@wdc.com>
-Date: Tue, 17 Jul 2018 13:28:39 -0700
-Message-Id: <9495ff8a469ffcdeeaeaf3f0b59f999d20df8285.1531859179.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1531859179.git.alistair.francis@wdc.com>
-References: <cover.1531859179.git.alistair.francis@wdc.com>
+	(envelope-from <david@redhat.com>) id 1ffWol-0006xm-2x
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:43:36 -0400
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-15-git-send-email-jjherne@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a00e445e-f8f5-b098-bccb-7fcaf1260402@redhat.com>
+Date: Tue, 17 Jul 2018 22:43:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 5/5] spike: Fix crash when introspecting the
- device
+In-Reply-To: <1530811543-6881-15-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 14/15] s390-bios: Support
+ booting from real dasd device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +25,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistair.francis@wdc.com, thuth@redhat.com, mjc@sifive.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-Use the new object_initialize_child() and sysbus_init_child_obj() to
-fix the issue.
+On 05.07.2018 19:25, Jason J. Herne wrote:
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+> 
+> Allows guest to boot from a vfio configured real dasd device.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  docs/devel/s390-dasd-ipl.txt | 132 +++++++++++++++++++++++
+>  pc-bios/s390-ccw/Makefile    |   2 +-
+>  pc-bios/s390-ccw/dasd-ipl.c  | 249 +++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/dasd-ipl.h  |  16 +++
+>  pc-bios/s390-ccw/main.c      |   4 +
+>  pc-bios/s390-ccw/s390-arch.h |  13 +++
+>  6 files changed, 415 insertions(+), 1 deletion(-)
+>  create mode 100644 docs/devel/s390-dasd-ipl.txt
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+> 
+> diff --git a/docs/devel/s390-dasd-ipl.txt b/docs/devel/s390-dasd-ipl.txt
+> new file mode 100644
+> index 0000000..87aecb9
+> --- /dev/null
+> +++ b/docs/devel/s390-dasd-ipl.txt
+> @@ -0,0 +1,132 @@
+> +*****************************
+> +***** s390 hardware IPL *****
+> +*****************************
+> +
+> +The s390 hardware IPL process consists of the following steps.
+> +
+> +1. A READ IPL ccw is constructed in memory location 0x0.
+> +    This ccw, by definition, reads the IPL1 record which is located on the disk
+> +    at cylinder 0 track 0 record 1. Note that the chain flag is on in this ccw
+> +    so when it is complete another ccw will be fetched and executed from memory
+> +    location 0x08.
+> +
+> +2. Execute the Read IPL ccw at 0x00, thereby reading IPL1 data into 0x00.
+> +    IPL1 data is 24 bytes in length and consists of the following pieces of
+> +    information: [psw][read ccw][tic ccw]. When the machine executes the Read
+> +    IPL ccw it read the 24-bytes of IPL1 to be read into memory starting at
+> +    location 0x0. Then the ccw program at 0x08 which consists of a read
+> +    ccw and a tic ccw is automatically executed because of the chain flag from
+> +    the original READ IPL ccw. The read ccw will read the IPL2 data into memory
+> +    and the TIC (Tranfer In Channel) will transfer control to the channel
+> +    program contained in the IPL2 data. The TIC channel command is the
+> +    equivalent of a branch/jump/goto instruction for channel programs.
+> +    NOTE: The ccws in IPL1 are defined by the architecture to be format 0.
+> +
+> +3. Execute IPL2.
+> +    The TIC ccw instruction at the end of the IPL1 channel program will begin
+> +    the execution of the IPL2 channel program. IPL2 is stage-2 of the boot
+> +    process and will contain a larger channel program than IPL1. The point of
+> +    IPL2 is to find and load either the operating system or a small program that
+> +    loads the operating system from disk. At the end of this step all or some of
+> +    the real operating system is loaded into memory and we are ready to hand
+> +    control over to the guest operating system. At this point the guest
+> +    operating system is entirely responsible for loading any more data it might
+> +    need to function. NOTE: The IPL2 channel program might read data into memory
+> +    location 0 thereby overwriting the IPL1 psw and channel program. This is ok
+> +    as long as the data placed in location 0 contains a psw whose instruction
+> +    address points to the guest operating system code to execute at the end of
+> +    the IPL/boot process.
+> +    NOTE: The ccws in IPL2 are defined by the architecture to be format 0.
+> +
+> +4. Start executing the guest operating system.
+> +    The psw that was loaded into memory location 0 as part of the ipl process
+> +    should contain the needed flags for the operating system we have loaded. The
+> +    psw's instruction address will point to the location in memory where we want
+> +    to start executing the operating system. This psw is loaded (via LPSW
+> +    instruction) causing control to be passed to the operating system code.
+> +
+> +In a non-virtualized environment this process, handled entirely by the hardware,
+> +is kicked off by the user initiating a "Load" procedure from the hardware
+> +management console. This "Load" procedure crafts a special "Read IPL" ccw in
+> +memory location 0x0 that reads IPL1. It then executes this ccw thereby kicking
+> +off the reading of IPL1 data. Since the channel program from IPL1 will be
+> +written immediately after the special "Read IPL" ccw, the IPL1 channel program
+> +will be executed immediately (the special read ccw has the chaining bit turned
+> +on). The TIC at the end of the IPL1 channel program will cause the IPL2 channel
+> +program to be executed automatically. After this sequence completes the "Load"
+> +procedure then loads the psw from 0x0.
+> +
+> +*****************************************
+> +***** How this all pertains to Qemu *****
+> +*****************************************
+> +
+> +In theory we should merely have to do the following to IPL/boot a guest
+> +operating system from a DASD device:
+> +
+> +1. Place a "Read IPL" ccw into memory location 0x0 with chaining bit on.
+> +2. Execute channel program at 0x0.
+> +3. LPSW 0x0.
+> +
+> +However, our emulation of the machine's channel program logic is missing one key
+> +feature that is required for this process to work: non-prefetch of ccw data.
+> +
+> +When we start a channel program we pass the channel subsystem parameters via an
+> +ORB (Operation Request Block). One of those parameters is a prefetch bit. If the
+> +bit is on then Qemu is allowed to read the entire channel program from guest
+> +memory before it starts executing it. This means that any channel commands that
+> +read additional channel commands will not work as expected because the newly
+> +read commands will only exist in guest memory and NOT within Qemu's channel
+> +subsystem memory. Qemu's channel subsystem's implementation currently requires
+> +this bit to be on for all channel programs. This is a problem because the IPL
+> +process consists of transferring control from the "Read IPL" ccw immediately to
+> +the IPL1 channel program that was read by "Read IPL".
+> ++
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/riscv/spike.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+I have way too little insight into channel devices and how QEMU
+implements them, however I wonder what hinders us from implementing
+support for !prefetch in QEMU?
 
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index f94e2b6707..c8c056c50b 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -171,9 +171,8 @@ static void spike_v1_10_0_board_init(MachineState *machine)
-     int i;
- 
-     /* Initialize SOC */
--    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
--    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
--                              &error_abort);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-+                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-     object_property_set_str(OBJECT(&s->soc), SPIKE_V1_10_0_CPU, "cpu-type",
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-@@ -254,9 +253,8 @@ static void spike_v1_09_1_board_init(MachineState *machine)
-     int i;
- 
-     /* Initialize SOC */
--    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
--    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
--                              &error_abort);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-+                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-     object_property_set_str(OBJECT(&s->soc), SPIKE_V1_09_1_CPU, "cpu-type",
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+What you tailored here seems impressive :) Just want to know what the
+technical background of this prefetch thingy in QEMU is.
+
 -- 
-2.17.1
+
+Thanks,
+
+David / dhildenb
