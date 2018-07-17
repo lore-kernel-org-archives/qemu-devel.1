@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ffWoq-00017j-3i
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:43:37 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1ffWrr-0002PF-0R
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ffWol-0006xm-2x
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:43:36 -0400
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<1530811543-6881-15-git-send-email-jjherne@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <a00e445e-f8f5-b098-bccb-7fcaf1260402@redhat.com>
-Date: Tue, 17 Jul 2018 22:43:27 +0200
+	(envelope-from <balaton@eik.bme.hu>) id 1ffWrm-0000hX-1u
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:46:43 -0400
+Date: Tue, 17 Jul 2018 22:46:35 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <e32447d1-92dd-7508-d388-ed2ac606c1b8@ilande.co.uk>
+Message-ID: <alpine.BSF.2.21.1807172232001.51759@zero.eik.bme.hu>
+References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+	<alpine.BSF.2.21.1807171644120.57515@zero.eik.bme.hu>
+	<64174176-84a6-57dc-4b34-d3cd11d585c9@ilande.co.uk>
+	<alpine.BSF.2.21.1807172049050.25631@zero.eik.bme.hu>
+	<e32447d1-92dd-7508-d388-ed2ac606c1b8@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <1530811543-6881-15-git-send-email-jjherne@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 14/15] s390-bios: Support
- booting from real dasd device
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] Profiling results
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 05.07.2018 19:25, Jason J. Herne wrote:
-> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
-> 
-> Allows guest to boot from a vfio configured real dasd device.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  docs/devel/s390-dasd-ipl.txt | 132 +++++++++++++++++++++++
->  pc-bios/s390-ccw/Makefile    |   2 +-
->  pc-bios/s390-ccw/dasd-ipl.c  | 249 +++++++++++++++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/dasd-ipl.h  |  16 +++
->  pc-bios/s390-ccw/main.c      |   4 +
->  pc-bios/s390-ccw/s390-arch.h |  13 +++
->  6 files changed, 415 insertions(+), 1 deletion(-)
->  create mode 100644 docs/devel/s390-dasd-ipl.txt
->  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
->  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
-> 
-> diff --git a/docs/devel/s390-dasd-ipl.txt b/docs/devel/s390-dasd-ipl.txt
-> new file mode 100644
-> index 0000000..87aecb9
-> --- /dev/null
-> +++ b/docs/devel/s390-dasd-ipl.txt
-> @@ -0,0 +1,132 @@
-> +*****************************
-> +***** s390 hardware IPL *****
-> +*****************************
-> +
-> +The s390 hardware IPL process consists of the following steps.
-> +
-> +1. A READ IPL ccw is constructed in memory location 0x0.
-> +    This ccw, by definition, reads the IPL1 record which is located on the disk
-> +    at cylinder 0 track 0 record 1. Note that the chain flag is on in this ccw
-> +    so when it is complete another ccw will be fetched and executed from memory
-> +    location 0x08.
-> +
-> +2. Execute the Read IPL ccw at 0x00, thereby reading IPL1 data into 0x00.
-> +    IPL1 data is 24 bytes in length and consists of the following pieces of
-> +    information: [psw][read ccw][tic ccw]. When the machine executes the Read
-> +    IPL ccw it read the 24-bytes of IPL1 to be read into memory starting at
-> +    location 0x0. Then the ccw program at 0x08 which consists of a read
-> +    ccw and a tic ccw is automatically executed because of the chain flag from
-> +    the original READ IPL ccw. The read ccw will read the IPL2 data into memory
-> +    and the TIC (Tranfer In Channel) will transfer control to the channel
-> +    program contained in the IPL2 data. The TIC channel command is the
-> +    equivalent of a branch/jump/goto instruction for channel programs.
-> +    NOTE: The ccws in IPL1 are defined by the architecture to be format 0.
-> +
-> +3. Execute IPL2.
-> +    The TIC ccw instruction at the end of the IPL1 channel program will begin
-> +    the execution of the IPL2 channel program. IPL2 is stage-2 of the boot
-> +    process and will contain a larger channel program than IPL1. The point of
-> +    IPL2 is to find and load either the operating system or a small program that
-> +    loads the operating system from disk. At the end of this step all or some of
-> +    the real operating system is loaded into memory and we are ready to hand
-> +    control over to the guest operating system. At this point the guest
-> +    operating system is entirely responsible for loading any more data it might
-> +    need to function. NOTE: The IPL2 channel program might read data into memory
-> +    location 0 thereby overwriting the IPL1 psw and channel program. This is ok
-> +    as long as the data placed in location 0 contains a psw whose instruction
-> +    address points to the guest operating system code to execute at the end of
-> +    the IPL/boot process.
-> +    NOTE: The ccws in IPL2 are defined by the architecture to be format 0.
-> +
-> +4. Start executing the guest operating system.
-> +    The psw that was loaded into memory location 0 as part of the ipl process
-> +    should contain the needed flags for the operating system we have loaded. The
-> +    psw's instruction address will point to the location in memory where we want
-> +    to start executing the operating system. This psw is loaded (via LPSW
-> +    instruction) causing control to be passed to the operating system code.
-> +
-> +In a non-virtualized environment this process, handled entirely by the hardware,
-> +is kicked off by the user initiating a "Load" procedure from the hardware
-> +management console. This "Load" procedure crafts a special "Read IPL" ccw in
-> +memory location 0x0 that reads IPL1. It then executes this ccw thereby kicking
-> +off the reading of IPL1 data. Since the channel program from IPL1 will be
-> +written immediately after the special "Read IPL" ccw, the IPL1 channel program
-> +will be executed immediately (the special read ccw has the chaining bit turned
-> +on). The TIC at the end of the IPL1 channel program will cause the IPL2 channel
-> +program to be executed automatically. After this sequence completes the "Load"
-> +procedure then loads the psw from 0x0.
-> +
-> +*****************************************
-> +***** How this all pertains to Qemu *****
-> +*****************************************
-> +
-> +In theory we should merely have to do the following to IPL/boot a guest
-> +operating system from a DASD device:
-> +
-> +1. Place a "Read IPL" ccw into memory location 0x0 with chaining bit on.
-> +2. Execute channel program at 0x0.
-> +3. LPSW 0x0.
-> +
-> +However, our emulation of the machine's channel program logic is missing one key
-> +feature that is required for this process to work: non-prefetch of ccw data.
-> +
-> +When we start a channel program we pass the channel subsystem parameters via an
-> +ORB (Operation Request Block). One of those parameters is a prefetch bit. If the
-> +bit is on then Qemu is allowed to read the entire channel program from guest
-> +memory before it starts executing it. This means that any channel commands that
-> +read additional channel commands will not work as expected because the newly
-> +read commands will only exist in guest memory and NOT within Qemu's channel
-> +subsystem memory. Qemu's channel subsystem's implementation currently requires
-> +this bit to be on for all channel programs. This is a problem because the IPL
-> +process consists of transferring control from the "Read IPL" ccw immediately to
-> +the IPL1 channel program that was read by "Read IPL".
-> ++
+On Tue, 17 Jul 2018, Mark Cave-Ayland wrote:
+> On 17/07/18 20:35, BALATON Zoltan wrote:
+>> On Tue, 17 Jul 2018, Mark Cave-Ayland wrote:
+>>>> MorphOS on mac99 this seems to be significant. This is with default 
+>>>> configure (--enable-qom-cast-debug):
+>>>> 
+>>>> %?????? cum. %???? linenr info???????????????? symbol name
+>>>> 9.7057?? 9.7057??? exec-all.h:410????????????? helper_lookup_tb_ptr
+>>>> 8.0330? 17.7387??? object.c:711 object_class_dynamic_cast_assert
+>>>> 6.9411? 24.6798??? cputlb.c:793??????????????? io_readx
+>>>> 6.3219? 31.0017??? sm501_template.h:62???????? draw_line16_32
+>>>> 5.3601? 36.3617??? cputlb.c:114??????????????? tlb_flush_nocheck
+>>>> 3.6170? 39.9787??? translate-all.c:749???????? page_trylock_add
+>>>> 3.1188? 43.0975??? translate-all.c:803???????? page_collection_lock
+>>>> 3.0405? 46.1380??? exec.c:3025???????????????? iotlb_to_section
+>>>> 2.7044? 48.8424??? softmmu_template.h:112????? helper_ret_ldub_mmu
+>>>> 2.4154? 51.2578??? memory.c:1350?????????????? memory_region_access_valid
+>> [...]
+>>> My first thought is that there is a QOM cast somewhere in a hot path on -M 
+>>> mac99 - can you show us the call stack information from the profile?
+>> 
+>> Not really. Oprofile that gave me this profile could not display call graph 
+>> for this call. I've tried again with the perf tool but I'm not quite sure 
+>> how to interpret its results. If I'm not mistaken it points me in the 
+>> direction of cpu_asidx_from_attrs, called from iotlb_to_section, called 
+>> from io_readx. The object_class_dynamic_cast_assert call likely comes from 
+>> OBJECT_CLASS_CHECK, expanded from OBJECT_GET_CLASS, expanded from 
+>> CPU_GET_CLASS. Would that make any sense? Any idea what to do about it?
+>
+> Good question. A quick grep for 'asidx_from_attrs' shows that 
+> cc->asidx_from_attrs() isn't set for PPC targets, so as a quick test does 
+> replacing the inline function cpu_asidx_from_attrs() in include/qom/cpu.h 
+> with a simple "return 0" change the profile at all?
 
-I have way too little insight into channel devices and how QEMU
-implements them, however I wonder what hinders us from implementing
-support for !prefetch in QEMU?
+It does seem to lessen its impact but it's still higher than I expected:
 
-What you tailored here seems impressive :) Just want to know what the
-technical background of this prefetch thingy in QEMU is.
+%        cum. %     linenr info                 symbol name
+10.7949  10.7949    exec-all.h:410              helper_lookup_tb_ptr
+  7.8663  18.6612    cputlb.c:793                io_readx
+  6.0265  24.6878    cputlb.c:114                tlb_flush_nocheck
+  4.0671  28.7548    sm501_template.h:62         draw_line16_32
+  4.0559  32.8107    object.c:765                object_class_dynamic_cast_assert
+  3.3780  36.1887    memory.c:1350               memory_region_access_valid
+  2.8920  39.0808    qemu-thread-posix.c:61      qemu_mutex_lock_impl
+  2.7187  41.7995    memory.c:1415               memory_region_dispatch_read
+  2.6011  44.4006    qht.c:487                   qht_lookup_custom
+  2.5356  46.9362    softmmu_template.h:112      helper_ret_ldub_mmu
 
--- 
+Maybe it's called from somewhere else too? I know draw_line16_32 but I 
+wonder where could helper_lookup_tb_ptr and tlb flushes come from? Those 
+seem to be significant. And io_readx in itself seems to be too high on the 
+list too. I wonder if it may have something to do with the background task 
+trying to read non-implemented i2c stuff frequently (as discussed in point 
+2. in http://zero.eik.bme.hu/~balaton/qemu/amiga/#morphos).
 
-Thanks,
-
-David / dhildenb
+Regards,
+BALATON Zoltan
