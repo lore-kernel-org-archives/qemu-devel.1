@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffOVD-0004Rj-R1
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:50:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1ffOXO-0006BH-8T
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffOVC-0004gC-Vm
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:50:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37062 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1ffOXN-0006ib-JY
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:53:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37494 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ffOVC-0004fx-Om
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:50:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ffOXN-0006iN-Du
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4E095401EF05
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:50:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D680481A4EAF
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:53:00 +0000 (UTC)
 References: <20180717113402.5510-1-quintela@redhat.com>
-	<20180717113402.5510-18-quintela@redhat.com>
+	<20180717113402.5510-10-quintela@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <34f8fb1a-85af-1bf8-6f6a-48258881a7c6@redhat.com>
-Date: Tue, 17 Jul 2018 13:50:42 +0200
+Message-ID: <b1dbab97-628b-3d68-99ee-33e05e040816@redhat.com>
+Date: Tue, 17 Jul 2018 13:52:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180717113402.5510-18-quintela@redhat.com>
+In-Reply-To: <20180717113402.5510-10-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 17/25] check: Only test wdt_ib700 when it
- is compiled in
+Subject: Re: [Qemu-devel] [PATCH 09/25] check: Only test es1370 when it is
+ compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,23 +45,20 @@ On 17.07.2018 13:33, Juan Quintela wrote:
 >  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 868a41986b..f635517a68 100644
+> index c6156fe105..3d146310f0 100644
 > --- a/tests/Makefile.include
 > +++ b/tests/Makefile.include
-> @@ -265,9 +265,9 @@ check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
->  check-qtest-i386-y += tests/i440fx-test$(EXESUF)
->  check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
->  check-qtest-i386-y += tests/drive_del-test$(EXESUF)
-> -check-qtest-i386-y += tests/wdt_ib700-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_WDT_IB700) += tests/wdt_ib700-test$(EXESUF)
->  check-qtest-i386-y += tests/tco-test$(EXESUF)
-> -gcov-files-i386-y += hw/watchdog/watchdog.c hw/watchdog/wdt_ib700.c
-> +gcov-files-i386-$(CONFIG_WDT_IB700) += hw/watchdog/watchdog.c hw/watchdog/wdt_ib700.c
->  check-qtest-i386-y += $(check-qtest-pci-y)
->  gcov-files-i386-y += $(gcov-files-pci-y)
->  check-qtest-i386-$(CONFIG_VMXNET3_PCI) += tests/vmxnet3-test$(EXESUF)
-
-In case you respin: Move the two ib700 lines next to each other again
-while you're at it?
+> @@ -226,8 +226,8 @@ check-qtest-pci-y += tests/nvme-test$(EXESUF)
+>  gcov-files-pci-y += hw/block/nvme.c
+>  check-qtest-pci-y += tests/ac97-test$(EXESUF)
+>  gcov-files-pci-y += hw/audio/ac97.c
+> -check-qtest-pci-y += tests/es1370-test$(EXESUF)
+> -gcov-files-pci-y += hw/audio/es1370.c
+> +check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
+> +gcov-files-pci-$(CONFIG_ES1370) += hw/audio/es1370.c
+>  check-qtest-pci-y += $(check-qtest-virtio-y)
+>  gcov-files-pci-y += $(gcov-files-virtio-y) hw/virtio/virtio-pci.c
+>  check-qtest-pci-y += tests/tpci200-test$(EXESUF)
+> 
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
