@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ffMSz-0004A0-1a
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:40:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1ffMTT-0004Rp-1b
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:40:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ffMSv-0007Xy-Va
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:40:21 -0400
-Date: Tue, 17 Jul 2018 10:40:13 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180717094013.GJ18603@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
-	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1ffMTP-0007pX-V0
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:40:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ffMTP-0007or-Nl
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:40:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ffMTO-00035d-1x
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 09:40:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 09C942E80C7
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 09:40:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Do not enable QOM debugging by default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Jul 2018 09:29:49 -0000
+From: Nadav Ruskin <1782107@bugs.launchpad.net>
+Reply-To: Bug 1782107 <1782107@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153181978967.32137.15387354948382398538.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1782107] [NEW] Random errors when emulating armv7
+ and using dh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Mon, Jul 16, 2018 at 09:41:12PM +0100, Peter Maydell wrote:
-> On 16 July 2018 at 20:47, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> > Commit 3556c233d 5 years ago added an option to disable QOM debugging,
-> > noting that it can have high performance cost but left the default to on.
-> > Change the default to off and only enable it when debugging is requested
-> > to avoid the performance penalty for those compiling without debug options.
-> >
-> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> 
-> Looking at the code, doesn't this disable all the type checking
-> on the QOM casts? That is not something I think we should drop,
-> in the same way that we do not disable assert()s even in the
-> non-debug build.
-> 
-> Is this coming up as significant in profiling? In the past we've
-> done some special casing if there are particular QOM casts in
-> hot paths that use significant runtime.
+Public bug reported:
 
-There might also be scope for doing optimization of the
-object_dynamic_cast_assert() implementation too.
+Howdy,
+I'm encountering random errors when using qemu to cross-package my project =
+using dh. In previous iterations of my project it would only fail once ever=
+y two attempts. Now it fails every time.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Example error included.
+
+
+If you'd like to try and replicate this error, a version of my project is p=
+ublicly available with simple instructions on how to package it (using qemu=
+) here:
+https://github.com/Nadav-Ruskin/configsite
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: dh error
+
+** Attachment added: "myerror.txt"
+   https://bugs.launchpad.net/bugs/1782107/+attachment/5164433/+files/myerr=
+or.txt
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1782107
+
+Title:
+  Random errors when emulating armv7 and using dh
+
+Status in QEMU:
+  New
+
+Bug description:
+  Howdy,
+  I'm encountering random errors when using qemu to cross-package my projec=
+t using dh. In previous iterations of my project it would only fail once ev=
+ery two attempts. Now it fails every time.
+
+  Example error included.
+
+
+  If you'd like to try and replicate this error, a version of my project is=
+ publicly available with simple instructions on how to package it (using qe=
+mu) here:
+  https://github.com/Nadav-Ruskin/configsite
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1782107/+subscriptions
