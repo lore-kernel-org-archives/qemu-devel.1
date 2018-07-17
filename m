@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffRH7-0002mf-PK
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:48:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRHP-00030R-BC
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:48:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffRH6-0007R8-Bj
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:48:25 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37459)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRHK-0007Zy-Mf
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:48:43 -0400
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:46883)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffRH6-0007Qt-6F
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:48:24 -0400
-Received: by mail-oi0-x243.google.com with SMTP id k81-v6so2514371oib.4
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 07:48:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRHK-0007Zk-Fs
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:48:38 -0400
+Received: by mail-ua0-x241.google.com with SMTP id r18-v6so833396ual.13
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 07:48:38 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180717022924.25428-1-f4bug@amsat.org>
+	<20180717022924.25428-4-f4bug@amsat.org> <8736wh6huk.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <25305c41-59ac-dd8c-31c9-bacb65abe407@amsat.org>
+Date: Tue, 17 Jul 2018 11:48:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <b8ec9c149fe42f3d3ea469c8d8680b2b87a81e35.1530395710.git.jcd@tribudubois.net>
-References: <cover.1530395710.git.jcd@tribudubois.net>
-	<b8ec9c149fe42f3d3ea469c8d8680b2b87a81e35.1530395710.git.jcd@tribudubois.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jul 2018 15:48:03 +0100
-Message-ID: <CAFEAcA-ZyZnb0J9sqAG3T=RwDcU5r956mPJvMgGEX_mbZgjgzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/3] i.MX6UL: Add i.MX6UL specific CCM
- device
+In-Reply-To: <8736wh6huk.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/4] docker: Rename 'amd64' image as
+ 'host-cross'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +36,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe Dubois <jcd@tribudubois.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Andrey Smirnov <andrew.smirnov@gmail.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On 30 June 2018 at 22:58, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
-> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
-> ---
->  hw/misc/Makefile.objs        |   1 +
->  hw/misc/imx6ul_ccm.c         | 887 +++++++++++++++++++++++++++++++++++
->  include/hw/misc/imx6ul_ccm.h | 228 +++++++++
->  3 files changed, 1116 insertions(+)
->  create mode 100644 hw/misc/imx6ul_ccm.c
->  create mode 100644 include/hw/misc/imx6ul_ccm.h
->
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 9350900845..51d27b3af1 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -36,6 +36,7 @@ obj-$(CONFIG_IMX) += imx_ccm.o
->  obj-$(CONFIG_IMX) += imx31_ccm.o
->  obj-$(CONFIG_IMX) += imx25_ccm.o
->  obj-$(CONFIG_IMX) += imx6_ccm.o
-> +obj-$(CONFIG_IMX) += imx6ul_ccm.o
->  obj-$(CONFIG_IMX) += imx6_src.o
->  obj-$(CONFIG_IMX) += imx7_ccm.o
->  obj-$(CONFIG_IMX) += imx2_wdt.o
-> diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
-> new file mode 100644
-> index 0000000000..fc894b087e
-> --- /dev/null
-> +++ b/hw/misc/imx6ul_ccm.c
-> @@ -0,0 +1,887 @@
-> +/*
-> + * IMX6UL Clock Control Module
-> + *
-> + * Copyright (c) 2018 Jean-Christophe Dubois <jcd@tribudubois.net>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + * To get the timer frequencies right, we need to emulate at least part of
-> + * the CCM.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/misc/imx6ul_ccm.h"
-> +#include "qemu/log.h"
-> +
-> +#ifndef DEBUG_IMX6UL_CCM
-> +#define DEBUG_IMX6UL_CCM 0
-> +#endif
-> +
-> +#define DPRINTF(fmt, args...) \
-> +    do { \
-> +        if (DEBUG_IMX6UL_CCM) { \
-> +            fprintf(stderr, "[%s]%s: " fmt , TYPE_IMX6UL_CCM, \
-> +                                             __func__, ##args); \
-> +        } \
-> +    } while (0)
+On 07/17/2018 11:45 AM, Alex Bennée wrote:
+> 
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  .shippable.yml                                           | 4 ++--
+>>  tests/docker/Makefile.include                            | 2 +-
+>>  .../{debian-amd64.docker => debian-host-cross.docker}    | 9
+>> ++++++---
+> 
+> I'd prefer debian-amd64->debian-host as it's not really a cross
+> compiler.
 
-Tracepoints would be preferable to more DPRINTF macros for
-new devices, ideally.
+This sounds better, indeed.
 
-> +static uint64_t imx6ul_ccm_get_periph_clk2_sel_clk(IMX6ULCCMState *dev)
-> +{
-> +    uint64_t freq = 0;
-> +
-> +    switch (EXTRACT(dev->ccm[CCM_CBCMR], PERIPH_CLK2_SEL)) {
-> +    case 0:
-> +        freq = imx6ul_analog_get_pll3_clk(dev);
-> +        break;
-> +    case 1:
-> +        freq = imx6ul_analog_get_osc_clk(dev);
-> +        break;
-> +    case 2:
-> +        freq = imx6ul_analog_pll2_bypass_clk(dev);
-> +        break;
+> Otherwise:
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> 
+>>  3 files changed, 9 insertions(+), 6 deletions(-)
+>>  rename tests/docker/dockerfiles/{debian-amd64.docker => debian-host-cross.docker} (82%)
+>>
+>> diff --git a/.shippable.yml b/.shippable.yml
+>> index f74a3de3ff..7625ba8f27 100644
+>> --- a/.shippable.yml
+>> +++ b/.shippable.yml
+>> @@ -5,8 +5,8 @@ env:
+>>    global:
+>>      - LC_ALL=C
+>>    matrix:
+>> -    - IMAGE=debian-amd64
+>> -      TARGET_LIST=x86_64-softmmu,x86_64-linux-user
+>> +    - IMAGE=debian-host-cross
+>> +      TARGET_LIST=aarch64-softmmu,x86_64-softmmu,x86_64-linux-user
 
-PERIPH_CLK2_SEL is a 2-bit field, right? Since there's
-nothing that prevents the guest from writing 0b11 to it,
-we need a case 3: here. (The guest should never be able
-to trigger a QEMU assertion failure.)
+This line might be tuned a bit.
 
-> +    default:
-> +        /* We should never get there */
-> +        g_assert_not_reached();
-> +        break;
-
-You don't need a 'break' here, as execution never returns
-from g_assert_not_reached(). The comment I think also
-can be dropped -- it just tells you what you can already
-determine from the g_assert_not_reached().
-
-> +    }
-> +
-> +    DPRINTF("freq = %d\n", (uint32_t)freq);
-> +
-> +    return freq;
-> +}
-
-
-> +static uint64_t imx6ul_ccm_read(void *opaque, hwaddr offset, unsigned size)
-> +{
-> +    uint32_t value = 0;
-> +    uint32_t index = offset >> 2;
-> +    IMX6ULCCMState *s = (IMX6ULCCMState *)opaque;
-> +
-> +    value = s->ccm[index];
-
-It looks like the index is forced to be in range by the size
-of this MemoryRegion. An assertion here will help to convince
-static analysis tools that this really can't overflow the array.
-(Similarly in the write fn below.)
-
-> +
-> +    DPRINTF("reg[%s] => 0x%" PRIx32 "\n", imx6ul_ccm_reg_name(index), value);
-> +
-> +    return (uint64_t)value;
-> +}
-> +#define EXTRACT(value, name) extract32(value, name##_SHIFT, name##_LENGTH)
-
-Please don't define ad-hoc extract macros. Either just use
-extract32() directly, or use the macros that include/hw/registerfields.h
-provides.
-
-thanks
--- PMM
+>>      - IMAGE=debian-win32-cross
+>>        TARGET_LIST=arm-softmmu,i386-softmmu,lm32-softmmu
+>>      - IMAGE=debian-win64-cross
+>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>> index b2a7e761cc..2db4190b4c 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -83,7 +83,7 @@ endif
+>>  # Enforce dependencies for composite images
+>>  docker-image-debian: docker-image-debian9
+>>  docker-image-debian8-mxe: docker-image-debian8
+>> -docker-image-debian-amd64: docker-image-debian9
+>> +docker-image-debian-host-cross: docker-image-debian9
+>>  docker-image-debian-armel-cross: docker-image-debian9
+>>  docker-image-debian-armhf-cross: docker-image-debian9
+>>  docker-image-debian-arm64-cross: docker-image-debian9
+>> diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-host-cross.docker
+>> similarity index 82%
+>> rename from tests/docker/dockerfiles/debian-amd64.docker
+>> rename to tests/docker/dockerfiles/debian-host-cross.docker
+>> index d79a599a0d..17d937efc9 100644
+>> --- a/tests/docker/dockerfiles/debian-amd64.docker
+>> +++ b/tests/docker/dockerfiles/debian-host-cross.docker
+>> @@ -1,8 +1,11 @@
+>>  #
+>> -# Docker x86_64 target
+>> +# Docker 'host' target (same architecture than the host)
+>>  #
+>> -# This docker target builds on the debian Stretch base image. Further
+>> -# libraries which are not widely available are installed by hand.
+>> +# This docker target builds on the debian Stretch base image.
+>> +#
+>> +# It is intented to build the host architecture, with as much
+>> +# features as possible (libraries which are not widely available
+>> +# are installed by hand).
+>>  #
+>>  FROM qemu:debian9
+>>  MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> 
+> --
+> Alex Bennée
+> 
