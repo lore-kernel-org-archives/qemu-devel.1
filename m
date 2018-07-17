@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ffTnG-0005YX-KK
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:29:47 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ffTuf-0007l5-NI
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:37:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ffTnC-0002FR-LB
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:29:46 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36916)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ffTuc-0007Oy-Gf
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:37:25 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46510)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ffTnC-0002EP-60
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:29:42 -0400
-Received: by mail-pg1-x541.google.com with SMTP id n7-v6so741271pgq.4
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:29:42 -0700 (PDT)
-References: <20180716133302.25989-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <57aa2f3f-aa32-bcdb-f971-32709e717833@linaro.org>
-Date: Tue, 17 Jul 2018 10:29:38 -0700
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1ffTuc-0007NX-7T
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:37:22 -0400
+Received: by mail-lj1-x244.google.com with SMTP id 203-v6so1687769ljj.13
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:37:20 -0700 (PDT)
+Date: Tue, 17 Jul 2018 19:37:16 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20180717173716.h2bhmmco7uoj2nvp@toto>
+References: <1531839343-13828-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180716133302.25989-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0] target/arm: Correctly handle
- overlapping small MPU regions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1531839343-13828-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/microblaze/xlnx-zynqmp-pmu: Fix
+ introspection problem in 'xlnx, zynqmp-pmu-soc'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Adithya Baglody <adithya.nagaraj.baglody@intel.com>, patches@linaro.org
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>
 
-On 07/16/2018 06:33 AM, Peter Maydell wrote:
-> @@ -9963,6 +9994,21 @@ static bool pmsav8_mpu_lookup(CPUARMState *env, uint32_t address,
->              }
+On Tue, Jul 17, 2018 at 04:55:43PM +0200, Thomas Huth wrote:
+> Valgrind complains:
+> 
+> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
+>  "'arguments':{'typename':'xlnx,zynqmp-pmu-soc'}}" \
+>  "{'execute': 'human-monitor-command', " \
+>  "'arguments': {'command-line': 'info qtree'}}" | \
+>  valgrind -q microblazeel-softmmu/qemu-system-microblazeel -M none,accel=qtest -qmp stdio
+> [...]
+> ==13605== Invalid read of size 8
+> ==13605==    at 0x2AC69A: qdev_print (qdev-monitor.c:686)
+> ==13605==    by 0x2AC69A: qbus_print (qdev-monitor.c:719)
+> ==13605==    by 0x2591E8: handle_hmp_command (monitor.c:3446)
+> 
+> Use the new object_initialize_child() and sysbus_init_child_obj() to
+> fix the issue.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+Peter, could you pick this up for 3.0? Or do you want a pull request?
+
+Cheers,
+Edgar
+
+
+> ---
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+> index 999a565..57dc1cc 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -62,13 +62,11 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
+>  {
+>      XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
 >  
->              if (address < base || address > limit) {> +                /*> +                 * Address not in this region. We must
-check whether the> +                 * region covers addresses in the same page
-as our address.> +                 * In that case we must not report a size
-that covers the> +                 * whole page for a subsequent hit against a
-different MPU> +                 * region or the background region, because it
-would result in> +                 * incorrect TLB hits for subsequent accesses
-to addresses that> +                 * are in this MPU region.> +
-  */> +                if (limit >= base &&> +
-ranges_overlap(base, limit - base + 1,> +
-addr_page_base,> +                                   TARGET_PAGE_SIZE)) {> +
-                *is_subpage = true;> +                }
-I don't understand why this is necessary in the v8m case.
-
-               AP                 APL
-    <----B1----|----L1-B2-A-------|---L2--->
-
-
-Your comment posits two regions [B1,L1] and [B2,L2], that A is not within
-[B1,L1] but is within [B2,L2] (otherwise we would not report a hit at all).
-Further, that [B1,L1] intersects [AP,APL] but does not intersect [B2,L2]
-(otherwise we would report a fault for overlapping regions).
-
-Surely this combination of ranges implies that [B2,L2] must itself set
-IS_SUBPAGE (otherwise the first region would not overlap the page of A, or
-would not overlap the second region).
-
-Because of the non-fault for region overlap in v7m, I can see that the test is
-required in get_phys_addr_pmsav7, but AFAICS only there.
-
-
-r~
+> -    object_initialize(&s->cpu, sizeof(s->cpu),
+> -                      TYPE_MICROBLAZE_CPU);
+> -    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
+> -                              &error_abort);
+> +    object_initialize_child(obj, "pmu-cpu", &s->cpu, sizeof(s->cpu),
+> +                            TYPE_MICROBLAZE_CPU, &error_abort, NULL);
+>  
+> -    object_initialize(&s->intc, sizeof(s->intc), TYPE_XLNX_PMU_IO_INTC);
+> -    qdev_set_parent_bus(DEVICE(&s->intc), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "intc", &s->intc, sizeof(s->intc),
+> +                          TYPE_XLNX_PMU_IO_INTC);
+>  }
+>  
+>  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
+> -- 
+> 1.8.3.1
+> 
