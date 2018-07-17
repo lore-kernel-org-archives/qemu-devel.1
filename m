@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ffTRD-0002XU-Hw
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:07:00 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ffTUT-0004aI-VD
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ffTR8-0000M1-Kr
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:06:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49110 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ffTR8-0000La-FJ
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:06:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1495B401EF05
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 17:06:54 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <13a77722-0a4e-ede7-60e9-749278c39d3a@redhat.com> (Thomas Huth's
-	message of "Tue, 17 Jul 2018 16:06:59 +0200")
-References: <20180717113402.5510-1-quintela@redhat.com>
-	<20180717113402.5510-21-quintela@redhat.com>
-	<13a77722-0a4e-ede7-60e9-749278c39d3a@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 17 Jul 2018 19:06:51 +0200
-Message-ID: <87sh4hyeok.fsf@secure.mitica>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ffTUO-0003Jv-Tw
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:10:21 -0400
+References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+	<alpine.BSF.2.21.1807171644120.57515@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <64174176-84a6-57dc-4b34-d3cd11d585c9@ilande.co.uk>
+Date: Tue, 17 Jul 2018 18:09:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 20/25] check: Only test usb-xhci-nec when
- it is compiled in
+In-Reply-To: <alpine.BSF.2.21.1807171644120.57515@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] Profiling results
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Thomas Huth <thuth@redhat.com> wrote:
-> On 17.07.2018 13:33, Juan Quintela wrote:
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  tests/Makefile.include | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->> 
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index b3e707e8c3..ccf71bddcc 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -288,8 +288,8 @@ check-qtest-i386-y += tests/usb-hcd-ehci-test$(EXESUF)
->>  gcov-files-i386-y += hw/usb/hcd-ehci.c
->>  gcov-files-i386-y += hw/usb/dev-hid.c
->>  gcov-files-i386-y += hw/usb/dev-storage.c
->> -check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
->> -gcov-files-i386-y += hw/usb/hcd-xhci.c
->> +check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
->> +gcov-files-i386-$(CONFIG_USB_XHCI) += hw/usb/hcd-xhci.c
->>  check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
->>  check-qtest-i386-y += tests/q35-test$(EXESUF)
->>  check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
->> @@ -347,8 +347,8 @@ check-qtest-ppc64-y += tests/usb-hcd-ohci-test$(EXESUF)
->>  gcov-files-ppc64-y += hw/usb/hcd-ohci.c
->>  check-qtest-ppc64-y += tests/usb-hcd-uhci-test$(EXESUF)
->>  gcov-files-ppc64-y += hw/usb/hcd-uhci.c
->> -check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
->> -gcov-files-ppc64-y += hw/usb/hcd-xhci.c
->> +check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
->> +gcov-files-ppc64-$(CONFIG_USB_XHCI) += hw/usb/hcd-xhci.c
->>  check-qtest-ppc64-y += $(check-qtest-virtio-y)
->>  check-qtest-ppc64-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
->>  check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
->
-> I wonder whether the gcov lines are still up-to-date, or whether they
-> should include hcd-xhci-nec.c as well? (See commit 0bbb2f3df1ffd9ccf713
-> for the split)
+On 17/07/18 16:09, BALATON Zoltan wrote:
 
-I don't even know how to launch gcov.  Not sure if I should put the
-$(CONFIG_foo) there.  File is not consistent at all.
+> On Mon, 16 Jul 2018, Peter Maydell wrote:
+>> Is this coming up as significant in profiling? In the past we've
+> 
+> This seems to depend on the workload. From the cases I'm interested in 
+> AROS and AmigaOS on qemu-system-ppc -M sam460ex does not seem to be 
+> effected much (object_class_dynamic_cast_assert is not in top 10 with 
+> <2%) but for MorphOS on mac99 this seems to be significant. This is with 
+> default configure (--enable-qom-cast-debug):
+> 
+> %       cum. %     linenr info                 symbol name
+> 9.7057   9.7057    exec-all.h:410              helper_lookup_tb_ptr
+> 8.0330  17.7387    object.c:711                
+> object_class_dynamic_cast_assert
+> 6.9411  24.6798    cputlb.c:793                io_readx
+> 6.3219  31.0017    sm501_template.h:62         draw_line16_32
+> 5.3601  36.3617    cputlb.c:114                tlb_flush_nocheck
+> 3.6170  39.9787    translate-all.c:749         page_trylock_add
+> 3.1188  43.0975    translate-all.c:803         page_collection_lock
+> 3.0405  46.1380    exec.c:3025                 iotlb_to_section
+> 2.7044  48.8424    softmmu_template.h:112      helper_ret_ldub_mmu
+> 2.4154  51.2578    memory.c:1350               memory_region_access_valid
+> 
+> and improves a bit (but not much) with --disable-qom-cast-debug
+> 
+> %        cum. %     linenr info                 symbol name
+> 10.2063  10.2063    exec-all.h:410              helper_lookup_tb_ptr
+>   7.1581  17.3644    object.c:711                
+> object_class_dynamic_cast_assert
+>   5.9297  23.2941    sm501_template.h:62         draw_line16_32
+>   5.9227  29.2168    cputlb.c:793                io_readx
+>   5.3030  34.5198    cputlb.c:114                tlb_flush_nocheck
+>   3.6445  38.1643    memory.c:1350               memory_region_access_valid
+>   3.5499  41.7142    softmmu_template.h:112      helper_ret_ldub_mmu
+>   3.0383  44.7525    translate-all.c:803         page_collection_lock
+>   2.9735  47.7260    memory.c:1415               
+> memory_region_dispatch_read
+>   2.9503  50.6763    translate-all.c:749         page_trylock_add
+> 
+> But the workloads may not have been 100% identical so this is not 
+> conclusive, maybe this debug code is not that expensive at the moment.
+> 
+> AROS on sam460ex has a different profile:
+> 
+> %        cum. %     linenr info                 symbol name
+> 8.9905   8.9905     translate-all.c:749         page_trylock_add
+> 8.7658  17.7563     exec-all.h:410              helper_lookup_tb_ptr
+> 7.7349  25.4911     translate-all.c:803         page_collection_lock
+> 5.8246  31.3158     cputlb.c:924                victim_tlb_hit
+> 3.1640  34.4797     cpus.c:347                  cpu_get_clock
+> 3.1538  37.6335     translate-all.c:788         tb_page_addr_cmp
+> 2.7969  40.4304     exec.c:435                  
+> address_space_translate_internal
+> 2.6647  43.0951     memory.c:571                access_with_adjusted_size
+> 2.0615  45.1567     exec.c:569                  flatview_do_translate
+> 1.9586  47.1153     memory.c:1350               memory_region_access_valid
+> 
+> Would anyone be able to guess what are the places that should be looked 
+> at or what to check to get more info on this?
 
-Later, Juan.
+My first thought is that there is a QOM cast somewhere in a hot path on 
+-M mac99 - can you show us the call stack information from the profile?
+
+I had a similar issue with SPARC32 whereby each DMA request needs to be 
+manually word-swapped, so instead of adding the QOM cast into these 
+routines I did a direct C cast from the opaque to ensure that the 
+overhead was as little as possible.
+
+
+ATB,
+
+Mark.
