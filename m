@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prabhakar.csengg@gmail.com>) id 1ffP0Z-00041Q-6k
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 08:23:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffQ6S-0002TB-Jt
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prabhakar.csengg@gmail.com>) id 1ffP0X-0003SG-U3
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 08:23:11 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:41325)
+	(envelope-from <peter.maydell@linaro.org>) id 1ffQ6R-00086F-CZ
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:33:20 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <prabhakar.csengg@gmail.com>)
-	id 1ffP0X-0003RR-IM
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 08:23:09 -0400
-Received: by mail-ed1-x542.google.com with SMTP id s24-v6so1030546edr.8
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 05:23:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ffQ6R-00085f-6o
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:33:19 -0400
+Received: by mail-oi0-x241.google.com with SMTP id k81-v6so2017903oib.4
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 06:33:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180709151947.940759-1-arnd@arndb.de>
-References: <20180709151947.940759-1-arnd@arndb.de>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 17 Jul 2018 13:22:37 +0100
-Message-ID: <CA+V-a8vw_4t7srk2wxp_W7QDN8-Vwj=OC8bvyvpzyTyhXnHLEA@mail.gmail.com>
+In-Reply-To: <20180714171601.5734-13-luc.michel@greensocs.com>
+References: <20180714171601.5734-1-luc.michel@greensocs.com>
+	<20180714171601.5734-13-luc.michel@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Jul 2018 14:32:57 +0100
+Message-ID: <CAFEAcA9dQEaONA3AkqnyY3PnkMHNcjc=MiBwoF99oHp-BJuRFA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] headers: fix linux/mod_devicetable.h
- inclusions
+Subject: Re: [Qemu-devel] [PATCH v4 12/20] intc/arm_gic: Implement
+ virtualization extensions in gic_(deactivate|complete_irq)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gabriel Somlo <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Stanimir Varbanov <stanimir.varbanov@linaro.org>, Jean-Christophe Trotin <jean-christophe.trotin@st.com>, Zha Qipeng <qipeng.zha@intel.com>, Darren Hart <dvhart@infradead.org>, Andy Shevchenko <andy@infradead.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, LKML <linux-kernel@vger.kernel.org>, linux-media <linux-media@vger.kernel.org>, linux-arm-msm@vger.kernel.org, platform-driver-x86@vger.kernel.org
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, Jan Kiszka <jan.kiszka@web.de>
 
-On Mon, Jul 9, 2018 at 4:19 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> A couple of drivers produced build errors after the mod_devicetable.h
-> header was split out from the platform_device one, e.g.
+On 14 July 2018 at 18:15, Luc Michel <luc.michel@greensocs.com> wrote:
+> Implement virtualization extensions in the gic_deactivate_irq() and
+> gic_complete_irq() functions.  When a guest tries to deactivat or end an
+
+"deactivate"
+
+> IRQ that does not exist in the LRs, the EOICount field of the virtual
+> interface HCR register is incremented by one, and the request is
+> ignored.
 >
-> drivers/media/platform/davinci/vpbe_osd.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
-> drivers/media/platform/davinci/vpbe_venc.c:42:40: error: array type has incomplete element type 'struct platform_device_id'
->
-
-For the above fixes,
-
-Acked-by: Lad, Prabhakar <prabhakar.csengg@gmail.com>
-
-Regards,
---Prabhakar Lad
-
-> This adds the inclusion where needed.
->
-> Fixes: ac3167257b9f ("headers: separate linux/mod_devicetable.h from linux/platform_device.h")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 > ---
->  drivers/firmware/qemu_fw_cfg.c             | 1 +
->  drivers/media/platform/davinci/vpbe_osd.c  | 1 +
->  drivers/media/platform/davinci/vpbe_venc.c | 1 +
->  drivers/media/platform/qcom/venus/vdec.c   | 1 +
->  drivers/media/platform/qcom/venus/venc.c   | 1 +
->  drivers/media/platform/sti/hva/hva-v4l2.c  | 1 +
->  drivers/platform/x86/intel_punit_ipc.c     | 1 +
->  7 files changed, 7 insertions(+)
+>  hw/intc/arm_gic.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >
-> diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cfg.c
-> index 14fedbeca724..039e0f91dba8 100644
-> --- a/drivers/firmware/qemu_fw_cfg.c
-> +++ b/drivers/firmware/qemu_fw_cfg.c
-> @@ -28,6 +28,7 @@
->   */
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index be9e2594d9..50cbbfbe24 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -590,6 +590,15 @@ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+>          return;
+>      }
 >
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/acpi.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/davinci/vpbe_osd.c b/drivers/media/platform/davinci/vpbe_osd.c
-> index 7f610320426d..c551a25d90d9 100644
-> --- a/drivers/media/platform/davinci/vpbe_osd.c
-> +++ b/drivers/media/platform/davinci/vpbe_osd.c
-> @@ -18,6 +18,7 @@
->   *
->   */
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/kernel.h>
->  #include <linux/interrupt.h>
->  #include <linux/platform_device.h>
-> diff --git a/drivers/media/platform/davinci/vpbe_venc.c b/drivers/media/platform/davinci/vpbe_venc.c
-> index ba157827192c..ddcad7b3e76c 100644
-> --- a/drivers/media/platform/davinci/vpbe_venc.c
-> +++ b/drivers/media/platform/davinci/vpbe_venc.c
-> @@ -11,6 +11,7 @@
->   * GNU General Public License for more details.
->   */
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/kernel.h>
->  #include <linux/init.h>
->  #include <linux/ctype.h>
-> diff --git a/drivers/media/platform/qcom/venus/vdec.c b/drivers/media/platform/qcom/venus/vdec.c
-> index f89a91d43cc9..d4e23c7df347 100644
-> --- a/drivers/media/platform/qcom/venus/vdec.c
-> +++ b/drivers/media/platform/qcom/venus/vdec.c
-> @@ -14,6 +14,7 @@
->   */
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/qcom/venus/venc.c b/drivers/media/platform/qcom/venus/venc.c
-> index f7a87a3dbb46..0522cf202b75 100644
-> --- a/drivers/media/platform/qcom/venus/venc.c
-> +++ b/drivers/media/platform/qcom/venus/venc.c
-> @@ -14,6 +14,7 @@
->   */
->  #include <linux/clk.h>
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/slab.h>
-> diff --git a/drivers/media/platform/sti/hva/hva-v4l2.c b/drivers/media/platform/sti/hva/hva-v4l2.c
-> index 15080cb00fa7..5a807c7c5e79 100644
-> --- a/drivers/media/platform/sti/hva/hva-v4l2.c
-> +++ b/drivers/media/platform/sti/hva/hva-v4l2.c
-> @@ -6,6 +6,7 @@
->   */
+> +    if (gic_is_vcpu(cpu) && !gic_virq_is_valid(s, irq, cpu)) {
+> +        /* This vIRQ does not have an LR entry which is either active or
+> +         * pending and active. Increment EOICount and ignore the write.
+> +         */
+> +        int rcpu = gic_get_vcpu_real_id(cpu);
+> +        s->h_hcr[rcpu] += 1 << R_GICH_HCR_EOICount_SHIFT;
+> +        return;
+> +    }
+
+It's a bit hard to tell from the amount of context in the diff,
+but I think this check is being done too late in this function.
+It needs to happen before we do any operations on the irq we're
+passed (eg checking which group it is).
+
+> +
+>      if (gic_cpu_ns_access(s, cpu, attrs) && !group) {
+>          DPRINTF("Non-secure DI for Group0 interrupt %d ignored\n", irq);
+>          return;
+> @@ -604,6 +613,15 @@ static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+>      int group;
 >
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/platform_device.h>
->  #include <linux/slab.h>
->  #include <media/v4l2-event.h>
-> diff --git a/drivers/platform/x86/intel_punit_ipc.c b/drivers/platform/x86/intel_punit_ipc.c
-> index b5b890127479..f1afc0ebbc68 100644
-> --- a/drivers/platform/x86/intel_punit_ipc.c
-> +++ b/drivers/platform/x86/intel_punit_ipc.c
-> @@ -12,6 +12,7 @@
->   */
->
->  #include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
->  #include <linux/acpi.h>
->  #include <linux/delay.h>
->  #include <linux/bitops.h>
+>      DPRINTF("EOI %d\n", irq);
+> +    if (gic_is_vcpu(cpu) && !gic_virq_is_valid(s, irq, cpu)) {
+> +        /* This vIRQ does not have an LR entry which is either active or
+> +         * pending and active. Increment EOICount and ignore the write.
+> +         */
+> +        int rcpu = gic_get_vcpu_real_id(cpu);
+> +        s->h_hcr[rcpu] += 1 << R_GICH_HCR_EOICount_SHIFT;
+> +        return;
+> +    }
+
+This isn't consistent with the deactivate code about whether we
+do this check before the "irq >= s->num_irq" check or after.
+
+I think the correct answer is "before", because the number of
+physical interrupts in the GIC shouldn't affect the valid
+range of virtual interrupts.
+
+There is also an edge case here: if the VIRQ written to the
+EOI or DIR registers is a special interrupt number (1020..1023),
+then should we increment the EOI count or not? The GICv2 spec
+is not entirely clear on this point, but it does say in the
+GICH_HCR.EOICount docs that "EOIs that do not clear a bit in
+the Active Priorities register GICH_APR do not cause an increment",
+and the GICv3 spec is clear so my recommendation is that for
+1020..1023 we should ignore the write and not increment EOICount.
+
+That bit about "EOIs that do not clear a bit in GICH_APR do
+not increment EOICount" also suggests that our logic for DIR
+and EOI needs to be something like:
+
+  if (vcpu) {
+      if (irq > 1020) {
+          return;
+      }
+      clear GICH_HCR bit;
+      if (no bit cleared) {
+          return;
+      }
+      if (!gic_virq_is_valid()) {
+          increment EOICount;
+          return;
+      }
+      clear active bit in LR;
+  }
+
+?
+
+> +
+>      if (irq >= s->num_irq) {
+>          /* This handles two cases:
+>           * 1. If software writes the ID of a spurious interrupt [ie 1023]
 > --
-> 2.9.0
+> 2.18.0
 >
+
+thanks
+-- PMM
