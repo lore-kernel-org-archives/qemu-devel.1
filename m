@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ffKrV-0006o6-VA
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:57:35 -0400
+	(envelope-from <sameeh@daynix.com>) id 1ffKsN-0007Gt-8a
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ffKrS-0001ud-TK
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:57:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ffKrS-0001uE-N8
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:57:30 -0400
-Date: Tue, 17 Jul 2018 09:57:27 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180717095727.7b63dcd0@redhat.com>
-In-Reply-To: <20180716125948.11666-6-marcandre.lureau@redhat.com>
-References: <20180716125948.11666-1-marcandre.lureau@redhat.com>
-	<20180716125948.11666-6-marcandre.lureau@redhat.com>
+	(envelope-from <sameeh@daynix.com>) id 1ffKsJ-0002AZ-9t
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:58:26 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:40460)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1ffKsI-0002AK-Q3
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:58:23 -0400
+Received: by mail-ed1-x541.google.com with SMTP id e19-v6so413619edq.7
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 00:58:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 5/5] PoC: tpm: add ACPI memory clear
- interface
+In-Reply-To: <153177149044.7766.17760513270449969196@sif>
+References: <20180626151038.24771-1-sameeh@daynix.com>
+	<20180626151038.24771-3-sameeh@daynix.com>
+	<153177149044.7766.17760513270449969196@sif>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 17 Jul 2018 10:58:21 +0300
+Message-ID: <CAKPgXcGftpxGJy+pRdcQ-iE0NE2McH6Mw-jO1BOP6b3ux=08dA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qga-win: fsinfo: pci-info: allow
+ partial info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,179 +30,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S.
-	Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
 
-On Mon, 16 Jul 2018 14:59:48 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On Mon, Jul 16, 2018 at 11:04 PM, Michael Roth <mdroth@linux.vnet.ibm.com>
+wrote:
 
-> This allows to pass the last failing test from the Windows HLK TPM 2.0
-> TCG PPI 1.3 tests.
->=20
-> The interface is described in the "TCG Platform Reset Attack
-> Mitigation Specification", chapter 6 "ACPI _DSM Function". According
-> to Laszlo, it's not so easy to implement in OVMF, he suggested to do
-> it in qemu instead. It is relatively simple to implement in QEMU, but
-> make this a proof-of-concept PATCH for discussion, since this is not
-> a conventional approach.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/tpm/tpm_ppi.c     | 25 ++++++++++++++++++++++++
->  docs/specs/tpm.txt   |  2 ++
->  hw/tpm/trace-events  |  3 +++
->  4 files changed, 76 insertions(+)
->=20
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 882fc27846..7e3c217076 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
->      pprq =3D aml_name("PPRQ");
->      pprm =3D aml_name("PPRM");
-> =20
-> +    aml_append(dev,
-> +               aml_operation_region("TPP3", AML_SYSTEM_MEMORY,
-> +                                    aml_int(TPM_PPI_ADDR_BASE + 0x200),
-> +                                    0x1));
-> +    field =3D aml_field("TPP3", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
-                                 ^^^ AML_BYTE_ACC
+> Quoting Sameeh Jubran (2018-06-26 10:10:38)
+> > From: Sameeh Jubran <sjubran@redhat.com>
+> >
+> > The call to SetupDiGetDeviceRegistryProperty might fail because the
+> > value doesn't exist in the registry, in this case we shouldn't exit from
+> > the loop but instead continue to look for other available values in the
+> > registry and set this value as unavailable (-1).
+> >
+> > Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+>
+> The values I'm seeing look off:
+>
+> win7:
+>
+> {'execute':'guest-get-fsinfo','arguments':{}}
+>
+> {"return": [{"name":
+> "\\\\?\\Volume{2823bc2b-b90f-11e7-9ea5-806e6f6e6963}\\", "total-bytes":
+> 316628992, "mountpoint": "E:\\", "disk": [{"bus-type": "ide", "bus": 0,
+> "unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": -1,
+> "function": -1}, "target": 0}], "used-bytes": 316628992, "type":
+> "CDFS"}, {"name":
+> "\\\\?\\Volume{a1ed8064-3f4a-11e1-972d-806e6f6e6963}\\", "total-bytes":
+> 21367877632, "mountpoint": "C:\\", "disk": [{"bus-type": "scsi", "bus":
+> 0, "unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": 0,
+> "function": 2}, "target": 0}], "used-bytes": 19656269824, "type":
+> "NTFS"}, {"name":
+> "\\\\?\\Volume{a1ed8063-3f4a-11e1-972d-806e6f6e6963}\\", "mountpoint":
+> "System Reserved", "disk": [{"bus-type": "scsi", "bus": 0, "unit": 0,
+> "pci-controller": {"bus": -1, "slot": -1, "domain": 0, "function": 1},
+> "target": 0}], "type": "NTFS"}]}
+>
+> win10:
+>
+> {'execute':'guest-get-fsinfo','arguments':{}}
+>
+> {"return": [{"name":
+> "\\\\?\\Volume{83835b2d-0032-11e6-a84f-806e6f6e6963}\\", "total-bytes":
+> 160755712, "mountpoint": "D:\\", "disk": [{"bus-type": "ide", "bus": 0,
+> "unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": -1,
+> "function": -1}, "target": 0}], "used-bytes": 160755712, "type":
+> "CDFS"}, {"name":
+> "\\\\?\\Volume{2ea839c6-0000-0000-0000-80620c000000}\\", "mountpoint":
+> "System Reserved", "disk": [{"bus-type": "scsi", "bus": 0, "unit": 0,
+> "pci-controller": {"bus": -1, "slot": -1, "domain": 0, "function": 3},
+> "target": 0}], "type": "NTFS"}, {"name":
+> "\\\\?\\Volume{2ea839c6-0000-0000-0000-501f00000000}\\", "total-bytes":
+> 52665839616, "mountpoint": "C:\\", "disk": [{"bus-type": "scsi", "bus":
+> 0, "unit": 0, "pci-controller": {"bus": -1, "slot": -1, "domain": 0,
+> "function": 2}, "target": 0}], "used-bytes": 29645811712, "type":
+> "NTFS"}, {"name":
+> "\\\\?\\Volume{2ea839c6-0000-0000-0000-100000000000}\\", "mountpoint":
+> "System Reserved", "disk": [{"bus-type": "scsi", "bus": 0, "unit": 0,
+> "pci-controller": {"bus": -1, "slot": -1, "domain": 0, "function": 1},
+> "target": 0}], "type": "NTFS"}]}
+>
+> If any one of domain/bus/slot/func fail, we should initialize everything
+> to -1 since we can't partially report a PCI address. The fact that we
+> get partial success makes me think SPDRP_ADDRESS, SPDRP_UI_NUMBER, etc.
+> aren't reporting what we expect they should. The documentation seems
+> a bit nebulous. Also I'm not using multifunction to the non-0 function
+> values seem off.
+>
 
-> +    aml_append(field, aml_named_field("MOVV", 8));
-> +    aml_append(dev, field);
->      /*
->       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
->       * operation region inside of a method for getting FUNC[op].
-> @@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
->              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
->          }
->          aml_append(method, ifctx);
-> +
-> +        ifctx =3D aml_if(
-> +            aml_equal(uuid,
-> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
-));
-> +        {
-> +            /* standard DSM query function */
-> +            ifctx2 =3D aml_if(aml_equal(function, zero));
-> +            {
-> +                uint8_t byte_list[1] =3D { 0x03 };
-> +                aml_append(ifctx2, aml_return(aml_buffer(1, byte_list)));
-> +            }
-> +            aml_append(ifctx, ifctx2);
-> +
-> +            /*
-> +             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
-.6
-> +             *
-> +             * Arg 2 (Integer): Function Index =3D 1
-> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
-> +             *                  Operation Value of the Request
-> +             * Returns: Type: Integer
-> +             *          0: Success
-> +             *          1: General Failure
-> +             */
-> +            ifctx2 =3D aml_if(aml_equal(function, one));
-> +            {
-> +                aml_append(ifctx2,
-> +                           aml_store(aml_derefof(aml_index(arguments, ze=
-ro)),
-> +                                     op));
-> +                {
-> +                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
-> +
-> +                    /* 0: success */
-> +                    aml_append(ifctx2, aml_return(zero));
-> +                }
-> +            }
-> +            aml_append(ifctx, ifctx2);
-> +        }
-> +        aml_append(method, ifctx);
->      }
-> +
->      aml_append(dev, method);
->  }
-> =20
-> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-> index 8b46b9dd4b..64e8d828e8 100644
-> --- a/hw/tpm/tpm_ppi.c
-> +++ b/hw/tpm/tpm_ppi.c
-> @@ -16,8 +16,31 @@
->  #include "qapi/error.h"
->  #include "cpu.h"
->  #include "sysemu/memory_mapping.h"
-> +#include "sysemu/reset.h"
->  #include "migration/vmstate.h"
->  #include "tpm_ppi.h"
-> +#include "trace.h"
-> +
-> +static void tpm_ppi_reset(void *opaque)
-> +{
-> +    TPMPPI *tpmppi =3D opaque;
-> +    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
-> +
-> +    if (ptr[0x200] & 0x1) {
-> +        GuestPhysBlockList guest_phys_blocks;
-> +        GuestPhysBlock *block;
-> +
-> +        guest_phys_blocks_init(&guest_phys_blocks);
-> +        guest_phys_blocks_append(&guest_phys_blocks);
-> +        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
-> +            trace_tpm_ppi_memset(block->host_addr,
-> +                             block->target_end - block->target_start);
-> +            memset(block->host_addr, 0,
-> +                   block->target_end - block->target_start);
-> +        }
-> +        guest_phys_blocks_free(&guest_phys_blocks);
-> +    }
-> +}
-> =20
->  bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
->                    hwaddr addr, Object *obj, Error **errp)
-> @@ -27,5 +50,7 @@ bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *=
-m,
->      vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
-> =20
->      memory_region_add_subregion(m, addr, &tpmppi->ram);
-> +    qemu_register_reset(tpm_ppi_reset, tpmppi);
-is it necessary,
-shouldn't it be reset by bus initiated reset?
 
-> +
->      return true;
->  }
-> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> index 16b210c1f2..9c44384315 100644
-> --- a/docs/specs/tpm.txt
-> +++ b/docs/specs/tpm.txt
-> @@ -121,6 +121,8 @@ layout:
->   +----------+--------+--------+-----------------------------------------=
---+
->   | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
-  |
->   |          |        |        | firmware. Used by firmware.             =
-  |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> + | movv     |   0x1  |  0x200 | Memory overwrite variable               =
-  |
->   +----------+--------+--------+-----------------------------------------=
---+
-> =20
->     The following values are supported for the 'func' field. They corresp=
-ond
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 25bee0cecf..920d32ad55 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
->  tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
->  tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
->  tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
-> +
-> +# hw/tpm/tpm_ppi.c
-> +tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
+>
+> Do you know of anyone manually setting CONFIG_QGA_NTDDSCSI in practice?
+>
+Yes, I am using it actually.
+
+> It's been left disabled in configure (left misnamed as CONFIG_QGA_NTDDDISK
+> due to some problems that popped up when we tried to enable it that I
+> don't quite recall, maybe similar issues to what you're seeing). I'm
+> starting to think it's better to leave this for 3.1 since it's not
+> technically a supported feature yet and may need some reworking outside
+> of the issue you were originally addressing.
+>
+No problem it can wait for 3.1.
+
+>
+> > ---
+> >  qga/commands-win32.c | 17 +++++++++--------
+> >  1 file changed, 9 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> > index c5f1c884e1..55e460dee3 100644
+> > --- a/qga/commands-win32.c
+> > +++ b/qga/commands-win32.c
+> > @@ -505,7 +505,8 @@ static GuestPCIAddress *get_pci_info(char *guid,
+> Error **errp)
+> >
+> >      dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
+> >      for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data);
+> i++) {
+> > -        DWORD addr, bus, slot, func, dev, data, size2;
+> > +        DWORD addr, bus, slot, data, size2;
+> > +        int func, dev;
+> >          while (!SetupDiGetDeviceRegistryProperty(dev_info,
+> &dev_info_data,
+> >
+> SPDRP_PHYSICAL_DEVICE_OBJECT_NAME,
+> >                                              &data, (PBYTE)buffer, size,
+> > @@ -535,21 +536,21 @@ static GuestPCIAddress *get_pci_info(char *guid,
+> Error **errp)
+> >           */
+> >          if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+> >                     SPDRP_BUSNUMBER, &data, (PBYTE)&bus, size, NULL)) {
+> > -            break;
+> > +            bus = -1;
+> >          }
+> >
+> >          /* The function retrieves the device's address. This value will
+> be
+> >           * transformed into device function and number */
+> >          if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+> >                     SPDRP_ADDRESS, &data, (PBYTE)&addr, size, NULL)) {
+> > -            break;
+> > +            addr = -1;
+> >          }
+> >
+> >          /* This call returns UINumber of DEVICE_CAPABILITIES structure.
+> >           * This number is typically a user-perceived slot number. */
+> >          if (!SetupDiGetDeviceRegistryProperty(dev_info, &dev_info_data,
+> >                     SPDRP_UI_NUMBER, &data, (PBYTE)&slot, size, NULL)) {
+> > -            break;
+> > +            slot = -1;
+> >          }
+> >
+> >          /* SetupApi gives us the same information as driver with
+> > @@ -559,12 +560,12 @@ static GuestPCIAddress *get_pci_info(char *guid,
+> Error **errp)
+> >           * DeviceNumber = (USHORT)(((propertyAddress) >> 16) &
+> 0x0000FFFF);
+> >           * SPDRP_ADDRESS is propertyAddress, so we do the same.*/
+> >
+> > -        func = addr & 0x0000FFFF;
+> > -        dev = (addr >> 16) & 0x0000FFFF;
+> > +        func = ((int) addr == -1) ? -1 : addr & 0x0000FFFF;
+> > +        dev = ((int) addr == -1) ? -1 : (addr >> 16) & 0x0000FFFF;
+> >          pci->domain = dev;
+> > -        pci->slot = slot;
+> > +        pci->slot = (int) slot;
+> >          pci->function = func;
+> > -        pci->bus = bus;
+> > +        pci->bus = (int) bus;
+> >          break;
+> >      }
+> >
+> > --
+> > 2.13.6
+> >
+>
+
+
+
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
