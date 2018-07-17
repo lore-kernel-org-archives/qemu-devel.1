@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dayeol@berkeley.edu>) id 1ffXTn-0002CG-C1
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:25:56 -0400
+	(envelope-from <dayeol@berkeley.edu>) id 1ffXA8-0002jI-W6
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dayeol@berkeley.edu>) id 1ffXTj-0000wm-Dl
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:25:55 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:42695)
+	(envelope-from <dayeol@berkeley.edu>) id 1ffXA4-0003NL-Oe
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:05:36 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34055)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1ffXTj-0000we-76
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:25:51 -0400
-Received: by mail-qt0-x243.google.com with SMTP id z8-v6so2262006qto.9
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 14:25:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1ffXA4-0003Mu-IR
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:05:32 -0400
+Received: by mail-qt0-x244.google.com with SMTP id m13-v6so2227295qth.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 14:05:32 -0700 (PDT)
 From: Dayeol Lee <dayeol@berkeley.edu>
-Date: Tue, 17 Jul 2018 21:25:45 +0000
-Message-Id: <1531862745-8394-1-git-send-email-dayeol@berkeley.edu>
-Subject: [Qemu-devel] [PATCH] target/riscv/pmp.c: Fix PMP range boundary
- address bug
+Date: Tue, 17 Jul 2018 21:05:13 +0000
+Message-Id: <1531861513-6549-1-git-send-email-dayeol@berkeley.edu>
+Subject: [Qemu-devel] [PATCH] target/riscv/pmp.c: Fix PMP NAPOT decoding bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,19 +26,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@wdc.com, Dayeol Lee <dayeol@berkeley.edu>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-A wrong address is passed to `pmp_is_in_range` while checking if a
-memory access is within a PMP range.
-Since the ending address of the pmp range (i.e., pmp_state.addr[i].ea)
-is set to the last address in the range (i.e., pmp base + pmp size - 1),
-memory accesses containg the last address in the range will always fail.
-
-For example, assume that a PMP range is 4KB from 0x87654000 such that
-the last address within the range is 0x87654fff.
-1-byte access to 0x87654fff should be considered to be fully inside the
-PMP range.
-However the access now fails and complains partial inclusion because
-pmp_is_in_range(env, i, addr + size) returns 0 whereas
-pmp_is_in_range(env, i, addr) returns 1.
+According to the RISC-V priv. v1.10 ISA document,
+pmpaddr register stores (base_addr | (size/2 - 1)) >> 2 for a
+NAPOT-encoded address.
+However, the current code decodes (base_addr | (size - 1)) >> 3 which
+leads to a wrong base address and size.
 
 Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -48,17 +39,17 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index c4c6b09..459e556 100644
+index f432f3b..c4c6b09 100644
 --- a/target/riscv/pmp.c
 +++ b/target/riscv/pmp.c
-@@ -245,7 +245,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-          from low to high */
-     for (i = 0; i < MAX_RISCV_PMPS; i++) {
-         s = pmp_is_in_range(env, i, addr);
--        e = pmp_is_in_range(env, i, addr + size);
-+        e = pmp_is_in_range(env, i, addr + size - 1);
- 
-         /* partially inside */
-         if ((s + e) == 1) {
+@@ -138,7 +138,7 @@ static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
+         return;
+     } else {
+         target_ulong t1 = ctz64(~a);
+-        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 3;
++        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 2;
+         target_ulong range = ((target_ulong)1 << (t1 + 3)) - 1;
+         *sa = base;
+         *ea = base + range;
 -- 
 2.7.4
