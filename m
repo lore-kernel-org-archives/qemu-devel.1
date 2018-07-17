@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffWrr-0002PF-0R
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:46:44 -0400
+	(envelope-from <naravamudan@digitalocean.com>) id 1ffWxG-0004Y7-0t
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffWrm-0000hX-1u
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:46:43 -0400
-Date: Tue, 17 Jul 2018 22:46:35 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <e32447d1-92dd-7508-d388-ed2ac606c1b8@ilande.co.uk>
-Message-ID: <alpine.BSF.2.21.1807172232001.51759@zero.eik.bme.hu>
-References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
-	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
-	<alpine.BSF.2.21.1807171644120.57515@zero.eik.bme.hu>
-	<64174176-84a6-57dc-4b34-d3cd11d585c9@ilande.co.uk>
-	<alpine.BSF.2.21.1807172049050.25631@zero.eik.bme.hu>
-	<e32447d1-92dd-7508-d388-ed2ac606c1b8@ilande.co.uk>
+	(envelope-from <naravamudan@digitalocean.com>) id 1ffWxC-0004by-Uu
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:52:18 -0400
+Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:46955)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <naravamudan@digitalocean.com>)
+	id 1ffWxC-0004bL-LX
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:52:14 -0400
+Received: by mail-pf0-x230.google.com with SMTP id l123-v6so1067062pfl.13
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:52:14 -0700 (PDT)
+Date: Tue, 17 Jul 2018 13:52:12 -0700
+From: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Message-ID: <20180717205212.GA9580@breakout>
+References: <e16f10f5-b113-5ebe-51e9-c379ca34193d@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] Profiling results
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e16f10f5-b113-5ebe-51e9-c379ca34193d@linux.ibm.com>
+Subject: Re: [Qemu-devel] [BUG?] aio_get_linux_aio: Assertion
+ `ctx->linux_aio' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Tue, 17 Jul 2018, Mark Cave-Ayland wrote:
-> On 17/07/18 20:35, BALATON Zoltan wrote:
->> On Tue, 17 Jul 2018, Mark Cave-Ayland wrote:
->>>> MorphOS on mac99 this seems to be significant. This is with default 
->>>> configure (--enable-qom-cast-debug):
->>>> 
->>>> %?????? cum. %???? linenr info???????????????? symbol name
->>>> 9.7057?? 9.7057??? exec-all.h:410????????????? helper_lookup_tb_ptr
->>>> 8.0330? 17.7387??? object.c:711 object_class_dynamic_cast_assert
->>>> 6.9411? 24.6798??? cputlb.c:793??????????????? io_readx
->>>> 6.3219? 31.0017??? sm501_template.h:62???????? draw_line16_32
->>>> 5.3601? 36.3617??? cputlb.c:114??????????????? tlb_flush_nocheck
->>>> 3.6170? 39.9787??? translate-all.c:749???????? page_trylock_add
->>>> 3.1188? 43.0975??? translate-all.c:803???????? page_collection_lock
->>>> 3.0405? 46.1380??? exec.c:3025???????????????? iotlb_to_section
->>>> 2.7044? 48.8424??? softmmu_template.h:112????? helper_ret_ldub_mmu
->>>> 2.4154? 51.2578??? memory.c:1350?????????????? memory_region_access_valid
->> [...]
->>> My first thought is that there is a QOM cast somewhere in a hot path on -M 
->>> mac99 - can you show us the call stack information from the profile?
->> 
->> Not really. Oprofile that gave me this profile could not display call graph 
->> for this call. I've tried again with the perf tool but I'm not quite sure 
->> how to interpret its results. If I'm not mistaken it points me in the 
->> direction of cpu_asidx_from_attrs, called from iotlb_to_section, called 
->> from io_readx. The object_class_dynamic_cast_assert call likely comes from 
->> OBJECT_CLASS_CHECK, expanded from OBJECT_GET_CLASS, expanded from 
->> CPU_GET_CLASS. Would that make any sense? Any idea what to do about it?
->
-> Good question. A quick grep for 'asidx_from_attrs' shows that 
-> cc->asidx_from_attrs() isn't set for PPC targets, so as a quick test does 
-> replacing the inline function cpu_asidx_from_attrs() in include/qom/cpu.h 
-> with a simple "return 0" change the profile at all?
+On 17.07.2018 [13:25:53 -0400], Farhan Ali wrote:
+> Hi,
+> 
+> I am seeing some strange QEMU assertion failures for qemu on s390x,
+> which prevents a guest from starting.
+> 
+> Git bisecting points to the following commit as the source of the error.
+> 
+> commit ed6e2161715c527330f936d44af4c547f25f687e
+> Author: Nishanth Aravamudan <naravamudan@digitalocean.com>
+> Date:   Fri Jun 22 12:37:00 2018 -0700
+> 
+>     linux-aio: properly bubble up errors from initialization
+> 
+>     laio_init() can fail for a couple of reasons, which will lead to a NULL
+>     pointer dereference in laio_attach_aio_context().
+> 
+>     To solve this, add a aio_setup_linux_aio() function which is called
+>     early in raw_open_common. If this fails, propagate the error up. The
+>     signature of aio_get_linux_aio() was not modified, because it seems
+>     preferable to return the actual errno from the possible failing
+>     initialization calls.
+> 
+>     Additionally, when the AioContext changes, we need to associate a
+>     LinuxAioState with the new AioContext. Use the bdrv_attach_aio_context
+>     callback and call the new aio_setup_linux_aio(), which will allocate a
+>     new AioContext if needed, and return errors on failures. If it fails for
+>     any reason, fallback to threaded AIO with an error message, as the
+>     device is already in-use by the guest.
+> 
+>     Add an assert that aio_get_linux_aio() cannot return NULL.
+> 
+>     Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
+>     Message-id: 20180622193700.6523-1-naravamudan@digitalocean.com
+>     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> 
+> Not sure what is causing this assertion to fail. Here is the qemu command
+> line of the guest, from qemu log, which throws this error:
+> 
+> 
+> LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+> QEMU_AUDIO_DRV=none /usr/local/bin/qemu-system-s390x -name
+> guest=rt_vm1,debug-threads=on -S -object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-21-rt_vm1/master-key.aes
+> -machine s390-ccw-virtio-2.12,accel=kvm,usb=off,dump-guest-core=off -m 1024
+> -realtime mlock=off -smp 4,sockets=4,cores=1,threads=1 -object
+> iothread,id=iothread1 -uuid 0cde16cd-091d-41bd-9ac2-5243df5c9a0d -display
+> none -no-user-config -nodefaults -chardev
+> socket,id=charmonitor,fd=28,server,nowait -mon
+> chardev=charmonitor,id=monitor,mode=control -rtc base=utc -no-shutdown -boot
+> strict=on -drive file=/dev/mapper/360050763998b0883980000002a000031,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native
+> -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0001,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on
+> -netdev tap,fd=30,id=hostnet0,vhost=on,vhostfd=31 -device
+> virtio-net-ccw,netdev=hostnet0,id=net0,mac=02:3a:c8:67:95:84,devno=fe.0.0000
+> -netdev tap,fd=32,id=hostnet1,vhost=on,vhostfd=33 -device
+> virtio-net-ccw,netdev=hostnet1,id=net1,mac=52:54:00:2a:e5:08,devno=fe.0.0002
+> -chardev pty,id=charconsole0 -device
+> sclpconsole,chardev=charconsole0,id=console0 -device
+> virtio-balloon-ccw,id=balloon0,devno=fe.3.ffba -sandbox
+> on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny -msg
+> timestamp=on
+> 
+> 
+> 
+> 2018-07-17 15:48:42.252+0000: Domain id=21 is tainted: high-privileges
+> 2018-07-17T15:48:42.279380Z qemu-system-s390x: -chardev pty,id=charconsole0:
+> char device redirected to /dev/pts/3 (label charconsole0)
+> qemu-system-s390x: util/async.c:339: aio_get_linux_aio: Assertion
+> `ctx->linux_aio' failed.
+> 2018-07-17 15:48:43.309+0000: shutting down, reason=failed
+> 
+> 
+> Any help debugging this would be greatly appreciated.
 
-It does seem to lessen its impact but it's still higher than I expected:
+iiuc, this possibly implies AIO was not actually used previously on this
+guest (it might have silently been falling back to threaded IO?). I
+don't have access to s390x, but would it be possible to run qemu under
+gdb and see if aio_setup_linux_aio is being called at all (I think it
+might not be, but I'm not sure why), and if so, if it's for the context
+in question?
 
-%        cum. %     linenr info                 symbol name
-10.7949  10.7949    exec-all.h:410              helper_lookup_tb_ptr
-  7.8663  18.6612    cputlb.c:793                io_readx
-  6.0265  24.6878    cputlb.c:114                tlb_flush_nocheck
-  4.0671  28.7548    sm501_template.h:62         draw_line16_32
-  4.0559  32.8107    object.c:765                object_class_dynamic_cast_assert
-  3.3780  36.1887    memory.c:1350               memory_region_access_valid
-  2.8920  39.0808    qemu-thread-posix.c:61      qemu_mutex_lock_impl
-  2.7187  41.7995    memory.c:1415               memory_region_dispatch_read
-  2.6011  44.4006    qht.c:487                   qht_lookup_custom
-  2.5356  46.9362    softmmu_template.h:112      helper_ret_ldub_mmu
+If it's not being called first, could you see what callpath is calling
+aio_get_linux_aio when this assertion trips?
 
-Maybe it's called from somewhere else too? I know draw_line16_32 but I 
-wonder where could helper_lookup_tb_ptr and tlb flushes come from? Those 
-seem to be significant. And io_readx in itself seems to be too high on the 
-list too. I wonder if it may have something to do with the background task 
-trying to read non-implemented i2c stuff frequently (as discussed in point 
-2. in http://zero.eik.bme.hu/~balaton/qemu/amiga/#morphos).
-
-Regards,
-BALATON Zoltan
+Thanks!
+-Nish
