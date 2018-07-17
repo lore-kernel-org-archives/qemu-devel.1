@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ffNZD-0006mx-2l
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:50:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1ffNZD-0006my-IT
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ffNZB-0007o9-T9
+	(envelope-from <bounces@canonical.com>) id 1ffNZ8-0007mC-Iu
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:50:51 -0400
-Date: Tue, 17 Jul 2018 20:50:06 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180717105006.GA2272@umbus.fritz.box>
-References: <152949925592.606785.4717120428688653960.stgit@bahia.lan>
-	<20180621011809.GD32328@umbus.fritz.box>
-	<20180621152321.3ab81d51@bahia.lan>
+Received: from indium.canonical.com ([91.189.90.7]:54524)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ffNZ8-0007lN-9U
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:50:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ffNZ4-0006b7-Ib
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:50:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 83E382E80CE
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:50:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
-Content-Disposition: inline
-In-Reply-To: <20180621152321.3ab81d51@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11.2] spapr: make pseries-2.11 the
- default machine type
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Jul 2018 10:37:10 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1587065@bugs.launchpad.net>
+Reply-To: Bug 1587065 <1587065@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160530134240.21929.85128.malonedeb@wampee.canonical.com>
+Message-Id: <153182383042.2927.6540823954149841874.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1587065] Re: btrfs qemu-ga - multiple mounts
+ block fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +38,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-stable@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+Tests are all ok, MP review was acked and case confirmed.
+No Security Update since then in between, so sponsoring into SRU queue now =
+...
 
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On Thu, Jun 21, 2018 at 03:23:21PM +0200, Greg Kurz wrote:
-> On Thu, 21 Jun 2018 11:18:09 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Jun 20, 2018 at 02:54:15PM +0200, Greg Kurz wrote:
-> > > The spapr capability framework was introduced in QEMU 2.12. It allows
-> > > to have an explicit control on how host features are exposed to the
-> > > guest. This is especially needed to handle migration between hetero-
-> > > geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
-> > > workarounds against speculative execution vulnerabilities to guests.
-> > > The framework was hence backported to QEMU 2.11.1, especially these
-> > > commits:
-> > >=20
-> > > 0fac4aa93074 spapr: Add pseries-2.12 machine type
-> > > 9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
-> > >  optional capability
-> > >=20
-> > > 0fac4aa93074 has the confusing effect of making pseries-2.12 the defa=
-ult
-> > > machine type for QEMU 2.11.1, instead of the expected pseries-2.11. T=
-his
-> > > patch changes the default machine back to pseries-2.11.
-> > >=20
-> > > Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2=
-=2E11
-> > > to be enabled by default, ie, when not passing cap-htm on the command
-> > > line. This breaks several 'make check' testcases that run qemu-system=
--ppc64
-> > > with TCG.
-> > >=20
-> > > The only sane way to fix this is to adapt the impacted testcases so t=
-hat
-> > > they all pass cap-htm=3Doff in this case. This patch does that as wel=
-l.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > > v2: - have the testcases to pass cap-htm=3Doff instead of violating t=
-he
-> > >       capabilities logic.
-> > >=20
-> > > Upstream doesn't need anything like that since newer pseries machine =
-types
-> > > start with HTM disabled by default. This is really a oneshot fix for =
-2.11.2,
-> > > and I've tried to make it as small as possible.
-> > >=20
-> > > This is a full replacement of the previous version. It is based on Mi=
-ke's
-> > > staging tree for 2.11: =20
-> >=20
-> > Thanks for fixing this up
-> >=20
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
-> > Btw, 2.11.z should probably have the 2.12 machine type removed
-> > entirely, as well as (obviously) not being the default.  Not within
-> > scope for this patch, though.
-> >=20
->=20
-> Well... it is indeed weird but I don't think it hurts. Also, people
-> may have started using pseries-2.12 with QEMU 2.11.1 (I seem to
-> remember Mike told me about something like this the other day)...
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1587065
 
-I came back to thinking about this and realized this is a terrible
-idea.  The problem is that because of the way we define the latest
-machine type, then backwards compat props for the earlier ones, it's
-very likely that the "pseries-2.12" in 2.11 won't be the same as
-pseries-2.12 in 2.12, simply because 2.11 won't have the necessary
-features to implement pseries-2.12 as in 2.12.
+Title:
+  btrfs qemu-ga - multiple mounts block fsfreeze
 
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Bug description:
+  [Impact]
 
---mYCpIKhGyMATD0i+
-Content-Type: application/pgp-signature; name="signature.asc"
+  =C2=A0* backport upstream fix to avoid double unmounts (e.g. bind mounts)
+  =C2=A0=C2=A0=C2=A0hanging the freeze action.
 
------BEGIN PGP SIGNATURE-----
+  [Test Case]
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltNyd4ACgkQbDjKyiDZ
-s5J+1A//eBfhcUm5vO7ZRoRnz2FqMSQee+iRaDtmQ508Vj3mMeM4WudKWwa6lqL9
-w5JkeF14vr+ytocvtJ3e86brs+m4lWOleg4DKujSl5Lq7Zco25ypxpHiyFkIwTw/
-qkvCocmp8HHN7yQLroP9jCCXwaEbJfdRuszW7HQXm62XPms4CQrnfMXwPgp57Ttc
-9ORCsWbK9Qy/zX8zrNYog6abu/OZMByhqHs1CQrL247XfdBELcX1DjKeOCvcvk41
-ZPNA00joRCGds3l/h6IBjPsF1bkT54e3AboramWqGkPiNfAKZNwajEW3VyBhrTy7
-qMKsBrXOIg7DW+nOPMuW6vM7TkOi1tevvP5fu/F/zNUSNrdSuWbOhur4iJ5HJJqp
-Qk5QemYTVmUhK45Rilss/hyBxJHHULHAU/wF7Jmz6843KeKWQG23S3ljdAWaUd87
-BNu7+kJ/NNTVYu/junO0sj6WdyPFwpBNU2V61fb0iVoPryoESsm2tlhGL4E5Y0IH
-vu4axFfnyGRrmEVAAwNcn2GsWYJ1HUQuNuSzBSlFsw4fdysutDc1vk2QHHVAXMhH
-FzeyaV1dBvqxjK4FQpW201GoBDEcnr944FAYNuZpvwP+mPIWeIj5EEVrCfY6yDL9
-lKiFiUdotcmUh9HOoDwNDkkfQAxvJyssfHvgNSHCN6UJh+GJwqA=
-=x8GL
------END PGP SIGNATURE-----
+  =C2=A0* Prepare a guest
+  =C2=A0=C2=A0=C2=A0$ uvt-simplestreams-libvirt --verbose sync --source htt=
+p://cloud-images.ubuntu.com/daily arch=3Damd64 release=3Dxenial label=3Ddai=
+ly
+  uvt-kvm create --password ubuntu x-freeze arch=3Damd64 release=3Dxenial l=
+abel=3Ddaily
 
---mYCpIKhGyMATD0i+--
+  =C2=A0* Shut it down and use virsh edit to add a channel for the agent. A=
+dd this somewhere under <devices>:
+  <channel type=3D'unix'>
+  =C2=A0=C2=A0=C2=A0<source mode=3D'bind'/>
+  =C2=A0=C2=A0=C2=A0<target type=3D'virtio' name=3D'org.qemu.guest_agent.0'=
+/>
+  </channel>
+
+  =C2=A0=C2=A0* Start the guest again, in it install qemu-guest-agent
+
+  =C2=A0=C2=A0*
+
+  =C2=A0=C2=A0* On the Host then freeze and thaw the guest
+  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsfreeze x-freeze
+  =C2=A0=C2=A0=C2=A0=C2=A0$ virsh domfsthaw x-freeze
+
+  =C2=A0=C2=A0# The above works, then trigger the issue, in the guest do
+  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mkdir /mnt/test
+  =C2=A0=C2=A0=C2=A0=C2=A0$ sudo mount -o bind / /mnt/test/
+
+  =C2=A0=C2=A0* Now the freeze/thaw will fail unless the fix is applied to =
+the
+  guest.
+
+  [Regression Potential]
+
+  =C2=A0* From looking at the code alone I could think of a different cause=
+ that
+  =C2=A0=C2=A0=C2=A0makes it return EBUSY.
+  =C2=A0=C2=A0=C2=A0The biggest risk I could see due to that is the agent r=
+eporting a
+  =C2=A0=C2=A0=C2=A0successful freeze due to accepting EBUSY which is not a=
+ctually true.
+  =C2=A0=C2=A0=C2=A0But we have that in Ubuntu since Artful and
+  =C2=A0=C2=A0=C2=A0upstream since January 2017 and there are no such repor=
+ts.
+
+  [Other Info]
+
+  =C2=A0* n/a
+
+  ---
+
+  Having two mounts of the same device makes fsfreeze through qemu-ga impos=
+sible.
+  root@CmsrvMTA:/# mount -l | grep /dev/vda2
+  /dev/vda2 on / type btrfs (rw,relatime,space_cache,subvolid=3D257,subvol=
+=3D/@)
+  /dev/vda2 on /home type btrfs (rw,relatime,space_cache,subvolid=3D258,sub=
+vol=3D/@home)
+
+  Having two mounts is rather common with btrfs, so the feature fsfreeze
+  is unusable on these systems.
+
+  Below more information about how we encountered this issue...
+
+  Message send to qemu-discuss@nongnu.org:
+
+  Message 1:
+  ----------
+  I use external snapshots to backup my guests. I use the 'quiesce' option =
+to flush and frees the guest file system with the qemu guest agent.
+
+  With the exeption of one guest, this procedure works fine. On the 'unwill=
+ing' guest, I get this error message:
+  "ERROR 2016-05-25 00:51:19 | T25-bakVMSCmsrvVH2 | fout: internal error: u=
+nable to execute QEMU agent command 'guest-fsfreeze-freeze': failed to free=
+ze /: Device or resource busy"
+
+  I don't think this is not some sort of time-out error, because
+  activation of the fsfreeze and the error message happen immediately
+  after each other:
+
+  $ grep qemu-ga syslog.1
+  May 25 00:51:19 CmsrvMTA qemu-ga: info: guest-fsfreeze called
+
+  This is the only entry of the qemu guest agent in syslog.
+
+  $ sudo virsh version
+  Compiled against library: libvirt 1.3.1
+  Using library: libvirt 1.3.1
+  Gebruikte API: QEMU 1.3.1
+  Draaiende hypervisor: QEMU 2.5.0
+
+  $ virsh qemu-agent-command CmsrvMTA '{"execute": "guest-info"}'
+  {"return":{"version":"2.5.0", ... ,{"enabled":true,"name":"guest-fstrim",=
+"success-response":true},{"enabled":true,"name":"guest-fsfreeze-thaw","succ=
+ess-response":true},{"enabled":true,"name":"guest-fsfreeze-status","success=
+-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze-list","succe=
+ss-response":true},{"enabled":true,"name":"guest-fsfreeze-freeze","success-=
+response":true}, ... }
+
+  For making an external snapshot, I use this command:
+  $ virsh snapshot-create-as --domain CmsrvMTA sn1 --disk-only --atomic --q=
+uiesce --no-metadata --diskspec vda,file=3D/srv/poolVMS/CmsrvMTA.sn1
+
+  Piece of reply 1:
+  -----------------
+  I have encountered this before. Some operating systems
+  =C2=A0may have bind-mounts that let a device appear multiple times in the=
+ mount list. Unfortunately the guest agent is not smart enough to consider =
+a device that has been frozen as succesfull and keep going. This causes thi=
+s specific error.
+
+  Piece of reply 2:
+  -----------------
+  Ok, that seems to be it.
+
+  I=E2=80=99ve got the =E2=80=98/=E2=80=99 and =E2=80=98/home=E2=80=99 on t=
+he same device formatted as btrfs on
+  two separate sub volumes.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1587065/+subscriptions
