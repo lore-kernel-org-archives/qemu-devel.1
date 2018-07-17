@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ffYl9-0005WI-U1
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:58 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffZXj-0000qP-TP
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 19:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ffYl9-0000sv-1e
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ffYl8-0000sJ-K3
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:54 -0400
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 17 Jul 2018 16:47:51 -0600
-Message-ID: <20180717224751.14019.95362.stgit@gimli.home>
-In-Reply-To: <20180717222721.14019.27548.stgit@gimli.home>
-References: <20180717222721.14019.27548.stgit@gimli.home>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffZXg-0004Ey-OX
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 19:38:07 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7a6766fc-9fac-79a5-d53c-b5209abccaae@amsat.org>
+Date: Tue, 17 Jul 2018 20:37:58 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH 3/3] vfio: Inhibit ballooning
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] qemu-iotests: workaround to avoid Python3 while
+ running tests on Fedora Docker image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-For all directly assigned devices and potentially some mdev devices,
-internal management of pinned pages is incompatible with ballooning.
-In the case of mdev devices, QEMU cannot know which pages the vendor
-driver has mapped for the device.  It could be only the working set,
-which should never be a ballooning victim page, or it could be the
-entire VM address space.  Until the vfio IOMMU interface can tell us
-more about the support for handling ballooning, assume any vfio
-container inhibits ballooning.
+I noticed this while running "make docker-test-block@fedora":
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/common.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+$ make docker-test-block@fedora NETWORK=1
+  BUILD   fedora
+    RUN test-block in qemu:fedora
+Configure options:
+--enable-werror --prefix=/tmp/qemu-test/install
+--python=/usr/bin/python3 --target-list=x86_64-softmmu
+...
+python            /usr/bin/python3 -B
+...
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index fb396cf00ac4..8124dd8df3c1 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -32,6 +32,7 @@
- #include "hw/hw.h"
- #include "qemu/error-report.h"
- #include "qemu/range.h"
-+#include "sysemu/balloon.h"
- #include "sysemu/kvm.h"
- #include "trace.h"
- #include "qapi/error.h"
-@@ -1218,6 +1219,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
- 
-     container->initialized = true;
- 
-+    /* vfio is currently incompatible with ballooning */
-+    qemu_balloon_inhibit(true);
-+
-     return 0;
- listener_release_exit:
-     QLIST_REMOVE(group, container_next);
-@@ -1276,6 +1280,8 @@ static void vfio_disconnect_container(VFIOGroup *group)
-         g_free(container);
- 
-         vfio_put_address_space(space);
-+
-+        qemu_balloon_inhibit(false);
-     }
- }
- 
+194         - output mismatch (see 194.out.bad)
+--- /tmp/qemu-test/src/tests/qemu-iotests/194.out       2018-07-17
+22:51:10.000000000 +0000
++++ /tmp/qemu-test/build/tests/qemu-iotests/194.out.bad 2018-07-17
+22:58:01.646916625 +0000
+@@ -1,18 +1,18 @@
+ Launching VMs...
+ Launching NBD server on destination...
+-{u'return': {}}
+-{u'return': {}}
++{'return': {}}
++{'return': {}}
+
+and many more errors, until:
+
+Failures: 045 132 148 152 162 169 194 205 208 218 222
+Failed 11 of 49 tests
+Test failed: iotests raw
+
+All failures are due to Python2 syntax.
+I started to fix but noticed there are too many and this isn't to
+correct fix for this release.
+
+I suppose we don't want to use Py3 for iotests.
+
+The bisect was obvious =)
+
+  commit 356dc290f0ef930a24b6af3a0908b1cb58ad47c9
+  Author: Daniel P. Berrange <berrange@redhat.com>
+  Date:   Tue Jan 16 13:42:17 2018 +0000
+
+    docker: change Fedora images to run with python3
+
+    Fedora has switched to Python 3 by default, so it
+    makes sense to use that for testing QEMU builds,
+    so we get testing of Python 3 compatibility.
+
+    Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+    Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+which added:
+
+ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
+
+I then figured out we can use EXTRA_CONFIGURE_OPTS:
+
+$ make docker-test-block@fedora NETWORK=1 \
+  EXTRA_CONFIGURE_OPTS=--python=/usr/bin/python2
+  COPY    RUNNER
+    RUN test-block in qemu:fedora
+Configure options:
+--enable-werror --prefix=/tmp/qemu-test/install
+--python=/usr/bin/python3 --python=/usr/bin/python2
+--target-list=x86_64-softmmu
+...
+python            /usr/bin/python2 -B
+...
+Passed all 48 tests
+PLATFORM      -- Linux/aarch64 757be6ea0325 4.15.0-20-generic
+
+So let's use this simple workaround :)
+
+  EXTRA_CONFIGURE_OPTS=--python=/usr/bin/python2
+
+Regards,
+
+Phil.
