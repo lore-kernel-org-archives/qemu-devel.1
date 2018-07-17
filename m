@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffQrN-0001Dw-FY
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:21:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffQw2-0002IX-Uu
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:26:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffQrM-00071R-EC
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:21:49 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40212)
+	(envelope-from <peter.maydell@linaro.org>) id 1ffQw2-0001Rq-4N
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:26:38 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:35636)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffQrM-00070R-8l
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:21:48 -0400
-Received: by mail-oi0-x242.google.com with SMTP id w126-v6so2325294oie.7
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 07:21:48 -0700 (PDT)
+	id 1ffQw1-0001Rf-Nk
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:26:38 -0400
+Received: by mail-oi0-x241.google.com with SMTP id i12-v6so2376549oik.2
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 07:26:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180714171601.5734-11-luc.michel@greensocs.com>
+In-Reply-To: <20180714171601.5734-15-luc.michel@greensocs.com>
 References: <20180714171601.5734-1-luc.michel@greensocs.com>
-	<20180714171601.5734-11-luc.michel@greensocs.com>
+	<20180714171601.5734-15-luc.michel@greensocs.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jul 2018 15:21:27 +0100
-Message-ID: <CAFEAcA-_EXpj+G=eoW5wptnkU6s3OfeT25Kadzr_mWP7hf6x4A@mail.gmail.com>
+Date: Tue, 17 Jul 2018 15:26:16 +0100
+Message-ID: <CAFEAcA__GVdga=VDuwiVq9XW4gBRxMECd2Xm_U8fDzH+aTkzOQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 10/20] intc/arm_gic: Implement
- virtualization extensions in gic_(activate_irq|drop_prio)
+Subject: Re: [Qemu-devel] [PATCH v4 14/20] intc/arm_gic: Wire the vCPU
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,18 +34,18 @@ To: Luc Michel <luc.michel@greensocs.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Mark Burton <mark.burton@greensocs.com>, Jan Kiszka <jan.kiszka@web.de>
 
 On 14 July 2018 at 18:15, Luc Michel <luc.michel@greensocs.com> wrote:
-> Implement virtualization extensions in gic_activate_irq() and
-> gic_drop_prio() and in gic_get_prio_from_apr_bits() called by
-> gic_drop_prio().
+> Add the read/write functions to handle accesses to the vCPU interface.
+> Those accesses are forwarded to the real CPU interface, with the CPU id
+> being converted to the corresponding vCPU id (vCPU id = CPU id +
+> GIC_NCPU).
 >
-> When the current CPU is a vCPU:
->   - Use GIC_VIRT_MIN_BPR and GIC_VIRT_NR_APRS instead of their non-virt
->   counterparts,
->   - the vCPU APR is stored in the virtual interface, in h_apr.
->
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> As for the CPU interface, we create a base region for the vCPU interface
+> that fetches the current vCPU id using the current_cpu global variable, and
+> one mirror region per vCPU which maps to that specific vCPU id. This is
+> required by the GIC architecture specification.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Is it? The spec says the GICH registers need to be accessible
+like this, but not the vCPU (GICV) registers...
 
 thanks
 -- PMM
