@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffQgN-0003dY-M2
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:10:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ffQiF-00050p-Pc
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffQgI-0007Zs-IX
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:10:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52950 helo=mx1.redhat.com)
+	(envelope-from <cohuck@redhat.com>) id 1ffQiE-0000xj-P9
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:12:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44504 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ffQgI-0007ZN-4p
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:10:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9EA13402312B
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 14:10:21 +0000 (UTC)
-References: <20180717113402.5510-1-quintela@redhat.com>
-	<20180717113402.5510-24-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <dccfc07d-4ba2-34aa-4d45-ddbd08a20c2b@redhat.com>
-Date: Tue, 17 Jul 2018 16:10:19 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ffQiE-0000xU-Jx
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 10:12:22 -0400
+Date: Tue, 17 Jul 2018 16:12:14 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180717161214.42bb4c26.cohuck@redhat.com>
+In-Reply-To: <20180717022924.25428-1-f4bug@amsat.org>
+References: <20180717022924.25428-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180717113402.5510-24-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 23/25] check: Only test usb-ehci when it is
- compiled in
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] docker: Improve 'host-cross' image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <huth@tuxfamily.org>
 
-On 17.07.2018 13:34, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/Makefile.include | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 27f50e3231..731443387d 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -284,8 +284,8 @@ check-qtest-i386-$(CONFIG_USB_OHCI) += tests/usb-hcd-ohci-test$(EXESUF)
->  gcov-files-i386-$(CONFIG_USB_OHCI) += hw/usb/hcd-ohci.c
->  check-qtest-i386-$(CONFIG_USB_UHCI) += tests/usb-hcd-uhci-test$(EXESUF)
->  gcov-files-i386-$(CONFIG_USB_UHCI) += hw/usb/hcd-uhci.c
-> -check-qtest-i386-y += tests/usb-hcd-ehci-test$(EXESUF)
-> -gcov-files-i386-y += hw/usb/hcd-ehci.c
-> +check-qtest-i386-$(CONFIG_USB_EHCI) += tests/usb-hcd-ehci-test$(EXESUF)
-> +gcov-files-i386-$(CONFIG_USB_EHCI) += hw/usb/hcd-ehci.c
->  gcov-files-i386-y += hw/usb/dev-hid.c
->  gcov-files-i386-y += hw/usb/dev-storage.c
->  check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
-> 
+On Mon, 16 Jul 2018 23:29:20 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Sorry I don't have a better name for this image,
+> it is meant to cross-build for the same architecture
+> than the host.
+>=20
+> Due to the bad name, explicitely tagged the last 2
+> patches as 'RFC'.
+>=20
+> Tested on x86_64 and aarch64, should also work on
+> s390x and ppc64le (per the Docker doc).
+>=20
+> If they are volunteers for test, the command is as simple as:
+>=20
+>   $ make docker-test-quick@debian-host-cross [V=3D1]
+
+On s390x, all looks reasonable until it tries to install libxen-dev:
+
+Step 4/14 : RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata     apt-get inst=
+all -y --no-install-recommends         libaio-dev         libasound2-dev   =
+      libattr1-dev         libbluetooth-dev         libbrlapi-dev         l=
+ibbz2-dev         libcacard-dev         libcap-dev         libcap-ng-dev   =
+      libcapstone-dev         libcurl4-gnutls-dev         libepoxy-dev     =
+    libfdt-dev         libibverbs-dev         libiscsi-dev         libjemal=
+loc-dev         libjpeg-dev         liblttng-ust-dev         liblzo2-dev   =
+      libncursesw5-dev         libnfs-dev         libnss3-dev         libpi=
+xman-1-dev         libpulse-dev         librados-dev         librbd-dev    =
+     librdmacm-dev         libseccomp-dev         libsnappy-dev         lib=
+spice-protocol-dev         libssh2-1-dev         liburcu-dev         libusb=
+-1.0-0-dev         libusbredirhost-dev         libusbredirparser-dev       =
+  libvdeplug-dev         libvte-dev         libxen-dev         uuid-dev    =
+     xfslibs-dev
+ ---> Running in a7f6ae892a05
+Reading package lists...
+Building dependency tree...
+Reading state information...
+E: Unable to locate package libxen-dev
