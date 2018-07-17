@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ffOFF-0006zU-7q
+	(envelope-from <quintela@redhat.com>) id 1ffOFF-0006zV-87
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ffOFD-0003S6-18
+	(envelope-from <quintela@redhat.com>) id 1ffOFA-0003QG-CZ
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32788 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36678 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ffOFC-0003Rs-Sy
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:14 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ffOFA-0003Pl-8X
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:12 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 855F07C6CA
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:34:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D9F16401EF05
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:34:11 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 17 Jul 2018 13:33:40 +0200
-Message-Id: <20180717113402.5510-4-quintela@redhat.com>
+Date: Tue, 17 Jul 2018 13:33:38 +0200
+Message-Id: <20180717113402.5510-2-quintela@redhat.com>
 In-Reply-To: <20180717113402.5510-1-quintela@redhat.com>
 References: <20180717113402.5510-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/25] check: Use land/lor when possible
+Subject: [Qemu-devel] [PATCH 01/25] configure: We don't want to clean
+ configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +33,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-So everythig is (a bit) more consistent
+If you don't want to compile everything, you configure
+config-devices.mak.  And then make clean remove it, and make will
+create a default one without your configuration.  Fix it by not
+removing it.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/Makefile.include | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a49282704e..47aea32193 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -98,11 +98,9 @@ check-unit-y += tests/test-block-backend$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
--ifeq ($(CONFIG_SOFTMMU),y)
--check-unit-y += tests/test-xbzrle$(EXESUF)
--gcov-files-test-xbzrle-y = migration/xbzrle.c
--check-unit-$(CONFIG_POSIX) += tests/test-vmstate$(EXESUF)
--endif
-+check-unit-$(CONFIG_SOFTMMU) += tests/test-xbzrle$(EXESUF)
-+gcov-files-test-xbzrle-$(CONFIG_SOFTMMU) = migration/xbzrle.c
-+check-unit-$(call land, $(CONFIG_SOFTMMU), $(CONFIG_POSIX)) += tests/test-vmstate$(EXESUF)
- check-unit-y += tests/test-cutils$(EXESUF)
- gcov-files-test-cutils-y += util/cutils.c
- check-unit-y += tests/test-shift128$(EXESUF)
-@@ -297,9 +295,7 @@ check-qtest-i386-y += tests/q35-test$(EXESUF)
- check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
- gcov-files-i386-y += hw/pci-host/q35.c
- check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
--ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
--check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
--endif
-+check-qtest-x86_64-$(call lor, $(CONFIG_VHOST_USER_NET_TEST_i386), $(CONFIG_VHOST_USER_NET_TEST_x86_64)) += tests/vhost-user-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-swtpm-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) += tests/tpm-tis-swtpm-test$(EXESUF)
+diff --git a/Makefile b/Makefile
+index 2da686be33..2ffbcde323 100644
+--- a/Makefile
++++ b/Makefile
+@@ -751,7 +751,7 @@ clean:
+ 	if test -d $$d; then $(MAKE) -C $$d $@ || exit 1; fi; \
+ 	rm -f $$d/qemu-options.def; \
+         done
+-	rm -f $(SUBDIR_DEVICES_MAK) config-all-devices.mak
++	rm -f config-all-devices.mak
+ 
+ VERSION ?= $(shell cat VERSION)
+ 
 -- 
 2.17.1
