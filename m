@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRXS-000427-Nc
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:05:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ffRZ9-00052g-0f
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRXN-0005eV-25
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:05:18 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:38274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRXM-0005dL-Sk
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:05:12 -0400
-Received: by mail-ua0-x242.google.com with SMTP id o11-v6so881863uak.5
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:05:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180713121741.19262-1-alex.bennee@linaro.org>
-	<20180713121741.19262-8-alex.bennee@linaro.org>
-	<63c0e5cd-fac0-789c-d7fd-f77ed8d9d047@amsat.org>
-	<87601e5fhk.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bc4a5288-e316-4998-8fd8-6d4ffb339e27@amsat.org>
-Date: Tue, 17 Jul 2018 12:05:06 -0300
-MIME-Version: 1.0
-In-Reply-To: <87601e5fhk.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 07/16] docker: gracefully skip
- check_qemu
+	(envelope-from <pbonzini@redhat.com>) id 1ffRZ7-0007AX-Hp
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54062 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ffRZ7-00079y-Bw
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:01 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 17 Jul 2018 17:06:43 +0200
+Message-Id: <1531840015-28804-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
+References: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 01/13] dump: add kernel_gs_base to QEMU CPU state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,65 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-On 07/17/2018 07:22 AM, Alex Bennée wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->> On 07/13/2018 09:17 AM, Alex Bennée wrote:
->>> Not all our images are able to run the tests. Rather than use features
->>> we can just check for the existence and run-ability of gtester. If the
->>> image has been setup for binfmt_misc it will be able to run anyway.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  tests/docker/common.rc | 8 +++++++-
->>>  1 file changed, 7 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
->>> index cfc620d554..6df431eb72 100755
->>> --- a/tests/docker/common.rc
->>> +++ b/tests/docker/common.rc
->>> @@ -47,7 +47,13 @@ check_qemu()
->>>      else
->>>          TEST="$@"
->>>      fi
->>> -    make $MAKEFLAGS $TEST
->>> +
->>> +    if type gtester > /dev/null 2>&1 && \
->>
->> commit e465ce7d09939d631f1861e0bd8873417c1c0d65
->>
->>     tests: Use "command -v" instead of which(1) in shell scripts
-> 
-> type is also a shell built-in albeit an 1982 bashism. I'll switch to
-> command -v as tending towards POSIX is what we should aim for (although
-> our test-FOO/common.rc structure seems a little confused).
+From: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-Thanks, with 'command -v':
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This patch adds field with content of KERNEL_GS_BASE MSR to QEMU note in
+ELF dump.
 
-> 
->>
->>     When which(1) is not installed, we would complain "perl not found"
->>     because it's the first set_prog_path check. The error message is
->>     wrong.
->>
->>     Fix it by using "command -v", a native way to query the existence
->>     of a command.
->>
->>> +           gtester --version > /dev/null 2>&1; then
->>> +        make $MAKEFLAGS $TEST
->>> +    else
->>> +        echo "No working gtester, skipping make $TEST"
->>> +    fi
->>>  }
->>>
->>>  test_fail()
->>>
-> 
-> 
-> --
-> Alex Bennée
-> 
+On Windows, if all vCPUs are running usermode tasks at the time the dump is
+created, this can be helpful in the discovery of guest system structures
+during conversion ELF dump to MEMORY.DMP dump.
+
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Message-Id: <20180714123000.11326-1-viktor.prutyanov@virtuozzo.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/arch_dump.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
+index 35b55fc..004141f 100644
+--- a/target/i386/arch_dump.c
++++ b/target/i386/arch_dump.c
+@@ -258,6 +258,12 @@ struct QEMUCPUState {
+     QEMUCPUSegment cs, ds, es, fs, gs, ss;
+     QEMUCPUSegment ldt, tr, gdt, idt;
+     uint64_t cr[5];
++    /*
++     * Fields below are optional and are being added at the end without
++     * changing the version. External tools may identify their presence
++     * by checking 'size' field.
++     */
++    uint64_t kernel_gs_base;
+ };
+ 
+ typedef struct QEMUCPUState QEMUCPUState;
+@@ -315,6 +321,10 @@ static void qemu_get_cpustate(QEMUCPUState *s, CPUX86State *env)
+     s->cr[2] = env->cr[2];
+     s->cr[3] = env->cr[3];
+     s->cr[4] = env->cr[4];
++
++#ifdef TARGET_X86_64
++    s->kernel_gs_base = env->kernelgsbase;
++#endif
+ }
+ 
+ static inline int cpu_write_qemu_note(WriteCoreDumpFunction f,
+-- 
+1.8.3.1
