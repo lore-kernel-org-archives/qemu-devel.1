@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffWBX-0000cQ-RD
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:03:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffWFJ-0003Yg-Nt
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:06:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffWBW-0001iq-79
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:59 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37378)
+	(envelope-from <peter.maydell@linaro.org>) id 1ffWFI-0003og-TV
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:06:53 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:34584)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ffWBV-0001iN-Vl
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:58 -0400
-Received: by mail-wm0-x244.google.com with SMTP id a19-v6so565997wmb.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:02:57 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 17 Jul 2018 20:55:49 +0100
-Message-Id: <20180717195553.9111-15-alex.bennee@linaro.org>
-In-Reply-To: <20180717195553.9111-1-alex.bennee@linaro.org>
-References: <20180717195553.9111-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ffWFI-0003oa-No
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:06:52 -0400
+Received: by mail-oi0-x233.google.com with SMTP id 13-v6so4438212ois.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:06:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 for 3.0 14/18] docker: Update debootstrap
- script after Debian migration from Alioth to Salsa
+In-Reply-To: <20180717195028.GA6691@localhost.localdomain>
+References: <20180717195028.GA6691@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Jul 2018 21:06:31 +0100
+Message-ID: <CAFEAcA-pPsvfn7ARu_pn0HH03rZh05fLP=wr+p=hx5douSf7vA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Why do we typedef every struct on QEMU?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 17 July 2018 at 20:50, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> I have been looking at patches that touch typedefs.h and
+> wondering: why do we make typedefs.h necessary at all?  Why do we
+> always add typedefs for every struct and union type in QEMU?
+>
+> Why do we prefer to write this:
+>
+> ----- qemu/typedefs.h:
+> typedef struct SomeType SomeType;
+> ----------------------
+>
+> ----- qemu/somecode.h:
+> #include <qemu/typedefs.h>
+>
+> int some_function(SomeType *a);
+> ----------------------
+>
+>
+> ...instead of simply writing this:?
+>
+> ----- qemu/somecode.h:
+> struct SomeType;
+> int some_function(struct SomeType *a);
+> ----------------------
+>
+> Is the maintenance burden of typedefs.h worth it?
 
-This silents the following warning:
+Personally I don't like typing "struct " all the time
+when I'm using the type...
 
-  Cloning into './debootstrap.git'...
-  warning: redirecting to https://salsa.debian.org/installer-team/debootstrap.git/
+Note also that most typedefed structs don't go in
+typedefs.h -- the typedef is defined with the struct.
+A quick rough count suggests less than 10% are in
+typedefs.h. We only put in the ones where there's
+a lot of code that wants to use pointers to them
+as opaque types and isn't pulling in the header where
+the full struct is defined.
 
-See https://lists.debian.org/debian-devel-announce/2018/01/msg00004.html
+Also, this is one of the few bits of QEMU coding style
+where we're pretty consistent, so I'd rather not
+let it open to more free variation.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/dockerfiles/debian-bootstrap.pre | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/docker/dockerfiles/debian-bootstrap.pre b/tests/docker/dockerfiles/debian-bootstrap.pre
-index 56e1aa7a21..ea324d6e4a 100755
---- a/tests/docker/dockerfiles/debian-bootstrap.pre
-+++ b/tests/docker/dockerfiles/debian-bootstrap.pre
-@@ -62,7 +62,7 @@ if [ -z $DEBOOTSTRAP_DIR ]; then
-         NEED_DEBOOTSTRAP=true
-     fi
-     if $NEED_DEBOOTSTRAP; then
--        DEBOOTSTRAP_SOURCE=https://anonscm.debian.org/git/d-i/debootstrap.git
-+        DEBOOTSTRAP_SOURCE=https://salsa.debian.org/installer-team/debootstrap.git
-         git clone ${DEBOOTSTRAP_SOURCE} ./debootstrap.git
-         export DEBOOTSTRAP_DIR=./debootstrap.git
-         DEBOOTSTRAP=./debootstrap.git/debootstrap
--- 
-2.17.1
+thanks
+-- PMM
