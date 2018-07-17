@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ffPlv-0003Rq-Mp
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:12:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1ffPoo-0005St-3D
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:15:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ffPlu-00006w-Nr
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:12:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41892 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1ffPok-0002kR-T9
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:15:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51204 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ffPlu-00006T-GV
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:12:06 -0400
-Date: Tue, 17 Jul 2018 14:11:56 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180717131156.GA13498@stefanha-x1.localdomain>
-References: <20180713075232.9575-1-pagupta@redhat.com>
-	<20180713075232.9575-3-pagupta@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ffPok-0002ik-N9
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:15:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5807D402312B
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:15:02 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
+	<20180706121354.2021-10-marcandre.lureau@redhat.com>
+	<87zhyqe1e4.fsf@dusky.pond.sub.org>
+	<CAMxuvaxL_W0_fZSfYzL9L5aGCEymcKAYSig7u84K-dzm2agPGQ@mail.gmail.com>
+Date: Tue, 17 Jul 2018 15:15:00 +0200
+In-Reply-To: <CAMxuvaxL_W0_fZSfYzL9L5aGCEymcKAYSig7u84K-dzm2agPGQ@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 17 Jul 2018
+	11:57:32 +0200")
+Message-ID: <87zhyqc8bv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IS0zKkzwUGydFO0o"
-Content-Disposition: inline
-In-Reply-To: <20180713075232.9575-3-pagupta@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v3 2/2] virtio-pmem: Add virtio pmem driver
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/12] tests: add a few qemu-qmp tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +37,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, jack@suse.cz, dan.j.williams@intel.com, riel@surriel.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, mst@redhat.com, niteshnarayanlal@hotmail.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
---IS0zKkzwUGydFO0o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Hi
+>
+> On Tue, Jul 17, 2018 at 10:01 AM, Markus Armbruster <armbru@redhat.com> w=
+rote:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>>> These 2 tests exhibited two qmp bugs that were fixed in 2.7
+>>> (series from commit e64c75a9752c5d0fd64eb2e684c656a5ea7d03c6 to
+>>> commit 1382d4abdf9619985e4078e37e49e487cea9935e)
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  tests/qmp-test.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 38 insertions(+)
+>>>
+>>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+>>> index ceaf4a6789..084c5edff0 100644
+>>> --- a/tests/qmp-test.c
+>>> +++ b/tests/qmp-test.c
+>>> @@ -249,7 +249,39 @@ static void test_qmp_oob(void)
+>>>      recv_cmd_id(qts, "blocks-2");
+>>>      recv_cmd_id(qts, "err-2");
+>>>      cleanup_blocking_cmd();
+>>> +}
+>>> +
+>>> +static void test_object_add_without_props(void)
+>>> +{
+>>> +    QTestState *qts;
+>>> +    QDict *ret;
+>>> +
+>>> +    qts =3D qtest_init(common_args);
+>>> +
+>>> +    ret =3D qtest_qmp(qts, "{'execute': 'object-add',"
+>>> +          " 'arguments': { 'qom-type': 'memory-backend-ram', 'id': 'ra=
+m1' } }");
+>>
+>> Please break lines between arguments instead of within.  More of the
+>> same below.
+>
+> Sorry I am not sure I understand what you want. It's broken between
+> argument "execute" and "arguments", how do you want to change it?
 
+The line is broken in the middle of the second argument to qtest_qmp().
 
-On Fri, Jul 13, 2018 at 01:22:31PM +0530, Pankaj Gupta wrote:
-> + /* The request submission function */
-> +static int virtio_pmem_flush(struct device *dev)
-> +{
-> +	int err;
-> +	unsigned long flags;
-> +	struct scatterlist *sgs[2], sg, ret;
-> +	struct virtio_device *vdev = dev_to_virtio(dev->parent->parent);
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct virtio_pmem_request *req = kmalloc(sizeof(*req), GFP_KERNEL);
-> +
-> +	req->done = false;
-> +	init_waitqueue_head(&req->acked);
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +
-> +	sg_init_one(&sg, req, sizeof(req));
+Line breaks I'd like better:
 
-What are you trying to do here?
+    ret =3D qtest_qmp(qts,
+                    "{'execute': 'object-add',"
+                    " 'arguments': {'qom-type': 'memory-backend-ram',
+                    "               'id': 'ram1'}}");
 
-sizeof(req) == sizeof(struct virtio_pmem_request *) == sizeof(void *)
+    ret =3D qtest_qmp(qts,
+                    "{'execute': 'object-add',"
+                    " 'arguments': {"
+                    "    'qom-type': 'memory-backend-ram', 'id': 'ram1'}}");
 
-Did you mean sizeof(*req)?
+    ret =3D qtest_qmp(qts,
+                    "{'execute': 'object-add', 'arguments':"
+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1'}}");
 
-But why map struct virtio_pmem_request to the device?  struct
-virtio_pmem_request is the driver-internal request state and is not part
-of the hardware interface.
+>>> +    g_assert_nonnull(ret);
+>>> +
+>>> +    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
+>>> +
+>>> +    qobject_unref(ret);
+>>> +    qtest_quit(qts);
+>>> +}
+>>> +
+>>> +static void test_qom_set_without_value(void)
+>>> +{
+>>> +    QTestState *qts;
+>>> +    QDict *ret;
+>>> +
+>>> +    qts =3D qtest_init(common_args);
+>>>
+>>> +    ret =3D qtest_qmp(qts, "{'execute': 'qom-set',"
+>>> +              " 'arguments': { 'path': '/machine', 'property': 'rtc-ti=
+me' } }");
+>>> +    g_assert_nonnull(ret);
+>>> +
+>>> +    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
+>>> +
+>>> +    qobject_unref(ret);
+>>>      qtest_quit(qts);
+>>>  }
+>>>
+>>> @@ -479,8 +511,13 @@ int main(int argc, char *argv[])
+>>>
+>>>      g_test_init(&argc, &argv, NULL);
+>>>
+>>> +    qtest_add_func("qmp/object-add-without-props",
+>>> +                   test_object_add_without_props);
+>>> +    qtest_add_func("qmp/qom-set-without-value",
+>>> +                   test_qom_set_without_value);
+>>>      qtest_add_func("qmp/protocol", test_qmp_protocol);
+>>>      qtest_add_func("qmp/oob", test_qmp_oob);
+>>> +
+>>>      qmp_schema_init(&schema);
+>>>      add_query_tests(&schema);
+>>>      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
+>>> @@ -488,5 +525,6 @@ int main(int argc, char *argv[])
+>>>      ret =3D g_test_run();
+>>>
+>>>      qmp_schema_cleanup(&schema);
+>>> +
+>>>      return ret;
+>>>  }
+>>
+>> Is this hunk intentional?
+>>
+>
+> no
 
-> +	sgs[0] = &sg;
-> +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> +	sgs[1] = &ret;
-> +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> +	if (err) {
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+Easy enough to drop :)
 
-This can happen if the virtqueue is full.  Printing a message and
-failing the flush isn't appropriate.  This thread needs to wait until
-virtqueue space becomes available.
+>> Taking a step back: the test cases look good, but is this file an
+>> appropriate home?  The file comment states it's about "QMP protocol test
+>> cases".  These test cases test commands, not the protocol.
+>
+> Actually, the tests were written to test the qapi/qmp fixes mentionned
+> in commit message. So they were more "protocol" related than command
+> related.
 
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +		return -ENOSPC;
+Let's see...
 
-req is leaked.
+1. test_object_add_without_props() tests the bug fixed in commit
+   e64c75a975 "qmp: fix object-add assert() without props"
 
-> +	virtio_device_ready(vdev);
+   object-add's parameter @props is optional, qmp_object_add() fails to
+   default it to {}, which user_creatable_add_type() requires.  This is
+   a bug in the command handler.  It went unnoticed because object-add
+   lacks systematic tests.  You add one test case, which is welcome, but
+   what we really want is at systematic coverage of all paths through
+   qmp_object_add().
 
-This call isn't needed.  Driver use it when they wish to submit buffers
-on virtqueues before ->probe() returns.
+   Aside: we want that for every QMP command.  We have it for next to
+   none of them.
 
-> diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
-> new file mode 100644
-> index 0000000..0f83d9c
-> --- /dev/null
-> +++ b/include/linux/virtio_pmem.h
+   Anyway, neither the bug nor its test are about the QMP protocol.
 
-include/ is for declarations (e.g. kernel APIs) needed by other
-compilation units.  The contents of this header are internal to the
-virtio_pmem driver implementation and can therefore be in virtio_pmem.c.
-include/linux/virtio_pmem.h isn't necessary since nothing besides
-virtio_pmem.c will need to include it.
+2. test_qom_set_without_value() tests the bug fixed in commit c489780203
+   "qapi: Fix crash when 'any' or 'null' parameter is missing"
 
---IS0zKkzwUGydFO0o
-Content-Type: application/pgp-signature; name="signature.asc"
+   The QMP input visitor neglects to check qmp_input_get_object() for
+   failure.  The bug is *not* in qom-set; qom-set is merely part of the
+   reproducer.  You're right, this case is 'more "protocol" related than
+   command related.'
 
------BEGIN PGP SIGNATURE-----
+   We do have tests for the QMP input visitor.  You fixed them to cover
+   this case in the very next commit bce3035a44
+   "tests/test-qmp-input-strict: Cover missing struct members".  That's
+   a unit test.
 
-iQEcBAEBAgAGBQJbTescAAoJEJykq7OBq3PIwPQH/3keU8xWbvv1c729mwMrCSlT
-GRJkt3AyzE2iIoaXFkeBpnjnpARsajzX0vH/EheCEse46G6aOtia9fALOzf0Fo2l
-XRB1KM3WhEDIx+xNZuk4/WH5AaSHEJPjSBM6Isv410MASfrDJzyu0vuRSjzqEAT8
-augb75qojqCkqkDQm5iMcN6zGwgjJ0MLrXZdN8EKIpgsqeMW7QmwWCwlmWwCgXrq
-f5nor6oEl3jci/EYjw6ctjWsBCSKdDz813phHbQLCbcMD9IuEngGlZt5b9XwdfNY
-5u2SaC66cIPqMYyogb6duBFMZ2AOzkrSZjHbHyh1HArf7Lhd/aoYYMLABy/hwTs=
-=0jCu
------END PGP SIGNATURE-----
+   Should we test it once more at the QMP level in a qtest?  If yes,
+   then we should test all the errors the visitor should report once
+   there, shouldn't we?  Mind, I'm not saying *you* should.
 
---IS0zKkzwUGydFO0o--
+>>
+>> I figure test_qom_set_without_value() belongs to qom-test.c.
+>>
+>> test_object_add_without_props() could go into a memory backend test
+>> collection, or an object-add test collection.  Sadly, neither exists.
+>> We could have a qmp command test collection as a home of last resort.
+>> Temptation to just throw a few random test cases there instead of
+>> covering (a set of related) commands with a proper test case collection.
+>>
+>> As is, your patch turns qmp-test.c into such a home of last resort.  If
+>> that's what we want, we should update the file comment.  But I think I'd
+>> rather have a separate qmp-cmd-test.c.
+>>
+>> Thoughts?
+>
+> It's somewhat blurry lines to me, it would be simpler to just use qmp-tes=
+t.
+
+Simpler, yes, but creating a new file isn't really hard, either.
+
+In current master, qmp-test.c has just under 500 lines.  It's already
+one of the larger files in tests/.  Certainly not too big, but I'd
+prefer to keep it focused.
+
+I defocused it some myself when I added the query smoke tests (commit
+e4a426e75e tests/qmp-test: Add generic, basic test of query commands).
+It was simpler to just use qmp-test.  I shouldn't have.
+
+I'll prepare a patch to split qmp-test.c into a command-independent part
+(protocol, infrastructure) and a part about commands.
