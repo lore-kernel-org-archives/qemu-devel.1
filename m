@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffRbm-0007Kg-IJ
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:09:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1ffReJ-000181-Hg
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:12:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ffRbj-00016p-CM
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:09:46 -0400
-Date: Tue, 17 Jul 2018 17:09:41 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1807171644120.57515@zero.eik.bme.hu>
-References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
-	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1ffReI-0002nB-GR
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:12:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54354 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ffReI-0002mw-B8
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:12:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 04C7A4075767
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 15:12:22 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
+	<20180706121354.2021-11-marcandre.lureau@redhat.com>
+Date: Tue, 17 Jul 2018 17:12:20 +0200
+In-Reply-To: <20180706121354.2021-11-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 6 Jul 2018 14:13:52 +0200")
+Message-ID: <87601ddhgr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: [Qemu-devel] Profiling results (was: Re: [PATCH] Do not enable QOM
- debugging by default)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/12] tests: add a qmp success-response
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +36,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, peterx@redhat.com
 
-On Mon, 16 Jul 2018, Peter Maydell wrote:
-> Is this coming up as significant in profiling? In the past we've
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-This seems to depend on the workload. From the cases I'm interested in 
-AROS and AmigaOS on qemu-system-ppc -M sam460ex does not seem to be 
-effected much (object_class_dynamic_cast_assert is not in top 10 with <2%) 
-but for MorphOS on mac99 this seems to be significant. This is with 
-default configure (--enable-qom-cast-debug):
+> Verify the usage of this schema feature and the API behaviour.  This
+> should be the only case where qmp_dispatch() returns NULL without
+> error.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-%       cum. %     linenr info                 symbol name
-9.7057   9.7057    exec-all.h:410              helper_lookup_tb_ptr
-8.0330  17.7387    object.c:711                object_class_dynamic_cast_assert
-6.9411  24.6798    cputlb.c:793                io_readx
-6.3219  31.0017    sm501_template.h:62         draw_line16_32
-5.3601  36.3617    cputlb.c:114                tlb_flush_nocheck
-3.6170  39.9787    translate-all.c:749         page_trylock_add
-3.1188  43.0975    translate-all.c:803         page_collection_lock
-3.0405  46.1380    exec.c:3025                 iotlb_to_section
-2.7044  48.8424    softmmu_template.h:112      helper_ret_ldub_mmu
-2.4154  51.2578    memory.c:1350               memory_region_access_valid
-
-and improves a bit (but not much) with --disable-qom-cast-debug
-
-%        cum. %     linenr info                 symbol name
-10.2063  10.2063    exec-all.h:410              helper_lookup_tb_ptr
-  7.1581  17.3644    object.c:711                object_class_dynamic_cast_assert
-  5.9297  23.2941    sm501_template.h:62         draw_line16_32
-  5.9227  29.2168    cputlb.c:793                io_readx
-  5.3030  34.5198    cputlb.c:114                tlb_flush_nocheck
-  3.6445  38.1643    memory.c:1350               memory_region_access_valid
-  3.5499  41.7142    softmmu_template.h:112      helper_ret_ldub_mmu
-  3.0383  44.7525    translate-all.c:803         page_collection_lock
-  2.9735  47.7260    memory.c:1415               memory_region_dispatch_read
-  2.9503  50.6763    translate-all.c:749         page_trylock_add
-
-But the workloads may not have been 100% identical so this is not 
-conclusive, maybe this debug code is not that expensive at the moment.
-
-AROS on sam460ex has a different profile:
-
-%        cum. %     linenr info                 symbol name
-8.9905   8.9905     translate-all.c:749         page_trylock_add
-8.7658  17.7563     exec-all.h:410              helper_lookup_tb_ptr
-7.7349  25.4911     translate-all.c:803         page_collection_lock
-5.8246  31.3158     cputlb.c:924                victim_tlb_hit
-3.1640  34.4797     cpus.c:347                  cpu_get_clock
-3.1538  37.6335     translate-all.c:788         tb_page_addr_cmp
-2.7969  40.4304     exec.c:435                  address_space_translate_internal
-2.6647  43.0951     memory.c:571                access_with_adjusted_size
-2.0615  45.1567     exec.c:569                  flatview_do_translate
-1.9586  47.1153     memory.c:1350               memory_region_access_valid
-
-Would anyone be able to guess what are the places that should be looked at 
-or what to check to get more info on this?
-
-Regards,
-BALATON Zoltan
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
