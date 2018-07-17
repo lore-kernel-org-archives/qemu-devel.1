@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1ffEXV-0007L5-Q5
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 21:12:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffEfY-0001Fh-LA
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 21:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1ffEXR-0004n4-Cx
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 21:12:29 -0400
-Received: from mga02.intel.com ([134.134.136.20]:17673)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1ffEXR-0004mL-1X
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 21:12:25 -0400
-References: <1531213054-63327-1-git-send-email-jingqi.liu@intel.com>
-	<83838432-354e-d504-a988-aa7672814822@redhat.com>
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Message-ID: <034503a9-aa83-1081-3b16-4111be78123a@intel.com>
-Date: Tue, 17 Jul 2018 09:12:20 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffEfU-0006zd-Lt
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 21:20:48 -0400
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:39578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffEfU-0006zP-Gl
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 21:20:44 -0400
+Received: by mail-vk0-x244.google.com with SMTP id e139-v6so21247542vkf.6
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 18:20:44 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1531779837-20557-1-git-send-email-linux@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c240db5a-ba24-bdea-ea90-d95a4d661889@amsat.org>
+Date: Mon, 16 Jul 2018 22:20:37 -0300
 MIME-Version: 1.0
-In-Reply-To: <83838432-354e-d504-a988-aa7672814822@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1531779837-20557-1-git-send-email-linux@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/3] x86/cpu: Enable a few new cpu features
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/sd/bcm2835_sdhost: Fix PIO mode writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +34,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, wei.w.wang@intel.com
+To: Guenter Roeck <linux@roeck-us.net>, Clement Deschamps <clement.deschamps@antfield.fr>, Luc Michel <luc.michel@git.antfield.fr>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-On 7/16/2018 10:59 PM, Paolo Bonzini wrote:
-> On 10/07/2018 10:57, Jingqi Liu wrote:
->> Enable a few new cpu features including UMONITOR, UMWAIT, TPAUSE,
->> MOVDIRI and MOVDIR64B.
->>
->> UMONITOR, UMWAIT, and TPAUSE are a set of user wait instructions.
->> MOVDIRI moves doubleword or quadword from register to memory through
->> direct store.
->> MOVDIR64B moves 64-bytes as direct-store with 64-bytes write atomicity.
-> Do you have corresponding KVM changes?
-Yes, the corresponding links are listed as below.
-https://www.spinics.net/lists/kvm/msg171563.html
-https://www.spinics.net/lists/kernel/msg2850965.html
-The patches had been sent for your review also.
-Thanks
-Jingqi Liu
->
-> Paolo
->
->> The bits definition:
->> CPUID.(EAX=7,ECX=0):ECX[bit 05] WAITPKG
->> CPUID.(EAX=7,ECX=0):ECX[bit 27] MOVDIRI
->> CPUID.(EAX=7,ECX=0):ECX[bit 28] MOVDIR64B
->>
->> The release document ref below link:
->> https://software.intel.com/sites/default/files/managed/c5/15/\
->> architecture-instruction-set-extensions-programming-reference.pdf
->>
->> Jingqi Liu (3):
->>    x86/cpu: Enable UMONITOR/UMWAIT/TPAUSE cpu features
->>    x86/cpu: Enable MOVDIRI cpu feature
->>    x86/cpu: Enable MOVDIR64B cpu feature
->>
->>   target/i386/cpu.c | 6 +++---
->>   target/i386/cpu.h | 3 +++
->>   2 files changed, 6 insertions(+), 3 deletions(-)
->>
+Cc'ing ANTField folks who might have the specs.
+
+On 07/16/2018 07:23 PM, Guenter Roeck wrote:
+> Writes in PIO mode have two requirements:
+> 
+> - A data interrupt must be generated after a write command has been
+>   issued to indicate that the chip is ready to receive data.
+> - A block interrupt must be generated after each block to indicate
+>   that the chip is ready to receive the next data block.
+> 
+> Rearrange the code to make this happen. Tested on raspi3 (in PIO mode)
+> and raspi2 (in DMA mode).
+
+Note to reviewers, this seems a follow-up of:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03397.html
+(This patch makes more sens after reading this previous thread).
+
+> 
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+>  hw/sd/bcm2835_sdhost.c | 20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
+> index 4df4de7..1b760b2 100644
+> --- a/hw/sd/bcm2835_sdhost.c
+> +++ b/hw/sd/bcm2835_sdhost.c
+> @@ -179,9 +179,11 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+>      uint32_t value = 0;
+>      int n;
+>      int is_read;
+> +    int is_write;
+>  
+>      is_read = (s->cmd & SDCMD_READ_CMD) != 0;
+> -    if (s->datacnt != 0 && (!is_read || sdbus_data_ready(&s->sdbus))) {
+> +    is_write = (s->cmd & SDCMD_WRITE_CMD) != 0;
+> +    if (s->datacnt != 0 && (is_write || sdbus_data_ready(&s->sdbus))) {
+>          if (is_read) {
+>              n = 0;
+>              while (s->datacnt && s->fifo_len < BCM2835_SDHOST_FIFO_LEN) {
+> @@ -201,8 +203,11 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+>              if (n != 0) {
+>                  bcm2835_sdhost_fifo_push(s, value);
+>                  s->status |= SDHSTS_DATA_FLAG;
+> +                if (s->config & SDHCFG_DATA_IRPT_EN) {
+> +                    s->status |= SDHSTS_SDIO_IRPT;
+> +                }
+>              }
+> -        } else { /* write */
+> +        } else if (is_write) { /* write */
+>              n = 0;
+>              while (s->datacnt > 0 && (s->fifo_len > 0 || n > 0)) {
+>                  if (n == 0) {
+> @@ -223,11 +228,18 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
+>              s->edm &= ~SDEDM_FSM_MASK;
+>              s->edm |= SDEDM_FSM_DATAMODE;
+>              trace_bcm2835_sdhost_edm_change("datacnt 0", s->edm);
+> -
+> -            if ((s->cmd & SDCMD_WRITE_CMD) &&
+> +        }
+> +        if (is_write) {
+> +            /* set block interrupt at end of each block transfer */
+> +            if (s->hbct && s->datacnt % s->hbct == 0 &&
+>                  (s->config & SDHCFG_BLOCK_IRPT_EN)) {
+>                  s->status |= SDHSTS_BLOCK_IRPT;
+>              }
+> +            /* set data interrupt after each transfer */
+> +            s->status |= SDHSTS_DATA_FLAG;
+> +            if (s->config & SDHCFG_DATA_IRPT_EN) {
+> +                s->status |= SDHSTS_SDIO_IRPT;
+> +            }
+>          }
+>      }
+>  
+> 
