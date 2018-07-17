@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffKeD-0003ch-5X
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:43:50 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ffKrV-0006o6-VA
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:57:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffKe8-0003uu-PY
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:43:49 -0400
-References: <20180716193312.A5BA17456B9@zero.eik.bme.hu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2164ddc5-68be-ffa2-cebf-6980220b1238@redhat.com>
-Date: Tue, 17 Jul 2018 09:43:36 +0200
+	(envelope-from <imammedo@redhat.com>) id 1ffKrS-0001ud-TK
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:57:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58308 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ffKrS-0001uE-N8
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 03:57:30 -0400
+Date: Tue, 17 Jul 2018 09:57:27 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180717095727.7b63dcd0@redhat.com>
+In-Reply-To: <20180716125948.11666-6-marcandre.lureau@redhat.com>
+References: <20180716125948.11666-1-marcandre.lureau@redhat.com>
+	<20180716125948.11666-6-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180716193312.A5BA17456B9@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Document command line options with single
- dash
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 5/5] PoC: tpm: add ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +28,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S.
+	Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 16.07.2018 21:12, BALATON Zoltan wrote:
-> QEMU options have a single dash (but also work as double dash for
-> convenience and compatibility). Most options are listed with single
-> dash in command line help but some were listed with two dashes.
-> Normalize these to have the same format as the others.
-> 
-> Left --preconfig as that is mentioned as double dash everywhere so I
-> assume that is the preferred form for that.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+On Mon, 16 Jul 2018 14:59:48 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+
+> This allows to pass the last failing test from the Windows HLK TPM 2.0
+> TCG PPI 1.3 tests.
+>=20
+> The interface is described in the "TCG Platform Reset Attack
+> Mitigation Specification", chapter 6 "ACPI _DSM Function". According
+> to Laszlo, it's not so easy to implement in OVMF, he suggested to do
+> it in qemu instead. It is relatively simple to implement in QEMU, but
+> make this a proof-of-concept PATCH for discussion, since this is not
+> a conventional approach.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  qemu-options.hx | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 371c427..b1bf0f4 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -471,7 +471,7 @@ STEXI
->  @item -balloon virtio[,addr=@var{addr}]
->  @findex -balloon
->  Enable virtio balloon device, optionally with PCI address @var{addr}. This
-> -option is deprecated, use @option{--device virtio-balloon} instead.
-> +option is deprecated, use @option{-device virtio-balloon} instead.
->  ETEXI
->  
->  DEF("device", HAS_ARG, QEMU_OPTION_device,
-> @@ -2005,7 +2005,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
->      "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
->      "                configure a hub port on the hub with ID 'n'\n", QEMU_ARCH_ALL)
->  DEF("nic", HAS_ARG, QEMU_OPTION_nic,
-> -    "--nic [tap|bridge|"
-> +    "-nic [tap|bridge|"
->  #ifdef CONFIG_SLIRP
->      "user|"
->  #endif
-> @@ -2024,7 +2024,7 @@ DEF("nic", HAS_ARG, QEMU_OPTION_nic,
->      "socket][,option][,...][mac=macaddr]\n"
->      "                initialize an on-board / default host NIC (using MAC address\n"
->      "                macaddr) and connect it to the given host network backend\n"
-> -    "--nic none      use it alone to have zero network devices (the default is to\n"
-> +    "-nic none       use it alone to have zero network devices (the default is to\n"
->      "                provided a 'user' network connection)\n",
->      QEMU_ARCH_ALL)
->  DEF("net", HAS_ARG, QEMU_OPTION_net,
-> @@ -3339,7 +3339,7 @@ mlocking qemu and guest memory can be enabled via @option{mlock=on}
->  ETEXI
->  
->  DEF("overcommit", HAS_ARG, QEMU_OPTION_overcommit,
-> -    "--overcommit [mem-lock=on|off][cpu-pm=on|off]\n"
-> +    "-overcommit [mem-lock=on|off][cpu-pm=on|off]\n"
->      "                run qemu with overcommit hints\n"
->      "                mem-lock=on|off controls memory lock support (default: off)\n"
->      "                cpu-pm=on|off controls cpu power management (default: off)\n",
-> 
+>  hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
+>  hw/tpm/tpm_ppi.c     | 25 ++++++++++++++++++++++++
+>  docs/specs/tpm.txt   |  2 ++
+>  hw/tpm/trace-events  |  3 +++
+>  4 files changed, 76 insertions(+)
+>=20
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 882fc27846..7e3c217076 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
+>      pprq =3D aml_name("PPRQ");
+>      pprm =3D aml_name("PPRM");
+> =20
+> +    aml_append(dev,
+> +               aml_operation_region("TPP3", AML_SYSTEM_MEMORY,
+> +                                    aml_int(TPM_PPI_ADDR_BASE + 0x200),
+> +                                    0x1));
+> +    field =3D aml_field("TPP3", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
+                                 ^^^ AML_BYTE_ACC
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+> +    aml_append(field, aml_named_field("MOVV", 8));
+> +    aml_append(dev, field);
+>      /*
+>       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
+>       * operation region inside of a method for getting FUNC[op].
+> @@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
+>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+>          }
+>          aml_append(method, ifctx);
+> +
+> +        ifctx =3D aml_if(
+> +            aml_equal(uuid,
+> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
+));
+> +        {
+> +            /* standard DSM query function */
+> +            ifctx2 =3D aml_if(aml_equal(function, zero));
+> +            {
+> +                uint8_t byte_list[1] =3D { 0x03 };
+> +                aml_append(ifctx2, aml_return(aml_buffer(1, byte_list)));
+> +            }
+> +            aml_append(ifctx, ifctx2);
+> +
+> +            /*
+> +             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
+.6
+> +             *
+> +             * Arg 2 (Integer): Function Index =3D 1
+> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> +             *                  Operation Value of the Request
+> +             * Returns: Type: Integer
+> +             *          0: Success
+> +             *          1: General Failure
+> +             */
+> +            ifctx2 =3D aml_if(aml_equal(function, one));
+> +            {
+> +                aml_append(ifctx2,
+> +                           aml_store(aml_derefof(aml_index(arguments, ze=
+ro)),
+> +                                     op));
+> +                {
+> +                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
+> +
+> +                    /* 0: success */
+> +                    aml_append(ifctx2, aml_return(zero));
+> +                }
+> +            }
+> +            aml_append(ifctx, ifctx2);
+> +        }
+> +        aml_append(method, ifctx);
+>      }
+> +
+>      aml_append(dev, method);
+>  }
+> =20
+> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> index 8b46b9dd4b..64e8d828e8 100644
+> --- a/hw/tpm/tpm_ppi.c
+> +++ b/hw/tpm/tpm_ppi.c
+> @@ -16,8 +16,31 @@
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "sysemu/memory_mapping.h"
+> +#include "sysemu/reset.h"
+>  #include "migration/vmstate.h"
+>  #include "tpm_ppi.h"
+> +#include "trace.h"
+> +
+> +static void tpm_ppi_reset(void *opaque)
+> +{
+> +    TPMPPI *tpmppi =3D opaque;
+> +    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
+> +
+> +    if (ptr[0x200] & 0x1) {
+> +        GuestPhysBlockList guest_phys_blocks;
+> +        GuestPhysBlock *block;
+> +
+> +        guest_phys_blocks_init(&guest_phys_blocks);
+> +        guest_phys_blocks_append(&guest_phys_blocks);
+> +        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
+> +            trace_tpm_ppi_memset(block->host_addr,
+> +                             block->target_end - block->target_start);
+> +            memset(block->host_addr, 0,
+> +                   block->target_end - block->target_start);
+> +        }
+> +        guest_phys_blocks_free(&guest_phys_blocks);
+> +    }
+> +}
+> =20
+>  bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+>                    hwaddr addr, Object *obj, Error **errp)
+> @@ -27,5 +50,7 @@ bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *=
+m,
+>      vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
+> =20
+>      memory_region_add_subregion(m, addr, &tpmppi->ram);
+> +    qemu_register_reset(tpm_ppi_reset, tpmppi);
+is it necessary,
+shouldn't it be reset by bus initiated reset?
 
-... I'm in favour for consistency for the 3.0 release. But in the long
-run, we should really come to a conclusion what we prefer (we still got
-the double dash task at
-https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
-)
+> +
+>      return true;
+>  }
+> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> index 16b210c1f2..9c44384315 100644
+> --- a/docs/specs/tpm.txt
+> +++ b/docs/specs/tpm.txt
+> @@ -121,6 +121,8 @@ layout:
+>   +----------+--------+--------+-----------------------------------------=
+--+
+>   | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
+  |
+>   |          |        |        | firmware. Used by firmware.             =
+  |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> + | movv     |   0x1  |  0x200 | Memory overwrite variable               =
+  |
+>   +----------+--------+--------+-----------------------------------------=
+--+
+> =20
+>     The following values are supported for the 'func' field. They corresp=
+ond
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 25bee0cecf..920d32ad55 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+>  tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+>  tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
+d to TPM: 0x%08x (size=3D%d)"
+>  tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
+t =3D %u"
+> +
+> +# hw/tpm/tpm_ppi.c
+> +tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
