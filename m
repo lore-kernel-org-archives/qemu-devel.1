@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ffHch-0002JH-Ss
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1ffIh3-000267-TI
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ffHce-0005ar-OB
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ffHce-0005aN-IM
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ffHcd-0007xe-As
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 04:29:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 477652E8083
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 04:29:59 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1ffIh0-0006LR-Q4
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:38:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53708 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ffIh0-0006LF-Ju
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:38:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E88B9401EF0B
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 05:38:33 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
+	<20180706121354.2021-6-marcandre.lureau@redhat.com>
+Date: Tue, 17 Jul 2018 07:38:32 +0200
+In-Reply-To: <20180706121354.2021-6-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 6 Jul 2018 14:13:47 +0200")
+Message-ID: <87va9eh15z.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Jul 2018 04:17:24 -0000
-From: Launchpad Bug Tracker <1459626@bugs.launchpad.net>
-Reply-To: Bug 1459626 <1459626@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150528112402.7427.77374.malonedeb@gac.canonical.com>
-Message-Id: <153180104440.8289.7957471272383207836.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1459626] Re: emacs (gtk3) core dumped with -vga
- qxl
+Subject: Re: [Qemu-devel] [PATCH 05/12] monitor: no need to save need_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +35,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, peterx@redhat.com
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> There is no need for per-command need_resume granularity, it should
+> resume after running an non-oob command on oob-disabled monitor.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  monitor.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 462cf96f7b..ec40a80d81 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -257,12 +257,6 @@ struct QMPRequest {
+>       */
+>      QObject *req;
+>      Error *err;
+> -    /*
+> -     * Whether we need to resume the monitor afterward.  This flag is
+> -     * used to emulate the old QMP server behavior that the current
+> -     * command must be completed before execution of the next one.
+> -     */
+> -    bool need_resume;
 
--- =
+Note for later: this comment goes away without a replacement.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1459626
+>  };
+>  typedef struct QMPRequest QMPRequest;
+>=20=20
+> @@ -4079,11 +4073,13 @@ static void monitor_qmp_bh_dispatcher(void *data)
+>  {
+>      QMPRequest *req_obj =3D monitor_qmp_requests_pop_any();
+>      QDict *rsp;
+> +    bool need_resume;
+>=20=20
+>      if (!req_obj) {
+>          return;
+>      }
+>=20=20
+> +    need_resume =3D !qmp_oob_enabled(req_obj->mon);
+>      if (req_obj->req) {
+>          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
+: "");
+>          monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
+> @@ -4094,7 +4090,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
+>          qobject_unref(rsp);
+>      }
+>=20=20
+> -    if (req_obj->need_resume) {
+> +    if (need_resume) {
+>          /* Pairs with the monitor_suspend() in handle_qmp_command() */
 
-Title:
-  emacs (gtk3) core dumped with -vga qxl
+Why not
 
-Status in QEMU:
-  Expired
+       if (!qmp_oob_enabled(req_obj->mon)) {
 
-Bug description:
-  Emacs (gtk3) exited with bus error and core dumped with -vga qxl. If I
-  use the builtin modesetting xorg driver, emacs could survive for a
-  short while sometimes. If I use xf86-video-qxl (git r587.8babd05), it
-  dies right away with the same error. It seems to corrupt xorg at some
-  point as well, because sometimes I cannot exit i3 properly and gnome-
-  terminal can go crazy afterwards (all letters become empty retangles).
+and drop the variable?  Perhaps you keep the variable to have its name
+provide a hint on why we resume.  But even with that hint and the "pairs
+with" comment, it's still less than clear.  What about...
 
-  It doesn't seem to happen with other -vga driver.
+>          monitor_resume(req_obj->mon);
+>      }
+> @@ -4146,7 +4142,6 @@ static void handle_qmp_command(JSONMessageParser *p=
+arser, GQueue *tokens)
+>      req_obj->id =3D id;
+>      req_obj->req =3D req;
+>      req_obj->err =3D err;
+> -    req_obj->need_resume =3D false;
+>=20=20
+>      /* Protect qmp_requests and fetching its length. */
+>      qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> @@ -4159,7 +4154,6 @@ static void handle_qmp_command(JSONMessageParser *p=
+arser, GQueue *tokens)
+>       */
+>      if (!qmp_oob_enabled(mon)) {
 
-  Error message is attached. Can also provide the core dumped but it's
-  of 47M.
+... adding a replacement for the deleted comment here, say
 
-  I started the vm as root (sudo) with the following command: qemu-
-  system-x86_64 -enable-kvm -m 4G -virtfs
-  local,mount_tag=3Dqemu,security_model=3Dpassthrough,path=3D/mnt/qemu/
-  -kernel /mnt/qemu/boot/vmlinuz-linux -initrd /mnt/qemu/boot/initramfs-
-  linux-fallback.img -append 'rw root=3Dqemu fstype=3D9p' -usbdevice tablet
-  -vga qxl -spice port=3D12345,disable-ticketing
+           /*
+           * Emulate traditional QMP server behavior: read next command
+           * only after current command completed.  Pairs with
+           * monitor_resume() in monitor_qmp_bh_dispatcher().
+           */
 
-  /mnt/qemu is a btrfs snapshot of the subvolume used as the host root
+Would you then be okay with cutting out the variable?
 
-  Arch Linux, qemu 2.3.0, emacs 24.5, xorg-server 1.17.1, linux 4.0.4,
-  gtk 3.16.3, glib 2.44.1
+>          monitor_suspend(mon);
+> -        req_obj->need_resume =3D true;
+>      } else {
+>          /* Drop the request if queue is full. */
+>          if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1459626/+subscriptions
+Your patch works fine as far as I can tell, so
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
