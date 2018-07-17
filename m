@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ffRZR-0005I6-7A
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRaT-0006AH-TD
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:08:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ffRZQ-0007La-7G
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47132 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ffRZQ-0007LC-1x
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:20 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 17 Jul 2018 17:06:55 +0200
-Message-Id: <1531840015-28804-14-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
-References: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 13/13] Document command line options with single
- dash
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRaQ-00083e-Mg
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:08:25 -0400
+Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:41623)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRaQ-00082z-Er
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:08:22 -0400
+Received: by mail-ua0-x242.google.com with SMTP id t14-v6so884722uao.8
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:08:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1531839759-14090-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5b221436-d992-f147-0fc7-487c2ff2a969@amsat.org>
+Date: Tue, 17 Jul 2018 12:08:17 -0300
+MIME-Version: 1.0
+In-Reply-To: <1531839759-14090-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/riscv/sifive_u: Fix introspection
+ problem in the "riscv.sifive.u.soc" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +35,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+On 07/17/2018 12:02 PM, Thomas Huth wrote:
+> Valgrind complains:
+> 
+> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
+>  "'arguments':{'typename':'riscv.sifive.u.soc'}}" \
+>  "{'execute': 'human-monitor-command', " \
+>  "'arguments': {'command-line': 'info qtree'}}" | \
+>  valgrind -q riscv32-softmmu/qemu-system-riscv32 -M none,accel=qtest -qmp stdio
+> [...]
+> ==28083== Invalid read of size 8
+> ==28083==    at 0x2E036A: qdev_print (qdev-monitor.c:686)
+> ==28083==    by 0x2E036A: qbus_print (qdev-monitor.c:719)
+> ==28083==    by 0x268938: handle_hmp_command (monitor.c:3446)
+> [...]
+> 
+> Use the new object_initialize_child() and sysbus_init_child_obj() functions
+> to fix the problem.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-QEMU options have a single dash (but also work as double dash for
-convenience and compatibility). Most options are listed with single
-dash in command line help but some were listed with two dashes.
-Normalize these to have the same format as the others.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Left --preconfig as that is mentioned as double dash everywhere so I
-assume that is the preferred form for that.
-
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20180716193312.A5BA17456B9@zero.eik.bme.hu>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- qemu-options.hx | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 654e69c..1a186fb 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -471,7 +471,7 @@ STEXI
- @item -balloon virtio[,addr=@var{addr}]
- @findex -balloon
- Enable virtio balloon device, optionally with PCI address @var{addr}. This
--option is deprecated, use @option{--device virtio-balloon} instead.
-+option is deprecated, use @option{-device virtio-balloon} instead.
- ETEXI
- 
- DEF("device", HAS_ARG, QEMU_OPTION_device,
-@@ -2005,7 +2005,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
-     "                configure a hub port on the hub with ID 'n'\n", QEMU_ARCH_ALL)
- DEF("nic", HAS_ARG, QEMU_OPTION_nic,
--    "--nic [tap|bridge|"
-+    "-nic [tap|bridge|"
- #ifdef CONFIG_SLIRP
-     "user|"
- #endif
-@@ -2024,7 +2024,7 @@ DEF("nic", HAS_ARG, QEMU_OPTION_nic,
-     "socket][,option][,...][mac=macaddr]\n"
-     "                initialize an on-board / default host NIC (using MAC address\n"
-     "                macaddr) and connect it to the given host network backend\n"
--    "--nic none      use it alone to have zero network devices (the default is to\n"
-+    "-nic none       use it alone to have zero network devices (the default is to\n"
-     "                provided a 'user' network connection)\n",
-     QEMU_ARCH_ALL)
- DEF("net", HAS_ARG, QEMU_OPTION_net,
-@@ -3338,7 +3338,7 @@ mlocking qemu and guest memory can be enabled via @option{mlock=on}
- ETEXI
- 
- DEF("overcommit", HAS_ARG, QEMU_OPTION_overcommit,
--    "--overcommit [mem-lock=on|off][cpu-pm=on|off]\n"
-+    "-overcommit [mem-lock=on|off][cpu-pm=on|off]\n"
-     "                run qemu with overcommit hints\n"
-     "                mem-lock=on|off controls memory lock support (default: off)\n"
-     "                cpu-pm=on|off controls cpu power management (default: off)\n",
--- 
-1.8.3.1
+> ---
+>  hw/riscv/sifive_u.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 3a6ffeb..459ec90 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -303,16 +303,15 @@ static void riscv_sifive_u_soc_init(Object *obj)
+>  {
+>      SiFiveUSoCState *s = RISCV_U_SOC(obj);
+>  
+> -    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
+> -    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
+> -                              &error_abort);
+> +    object_initialize_child(obj, "cpus", &s->cpus, sizeof(s->cpus),
+> +                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+>      object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
+>                              &error_abort);
+>      object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
+>                              &error_abort);
+>  
+> -    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
+> -    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+> +                          TYPE_CADENCE_GEM);
+>  }
+>  
+>  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> 
