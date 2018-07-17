@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1ffSLG-0008LK-IQ
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:56:47 -0400
+	(envelope-from <jusual@mail.ru>) id 1ffSLX-0008UK-9g
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1ffSLD-0001BP-FP
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:56:46 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1ffSLD-0001Aa-9R
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:56:43 -0400
-Received: by mail-pf0-x242.google.com with SMTP id k19-v6so724541pfi.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:56:43 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Tue, 17 Jul 2018 08:56:40 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180717155640.GB30101@roeck-us.net>
-References: <1531779837-20557-1-git-send-email-linux@roeck-us.net>
-	<c240db5a-ba24-bdea-ea90-d95a4d661889@amsat.org>
+	(envelope-from <jusual@mail.ru>) id 1ffSLU-0001Tn-76
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:57:03 -0400
+Received: from smtp53.i.mail.ru ([94.100.177.113]:57854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1ffSLT-0001Sc-Rh
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:57:00 -0400
+References: <20180713103059.12539-1-jusual@mail.ru>
+	<CAFEAcA9zzSu86Ra3Cgs_V8NYnC+vYCujE5vBkqtnX6AWFk-+LQ@mail.gmail.com>
+	<42c6cde3-2b82-f1e8-f893-ce19849f9e46@mail.ru>
+	<CAFEAcA-1LHmcwQFy7tMEzVoNgELpuaJDPhOpi74h0=WyDeiqJQ@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <8f55a8de-1599-4567-6e63-f2c048eae894@mail.ru>
+Date: Tue, 17 Jul 2018 18:56:49 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c240db5a-ba24-bdea-ea90-d95a4d661889@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] hw/sd/bcm2835_sdhost: Fix PIO mode writes
+In-Reply-To: <CAFEAcA-1LHmcwQFy7tMEzVoNgELpuaJDPhOpi74h0=WyDeiqJQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] arm: Add ARMv6-M programmer's model support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Clement Deschamps <clement.deschamps@antfield.fr>, Luc Michel <luc.michel@git.antfield.fr>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
 
-On Mon, Jul 16, 2018 at 10:20:37PM -0300, Philippe Mathieu-Daudé wrote:
-> Cc'ing ANTField folks who might have the specs.
+On 17.07.2018 16:49, Peter Maydell wrote:
+> On 17 July 2018 at 14:42, Julia Suvorova <jusual@mail.ru> wrote:
+>> On 17.07.2018 16:09, Peter Maydell wrote:
+>>> This should be outside the "if v8" if(), because you also want it for v6M
+>>> (giving you the v6M CCR value of STKALIGN and UNALIGN_TRP set and all
+>>> other bits clear).
+>>
+>>
+>> This is the main problem. If I understand correctly, bits[4:8] also
+>> should be read-as-one (Table B3-4 ARMv6-M ARM). And I've already set them
+>> (with UNALIGN_TRP) before for v6m.
 > 
-> On 07/16/2018 07:23 PM, Guenter Roeck wrote:
-> > Writes in PIO mode have two requirements:
-> > 
-> > - A data interrupt must be generated after a write command has been
-> >   issued to indicate that the chip is ready to receive data.
-> > - A block interrupt must be generated after each block to indicate
-> >   that the chip is ready to receive the next data block.
-> > 
-> > Rearrange the code to make this happen. Tested on raspi3 (in PIO mode)
-> > and raspi2 (in DMA mode).
+> That is very odd. In table B3-10 bits [8:4] are documented as
+> "reserved" which usually means reads-as-zero. I wonder if table
+> B3-4 has a docs error and should really be saying
+> "bits [9,3] = 0b11" rather than specifying [9:3]" ?
 > 
-> Note to reviewers, this seems a follow-up of:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg03397.html
-> (This patch makes more sens after reading this previous thread).
-> 
-Not sure about making more sense, but the other patch may be required
-as prerequisite. I noticed multiple divide by zero errors in the Linux
-mmc code without it.  
+> Do you have access to a real hardware Cortex-M0 which you can read
+> the CCR value from ?
 
-Guenter
+It's a docs error. CCR is 520 (0b1000001000) on real micro:bit.
 
-> > 
-> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> > ---
-> >  hw/sd/bcm2835_sdhost.c | 20 ++++++++++++++++----
-> >  1 file changed, 16 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
-> > index 4df4de7..1b760b2 100644
-> > --- a/hw/sd/bcm2835_sdhost.c
-> > +++ b/hw/sd/bcm2835_sdhost.c
-> > @@ -179,9 +179,11 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
-> >      uint32_t value = 0;
-> >      int n;
-> >      int is_read;
-> > +    int is_write;
-> >  
-> >      is_read = (s->cmd & SDCMD_READ_CMD) != 0;
-> > -    if (s->datacnt != 0 && (!is_read || sdbus_data_ready(&s->sdbus))) {
-> > +    is_write = (s->cmd & SDCMD_WRITE_CMD) != 0;
-> > +    if (s->datacnt != 0 && (is_write || sdbus_data_ready(&s->sdbus))) {
-> >          if (is_read) {
-> >              n = 0;
-> >              while (s->datacnt && s->fifo_len < BCM2835_SDHOST_FIFO_LEN) {
-> > @@ -201,8 +203,11 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
-> >              if (n != 0) {
-> >                  bcm2835_sdhost_fifo_push(s, value);
-> >                  s->status |= SDHSTS_DATA_FLAG;
-> > +                if (s->config & SDHCFG_DATA_IRPT_EN) {
-> > +                    s->status |= SDHSTS_SDIO_IRPT;
-> > +                }
-> >              }
-> > -        } else { /* write */
-> > +        } else if (is_write) { /* write */
-> >              n = 0;
-> >              while (s->datacnt > 0 && (s->fifo_len > 0 || n > 0)) {
-> >                  if (n == 0) {
-> > @@ -223,11 +228,18 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
-> >              s->edm &= ~SDEDM_FSM_MASK;
-> >              s->edm |= SDEDM_FSM_DATAMODE;
-> >              trace_bcm2835_sdhost_edm_change("datacnt 0", s->edm);
-> > -
-> > -            if ((s->cmd & SDCMD_WRITE_CMD) &&
-> > +        }
-> > +        if (is_write) {
-> > +            /* set block interrupt at end of each block transfer */
-> > +            if (s->hbct && s->datacnt % s->hbct == 0 &&
-> >                  (s->config & SDHCFG_BLOCK_IRPT_EN)) {
-> >                  s->status |= SDHSTS_BLOCK_IRPT;
-> >              }
-> > +            /* set data interrupt after each transfer */
-> > +            s->status |= SDHSTS_DATA_FLAG;
-> > +            if (s->config & SDHCFG_DATA_IRPT_EN) {
-> > +                s->status |= SDHSTS_SDIO_IRPT;
-> > +            }
-> >          }
-> >      }
-> >  
-> > 
+Best regards, Julia Suvorova.
