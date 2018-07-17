@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ffUko-0000EU-TB
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:31:20 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ffV6n-0006fo-RK
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:54:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ffUkl-0002Iw-Lq
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:31:18 -0400
-Date: Tue, 17 Jul 2018 19:31:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180717183109.GF2383@work-vm>
-References: <152949925592.606785.4717120428688653960.stgit@bahia.lan>
-	<20180621011809.GD32328@umbus.fritz.box>
-	<20180621152321.3ab81d51@bahia.lan>
-	<20180717105006.GA2272@umbus.fritz.box>
-	<153184694309.16660.1687761920219675996@sif>
+	(envelope-from <alex.bennee@linaro.org>) id 1ffV6k-0001Ag-QO
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:54:01 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ffV6k-00019p-9e
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:53:58 -0400
+Received: by mail-wm0-x234.google.com with SMTP id 69-v6so394994wmf.3
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:53:58 -0700 (PDT)
+References: <20180713121741.19262-1-alex.bennee@linaro.org>
+	<1061e94e-debe-a92c-a300-ebc68835fa56@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1061e94e-debe-a92c-a300-ebc68835fa56@amsat.org>
+Date: Tue, 17 Jul 2018 19:53:55 +0100
+Message-ID: <87zhyp4rss.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <153184694309.16660.1687761920219675996@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11.2] spapr: make pseries-2.11 the
- default machine type
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 00/16] various docker fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, Laurent Vivier <laurent@vivier.eu>, cota@braap.org, qemu-devel@nongnu.org
 
-* Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
-> Quoting David Gibson (2018-07-17 05:50:06)
-> > On Thu, Jun 21, 2018 at 03:23:21PM +0200, Greg Kurz wrote:
-> > > On Thu, 21 Jun 2018 11:18:09 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > 
-> > > > On Wed, Jun 20, 2018 at 02:54:15PM +0200, Greg Kurz wrote:
-> > > > > The spapr capability framework was introduced in QEMU 2.12. It allows
-> > > > > to have an explicit control on how host features are exposed to the
-> > > > > guest. This is especially needed to handle migration between hetero-
-> > > > > geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
-> > > > > workarounds against speculative execution vulnerabilities to guests.
-> > > > > The framework was hence backported to QEMU 2.11.1, especially these
-> > > > > commits:
-> > > > > 
-> > > > > 0fac4aa93074 spapr: Add pseries-2.12 machine type
-> > > > > 9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
-> > > > >  optional capability
-> > > > > 
-> > > > > 0fac4aa93074 has the confusing effect of making pseries-2.12 the default
-> > > > > machine type for QEMU 2.11.1, instead of the expected pseries-2.11. This
-> > > > > patch changes the default machine back to pseries-2.11.
-> > > > > 
-> > > > > Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2.11
-> > > > > to be enabled by default, ie, when not passing cap-htm on the command
-> > > > > line. This breaks several 'make check' testcases that run qemu-system-ppc64
-> > > > > with TCG.
-> > > > > 
-> > > > > The only sane way to fix this is to adapt the impacted testcases so that
-> > > > > they all pass cap-htm=off in this case. This patch does that as well.
-> > > > > 
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > > ---
-> > > > > v2: - have the testcases to pass cap-htm=off instead of violating the
-> > > > >       capabilities logic.
-> > > > > 
-> > > > > Upstream doesn't need anything like that since newer pseries machine types
-> > > > > start with HTM disabled by default. This is really a oneshot fix for 2.11.2,
-> > > > > and I've tried to make it as small as possible.
-> > > > > 
-> > > > > This is a full replacement of the previous version. It is based on Mike's
-> > > > > staging tree for 2.11:  
-> > > > 
-> > > > Thanks for fixing this up
-> > > > 
-> > > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > 
-> > > > Btw, 2.11.z should probably have the 2.12 machine type removed
-> > > > entirely, as well as (obviously) not being the default.  Not within
-> > > > scope for this patch, though.
-> > > > 
-> > > 
-> > > Well... it is indeed weird but I don't think it hurts. Also, people
-> > > may have started using pseries-2.12 with QEMU 2.11.1 (I seem to
-> > > remember Mike told me about something like this the other day)...
-> > 
-> > I came back to thinking about this and realized this is a terrible
-> > idea.  The problem is that because of the way we define the latest
-> > machine type, then backwards compat props for the earlier ones, it's
-> > very likely that the "pseries-2.12" in 2.11 won't be the same as
-> > pseries-2.12 in 2.12, simply because 2.11 won't have the necessary
-> > features to implement pseries-2.12 as in 2.12.
-> 
-> What I saw was likely a holdover from early Ubuntu 18.04 p9 testing
-> before HTM emulation had made it's way into their kernel. In that
-> particular case Ubuntu doesn't support it at all now, but it remains
-> the only option for anyone else who happens to find themselves in
-> that situation and doesn't have a libvirt/Openstack with appropriate
-> machine capabilities.
-> 
-> Given that it was at least possible to run that config (however
-> broken) with QEMU 2.11.0, it seemed fair to leave some sort of
-> "out". But really it just seems like we don't have much to gain
-> by removing it at this point.
 
-It may confuse people trying to migrate from 2.11.1 to 2.12
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Dave
+> On 07/13/2018 09:17 AM, Alex Benn=C3=A9e wrote:
+>> Hi,
+>>
+>> Unfortunately this series grew a little while I was re-basing as I
+>> noticed a couple of bugs. An upstream change in debootstrap which I'd
+>> been happily using for Ubuntu images caused a breakage which I've
+>> hopefully now fixed:
+>>
+>>   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D903657
+>>
+>> However since I upgraded by devbox I hadn't clocked to the fact I
+>> should have been using the stable debootstrap anyway but our ugly
+>> shell version check failed to pick it up. That's now fixed and I can
+>> now bootstrap away.
+>>
+>> I grabbed a couple of Philippe's patches while I was at it as they
+>> were relevant to the other changes. It does mean the un-reviewed count
+>> has gone up slightly:
+>>
+>>   patch docker/base debian tricore on qemu debian9.patch
+>>   patch docker/split configure_qemu from build_qemu.patch
+>>   patch docker/move make check into check_qemu helper.patch
+>>   patch docker/gracefully skip check_qemu.patch
+>>   patch docker/Makefile.include don t include partial images.patch
+>>   patch docker/disable debian powerpc user cross.patch
+>>   patch docker/add test unit runner.patch
+>>   patch docker/add expansion for docker test FOO to Makefile.patch
+>>   patch docker/drop QEMU_TARGET check fallback in EXECUTABLE.patch
+>>   patch docker/add hint to docker.py check.patch
+>>   patch docker/add commentary to debian bootstrap.docker.patch
+>>   patch docker/ignore distro versioning of debootstrap.patch
+>
+> [Note]
+>
+> I hit:
+>
+> $ make docker-binfmt-image-debian-powerpc-user
+>   BUILD   binfmt debian-powerpc-user (debootstrapped)
+> Cloning into './debootstrap.git'...
+> remote: Enumerating objects: 3262, done.
+> remote: Counting objects: 100% (3262/3262), done.
+> remote: Compressing objects: 100% (902/902), done.
+> remote: Total 3262 (delta 2353), reused 3245 (delta 2339)
+> Receiving objects: 100% (3262/3262), 531.08 KiB | 335.00 KiB/s, done.
+> Resolving deltas: 100% (2353/2353), done.
+> The command '/bin/sh -c /debootstrap/debootstrap --second-stage'
+> returned a non-zero code: 139
+> Traceback (most recent call last):
+>   File "tests/docker/docker.py", line 536, in <module>
+>     sys.exit(main())
+>   File "tests/docker/docker.py", line 533, in main
+>     return args.cmdobj.run(args, argv)
+>   File "tests/docker/docker.py", line 348, in run
+>     extra_files_cksum=3Dcksum)
+>   File "tests/docker/docker.py", line 231, in build_image
+>     quiet=3Dquiet)
+>   File "tests/docker/docker.py", line 158, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib/python2.7/subprocess.py", line 190, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+> 'qemu:debian-powerpc-user', '-f',
+> '/tmp/docker_buildPNDAtz/tmpIVpPn7.docker', '/tmp/docker_buildPNDAtz']'
+> returned non-zero exit status 139
+> make: *** [tests/docker/Makefile.include:62:
+> docker-binfmt-image-debian-powerpc-user] Error 1
+>
+> "returned non-zero exit status 139" seems to be qemu-user crashing for
+> not being statistically linked.
 
-> I agree in general though and probably would've handled this
-> differently if I'd thought through it a bit more.
-> 
-> > 
-> > 
-> > -- 
-> > David Gibson                    | I'll have my music baroque, and my code
-> > david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_ _other_
-> >                                 | _way_ _around_!
-> > http://www.ozlabs.org/~dgibson
-> 
+What system are you building on? Basically --static is always safer but
+as long as there isn't a clash between host/guest file system layouts it
+can work which is why I don't enforce it (although earlier patches tried
+to).
+
+> Once rebuilt after ./configure --static, it worked:
+>
+> $ make docker-binfmt-image-debian-powerpc-user V=3D1
+> [...]
+> I: Extracting zlib1g...
+> ppc-linux-user/qemu-ppc had no associated libraries (static build?)
+> Sending build context to Docker daemon  226.5MB
+> Step 1/7 : FROM scratch
+> Step 2/7 : ADD . /
+> Step 3/7 : RUN sed -i 's/in_target mount/echo not for docker in_target
+> mount/g' /debootstrap/functions
+> Step 4/7 : RUN /debootstrap/debootstrap --second-stage
+> I: Installing core packages...
+> [...]
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
