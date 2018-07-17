@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47848)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRWF-00033o-Fw
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:04:04 -0400
+	id 1ffRXS-000427-Nc
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRWC-0004kk-B5
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:04:03 -0400
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:40137)
+	id 1ffRXN-0005eV-25
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:05:18 -0400
+Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:38274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRWC-0004kS-4r
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:04:00 -0400
-Received: by mail-ua0-x22d.google.com with SMTP id p22-v6so876442uao.7
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:04:00 -0700 (PDT)
+	id 1ffRXM-0005dL-Sk
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:05:12 -0400
+Received: by mail-ua0-x242.google.com with SMTP id o11-v6so881863uak.5
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:05:12 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180713121741.19262-1-alex.bennee@linaro.org>
-	<20180713121741.19262-12-alex.bennee@linaro.org>
-	<27bc62f7-919b-7d81-55b0-15cf4f9517e4@amsat.org>
-	<87efg35z0y.fsf@linaro.org>
+	<20180713121741.19262-8-alex.bennee@linaro.org>
+	<63c0e5cd-fac0-789c-d7fd-f77ed8d9d047@amsat.org>
+	<87601e5fhk.fsf@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8df0a984-0f60-ecd3-473f-2f838f64685e@amsat.org>
-Date: Tue, 17 Jul 2018 12:03:54 -0300
+Message-ID: <bc4a5288-e316-4998-8fd8-6d4ffb339e27@amsat.org>
+Date: Tue, 17 Jul 2018 12:05:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <87efg35z0y.fsf@linaro.org>
+In-Reply-To: <87601e5fhk.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 11/16] docker: add expansion for
- docker-test-FOO to Makefile.include
+Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 07/16] docker: gracefully skip
+ check_qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,80 +39,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, cota@braap.org, famz@redhat.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-On 07/16/2018 06:07 AM, Alex Bennée wrote:
+On 07/17/2018 07:22 AM, Alex Bennée wrote:
 > Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> Hi Alex,
->>
 >> On 07/13/2018 09:17 AM, Alex Bennée wrote:
->>> This allows us to run a particular test on all docker images. For
->>> example:
->>>
->>>   make docker-test-unit
->>>
->>> Will run the unit tests on every supported image. At the same time
->>> rename docker-test to docker-all-tests to be clearer.
+>>> Not all our images are able to run the tests. Rather than use features
+>>> we can just check for the existence and run-ability of gtester. If the
+>>> image has been setup for binfmt_misc it will be able to run anyway.
 >>>
 >>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>>
 >>> ---
->>> v2
->>>   - docker-test -> docker-all-tests
->>> ---
->>>  tests/docker/Makefile.include | 6 ++++--
->>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>>  tests/docker/common.rc | 8 +++++++-
+>>>  1 file changed, 7 insertions(+), 1 deletion(-)
 >>>
->>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->>> index fe63aacf69..e32c35be0d 100644
->>> --- a/tests/docker/Makefile.include
->>> +++ b/tests/docker/Makefile.include
->>> @@ -151,7 +151,8 @@ $(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPR
->>>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
->>>  	) \
->>>  	$(foreach t,$(DOCKER_TESTS), \
->>> -		$(eval docker-test: docker-$t@$i) \
->>> +		$(eval docker-all-tests: docker-$t@$i) \
->>> +		$(eval docker-$t: docker-$t@$i) \
+>>> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+>>> index cfc620d554..6df431eb72 100755
+>>> --- a/tests/docker/common.rc
+>>> +++ b/tests/docker/common.rc
+>>> @@ -47,7 +47,13 @@ check_qemu()
+>>>      else
+>>>          TEST="$@"
+>>>      fi
+>>> -    make $MAKEFLAGS $TEST
+>>> +
+>>> +    if type gtester > /dev/null 2>&1 && \
 >>
->> Is this supposed to work this way?
+>> commit e465ce7d09939d631f1861e0bd8873417c1c0d65
 >>
->> $ make docker-test-quick@debian-alpha-cross
->> make: *** No rule to make target
->> 'docker-test-quick@debian-alpha-cross'.
+>>     tests: Use "command -v" instead of which(1) in shell scripts
 > 
-> No
-> 
->   make docker-test-quick
-> 
-> will make the test-quick on all images.
-> 
-> Your example fails because debian-alpha-cross is a PARTIAL image, good
-> for building test cases but not QEMU so it's not expanded in the above
-> bit: $(eval docker-$t@$i: docker-image-$i docker-run-$t@$i)
+> type is also a shell built-in albeit an 1982 bashism. I'll switch to
+> command -v as tending towards POSIX is what we should aim for (although
+> our test-FOO/common.rc structure seems a little confused).
 
-I noticed too late ;)
-
+Thanks, with 'command -v':
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > 
->>  Stop.
 >>
->>>  	) \
->>>  )
+>>     When which(1) is not installed, we would complain "perl not found"
+>>     because it's the first set_prog_path check. The error message is
+>>     wrong.
+>>
+>>     Fix it by using "command -v", a native way to query the existence
+>>     of a command.
+>>
+>>> +           gtester --version > /dev/null 2>&1; then
+>>> +        make $MAKEFLAGS $TEST
+>>> +    else
+>>> +        echo "No working gtester, skipping make $TEST"
+>>> +    fi
+>>>  }
 >>>
->>> @@ -161,7 +162,8 @@ docker:
->>>  	@echo 'Available targets:'
->>>  	@echo
->>>  	@echo '    docker:              Print this help.'
->>> -	@echo '    docker-test:         Run all image/test combinations.'
->>> +	@echo '    docker-all-tests:    Run all image/test combinations.'
->>> +	@echo '    docker-TEST:         Run TEST on all image combinations.'
->>>  	@echo '    docker-clean:        Kill and remove residual docker testing containers.'
->>>  	@echo '    docker-TEST@IMAGE:   Run "TEST" in container "IMAGE".'
->>>  	@echo '                         Note: "TEST" is one of the listed test name,'
+>>>  test_fail()
 >>>
 > 
 > 
