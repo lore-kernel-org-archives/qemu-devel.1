@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49275)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffG2d-000087-Pu
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:44 -0400
+	id 1ffG2j-0000Dq-Jt
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffG2d-0008VA-2h
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:43 -0400
-Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:34288)
+	id 1ffG2f-0008WL-Nw
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:49 -0400
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:45842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffG2c-0008V4-TT
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:43 -0400
-Received: by mail-vk0-x22d.google.com with SMTP id l143-v6so15439026vke.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 19:48:42 -0700 (PDT)
+	id 1ffG2f-0008W2-Hm
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:48:45 -0400
+Received: by mail-vk0-x22f.google.com with SMTP id b78-v6so8792855vka.12
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 19:48:45 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Jul 2018 23:48:25 -0300
-Message-Id: <20180717024827.27897-4-f4bug@amsat.org>
+Date: Mon, 16 Jul 2018 23:48:26 -0300
+Message-Id: <20180717024827.27897-5-f4bug@amsat.org>
 In-Reply-To: <20180717024827.27897-1-f4bug@amsat.org>
 References: <20180717024827.27897-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/5] tests/vm: Do not abuse parallelism when
- KVM is not available
+Subject: [Qemu-devel] [RFC PATCH 4/5] tests/vm: Display remaining seconds to
+ wait for a VM to start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,30 +39,29 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/vm/basevm.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/vm/basevm.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 1f4ad04c32..715e433142 100755
+index 715e433142..7575c36f0b 100755
 --- a/tests/vm/basevm.py
 +++ b/tests/vm/basevm.py
-@@ -233,7 +233,7 @@ def main(vmcls):
-             return 1
-         logging.basicConfig(level=(logging.DEBUG if args.debug
-                                    else logging.WARN))
--        vm = vmcls(debug=args.debug, vcpus=args.jobs)
-+        vm = vmcls(debug=args.debug, vcpus=args.jobs if kvm_available() else 0)
-         if args.build_image:
-             if os.path.exists(args.image) and not args.force:
-                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
-@@ -244,7 +244,7 @@ def main(vmcls):
-             vm.add_source_dir(args.build_qemu)
-             cmd = [vm.BUILD_SCRIPT.format(
-                    configure_opts = " ".join(argv),
--                   jobs=args.jobs)]
-+                   jobs=args.jobs if kvm_available() else 1)]
-         else:
-             cmd = argv
-         vm.boot(args.image + ",snapshot=on")
+@@ -183,12 +183,15 @@ class BaseVM(object):
+ 
+     def wait_ssh(self, seconds=120):
+         starttime = datetime.datetime.now()
++        endtime = starttime + datetime.timedelta(seconds=seconds)
+         guest_up = False
+-        while (datetime.datetime.now() - starttime).total_seconds() < seconds:
++        while datetime.datetime.now() < endtime:
+             if self.ssh("exit 0") == 0:
+                 guest_up = True
+                 break
+             time.sleep(1)
++            seconds = (endtime - datetime.datetime.now()).total_seconds()
++            logging.debug("%ds before timeout", seconds)
+         if not guest_up:
+             raise Exception("Timeout while waiting for guest ssh")
+ 
 -- 
 2.18.0
