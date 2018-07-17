@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffPjO-0002If-5e
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:09:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1ffPlV-0003H0-Fj
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffPjN-00062z-6V
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:09:30 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffPjN-00061X-07
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:09:29 -0400
-Received: by mail-oi0-x243.google.com with SMTP id 13-v6so1893584ois.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 06:09:28 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1ffPlS-0008Go-A2
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:11:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51122 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ffPlS-0008GW-2m
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 09:11:38 -0400
+Date: Tue, 17 Jul 2018 14:11:34 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180717131134.GR18603@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180717125239.22517-1-marcandre.lureau@redhat.com>
+	<20180717125239.22517-4-marcandre.lureau@redhat.com>
+	<20180717130130.GQ18603@redhat.com>
+	<CAJ+F1CKXhSmbushwJR1xwy0C5eGoN27ONH_+mEg1BopJOO-F5Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180713103059.12539-1-jusual@mail.ru>
-References: <20180713103059.12539-1-jusual@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jul 2018 14:09:07 +0100
-Message-ID: <CAFEAcA9zzSu86Ra3Cgs_V8NYnC+vYCujE5vBkqtnX6AWFk-+LQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] arm: Add ARMv6-M programmer's model support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKXhSmbushwJR1xwy0C5eGoN27ONH_+mEg1BopJOO-F5Q@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] char-socket: delay setting fd-pass
+ feature until connected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On 13 July 2018 at 11:30, Julia Suvorova <jusual@mail.ru> wrote:
-> Forbid stack alignment change. (CCR)
-> Reserve FAULTMASK, BASEPRI registers.
-> Report any fault as HardFault. Disable MemManage, BusFault and
-> UsageFault, so they always escalated to HardFault. (SHCSR)
->
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
-> This is the last cortex-m0 patch.
->
->  hw/intc/armv7m_nvic.c | 10 ++++++++++
->  target/arm/cpu.c      | 10 ++++++++++
->  target/arm/helper.c   | 13 +++++++++++--
->  3 files changed, 31 insertions(+), 2 deletions(-)
+On Tue, Jul 17, 2018 at 03:07:01PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Tue, Jul 17, 2018 at 3:01 PM, Daniel P. Berrang=C3=A9 <berrange@redh=
+at.com> wrote:
+> > On Tue, Jul 17, 2018 at 02:52:39PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> >> Wait for QIO channel connection completion, and check the feature se=
+t
+> >> by QIO. This fixes setting fd-pass chardev feature on
+> >> SOCKET_ADDRESS_FD where fd has AF_UNIX.
+> >>
+> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >> ---
+> >>  chardev/char-socket.c | 8 ++++----
+> >>  1 file changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> >> index 6daa8d003a..7387e632d4 100644
+> >> --- a/chardev/char-socket.c
+> >> +++ b/chardev/char-socket.c
+> >> @@ -789,6 +789,9 @@ static int tcp_chr_new_client(Chardev *chr, QIOC=
+hannelSocket *sioc)
+> >>
+> >>      qio_channel_set_blocking(s->ioc, false, NULL);
+> >>
+> >> +    if (qio_channel_has_feature(s->ioc, QIO_CHANNEL_FEATURE_FD_PASS=
+)) {
+> >> +        qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
+> >> +    }
+> >
+> > I really don't like this approach as it has unpleasant async/race pro=
+ne
+> > semantics or the external users of the chardev.
+> >
+> > With the current approach they know that once the chardev is created,
+> > the features have been initialized.
+> >
+> > With this approach, the features are only initialized once the client
+> > connection has been completed, or once the server has started listeni=
+ng,
+> > which may or may not be the case once the chardev constructor complet=
+es.
+>=20
+> Ok, what about augmenting the feature set then?:
+>=20
+> keep the current qemu_chr_set_feature() in contructor for
+> ADDRESS_TYPE_UNIX, and add the feature in new_client() for
+> ADDRESS_TYPE_FD?
 
-Most of this looks good; I have some comments on the reset value of CCR.
+IMHO that makes the behaviour even more non-deterministic for callers.
 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index a914ce4e8c..3788cb773d 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -220,6 +220,11 @@ static void arm_cpu_reset(CPUState *s)
->              env->v7m.aircr = R_V7M_AIRCR_BFHFNMINS_MASK;
->          }
->
-> +        if (!arm_feature(env, ARM_FEATURE_V7)) {
-> +            env->v7m.ccr[M_REG_NS] = 0x3f8;
-> +            env->v7m.ccr[M_REG_S] = 0x3f8;
+How about we just delete the entire feature concept from chardevs and rem=
+ove
+the check from the vhostuser network backend too.
 
-This code will have no effect, because just below we already have an
-assignment to these fields:
-        env->v7m.ccr[M_REG_NS] = R_V7M_CCR_STKALIGN_MASK;
-        env->v7m.ccr[M_REG_S] = R_V7M_CCR_STKALIGN_MASK;
+We have lots of users of chardevs in QEMU and vhostuser is the only one
+that has tried to do this sanity check for the "correct" chardev backend.
+The other users just assume the user / mgmt app will configure a suitable
+chardev backend.  The vhostuser sanity checks have just caused more probl=
+ems
+then they've solved.
 
-> +        }
-> +
->          /* In v7M the reset value of this bit is IMPDEF, but ARM recommends
->           * that it resets to 1, so QEMU always does that rather than making
->           * it dependent on CPU model. In v8M it is RES1.
-> @@ -230,6 +235,11 @@ static void arm_cpu_reset(CPUState *s)
->              /* in v8M the NONBASETHRDENA bit [0] is RES1 */
->              env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_NONBASETHRDENA_MASK;
->              env->v7m.ccr[M_REG_S] |= R_V7M_CCR_NONBASETHRDENA_MASK;
-> +
-> +            if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
-> +                env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_UNALIGN_TRP_MASK;
-> +                env->v7m.ccr[M_REG_S] |= R_V7M_CCR_UNALIGN_TRP_MASK;
-> +            }
 
-This should be outside the "if v8" if(), because you also want it for v6M
-(giving you the v6M CCR value of STKALIGN and UNALIGN_TRP set and all
-other bits clear).
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
