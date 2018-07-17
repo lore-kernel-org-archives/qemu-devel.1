@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ffRZB-00054f-IQ
+	(envelope-from <pbonzini@redhat.com>) id 1ffRZB-00054k-Md
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ffRZ5-00079O-Sp
+	(envelope-from <pbonzini@redhat.com>) id 1ffRZA-0007CI-IA
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55084 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54078 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ffRZ5-00078p-NA
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:06:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB78B402312B
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 15:06:58 +0000 (UTC)
-Received: from 640k.localdomain.com (ovpn-112-17.ams2.redhat.com
-	[10.36.112.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E1282026D68
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 15:06:57 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ffRZA-0007C3-B0
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:07:04 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 17 Jul 2018 17:06:42 +0200
-Message-Id: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/13] Misc fixes for QEMU 3.0.0-rc1
+Date: Tue, 17 Jul 2018 17:06:45 +0200
+Message-Id: <1531840015-28804-4-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
+References: <1531840015-28804-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 03/13] hyperv: rename vcpu_id to vp_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +24,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Roman Kagan <rkagan@virtuozzo.com>
 
-The following changes since commit 9277d81f5c2c6f4d0b5e47c8476eb7ee7e5c0b=
-eb:
+From: Roman Kagan <rkagan@virtuozzo.com>
 
-  docs: Grammar and spelling fixes (2018-07-13 10:16:04 +0100)
+In Hyper-V-related code, vCPUs are identified by their VP (virtual
+processor) index.  Since it's customary for "vcpu_id" in QEMU to mean
+APIC id, rename the respective variables to "vp_index" to make the
+distinction clear.
 
-are available in the git repository at:
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+Message-Id: <20180702134156.13404-2-rkagan@virtuozzo.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/misc/hyperv_testdev.c | 16 ++++++++--------
+ target/i386/hyperv.c     |  6 +++---
+ target/i386/hyperv.h     |  4 ++--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-  git://github.com/bonzini/qemu.git=20
-
-for you to fetch changes up to dfaa7d50b0f72060764096ffcae4a0c06ce24f9b:
-
-  Document command line options with single dash (2018-07-17 16:24:50 +02=
-00)
-
-----------------------------------------------------------------
-Bug fixes.
-
-----------------------------------------------------------------
-BALATON Zoltan (1):
-      Document command line options with single dash
-
-Calvin Lee (1):
-      PC Chipset: Improve serial divisor calculation
-
-Daniel P. Berrang=C3=A9 (3):
-      i386: fix regression parsing multiboot initrd modules
-      i386: only parse the initrd_filename once for multiboot modules
-      opts: remove redundant check for NULL parameter
-
-Emanuele Giuseppe Esposito (1):
-      vhost-user-test: added proper TestServer *dest initialization in te=
-st_migrate()
-
-Marc-Andr=C3=A9 Lureau (1):
-      hw/char/serial: retry write if EAGAIN
-
-Roman Kagan (2):
-      hyperv: rename vcpu_id to vp_index
-      hyperv: ensure VP index equal to QEMU cpu_index
-
-Stefan Hajnoczi (2):
-      qdev: add HotplugHandler->post_plug() callback
-      virtio-scsi: fix hotplug ->reset() vs event race
-
-Stefan Weil (1):
-      accel: Fix typo and grammar in comment
-
-Viktor Prutyanov (1):
-      dump: add kernel_gs_base to QEMU CPU state
-
- accel/tcg/translate-all.c |  2 +-
- hw/char/serial.c          | 46 +++++++++++++++++++++++++++--------------=
------
- hw/core/hotplug.c         | 10 ++++++++++
- hw/core/qdev.c            |  4 ++++
- hw/i386/multiboot.c       | 35 ++++++++++++++++-------------------
- hw/i386/pc.c              |  5 +++++
- hw/misc/hyperv_testdev.c  | 16 ++++++++--------
- hw/scsi/virtio-scsi.c     | 11 ++++++++++-
- include/hw/hotplug.h      | 11 +++++++++++
- qemu-options.hx           |  8 ++++----
- target/i386/arch_dump.c   | 10 ++++++++++
- target/i386/hyperv.c      | 16 +++++++++++++---
- target/i386/hyperv.h      |  7 +++++--
- target/i386/kvm-stub.c    |  5 +++++
- target/i386/kvm.c         | 47 +++++++++++++++++++++++++++++++++++++++++=
-++++++
- target/i386/kvm_i386.h    |  2 ++
- tests/vhost-user-test.c   |  3 +++
- util/qemu-option.c        |  8 +++-----
- 18 files changed, 184 insertions(+), 62 deletions(-)
---=20
+diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
+index dbd7cdd..bf6bbfa 100644
+--- a/hw/misc/hyperv_testdev.c
++++ b/hw/misc/hyperv_testdev.c
+@@ -57,7 +57,7 @@ static void free_sint_route_index(HypervTestDev *dev, int i)
+     dev->sint_route[i] = NULL;
+ }
+ 
+-static int find_sint_route_index(HypervTestDev *dev, uint32_t vcpu_id,
++static int find_sint_route_index(HypervTestDev *dev, uint32_t vp_index,
+                                  uint32_t sint)
+ {
+     HvSintRoute *sint_route;
+@@ -65,7 +65,7 @@ static int find_sint_route_index(HypervTestDev *dev, uint32_t vcpu_id,
+ 
+     for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
+         sint_route = dev->sint_route[i];
+-        if (sint_route && sint_route->vcpu_id == vcpu_id &&
++        if (sint_route && sint_route->vp_index == vp_index &&
+             sint_route->sint == sint) {
+             return i;
+         }
+@@ -74,7 +74,7 @@ static int find_sint_route_index(HypervTestDev *dev, uint32_t vcpu_id,
+ }
+ 
+ static void hv_synic_test_dev_control(HypervTestDev *dev, uint32_t ctl,
+-                                      uint32_t vcpu_id, uint32_t sint)
++                                      uint32_t vp_index, uint32_t sint)
+ {
+     int i;
+     HvSintRoute *sint_route;
+@@ -83,19 +83,19 @@ static void hv_synic_test_dev_control(HypervTestDev *dev, uint32_t ctl,
+     case HV_TEST_DEV_SINT_ROUTE_CREATE:
+         i = alloc_sint_route_index(dev);
+         assert(i >= 0);
+-        sint_route = kvm_hv_sint_route_create(vcpu_id, sint, NULL);
++        sint_route = kvm_hv_sint_route_create(vp_index, sint, NULL);
+         assert(sint_route);
+         dev->sint_route[i] = sint_route;
+         break;
+     case HV_TEST_DEV_SINT_ROUTE_DESTROY:
+-        i = find_sint_route_index(dev, vcpu_id, sint);
++        i = find_sint_route_index(dev, vp_index, sint);
+         assert(i >= 0);
+         sint_route = dev->sint_route[i];
+         kvm_hv_sint_route_destroy(sint_route);
+         free_sint_route_index(dev, i);
+         break;
+     case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
+-        i = find_sint_route_index(dev, vcpu_id, sint);
++        i = find_sint_route_index(dev, vp_index, sint);
+         assert(i >= 0);
+         sint_route = dev->sint_route[i];
+         kvm_hv_sint_route_set_sint(sint_route);
+@@ -117,8 +117,8 @@ static void hv_test_dev_control(void *opaque, hwaddr addr, uint64_t data,
+     case HV_TEST_DEV_SINT_ROUTE_DESTROY:
+     case HV_TEST_DEV_SINT_ROUTE_SET_SINT: {
+         uint8_t sint = data & 0xFF;
+-        uint8_t vcpu_id = (data >> 8ULL) & 0xFF;
+-        hv_synic_test_dev_control(dev, ctl, vcpu_id, sint);
++        uint8_t vp_index = (data >> 8ULL) & 0xFF;
++        hv_synic_test_dev_control(dev, ctl, vp_index, sint);
+         break;
+     }
+     default:
+diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
+index a050c9d..7cc0fbb 100644
+--- a/target/i386/hyperv.c
++++ b/target/i386/hyperv.c
+@@ -72,7 +72,7 @@ static void kvm_hv_sint_ack_handler(EventNotifier *notifier)
+     }
+ }
+ 
+-HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
++HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+                                       HvSintAckClb sint_ack_clb)
+ {
+     HvSintRoute *sint_route;
+@@ -92,7 +92,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
+     event_notifier_set_handler(&sint_route->sint_ack_notifier,
+                                kvm_hv_sint_ack_handler);
+ 
+-    gsi = kvm_irqchip_add_hv_sint_route(kvm_state, vcpu_id, sint);
++    gsi = kvm_irqchip_add_hv_sint_route(kvm_state, vp_index, sint);
+     if (gsi < 0) {
+         goto err_gsi;
+     }
+@@ -105,7 +105,7 @@ HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
+     }
+     sint_route->gsi = gsi;
+     sint_route->sint_ack_clb = sint_ack_clb;
+-    sint_route->vcpu_id = vcpu_id;
++    sint_route->vp_index = vp_index;
+     sint_route->sint = sint;
+ 
+     return sint_route;
+diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+index 0c3b562..eaf3df3 100644
+--- a/target/i386/hyperv.h
++++ b/target/i386/hyperv.h
+@@ -23,7 +23,7 @@ typedef void (*HvSintAckClb)(HvSintRoute *sint_route);
+ 
+ struct HvSintRoute {
+     uint32_t sint;
+-    uint32_t vcpu_id;
++    uint32_t vp_index;
+     int gsi;
+     EventNotifier sint_set_notifier;
+     EventNotifier sint_ack_notifier;
+@@ -32,7 +32,7 @@ struct HvSintRoute {
+ 
+ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
+ 
+-HvSintRoute *kvm_hv_sint_route_create(uint32_t vcpu_id, uint32_t sint,
++HvSintRoute *kvm_hv_sint_route_create(uint32_t vp_index, uint32_t sint,
+                                       HvSintAckClb sint_ack_clb);
+ 
+ void kvm_hv_sint_route_destroy(HvSintRoute *sint_route);
+-- 
 1.8.3.1
