@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dayeol@berkeley.edu>) id 1ffXA8-0002jI-W6
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:05:37 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1ffYkt-0005Qg-D6
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dayeol@berkeley.edu>) id 1ffXA4-0003NL-Oe
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:05:36 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1ffXA4-0003Mu-IR
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:05:32 -0400
-Received: by mail-qt0-x244.google.com with SMTP id m13-v6so2227295qth.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 14:05:32 -0700 (PDT)
-From: Dayeol Lee <dayeol@berkeley.edu>
-Date: Tue, 17 Jul 2018 21:05:13 +0000
-Message-Id: <1531861513-6549-1-git-send-email-dayeol@berkeley.edu>
-Subject: [Qemu-devel] [PATCH] target/riscv/pmp.c: Fix PMP NAPOT decoding bug
+	(envelope-from <alex.williamson@redhat.com>) id 1ffYko-0000ha-If
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58878 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ffYko-0000gF-D2
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:34 -0400
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 17 Jul 2018 16:47:31 -0600
+Message-ID: <20180717222721.14019.27548.stgit@gimli.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +26,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@wdc.com, Dayeol Lee <dayeol@berkeley.edu>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: kvm@vger.kernel.org
 
-According to the RISC-V priv. v1.10 ISA document,
-pmpaddr register stores (base_addr | (size/2 - 1)) >> 2 for a
-NAPOT-encoded address.
-However, the current code decodes (base_addr | (size - 1)) >> 3 which
-leads to a wrong base address and size.
+Directly assigned vfio devices have never been compatible with
+ballooning.  Zapping MADV_DONTNEED pages happens completely
+independent of vfio page pinning and IOMMU mapping, leaving us with
+inconsistent GPA to HPA mapping between vCPUs and assigned devices
+when the balloon deflates.  Mediated devices can theoretically do
+better, if we make the assumption that the mdev vendor driver is fully
+synchronized to the actual working set of the guest driver.  In that
+case the guest balloon driver should never be able to allocate an mdev
+pinned page for balloon inflation.  Unfortunately, QEMU can't know the
+workings of the vendor driver pinning, and doesn't actually know the
+difference between mdev devices and directly assigned devices.  Until
+we can sort out how the vfio IOMMU backend can tell us if ballooning
+is safe, the best approach is to disabling ballooning any time a vfio
+devices is attached.
 
-Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+To do that, simply make the balloon inhibitor a counter rather than a
+boolean, fixup a case where KVM can then simply use the inhibit
+interface, and inhibit ballooning any time a vfio device is attached.
+I'm expecting we'll expose some sort of flag similar to
+KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
+this.  An addition we could consider here would be yet another device
+option for vfio, such as x-disable-balloon-inhibit, in case there are
+mdev devices that behave in a manner compatible with ballooning.
+
+Please let me know if this looks like a good idea.  Thanks,
+
+Alex
+
 ---
- target/riscv/pmp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index f432f3b..c4c6b09 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -138,7 +138,7 @@ static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
-         return;
-     } else {
-         target_ulong t1 = ctz64(~a);
--        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 3;
-+        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 2;
-         target_ulong range = ((target_ulong)1 << (t1 + 3)) - 1;
-         *sa = base;
-         *ea = base + range;
--- 
-2.7.4
+Alex Williamson (3):
+      balloon: Allow nested inhibits
+      kvm: Use inhibit to prevent ballooning without synchronous mmu
+      vfio: Inhibit ballooning
+
+
+ accel/kvm/kvm-all.c        |    4 ++++
+ balloon.c                  |    7 ++++---
+ hw/vfio/common.c           |    6 ++++++
+ hw/virtio/virtio-balloon.c |    4 +---
+ 4 files changed, 15 insertions(+), 6 deletions(-)
