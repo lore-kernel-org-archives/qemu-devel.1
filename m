@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRaT-0006AH-TD
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:08:26 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1ffRbm-0007Kg-IJ
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRaQ-00083e-Mg
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:08:25 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:41623)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffRaQ-00082z-Er
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:08:22 -0400
-Received: by mail-ua0-x242.google.com with SMTP id t14-v6so884722uao.8
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:08:22 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1531839759-14090-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5b221436-d992-f147-0fc7-487c2ff2a969@amsat.org>
-Date: Tue, 17 Jul 2018 12:08:17 -0300
+	(envelope-from <balaton@eik.bme.hu>) id 1ffRbj-00016p-CM
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:09:46 -0400
+Date: Tue, 17 Jul 2018 17:09:41 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.1807171644120.57515@zero.eik.bme.hu>
+References: <20180716195851.0FE177456B7@zero.eik.bme.hu>
+	<CAFEAcA-Lu=gZWQOROa+oEwaWP8FWSY__=jneDQZVK=mFXAcFMw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1531839759-14090-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/riscv/sifive_u: Fix introspection
- problem in the "riscv.sifive.u.soc" device
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: [Qemu-devel] Profiling results (was: Re: [PATCH] Do not enable QOM
+ debugging by default)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 07/17/2018 12:02 PM, Thomas Huth wrote:
-> Valgrind complains:
-> 
-> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
->  "'arguments':{'typename':'riscv.sifive.u.soc'}}" \
->  "{'execute': 'human-monitor-command', " \
->  "'arguments': {'command-line': 'info qtree'}}" | \
->  valgrind -q riscv32-softmmu/qemu-system-riscv32 -M none,accel=qtest -qmp stdio
-> [...]
-> ==28083== Invalid read of size 8
-> ==28083==    at 0x2E036A: qdev_print (qdev-monitor.c:686)
-> ==28083==    by 0x2E036A: qbus_print (qdev-monitor.c:719)
-> ==28083==    by 0x268938: handle_hmp_command (monitor.c:3446)
-> [...]
-> 
-> Use the new object_initialize_child() and sysbus_init_child_obj() functions
-> to fix the problem.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Mon, 16 Jul 2018, Peter Maydell wrote:
+> Is this coming up as significant in profiling? In the past we've
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This seems to depend on the workload. From the cases I'm interested in 
+AROS and AmigaOS on qemu-system-ppc -M sam460ex does not seem to be 
+effected much (object_class_dynamic_cast_assert is not in top 10 with <2%) 
+but for MorphOS on mac99 this seems to be significant. This is with 
+default configure (--enable-qom-cast-debug):
 
-> ---
->  hw/riscv/sifive_u.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 3a6ffeb..459ec90 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -303,16 +303,15 @@ static void riscv_sifive_u_soc_init(Object *obj)
->  {
->      SiFiveUSoCState *s = RISCV_U_SOC(obj);
->  
-> -    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
-> -    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
-> -                              &error_abort);
-> +    object_initialize_child(obj, "cpus", &s->cpus, sizeof(s->cpus),
-> +                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
->      object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
->                              &error_abort);
->      object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
->                              &error_abort);
->  
-> -    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
-> -    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-> +                          TYPE_CADENCE_GEM);
->  }
->  
->  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-> 
+%       cum. %     linenr info                 symbol name
+9.7057   9.7057    exec-all.h:410              helper_lookup_tb_ptr
+8.0330  17.7387    object.c:711                object_class_dynamic_cast_assert
+6.9411  24.6798    cputlb.c:793                io_readx
+6.3219  31.0017    sm501_template.h:62         draw_line16_32
+5.3601  36.3617    cputlb.c:114                tlb_flush_nocheck
+3.6170  39.9787    translate-all.c:749         page_trylock_add
+3.1188  43.0975    translate-all.c:803         page_collection_lock
+3.0405  46.1380    exec.c:3025                 iotlb_to_section
+2.7044  48.8424    softmmu_template.h:112      helper_ret_ldub_mmu
+2.4154  51.2578    memory.c:1350               memory_region_access_valid
+
+and improves a bit (but not much) with --disable-qom-cast-debug
+
+%        cum. %     linenr info                 symbol name
+10.2063  10.2063    exec-all.h:410              helper_lookup_tb_ptr
+  7.1581  17.3644    object.c:711                object_class_dynamic_cast_assert
+  5.9297  23.2941    sm501_template.h:62         draw_line16_32
+  5.9227  29.2168    cputlb.c:793                io_readx
+  5.3030  34.5198    cputlb.c:114                tlb_flush_nocheck
+  3.6445  38.1643    memory.c:1350               memory_region_access_valid
+  3.5499  41.7142    softmmu_template.h:112      helper_ret_ldub_mmu
+  3.0383  44.7525    translate-all.c:803         page_collection_lock
+  2.9735  47.7260    memory.c:1415               memory_region_dispatch_read
+  2.9503  50.6763    translate-all.c:749         page_trylock_add
+
+But the workloads may not have been 100% identical so this is not 
+conclusive, maybe this debug code is not that expensive at the moment.
+
+AROS on sam460ex has a different profile:
+
+%        cum. %     linenr info                 symbol name
+8.9905   8.9905     translate-all.c:749         page_trylock_add
+8.7658  17.7563     exec-all.h:410              helper_lookup_tb_ptr
+7.7349  25.4911     translate-all.c:803         page_collection_lock
+5.8246  31.3158     cputlb.c:924                victim_tlb_hit
+3.1640  34.4797     cpus.c:347                  cpu_get_clock
+3.1538  37.6335     translate-all.c:788         tb_page_addr_cmp
+2.7969  40.4304     exec.c:435                  address_space_translate_internal
+2.6647  43.0951     memory.c:571                access_with_adjusted_size
+2.0615  45.1567     exec.c:569                  flatview_do_translate
+1.9586  47.1153     memory.c:1350               memory_region_access_valid
+
+Would anyone be able to guess what are the places that should be looked at 
+or what to check to get more info on this?
+
+Regards,
+BALATON Zoltan
