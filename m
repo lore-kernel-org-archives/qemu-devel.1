@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ffSTs-0006JX-3k
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:05:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffSUh-0007Ah-2y
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ffSTm-0007vf-Qo
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:05:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46902 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ffSTm-0007vL-DX
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:05:34 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
-	<20180706121354.2021-13-marcandre.lureau@redhat.com>
-Date: Tue, 17 Jul 2018 18:05:31 +0200
-In-Reply-To: <20180706121354.2021-13-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 6 Jul 2018 14:13:54 +0200")
-Message-ID: <87a7qpc0fo.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1ffSUf-0008KI-JH
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:06:31 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:39124)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ffSUf-0008K2-Ca
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:06:29 -0400
+Received: by mail-oi0-x243.google.com with SMTP id d189-v6so3023866oib.6
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 09:06:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 12/12] RFC: qmp: rework 'id' handling
+In-Reply-To: <1529699547-17044-8-git-send-email-alindsay@codeaurora.org>
+References: <1529699547-17044-1-git-send-email-alindsay@codeaurora.org>
+	<1529699547-17044-8-git-send-email-alindsay@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Jul 2018 17:06:08 +0100
+Message-ID: <CAFEAcA-ZVvytysV4M4oM-czE5zhxu-VJsd_mfgkp47QAVEtYXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 07/13] target/arm: Add array for
+ supported PMU events, generate PMCEID[01]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,258 +30,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aclindsa@gmail.com>
 
-Copying the guest agent maintainer Michael Roth.
-
-Patch needs a rebase.
-
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Let qmp_dispatch() copy the 'id' field. That way any qmp client will
-> conform to the specification, including QGA.
-
-Before this patch, users of the common core shared by QMP and QGA have
-to do extra work to conform to qmp-spec.txt.  QMP does, QGA doesn't.
-I'm inclined to consider that a bug.
-
-Judging from your description, this patch moves that work into the
-shared part.  The patch is therefore not just a rework of 'id' handling,
-it's a QGA bug fix, if you're so inclined, else a QGA improvement.
-
-Thus, 1. please rephrase the commit message accordingly, and 2. the
-patch needs Michael's approval.
-
->                                              Furthermore, it
-> simplifies the work for qemu monitor.
+On 22 June 2018 at 21:32, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> This commit doesn't add any supported events, but provides the framework
+> for adding them. We store the pm_event structs in a simple array, and
+> provide the mapping from the event numbers to array indexes in the
+> supported_event_map array. Because the value of PMCEID[01] depends upon
+> which events are supported at runtime, generate it dynamically.
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 > ---
->  monitor.c           | 31 ++++++++++++-------------------
->  qapi/qmp-dispatch.c | 10 ++++++++--
->  tests/test-qga.c    | 13 +++++--------
->  3 files changed, 25 insertions(+), 29 deletions(-)
+>  target/arm/cpu.c    | 20 +++++++++++++-------
+>  target/arm/cpu.h    | 10 ++++++++++
+>  target/arm/cpu64.c  |  2 --
+>  target/arm/helper.c | 37 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 60 insertions(+), 9 deletions(-)
 >
-> diff --git a/monitor.c b/monitor.c
-> index a3efe96d1d..bf192697e4 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -249,8 +249,6 @@ QEMUBH *qmp_dispatcher_bh;
->  struct QMPRequest {
->      /* Owner of the request */
->      Monitor *mon;
-> -    /* "id" field of the request */
-> -    QObject *id;
->      /*
->       * Request object to be handled or Error to be reported
->       * (exactly one of them is non-null)
-> @@ -351,7 +349,6 @@ int monitor_read_password(Monitor *mon, ReadLineFunc =
-*readline_func,
->=20=20
->  static void qmp_request_free(QMPRequest *req)
->  {
-> -    qobject_unref(req->id);
->      qobject_unref(req->req);
->      error_free(req->err);
->      g_free(req);
-> @@ -3991,18 +3988,14 @@ static int monitor_can_read(void *opaque)
->   * Null @rsp can only happen for commands with QCO_NO_SUCCESS_RESP.
->   * Nothing is emitted then.
->   */
-> -static void monitor_qmp_respond(Monitor *mon, QDict *rsp, QObject *id)
-> +static void monitor_qmp_respond(Monitor *mon, QDict *rsp)
->  {
->      if (rsp) {
-> -        if (id) {
-> -            qdict_put_obj(rsp, "id", qobject_ref(id));
-> -        }
-> -
->          qmp_send_response(mon, rsp);
->      }
->  }
->=20=20
-> -static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *id)
-> +static void monitor_qmp_dispatch(Monitor *mon, QObject *req)
->  {
->      Monitor *old_mon;
->      QDict *rsp;
-> @@ -4027,7 +4020,7 @@ static void monitor_qmp_dispatch(Monitor *mon, QObj=
-ect *req, QObject *id)
->          }
->      }
->=20=20
-> -    monitor_qmp_respond(mon, rsp, id);
-> +    monitor_qmp_respond(mon, rsp);
->      qobject_unref(rsp);
->  }
->=20=20
-> @@ -4081,12 +4074,15 @@ static void monitor_qmp_bh_dispatcher(void *data)
->=20=20
->      need_resume =3D !qmp_oob_enabled(req_obj->mon);
->      if (req_obj->req) {
-> -        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
-: "");
-> -        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
-> +        QDict *qdict =3D qobject_to(QDict, req_obj->req);
-> +        QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
-> +        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
-> +        monitor_qmp_dispatch(req_obj->mon, req_obj->req);
->      } else {
->          assert(req_obj->err);
->          rsp =3D qmp_error_response(req_obj->err);
-> -        monitor_qmp_respond(req_obj->mon, rsp, NULL);
-> +        req_obj->err =3D NULL;
-> +        monitor_qmp_respond(req_obj->mon, rsp);
-
-Error response without ID before and after the patch.  Okay.
-
->          qobject_unref(rsp);
->      }
->=20=20
-> @@ -4115,8 +4111,7 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
->=20=20
->      qdict =3D qobject_to(QDict, req);
->      if (qdict) {
-> -        id =3D qobject_ref(qdict_get(qdict, "id"));
-> -        qdict_del(qdict, "id");
-> +        id =3D qdict_get(qdict, "id");
->      } /* else will fail qmp_dispatch() */
-
-Two users of @id remain: trace_monitor_qmp_cmd_out_of_band(), visible
-below, and qapi_event_send_command_dropped().  We currently plan to kill
-the latter.  The former is guarded by if (qdict && qmp_is_oob(qdict)),
-and could therefore safely use qdict_get(qdict, "id").  Together, this
-will let us delete the whole conditional here.
-
->=20=20
->      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
-> @@ -4127,15 +4122,13 @@ static void handle_qmp_command(JSONMessageParser =
-*parser, GQueue *tokens)
->=20=20
->      if (qdict && qmp_is_oob(qdict)) {
->          /* OOB commands are executed immediately */
-> -        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
-> -                                          ?: "");
-> -        monitor_qmp_dispatch(mon, req, id);
-> +        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id) ?: "");
-> +        monitor_qmp_dispatch(mon, req);
->          return;
->      }
->=20=20
->      req_obj =3D g_new0(QMPRequest, 1);
->      req_obj->mon =3D mon;
-> -    req_obj->id =3D id;
->      req_obj->req =3D req;
->      req_obj->err =3D err;
->=20=20
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index 90ba5e3074..acea0fcfcd 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -59,6 +59,8 @@ static QDict *qmp_dispatch_check_obj(const QObject *req=
-uest, bool allow_oob,
->                             "QMP input member 'arguments' must be an obje=
-ct");
->                  return NULL;
->              }
-> +        } else if (!strcmp(arg_name, "id")) {
-> +            continue;
->          } else {
->              error_setg(errp, "QMP input member '%s' is unexpected",
->                         arg_name);
-> @@ -166,8 +168,8 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *re=
-quest,
->                      bool allow_oob)
->  {
->      Error *err =3D NULL;
-> -    QObject *ret;
-> -    QDict *rsp;
-> +    QDict *rsp, *dict =3D qobject_to(QDict, request);
-> +    QObject *ret, *id =3D dict ? qdict_get(dict, "id") : NULL;
-
-I dislike mixing initialized and uninitialized variables in the same
-declaration.
-
->=20=20
->      ret =3D do_qmp_dispatch(cmds, request, allow_oob, &err);
->=20=20
-> @@ -181,5 +183,9 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *re=
-quest,
->          rsp =3D NULL;
->      }
->=20=20
-> +    if (rsp && id) {
-> +        qdict_put_obj(rsp, "id", qobject_ref(id));
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 98790b1..2f5b16a 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -927,9 +927,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>      if (!cpu->has_pmu) {
+>          unset_feature(env, ARM_FEATURE_PMU);
+>          cpu->id_aa64dfr0 &= ~0xf00;
+> -    } else if (!kvm_enabled()) {
+> -        arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+> -        arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
 > +    }
+> +    if (arm_feature(env, ARM_FEATURE_PMU)) {
+> +        uint64_t pmceid = get_pmceid(&cpu->env);
+> +        cpu->pmceid0 = pmceid & 0xffffffff;
+> +        cpu->pmceid1 = (pmceid >> 32) & 0xffffffff;
 > +
->      return rsp;
+> +        if (!kvm_enabled()) {
+> +            arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+> +            arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
+> +        }
+> +    } else {
+> +        cpu->pmceid0 = 0x00000000;
+> +        cpu->pmceid1 = 0x00000000;
+
+This is ok for now, but we really need to sort out what we're
+doing for the interplay between feature bits and ID register
+values more generally (notably for '-cpu max'), so depending on
+when we do that work this might end up needing to change a bit
+to fit in.
+
+>      }
+>
+>      if (!arm_feature(env, ARM_FEATURE_EL2)) {
+> @@ -1538,8 +1548,6 @@ static void cortex_a7_initfn(Object *obj)
+>      cpu->id_pfr0 = 0x00001131;
+>      cpu->id_pfr1 = 0x00011011;
+>      cpu->id_dfr0 = 0x02010555;
+> -    cpu->pmceid0 = 0x00000000;
+> -    cpu->pmceid1 = 0x00000000;
+>      cpu->id_afr0 = 0x00000000;
+>      cpu->id_mmfr0 = 0x10101105;
+>      cpu->id_mmfr1 = 0x40000000;
+> @@ -1581,8 +1589,6 @@ static void cortex_a15_initfn(Object *obj)
+>      cpu->id_pfr0 = 0x00001131;
+>      cpu->id_pfr1 = 0x00011011;
+>      cpu->id_dfr0 = 0x02010555;
+> -    cpu->pmceid0 = 0x0000000;
+> -    cpu->pmceid1 = 0x00000000;
+>      cpu->id_afr0 = 0x00000000;
+>      cpu->id_mmfr0 = 0x10201105;
+>      cpu->id_mmfr1 = 0x20000000;
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 852743b..430b8d5 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -964,6 +964,16 @@ void pmu_op_finish(CPUARMState *env);
+>  void pmu_pre_el_change(ARMCPU *cpu, void *ignored);
+>  void pmu_post_el_change(ARMCPU *cpu, void *ignored);
+>
+> +/*
+> + * get_pmceid
+> + * @env: CPUARMState
+> + *
+> + * Return the PMCEID[01] register values corresponding to the counters which
+> + * are supported given the current configuration (0 is low 32, 1 is high 32
+> + * bits)
+> + */
+> +uint64_t get_pmceid(CPUARMState *env);
+> +
+>  /* SCTLR bit meanings. Several bits have been reused in newer
+>   * versions of the architecture; in that case we define constants
+>   * for both old and new bit meanings. Code which tests against those
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index c50dcd4..28482a0 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -141,8 +141,6 @@ static void aarch64_a57_initfn(Object *obj)
+>      cpu->id_isar5 = 0x00011121;
+>      cpu->id_aa64pfr0 = 0x00002222;
+>      cpu->id_aa64dfr0 = 0x10305106;
+> -    cpu->pmceid0 = 0x00000000;
+> -    cpu->pmceid1 = 0x00000000;
+>      cpu->id_aa64isar0 = 0x00011120;
+>      cpu->id_aa64mmfr0 = 0x00001124;
+>      cpu->dbgdidr = 0x3516d000;
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 5d83446..9f81747 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -964,6 +964,43 @@ static inline uint64_t pmu_counter_mask(CPUARMState *env)
+>    return (1 << 31) | ((1 << pmu_num_counters(env)) - 1);
 >  }
+>
+> +typedef struct pm_event {
+> +    uint16_t number; /* PMEVTYPER.evtCount is 10 bits wide */
+> +    /* If the event is supported on this CPU (used to generate PMCEID[01]) */
+> +    bool (*supported)(CPUARMState *);
+> +    /* Retrieve the current count of the underlying event. The programmed
+> +     * counters hold a difference from the return value from this function */
 
-This puts the ID (if any) into the response.  Good.
+Don't leave the */ dangling on the RHS of a multiline comment.
+(CODING_STYLE now recommends Linux-kernel style.)
 
-The monitor sends command responses only with monitor_qmp_respond().
-It's called on two places:
+> +    uint64_t (*get_count)(CPUARMState *);
+> +} pm_event;
+> +
+> +#define SUPPORTED_EVENT_SENTINEL UINT16_MAX
+> +static const pm_event pm_events[] = {
+> +    { .number = SUPPORTED_EVENT_SENTINEL }
+> +};
+> +static uint16_t supported_event_map[0x3f];
 
-* monitor_qmp_dispatch()
+What is this hardcoded 0x3f ?
 
-  Gets its response from qmp_dispatch(), which now puts the ID (if any).
+> +
+> +/*
+> + * Called upon initialization to build PMCEID0 (low 32 bits) and PMCEID1 (high
+> + * 32). We also use it to build a map of ARM event numbers to indices in
+> + * our pm_events array.
+> + */
+> +uint64_t get_pmceid(CPUARMState *env)
+> +{
+> +    uint64_t pmceid = 0;
+> +    unsigned int i = 0;
+> +    while (pm_events[i].number != SUPPORTED_EVENT_SENTINEL) {
 
-* monitor_qmp_bh_dispatcher()
+Are we ever going to run through some other array than the
+constant pm_events[] ? We could just use ARRAY_SIZE rather
+than requiring a sentinel member.
 
-  Error response without ID before and after the patch (see above).
+> +        const pm_event *cnt = &pm_events[i];
+> +        if (cnt->number < 0x3f && cnt->supported(env)) {
 
-Good.
+...another 0x3f. Are we ever really going to see an
+out-of-range .number field, or should we just assert()
+that it's in range ?
 
-Not visible in the patch: QGA.  It sends command responses only with
-send_response().  Called only in process_event().  Two cases:
+> +            pmceid |= (1 << cnt->number);
+> +            supported_event_map[cnt->number] = i;
+> +        } else {
+> +            supported_event_map[cnt->number] = SUPPORTED_EVENT_SENTINEL;
 
-* json_parser_parse_err() sets an error
+This will leave us with supported_event_map[] entries in
+one of three states:
+ * SUPPORTED_EVENT_SENTINEL if they have a specific pm_events[]
+   entry marked as not supported
+ * an index if they are supported
+ * zero if there is no pm_events[] entry
 
-  Error response without ID before and after the patch
+Don't the ones in the last category get confused with the
+real index 0?
 
-* qmp_dispatch()
+Maybe this should initialize the whole array first to the
+sentinel value and then just fill in the supported ones with
+their index values?
 
-  Now puts the ID (if any).  This is the externally visible change.
+> +        }
+> +        i++;
+> +    }
+> +    return pmceid;
+> +}
+> +
 
-Good.
-
-> diff --git a/tests/test-qga.c b/tests/test-qga.c
-> index d638b1571a..4ee8b405f4 100644
-> --- a/tests/test-qga.c
-> +++ b/tests/test-qga.c
-> @@ -227,18 +227,15 @@ static void test_qga_ping(gconstpointer fix)
->      qobject_unref(ret);
->  }
->=20=20
-> -static void test_qga_invalid_id(gconstpointer fix)
-> +static void test_qga_id(gconstpointer fix)
->  {
->      const TestFixture *fixture =3D fix;
-> -    QDict *ret, *error;
-> -    const char *class;
-> +    QDict *ret;
->=20=20
->      ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-ping', 'id': 1}");
->      g_assert_nonnull(ret);
-> -
-> -    error =3D qdict_get_qdict(ret, "error");
-> -    class =3D qdict_get_try_str(error, "class");
-> -    g_assert_cmpstr(class, =3D=3D, "GenericError");
-> +    qmp_assert_no_error(ret);
-> +    g_assert_cmpint(qdict_get_int(ret, "id"), =3D=3D, 1);
->=20=20
->      qobject_unref(ret);
->  }
-> @@ -1014,7 +1011,7 @@ int main(int argc, char **argv)
->      g_test_add_data_func("/qga/file-ops", &fix, test_qga_file_ops);
->      g_test_add_data_func("/qga/file-write-read", &fix, test_qga_file_wri=
-te_read);
->      g_test_add_data_func("/qga/get-time", &fix, test_qga_get_time);
-> -    g_test_add_data_func("/qga/invalid-id", &fix, test_qga_invalid_id);
-> +    g_test_add_data_func("/qga/id", &fix, test_qga_id);
->      g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob);
->      g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd);
->      g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_arg=
-s);
+thanks
+-- PMM
