@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffSq1-0006zx-3t
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:28:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ffT7F-0001Rq-Ay
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffSq0-0004qQ-6i
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:28:33 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34688)
+	(envelope-from <rth7680@gmail.com>) id 1ffT7C-000878-6L
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:46:21 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40964)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffSpz-0004pj-OQ
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:28:32 -0400
-Received: by mail-oi0-x243.google.com with SMTP id 13-v6so3193651ois.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 09:28:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ffT7B-00084f-Um
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:46:18 -0400
+Received: by mail-pg1-x544.google.com with SMTP id z8-v6so685116pgu.8
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 09:46:17 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1531809130-31088-1-git-send-email-junyan.he@gmx.com>
+	<1531809130-31088-5-git-send-email-junyan.he@gmx.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <c2c301a7-759a-00ad-97fe-8b04e2718971@twiddle.net>
+Date: Tue, 17 Jul 2018 09:46:14 -0700
 MIME-Version: 1.0
-In-Reply-To: <1529699547-17044-14-git-send-email-alindsay@codeaurora.org>
-References: <1529699547-17044-1-git-send-email-alindsay@codeaurora.org>
-	<1529699547-17044-14-git-send-email-alindsay@codeaurora.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jul 2018 17:28:10 +0100
-Message-ID: <CAFEAcA8v=c6Q-Ftoq-JWk2LLnv8hry2gyOrgsxAV5GSs_6eo1w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 13/13] target/arm: Send interrupts on
- PMU counter overflow
+In-Reply-To: <1531809130-31088-5-git-send-email-junyan.he@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/7 V10] hostmem-file: add the 'pmem' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aclindsa@gmail.com>
+To: junyan.he@gmx.com, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, yi.z.zhang@intel.com, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-On 22 June 2018 at 21:32, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> Setup a QEMUTimer to get a callback when we expect counters to next
-> overflow and trigger an interrupt at that time.
->
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> ---
->  target/arm/cpu.c    |  11 +++++
->  target/arm/cpu.h    |   7 +++
->  target/arm/helper.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++++----
->  3 files changed, 141 insertions(+), 9 deletions(-)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 2f5b16a..7b3c137 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -743,6 +743,12 @@ static void arm_cpu_finalizefn(Object *obj)
->          QLIST_REMOVE(hook, node);
->          g_free(hook);
->      }
-> +#ifndef CONFIG_USER_ONLY
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
-> +        timer_deinit(cpu->pmu_timer);
-> +        timer_free(cpu->pmu_timer);
-> +    }
-> +#endif
->  }
->
->  static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-> @@ -937,6 +943,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->              arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
->              arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
->          }
-> +
-> +#ifndef CONFIG_USER_ONLY
-> +        cpu->pmu_timer = timer_new(QEMU_CLOCK_VIRTUAL, 1, arm_pmu_timer_cb,
-> +                cpu);
+On 07/16/2018 11:32 PM, junyan.he@gmx.com wrote:
+> @@ -34,6 +35,7 @@ struct HostMemoryBackendFile {
+>      bool discard_data;
+>      char *mem_path;
+>      uint64_t align;
+> +    bool is_pmem;
+>  };
 
-This is a confusing way to write timer_new_ns().
+Sort all the bool's to the end?
 
-> +#endif
 
->  #define SUPPORTED_EVENT_SENTINEL UINT16_MAX
->  static const pm_event pm_events[] = {
->      { .number = 0x000, /* SW_INCR */
->        .supported = event_always_supported,
-> -      .get_count = swinc_get_count
-> +      .get_count = swinc_get_count,
-> +      .ns_per_count = swinc_ns_per
+> +    /* Just support these ram flags by now. */
+> +    assert(ram_flags == 0 || (ram_flags & (RAM_SHARED | RAM_PMEM)));
 
-If you always put trailing commas on the end of the last line in
-a struct initializer, then you don't need to modify the preceding
-line in later patches which add a new line to the initializer.
+Surely assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0).
 
-The meat of the patch is beyond me at this time of the
-afternoon :-)
+> +If the vNVDIMM backend is on the host persistent memory that can be
 
-thanks
--- PMM
+Grammar nit: "is in host persistent memory".
+
+> +++ b/qemu-options.hx
+> @@ -4070,6 +4070,13 @@ requires an alignment different than the default one used by QEMU, eg
+>  the device DAX /dev/dax0.0 requires 2M alignment rather than 4K. In
+>  such cases, users can specify the required alignment via this option.
+>  
+> +The @option{pmem} option specifies whether the backing file specified
+> +by @option{mem-path} is on the persistent memory that can be accessed
+
+Likewise.
+
+
+r~
