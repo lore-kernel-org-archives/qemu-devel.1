@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ffX80-0000f4-My
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:03:27 -0400
+	(envelope-from <mjc@sifive.com>) id 1ffX8K-0000si-PK
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1ffX7z-0002D6-JD
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:03:24 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:34036)
+	(envelope-from <mjc@sifive.com>) id 1ffX8J-0002PD-KZ
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:03:44 -0400
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:34865)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ffX7z-0002Cr-BB
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:03:23 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id 13-v6so4726606ois.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 14:03:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1ffX8J-0002P1-Eg
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 17:03:43 -0400
+Received: by mail-oi0-x232.google.com with SMTP id i12-v6so4712273oik.2
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 14:03:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0f2b0a7a0b3565525a8683ac8fe65f44f734ab19.1531859179.git.alistair.francis@wdc.com>
+In-Reply-To: <8a6a1a1a1056023dc79179399c11e059fbdcde1a.1531859179.git.alistair.francis@wdc.com>
 References: <cover.1531859179.git.alistair.francis@wdc.com>
-	<0f2b0a7a0b3565525a8683ac8fe65f44f734ab19.1531859179.git.alistair.francis@wdc.com>
+	<8a6a1a1a1056023dc79179399c11e059fbdcde1a.1531859179.git.alistair.francis@wdc.com>
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 18 Jul 2018 09:03:22 +1200
-Message-ID: <CAHNT7NuxY1EooNNu-Hqw+0JBoYzMc_64zLJsS0e=8+aXGqw3gg@mail.gmail.com>
+Date: Wed, 18 Jul 2018 09:03:42 +1200
+Message-ID: <CAHNT7Nvkcv=R_18O_f_Th4RyBwNRKvuA0pgrXRJoCgPMbf4hzQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] sifive_u: Fix crash when
- introspecting the device
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] virt: Fix crash when introspecting
+ the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,47 +45,27 @@ Reviewed-by: Michael Clark <mjc@sifive.com>
 
 
 > ---
->  hw/riscv/sifive_u.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
+>  hw/riscv/virt.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 3a6ffeb437..59ae1ce24a 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -244,9 +244,9 @@ static void riscv_sifive_u_init(MachineState *machine)
->      int i;
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index aeada2498d..248bbdffd3 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -274,9 +274,8 @@ static void riscv_virt_board_init(MachineState
+> *machine)
+>      void *fdt;
 >
->      /* Initialize SoC */
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_U_SOC);
+>      /* Initialize SOC */
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
 > -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
 > -                              &error_abort);
 > +    object_initialize_child(OBJECT(machine), "soc", &s->soc,
-> +                            sizeof(s->soc), TYPE_RISCV_U_SOC,
-> +                            &error_abort, NULL);
->      object_property_set_bool(OBJECT(&s->soc), true, "realized",
->                              &error_abort);
->
-> @@ -303,16 +303,15 @@ static void riscv_sifive_u_soc_init(Object *obj)
->  {
->      SiFiveUSoCState *s = RISCV_U_SOC(obj);
->
-> -    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
-> -    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
-> -                              &error_abort);
-> +    object_initialize_child(obj, "cpus", &s->cpus, sizeof(s->cpus),
+> sizeof(s->soc),
 > +                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
->      object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
+>      object_property_set_str(OBJECT(&s->soc), VIRT_CPU, "cpu-type",
 >                              &error_abort);
->      object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
->                              &error_abort);
->
-> -    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
-> -    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-> +                          TYPE_CADENCE_GEM);
->  }
->
->  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+>      object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
 > --
 > 2.17.1
 >
