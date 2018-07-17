@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51269)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffGER-0006Ii-Ij
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 23:00:57 -0400
+	id 1ffGGF-000739-FY
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 23:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffGEO-0004Vp-Ex
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 23:00:55 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:35339)
+	id 1ffGGC-00054K-93
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 23:02:47 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:40098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffGEO-0004Vl-9F
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 23:00:52 -0400
-Received: by mail-ua0-x242.google.com with SMTP id q12-v6so26216603ual.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 20:00:52 -0700 (PDT)
+	id 1ffGGC-00054D-4k
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 23:02:44 -0400
+Received: by mail-ua0-x244.google.com with SMTP id p22-v6so15639810uao.7
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 20:02:44 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180713121741.19262-1-alex.bennee@linaro.org>
-	<20180713121741.19262-7-alex.bennee@linaro.org>
+	<20180713121741.19262-8-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a0312306-f433-a2a5-9970-b7f438773c05@amsat.org>
-Date: Tue, 17 Jul 2018 00:00:44 -0300
+Message-ID: <63c0e5cd-fac0-789c-d7fd-f77ed8d9d047@amsat.org>
+Date: Tue, 17 Jul 2018 00:02:38 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180713121741.19262-7-alex.bennee@linaro.org>
+In-Reply-To: <20180713121741.19262-8-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 06/16] docker: move make check
- into check_qemu helper
+Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 07/16] docker: gracefully skip
+ check_qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,96 +40,44 @@ To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@
 Cc: qemu-devel@nongnu.org
 
 On 07/13/2018 09:17 AM, Alex Bennée wrote:
-> Not all docker images can run the check step. Let's move everything
-> into a common helper so we don't need to replicate checks in the
-> future.
+> Not all our images are able to run the tests. Rather than use features
+> we can just check for the existence and run-ability of gtester. If the
+> image has been setup for binfmt_misc it will be able to run anyway.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
 > ---
-> v2
->   - add "move" to Let's everything in commit message
-> ---
->  tests/docker/common.rc  | 10 ++++++++++
->  tests/docker/test-clang |  2 +-
->  tests/docker/test-debug |  2 +-
->  tests/docker/test-full  |  2 +-
->  tests/docker/test-quick |  2 +-
->  5 files changed, 14 insertions(+), 4 deletions(-)
+>  tests/docker/common.rc | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
 > diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-> index ba1f942328..cfc620d554 100755
+> index cfc620d554..6df431eb72 100755
 > --- a/tests/docker/common.rc
 > +++ b/tests/docker/common.rc
-> @@ -40,6 +40,16 @@ build_qemu()
->      make $MAKEFLAGS
+> @@ -47,7 +47,13 @@ check_qemu()
+>      else
+>          TEST="$@"
+>      fi
+> -    make $MAKEFLAGS $TEST
+> +
+> +    if type gtester > /dev/null 2>&1 && \
+
+commit e465ce7d09939d631f1861e0bd8873417c1c0d65
+
+    tests: Use "command -v" instead of which(1) in shell scripts
+
+    When which(1) is not installed, we would complain "perl not found"
+    because it's the first set_prog_path check. The error message is
+    wrong.
+
+    Fix it by using "command -v", a native way to query the existence
+    of a command.
+
+> +           gtester --version > /dev/null 2>&1; then
+> +        make $MAKEFLAGS $TEST
+> +    else
+> +        echo "No working gtester, skipping make $TEST"
+> +    fi
 >  }
 >  
-> +check_qemu()
-> +{
-> +    if test -z "$@"; then
-> +        TEST="check"
-> +    else
-> +        TEST="$@"
-
-This is a bit confuse:
-
-  check_qemu V=1 -> TEST=V=1
-
-> +    fi
-> +    make $MAKEFLAGS $TEST
-
-    -> make V=1
-
-> +}
-> +
 >  test_fail()
->  {
->      echo "$@"
-> diff --git a/tests/docker/test-clang b/tests/docker/test-clang
-> index e90a793178..324e341cea 100755
-> --- a/tests/docker/test-clang
-> +++ b/tests/docker/test-clang
-> @@ -23,5 +23,5 @@ OPTS="--cxx=clang++ --cc=clang --host-cc=clang"
->  #OPTS="$OPTS --extra-cflags=-fsanitize=undefined \
->      #--extra-cflags=-fno-sanitize=float-divide-by-zero"
->  build_qemu $OPTS
-> -make $MAKEFLAGS check
-> +check_qemu
->  install_qemu
-> diff --git a/tests/docker/test-debug b/tests/docker/test-debug
-> index d3f9f70d01..137f4f2ddc 100755
-> --- a/tests/docker/test-debug
-> +++ b/tests/docker/test-debug
-> @@ -22,5 +22,5 @@ OPTS="--cxx=clang++ --cc=clang --host-cc=clang"
->  OPTS="--enable-debug --enable-sanitizers $OPTS"
->  
->  build_qemu $OPTS
-> -make $MAKEFLAGS V=1 check
-> +check_qemu check V=1
-
-Gotcha!
-
->  install_qemu
-> diff --git a/tests/docker/test-full b/tests/docker/test-full
-> index b4e42d25d7..aadc0f00a2 100755
-> --- a/tests/docker/test-full
-> +++ b/tests/docker/test-full
-> @@ -15,4 +15,4 @@
->  
->  cd "$BUILD_DIR"
->  
-> -build_qemu && make check $MAKEFLAGS && install_qemu
-> +build_qemu && check_qemu && install_qemu
-> diff --git a/tests/docker/test-quick b/tests/docker/test-quick
-> index 3b7bce6105..eee59c55fb 100755
-> --- a/tests/docker/test-quick
-> +++ b/tests/docker/test-quick
-> @@ -18,5 +18,5 @@ cd "$BUILD_DIR"
->  DEF_TARGET_LIST="x86_64-softmmu,aarch64-softmmu"
->  TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
->  build_qemu
-> -make check $MAKEFLAGS
-> +check_qemu
->  install_qemu
 > 
