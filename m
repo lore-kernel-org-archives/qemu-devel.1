@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffW4s-00033u-4v
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:06 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ffW4u-00035i-Fy
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffW4r-0004iT-86
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:06 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35307)
+	(envelope-from <alex.bennee@linaro.org>) id 1ffW4t-0004kb-FK
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:08 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:39837)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ffW4r-0004hU-1e
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:05 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a3-v6so2390104wrt.2
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 12:56:04 -0700 (PDT)
+	id 1ffW4t-0004jq-74
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:56:07 -0400
+Received: by mail-wm0-x229.google.com with SMTP id h20-v6so535299wmb.4
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 12:56:07 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 17 Jul 2018 20:55:45 +0100
-Message-Id: <20180717195553.9111-11-alex.bennee@linaro.org>
+Date: Tue, 17 Jul 2018 20:55:42 +0100
+Message-Id: <20180717195553.9111-8-alex.bennee@linaro.org>
 In-Reply-To: <20180717195553.9111-1-alex.bennee@linaro.org>
 References: <20180717195553.9111-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 for 3.0 10/18] docker: add test-unit runner
+Subject: [Qemu-devel] [PATCH v3 for 3.0 07/18] docker: gracefully skip
+ check_qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +33,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This test doesn't even build QEMU, it just builds and runs all the
-unit tests. Intended to make checking unit tests on all docker images
-easier.
+Not all our images are able to run the tests. Rather than use features
+we can just check for the existence and run-ability of gtester. If the
+image has been setup for binfmt_misc it will be able to run anyway.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v2
-  - make script -e to error out on failure
-  - add comment as to why the configure step is run
+v3
+  - use command -v in preference to bash-ist type
 ---
- tests/docker/test-unit | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
- create mode 100755 tests/docker/test-unit
+ tests/docker/common.rc | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/tests/docker/test-unit b/tests/docker/test-unit
-new file mode 100755
-index 0000000000..8905d01150
---- /dev/null
-+++ b/tests/docker/test-unit
-@@ -0,0 +1,21 @@
-+#!/bin/bash -e
-+#
-+# Build and run the unit tests
-+#
-+# Copyright (c) 2018 Linaro Ltd.
-+#
-+# Authors:
-+#  Alex Bennée <alex.bennee@linaro.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or (at your option) any later version. See the COPYING file in
-+# the top-level directory.
+diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+index 4ff5974016..4011561587 100755
+--- a/tests/docker/common.rc
++++ b/tests/docker/common.rc
+@@ -48,7 +48,13 @@ check_qemu()
+     else
+         INVOCATION="$@"
+     fi
+-    make $MAKEFLAGS $INVOCATION
 +
-+. common.rc
-+
-+cd "$BUILD_DIR"
-+
-+# although we are not building QEMU itself we still need a configured
-+# build for the unit tests to be built and run
-+configure_qemu
-+check_qemu check-unit
++    if command -v gtester > /dev/null 2>&1 && \
++           gtester --version > /dev/null 2>&1; then
++        make $MAKEFLAGS $INVOCATION
++    else
++        echo "No working gtester, skipping make $INVOCATION"
++    fi
+ }
+ 
+ test_fail()
 -- 
 2.17.1
