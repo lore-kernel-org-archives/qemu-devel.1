@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffTAN-0003Aa-Pj
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:49:36 -0400
+	(envelope-from <rth7680@gmail.com>) id 1ffTL3-0006rH-IE
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:00:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffTAM-00030v-T9
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:49:35 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:39949)
+	(envelope-from <rth7680@gmail.com>) id 1ffTL0-0003Kk-7f
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:00:37 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffTAM-0002zJ-LU
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 12:49:34 -0400
-Received: by mail-oi0-x243.google.com with SMTP id w126-v6so3282557oie.7
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 09:49:34 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ffTKz-0003K1-O9
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:00:33 -0400
+Received: by mail-pg1-x544.google.com with SMTP id k3-v6so707222pgq.5
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:00:33 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1531809130-31088-1-git-send-email-junyan.he@gmx.com>
+	<1531809130-31088-6-git-send-email-junyan.he@gmx.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e72743f4-1bb8-cf0b-0f54-aef1aff9c714@twiddle.net>
+Date: Tue, 17 Jul 2018 10:00:30 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180713154007.3853-1-contrib@steffen-goertz.de>
-References: <20180713154007.3853-1-contrib@steffen-goertz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jul 2018 17:49:13 +0100
-Message-ID: <CAFEAcA_BR6gECO4Vps=zOd6ZWfw-kRL9pqpD3hRkGRZMAitpPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v3] arm: Add NRF51 random number generator
- peripheral
+In-Reply-To: <1531809130-31088-6-git-send-email-junyan.he@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/7 V10] mem/nvdimm: ensure write
+ persistence to PMEM in label emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
+To: junyan.he@gmx.com, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, yi.z.zhang@intel.com, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-On 13 July 2018 at 16:40, Steffen G=C3=B6rtz <contrib@steffen-goertz.de> wr=
-ote:
-> Add a model of the NRF51 random number generator peripheral.
->
-> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-> ---
-> Changes since v3:
->   - Replace bitfields
->   - Add VMState / reset
->   - Add reference to reference manual
->
-> Changes since v2:
->   - Add missing 'qapi/error.h' for error_abort
->
-> Changes since v1:
->   - Add implementation access size hints to MemoryRegionOps
->   - Fail on error if qcrypto_random_bytes fails
->   - Add references to Nrf51 datasheets
->
->
->  hw/misc/Makefile.objs       |   1 +
->  hw/misc/nrf51_rng.c         | 269 ++++++++++++++++++++++++++++++++++++
->  include/hw/misc/nrf51_rng.h |  71 ++++++++++
->  3 files changed, 341 insertions(+)
->  create mode 100644 hw/misc/nrf51_rng.c
->  create mode 100644 include/hw/misc/nrf51_rng.h
->
-
+On 07/16/2018 11:32 PM, junyan.he@gmx.com wrote:
+> +++ b/stubs/pmem.c
+> @@ -0,0 +1,19 @@
+> +/*
+> + * Stubs for libpmem.
+> + *
+> + * Copyright (c) 2018 Intel Corporation.
+> + *
+> + * Author: Haozhong Zhang <address@hidden>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
 > +
-> +static void nrf51_rng_timer_expire(void *opaque)
+> +#include <string.h>
+> +
+> +#include "qemu/pmem.h"
+> +
+> +void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
 > +{
-> +    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-> +
-> +    qcrypto_random_bytes(&s->value, 1, &error_abort);
-> +
-> +    s->event_valrdy =3D 1;
-> +    qemu_set_irq(s->eep_valrdy, 1);
-> +
-> +    if (s->interrupt_enabled) {
-> +        qemu_irq_pulse(s->irq);
-
-Is this definitely a pulse interrupt ? Usually
-devices raise an irq line and keep it high until
-the guest checks them and tells them to drop it.
-
-> +    }
-> +
-> +    if (s->shortcut_stop_on_valrdy) {
-> +        s->active =3D 0;
-> +    }
-> +
-> +    rng_update_timer(s);
+> +    return memcpy(pmemdest, src, len);
 > +}
-> +
-> +static void nrf51_rng_tep_start(void *opaque, int n, int level)
-> +{
-> +    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-> +
-> +    if (level) {
-> +        s->active =3D 1;
-> +        rng_update_timer(s);
-> +    }
-> +}
-> +
-> +static void nrf51_rng_tep_stop(void *opaque, int n, int level)
-> +{
-> +    Nrf51RNGState *s =3D NRF51_RNG(opaque);
-> +
-> +    if (level) {
-> +        s->active =3D 0;
-> +        rng_update_timer(s);
-> +    }
-> +}
-> +
-> +
-> +static void nrf51_rng_init(Object *obj)
-> +{
-> +    Nrf51RNGState *s =3D NRF51_RNG(obj);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &rng_ops, s,
-> +            TYPE_NRF51_RNG, NRF51_RNG_SIZE);
-> +    sysbus_init_mmio(sbd, &s->mmio);
-> +
-> +    timer_init_us(&s->timer, QEMU_CLOCK_VIRTUAL, nrf51_rng_timer_expire,=
- s);
-> +
-> +    qdev_init_gpio_out_named(DEVICE(s), &s->irq, "irq", 1);
-> +
-> +    /* Tasks */
-> +    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_start, "tep_start",=
- 1);
-> +    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_stop, "tep_stop", 1=
-);
-> +
-> +    /* Events */
-> +    qdev_init_gpio_out_named(DEVICE(s), &s->eep_valrdy, "eep_valrdy", 1)=
-;
-> +}
-> +
-> +static void nrf51_rng_reset(DeviceState *dev)
-> +{
-> +    Nrf51RNGState *s =3D NRF51_RNG(dev);
-> +
-> +    rng_update_timer(s);
+> 
 
-Isn't this reset function missing some code to reset the
-various bits of guest-modifiable state (eg s->active,
-s->event_valrdy) ?
+This will never be used, because you prevented is_pmem
+from being set when creating the device.
 
-> +}
+I also know that you want to avoid an ifdef within nvdimm_write_label_data, but
+a more obvious solution might be in qemu/pmem.h,
 
-thanks
--- PMM
+#ifdef CONFIG_LIBPMEM
+#include <libpmem.h>
+#else  /* !CONFIG_LIBPMEM */
+
+static inline void *
+pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
+{
+    g_assert_not_reached();
+}
+
+#endif /* CONFIG_LIBPMEM */
+
+
+
+r~
