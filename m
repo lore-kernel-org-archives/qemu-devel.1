@@ -1,19 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffRV3-0002I6-BO
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:02:50 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRWF-00033o-Fw
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:04:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ffRUx-0003t1-4l
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:02:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54912 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ffRUw-0003sF-UN
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:02:43 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 17 Jul 2018 17:02:39 +0200
-Message-Id: <1531839759-14090-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/riscv/sifive_u: Fix introspection problem
- in the "riscv.sifive.u.soc" device
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRWC-0004kk-B5
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:04:03 -0400
+Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:40137)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffRWC-0004kS-4r
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 11:04:00 -0400
+Received: by mail-ua0-x22d.google.com with SMTP id p22-v6so876442uao.7
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 08:04:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180713121741.19262-1-alex.bennee@linaro.org>
+	<20180713121741.19262-12-alex.bennee@linaro.org>
+	<27bc62f7-919b-7d81-55b0-15cf4f9517e4@amsat.org>
+	<87efg35z0y.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8df0a984-0f60-ecd3-473f-2f838f64685e@amsat.org>
+Date: Tue, 17 Jul 2018 12:03:54 -0300
+MIME-Version: 1.0
+In-Reply-To: <87efg35z0y.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 11/16] docker: add expansion for
+ docker-test-FOO to Makefile.include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +38,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, cota@braap.org, famz@redhat.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-Valgrind complains:
+On 07/16/2018 06:07 AM, Alex Bennée wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Hi Alex,
+>>
+>> On 07/13/2018 09:17 AM, Alex Bennée wrote:
+>>> This allows us to run a particular test on all docker images. For
+>>> example:
+>>>
+>>>   make docker-test-unit
+>>>
+>>> Will run the unit tests on every supported image. At the same time
+>>> rename docker-test to docker-all-tests to be clearer.
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>
+>>> ---
+>>> v2
+>>>   - docker-test -> docker-all-tests
+>>> ---
+>>>  tests/docker/Makefile.include | 6 ++++--
+>>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>>> index fe63aacf69..e32c35be0d 100644
+>>> --- a/tests/docker/Makefile.include
+>>> +++ b/tests/docker/Makefile.include
+>>> @@ -151,7 +151,8 @@ $(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(DOCKER_DEPR
+>>>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+>>>  	) \
+>>>  	$(foreach t,$(DOCKER_TESTS), \
+>>> -		$(eval docker-test: docker-$t@$i) \
+>>> +		$(eval docker-all-tests: docker-$t@$i) \
+>>> +		$(eval docker-$t: docker-$t@$i) \
+>>
+>> Is this supposed to work this way?
+>>
+>> $ make docker-test-quick@debian-alpha-cross
+>> make: *** No rule to make target
+>> 'docker-test-quick@debian-alpha-cross'.
+> 
+> No
+> 
+>   make docker-test-quick
+> 
+> will make the test-quick on all images.
+> 
+> Your example fails because debian-alpha-cross is a PARTIAL image, good
+> for building test cases but not QEMU so it's not expanded in the above
+> bit: $(eval docker-$t@$i: docker-image-$i docker-run-$t@$i)
 
-echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
- "'arguments':{'typename':'riscv.sifive.u.soc'}}" \
- "{'execute': 'human-monitor-command', " \
- "'arguments': {'command-line': 'info qtree'}}" | \
- valgrind -q riscv32-softmmu/qemu-system-riscv32 -M none,accel=qtest -qmp stdio
-[...]
-==28083== Invalid read of size 8
-==28083==    at 0x2E036A: qdev_print (qdev-monitor.c:686)
-==28083==    by 0x2E036A: qbus_print (qdev-monitor.c:719)
-==28083==    by 0x268938: handle_hmp_command (monitor.c:3446)
-[...]
+I noticed too late ;)
 
-Use the new object_initialize_child() and sysbus_init_child_obj() functions
-to fix the problem.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/riscv/sifive_u.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 3a6ffeb..459ec90 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -303,16 +303,15 @@ static void riscv_sifive_u_soc_init(Object *obj)
- {
-     SiFiveUSoCState *s = RISCV_U_SOC(obj);
- 
--    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
--    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
--                              &error_abort);
-+    object_initialize_child(obj, "cpus", &s->cpus, sizeof(s->cpus),
-+                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-     object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
-                             &error_abort);
- 
--    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
--    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-+                          TYPE_CADENCE_GEM);
- }
- 
- static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
--- 
-1.8.3.1
+> 
+>>  Stop.
+>>
+>>>  	) \
+>>>  )
+>>>
+>>> @@ -161,7 +162,8 @@ docker:
+>>>  	@echo 'Available targets:'
+>>>  	@echo
+>>>  	@echo '    docker:              Print this help.'
+>>> -	@echo '    docker-test:         Run all image/test combinations.'
+>>> +	@echo '    docker-all-tests:    Run all image/test combinations.'
+>>> +	@echo '    docker-TEST:         Run TEST on all image combinations.'
+>>>  	@echo '    docker-clean:        Kill and remove residual docker testing containers.'
+>>>  	@echo '    docker-TEST@IMAGE:   Run "TEST" in container "IMAGE".'
+>>>  	@echo '                         Note: "TEST" is one of the listed test name,'
+>>>
+> 
+> 
+> --
+> Alex Bennée
+> 
