@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ffYkv-0005Qz-FS
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:42 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1ffYl6-0005Uf-07
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ffYku-0000l5-OI
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39674 helo=mx1.redhat.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1ffYl1-0000oU-6e
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36534)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ffYku-0000kw-Ix
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:40 -0400
+	id 1ffYl0-0000o7-V9
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 18:47:47 -0400
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 17 Jul 2018 16:47:37 -0600
-Message-ID: <20180717224737.14019.3324.stgit@gimli.home>
+Date: Tue, 17 Jul 2018 16:47:45 -0600
+Message-ID: <20180717224745.14019.33974.stgit@gimli.home>
 In-Reply-To: <20180717222721.14019.27548.stgit@gimli.home>
 References: <20180717222721.14019.27548.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH 1/3] balloon: Allow nested inhibits
+Subject: [Qemu-devel] [RFC PATCH 2/3] kvm: Use inhibit to prevent ballooning
+ without synchronous mmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org
 
-A simple true/false internal state does not allow multiple users.  Fix
-this within the existing interface by converting to a counter, so long
-as the counter is elevated, ballooning is inhibited.
+Remove KVM specific tests in balloon_page(), instead marking
+ballooning as inhibited without KVM_CAP_SYNC_MMU support.
 
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- balloon.c |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ accel/kvm/kvm-all.c        |    4 ++++
+ hw/virtio/virtio-balloon.c |    4 +---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/balloon.c b/balloon.c
-index 6bf0a9681377..2a6a7e1a22a0 100644
---- a/balloon.c
-+++ b/balloon.c
-@@ -37,16 +37,17 @@
- static QEMUBalloonEvent *balloon_event_fn;
- static QEMUBalloonStatus *balloon_stat_fn;
- static void *balloon_opaque;
--static bool balloon_inhibited;
-+static int balloon_inhibited;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index eb7db92a5e3b..38f468d8e2b1 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -39,6 +39,7 @@
+ #include "trace.h"
+ #include "hw/irq.h"
+ #include "sysemu/sev.h"
++#include "sysemu/balloon.h"
  
- bool qemu_balloon_is_inhibited(void)
+ #include "hw/boards.h"
+ 
+@@ -1698,6 +1699,9 @@ static int kvm_init(MachineState *ms)
+     s->many_ioeventfds = kvm_check_many_ioeventfds();
+ 
+     s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
++    if (!s->sync_mmu) {
++        qemu_balloon_inhibit(true);
++    }
+ 
+     return 0;
+ 
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 1f7a87f09429..b5425080c5fb 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -21,7 +21,6 @@
+ #include "hw/mem/pc-dimm.h"
+ #include "sysemu/balloon.h"
+ #include "hw/virtio/virtio-balloon.h"
+-#include "sysemu/kvm.h"
+ #include "exec/address-spaces.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-misc.h"
+@@ -36,8 +35,7 @@
+ 
+ static void balloon_page(void *addr, int deflate)
  {
--    return balloon_inhibited;
-+    return balloon_inhibited > 0;
- }
- 
- void qemu_balloon_inhibit(bool state)
- {
--    balloon_inhibited = state;
-+    balloon_inhibited += (state ? 1 : -1);
-+    assert(balloon_inhibited >= 0);
- }
- 
- static bool have_balloon(Error **errp)
+-    if (!qemu_balloon_is_inhibited() && (!kvm_enabled() ||
+-                                         kvm_has_sync_mmu())) {
++    if (!qemu_balloon_is_inhibited()) {
+         qemu_madvise(addr, BALLOON_PAGE_SIZE,
+                 deflate ? QEMU_MADV_WILLNEED : QEMU_MADV_DONTNEED);
+     }
