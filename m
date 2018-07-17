@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ffTuf-0007l5-NI
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:37:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1ffURB-0001kE-F3
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ffTuc-0007Oy-Gf
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:37:25 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1ffTuc-0007NX-7T
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 13:37:22 -0400
-Received: by mail-lj1-x244.google.com with SMTP id 203-v6so1687769ljj.13
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:37:20 -0700 (PDT)
-Date: Tue, 17 Jul 2018 19:37:16 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20180717173716.h2bhmmco7uoj2nvp@toto>
-References: <1531839343-13828-1-git-send-email-thuth@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1ffUR7-0004bZ-Cu
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 14:11:01 -0400
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-9-git-send-email-jjherne@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7e74ef35-e925-30d9-b81d-33fa5a9ce468@redhat.com>
+Date: Tue, 17 Jul 2018 20:10:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1531839343-13828-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/microblaze/xlnx-zynqmp-pmu: Fix
- introspection problem in 'xlnx, zynqmp-pmu-soc'
+In-Reply-To: <1530811543-6881-9-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 08/15] s390-bios: Map low core
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +25,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-On Tue, Jul 17, 2018 at 04:55:43PM +0200, Thomas Huth wrote:
-> Valgrind complains:
+On 05.07.2018 19:25, Jason J. Herne wrote:
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
 > 
-> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
->  "'arguments':{'typename':'xlnx,zynqmp-pmu-soc'}}" \
->  "{'execute': 'human-monitor-command', " \
->  "'arguments': {'command-line': 'info qtree'}}" | \
->  valgrind -q microblazeel-softmmu/qemu-system-microblazeel -M none,accel=qtest -qmp stdio
-> [...]
-> ==13605== Invalid read of size 8
-> ==13605==    at 0x2AC69A: qdev_print (qdev-monitor.c:686)
-> ==13605==    by 0x2AC69A: qbus_print (qdev-monitor.c:719)
-> ==13605==    by 0x2591E8: handle_hmp_command (monitor.c:3446)
+> Create a new header for basic architecture specific definitions and add a
+> mapping of low core memory. This mapping will be used by the real dasd boot
+> process.
 > 
-> Use the new object_initialize_child() and sysbus_init_child_obj() to
-> fix the issue.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Peter, could you pick this up for 3.0? Or do you want a pull request?
-
-Cheers,
-Edgar
-
-
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 > ---
->  hw/microblaze/xlnx-zynqmp-pmu.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+>  pc-bios/s390-ccw/main.c      |   2 +
+>  pc-bios/s390-ccw/s390-arch.h | 100 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 102 insertions(+)
+>  create mode 100644 pc-bios/s390-ccw/s390-arch.h
 > 
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index 999a565..57dc1cc 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -62,13 +62,11 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
->  {
->      XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index e5174fb..20c30c6 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -9,6 +9,7 @@
+>   */
 >  
-> -    object_initialize(&s->cpu, sizeof(s->cpu),
-> -                      TYPE_MICROBLAZE_CPU);
-> -    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
-> -                              &error_abort);
-> +    object_initialize_child(obj, "pmu-cpu", &s->cpu, sizeof(s->cpu),
-> +                            TYPE_MICROBLAZE_CPU, &error_abort, NULL);
+>  #include "libc.h"
+> +#include "s390-arch.h"
+>  #include "s390-ccw.h"
+>  #include "cio.h"
+>  #include "virtio.h"
+> @@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>  QemuIplParameters qipl;
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>  static bool have_iplb;
+> +LowCore *lowcore = 0;
+
+See checkpatch warning ;-)
+
 >  
-> -    object_initialize(&s->intc, sizeof(s->intc), TYPE_XLNX_PMU_IO_INTC);
-> -    qdev_set_parent_bus(DEVICE(&s->intc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "intc", &s->intc, sizeof(s->intc),
-> +                          TYPE_XLNX_PMU_IO_INTC);
->  }
->  
->  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
-> -- 
-> 1.8.3.1
-> 
+>  #define LOADPARM_PROMPT "PROMPT  "
+>  #define LOADPARM_EMPTY  "        "
+> diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
+> new file mode 100644
+> index 0000000..9074ba2
+> --- /dev/null
+> +++ b/pc-bios/s390-ccw/s390-arch.h
+> @@ -0,0 +1,100 @@
+> +/*
+> + * S390 Basic Architecture
+> + *
+> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#ifndef S390_ARCH_H
+> +#define S390_ARCH_H
+> +
+> +typedef struct PSW {
+> +    uint64_t mask;
+> +    uint64_t addr;
+> +} __attribute__ ((packed, aligned(8))) PSW;
+> +
+> +/* Older PSW format used by LPSW instruction */
+> +typedef struct PSWLegacy {
+> +    uint32_t mask;
+> +    uint32_t addr;
+> +} __attribute__ ((packed, aligned(8))) PSWLegacy;
+> +
+> +/* s390 psw bit masks */
+> +#define PSW_MASK_IOINT      0x0200000000000000ULL
+> +#define PSW_MASK_WAIT       0x0002000000000000ULL
+> +#define PSW_MASK_EAMODE     0x0000000100000000ULL
+> +#define PSW_MASK_BAMODE     0x0000000080000000ULL
+> +#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
+> +
+> +/* Low core mapping */
+> +typedef struct LowCore {
+> +    /* prefix area: defined by architecture */
+> +    uint64_t        ipl_psw;                  /* 0x000 */
+> +    uint32_t        ccw1[2];                 /* 0x008 */
+
+Add one more space before above comment?
+
+> +    uint32_t        ccw2[2];                  /* 0x010 */
+> +    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
+> +    uint32_t        ext_params;               /* 0x080 */
+> +    uint16_t        cpu_addr;                 /* 0x084 */
+> +    uint16_t        ext_int_code;             /* 0x086 */
+> +    uint16_t        svc_ilen;                 /* 0x088 */
+> +    uint16_t        svc_code;                 /* 0x08a */
+> +    uint16_t        pgm_ilen;                 /* 0x08c */
+> +    uint16_t        pgm_code;                 /* 0x08e */
+> +    uint32_t        data_exc_code;            /* 0x090 */
+> +    uint16_t        mon_class_num;            /* 0x094 */
+> +    uint16_t        per_perc_atmid;           /* 0x096 */
+> +    uint64_t        per_address;              /* 0x098 */
+> +    uint8_t         exc_access_id;            /* 0x0a0 */
+> +    uint8_t         per_access_id;            /* 0x0a1 */
+> +    uint8_t         op_access_id;             /* 0x0a2 */
+> +    uint8_t         ar_access_id;             /* 0x0a3 */
+> +    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
+> +    uint64_t        trans_exc_code;           /* 0x0a8 */
+> +    uint64_t        monitor_code;             /* 0x0b0 */
+> +    uint16_t        subchannel_id;            /* 0x0b8 */
+> +    uint16_t        subchannel_nr;            /* 0x0ba */
+> +    uint32_t        io_int_parm;              /* 0x0bc */
+> +    uint32_t        io_int_word;              /* 0x0c0 */
+> +    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
+> +    uint32_t        stfl_fac_list;            /* 0x0c8 */
+> +    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
+> +    uint64_t        mcic;                     /* 0x0e8 */
+> +    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
+> +    uint32_t        external_damage_code;     /* 0x0f4 */
+> +    uint64_t        failing_storage_address;  /* 0x0f8 */
+> +    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
+> +    uint64_t        per_breaking_event_addr;  /* 0x110 */
+> +    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
+> +    PSW             restart_old_psw;          /* 0x120 */
+> +    PSW             external_old_psw;         /* 0x130 */
+> +    PSW             svc_old_psw;              /* 0x140 */
+> +    PSW             program_old_psw;          /* 0x150 */
+> +    PSW             mcck_old_psw;             /* 0x160 */
+> +    PSW             io_old_psw;               /* 0x170 */
+> +    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
+> +    PSW             restart_new_psw;          /* 0x1a0 */
+> +    PSW             external_new_psw;         /* 0x1b0 */
+> +    PSW             svc_new_psw;              /* 0x1c0 */
+> +    PSW             program_new_psw;          /* 0x1d0 */
+> +    PSW             mcck_new_psw;             /* 0x1e0 */
+> +    PSW             io_new_psw;               /* 0x1f0 */
+> +    PSW             return_psw;               /* 0x200 */
+> +    uint8_t         irb[64];                  /* 0x210 */
+> +    uint64_t        sync_enter_timer;         /* 0x250 */
+> +    uint64_t        async_enter_timer;        /* 0x258 */
+> +    uint64_t        exit_timer;               /* 0x260 */
+> +    uint64_t        last_update_timer;        /* 0x268 */
+> +    uint64_t        user_timer;               /* 0x270 */
+> +    uint64_t        system_timer;             /* 0x278 */
+> +    uint64_t        last_update_clock;        /* 0x280 */
+> +    uint64_t        steal_clock;              /* 0x288 */
+> +    PSW             return_mcck_psw;          /* 0x290 */
+> +    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
+
+The names of the fields look exactly the same as in the Linux kernel ...
+maybe credit them at least in the patch description?
+
+ Thomas
