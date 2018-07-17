@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ffOFF-0006zT-8B
+	(envelope-from <quintela@redhat.com>) id 1ffOFF-0006zS-7e
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ffOFB-0003RL-OK
+	(envelope-from <quintela@redhat.com>) id 1ffOFA-0003Pt-6y
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37104 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48100 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ffOFB-0003R3-It
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:13 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ffOF9-0003OO-UP
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 07:34:12 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3433F81A4EBC
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:34:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 89EBB402312B
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 11:34:10 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 17 Jul 2018 13:33:39 +0200
-Message-Id: <20180717113402.5510-3-quintela@redhat.com>
-In-Reply-To: <20180717113402.5510-1-quintela@redhat.com>
-References: <20180717113402.5510-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/25] config: CONFIG_SERIAL* is already in
- pci.mak
+Date: Tue, 17 Jul 2018 13:33:37 +0200
+Message-Id: <20180717113402.5510-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/25] Don't "check" disabled drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,162 +30,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- default-configs/alpha-softmmu.mak       | 2 --
- default-configs/arm-softmmu.mak         | 2 --
- default-configs/hppa-softmmu.mak        | 3 ---
- default-configs/i386-softmmu.mak        | 2 --
- default-configs/mips-softmmu-common.mak | 2 --
- default-configs/ppc-softmmu.mak         | 1 -
- default-configs/ppcemb-softmmu.mak      | 2 --
- default-configs/sh4-softmmu.mak         | 2 --
- default-configs/sh4eb-softmmu.mak       | 2 --
- default-configs/sparc64-softmmu.mak     | 2 --
- default-configs/x86_64-softmmu.mak      | 2 --
- 11 files changed, 22 deletions(-)
+Hi
 
-diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
-index bbe361f01a..2d81a98441 100644
---- a/default-configs/alpha-softmmu.mak
-+++ b/default-configs/alpha-softmmu.mak
-@@ -2,8 +2,6 @@
- 
- include pci.mak
- include usb.mak
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_I82374=y
- CONFIG_I8254=y
- CONFIG_I8257=y
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 834d45cfaf..4d33e9983d 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -5,8 +5,6 @@ include usb.mak
- CONFIG_VGA=y
- CONFIG_NAND=y
- CONFIG_ECC=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PTIMER=y
- CONFIG_SD=y
- CONFIG_MAX7310=y
-diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-softmmu.mak
-index 4badc0521e..f3712afc27 100644
---- a/default-configs/hppa-softmmu.mak
-+++ b/default-configs/hppa-softmmu.mak
-@@ -1,8 +1,5 @@
- include pci.mak
- include usb.mak
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
--CONFIG_ISA_BUS=y
- CONFIG_I8259=y
- CONFIG_E1000_PCI=y
- CONFIG_IDE_ISA=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 8c7d4a0fa0..8827166ba1 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -15,8 +15,6 @@ CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PARALLEL=y
- CONFIG_I8254=y
- CONFIG_PCSPK=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index fae2347ee7..9bae997ca0 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -9,8 +9,6 @@ CONFIG_VGA_ISA=y
- CONFIG_VGA_ISA_MM=y
- CONFIG_VGA_CIRRUS=y
- CONFIG_VMWARE_VGA=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PARALLEL=y
- CONFIG_I8254=y
- CONFIG_PCSPK=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 3181bbf163..d8dd969499 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -53,7 +53,6 @@ CONFIG_IDE_MACIO=y
- # For PReP
- CONFIG_PREP=y
- CONFIG_PREP_PCI=y
--CONFIG_SERIAL_ISA=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_RS6000_MC=y
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index ac44f150c6..f7a0d577d8 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -5,8 +5,6 @@ include sound.mak
- include usb.mak
- CONFIG_PPC4XX=y
- CONFIG_M48T59=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_I8257=y
- CONFIG_OPENPIC=y
- CONFIG_PFLASH_CFI01=y
-diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index caeccd55be..2b46d57ab4 100644
---- a/default-configs/sh4-softmmu.mak
-+++ b/default-configs/sh4-softmmu.mak
-@@ -2,8 +2,6 @@
- 
- include pci.mak
- include usb.mak
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI02=y
- CONFIG_SH4=y
-diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index 53b9cd7b5a..279896a43d 100644
---- a/default-configs/sh4eb-softmmu.mak
-+++ b/default-configs/sh4eb-softmmu.mak
-@@ -2,8 +2,6 @@
- 
- include pci.mak
- include usb.mak
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PTIMER=y
- CONFIG_PFLASH_CFI02=y
- CONFIG_SH4=y
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 52edafe547..e039ae3057 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -4,8 +4,6 @@ include pci.mak
- include usb.mak
- CONFIG_M48T59=y
- CONFIG_PTIMER=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PARALLEL=y
- CONFIG_PCKBD=y
- CONFIG_FDC=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 0390b4303c..85528ac9af 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -15,8 +15,6 @@ CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
- CONFIG_PARALLEL=y
- CONFIG_I8254=y
- CONFIG_PCSPK=y
+We can disable drivers with "<foo>-softmmu/config-devices.mak".  But
+if we remove drivers there and do "make check", we still try to test
+that devices (that are compiled in).  This is a list with the removal
+of the ovbious ones.
+
+While I was doing this I fonund:
+- we remove <foo>-softmmu/config-devices.mak when we do make clean
+  That is an "user" configuration file, we shouldn't do that.
+- Use land/lor for consistence
+- CONFIG_SERIAL was defined twice for all configurations that include
+  pci.mak, fix it.
+- pvpanic: We can do the same tricks that everywhere to be able to
+  compile it out.
+
+To do a better job, we are in trouble because we only have
+"config-devices.mak", but not config-devices.h, so we can't disable
+part of the tests/files when we don't want them.  Bigger culprits here
+are usb and virtio devices, basically all of them depend of the others
+one way or another.
+
+Motivation:
+
+- I compile *lots* of times a day, so it is great to be able to
+  compile less devices, it takes less time.
+- But if I want to do make check, I need to compile basically a full
+  configuration for that platform, so we are at square one.
+
+There are still things that still take too long:
+- e1000*/virtio-net pxe test.  It takes more than one second for each,
+  and we have e1000/virtio-net/e1000p/virtio-net(again).
+- qom tests.  We check _all_ machine types here.  In fast mode, IMHO
+  we would only want something like pc-3.0 and q35-30 in fast mode
+  (in slow mode everything is ok).
+- migration tests: yes, they also took around 5-6 seconds in total,
+  and we are adding new tests.  Something needs to be done here.
+
+Time to do "make check" on my laptop (reasonably fast laptop from this
+Jannuary) is almost 3mins.  This makes it too long to run continously
+for testing that I haven't broken anything.
+
+In another submission I wil send some examples on "how" to disable
+other drivers that we can't do now.  But it requires that we generate
+config-devices.h to be able to apply them (or yet more complicated
+things of registration, see how virtio devices needs to be disabled)
+
+Please review, Juan.
+
+Juan Quintela (25):
+  configure: We don't want to clean configuration files
+  config:  CONFIG_SERIAL* is already in pci.mak
+  check: Use land/lor when possible
+  check: Only test vmxnet3 when it is compiled in
+  check: Only test ne2000 when it is compiled in
+  check: Only test eepro100 when it is compiled in
+  check: Only test pcnet when it is compiled in
+  check: Only test rtl8139 when it is compiled in
+  check: Only test es1370 when it is compiled in
+  check: Only test ac97 when it is compiled in
+  check: Only test hda when it is compiled in
+  check: Only test ipack when it is compiled in
+  check: Only test isa-testdev when it is compiled in
+  check: Only test ioh3420 when it is compiled in
+  check: Only test i82801b11 when it is compiled in
+  check: Only test sdhci when it is compiled in
+  check: Only test wdt_ib700 when it is compiled in
+  check: Only test pvpanic when it is compiled in
+  check: Only test nvme when it is compiled in
+  check: Only test usb-xhci-nec when it is compiled in
+  check: Only test usb-ohci when it is compiled in
+  check: Only test usb-uhci devices when they are compiled in
+  check: Only test usb-ehci when it is compiled in
+  check: Only test ivshm when it is compiled in
+  check: Only test tpm devices when they are compiled in
+
+ Makefile                                |   2 +-
+ default-configs/alpha-softmmu.mak       |   2 -
+ default-configs/arm-softmmu.mak         |   2 -
+ default-configs/hppa-softmmu.mak        |   3 -
+ default-configs/i386-softmmu.mak        |   2 -
+ default-configs/mips-softmmu-common.mak |   2 -
+ default-configs/ppc-softmmu.mak         |   1 -
+ default-configs/ppcemb-softmmu.mak      |   2 -
+ default-configs/sh4-softmmu.mak         |   2 -
+ default-configs/sh4eb-softmmu.mak       |   2 -
+ default-configs/sparc64-softmmu.mak     |   2 -
+ default-configs/x86_64-softmmu.mak      |   2 -
+ hw/misc/pvpanic.c                       |  11 --
+ include/hw/misc/pvpanic.h               |  11 +-
+ tests/Makefile.include                  | 144 ++++++++++++------------
+ 15 files changed, 81 insertions(+), 109 deletions(-)
+
 -- 
 2.17.1
