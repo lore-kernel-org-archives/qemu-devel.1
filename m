@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffWBX-0000cV-Sk
+	(envelope-from <alex.bennee@linaro.org>) id 1ffWBY-0000cm-6R
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffWBS-0001gK-WD
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:59 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39782)
+	(envelope-from <alex.bennee@linaro.org>) id 1ffWBX-0001je-9O
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:03:00 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ffWBS-0001fn-On
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:54 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id h10-v6so2397349wre.6
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:02:54 -0700 (PDT)
+	id 1ffWBX-0001j1-23
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 16:02:59 -0400
+Received: by mail-wm0-x235.google.com with SMTP id a19-v6so566036wmb.2
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 13:02:58 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 17 Jul 2018 20:55:52 +0100
-Message-Id: <20180717195553.9111-18-alex.bennee@linaro.org>
+Date: Tue, 17 Jul 2018 20:55:48 +0100
+Message-Id: <20180717195553.9111-14-alex.bennee@linaro.org>
 In-Reply-To: <20180717195553.9111-1-alex.bennee@linaro.org>
 References: <20180717195553.9111-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 for 3.0 17/18] docker: perform basic
- binfmt_misc validation in docker.py
+Subject: [Qemu-devel] [PATCH v3 for 3.0 13/18] docker: add --hint to
+ docker.py check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +33,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Setting up binfmt_misc is outside of the scope of the docker.py script
-but we can at least validate it with any given executable so we have a
-more useful error message than the sed line of deboostrap failing
-cryptically.
+When a check fails we currently just report why we failed. This is not
+totally helpful to people who want to boot-strap a new image. Add a
+--hint option which we can pass down to give a bit more information.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reported-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/docker.py | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ tests/docker/Makefile.include | 3 ++-
+ tests/docker/docker.py        | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index ec23620153..c9e412f9d0 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -73,7 +73,8 @@ docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/debian-bootstrap.docker
+ 			$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)), \
+ 			"BUILD","binfmt debian-$* (debootstrapped)"),		\
+ 		$(call quiet-command,						\
+-			$(DOCKER_SCRIPT) check --quiet qemu:debian-$* $<,	\
++			$(DOCKER_SCRIPT) check --quiet qemu:debian-$* $<	\
++			--hint "you will need to build $(EXECUTABLE)",		\
+ 			"CHECK", "debian-$* exists"))
+ 
+ endif
 diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 523f4b95a2..a3f5b0c1b0 100755
+index 2f81c6b13b..523f4b95a2 100755
 --- a/tests/docker/docker.py
 +++ b/tests/docker/docker.py
-@@ -112,6 +112,31 @@ def _copy_binary_with_libs(src, dest_dir):
-             so_path = os.path.dirname(l)
-             _copy_with_mkdir(l , dest_dir, so_path)
+@@ -475,6 +475,7 @@ class CheckCommand(SubCommand):
+                             default="checksum", help="check type")
+         parser.add_argument("--olderthan", default=60, type=int,
+                             help="number of minutes")
++        parser.add_argument("--hint", default="", help="hint to user")
  
-+
-+def _check_binfmt_misc(executable):
-+    """Check binfmt_misc has entry for executable in the right place.
-+
-+    The details of setting up binfmt_misc are outside the scope of
-+    this script but we should at least fail early with a useful
-+    message if it won't work."""
-+
-+    binary = os.path.basename(executable)
-+    binfmt_entry = "/proc/sys/fs/binfmt_misc/%s" % (binary)
-+
-+    if not os.path.exists(binfmt_entry):
-+        print ("No binfmt_misc entry for %s" % (binary))
-+        return False
-+
-+    with open(binfmt_entry) as x: entry = x.read()
-+
-+    qpath = "/usr/bin/%s" % (binary)
-+    if not re.search("interpreter %s\n" % (qpath), entry):
-+        print ("binfmt_misc for %s does not point to %s" % (binary, qpath))
-+        return False
-+
-+    return True
-+
-+
- def _read_qemu_dockerfile(img_name):
-     # special case for Debian linux-user images
-     if img_name.startswith("debian") and img_name.endswith("user"):
-@@ -315,6 +340,11 @@ class BuildCommand(SubCommand):
-             # Create a docker context directory for the build
-             docker_dir = tempfile.mkdtemp(prefix="docker_build")
+     def run(self, args, argv):
+         tag = args.tag
+@@ -487,7 +488,7 @@ class CheckCommand(SubCommand):
  
-+            # Validate binfmt_misc will work
-+            if args.include_executable:
-+                if not _check_binfmt_misc(args.include_executable):
-+                    return 1
-+
-             # Is there a .pre file to run in the build context?
-             docker_pre = os.path.splitext(args.dockerfile)[0]+".pre"
-             if os.path.exists(docker_pre):
+         info = dkr.inspect_tag(tag)
+         if info is None:
+-            print("Image does not exist")
++            print("Image does not exist %s" % (args.hint))
+             return 1
+ 
+         if args.checktype == "checksum":
 -- 
 2.17.1
