@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ffIh3-000267-TI
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:38:39 -0400
+	(envelope-from <sameeh@daynix.com>) id 1ffIoj-00040V-Cb
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ffIh0-0006LR-Q4
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:38:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53708 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ffIh0-0006LF-Ju
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:38:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E88B9401EF0B
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 05:38:33 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
-	<20180706121354.2021-6-marcandre.lureau@redhat.com>
-Date: Tue, 17 Jul 2018 07:38:32 +0200
-In-Reply-To: <20180706121354.2021-6-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 6 Jul 2018 14:13:47 +0200")
-Message-ID: <87va9eh15z.fsf@dusky.pond.sub.org>
+	(envelope-from <sameeh@daynix.com>) id 1ffIof-0001qj-BE
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:46:33 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:46317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1ffIoe-0001q5-Sm
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 01:46:29 -0400
+Received: by mail-ed1-x542.google.com with SMTP id o8-v6so138854edt.13
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 22:46:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/12] monitor: no need to save need_resume
+In-Reply-To: <153177183866.7766.1789433991037567183@sif>
+References: <20180624124540.6659-1-sameeh@daynix.com>
+	<153177183866.7766.1789433991037567183@sif>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 17 Jul 2018 08:46:27 +0300
+Message-ID: <CAKPgXcF64Bq+xfFRojYwHS-s3HjNS8s=1Lix4C9Z16Y5Ez3yCg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] qga-win: Handle fstrim for OSes lower than
+ Win8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,101 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, peterx@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+I'v successfully compiled the previous patch on Fedora 27, but it seems to
+be failing on RHEL, You can apply this patch instead which avoids using the
+versionhelpers header:
+---
+ qga/commands-win32.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> There is no need for per-command need_resume granularity, it should
-> resume after running an non-oob command on oob-disabled monitor.
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index fb91f5d..e688e71 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -846,6 +846,17 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum,
+Error **errp)
+     GuestFilesystemTrimResponse *resp;
+     HANDLE handle;
+     WCHAR guid[MAX_PATH] = L"";
++    OSVERSIONINFO osvi;
++    BOOL bIsWindows8orLater;
++
++    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
++    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
++    GetVersionEx(&osvi);
++    bIsWindows8orLater = ((osvi.dwMajorVersion == 6) &&
+(osvi.dwMinorVersion >= 2));
++    if (!bIsWindows8orLater) {
++         error_setg(errp, "fstrim is only supported for Win8+");
++         return NULL;
++    }
+
+     handle = FindFirstVolumeW(guid, ARRAYSIZE(guid));
+     if (handle == INVALID_HANDLE_VALUE) {
+--
+2.8.1.185.gdc0db2c
+
+
+On Mon, Jul 16, 2018 at 11:10 PM, Michael Roth <mdroth@linux.vnet.ibm.com>
+wrote:
+
+> Quoting Sameeh Jubran (2018-06-24 07:45:40)
+> > From: Sameeh Jubran <sjubran@redhat.com>
+> >
+> > The defrag.exe tool which is used for executing the fstrim command
+> > on Windows doesn't support retrim for OSes lower than Win8. This
+> > commit handles this case and returns a suitable error.
+> >
+> > Output of fstrim before this commit:
+> > {"execute":"guest-fstrim"}
+> > {"return": {"paths": [{"path": "C:\\", "error": "An invalid command line
+> option
+> > was specified. (0x89000008)"}, {"path": "F:\\", "error": "An invalid
+> command
+> > line option was specified. (0x89000008)"}, {"path": "S:\\", "error": "An
+> > invalid command line option was specified. (0x89000008)"}]}}
+> >
+> > Reported on:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1594113
+> >
+> > Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+> > ---
+> >  qga/commands-win32.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> > index d79974f212..0bdcd9dd38 100644
+> > --- a/qga/commands-win32.c
+> > +++ b/qga/commands-win32.c
+> > @@ -30,6 +30,7 @@
+> >  #include <lm.h>
+> >  #include <wtsapi32.h>
+> >  #include <wininet.h>
+> > +#include <versionhelpers.h>
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  monitor.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
+> I have this queued locally but the mingw64 build environment I've been
+> using (fc20) doesn't support this header and I'm running into some odd
+> null pointer / 0xc0000005 / access violation issues with the binary
+> generated in newer tool chains. I'll send a pull for this next week when
+> I can get it tested.
 >
-> diff --git a/monitor.c b/monitor.c
-> index 462cf96f7b..ec40a80d81 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -257,12 +257,6 @@ struct QMPRequest {
->       */
->      QObject *req;
->      Error *err;
-> -    /*
-> -     * Whether we need to resume the monitor afterward.  This flag is
-> -     * used to emulate the old QMP server behavior that the current
-> -     * command must be completed before execution of the next one.
-> -     */
-> -    bool need_resume;
+> What build envionment are you using?
+>
+> >
+> >  #include "qga/guest-agent-core.h"
+> >  #include "qga/vss-win32.h"
+> > @@ -852,6 +853,11 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum,
+> Error **errp)
+> >      HANDLE handle;
+> >      WCHAR guid[MAX_PATH] = L"";
+> >
+> > +   if (!IsWindows8OrGreater()) {
+> > +        error_setg(errp, "fstrim is only supported for Win8+");
+> > +        return NULL;
+> > +   }
+> > +
+> >      handle = FindFirstVolumeW(guid, ARRAYSIZE(guid));
+> >      if (handle == INVALID_HANDLE_VALUE) {
+> >          error_setg_win32(errp, GetLastError(), "failed to find any
+> volume");
+> > --
+> > 2.13.6
+> >
+>
 
-Note for later: this comment goes away without a replacement.
 
->  };
->  typedef struct QMPRequest QMPRequest;
->=20=20
-> @@ -4079,11 +4073,13 @@ static void monitor_qmp_bh_dispatcher(void *data)
->  {
->      QMPRequest *req_obj =3D monitor_qmp_requests_pop_any();
->      QDict *rsp;
-> +    bool need_resume;
->=20=20
->      if (!req_obj) {
->          return;
->      }
->=20=20
-> +    need_resume =3D !qmp_oob_enabled(req_obj->mon);
->      if (req_obj->req) {
->          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
-: "");
->          monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
-> @@ -4094,7 +4090,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
->          qobject_unref(rsp);
->      }
->=20=20
-> -    if (req_obj->need_resume) {
-> +    if (need_resume) {
->          /* Pairs with the monitor_suspend() in handle_qmp_command() */
 
-Why not
-
-       if (!qmp_oob_enabled(req_obj->mon)) {
-
-and drop the variable?  Perhaps you keep the variable to have its name
-provide a hint on why we resume.  But even with that hint and the "pairs
-with" comment, it's still less than clear.  What about...
-
->          monitor_resume(req_obj->mon);
->      }
-> @@ -4146,7 +4142,6 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
->      req_obj->id =3D id;
->      req_obj->req =3D req;
->      req_obj->err =3D err;
-> -    req_obj->need_resume =3D false;
->=20=20
->      /* Protect qmp_requests and fetching its length. */
->      qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-> @@ -4159,7 +4154,6 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
->       */
->      if (!qmp_oob_enabled(mon)) {
-
-... adding a replacement for the deleted comment here, say
-
-           /*
-           * Emulate traditional QMP server behavior: read next command
-           * only after current command completed.  Pairs with
-           * monitor_resume() in monitor_qmp_bh_dispatcher().
-           */
-
-Would you then be okay with cutting out the variable?
-
->          monitor_suspend(mon);
-> -        req_obj->need_resume =3D true;
->      } else {
->          /* Drop the request if queue is full. */
->          if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
-
-Your patch works fine as far as I can tell, so
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
