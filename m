@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ffNFr-00020s-Bh
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:30:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ffNL2-0003Lm-V4
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ffNFo-0002AF-3J
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:30:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44594 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ffNFn-00029W-U1
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:30:48 -0400
-Date: Tue, 17 Jul 2018 11:30:42 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180717103042.GA9927@stefanha-x1.localdomain>
-References: <20180716173743.133393-1-dgilbert@redhat.com>
-	<20180716173743.133393-3-dgilbert@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ffNKz-0006Yf-QC
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:36:12 -0400
+References: <20180716174146.19845-1-krinkin.m.u@gmail.com>
+	<20180716184752.GA30657@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5ea51a39-bddd-81b7-318d-fac8bfb56a93@redhat.com>
+Date: Tue, 17 Jul 2018 12:36:06 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
-Content-Disposition: inline
-In-Reply-To: <20180716173743.133393-3-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 3.1 2/4] virtio: Check
- qemu_get_virtqueue_element returns
+In-Reply-To: <20180716184752.GA30657@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] opts: fix NULL pointer derefernce in
+ get_opt_value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, famz@redhat.com, amit@kernel.org, eblake@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, Mike Krinkin <krinkin.m.u@gmail.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, qemu-trivial@nongnu.org
 
+On 16/07/2018 20:47, Daniel P. Berrange wrote:
+> On Mon, Jul 16, 2018 at 06:41:46PM +0100, Mike Krinkin wrote:
+>> The value argument can be NULL, for example, in hw/i386/multiboot.c
+>> in the load_multiboot function get_opt_value is explicitly called
+>> with NULL as the second argument.
+>>
+>> The problem was introduced in commit 950c4e6c94b1 ("opts: don't
+>> silently truncate long option values"). This change fixes the
+>> problem by adding a check whether the value is NULL or not.
+>>
+>> Signed-off-by: Mike Krinkin <krinkin.m.u@gmail.com>
+>> ---
+>>  util/qemu-option.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> This problem is fixed in this:
+> 
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01490.html
+> 
+> but it is still waiting for i386 maintainers to respond....
 
---k1lZvvs/B4yU6o8G
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Generally Kevin has looked at multiboot patches, but I'll merge these
+ones because he's on vacation.  Thanks,
 
-On Mon, Jul 16, 2018 at 06:37:41PM +0100, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Check calls to qemu_get_virtqueue_element for NULL and pass
-> up the chain.
-
-What happens to the device state that has been partially deserialized
-(e.g. virtio-blk's s->rq linked list)?
-
-It's not clear to me that simply returning NULL is enough to put QEMU
-into a sane state without memory leaks or crashes if we decide to retry.
-
---k1lZvvs/B4yU6o8G
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbTcVSAAoJEJykq7OBq3PIU1sH/3r1r4UJ48HTUdY/5NVRMhY9
-uk0Ec/SR8qSdgf8YFzo6sGde8RHhTgR1Aa8WyE5fyb4Tpr2VPwFbBZLdNjbBoOP5
-JO2usqnamnFubYYJkEJXey79NMmRGrEw+U3Ym02TI9S8VVolHne9iL9tSx/pLkYI
-7tg1NeGOQz0fOEXu5RpMnj33IVSdTduZpPcraalAPI8WfNwll9Uy1DjXSjBT8TXY
-Rc2a3SOcCkR0OYqzkMDN3xA/cXjSPgPg6/YPIqjz4tw/rVbTgPhTo26g54YREB8X
-VK5o5cXB/k1zTkzXAYvbB44aRCooMUO7FIP1kZYZ0VPxeHXtJDx741yiNHQVnsM=
-=xMmf
------END PGP SIGNATURE-----
-
---k1lZvvs/B4yU6o8G--
+Paolo
