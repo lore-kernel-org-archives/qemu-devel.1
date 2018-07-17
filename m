@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ffHch-0002JI-TA
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1ffHch-0002JH-Ss
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ffHce-0005b0-Vo
+	(envelope-from <bounces@canonical.com>) id 1ffHce-0005ar-OB
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41084)
+Received: from indium.canonical.com ([91.189.90.7]:41056)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ffHce-0005aZ-Px
+	id 1ffHce-0005aN-IM
 	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 00:30:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ffHcd-0007xp-Qe
+	id 1ffHcd-0007xe-As
 	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 04:29:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C0C032E8079
+	by loganberry.canonical.com (Postfix) with ESMTP id 477652E8083
 	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 04:29:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Jul 2018 04:17:25 -0000
-From: Launchpad Bug Tracker <1459622@bugs.launchpad.net>
-Reply-To: Bug 1459622 <1459622@bugs.launchpad.net>
+Date: Tue, 17 Jul 2018 04:17:24 -0000
+From: Launchpad Bug Tracker <1459626@bugs.launchpad.net>
+Reply-To: Bug 1459626 <1459626@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150528110403.25663.72948.malonedeb@soybean.canonical.com>
-Message-Id: <153180104541.8289.13048739074577796296.malone@loganberry.canonical.com>
+References: <20150528112402.7427.77374.malonedeb@gac.canonical.com>
+Message-Id: <153180104440.8289.7957471272383207836.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1459622] Re: firefox hang with virtfs
+Subject: [Qemu-devel] [Bug 1459626] Re: emacs (gtk3) core dumped with -vga
+ qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,19 +48,26 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1459622
+https://bugs.launchpad.net/bugs/1459626
 
 Title:
-  firefox hang with virtfs
+  emacs (gtk3) core dumped with -vga qxl
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Firefox hangs once it starts to load pages. I tried to delete
-  .cache/mozilla/ and .mozilla/ but it doesn't help. But if I mount
-  tmpfs on to .mozilla (not necessary for .cache/mozilla/), pages loads
-  fine.
+  Emacs (gtk3) exited with bus error and core dumped with -vga qxl. If I
+  use the builtin modesetting xorg driver, emacs could survive for a
+  short while sometimes. If I use xf86-video-qxl (git r587.8babd05), it
+  dies right away with the same error. It seems to corrupt xorg at some
+  point as well, because sometimes I cannot exit i3 properly and gnome-
+  terminal can go crazy afterwards (all letters become empty retangles).
+
+  It doesn't seem to happen with other -vga driver.
+
+  Error message is attached. Can also provide the core dumped but it's
+  of 47M.
 
   I started the vm as root (sudo) with the following command: qemu-
   system-x86_64 -enable-kvm -m 4G -virtfs
@@ -70,7 +78,8 @@ Bug description:
 
   /mnt/qemu is a btrfs snapshot of the subvolume used as the host root
 
-  Arch Linux, qemu 2.3.0, firefox 38.0.1
+  Arch Linux, qemu 2.3.0, emacs 24.5, xorg-server 1.17.1, linux 4.0.4,
+  gtk 3.16.3, glib 2.44.1
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1459622/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1459626/+subscriptions
