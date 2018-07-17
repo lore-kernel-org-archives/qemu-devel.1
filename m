@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45131)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffFkE-0002Ou-3s
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:29:43 -0400
+	id 1ffFkG-0002Qu-Oc
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffFkD-00006R-A0
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:29:42 -0400
-Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:35705)
+	id 1ffFkF-000086-Rp
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:29:44 -0400
+Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:39696)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffFkD-00006C-3m
-	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:29:41 -0400
-Received: by mail-ua0-x230.google.com with SMTP id q12-v6so26182578ual.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 19:29:41 -0700 (PDT)
+	id 1ffFkF-00007s-L9
+	for qemu-devel@nongnu.org; Mon, 16 Jul 2018 22:29:43 -0400
+Received: by mail-ua0-x22b.google.com with SMTP id g18-v6so13408322uam.6
+	for <qemu-devel@nongnu.org>; Mon, 16 Jul 2018 19:29:43 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Jul 2018 23:29:22 -0300
-Message-Id: <20180717022924.25428-3-f4bug@amsat.org>
+Date: Mon, 16 Jul 2018 23:29:23 -0300
+Message-Id: <20180717022924.25428-4-f4bug@amsat.org>
 In-Reply-To: <20180717022924.25428-1-f4bug@amsat.org>
 References: <20180717022924.25428-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/4] docker: Improve how the virgl library is
- built
+Subject: [Qemu-devel] [RFC PATCH 3/4] docker: Rename 'amd64' image as
+ 'host-cross'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +37,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-- Call autogen once in the same layer of the git repository clone,
-- Disable build warnings (they are not relevant for QEMU),
-- Call ldconfig once installed.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/dockerfiles/debian-amd64.docker | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ .shippable.yml                                           | 4 ++--
+ tests/docker/Makefile.include                            | 2 +-
+ .../{debian-amd64.docker => debian-host-cross.docker}    | 9 ++++++---
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+ rename tests/docker/dockerfiles/{debian-amd64.docker => debian-host-cross.docker} (82%)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 3312374304..d79a599a0d 100644
+diff --git a/.shippable.yml b/.shippable.yml
+index f74a3de3ff..7625ba8f27 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -5,8 +5,8 @@ env:
+   global:
+     - LC_ALL=C
+   matrix:
+-    - IMAGE=debian-amd64
+-      TARGET_LIST=x86_64-softmmu,x86_64-linux-user
++    - IMAGE=debian-host-cross
++      TARGET_LIST=aarch64-softmmu,x86_64-softmmu,x86_64-linux-user
+     - IMAGE=debian-win32-cross
+       TARGET_LIST=arm-softmmu,i386-softmmu,lm32-softmmu
+     - IMAGE=debian-win64-cross
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index b2a7e761cc..2db4190b4c 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -83,7 +83,7 @@ endif
+ # Enforce dependencies for composite images
+ docker-image-debian: docker-image-debian9
+ docker-image-debian8-mxe: docker-image-debian8
+-docker-image-debian-amd64: docker-image-debian9
++docker-image-debian-host-cross: docker-image-debian9
+ docker-image-debian-armel-cross: docker-image-debian9
+ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-arm64-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-host-cross.docker
+similarity index 82%
+rename from tests/docker/dockerfiles/debian-amd64.docker
+rename to tests/docker/dockerfiles/debian-host-cross.docker
+index d79a599a0d..17d937efc9 100644
 --- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -24,8 +24,12 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         libegl1-mesa-dev \
-         libepoxy-dev \
-         libgbm-dev
--RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virglrenderer
--RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx --disable-tests && make install
-+RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virglrenderer && \
-+    cd /usr/src/virglrenderer && ./autogen.sh
-+RUN cd /usr/src/virglrenderer && \
-+    CPPFLAGS=-w ./configure --with-glx --disable-tests && \
-+    make install && \
-+    ldconfig
- 
- # netmap
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++++ b/tests/docker/dockerfiles/debian-host-cross.docker
+@@ -1,8 +1,11 @@
+ #
+-# Docker x86_64 target
++# Docker 'host' target (same architecture than the host)
+ #
+-# This docker target builds on the debian Stretch base image. Further
+-# libraries which are not widely available are installed by hand.
++# This docker target builds on the debian Stretch base image.
++#
++# It is intented to build the host architecture, with as much
++# features as possible (libraries which are not widely available
++# are installed by hand).
+ #
+ FROM qemu:debian9
+ MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
 -- 
 2.18.0
