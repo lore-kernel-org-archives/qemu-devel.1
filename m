@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffMlx-0000xq-Gi
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:59:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1ffMmv-0001gn-Kb
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:01:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ffMls-0000zx-TR
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:59:57 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34775)
+	(envelope-from <bounces@canonical.com>) id 1ffMmp-0001WP-OW
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:00:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34100)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ffMls-0000wP-Lq
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 05:59:52 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c13-v6so633003wrt.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 02:59:51 -0700 (PDT)
-References: <20180713121741.19262-1-alex.bennee@linaro.org>
-	<20180713121741.19262-7-alex.bennee@linaro.org>
-	<a0312306-f433-a2a5-9970-b7f438773c05@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <a0312306-f433-a2a5-9970-b7f438773c05@amsat.org>
-Date: Tue, 17 Jul 2018 10:59:49 +0100
-Message-ID: <877elu5giy.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ffMmp-0001Vc-Gm
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 06:00:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ffMmn-0005Vw-BL
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:00:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 529F32E80CF
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 10:00:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for 3.0 06/16] docker: move make check
- into check_qemu helper
+Date: Tue, 17 Jul 2018 09:47:26 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1782107 <1782107@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153181978967.32137.15387354948382398538.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153182084650.31372.11440773352326544570.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1782107] Re: Random errors when emulating armv7
+ and using dh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,110 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+The ioctl warnings are I think for BTRFS_IOC_CLONE, which are probably
+harmless (the calling program ought to cope with it not working and fall
+back to something else).
+
+Which version of QEMU are you using ?
+
+(Unfortunately the log is not very revealing about what has gone wrong:
+it says "Running setup.py bdist_wheel for itsdangerous ... error" but
+gives no detail about what the error was. Is it possible to get the
+python build/install process to be more verbose?)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1782107
+
+Title:
+  Random errors when emulating armv7 and using dh
+
+Status in QEMU:
+  New
+
+Bug description:
+  Howdy,
+  I'm encountering random errors when using qemu to cross-package my projec=
+t using dh. In previous iterations of my project it would only fail once ev=
+ery two attempts. Now it fails every time.
+
+  Example error included.
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+  If you'd like to try and replicate this error, a version of my project is=
+ publicly available with simple instructions on how to package it (using qe=
+mu) here:
+  https://github.com/Nadav-Ruskin/configsite
 
-> On 07/13/2018 09:17 AM, Alex Benn=C3=A9e wrote:
->> Not all docker images can run the check step. Let's move everything
->> into a common helper so we don't need to replicate checks in the
->> future.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> ---
->> v2
->>   - add "move" to Let's everything in commit message
->> ---
->>  tests/docker/common.rc  | 10 ++++++++++
->>  tests/docker/test-clang |  2 +-
->>  tests/docker/test-debug |  2 +-
->>  tests/docker/test-full  |  2 +-
->>  tests/docker/test-quick |  2 +-
->>  5 files changed, 14 insertions(+), 4 deletions(-)
->>
->> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
->> index ba1f942328..cfc620d554 100755
->> --- a/tests/docker/common.rc
->> +++ b/tests/docker/common.rc
->> @@ -40,6 +40,16 @@ build_qemu()
->>      make $MAKEFLAGS
->>  }
->>
->> +check_qemu()
->> +{
->> +    if test -z "$@"; then
->> +        TEST=3D"check"
->> +    else
->> +        TEST=3D"$@"
->
-> This is a bit confuse:
->
->   check_qemu V=3D1 -> TEST=3DV=3D1
->
->> +    fi
->> +    make $MAKEFLAGS $TEST
->
->     -> make V=3D1
-
-How about s/TEST/INVOCATION/?
-
->
->> +}
->> +
->>  test_fail()
->>  {
->>      echo "$@"
->> diff --git a/tests/docker/test-clang b/tests/docker/test-clang
->> index e90a793178..324e341cea 100755
->> --- a/tests/docker/test-clang
->> +++ b/tests/docker/test-clang
->> @@ -23,5 +23,5 @@ OPTS=3D"--cxx=3Dclang++ --cc=3Dclang --host-cc=3Dclang"
->>  #OPTS=3D"$OPTS --extra-cflags=3D-fsanitize=3Dundefined \
->>      #--extra-cflags=3D-fno-sanitize=3Dfloat-divide-by-zero"
->>  build_qemu $OPTS
->> -make $MAKEFLAGS check
->> +check_qemu
->>  install_qemu
->> diff --git a/tests/docker/test-debug b/tests/docker/test-debug
->> index d3f9f70d01..137f4f2ddc 100755
->> --- a/tests/docker/test-debug
->> +++ b/tests/docker/test-debug
->> @@ -22,5 +22,5 @@ OPTS=3D"--cxx=3Dclang++ --cc=3Dclang --host-cc=3Dclang"
->>  OPTS=3D"--enable-debug --enable-sanitizers $OPTS"
->>
->>  build_qemu $OPTS
->> -make $MAKEFLAGS V=3D1 check
->> +check_qemu check V=3D1
->
-> Gotcha!
->
->>  install_qemu
->> diff --git a/tests/docker/test-full b/tests/docker/test-full
->> index b4e42d25d7..aadc0f00a2 100755
->> --- a/tests/docker/test-full
->> +++ b/tests/docker/test-full
->> @@ -15,4 +15,4 @@
->>
->>  cd "$BUILD_DIR"
->>
->> -build_qemu && make check $MAKEFLAGS && install_qemu
->> +build_qemu && check_qemu && install_qemu
->> diff --git a/tests/docker/test-quick b/tests/docker/test-quick
->> index 3b7bce6105..eee59c55fb 100755
->> --- a/tests/docker/test-quick
->> +++ b/tests/docker/test-quick
->> @@ -18,5 +18,5 @@ cd "$BUILD_DIR"
->>  DEF_TARGET_LIST=3D"x86_64-softmmu,aarch64-softmmu"
->>  TARGET_LIST=3D${TARGET_LIST:-$DEF_TARGET_LIST} \
->>  build_qemu
->> -make check $MAKEFLAGS
->> +check_qemu
->>  install_qemu
->>
-
-
---
-Alex Benn=C3=A9e
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1782107/+subscriptions
