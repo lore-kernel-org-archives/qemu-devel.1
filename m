@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffVq1-0004wX-B6
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:40:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffVqh-0005Wz-Ht
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffVq0-0000Eg-Fq
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:40:45 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43867)
+	(envelope-from <peter.maydell@linaro.org>) id 1ffVqg-0000my-NN
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:41:27 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffVq0-0000E3-8o
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:40:44 -0400
-Received: by mail-oi0-x241.google.com with SMTP id b15-v6so4249496oib.10
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 12:40:44 -0700 (PDT)
+	id 1ffVqg-0000lz-Hf
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 15:41:26 -0400
+Received: by mail-oi0-x243.google.com with SMTP id k12-v6so4266238oiw.8
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 12:41:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <57aa2f3f-aa32-bcdb-f971-32709e717833@linaro.org>
-References: <20180716133302.25989-1-peter.maydell@linaro.org>
-	<57aa2f3f-aa32-bcdb-f971-32709e717833@linaro.org>
+In-Reply-To: <20180717173716.h2bhmmco7uoj2nvp@toto>
+References: <1531839343-13828-1-git-send-email-thuth@redhat.com>
+	<20180717173716.h2bhmmco7uoj2nvp@toto>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Jul 2018 20:40:23 +0100
-Message-ID: <CAFEAcA8FnSP35scTZmLG6_qFOBsu1wRC0mLq5isz+Y_r907i5w@mail.gmail.com>
+Date: Tue, 17 Jul 2018 20:41:05 +0100
+Message-ID: <CAFEAcA9=RNAjyiN5PT8cxU_rUk9ZGcSSJ2c4uW-V3VC+3SbLNw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.0] target/arm: Correctly handle
- overlapping small MPU regions
+Subject: Re: [Qemu-devel] [PATCH] hw/microblaze/xlnx-zynqmp-pmu: Fix
+ introspection problem in 'xlnx, zynqmp-pmu-soc'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Adithya Baglody <adithya.nagaraj.baglody@intel.com>, "patches@linaro.org" <patches@linaro.org>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>
 
-On 17 July 2018 at 18:29, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> I don't understand why this is necessary in the v8m case.
+On 17 July 2018 at 18:37, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> On Tue, Jul 17, 2018 at 04:55:43PM +0200, Thomas Huth wrote:
+>> Valgrind complains:
+>>
+>> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties'," \
+>>  "'arguments':{'typename':'xlnx,zynqmp-pmu-soc'}}" \
+>>  "{'execute': 'human-monitor-command', " \
+>>  "'arguments': {'command-line': 'info qtree'}}" | \
+>>  valgrind -q microblazeel-softmmu/qemu-system-microblazeel -M none,accel=qtest -qmp stdio
+>> [...]
+>> ==13605== Invalid read of size 8
+>> ==13605==    at 0x2AC69A: qdev_print (qdev-monitor.c:686)
+>> ==13605==    by 0x2AC69A: qbus_print (qdev-monitor.c:719)
+>> ==13605==    by 0x2591E8: handle_hmp_command (monitor.c:3446)
+>>
+>> Use the new object_initialize_child() and sysbus_init_child_obj() to
+>> fix the issue.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >
->                AP                 APL
->     <----B1----|----L1-B2-A-------|---L2--->
 >
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 >
-> Your comment posits two regions [B1,L1] and [B2,L2], that A is not within
-> [B1,L1] but is within [B2,L2] (otherwise we would not report a hit at all).
-> Further, that [B1,L1] intersects [AP,APL] but does not intersect [B2,L2]
-> (otherwise we would report a fault for overlapping regions).
->
-> Surely this combination of ranges implies that [B2,L2] must itself set
-> IS_SUBPAGE (otherwise the first region would not overlap the page of A, or
-> would not overlap the second region).
+> Peter, could you pick this up for 3.0? Or do you want a pull request?
 
-(a) the overlap fault is only for addresses which are actually in the
-overlap (ie "you asked about address X and it hits in R1 and R2"); it
-doesn't imply that other addresses which are only in R1 fault just
-because some part of R1 overlaps with R2. So for instance:
-
-       AP                        APL
-   [B1                                L1]
-                 [B2       L2]
-             A1^     A2^
-
-we must report a narrowed page for address A1, even though
-it hits only within one region (B1-L1) which covers the
-full page which A1 is within. (Otherwise if we later access
-A2 then we'll get the TLB entry for A1, rather than reporting
-the fault for it being in 2 regions.)
-
-(b) Consider the case where one of the regions is the "background
-region" that you get if you don't hit on anything.
+It's missed rc1 but I'll put it in via target-arm.next for rc2.
 
 thanks
 -- PMM
