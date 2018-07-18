@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ffh4y-0008Rc-IL
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:40:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ffm4n-0001Sa-MH
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ffh4v-0001F3-BJ
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:40:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ffh4u-0001CV-Lb
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:40:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ffh4s-0003ec-OE
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 07:40:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9F8732E80D4
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 07:40:50 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1ffm4m-0001Lb-1l
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:01:05 -0400
+Date: Wed, 18 Jul 2018 15:00:44 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180718150044.4c542d21@redhat.com>
+In-Reply-To: <6047361a-be99-fc7f-5270-5ab3b4ab84e2@redhat.com>
+References: <43c1349e-1ca6-4890-07c0-7bfa35ab914d@redhat.com>
+	<5311fed5-7f13-a177-b967-db6e3ed028b9@redhat.com>
+	<405e3f2b-3044-d7fc-8df4-b07a8487470f@redhat.com>
+	<f2d61062-21df-4478-bc61-c32e92329cf8@redhat.com>
+	<57030c9f-c3d1-49a8-090e-d6b316e7a818@redhat.com>
+	<fc6a29d4-1094-8d29-d415-fc30d5e30c31@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA838712003@FRAEML521-MBX.china.huawei.com>
+	<fd7e2831-86a8-c2a1-fe0c-d9784bc2d3cb@redhat.com>
+	<20180711151740.3d119e95@redhat.com>
+	<5e65f669-69f6-53aa-0337-2825ce353b5e@redhat.com>
+	<20180712144516.zsjvfrruduirzqug@kamzik.brq.redhat.com>
+	<6047361a-be99-fc7f-5270-5ab3b4ab84e2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Jul 2018 07:30:13 -0000
-From: PJ Tsao <pjtsao@itri.org.tw>
-Reply-To: Bug 1782300 <1782300@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153189901344.31406.13269648308515707918.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1782300] [NEW] COLO unable to failover to
- secondary VM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate device_memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,248 +33,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "agraf@suse.de" <agraf@suse.de>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
-Public bug reported:
+On Thu, 12 Jul 2018 16:53:01 +0200
+Auger Eric <eric.auger@redhat.com> wrote:
 
-I test COLO feature on my host following docs/COLO-FT.txt in qemu folder, b=
-ut fail to failover to secondary VM. =
+> Hi Drew,
+> 
+> On 07/12/2018 04:45 PM, Andrew Jones wrote:
+> > On Thu, Jul 12, 2018 at 04:22:05PM +0200, Auger Eric wrote:  
+> >> Hi Igor,
+> >>
+> >> On 07/11/2018 03:17 PM, Igor Mammedov wrote:  
+> >>> On Thu, 5 Jul 2018 16:27:05 +0200
+> >>> Auger Eric <eric.auger@redhat.com> wrote:
+> >>>  
+> >>>> Hi Shameer,
+> >>>>
+> >>>> On 07/05/2018 03:19 PM, Shameerali Kolothum Thodi wrote:  
+> >>>>>     
+> >>>>>> -----Original Message-----
+> >>>>>> From: Auger Eric [mailto:eric.auger@redhat.com]
+> >>>>>> Sent: 05 July 2018 13:18
+> >>>>>> To: David Hildenbrand <david@redhat.com>; eric.auger.pro@gmail.com;
+> >>>>>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
+> >>>>>> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> >>>>>> imammedo@redhat.com
+> >>>>>> Cc: wei@redhat.com; drjones@redhat.com; david@gibson.dropbear.id.au;
+> >>>>>> dgilbert@redhat.com; agraf@suse.de
+> >>>>>> Subject: Re: [Qemu-devel] [RFC v3 06/15] hw/arm/virt: Allocate
+> >>>>>> device_memory
+> >>>>>>
+> >>>>>> Hi David,
+> >>>>>>
+> >>>>>> On 07/05/2018 02:09 PM, David Hildenbrand wrote:    
+> >>>>>>> On 05.07.2018 14:00, Auger Eric wrote:    
+> >>>>>>>> Hi David,
+> >>>>>>>>
+> >>>>>>>> On 07/05/2018 01:54 PM, David Hildenbrand wrote:    
+> >>>>>>>>> On 05.07.2018 13:42, Auger Eric wrote:    
+> >>>>>>>>>> Hi David,
+> >>>>>>>>>>
+> >>>>>>>>>> On 07/04/2018 02:05 PM, David Hildenbrand wrote:    
+> >>>>>>>>>>> On 03.07.2018 21:27, Auger Eric wrote:    
+> >>>>>>>>>>>> Hi David,
+> >>>>>>>>>>>> On 07/03/2018 08:25 PM, David Hildenbrand wrote:    
+> >>>>>>>>>>>>> On 03.07.2018 09:19, Eric Auger wrote:    
+> >>>>>>>>>>>>>> We define a new hotpluggable RAM region (aka. device memory).
+> >>>>>>>>>>>>>> Its base is 2TB GPA. This obviously requires 42b IPA support
+> >>>>>>>>>>>>>> in KVM/ARM, FW and guest kernel. At the moment the device
+> >>>>>>>>>>>>>> memory region is max 2TB.    
+> >>>>>>>>>>>>>
+> >>>>>>>>>>>>> Maybe a stupid question, but why exactly does it have to start at 2TB
+> >>>>>>>>>>>>> (and not e.g. at 1TB)?    
+> >>>>>>>>>>>> not a stupid question. See tentative answer below.    
+> >>>>>>>>>>>>>    
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> This is largely inspired of device memory initialization in
+> >>>>>>>>>>>>>> pc machine code.
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>>>>>>>>>>>> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+> >>>>>>>>>>>>>> ---
+> >>>>>>>>>>>>>>  hw/arm/virt.c         | 104    
+> >>>>>> ++++++++++++++++++++++++++++++++++++--------------    
+> >>>>>>>>>>>>>>  include/hw/arm/arm.h  |   2 +
+> >>>>>>>>>>>>>>  include/hw/arm/virt.h |   1 +
+> >>>>>>>>>>>>>>  3 files changed, 79 insertions(+), 28 deletions(-)
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >>>>>>>>>>>>>> index 5a4d0bf..6fefb78 100644
+> >>>>>>>>>>>>>> --- a/hw/arm/virt.c
+> >>>>>>>>>>>>>> +++ b/hw/arm/virt.c
+> >>>>>>>>>>>>>> @@ -59,6 +59,7 @@
+> >>>>>>>>>>>>>>  #include "qapi/visitor.h"
+> >>>>>>>>>>>>>>  #include "standard-headers/linux/input.h"
+> >>>>>>>>>>>>>>  #include "hw/arm/smmuv3.h"
+> >>>>>>>>>>>>>> +#include "hw/acpi/acpi.h"
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+> >>>>>>>>>>>>>>      static void virt_##major##_##minor##_class_init(ObjectClass *oc,    
+> >>>>>> \    
+> >>>>>>>>>>>>>> @@ -94,34 +95,25 @@
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>>  #define PLATFORM_BUS_NUM_IRQS 64
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> -/* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this    
+> >>>>>> means    
+> >>>>>>>>>>>>>> - * RAM can go up to the 256GB mark, leaving 256GB of the physical
+> >>>>>>>>>>>>>> - * address space unallocated and free for future use between 256G    
+> >>>>>> and 512G.    
+> >>>>>>>>>>>>>> - * If we need to provide more RAM to VMs in the future then we    
+> >>>>>> need to:    
+> >>>>>>>>>>>>>> - *  * allocate a second bank of RAM starting at 2TB and working up    
+> >>>>>>>>>>>> I acknowledge this comment was the main justification. Now if you look    
+> >>>>>> at    
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Principles of ARM Memory Maps
+> >>>>>>>>>>>>    
+> >>>>>> http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_princ
+> >>>>>> iples_of_arm_memory_maps.pdf    
+> >>>>>>>>>>>> chapter 2.3 you will find that when adding PA bits, you always leave
+> >>>>>>>>>>>> space for reserved space and mapped IO.    
+> >>>>>>>>>>>
+> >>>>>>>>>>> Thanks for the pointer!
+> >>>>>>>>>>>
+> >>>>>>>>>>> So ... we can fit
+> >>>>>>>>>>>
+> >>>>>>>>>>> a) 2GB at 2GB
+> >>>>>>>>>>> b) 32GB at 32GB
+> >>>>>>>>>>> c) 512GB at 512GB
+> >>>>>>>>>>> d) 8TB at 8TB
+> >>>>>>>>>>> e) 128TB at 128TB
+> >>>>>>>>>>>
+> >>>>>>>>>>> (this is a nice rule of thumb if I understand it correctly :) )
+> >>>>>>>>>>>
+> >>>>>>>>>>> We should strive for device memory (maxram_size - ram_size) to fit
+> >>>>>>>>>>> exactly into one of these slots (otherwise things get nasty).
+> >>>>>>>>>>>
+> >>>>>>>>>>> Depending on the ram_size, we might have simpler setups and can    
+> >>>>>> support    
+> >>>>>>>>>>> more configurations, no?
+> >>>>>>>>>>>
+> >>>>>>>>>>> E.g. ram_size <= 34GB, device_memory <= 512GB    
+> >>>>>>>>>>> -> move ram into a) and b)
+> >>>>>>>>>>> -> move device memory into c)    
+> >>>>>>>>>>
+> >>>>>>>>>> The issue is machvirt doesn't comply with that document.
+> >>>>>>>>>> At the moment we have
+> >>>>>>>>>> 0 -> 1GB MMIO
+> >>>>>>>>>> 1GB -> 256GB RAM
+> >>>>>>>>>> 256GB -> 512GB is theoretically reserved for IO but most is free.
+> >>>>>>>>>> 512GB -> 1T is reserved for ECAM MMIO range. This is the top of our
+> >>>>>>>>>> existing 40b GPA space.
+> >>>>>>>>>>
+> >>>>>>>>>> We don't want to change this address map due to legacy reasons.
+[...]
 
-Is there any mistake in my execution steps?
+> >> Also there is the problematic of migration. How
+> >> would you migrate between guests whose RAM is not laid out at the same
+> >> place?  
+> > 
+> > I'm not sure what you mean here. Boot a guest with a new memory map,
+> > probably by explicitly asking for it with a new machine property,
+> > which means a new virt machine version. Then migrate at will to any
+> > host that supports that machine type.  
+> My concern rather was about holes in the memory map matching reserved
+> regions.
+> >   
+> >> I understood hotplug memory relied on a specific device_memory
+> >> region. So do you mean we would have 2 contiguous regions?  
+> > 
+> > I think Igor wants one contiguous region for RAM, where additional
+> > space can be reserved for hotplugging.  
+> This is not compliant with 2012 ARM white paper, although I don't really
+> know if this document truly is a reference (did not get any reply).
+it's upto QEMU to pick layout, if we have maxmem (upto 256Gb) we could
+accommodate legacy req and put single device_memory in 1Gb-256Gb GPA gap,
+if it's more we can move whole device_memory to 2Tb, 8Tb ...
+that keeps things manageable for us and fits specs (if such exist).
+WE should make selection of the next RAM base deterministic is possible
+when layout changes due to maxram size or IOVA, so that we won't need
+to use compat knobs/checks to keep machine migratable.
 
-Execution environment:
-QEMU v2.12.0-rc4
-OS:     Ubuntu 16.04.3 LTS
-Kernel: Linux 4.4.35
-Secondary VM IP: noted as "a.b.c.d"
-
-Execution steps:
-# Primary
-${COLO_PATH}/x86_64-softmmu/qemu-system-x86_64 \
-    -enable-kvm \
-    -m 512M \
-    -smp 2 \
-    -qmp stdio \
-    -vnc :7 \
-    -name primary \
-    -device piix3-usb-uhci \
-    -device usb-tablet \
-    -netdev tap,id=3Dtap0,vhost=3Doff \
-    -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dtap0 \
-    -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfi=
-fo,vote-threshold=3D1,\
-        children.0.file.filename=3D${IMG_PATH},\
-        children.0.driver=3Draw -S
-
-# Secondary
-${COLO_PATH}/x86_64-softmmu/qemu-system-x86_64 \
-    -enable-kvm \
-    -m 512M \
-    -smp 2 \
-    -qmp stdio \
-    -vnc :8 \
-    -name secondary \
-    -device piix3-usb-uhci \
-    -device usb-tablet \
-    -netdev tap,id=3Dtap1,vhost=3Doff \
-    -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dtap1 \
-    -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D${IMG_PATH},drive=
-r=3Draw,node-name=3Dnode0 \
-    -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecond=
-ary,\
-        file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-        file.file.filename=3D$ACTIVE_DISK,\
-        file.backing.driver=3Dqcow2,\
-        file.backing.file.filename=3D$HIDDEN_DISK,\
-        file.backing.backing=3Dsecondary-disk0 \
-    -incoming tcp:0:8888
-
-# Enter into Secondary:
-{'execute':'qmp_capabilities'}
-{ 'execute': 'nbd-server-start',
-    'arguments': {'addr': {'type': 'inet', 'data': {'host': 'a.b.c.d', 'por=
-t': '8889'} } }
-}
-{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', 'w=
-ritable': true } }
-
-# Enter into Primary:
-{'execute':'qmp_capabilities'}
-{'execute': 'human-monitor-command',
-    'arguments': {
-        'command-line': 'drive_add -n buddy driver=3Dreplication,mode=3Dpri=
-mary,file.driver=3Dnbd,file.host=3Da.b.c.d,file.port=3D8889,file.export=3Ds=
-econdary-disk0,node-name=3Dnbd_client0'
-    }
-}
-{ 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', 'n=
-ode': 'nbd_client0' } }
-{ 'execute': 'migrate-set-capabilities',
-    'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': true =
-} ] } }
-{ 'execute': 'migrate', 'arguments': {'uri': 'tcp:a.b.c.d:8888' } }
-
-# To test failover
-Primary
-{ 'execute': 'x-blockdev-change', 'arguments': {'parent': 'primary-disk0', =
-'child': 'children.1'}}
-{ 'execute': 'human-monitor-command','arguments': {'command-line': 'drive_d=
-el nbd_client0'}}
-
-Secondary
-{ 'execute': 'nbd-server-stop' }
-
-Stop Primary
-Send ^C signal to terminate PVM.
-
-Secondary
-{ "execute": "x-colo-lost-heartbeat" }
-
-
-# Result:
-Primary (Use ^C to terminate)
-qemu-system-x86_64: Can't receive COLO message: Input/output error
-qemu-system-x86_64: terminating on signal 2
-{"timestamp": {"seconds": 1531815575, "microseconds": 997696}, "event": "SH=
-UTDOWN", "data": {"guest":false}}
-
-Secondary
-{ 'execute': 'nbd-server-stop' }
-{"return": {}}
-{ "execute": "x-colo-lost-heartbeat" }
-{"return": {}}
-qemu-system-x86_64: Can't receive COLO message: Input/output error
-Segmentation fault
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: colo
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1782300
-
-Title:
-  COLO unable to failover to secondary VM
-
-Status in QEMU:
-  New
-
-Bug description:
-  I test COLO feature on my host following docs/COLO-FT.txt in qemu folder,=
- but fail to failover to secondary VM. =
-
-  Is there any mistake in my execution steps?
-
-  Execution environment:
-  QEMU v2.12.0-rc4
-  OS:     Ubuntu 16.04.3 LTS
-  Kernel: Linux 4.4.35
-  Secondary VM IP: noted as "a.b.c.d"
-
-  Execution steps:
-  # Primary
-  ${COLO_PATH}/x86_64-softmmu/qemu-system-x86_64 \
-      -enable-kvm \
-      -m 512M \
-      -smp 2 \
-      -qmp stdio \
-      -vnc :7 \
-      -name primary \
-      -device piix3-usb-uhci \
-      -device usb-tablet \
-      -netdev tap,id=3Dtap0,vhost=3Doff \
-      -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dtap0 \
-      -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3D=
-fifo,vote-threshold=3D1,\
-          children.0.file.filename=3D${IMG_PATH},\
-          children.0.driver=3Draw -S
-
-  # Secondary
-  ${COLO_PATH}/x86_64-softmmu/qemu-system-x86_64 \
-      -enable-kvm \
-      -m 512M \
-      -smp 2 \
-      -qmp stdio \
-      -vnc :8 \
-      -name secondary \
-      -device piix3-usb-uhci \
-      -device usb-tablet \
-      -netdev tap,id=3Dtap1,vhost=3Doff \
-      -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dtap1 \
-      -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D${IMG_PATH},dri=
-ver=3Draw,node-name=3Dnode0 \
-      -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dseco=
-ndary,\
-          file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-          file.file.filename=3D$ACTIVE_DISK,\
-          file.backing.driver=3Dqcow2,\
-          file.backing.file.filename=3D$HIDDEN_DISK,\
-          file.backing.backing=3Dsecondary-disk0 \
-      -incoming tcp:0:8888
-
-  # Enter into Secondary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'nbd-server-start',
-      'arguments': {'addr': {'type': 'inet', 'data': {'host': 'a.b.c.d', 'p=
-ort': '8889'} } }
-  }
-  {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', =
-'writable': true } }
-
-  # Enter into Primary:
-  {'execute':'qmp_capabilities'}
-  {'execute': 'human-monitor-command',
-      'arguments': {
-          'command-line': 'drive_add -n buddy driver=3Dreplication,mode=3Dp=
-rimary,file.driver=3Dnbd,file.host=3Da.b.c.d,file.port=3D8889,file.export=
-=3Dsecondary-disk0,node-name=3Dnbd_client0'
-      }
-  }
-  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', =
-'node': 'nbd_client0' } }
-  { 'execute': 'migrate-set-capabilities',
-      'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': tru=
-e } ] } }
-  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:a.b.c.d:8888' } }
-
-  # To test failover
-  Primary
-  { 'execute': 'x-blockdev-change', 'arguments': {'parent': 'primary-disk0'=
-, 'child': 'children.1'}}
-  { 'execute': 'human-monitor-command','arguments': {'command-line': 'drive=
-_del nbd_client0'}}
-
-  Secondary
-  { 'execute': 'nbd-server-stop' }
-
-  Stop Primary
-  Send ^C signal to terminate PVM.
-
-  Secondary
-  { "execute": "x-colo-lost-heartbeat" }
-
-  =
-
-  # Result:
-  Primary (Use ^C to terminate)
-  qemu-system-x86_64: Can't receive COLO message: Input/output error
-  qemu-system-x86_64: terminating on signal 2
-  {"timestamp": {"seconds": 1531815575, "microseconds": 997696}, "event": "=
-SHUTDOWN", "data": {"guest":false}}
-
-  Secondary
-  { 'execute': 'nbd-server-stop' }
-  {"return": {}}
-  { "execute": "x-colo-lost-heartbeat" }
-  {"return": {}}
-  qemu-system-x86_64: Can't receive COLO message: Input/output error
-  Segmentation fault
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1782300/+subscriptions
+[...]
