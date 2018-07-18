@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ffc6h-0008Aq-KR
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:22:24 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ffcF9-0001NQ-PH
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:31:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ffc6g-0007MQ-Fb
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:22:23 -0400
-Date: Wed, 18 Jul 2018 12:22:02 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1ffcF6-0008Ew-JZ
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:31:07 -0400
+Received: from ozlabs.org ([203.11.71.1]:53255)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ffcF5-00089r-O3
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:31:04 -0400
+Date: Wed, 18 Jul 2018 12:30:53 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180718022202.GC2102@umbus.fritz.box>
-References: <1531767792-17705-1-git-send-email-yasmins@linux.ibm.com>
+Message-ID: <20180718023053.GD2102@umbus.fritz.box>
+References: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
+	<20180716025346.GF2599@umbus.fritz.box>
+	<alpine.BSF.2.21.1807162207210.15021@zero.eik.bme.hu>
+	<CAFEAcA_3km1OB=7kqoZ6AvW0+G9FqfgD+go_KghFLDrgj2Xk+g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="96YOpH+ONegL0A3E"
+	protocol="application/pgp-signature"; boundary="d9ADC0YsG2v16Js0"
 Content-Disposition: inline
-In-Reply-To: <1531767792-17705-1-git-send-email-yasmins@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: bcdsub fix sign when result is
- zero
+In-Reply-To: <CAFEAcA_3km1OB=7kqoZ6AvW0+G9FqfgD+go_KghFLDrgj2Xk+g@mail.gmail.com>
+Subject: Re: [Qemu-devel] hw/display/sm501* status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yasmin Beatriz <yasmins@linux.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, QEMU Developers <qemu-devel@nongnu.org>
 
 
---96YOpH+ONegL0A3E
+--d9ADC0YsG2v16Js0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 16, 2018 at 07:03:12PM +0000, Yasmin Beatriz wrote:
-> When the result of bcdsub is equal to zero, the result sign may be
-> set to negative in some cases, and this does not follow the Power ISA
-> specifications as to decimal integer arithmetic instructions.
+On Mon, Jul 16, 2018 at 09:43:05PM +0100, Peter Maydell wrote:
+> On 16 July 2018 at 21:26, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> > I could list sm501 in the sam460ex section thus formally taking
+> > sub-maintainership but this would only go as far that I'll get cc-d on
+> > changes and try to review them. I still can't (and don't want to) maint=
+ain
+> > my own tree and send pull requests directly so I'd need someone's help =
+with
+> > that who can take my patches and merge them via their tree. If it's OK =
+to
+> > continue to use the PPC tree for that I'm fine with that if David agrees
+> > (which I think he did above).
+> >
+> > So is it OK to add sm501 to sam460ex section so I claim responsibility =
+for
+> > changes and will continue sending patches cc-ing David (and maybe Gerd =
+to
+> > help spotting problems) then David could take these via the PPC tree?
 >=20
-> Signed-off-by: Yasmin Beatriz <yasmins@linux.ibm.com>
+> I think that makes sense. sh4 is pretty dead and if sm501's major
+> active user is the sam460ex then listing it there seems reasonable.
 
-The fix looks correct, but since this has been broken forever and
-we're in hard freeze I'm going to apply for 3.1, not 3.0.
+Sounds good to me.
 
-Fwiw, I think the surrounding logic can probably be simplified a
-little as well - I think this is now the only case with a zero result,
-so I think the 'zero' local can probably be removed.
+Zoltan, can you send a patch adding sm501 to the sam460ex section of
+the MAINTAINERS file.  That will make you the right point of contact
+for it.
 
-> ---
->  target/ppc/int_helper.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index 03d37da..fa18e6e 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -2747,6 +2747,9 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a,=
- ppc_avr_t *b, uint32_t ps)
->              result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgna, ps);
->              zero =3D bcd_sub_mag(&result, a, b, &invalid, &overflow);
->              cr =3D (sgna > 0) ? CRF_GT : CRF_LT;
-> +        } else if (bcd_cmp_mag(a, b) =3D=3D 0) {
-> +            result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(0, ps);
-> +            zero =3D bcd_sub_mag(&result, b, a, &invalid, &overflow);
->          } else {
->              result.u8[BCD_DIG_BYTE(0)] =3D bcd_preferred_sgn(sgnb, ps);
->              zero =3D bcd_sub_mag(&result, b, a, &invalid, &overflow);
+On the understanding that it's just about tree logistics, rather than
+review, I'll be happy to take sm501 patches from you through my tree.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -73,24 +76,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---96YOpH+ONegL0A3E
+--d9ADC0YsG2v16Js0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltOpEgACgkQbDjKyiDZ
-s5J8IBAArdfYMVMIJM8bcxLajOnc2UDPPid++W9cFXPy/FuhAUszJ0tQi98rhjiA
-0V1U8k0IrqOk7EQ99ba9jjCz+iYv0ZosukwhynWnwRf11uc6jtff2oTvYSTKO9+U
-QiSJj694Fu49ZSLq8PZlrjKvmvivm9QaQswOzBbE07BmAHeKZV8KeQWLU1GPZSxM
-7s84HWLEQLUObigthmU8U5z4Q2Wpt630xVK3Uf/Aahns4aNhGSHUbcA3LQnNGarm
-vu67lNWu8LcBqPTs9Oyh9AZ0DBepjmcYpCHJprDYo6A0/ekFxAJDWpkBbl/vpUu/
-2p7G/Rm2AfsaDvHOQ7l4XLzPQ9Qqyakeg/0gZBvfuiEh2lQ3bxdbvBxqyqulFIG3
-ChRGmsyXj7eg8ivLr612iSH6ykSrh7Q94Tfzoh4ZTLdus4qHx+gWF1Vb8OFPZ9C2
-W3Bc7OHaFX8fmyB/8FWANogjG5n4aEIjz37j6C1i1MD7VKGiFBnknjlYyHW0Q59Y
-Q/YMdRDCSeN/psOLqOsURmPajjPimg5K0F7QxsgX7W4vZAILRxRGnwA9TmNpMJ1s
-VK3HTruIl4AgbMcp4/6M/E/44tziMDFPnIZubVQ4c8vcXDOK2o1t/RYrxoMmrKdA
-fzOxArHAB1tkfHy6o9xkkaKFGyk96JowrQnf1QmgsrqxQ4X2XtQ=
-=xmWX
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltOpl0ACgkQbDjKyiDZ
+s5I+Uw//TFjZIWgl05g0MAm5nqXyc9EmHeGm1Hrlk3avZL4ILPFufV2aN72RniNx
+z9e5P+Hd2z7YcSlIpUjLFfzvuAOUOpaMAw/74oUe39Q+AvvtzGNttvoYxBclPHpj
+BJY7dZB96/csUhpq6GNYainfhDrJ5HZJN+NpVd1SrTO22uMdRccv1EB4Zi3Deykl
+7n8fXAiOXyoRUHTY2EX2ytuU/tPrqQz0pLlCOZevt3L4U+2DKZf+Y3fNjFUYTUIY
+FYBE69dzkw2Om8gmK8l65ORkXfF+LO63eOTperQdxgNZLdfiZGcdmLJnRA9s7olr
+5aXkitiXWF4MlnVOg+qrMuDN/hr8ObSjIySNU1+QEUR8XrGV/fXIoOGWd7fsMqxh
+keKzVW/gRz0CSVoFVLss3Z3hTox0vOTnOIXdcZhfz3bP5rljqf1bedX+frtrLoou
+rrBd7EfzM0aFK+MS5TztirFGi0yRzJUKSDKzd6yz6ogQnxTH0C6KQstWNPw8+HK2
+lo3unn0RJ5AAC2eebjqkiNe8uwVDAca6GFhHbsrBvm+DU3ZMU7bYlwAjAF8AZNa2
+V48q8U1ltfHmfw/a85GRrrW+Hr9SrSC718B5cOSqmPOI53ZVpVASUnNK1cuupQXs
+xGXCn0O0bEcZgIr6+cMeX6gS7zjddY0ysoyYRUTPPg5BI9jUjcE=
+=3faF
 -----END PGP SIGNATURE-----
 
---96YOpH+ONegL0A3E--
+--d9ADC0YsG2v16Js0--
