@@ -1,42 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ffi4m-0004EM-7k
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:44:49 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1ffi6Q-0005NE-1o
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:46:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ffi4j-0003Mt-5Y
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:44:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58670
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ffi4i-0003L5-T3
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:44:45 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6I8d52B142866
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 04:44:44 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ka0h04dpe-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 04:44:43 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 18 Jul 2018 09:44:42 +0100
-References: <20180718082425.14834-1-david@redhat.com>
-	<148539ec-691f-5822-509f-d11dbfa3f88b@de.ibm.com>
-	<873c35d4-5a5f-d095-9485-4fb7ec8b746f@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 18 Jul 2018 10:44:38 +0200
+	(envelope-from <guangrong.xiao@gmail.com>) id 1ffi6O-00067V-M2
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:46:30 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:40787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1ffi6O-00066C-Gd
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:46:28 -0400
+Received: by mail-it0-x244.google.com with SMTP id 188-v6so3050808ita.5
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 01:46:28 -0700 (PDT)
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-7-xiaoguangrong@tencent.com>
+	<20180619073034.GA14814@xz-mi>
+	<e945c2af-ccfb-f777-fdbf-724d4572dd0a@gmail.com>
+	<20180629094213.GD2568@work-vm>
+	<83856901-3986-ada7-7069-bcf3619f89db@gmail.com>
+	<20180716185800.GD2664@work-vm>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <ccb56d2e-c2db-3cb0-0e35-1b6ebf8ddc3a@gmail.com>
+Date: Wed, 18 Jul 2018 16:46:21 +0800
 MIME-Version: 1.0
-In-Reply-To: <873c35d4-5a5f-d095-9485-4fb7ec8b746f@redhat.com>
+In-Reply-To: <20180716185800.GD2664@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <46dcb3bc-4f7f-74cb-2351-7ad2f95ea461@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/cpumodel: fix
- segmentation fault when baselining models
+Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,66 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
 
-On 07/18/2018 10:40 AM, David Hildenbrand wrote:
-> On 18.07.2018 10:39, Christian Borntraeger wrote:
+On 07/17/2018 02:58 AM, Dr. David Alan Gilbert wrote:
+> * Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
 >>
 >>
->> On 07/18/2018 10:24 AM, David Hildenbrand wrote:
->>> Usually, when baselining two CPU models, whereby one of them has base
->>> CPU features disabled (e.g. z14-base,msa=off), we fallback to an older
->>> model that did not have these features in the base model. We always try to
->>> create a "sane" CPU model (as far as possible), and one part of it is that
->>> removing base features is no good and to be avoided.
+>> On 06/29/2018 05:42 PM, Dr. David Alan Gilbert wrote:
+>>> * Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
+>>>>
+>>>> Hi Peter,
+>>>>
+>>>> Sorry for the delay as i was busy on other things.
+>>>>
+>>>> On 06/19/2018 03:30 PM, Peter Xu wrote:
+>>>>> On Mon, Jun 04, 2018 at 05:55:14PM +0800, guangrong.xiao@gmail.com wrote:
+>>>>>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>>>>>
+>>>>>> Detecting zero page is not a light work, we can disable it
+>>>>>> for compression that can handle all zero data very well
+>>>>>
+>>>>> Is there any number shows how the compression algo performs better
+>>>>> than the zero-detect algo?  Asked since AFAIU buffer_is_zero() might
+>>>>> be fast, depending on how init_accel() is done in util/bufferiszero.c.
+>>>>
+>>>> This is the comparison between zero-detection and compression (the target
+>>>> buffer is all zero bit):
+>>>>
+>>>> Zero 810 ns Compression: 26905 ns.
+>>>> Zero 417 ns Compression: 8022 ns.
+>>>> Zero 408 ns Compression: 7189 ns.
+>>>> Zero 400 ns Compression: 7255 ns.
+>>>> Zero 412 ns Compression: 7016 ns.
+>>>> Zero 411 ns Compression: 7035 ns.
+>>>> Zero 413 ns Compression: 6994 ns.
+>>>> Zero 399 ns Compression: 7024 ns.
+>>>> Zero 416 ns Compression: 7053 ns.
+>>>> Zero 405 ns Compression: 7041 ns.
+>>>>
+>>>> Indeed, zero-detection is faster than compression.
+>>>>
+>>>> However during our profiling for the live_migration thread (after reverted this patch),
+>>>> we noticed zero-detection cost lots of CPU:
+>>>>
+>>>>    12.01%  kqemu  qemu-system-x86_64            [.] buffer_zero_sse2                                                                                                                                                                           ◆
 >>>
->>> Now, if we disable base features that were part of a z900, we're out of
->>> luck. We won't find a CPU model and QEMU will segfault. This is a
->>> scenario that should never happen in real life, but it can be used to
->>> crash QEMU.
->>>
->>> So let's make something like this:
->>>
->>> { "execute": "query-cpu-model-baseline",
->>>   "arguments" : { "modela": { "name": "z14-base", "props": {"esan3" : false}},
->>>                   "modelb": { "name": "z14"}} }
->>>
->>> Produce:
->>>
->>> {"return": {"model": {"name": "z900-base", "props": {"esan3": false}}}}
->>>
->>> Instead of segfaulting.
->>>
->>> This could of course be improved (e.g. to z14-base,esan3=false), however
->>> as this ususally won't happen, let's just avoid crashes.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  target/s390x/cpu_models.c | 6 ++++++
->>>  1 file changed, 6 insertions(+)
->>>
->>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->>> index cfdbccf46d..13a5d4f095 100644
->>> --- a/target/s390x/cpu_models.c
->>> +++ b/target/s390x/cpu_models.c
->>> @@ -716,6 +716,12 @@ CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *infoa,
->>>  
->>>      model.def = s390_find_cpu_def(cpu_type, max_gen, max_gen_ga,
->>>                                    model.features);
->>> +
->>> +    /* models without early base features (esan3) are bad - fallback to z900 */
->>> +    if (!model.def) {
->>> +        model.def = s390_find_cpu_def(0x2064, 7, 1, NULL);
->>> +    }
->>> +
+>>> Interesting; what host are you running on?
+>>> Some hosts have support for the faster buffer_zero_ss4/avx2
 >>
->> Is there a way to not even return z900 but retuning an empty model (e.g. no model that 
->> matches) ?
+>> The host is:
+>>
+>> model name	: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz
+>> ...
+>> flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi
+>>   mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts
+>>   rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor
+>>   ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt
+>>   tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3
+>>   cdp_l3 intel_ppin intel_pt mba tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1
+>>   hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt
+>>   clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total
+>>   cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke
+>>
+>> I checked and noticed "CONFIG_AVX2_OPT" has not been enabled, maybe is due to too old glib/gcc
+>> version:
+>>     gcc version 4.4.6 20110731 (Red Hat 4.4.6-4) (GCC)
+>>     glibc.x86_64                     2.12
 > 
-> An error would be an alternative.
+> Yes, that's pretty old (RHEL6 ?) - I think you should get AVX2 in RHEL7.
 
-As N3 means new in zarch (and backported to ESA390 mode), there is no machine without N3.
-So I would prefer an error.
+Er, it is not easy to update glibc in the production env.... :(
