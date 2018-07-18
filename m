@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1ffmzF-0000M8-0V
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:59:25 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ffn48-0001hL-UB
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1ffmzB-0002ZD-Vw
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:59:25 -0400
-Received: from smtp5.mail.ru ([94.100.179.24]:57244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1ffmzB-0002Wv-Iw
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:59:21 -0400
-References: <20180710153335.1232-1-jusual@mail.ru>
-	<CAFEAcA_oZtV3NQnJNPQh74BOk7eyo_A_j4smCbU+xV=QatpJeA@mail.gmail.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <1b8b53d3-721a-ab7d-bcb3-43cf97127a7a@mail.ru>
-Date: Wed, 18 Jul 2018 16:59:12 +0300
+	(envelope-from <imammedo@redhat.com>) id 1ffn47-0006ru-Lc
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:04:28 -0400
+Date: Wed, 18 Jul 2018 16:04:13 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180718160413.5c4dc514@redhat.com>
+In-Reply-To: <1530602398-16127-9-git-send-email-eric.auger@redhat.com>
+References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	<1530602398-16127-9-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_oZtV3NQnJNPQh74BOk7eyo_A_j4smCbU+xV=QatpJeA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nvic: Change NVIC to support ARMv6-M
+Subject: Re: [Qemu-devel] [RFC v3 08/15] hw/arm/boot: introduce
+ fdt_add_memory_node helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
 
-On 17.07.2018 15:58, Peter Maydell wrote:
-> On 10 July 2018 at 16:33, Julia Suvorova <jusual@mail.ru> wrote:
->> The differences from ARMv7-M NVIC are:
->>    * ARMv6-M only supports up to 32 external interrupts
->>     (configurable feature already). The ICTR is reserved.
->>    * Active Bit Register is reserved.
->>    * ARMv6-M supports 4 priority levels against 256 in ARMv7-M.
->>
->> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->> ---
->>   hw/intc/armv7m_nvic.c | 29 +++++++++++++++++++++++++----
->>   1 file changed, 25 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
->> index 38aaf3dc8e..8545c87caa 100644
->> --- a/hw/intc/armv7m_nvic.c
->> +++ b/hw/intc/armv7m_nvic.c
->> @@ -420,6 +420,10 @@ static void set_prio(NVICState *s, unsigned irq, bool secure, uint8_t prio)
->>       assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
->>       assert(irq < s->num_irq);
->>
->> +    if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
->> +        prio &= 0xc0;
+On Tue,  3 Jul 2018 09:19:51 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > 
-> Rather than hard-coding this, I think we should have a
-> num_prio_bits field in the NVICState struct which defines
-> how many bits of priority are implemented. This would be
-> 2 for v6M and 8 otherwise, and can be set in
-> armv7m_nvic_realize. Then the mask is
->    MAKE_64BIT_MASK(8 - num_prio_bits, num_prio_bits);
-> (For v8M the number of priority bits is configurable.)
+> We introduce an helper to create a memory node.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - nop of existing /memory nodes was already handled
+> ---
+>  hw/arm/boot.c | 54 ++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 34 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index e09201c..5243a25 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -413,6 +413,36 @@ static void set_kernel_args_old(const struct arm_boot_info *info,
+>      }
+>  }
+>  
+> +static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_base,
+> +                               uint32_t scells, hwaddr mem_len,
+> +                               int numa_node_id)
+> +{
+> +    char *nodename = NULL;
+> +    int ret;
+> +
+> +    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+> +    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
+> +                                       scells, mem_len);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "couldn't set %s/reg\n", nodename);
+> +        goto out;
+> +    }
+> +    if (numa_node_id < 0) {
+> +        goto out;
+> +    }
+> +
+> +    ret = qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_node_id);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
+> +    }
+> +
+> +out:
+> +    g_free(nodename);
+> +    return ret;
+> +}
+> +
 
-Do I understand correctly that the check in armv7m_nvic_realize is for
-Baseline, not only v6m, because Baseline has only 4 priority levels too?
-And num_prio_bits should be just a field, not a property?
+not related question from hotplug POV,
+is entry size fixed?
+can we estimate exact size for #slots number of dimms and reserve it in advance
+in FDT 'rom'?
 
-Best regards, Julia Suvorova.
+>  static void fdt_add_psci_node(void *fdt)
+>  {
+>      uint32_t cpu_suspend_fn;
+> @@ -492,7 +522,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>      void *fdt = NULL;
+>      int size, rc, n = 0;
+>      uint32_t acells, scells;
+> -    char *nodename;
+>      unsigned int i;
+>      hwaddr mem_base, mem_len;
+>      char **node_path;
+> @@ -566,35 +595,20 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>          mem_base = binfo->loader_start;
+>          for (i = 0; i < nb_numa_nodes; i++) {
+>              mem_len = numa_info[i].node_mem;
+> -            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
+> -            qemu_fdt_add_subnode(fdt, nodename);
+> -            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+> -            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+> -                                              acells, mem_base,
+> -                                              scells, mem_len);
+> +            rc = fdt_add_memory_node(fdt, acells, mem_base,
+> +                                     scells, mem_len, i);
+>              if (rc < 0) {
+> -                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
+> -                        i);
+>                  goto fail;
+>              }
+>  
+> -            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+>              mem_base += mem_len;
+> -            g_free(nodename);
+>          }
+>      } else {
+> -        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
+> -        qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+> -
+> -        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+> -                                          acells, binfo->loader_start,
+> -                                          scells, binfo->ram_size);
+> +        rc = fdt_add_memory_node(fdt, acells, binfo->loader_start,
+> +                                 scells, binfo->ram_size, -1);
+>          if (rc < 0) {
+> -            fprintf(stderr, "couldn't set %s reg\n", nodename);
+>              goto fail;
+>          }
+> -        g_free(nodename);
+>      }
+>  
+>      rc = fdt_path_offset(fdt, "/chosen");
+nice cleanup, but I won't stop here just yet if hotplug to be considered.
+
+I see arm_load_dtb() as a hack called from every board
+where we dump everything that might be related to DTB regardless
+if it's generic for every board or only a board specific stuff.
+
+Could we split it in several logical parts that do a single thing
+and preferably user only when they are actually need?
+Something along following lines:
+(cleanups/refactoring should be a separate from pcdimm series as it's self sufficient
+and it would be easier to review/merge and could simplify following up pcdimm series):
+
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index e09201c..9c41efd 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@ -486,9 +486,6 @@ static void fdt_add_psci_node(void *fdt)
+     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+ }
+ 
+-int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+-                 hwaddr addr_limit, AddressSpace *as)
+-{
+...
+
+@@ -1158,9 +1158,14 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+     }
+ 
+     if (!info->skip_dtb_autoload && have_dtb(info)) {
+-        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
+-            exit(1);
+-        }
++        load_dtb_from_file() /* reuse generic machine_get_dtb() ??? */
++        create_dtb_memory_nodes() /* non numa variant */
++        /* move out mac-virt specific binfo->get_dtb into the board */
++        /* move out modify_dtb() which vexpress hack into vexpress */
++        /* move out fdt_add_psci_node() into mac-ivrt */
++        create_dtb_initrd_kernel_nodes()
++        dump_fdt()
++        rom_add_blob_fixed_as()
+     }
+ }
+ 
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 281ddcd..7686abf 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1285,9 +1285,12 @@ void virt_machine_done(Notifier *notifier, void *data)
+                                        vms->memmap[VIRT_PLATFORM_BUS].size,
+                                        vms->irqmap[VIRT_PLATFORM_BUS]);
+     }
+-    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
+-        exit(1);
+-    }
++    load_dtb_from_file()/get_dtb() stuff
++    virt_create_dtb_memory_nodes() /* incl. numa variant nad later pcdimm nodes */                         
++    fdt_add_psci_node()                         
++    create_dtb_initrd_kernel_nodes()                                         
++    dump_fdt()                                                               
++    rom_add_blob_fixed_as()
+ 
+     virt_acpi_setup(vms);
+     virt_build_smbios(vms);
