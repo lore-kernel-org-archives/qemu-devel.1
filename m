@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ffg8O-0000tx-Qq
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 02:40:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1ffgG1-0002iY-3B
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 02:48:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ffg8L-00063e-P3
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 02:40:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47128 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ffgFx-0001Dd-W8
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 02:48:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47986 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ffg8L-000619-Jw
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 02:40:21 -0400
-Date: Wed, 18 Jul 2018 14:40:15 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ffgFx-0001CM-PI
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 02:48:13 -0400
+Date: Wed, 18 Jul 2018 14:48:03 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180718064015.GI20520@xz-mi>
+Message-ID: <20180718064803.GA6197@xz-mi>
 References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180717224737.14019.3324.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180717224737.14019.3324.stgit@gimli.home>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] balloon: Allow nested inhibits
+In-Reply-To: <20180717222721.14019.27548.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +29,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alex Williamson <alex.williamson@redhat.com>
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Tue, Jul 17, 2018 at 04:47:37PM -0600, Alex Williamson wrote:
-> A simple true/false internal state does not allow multiple users.  Fix
-> this within the existing interface by converting to a counter, so long
-> as the counter is elevated, ballooning is inhibited.
+On Tue, Jul 17, 2018 at 04:47:31PM -0600, Alex Williamson wrote:
+> Directly assigned vfio devices have never been compatible with
+> ballooning.  Zapping MADV_DONTNEED pages happens completely
+> independent of vfio page pinning and IOMMU mapping, leaving us with
+> inconsistent GPA to HPA mapping between vCPUs and assigned devices
+> when the balloon deflates.  Mediated devices can theoretically do
+> better, if we make the assumption that the mdev vendor driver is fully
+> synchronized to the actual working set of the guest driver.  In that
+> case the guest balloon driver should never be able to allocate an mdev
+> pinned page for balloon inflation.  Unfortunately, QEMU can't know the
+> workings of the vendor driver pinning, and doesn't actually know the
+> difference between mdev devices and directly assigned devices.  Until
+> we can sort out how the vfio IOMMU backend can tell us if ballooning
+> is safe, the best approach is to disabling ballooning any time a vfio
+> devices is attached.
 > 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  balloon.c |    7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> To do that, simply make the balloon inhibitor a counter rather than a
+> boolean, fixup a case where KVM can then simply use the inhibit
+> interface, and inhibit ballooning any time a vfio device is attached.
+> I'm expecting we'll expose some sort of flag similar to
+> KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
+> this.  An addition we could consider here would be yet another device
+> option for vfio, such as x-disable-balloon-inhibit, in case there are
+> mdev devices that behave in a manner compatible with ballooning.
 > 
-> diff --git a/balloon.c b/balloon.c
-> index 6bf0a9681377..2a6a7e1a22a0 100644
-> --- a/balloon.c
-> +++ b/balloon.c
-> @@ -37,16 +37,17 @@
->  static QEMUBalloonEvent *balloon_event_fn;
->  static QEMUBalloonStatus *balloon_stat_fn;
->  static void *balloon_opaque;
-> -static bool balloon_inhibited;
-> +static int balloon_inhibited;
->  
->  bool qemu_balloon_is_inhibited(void)
->  {
-> -    return balloon_inhibited;
-> +    return balloon_inhibited > 0;
->  }
->  
->  void qemu_balloon_inhibit(bool state)
->  {
-> -    balloon_inhibited = state;
-> +    balloon_inhibited += (state ? 1 : -1);
-> +    assert(balloon_inhibited >= 0);
+> Please let me know if this looks like a good idea.  Thanks,
 
-Better do it atomically?
+IMHO patches 1-2 are good cleanup as standalone patches...
 
->  }
->  
->  static bool have_balloon(Error **errp)
-> 
-> 
+I totally have no idea on whether people would like to use vfio-pci
+and the balloon device at the same time.  After all vfio-pci are
+majorly for performance players, then I would vaguely guess that they
+don't really care thin provisioning of memory at all, hence the usage
+scenario might not exist much.  Is that the major reason that we'd
+just like to disable it (which makes sense to me)?
 
-Regards,
+I'm wondering what if want to do that somehow some day... Whether
+it'll work if we just let vfio-pci devices to register some guest
+memory invalidation hook (just like the iommu notifiers, but for guest
+memory address space instead), then we map/unmap the IOMMU pages there
+for vfio-pci device to make sure the inflated balloon pages are not
+mapped and also make sure new pages are remapped with correct HPA
+after deflated.  This is a pure question out of my curiosity, and for
+sure it makes little sense if the answer of the first question above
+is positive.
+
+Thanks,
 
 -- 
 Peter Xu
