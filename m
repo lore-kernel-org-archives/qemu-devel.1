@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ffiuc-0003UF-P1
+	(envelope-from <berrange@redhat.com>) id 1ffiuc-0003UC-N7
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:38:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ffiuZ-0001Br-Eh
+	(envelope-from <berrange@redhat.com>) id 1ffiuY-0001BF-RD
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:38:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56554 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52886 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ffiuZ-0001BL-9S
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:38:19 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ffiuY-0001Ax-MW
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:38:18 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB36E7D84D
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 09:38:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A53E1401EF11
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 09:38:17 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 18 Jul 2018 10:38:12 +0100
-Message-Id: <20180718093815.8104-2-berrange@redhat.com>
-In-Reply-To: <20180718093815.8104-1-berrange@redhat.com>
-References: <20180718093815.8104-1-berrange@redhat.com>
+Date: Wed, 18 Jul 2018 10:38:11 +0100
+Message-Id: <20180718093815.8104-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for 3.0 1/4] tests: call qcrypto_init instead
- of gnutls_global_init
+Subject: [Qemu-devel] [PATCH for 3.0 0/4] Multiple fixes and improvements to
+ TLS tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +34,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Calling qcrypto_init ensures that all relevant initialization is
-done. In particular this honours the debugging settings and thread
-settings.
+The switch to enable TLS 1.3 protocol support in GNUTLS in Fedora
+exposed a subtle flaw in our TLS unit tests. This was horrible to debug
+because of bad error reporting in our tests which caused all the error
+messages to be irretrievably lost instead of displayed on stderr.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tests/crypto-tls-x509-helpers.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Daniel P. Berrang=C3=A9 (4):
+  tests: call qcrypto_init instead of gnutls_global_init
+  tests: don't silence error reporting for all tests
+  tests: use error_abort in places expecting errors
+  tests: fix TLS handshake failure with TLS 1.3
 
-diff --git a/tests/crypto-tls-x509-helpers.c b/tests/crypto-tls-x509-help=
-ers.c
-index 173d4e28fb..70df68f5df 100644
---- a/tests/crypto-tls-x509-helpers.c
-+++ b/tests/crypto-tls-x509-helpers.c
-@@ -21,6 +21,8 @@
- #include "qemu/osdep.h"
-=20
- #include "crypto-tls-x509-helpers.h"
-+#include "crypto/init.h"
-+#include "qapi/error.h"
- #include "qemu/sockets.h"
-=20
- #ifdef QCRYPTO_HAVE_TLS_TEST_SUPPORT
-@@ -95,7 +97,7 @@ static gnutls_x509_privkey_t test_tls_load_key(void)
-=20
- void test_tls_init(const char *keyfile)
- {
--    gnutls_global_init();
-+    qcrypto_init(&error_abort);
-=20
-     if (asn1_array2tree(pkix_asn1_tab, &pkix_asn1, NULL) !=3D ASN1_SUCCE=
-SS) {
-         abort();
+ stubs/error-printf.c             |  5 +-
+ tests/crypto-tls-x509-helpers.c  |  4 +-
+ tests/test-crypto-tlscredsx509.c | 11 +----
+ tests/test-crypto-tlssession.c   | 80 ++++++++++++--------------------
+ tests/test-io-channel-tls.c      | 24 ++++------
+ tests/test-vmstate.c             |  3 ++
+ 6 files changed, 51 insertions(+), 76 deletions(-)
+
 --=20
 2.17.1
