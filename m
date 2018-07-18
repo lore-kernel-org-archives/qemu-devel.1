@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffZip-0004cV-9W
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 19:49:37 -0400
+	(envelope-from <kevlough@umich.edu>) id 1ffbMY-000719-TO
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 21:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffZik-0000pd-Bp
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 19:49:35 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:36316)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffZik-0000pG-5x
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 19:49:30 -0400
-Received: by mail-ua0-x242.google.com with SMTP id y8-v6so1815712uan.3
-	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 16:49:30 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180717194010.30096-1-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4d551ea5-4ee7-db0d-bc15-688c70029ecc@amsat.org>
-Date: Tue, 17 Jul 2018 20:49:24 -0300
+	(envelope-from <kevlough@umich.edu>) id 1ffbMV-0005h1-Nh
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 21:34:42 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180717194010.30096-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.0] i386: Rename enum CacheType members
+References: <CAB30WPccergMTSWWrwj-WhTCcaMvvW7vnAMO3qvy9b9B53N=zA@mail.gmail.com>
+	<CAFEAcA8v762p3JSQ=9Vu68-evYS5MMH467pAo8=XZWsw+x6s7Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA8v762p3JSQ=9Vu68-evYS5MMH467pAo8=XZWsw+x6s7Q@mail.gmail.com>
+From: Kevin Loughlin <kevlough@umich.edu>
+Date: Tue, 17 Jul 2018 21:34:18 -0400
+Message-ID: <CAB30WPfKKesSfvyEx9ZpSUQShnXJnH1YCXgZgp0OoY888r0K4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Native Memory Virtualization in qemu-system-aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,292 +22,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Babu Moger <babu.moger@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-discuss@nongnu.org, "Mickens, James" <mickens@g.harvard.edu>
 
-On 07/17/2018 04:40 PM, Eduardo Habkost wrote:
-> Rename DCACHE to DATA_CACHE and ICACHE to INSTRUCTION_CACHE.
+I am indeed attempting to implement a non-standard extension to the ARMv8
+architecture for experimental purposes. My high-level goal for the
+extension is to completely isolate *N* execution environments (for example,
+I even prohibit inter-environment communication) using purely HW-based
+isolation mechanisms (i.e. no monitor software to help enforce/configure
+isolation).
 
-Effective, thanks.
+As part of my design, I want to take a single set of physical memory
+hardware (e.g., RAM chips, MMUs, etc.) and
 
-> This avoids conflict with Linux asm/cachectl.h macros and fixes
-> build failure on mips hosts.
-> 
-> Reported-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+   1. partition the resources *N* ways, creating *N* views of the available
+   physical resources, and then
+   2. be able to dynamically switch the current view that is "active,"
+   i.e., visible to the CPU and other devices
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Under my setup, the CPU's MMU translates from VAs to IPAs, and an external
+memory controller then intercepts all memory transactions and translates
+these IPAs to true PAs. This allows the memory controller to enforce
+physical isolation of environments, and does not expose true PAs to the
+CPU/system software.
 
-> ---
->  target/i386/cpu.h |   4 +-
->  target/i386/cpu.c | 128 +++++++++++++++++++++++-----------------------
->  2 files changed, 66 insertions(+), 66 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 2c5a0d90a6..194e2e6b92 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1050,8 +1050,8 @@ typedef enum TPRAccess {
->  /* Cache information data structures: */
->  
->  enum CacheType {
-> -    DCACHE,
-> -    ICACHE,
-> +    DATA_CACHE,
-> +    INSTRUCTION_CACHE,
->      UNIFIED_CACHE
->  };
->  
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index e0e2f2eea1..f454d4beb3 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -71,123 +71,123 @@ struct CPUID2CacheDescriptorInfo {
->   * From Intel SDM Volume 2A, CPUID instruction
->   */
->  struct CPUID2CacheDescriptorInfo cpuid2_cache_descriptors[] = {
-> -    [0x06] = { .level = 1, .type = ICACHE,        .size =   8 * KiB,
-> +    [0x06] = { .level = 1, .type = INSTRUCTION_CACHE, .size =   8 * KiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x08] = { .level = 1, .type = ICACHE,        .size =  16 * KiB,
-> +    [0x08] = { .level = 1, .type = INSTRUCTION_CACHE, .size =  16 * KiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x09] = { .level = 1, .type = ICACHE,        .size =  32 * KiB,
-> +    [0x09] = { .level = 1, .type = INSTRUCTION_CACHE, .size =  32 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x0A] = { .level = 1, .type = DCACHE,        .size =   8 * KiB,
-> +    [0x0A] = { .level = 1, .type = DATA_CACHE,        .size =   8 * KiB,
->                 .associativity = 2,  .line_size = 32, },
-> -    [0x0C] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
-> +    [0x0C] = { .level = 1, .type = DATA_CACHE,        .size =  16 * KiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x0D] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
-> +    [0x0D] = { .level = 1, .type = DATA_CACHE,        .size =  16 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x0E] = { .level = 1, .type = DCACHE,        .size =  24 * KiB,
-> +    [0x0E] = { .level = 1, .type = DATA_CACHE,        .size =  24 * KiB,
->                 .associativity = 6,  .line_size = 64, },
-> -    [0x1D] = { .level = 2, .type = UNIFIED_CACHE, .size = 128 * KiB,
-> +    [0x1D] = { .level = 2, .type = UNIFIED_CACHE,     .size = 128 * KiB,
->                 .associativity = 2,  .line_size = 64, },
-> -    [0x21] = { .level = 2, .type = UNIFIED_CACHE, .size = 256 * KiB,
-> +    [0x21] = { .level = 2, .type = UNIFIED_CACHE,     .size = 256 * KiB,
->                 .associativity = 8,  .line_size = 64, },
->      /* lines per sector is not supported cpuid2_cache_descriptor(),
->      * so descriptors 0x22, 0x23 are not included
->      */
-> -    [0x24] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0x24] = { .level = 2, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 16, .line_size = 64, },
->      /* lines per sector is not supported cpuid2_cache_descriptor(),
->      * so descriptors 0x25, 0x20 are not included
->      */
-> -    [0x2C] = { .level = 1, .type = DCACHE,        .size =  32 * KiB,
-> +    [0x2C] = { .level = 1, .type = DATA_CACHE,        .size =  32 * KiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0x30] = { .level = 1, .type = ICACHE,        .size =  32 * KiB,
-> +    [0x30] = { .level = 1, .type = INSTRUCTION_CACHE, .size =  32 * KiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0x41] = { .level = 2, .type = UNIFIED_CACHE, .size = 128 * KiB,
-> +    [0x41] = { .level = 2, .type = UNIFIED_CACHE,     .size = 128 * KiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x42] = { .level = 2, .type = UNIFIED_CACHE, .size = 256 * KiB,
-> +    [0x42] = { .level = 2, .type = UNIFIED_CACHE,     .size = 256 * KiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x43] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
-> +    [0x43] = { .level = 2, .type = UNIFIED_CACHE,     .size = 512 * KiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x44] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0x44] = { .level = 2, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x45] = { .level = 2, .type = UNIFIED_CACHE, .size =   2 * MiB,
-> +    [0x45] = { .level = 2, .type = UNIFIED_CACHE,     .size =   2 * MiB,
->                 .associativity = 4,  .line_size = 32, },
-> -    [0x46] = { .level = 3, .type = UNIFIED_CACHE, .size =   4 * MiB,
-> +    [0x46] = { .level = 3, .type = UNIFIED_CACHE,     .size =   4 * MiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x47] = { .level = 3, .type = UNIFIED_CACHE, .size =   8 * MiB,
-> +    [0x47] = { .level = 3, .type = UNIFIED_CACHE,     .size =   8 * MiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0x48] = { .level = 2, .type = UNIFIED_CACHE, .size =   3 * MiB,
-> +    [0x48] = { .level = 2, .type = UNIFIED_CACHE,     .size =   3 * MiB,
->                 .associativity = 12, .line_size = 64, },
->      /* Descriptor 0x49 depends on CPU family/model, so it is not included */
-> -    [0x4A] = { .level = 3, .type = UNIFIED_CACHE, .size =   6 * MiB,
-> +    [0x4A] = { .level = 3, .type = UNIFIED_CACHE,     .size =   6 * MiB,
->                 .associativity = 12, .line_size = 64, },
-> -    [0x4B] = { .level = 3, .type = UNIFIED_CACHE, .size =   8 * MiB,
-> +    [0x4B] = { .level = 3, .type = UNIFIED_CACHE,     .size =   8 * MiB,
->                 .associativity = 16, .line_size = 64, },
-> -    [0x4C] = { .level = 3, .type = UNIFIED_CACHE, .size =  12 * MiB,
-> +    [0x4C] = { .level = 3, .type = UNIFIED_CACHE,     .size =  12 * MiB,
->                 .associativity = 12, .line_size = 64, },
-> -    [0x4D] = { .level = 3, .type = UNIFIED_CACHE, .size =  16 * MiB,
-> +    [0x4D] = { .level = 3, .type = UNIFIED_CACHE,     .size =  16 * MiB,
->                 .associativity = 16, .line_size = 64, },
-> -    [0x4E] = { .level = 2, .type = UNIFIED_CACHE, .size =   6 * MiB,
-> +    [0x4E] = { .level = 2, .type = UNIFIED_CACHE,     .size =   6 * MiB,
->                 .associativity = 24, .line_size = 64, },
-> -    [0x60] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
-> +    [0x60] = { .level = 1, .type = DATA_CACHE,        .size =  16 * KiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0x66] = { .level = 1, .type = DCACHE,        .size =   8 * KiB,
-> +    [0x66] = { .level = 1, .type = DATA_CACHE,        .size =   8 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x67] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
-> +    [0x67] = { .level = 1, .type = DATA_CACHE,        .size =  16 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x68] = { .level = 1, .type = DCACHE,        .size =  32 * KiB,
-> +    [0x68] = { .level = 1, .type = DATA_CACHE,        .size =  32 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x78] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0x78] = { .level = 2, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 4,  .line_size = 64, },
->      /* lines per sector is not supported cpuid2_cache_descriptor(),
->      * so descriptors 0x79, 0x7A, 0x7B, 0x7C are not included.
->      */
-> -    [0x7D] = { .level = 2, .type = UNIFIED_CACHE, .size =   2 * MiB,
-> +    [0x7D] = { .level = 2, .type = UNIFIED_CACHE,     .size =   2 * MiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0x7F] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
-> +    [0x7F] = { .level = 2, .type = UNIFIED_CACHE,     .size = 512 * KiB,
->                 .associativity = 2,  .line_size = 64, },
-> -    [0x80] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
-> +    [0x80] = { .level = 2, .type = UNIFIED_CACHE,     .size = 512 * KiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0x82] = { .level = 2, .type = UNIFIED_CACHE, .size = 256 * KiB,
-> +    [0x82] = { .level = 2, .type = UNIFIED_CACHE,     .size = 256 * KiB,
->                 .associativity = 8,  .line_size = 32, },
-> -    [0x83] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
-> +    [0x83] = { .level = 2, .type = UNIFIED_CACHE,     .size = 512 * KiB,
->                 .associativity = 8,  .line_size = 32, },
-> -    [0x84] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0x84] = { .level = 2, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 8,  .line_size = 32, },
-> -    [0x85] = { .level = 2, .type = UNIFIED_CACHE, .size =   2 * MiB,
-> +    [0x85] = { .level = 2, .type = UNIFIED_CACHE,     .size =   2 * MiB,
->                 .associativity = 8,  .line_size = 32, },
-> -    [0x86] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
-> +    [0x86] = { .level = 2, .type = UNIFIED_CACHE,     .size = 512 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0x87] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0x87] = { .level = 2, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0xD0] = { .level = 3, .type = UNIFIED_CACHE, .size = 512 * KiB,
-> +    [0xD0] = { .level = 3, .type = UNIFIED_CACHE,     .size = 512 * KiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0xD1] = { .level = 3, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0xD1] = { .level = 3, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0xD2] = { .level = 3, .type = UNIFIED_CACHE, .size =   2 * MiB,
-> +    [0xD2] = { .level = 3, .type = UNIFIED_CACHE,     .size =   2 * MiB,
->                 .associativity = 4,  .line_size = 64, },
-> -    [0xD6] = { .level = 3, .type = UNIFIED_CACHE, .size =   1 * MiB,
-> +    [0xD6] = { .level = 3, .type = UNIFIED_CACHE,     .size =   1 * MiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0xD7] = { .level = 3, .type = UNIFIED_CACHE, .size =   2 * MiB,
-> +    [0xD7] = { .level = 3, .type = UNIFIED_CACHE,     .size =   2 * MiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0xD8] = { .level = 3, .type = UNIFIED_CACHE, .size =   4 * MiB,
-> +    [0xD8] = { .level = 3, .type = UNIFIED_CACHE,     .size =   4 * MiB,
->                 .associativity = 8,  .line_size = 64, },
-> -    [0xDC] = { .level = 3, .type = UNIFIED_CACHE, .size = 1.5 * MiB,
-> +    [0xDC] = { .level = 3, .type = UNIFIED_CACHE,     .size = 1.5 * MiB,
->                 .associativity = 12, .line_size = 64, },
-> -    [0xDD] = { .level = 3, .type = UNIFIED_CACHE, .size =   3 * MiB,
-> +    [0xDD] = { .level = 3, .type = UNIFIED_CACHE,     .size =   3 * MiB,
->                 .associativity = 12, .line_size = 64, },
-> -    [0xDE] = { .level = 3, .type = UNIFIED_CACHE, .size =   6 * MiB,
-> +    [0xDE] = { .level = 3, .type = UNIFIED_CACHE,     .size =   6 * MiB,
->                 .associativity = 12, .line_size = 64, },
-> -    [0xE2] = { .level = 3, .type = UNIFIED_CACHE, .size =   2 * MiB,
-> +    [0xE2] = { .level = 3, .type = UNIFIED_CACHE,     .size =   2 * MiB,
->                 .associativity = 16, .line_size = 64, },
-> -    [0xE3] = { .level = 3, .type = UNIFIED_CACHE, .size =   4 * MiB,
-> +    [0xE3] = { .level = 3, .type = UNIFIED_CACHE,     .size =   4 * MiB,
->                 .associativity = 16, .line_size = 64, },
-> -    [0xE4] = { .level = 3, .type = UNIFIED_CACHE, .size =   8 * MiB,
-> +    [0xE4] = { .level = 3, .type = UNIFIED_CACHE,     .size =   8 * MiB,
->                 .associativity = 16, .line_size = 64, },
-> -    [0xEA] = { .level = 3, .type = UNIFIED_CACHE, .size =  12 * MiB,
-> +    [0xEA] = { .level = 3, .type = UNIFIED_CACHE,     .size =  12 * MiB,
->                 .associativity = 24, .line_size = 64, },
-> -    [0xEB] = { .level = 3, .type = UNIFIED_CACHE, .size =  18 * MiB,
-> +    [0xEB] = { .level = 3, .type = UNIFIED_CACHE,     .size =  18 * MiB,
->                 .associativity = 24, .line_size = 64, },
-> -    [0xEC] = { .level = 3, .type = UNIFIED_CACHE, .size =  24 * MiB,
-> +    [0xEC] = { .level = 3, .type = UNIFIED_CACHE,     .size =  24 * MiB,
->                 .associativity = 24, .line_size = 64, },
->  };
->  
-> @@ -238,10 +238,10 @@ static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
->  #define CACHE_COMPLEX_IDX     (1 << 2)
->  
->  /* Encode CacheType for CPUID[4].EAX */
-> -#define CACHE_TYPE(t) (((t) == DCACHE)  ? CACHE_TYPE_D  : \
-> -                         ((t) == ICACHE)  ? CACHE_TYPE_I  : \
-> -                         ((t) == UNIFIED_CACHE) ? CACHE_TYPE_UNIFIED : \
-> -                         0 /* Invalid value */)
-> +#define CACHE_TYPE(t) (((t) == DATA_CACHE) ? CACHE_TYPE_D : \
-> +                       ((t) == INSTRUCTION_CACHE) ? CACHE_TYPE_I : \
-> +                       ((t) == UNIFIED_CACHE) ? CACHE_TYPE_UNIFIED : \
-> +                       0 /* Invalid value */)
->  
->  
->  /* Encode cache info for CPUID[4] */
-> @@ -538,7 +538,7 @@ static void encode_topo_cpuid8000001e(CPUState *cs, X86CPU *cpu,
->  
->  /* L1 data cache: */
->  static CPUCacheInfo legacy_l1d_cache = {
-> -    .type = DCACHE,
-> +    .type = DATA_CACHE,
->      .level = 1,
->      .size = 32 * KiB,
->      .self_init = 1,
-> @@ -551,7 +551,7 @@ static CPUCacheInfo legacy_l1d_cache = {
->  
->  /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
->  static CPUCacheInfo legacy_l1d_cache_amd = {
-> -    .type = DCACHE,
-> +    .type = DATA_CACHE,
->      .level = 1,
->      .size = 64 * KiB,
->      .self_init = 1,
-> @@ -565,7 +565,7 @@ static CPUCacheInfo legacy_l1d_cache_amd = {
->  
->  /* L1 instruction cache: */
->  static CPUCacheInfo legacy_l1i_cache = {
-> -    .type = ICACHE,
-> +    .type = INSTRUCTION_CACHE,
->      .level = 1,
->      .size = 32 * KiB,
->      .self_init = 1,
-> @@ -578,7 +578,7 @@ static CPUCacheInfo legacy_l1i_cache = {
->  
->  /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
->  static CPUCacheInfo legacy_l1i_cache_amd = {
-> -    .type = ICACHE,
-> +    .type = INSTRUCTION_CACHE,
->      .level = 1,
->      .size = 64 * KiB,
->      .self_init = 1,
-> @@ -1310,7 +1310,7 @@ struct X86CPUDefinition {
->  
->  static CPUCaches epyc_cache_info = {
->      .l1d_cache = &(CPUCacheInfo) {
-> -        .type = DCACHE,
-> +        .type = DATA_CACHE,
->          .level = 1,
->          .size = 32 * KiB,
->          .line_size = 64,
-> @@ -1322,7 +1322,7 @@ static CPUCaches epyc_cache_info = {
->          .no_invd_sharing = true,
->      },
->      .l1i_cache = &(CPUCacheInfo) {
-> -        .type = ICACHE,
-> +        .type = INSTRUCTION_CACHE,
->          .level = 1,
->          .size = 64 * KiB,
->          .line_size = 64,
-> 
+The CPU object would initialize and store an AddressSpace object for each
+environment in its field "cpu_ases." Additionally, each environment's
+memory map would follow identical offsets. That is, if RAM/flash/etc starts
+at offset X in one environment, it will start at offset X in the other as
+well. Therefore, my controller only ever needs to perform IPA-to-PA
+translations via a simple, hard-wired base+bounds policy that is based on
+the active environment.
+
+My question is how best to emulate the memory controller given this desired
+setup. I have three primary ideas, and I would love to get feedback on
+their feasibility.
+
+   1. Implement the controller as an IOMMU region. I would be responsible
+   for writing the controller's operations to shift and forward the target
+   address to the appropriate subregion. Would it be possible to trigger
+   the IOMMU region on every access to system_memory? For example, even during
+   QEMU's loading process? Or would I only be able to trigger the IOMMU
+   operations on access to the subregions that represent my environments? My
+   understanding of the IOMMU regions is shaky. Nonetheless, this sounds
+   like the most promising approach, assuming I can provide the shifting and
+   forwarding operations and hide the PAs from the CPU's TLB as desired.
+
+   2. Go into the target/arm code, find every instance of accesses to
+   address spaces, and shift the target physical address accordingly. This
+   seems ugly and unlikely to work.
+
+   3. Use overlapping subregions with differing priorities, as in done in
+   QEMU's TrustZone implementation. However, these priorities would have to
+   change on an environment context switch, and I don't know if that would
+   lead to chaos.
+
+
+Thanks,
+
+Kevin
+
+P.S. Note that my virtualization actually occurs *beneath* the TrustZone
+layer. While creating "nested" TrustZones within each of my partitions is
+theoretically possible, it's not an explicit goal of my design. Naturally,
+I do use some isolation techniques similar to those deployed in TrustZone,
+but ultimately my extension is designed for different purposes than
+TrustZone.
+
+On Fri, Jul 13, 2018 at 11:22 AM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On 12 July 2018 at 17:48, Kevin Loughlin <kevlough@umich.edu> wrote:
+> > I know TrustZone has support for memory virtualization in AArch64, but
+> I'm
+> > looking to create a different model. Namely, I'd like to fully virtualize
+> > the memory map for the "virt" board.
+> >
+> > As a basic example of what I want, assuming an execution environment that
+> > runs in a 1GB physical address space (0x0 - 0x3FFFFFFF), I'd like to be
+> > able to switch to a second execution environment with a distinct SW stack
+> > that runs in the second GB of a board memory (0x40000000 - 0x7FFFFFFF).
+> The
+> > key points for my desired memory virtualization are the following...
+> >
+> >    1. Both of these environments should have distinct virtual address
+> spaces
+> >    2. The OS in each environment should believe it is running on physical
+> >    addresses 0x0 - 0x3FFFFFFF in both cases.
+> >    3. Neither environment should have access to the physical memory state
+> >    of the other
+> >
+> > I initialize distinct AddressSpace and MemoryRegion structures for each
+> of
+> > these GB blocks. Because all I want is a simple shift of physical address
+> > for one environment, I hesitate to mirror the (relatively) complex
+> address
+> > translation process for TrustZone. Does anyone know if it would be better
+> > to either (a) provide custom read/write functions for the shifted
+> > MemoryRegion object, or (b) modify the target/arm code, such as adding a
+> > shift to get_phys_addr() in target/arm/helper.c?
+>
+> I'm a bit confused about what you're trying to do. Without TrustZone,
+> by definition there is only one physical address space (ie all of
+> memory/devices/etc are addressed by a single 64-bit physaddr).
+> There's no way to cause the CPU to not have access to it.
+> With TrustZone, you can think of the system as having two physical
+> address spaces (so to access something you need to specify both
+> a 64-bit physaddr and the TZ secure/nonsecure bit), and the CPU
+> and the system design cooperate to enforce that code running in the
+> nonsecure world can't get at things in the system it should not have
+> access to.
+>
+> The whole point of TZ is to allow you to do this sort of partitioning.
+> Without it there's no way for the system (RAM or whatever) to know which
+> environment is running on the CPU.
+>
+> You could in theory design and implement a non-standard extension to
+> the architecture to do equivalent things to what TZ is doing I suppose,
+> but that would be a lot of work and a lot of fragile modifications
+> to QEMU.
+>
+> thanks
+> -- PMM
+>
