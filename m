@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ffiPU-00048S-9f
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:06:15 -0400
+	(envelope-from <peterx@redhat.com>) id 1ffiXA-0005zg-IA
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:14:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ffiPP-0003Lf-JT
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:06:12 -0400
-Date: Wed, 18 Jul 2018 11:06:03 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180718110603.4933a4e4.cohuck@redhat.com>
-In-Reply-To: <fb787a48-341a-cb53-a1ba-23bb1e4ef4ee@redhat.com>
-References: <20180718082425.14834-1-david@redhat.com>
-	<148539ec-691f-5822-509f-d11dbfa3f88b@de.ibm.com>
-	<873c35d4-5a5f-d095-9485-4fb7ec8b746f@redhat.com>
-	<46dcb3bc-4f7f-74cb-2351-7ad2f95ea461@de.ibm.com>
-	<fb787a48-341a-cb53-a1ba-23bb1e4ef4ee@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1ffiX7-000120-E4
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:14:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34344 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ffiX7-00011b-9Y
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:14:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A7BFA4023132
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 09:14:04 +0000 (UTC)
+Date: Wed, 18 Jul 2018 17:14:00 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180718091400.GD6197@xz-mi>
+References: <20180718090557.17248-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/cpumodel: fix
- segmentation fault when baselining models
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180718090557.17248-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.0] qapi: Make 'allow-oob' optional in
+ SchemaInfoCommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com
 
-On Wed, 18 Jul 2018 10:50:01 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, Jul 18, 2018 at 11:05:57AM +0200, Markus Armbruster wrote:
+> Making 'allow-oob' optional in SchemaInfoCommand permits omitting it
+> in the common case.  Shrinks query-qmp-schema's output from 122.1KiB
+> to 118.6KiB for me.
+> 
+> Note that out-of-band execution is still experimental (you have to
+> configure the monitor with x-oob=on to use it).
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index cfdbccf46d..604898a882 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -716,6 +716,14 @@ CpuModelBaselineInfo
-> *arch_query_cpu_model_baseline(CpuModelInfo *infoa,
-> 
->      model.def = s390_find_cpu_def(cpu_type, max_gen, max_gen_ga,
->                                    model.features);
-> +
-> +    /* models without early base features (esan3) are bad */
-> +    if (!model.def) {
-> +        error_setg(errp, "No compatible CPU model could be created as"
-> +                   " important base features are disabled");
-> +        return NULL;
-> +    }
-> +
->      /* strip off features not part of the max model */
->      bitmap_and(model.features, model.features, model.def->full_feat,
->                 S390_FEAT_MAX);
-> 
-> 
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-+1, would queue.
+Regards,
+
+-- 
+Peter Xu
