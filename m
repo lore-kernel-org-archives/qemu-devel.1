@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1ffsj2-0007Lr-0E
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 16:07:05 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fftNp-0007rn-Lo
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 16:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1ffsiw-0003MV-Fs
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 16:07:03 -0400
-Received: from relay3.mail.vrmd.de ([81.28.224.24]:39089)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mail@sebastianbauer.info>)
-	id 1ffsiw-0003Il-74
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 16:06:58 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fftNl-0000fC-2b
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 16:49:13 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
+	id 1fftNk-0000eh-QD
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 16:49:08 -0400
+Received: by mail-ed1-x544.google.com with SMTP id f23-v6so5352105edr.11
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 13:49:08 -0700 (PDT)
+References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
+	<20180709091136.28849-3-e.emanuelegiuseppe@gmail.com>
+	<20180711144920.GN31228@stefanha-x1.localdomain>
+	<494e6b18-a5e9-0521-4ace-dca2160ea191@redhat.com>
+	<20180718142927.GN21825@stefanha-x1.localdomain>
+	<2d822611-d227-1e9e-bfb4-d119f78a0282@gmail.com>
+	<645dd61a-b309-4a54-3e59-2dce23244045@redhat.com>
+From: Emanuele <e.emanuelegiuseppe@gmail.com>
+Message-ID: <928e71ec-1a1d-ed63-310b-83910e10e51f@gmail.com>
+Date: Wed, 18 Jul 2018 22:49:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <645dd61a-b309-4a54-3e59-2dce23244045@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Date: Wed, 18 Jul 2018 22:06:49 +0200
-From: Sebastian Bauer <mail@sebastianbauer.info>
-In-Reply-To: <20180718023053.GD2102@umbus.fritz.box>
-References: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
-	<20180716025346.GF2599@umbus.fritz.box>
-	<alpine.BSF.2.21.1807162207210.15021@zero.eik.bme.hu>
-	<CAFEAcA_3km1OB=7kqoZ6AvW0+G9FqfgD+go_KghFLDrgj2Xk+g@mail.gmail.com>
-	<20180718023053.GD2102@umbus.fritz.box>
-Message-ID: <ff5eefb78d7f075df404707d83ed5d95@sebastianbauer.info>
-Subject: Re: [Qemu-devel] hw/display/sm501* status
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/7] tests/qgraph: pci-pc driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, BALATON Zoltan <balaton@eik.bme.hu>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Hi,
 
-Am 2018-07-18 04:30, schrieb David Gibson:
-> On Mon, Jul 16, 2018 at 09:43:05PM +0100, Peter Maydell wrote:
->> On 16 July 2018 at 21:26, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> > I could list sm501 in the sam460ex section thus formally taking
->> > sub-maintainership but this would only go as far that I'll get cc-d on
->> > changes and try to review them. I still can't (and don't want to) maintain
->> > my own tree and send pull requests directly so I'd need someone's help with
->> > that who can take my patches and merge them via their tree. If it's OK to
->> > continue to use the PPC tree for that I'm fine with that if David agrees
->> > (which I think he did above).
->> >
->> > So is it OK to add sm501 to sam460ex section so I claim responsibility for
->> > changes and will continue sending patches cc-ing David (and maybe Gerd to
->> > help spotting problems) then David could take these via the PPC tree?
->> 
->> I think that makes sense. sh4 is pretty dead and if sm501's major
->> active user is the sam460ex then listing it there seems reasonable.
-> 
-> Sounds good to me.
-> 
-> Zoltan, can you send a patch adding sm501 to the sam460ex section of
-> the MAINTAINERS file.  That will make you the right point of contact
-> for it.
-> 
-> On the understanding that it's just about tree logistics, rather than
-> review, I'll be happy to take sm501 patches from you through my tree.
 
-Zoltan, if you like you can also add me as a possible reviewer for 
-anything that is Sam460ex-related.
-
-Bye
-Sebastian
+On 07/18/2018 09:33 PM, Paolo Bonzini wrote:
+> On 18/07/2018 20:29, Emanuele wrote:
+>> I had to put this patch here because it also introduces
+>> qpci_device_init, used by sdhci (patch 3).
+>>
+>> For the next version I plan to have a patch X where I rename all
+>> occurrences of qpci_init_pc in qpci_pc_new, and a patch X+1 that
+>> introduces qpci_init_pc (was qpci_set_pc) and the other changes.
+>>
+>> Should I only introduce qpci_device_init in patch 3 and the remaining
+>> things in patch 5?
+>>
+>> I think the general problem here is that in some patches I create
+>> functions that are planned to only be used only in next patches (of the
+>> current series).
+> I think it's okay this way, however you should justify the changes you
+> make to "qgraph-ify" each component.
+>
+> For patch 1, let's wait for Stefan's reply.  Because patch 1 is
+> introducing the infrastructure, I think it is acceptable that some
+> definitions are introduced early as long as they have doc comments; it
+> would make little sense to introduce get_device in patch 4 just because
+> there are no "contains" edges until then.
+>
+> However, introducing the qos-test directly at the beginning is also a
+> possibility.
+>
+> In either case, we need better doc comments for the function pointers in
+> QOSGraphObject.
+What would you suggest as better doc comments? For version 2 I have 
+written a little introduction like in qom/object.h, essentially pasting 
+the cover letter and a working example.
+> Paolo
