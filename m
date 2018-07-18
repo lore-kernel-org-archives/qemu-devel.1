@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoal-0003Hr-K2
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:18 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoal-0003Hs-Km
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoag-0000Hg-IP
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoag-0000HV-HU
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:15 -0400
-Received: from relay.sw.ru ([185.231.240.75]:36366)
+Received: from relay.sw.ru ([185.231.240.75]:36406)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1ffoag-0000FB-39
+	id 1ffoag-0000Fu-4c
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:10 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Wed, 18 Jul 2018 18:41:44 +0300
-Message-Id: <20180718154200.26777-2-dplotnikov@virtuozzo.com>
+Date: Wed, 18 Jul 2018 18:41:56 +0300
+Message-Id: <20180718154200.26777-14-dplotnikov@virtuozzo.com>
 In-Reply-To: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
 References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v1 01/17] migration: add background snapshot
- capability
+Subject: [Qemu-devel] [PATCH v1 13/17] background snapshot: add
+ write-protected page access handler function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +28,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org
 
-The capability is used for the background vmstate saving
-using the migration infrastructure.
-Background vmstate saving means that the majority of vmstate
-(RAM) is saved in the background when VM's vCPUS are running.
-This helps to reduce the VM downtime on VM snapshotting.
+The handler does all the necessary operations to save the page being
+accessed to the snapshot file(stream).
 
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- migration/migration.c | 35 +++++++++++++++++++++++++++++++++++
- migration/migration.h |  1 +
- qapi/migration.json   |  6 +++++-
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ migration/ram.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ migration/ram.h |  1 +
+ 2 files changed, 44 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index d780601f0c..87096d23ef 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -697,6 +697,12 @@ static bool migrate_caps_check(bool *cap_list,
-             return false;
-         }
+diff --git a/migration/ram.c b/migration/ram.c
+index b1623e96e7..04a4bf708d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1762,6 +1762,49 @@ int ram_copy_page(RAMBlock *block, unsigned long page_nr,
+     return 1;
+ }
  
-+        if (cap_list[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT]) {
-+            error_setg(errp, "Postcopy is not compatible "
-+                        "with background snapshot");
-+            return false;
-+        }
++/**
++ * ram_process_page_fault
++ *
++ * Used in the background snapshot to queue the copy of the memory
++ * page for writing.
++ *
++ * Returns:
++ *    0 > - on error
++ *    0   - success
++ *
++ * @address:  guest address
++ *
++ */
++int ram_process_page_fault(void *address)
++{
++    int ret;
++    void *page_copy = NULL;
++    unsigned long page_nr;
++    ram_addr_t offset;
 +
-         /* This check is reasonably expensive, so only when it's being
-          * set the first time, also it's only the destination that needs
-          * special support.
-@@ -711,6 +717,26 @@ static bool migrate_caps_check(bool *cap_list,
-         }
-     }
- 
-+    if (cap_list[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT]) {
-+        if (cap_list[MIGRATION_CAPABILITY_RELEASE_RAM]) {
-+            error_setg(errp, "Background snapshot is not compatible "
-+                        "with release ram capability");
-+            return false;
-+        }
++    RAMBlock *block = ram_bgs_block_find(address, &offset);
 +
-+        if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
-+            error_setg(errp, "Background snapshot is not "
-+                        "currently compatible with compression");
-+            return false;
-+        }
++    if (!block) {
++        return -1;
++    }
 +
-+        if (cap_list[MIGRATION_CAPABILITY_XBZRLE]) {
-+            error_setg(errp, "Background snapshot is not "
-+                        "currently compatible with XBZLRE");
-+            return false;
++    page_nr = offset >> TARGET_PAGE_BITS;
++
++    ret = ram_copy_page(block, page_nr, &page_copy);
++
++    if (ret < 0) {
++        return ret;
++    } else if (ret > 0) {
++        if (ram_save_queue_pages(block, NULL, offset,
++                                 TARGET_PAGE_SIZE, page_copy)) {
++            ram_page_buffer_free(page_copy);
++            return -1;
 +        }
 +    }
 +
-     return true;
- }
- 
-@@ -1635,6 +1661,15 @@ bool migrate_use_block_incremental(void)
-     return s->parameters.block_incremental;
- }
- 
-+bool migrate_background_snapshot(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_BACKGROUND_SNAPSHOT];
++    return 0;
 +}
 +
- /* migration thread support */
- /*
-  * Something bad happened to the RP stream, mark an error
-diff --git a/migration/migration.h b/migration/migration.h
-index 663415fe48..21babbc008 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -201,6 +201,7 @@ int migrate_compress_level(void);
- int migrate_compress_threads(void);
- int migrate_decompress_threads(void);
- bool migrate_use_events(void);
-+bool migrate_background_snapshot(void);
+ /**
+  * ram_find_and_save_block: finds a dirty page and sends it to f
+  *
+diff --git a/migration/ram.h b/migration/ram.h
+index 76ab0a3377..2b565ce620 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -76,4 +76,5 @@ int ram_block_list_set_readonly(void);
+ int ram_block_list_set_writable(void);
  
- /* Sending on the return path - generic and then for each message type */
- void migrate_send_rp_shut(MigrationIncomingState *mis,
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 03f57c9616..eb5f52b7ff 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -352,12 +352,16 @@
- #
- # @x-multifd: Use more than one fd for migration (since 2.11)
- #
-+# @background-snapshot: Using migration infrastructure makes VM snapshot
-+#         saving its RAM in background. This reduces  VM downtime. (since 2.12)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
--           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
-+           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
-+           'background-snapshot' ] }
- 
- ##
- # @MigrationCapabilityStatus:
+ int ram_copy_page(RAMBlock *block, unsigned long page_nr, void **page_copy);
++int ram_process_page_fault(void *address);
+ #endif
 -- 
 2.17.0
