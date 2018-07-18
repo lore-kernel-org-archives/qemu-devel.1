@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevlough@umich.edu>) id 1ffbMY-000719-TO
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 21:34:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ffbwY-000680-Fd
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevlough@umich.edu>) id 1ffbMV-0005h1-Nh
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 21:34:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ffbwX-0004i3-0O
+	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:11:54 -0400
+Date: Wed, 18 Jul 2018 11:57:18 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180718015718.GA2102@umbus.fritz.box>
+References: <1531839114-13671-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-References: <CAB30WPccergMTSWWrwj-WhTCcaMvvW7vnAMO3qvy9b9B53N=zA@mail.gmail.com>
-	<CAFEAcA8v762p3JSQ=9Vu68-evYS5MMH467pAo8=XZWsw+x6s7Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA8v762p3JSQ=9Vu68-evYS5MMH467pAo8=XZWsw+x6s7Q@mail.gmail.com>
-From: Kevin Loughlin <kevlough@umich.edu>
-Date: Tue, 17 Jul 2018 21:34:18 -0400
-Message-ID: <CAB30WPfKKesSfvyEx9ZpSUQShnXJnH1YCXgZgp0OoY888r0K4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Native Memory Virtualization in qemu-system-aarch64
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
+Content-Disposition: inline
+In-Reply-To: <1531839114-13671-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/misc/macio: Fix device
+ introspection problems in macio devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,126 +24,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-discuss@nongnu.org, "Mickens, James" <mickens@g.harvard.edu>
-
-I am indeed attempting to implement a non-standard extension to the ARMv8
-architecture for experimental purposes. My high-level goal for the
-extension is to completely isolate *N* execution environments (for example,
-I even prohibit inter-environment communication) using purely HW-based
-isolation mechanisms (i.e. no monitor software to help enforce/configure
-isolation).
-
-As part of my design, I want to take a single set of physical memory
-hardware (e.g., RAM chips, MMUs, etc.) and
-
-   1. partition the resources *N* ways, creating *N* views of the available
-   physical resources, and then
-   2. be able to dynamically switch the current view that is "active,"
-   i.e., visible to the CPU and other devices
-
-Under my setup, the CPU's MMU translates from VAs to IPAs, and an external
-memory controller then intercepts all memory transactions and translates
-these IPAs to true PAs. This allows the memory controller to enforce
-physical isolation of environments, and does not expose true PAs to the
-CPU/system software.
-
-The CPU object would initialize and store an AddressSpace object for each
-environment in its field "cpu_ases." Additionally, each environment's
-memory map would follow identical offsets. That is, if RAM/flash/etc starts
-at offset X in one environment, it will start at offset X in the other as
-well. Therefore, my controller only ever needs to perform IPA-to-PA
-translations via a simple, hard-wired base+bounds policy that is based on
-the active environment.
-
-My question is how best to emulate the memory controller given this desired
-setup. I have three primary ideas, and I would love to get feedback on
-their feasibility.
-
-   1. Implement the controller as an IOMMU region. I would be responsible
-   for writing the controller's operations to shift and forward the target
-   address to the appropriate subregion. Would it be possible to trigger
-   the IOMMU region on every access to system_memory? For example, even during
-   QEMU's loading process? Or would I only be able to trigger the IOMMU
-   operations on access to the subregions that represent my environments? My
-   understanding of the IOMMU regions is shaky. Nonetheless, this sounds
-   like the most promising approach, assuming I can provide the shifting and
-   forwarding operations and hide the PAs from the CPU's TLB as desired.
-
-   2. Go into the target/arm code, find every instance of accesses to
-   address spaces, and shift the target physical address accordingly. This
-   seems ugly and unlikely to work.
-
-   3. Use overlapping subregions with differing priorities, as in done in
-   QEMU's TrustZone implementation. However, these priorities would have to
-   change on an environment context switch, and I don't know if that would
-   lead to chaos.
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
-Thanks,
+--wac7ysb48OaltWcw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Kevin
+On Tue, Jul 17, 2018 at 04:51:54PM +0200, Thomas Huth wrote:
+11;rgb:ffff/ffff/ffff> Valgrind reports an error when introspecting the mac=
+io devices, e.g.:
+>=20
+> echo "{'execute':'qmp_capabilities'} {'execute':'device-list-properties',=
+" \
+>  "'arguments':{'typename':'macio-newworld'}}" \
+>  "{'execute': 'human-monitor-command', " \
+>  "'arguments': {'command-line': 'info qtree'}}" | \
+>  valgrind -q ppc64-softmmu/qemu-system-ppc64 -M none,accel=3Dqtest -qmp s=
+tdio
+> [...]
+> =3D=3D30768=3D=3D Invalid read of size 8
+> =3D=3D30768=3D=3D    at 0x5BC1EA: qdev_print (qdev-monitor.c:686)
+> =3D=3D30768=3D=3D    by 0x5BC1EA: qbus_print (qdev-monitor.c:719)
+> =3D=3D30768=3D=3D    by 0x43E458: handle_hmp_command (monitor.c:3446)
+> [...]
+>=20
+> Use the new function sysbus_init_child_obj() to initialize the objects
+> here, to get the reference counting of the objects right, so that they
+> are cleaned up correctly when the parent gets removed.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-P.S. Note that my virtualization actually occurs *beneath* the TrustZone
-layer. While creating "nested" TrustZones within each of my partitions is
-theoretically possible, it's not an explicit goal of my design. Naturally,
-I do use some isolation techniques similar to those deployed in TrustZone,
-but ultimately my extension is designed for different purposes than
-TrustZone.
+Applied to ppc-for-3.0, thanks.
 
-On Fri, Jul 13, 2018 at 11:22 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+> ---
+>  hw/misc/macio/cuda.c  |  5 ++---
+>  hw/misc/macio/macio.c | 24 ++++++++----------------
+>  hw/misc/macio/pmu.c   |  5 ++---
+>  3 files changed, 12 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+> index 9651ed9..c4f7a2f 100644
+> --- a/hw/misc/macio/cuda.c
+> +++ b/hw/misc/macio/cuda.c
+> @@ -554,9 +554,8 @@ static void cuda_init(Object *obj)
+>      CUDAState *s =3D CUDA(obj);
+>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+> =20
+> -    object_initialize(&s->mos6522_cuda, sizeof(s->mos6522_cuda),
+> -                      TYPE_MOS6522_CUDA);
+> -    qdev_set_parent_bus(DEVICE(&s->mos6522_cuda), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "mos6522-cuda", &s->mos6522_cuda,
+> +                          sizeof(s->mos6522_cuda), TYPE_MOS6522_CUDA);
+> =20
+>      memory_region_init_io(&s->mem, obj, &mos6522_cuda_ops, s, "cuda", 0x=
+2000);
+>      sysbus_init_mmio(sbd, &s->mem);
+> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+> index d135e3b..52aa377 100644
+> --- a/hw/misc/macio/macio.c
+> +++ b/hw/misc/macio/macio.c
+> @@ -209,14 +209,11 @@ static void macio_oldworld_realize(PCIDevice *d, Er=
+ror **errp)
+>  static void macio_init_ide(MacIOState *s, MACIOIDEState *ide, size_t ide=
+_size,
+>                             int index)
+>  {
+> -    gchar *name;
+> +    gchar *name =3D g_strdup_printf("ide[%i]", index);
+> =20
+> -    object_initialize(ide, ide_size, TYPE_MACIO_IDE);
+> -    qdev_set_parent_bus(DEVICE(ide), sysbus_get_default());
+> +    sysbus_init_child_obj(OBJECT(s), name, ide, ide_size, TYPE_MACIO_IDE=
+);
+>      memory_region_add_subregion(&s->bar, 0x1f000 + ((index + 1) * 0x1000=
+),
+>                                  &ide->mem);
+> -    name =3D g_strdup_printf("ide[%i]", index);
+> -    object_property_add_child(OBJECT(s), name, OBJECT(ide), NULL);
+>      g_free(name);
+>  }
+> =20
+> @@ -232,9 +229,7 @@ static void macio_oldworld_init(Object *obj)
+>                               qdev_prop_allow_set_link_before_realize,
+>                               0, NULL);
+> =20
+> -    object_initialize(&s->cuda, sizeof(s->cuda), TYPE_CUDA);
+> -    qdev_set_parent_bus(DEVICE(&s->cuda), sysbus_get_default());
+> -    object_property_add_child(obj, "cuda", OBJECT(&s->cuda), NULL);
+> +    sysbus_init_child_obj(obj, "cuda", &s->cuda, sizeof(s->cuda), TYPE_C=
+UDA);
+> =20
+>      object_initialize(&os->nvram, sizeof(os->nvram), TYPE_MACIO_NVRAM);
+>      dev =3D DEVICE(&os->nvram);
+> @@ -390,8 +385,8 @@ static void macio_newworld_init(Object *obj)
+>                               qdev_prop_allow_set_link_before_realize,
+>                               0, NULL);
+> =20
+> -    object_initialize(&ns->gpio, sizeof(ns->gpio), TYPE_MACIO_GPIO);
+> -    qdev_set_parent_bus(DEVICE(&ns->gpio), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "gpio", &ns->gpio, sizeof(ns->gpio),
+> +                          TYPE_MACIO_GPIO);
+> =20
+>      for (i =3D 0; i < 2; i++) {
+>          macio_init_ide(s, &ns->ide[i], sizeof(ns->ide[i]), i);
+> @@ -404,13 +399,10 @@ static void macio_instance_init(Object *obj)
+> =20
+>      memory_region_init(&s->bar, obj, "macio", 0x80000);
+> =20
+> -    object_initialize(&s->dbdma, sizeof(s->dbdma), TYPE_MAC_DBDMA);
+> -    qdev_set_parent_bus(DEVICE(&s->dbdma), sysbus_get_default());
+> -    object_property_add_child(obj, "dbdma", OBJECT(&s->dbdma), NULL);
+> +    sysbus_init_child_obj(obj, "dbdma", &s->dbdma, sizeof(s->dbdma),
+> +                          TYPE_MAC_DBDMA);
+> =20
+> -    object_initialize(&s->escc, sizeof(s->escc), TYPE_ESCC);
+> -    qdev_set_parent_bus(DEVICE(&s->escc), sysbus_get_default());
+> -    object_property_add_child(obj, "escc", OBJECT(&s->escc), NULL);
+> +    sysbus_init_child_obj(obj, "escc", &s->escc, sizeof(s->escc), TYPE_E=
+SCC);
+>  }
+> =20
+>  static const VMStateDescription vmstate_macio_oldworld =3D {
+> diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
+> index e246b0f..d25344f 100644
+> --- a/hw/misc/macio/pmu.c
+> +++ b/hw/misc/macio/pmu.c
+> @@ -770,9 +770,8 @@ static void pmu_init(Object *obj)
+>                               qdev_prop_allow_set_link_before_realize,
+>                               0, NULL);
+> =20
+> -    object_initialize(&s->mos6522_pmu, sizeof(s->mos6522_pmu),
+> -                      TYPE_MOS6522_PMU);
+> -    qdev_set_parent_bus(DEVICE(&s->mos6522_pmu), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "mos6522-pmu", &s->mos6522_pmu,
+> +                          sizeof(s->mos6522_pmu), TYPE_MOS6522_PMU);
+> =20
+>      memory_region_init_io(&s->mem, obj, &mos6522_pmu_ops, s, "via-pmu",
+>                            0x2000);
 
-> On 12 July 2018 at 17:48, Kevin Loughlin <kevlough@umich.edu> wrote:
-> > I know TrustZone has support for memory virtualization in AArch64, but
-> I'm
-> > looking to create a different model. Namely, I'd like to fully virtualize
-> > the memory map for the "virt" board.
-> >
-> > As a basic example of what I want, assuming an execution environment that
-> > runs in a 1GB physical address space (0x0 - 0x3FFFFFFF), I'd like to be
-> > able to switch to a second execution environment with a distinct SW stack
-> > that runs in the second GB of a board memory (0x40000000 - 0x7FFFFFFF).
-> The
-> > key points for my desired memory virtualization are the following...
-> >
-> >    1. Both of these environments should have distinct virtual address
-> spaces
-> >    2. The OS in each environment should believe it is running on physical
-> >    addresses 0x0 - 0x3FFFFFFF in both cases.
-> >    3. Neither environment should have access to the physical memory state
-> >    of the other
-> >
-> > I initialize distinct AddressSpace and MemoryRegion structures for each
-> of
-> > these GB blocks. Because all I want is a simple shift of physical address
-> > for one environment, I hesitate to mirror the (relatively) complex
-> address
-> > translation process for TrustZone. Does anyone know if it would be better
-> > to either (a) provide custom read/write functions for the shifted
-> > MemoryRegion object, or (b) modify the target/arm code, such as adding a
-> > shift to get_phys_addr() in target/arm/helper.c?
->
-> I'm a bit confused about what you're trying to do. Without TrustZone,
-> by definition there is only one physical address space (ie all of
-> memory/devices/etc are addressed by a single 64-bit physaddr).
-> There's no way to cause the CPU to not have access to it.
-> With TrustZone, you can think of the system as having two physical
-> address spaces (so to access something you need to specify both
-> a 64-bit physaddr and the TZ secure/nonsecure bit), and the CPU
-> and the system design cooperate to enforce that code running in the
-> nonsecure world can't get at things in the system it should not have
-> access to.
->
-> The whole point of TZ is to allow you to do this sort of partitioning.
-> Without it there's no way for the system (RAM or whatever) to know which
-> environment is running on the CPU.
->
-> You could in theory design and implement a non-standard extension to
-> the architecture to do equivalent things to what TZ is doing I suppose,
-> but that would be a lot of work and a lot of fragile modifications
-> to QEMU.
->
-> thanks
-> -- PMM
->
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--wac7ysb48OaltWcw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltOnnoACgkQbDjKyiDZ
+s5Lavw/+JBCwnan3qRhjmK+TBkPOOku8R6w8tCw86tc7mEwupWRxW3VYNMIU2oNN
+ygkdRnMT4H2ZMHWmLjok+hn6ggr4/z9aQdBOWQcayA6VnocA7Cc5y5FtWptNfT5n
+yplNMXwTHj7j/1Ekhg8dVvcX5RUbV0JrNbCdlLE7/YYjAIVWdjjAR2Hh00Sh503y
+1VlPZuKYlE3UhZL4FoLuHNJbyQ2eJhTSKrTT/SFdr8IYeU+pA61jYtdYN3UfTvZi
+PxMRca6NB7HZ51+jjiFDW0JeenFEehB0pPe/f0g6Lea1nP/NkpNpGZmYcllHfB6O
+QxYsEgYI2TQB2kAEh0GN8cy/anzawlBtdIFpZepkMB1iHj6tGI+E0jLYAvkpJUI5
+zSV7OiGNjYOcrUAYQhgaHCUtbTcfEM+wKegZ72WrTq6oR8o9gbXAnE2/1kFSJQOS
+jIRAwQY2x0Yjsnhpo0dcVexuDwbE8KWxlTJEtA6rxQ/bm1ei3grQvOr3QT44YPJR
+s/pQGjASQk6KdG0aOeW6WE2F3y6d8zXprxXScAsyOYXY35G0e1ZAW0OhePzIjDRG
+bNwVUqe9jvIwaj1pANJC2er4pwH7vXu6nO8AuTI9XpEiQWt21tOuowCo24gyR71L
+C+HpJOqlhJ7OChAvL5cqWZl/UsMokqyVhxYXqcu6fH6ANF89ujU=
+=OpJE
+-----END PGP SIGNATURE-----
+
+--wac7ysb48OaltWcw--
