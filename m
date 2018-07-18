@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffroE-0002Zs-46
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 15:08:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1ffs8H-0006kM-H9
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 15:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffroD-0002HX-55
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 15:08:22 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36411)
+	(envelope-from <pbonzini@redhat.com>) id 1ffs8C-0007DH-HZ
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 15:29:05 -0400
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:52078)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffroC-0002HK-UX
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 15:08:21 -0400
-Received: by mail-oi0-x244.google.com with SMTP id r16-v6so10860369oie.3
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 12:08:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ffs8C-0007Cb-9G
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 15:29:00 -0400
+Received: by mail-wm0-f65.google.com with SMTP id h3-v6so3429173wmb.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 12:28:59 -0700 (PDT)
+References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
+	<20180709091136.28849-2-e.emanuelegiuseppe@gmail.com>
+	<20180711142819.GM31228@stefanha-x1.localdomain>
+	<bc76dd27-434f-9a75-0afd-47049cc915d6@redhat.com>
+	<20180718142357.GM21825@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <00b4f8fe-b473-ac7a-4f13-9752aeef7062@redhat.com>
+Date: Wed, 18 Jul 2018 21:28:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180718170428.GT9812@redhat.com>
-References: <20180712192603.11599-1-sw@weilnetz.de>
-	<20180718162111.GR9812@redhat.com>
-	<255cc07f-8eb7-0839-2001-e6ead4f3d969@weilnetz.de>
-	<20180718170428.GT9812@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Jul 2018 20:07:59 +0100
-Message-ID: <CAFEAcA-qaDKwG1Use+WG-ocBMd7h3irDQNBYsq_jyE1u8fRA2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Support pkg-config for zlib
+In-Reply-To: <20180718142357.GM21825@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] tests: qgraph API for the qtest driver
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Stefan Weil <sw@weilnetz.de>, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developer <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On 18 July 2018 at 18:04, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
-te:
-> On Wed, Jul 18, 2018 at 06:59:25PM +0200, Stefan Weil wrote:
->> Am 18.07.2018 um 18:21 schrieb Daniel P. Berrang=C3=A9:
->> > .... this fallback support for non-pkgconfig scenarios can be entirely
->> > deleted, just leaving the error_exit message.
->>
->> I have no objection. Thank you for the investigation of the zlib
->> history. Removing old unneeded code is always good, but maybe that's
->> something which could be done after release 3.0.
->>
->> Or would you suggest to do it now? Then I can either send an updated
->> patch (v2), or whoever pulls that patch can make that trivial modificati=
-on.
->
-> If we're ok with adding support for pkg-config in 3.0, I think it is
-> reasonable to drop the fallback check at the same time.  I think it
-> this stills qualify as a bug fix patch in terms of our freeze rules,
-> since we're specificially aiming to fix build problems on one of our
-> supported platforms.
->
-> So personally I'd suggest sending a v2 with the fallback dropped.
-> for 3.0
+On 18/07/2018 16:23, Stefan Hajnoczi wrote:
+>>>> +struct QOSGraphObject {
+>>>> +    /* for produces, returns void * */
+>>>> +    QOSGetDriver get_driver;
+>>> Unused?
+>>>
+>>>> +    /* for contains, returns a QOSGraphObject * */
+>>>> +    QOSGetDevice get_device;
+>>> Unused?
+>> What is unused?
+> Neither of these fields are used in this patch.  Please introduce them
+> in the first patch that actually uses them.  This way code review can
+> proceed linearly and it also prevents deadcode when just part of a patch
+> series is merged or backported.
 
-I would favour doing that part in 3.1. This feels like the
-kind of change that we're all pretty certain is safe that
-then turns out not to be for some case or other, and it's
-easier not to have to fix it up later.
+So do you suggest to squash patch 6 into this one, so that a user of
+QOSGraphObject exists already here?
 
-thanks
--- PMM
+Thanks,
+
+Paolo
