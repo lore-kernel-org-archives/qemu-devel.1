@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ffmpP-0004pE-VN
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:49:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffmrK-00060W-EF
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:51:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ffmpL-00067W-0x
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:49:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ffmpK-00067K-PL
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:49:10 -0400
-Date: Wed, 18 Jul 2018 10:49:02 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180718134902.GY31657@localhost.localdomain>
-References: <CANhJxzwZny93TOTKTpEoThN8bnw1tXENPH_S60wczUAQodBMNw@mail.gmail.com>
-	<20180718095034.GJ9812@redhat.com>
-	<20180718101844.GB22954@antique-laptop>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffmrE-00078C-4v
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 09:51:14 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <7a6766fc-9fac-79a5-d53c-b5209abccaae@amsat.org>
+	<20180718072548.GB9812@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <79c7bfce-45b0-18cc-ac56-5c3f8a296762@amsat.org>
+Date: Wed, 18 Jul 2018 10:51:02 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180718101844.GB22954@antique-laptop>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] CPU Support
+In-Reply-To: <20180718072548.GB9812@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qemu-iotests: workaround to avoid Python3 while
+ running tests on Fedora Docker image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Hrdina <phrdina@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Hetz Ben Hamo <hetz@hetz.biz>, qemu-devel@nongnu.org, libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Babu Moger <babu.moger@amd.com>, Brijesh Singh <brijesh.singh@amd.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-CCing the AMD people who worked on this.
+Hi Daniel,
 
-On Wed, Jul 18, 2018 at 12:18:45PM +0200, Pavel Hrdina wrote:
-> On Wed, Jul 18, 2018 at 10:50:34AM +0100, Daniel P. Berrang=E9 wrote:
-> > On Wed, Jul 18, 2018 at 12:41:48PM +0300, Hetz Ben Hamo wrote:
-> > > Hi,
-> > >=20
-> > > I've been looking at the CPU list and although I see lots of CPU's,=
- I
-> > > cannot find 2 CPU families:
-> > >=20
-> > > * AMD Ryzen
-> > > * AMD Threadripper
-> > >=20
-> > > Although EPYC has been added recently.
-> > >=20
-> > > Are there any missing details which preventing adding those CPU's t=
-o the
-> > > list?
-> >=20
-> > Libvirt adds CPU models based on what QEMU supports. So from libvirt =
-side the
-> > answer is simply that QEMU doesn't expose any models for Ryzen/Thread=
-ripper,
-> > but I'm not clear why it doesn't...
-> >=20
-> > For a while I thought Ryzen/Threadripper would have same feature set =
-as
-> > EPYC, but I've seen bugs recently suggesting that is not in fact the
-> > case. So it does look like having those models exposed by QEMU might
-> > be useful.
-> >=20
-> > Copy'ing QEMU devel & the CPU model maintainers for opinions.
->=20
-> I think that QEMU should figure out some pattern for naming CPU models
-> because it's one big mess.  EPYC and Ryzen are bad names for QEMU as
-> Core/Xeon would be for Intel CPUs.  It's the name of a model families
-> and it will probably remain the same but with different
-> microarchitecture.
->=20
-> Better name would be similarly like for the latest Inter CPUs,
-> Skylake-Client and Skylake-Server.  Currently AMD has already two
-> microarchitectures, Zen and Zen+ and there is third one Zen 2 planned.
->=20
-> Zen has AMD Ryzen, AMD Ryzen Threadripper and AMD Epyc.
-> Zen+ has AMD Ryzen, AMD Ryzen Threadripper
->=20
-> And I bet that Zen 2 will follow the same model families.
->=20
-> We probably cannot rename EPYC now, but before we introduce Ryzen and
-> Threadripper let's thing about it and come up with better names, for
-> example Zen-Client/Zen-Server Zen+-Client or something like that.
->=20
-> Pavel
+On 07/18/2018 04:25 AM, Daniel P. Berrangé wrote:
+> On Tue, Jul 17, 2018 at 08:37:58PM -0300, Philippe Mathieu-Daudé wrote:
+>> I noticed this while running "make docker-test-block@fedora":
+>>
+>> $ make docker-test-block@fedora NETWORK=1
+>>   BUILD   fedora
+>>     RUN test-block in qemu:fedora
+>> Configure options:
+>> --enable-werror --prefix=/tmp/qemu-test/install
+>> --python=/usr/bin/python3 --target-list=x86_64-softmmu
+>> ...
+>> python            /usr/bin/python3 -B
+>> ...
+>>
+>> 194         - output mismatch (see 194.out.bad)
+>> --- /tmp/qemu-test/src/tests/qemu-iotests/194.out       2018-07-17
+>> 22:51:10.000000000 +0000
+>> +++ /tmp/qemu-test/build/tests/qemu-iotests/194.out.bad 2018-07-17
+>> 22:58:01.646916625 +0000
+>> @@ -1,18 +1,18 @@
+>>  Launching VMs...
+>>  Launching NBD server on destination...
+>> -{u'return': {}}
+>> -{u'return': {}}
+>> +{'return': {}}
+>> +{'return': {}}
+>>
+>> and many more errors, until:
+>>
+>> Failures: 045 132 148 152 162 169 194 205 208 218 222
+>> Failed 11 of 49 tests
+>> Test failed: iotests raw
+>>
+>> All failures are due to Python2 syntax.
+>> I started to fix but noticed there are too many and this isn't to
+>> correct fix for this release.
+> 
+> Were they all due to the unicode string prefix, or where there
+> difference failures too ?
 
---=20
-Eduardo
+3 more kinds:
+
+148         [failed, exit status 1] - output mismatch (see 148.out.bad)
+--- /tmp/qemu-test/src/tests/qemu-iotests/148.out	2018-07-18
+13:20:17.000000000 +0000
++++ /tmp/qemu-test/build/tests/qemu-iotests/148.out.bad	2018-07-18
+13:25:58.649302935 +0000
+@@ -1,5 +1,8 @@
+-..
+-----------------------------------------------------------------------
+-Ran 2 tests
+-
+-OK
++Traceback (most recent call last):
++  File "148", line 139, in <module>
++    iotests.verify_quorum()
++  File "/tmp/qemu-test/src/tests/qemu-iotests/iotests.py", line 657, in
+verify_quorum
++    if not supports_quorum():
++  File "/tmp/qemu-test/src/tests/qemu-iotests/iotests.py", line 653, in
+supports_quorum
++    return 'quorum' in qemu_img_pipe('--help')
++TypeError: a bytes-like object is required, not 'str'
+
+169         [failed, exit status 1] - output mismatch (see 169.out.bad)
+--- /tmp/qemu-test/src/tests/qemu-iotests/169.out	2018-07-18
+13:20:17.000000000 +0000
++++ /tmp/qemu-test/build/tests/qemu-iotests/169.out.bad	2018-07-18
+13:26:49.594192720 +0000
+@@ -1,5 +1,4 @@
+-................
+-----------------------------------------------------------------------
+-Ran 16 tests
+-
+-OK
++Traceback (most recent call last):
++  File "169", line 26, in <module>
++    import new
++ModuleNotFoundError: No module named 'new'
+
+205         [failed, exit status 1] - output mismatch (see 205.out.bad)
+--- /tmp/qemu-test/src/tests/qemu-iotests/205.out	2018-07-18
+13:20:17.000000000 +0000
++++ /tmp/qemu-test/build/tests/qemu-iotests/205.out.bad	2018-07-18
+13:27:46.775187975 +0000
+@@ -1,5 +1,97 @@
+-.......
++EEEFFFF
++======================================================================
++ERROR: test_connect_after_remove_default (__main__.TestNbdServerRemove)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "205", line 96, in test_connect_after_remove_default
++    self.do_test_connect_after_remove()
++  File "205", line 87, in do_test_connect_after_remove
++    self.assertReadOk(qemu_io(*args))
++  File "205", line 71, in assertReadOk
++    filter_qemu_io(qemu_io_output).strip(),
++  File "/tmp/qemu-test/src/tests/qemu-iotests/iotests.py", line 218, in
+filter_qemu_io
++    msg = filter_win32(msg)
++  File "/tmp/qemu-test/src/tests/qemu-iotests/iotests.py", line 214, in
+filter_win32
++    return win32_re.sub("", msg)
++TypeError: cannot use a string pattern on a bytes-like object
