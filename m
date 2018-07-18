@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52647)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=730c0c5bd=Alistair.Francis@wdc.com>)
-	id 1ffuvf-0001lx-Po
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:28:17 -0400
+	id 1ffuvf-0001lz-Pr
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=730c0c5bd=Alistair.Francis@wdc.com>)
-	id 1ffuva-0002Ee-RD
+	id 1ffuvb-0002F7-AS
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:28:15 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:59721)
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:15044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=730c0c5bd=Alistair.Francis@wdc.com>)
-	id 1ffuva-0002Du-5t
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:28:10 -0400
+	id 1ffuva-0002EN-VM
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:28:11 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Wed, 18 Jul 2018 15:27:50 -0700
-Message-Id: <20180718222755.9014-1-alistair.francis@wdc.com>
+Date: Wed, 18 Jul 2018 15:27:51 -0700
+Message-Id: <20180718222755.9014-2-alistair.francis@wdc.com>
+In-Reply-To: <20180718222755.9014-1-alistair.francis@wdc.com>
+References: <20180718222755.9014-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/5] riscv-pull queue
+Subject: [Qemu-devel] [PULL 1/5] sifive_e: Fix crash when introspecting the
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +33,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
 
-The following changes since commit ea6abffa8a08d832feb759d359d5b935e3087cf7:
+Use the new object_initialize_child() and sysbus_init_child_obj() to
+fix the issue.
 
-  Update version for v3.0.0-rc1 release (2018-07-17 18:15:19 +0100)
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/riscv/sifive_e.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-are available in the Git repository at:
-
-  git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180718-2
-
-for you to fetch changes up to 451ea962be0cbb6710737eeb90c2a801b979cad3:
-
-  spike: Fix crash when introspecting the device (2018-07-18 14:33:40 -0700)
-
-----------------------------------------------------------------
-riscv: Fix introspection problems
-
-This is based on Thomas's work fixing introspection problems [1] and
-applied to the RISC-V port.
-
-1: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03261.html
-
-----------------------------------------------------------------
-Alistair Francis (5):
-      sifive_e: Fix crash when introspecting the device
-      sifive_u: Fix crash when introspecting the device
-      virt: Fix crash when introspecting the device
-      riscv_hart: Fix crash when introspecting the device
-      spike: Fix crash when introspecting the device
-
- hw/riscv/riscv_hart.c |  7 +++----
- hw/riscv/sifive_e.c   | 12 ++++++------
- hw/riscv/sifive_u.c   | 15 +++++++--------
- hw/riscv/spike.c      | 10 ++++------
- hw/riscv/virt.c       |  5 ++---
- 5 files changed, 22 insertions(+), 27 deletions(-)
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 8a8dbe1c00..4577d72037 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -105,9 +105,9 @@ static void riscv_sifive_e_init(MachineState *machine)
+     int i;
+ 
+     /* Initialize SoC */
+-    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_E_SOC);
+-    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+-                              &error_abort);
++    object_initialize_child(OBJECT(machine), "soc", &s->soc,
++                            sizeof(s->soc), TYPE_RISCV_E_SOC,
++                            &error_abort, NULL);
+     object_property_set_bool(OBJECT(&s->soc), true, "realized",
+                             &error_abort);
+ 
+@@ -139,9 +139,9 @@ static void riscv_sifive_e_soc_init(Object *obj)
+ {
+     SiFiveESoCState *s = RISCV_E_SOC(obj);
+ 
+-    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
+-    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
+-                              &error_abort);
++    object_initialize_child(obj, "cpus", &s->cpus,
++                            sizeof(s->cpus), TYPE_RISCV_HART_ARRAY,
++                            &error_abort, NULL);
+     object_property_set_str(OBJECT(&s->cpus), SIFIVE_E_CPU, "cpu-type",
+                             &error_abort);
+     object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
+-- 
+2.17.1
