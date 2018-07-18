@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1ffjCS-0001YU-Pj
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:56:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1ffjKZ-00038J-HQ
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1ffjCP-0004CY-Lh
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:56:48 -0400
-Received: from smtp61.i.mail.ru ([217.69.128.41]:49376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1ffjCP-0004BM-7b
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:56:45 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Wed, 18 Jul 2018 12:56:28 +0300
-Message-Id: <20180718095628.26442-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH v2] arm: Add ARMv6-M programmer's model support
+	(envelope-from <alex.bennee@linaro.org>) id 1ffjKW-000107-94
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:05:11 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ffjKW-0000zU-0V
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:05:08 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id h20-v6so2211706wmb.4
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 03:05:07 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 18 Jul 2018 11:04:55 +0100
+Message-Id: <20180718100505.7546-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH RFC 00/10] docker on non-x86 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,119 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Forbid stack alignment change. (CCR)
-Reserve FAULTMASK, BASEPRI registers.
-Report any fault as a HardFault. Disable MemManage, BusFault and
-UsageFault, so they always escalated to HardFault. (SHCSR)
+Hi,
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
-v2:
-    * Changed CCR reset value
+Our existing support for docker is fairly x86 centric. While docker
+itself has support for multiple architectures not all architectures
+are equal. For example Debian only packages the widest range of
+cross-compilers in it's x86 images (although for example armhf is
+available on aarch64 based images).
 
- hw/intc/armv7m_nvic.c | 10 ++++++++++
- target/arm/cpu.c      |  4 ++++
- target/arm/helper.c   | 13 +++++++++++--
- 3 files changed, 25 insertions(+), 2 deletions(-)
+As the binfmt support is getting more solid we always have that fall
+back option and I've converted a number of the guests that way.
+Unfortunately I've overloaded the meaning of DOCKER_PARTIAL_IMAGES but
+I was loathed to throw in yet another magic variable without some
+discussion first. I'm not sure if my current path will end up with a
+maze of twisty if/else statements all subtly alike.
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index d344672059..55efae1880 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -885,6 +885,9 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         val |= cpu->env.v7m.ccr[M_REG_NS] & R_V7M_CCR_BFHFNMIGN_MASK;
-         return val;
-     case 0xd24: /* System Handler Control and State (SHCSR) */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            goto bad_offset;
-+        }
-         val = 0;
-         if (attrs.secure) {
-             if (s->sec_vectors[ARMV7M_EXCP_MEM].active) {
-@@ -1322,6 +1325,10 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         cpu->env.v7m.scr[attrs.secure] = value;
-         break;
-     case 0xd14: /* Configuration Control.  */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_offset;
-+        }
-+
-         /* Enforce RAZ/WI on reserved and must-RAZ/WI bits */
-         value &= (R_V7M_CCR_STKALIGN_MASK |
-                   R_V7M_CCR_BFHFNMIGN_MASK |
-@@ -1346,6 +1353,9 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         cpu->env.v7m.ccr[attrs.secure] = value;
-         break;
-     case 0xd24: /* System Handler Control and State (SHCSR) */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V7)) {
-+            goto bad_offset;
-+        }
-         if (attrs.secure) {
-             s->sec_vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
-             /* Secure HardFault active bit cannot be written */
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index a914ce4e8c..661e70c9d5 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -231,6 +231,10 @@ static void arm_cpu_reset(CPUState *s)
-             env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_NONBASETHRDENA_MASK;
-             env->v7m.ccr[M_REG_S] |= R_V7M_CCR_NONBASETHRDENA_MASK;
-         }
-+        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
-+            env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_UNALIGN_TRP_MASK;
-+            env->v7m.ccr[M_REG_S] |= R_V7M_CCR_UNALIGN_TRP_MASK;
-+        }
- 
-         /* Unlike A/R profile, M profile defines the reset LR value */
-         env->regs[14] = 0xffffffff;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2e45dda4e1..fdb481a51d 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10670,13 +10670,13 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-             env->v7m.primask[M_REG_NS] = val & 1;
-             return;
-         case 0x91: /* BASEPRI_NS */
--            if (!env->v7m.secure) {
-+            if (!env->v7m.secure || !arm_feature(env, ARM_FEATURE_M_MAIN)) {
-                 return;
-             }
-             env->v7m.basepri[M_REG_NS] = val & 0xff;
-             return;
-         case 0x93: /* FAULTMASK_NS */
--            if (!env->v7m.secure) {
-+            if (!env->v7m.secure || !arm_feature(env, ARM_FEATURE_M_MAIN)) {
-                 return;
-             }
-             env->v7m.faultmask[M_REG_NS] = val & 1;
-@@ -10760,9 +10760,15 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-         env->v7m.primask[env->v7m.secure] = val & 1;
-         break;
-     case 17: /* BASEPRI */
-+        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_reg;
-+        }
-         env->v7m.basepri[env->v7m.secure] = val & 0xff;
-         break;
-     case 18: /* BASEPRI_MAX */
-+        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_reg;
-+        }
-         val &= 0xff;
-         if (val != 0 && (val < env->v7m.basepri[env->v7m.secure]
-                          || env->v7m.basepri[env->v7m.secure] == 0)) {
-@@ -10770,6 +10776,9 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-         }
-         break;
-     case 19: /* FAULTMASK */
-+        if (!arm_feature(env, ARM_FEATURE_M_MAIN)) {
-+            goto bad_reg;
-+        }
-         env->v7m.faultmask[env->v7m.secure] = val & 1;
-         break;
-     case 20: /* CONTROL */
+Thoughts?
+
+Alex Bennée (10):
+  docker: rename docker-amd64 to docker-host
+  docker: change docker-image to docker-all-images target
+  docker: add a placeholder for handling non-x86 hosts
+  docker: don't include docker-arm64-cross on aarch64 hosts
+  docker: fall-back to binfmt_misc debian-mips64el-user-cross on non-x86
+  docker: fall-back to binfmt_misc debian-ppc64el-user-cross on non-x86
+  docker: fall-back to binfmt_misc debian-s390x-user-cross on non-x86
+  docker: disable additional non-x86 images
+  tests: tcg skip docker images we can't build
+  tests/tcg: debian-mips64el-user-cross fallback
+
+ Makefile                                      |  4 +-
+ tests/docker/Makefile.include                 | 58 +++++++++++++++++--
+ ...debian-amd64.docker => debian-host.docker} |  4 +-
+ .../debian-mips64el-user-cross.docker         | 16 +++++
+ .../debian-ppc64el-user-cross.docker          | 16 +++++
+ .../debian-s390x-user-cross.docker            | 16 +++++
+ tests/tcg/Makefile.include                    |  3 +
+ tests/tcg/Makefile.probe                      |  2 +-
+ tests/tcg/mips/Makefile.include               |  5 ++
+ 9 files changed, 116 insertions(+), 8 deletions(-)
+ rename tests/docker/dockerfiles/{debian-amd64.docker => debian-host.docker} (91%)
+ create mode 100644 tests/docker/dockerfiles/debian-mips64el-user-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-ppc64el-user-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-s390x-user-cross.docker
+
 -- 
 2.17.1
