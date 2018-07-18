@@ -1,20 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1ffk0l-0003Lk-UA
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:48:49 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1ffk7m-0005yj-JP
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1ffk0i-0007jd-VD
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:48:47 -0400
-Received: from ssl.serverraum.org ([2a01:4f8:151:8464::1:2]:58513)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1ffk0i-0007j7-Ls
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:48:44 -0400
-From: Michael Walle <michael@walle.cc>
-Date: Wed, 18 Jul 2018 12:48:36 +0200
-Message-Id: <20180718104836.18488-3-michael@walle.cc>
-In-Reply-To: <20180718104836.18488-1-michael@walle.cc>
-References: <20180718104836.18488-1-michael@walle.cc>
-Subject: [Qemu-devel] [PATCH 3/3] milkymist-pfpu: add qtests
+	(envelope-from <pasic@linux.ibm.com>) id 1ffk7j-00021v-EZ
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:56:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55482
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ffk7j-00021Y-6v
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 06:55:59 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6IAsVrZ022987
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 06:55:57 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ka24ad7ds-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 06:55:57 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 18 Jul 2018 11:55:55 +0100
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-15-git-send-email-jjherne@linux.ibm.com>
+	<a00e445e-f8f5-b098-bccb-7fcaf1260402@redhat.com>
+	<20180718094039.3271a216.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 18 Jul 2018 12:55:51 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180718094039.3271a216.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <066430cc-7ab0-839e-0cc9-7cdda027c253@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 14/15] s390-bios: Support
+ booting from real dasd device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,266 +45,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Walle <michael@walle.cc>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, bjsdjshi@linux.ibm.com
 
-Add initial tests which check basic computations and error cases on the
-PFPU.
 
-Signed-off-by: Michael Walle <michael@walle.cc>
----
- MAINTAINERS                 |   1 +
- hw/lm32/lm32.h              |   2 +
- tests/Makefile.include      |   4 +
- tests/milkymist-pfpu-test.c | 193 ++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 200 insertions(+)
- create mode 100644 tests/milkymist-pfpu-test.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 666e936812..bde0d132b9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -171,6 +171,7 @@ F: hw/*/milkymist-*
- F: include/hw/char/lm32_juart.h
- F: include/hw/lm32/
- F: tests/tcg/lm32/
-+F: tests/milkymist-*
- 
- M68K
- M: Laurent Vivier <laurent@vivier.eu>
-diff --git a/hw/lm32/lm32.h b/hw/lm32/lm32.h
-index d1514a61b3..b14f7ce158 100644
---- a/hw/lm32/lm32.h
-+++ b/hw/lm32/lm32.h
-@@ -9,6 +9,8 @@ static inline DeviceState *lm32_pic_init(qemu_irq cpu_irq)
-     SysBusDevice *d;
- 
-     dev = qdev_create(NULL, "lm32-pic");
-+    object_property_add_child(qdev_get_machine(), "lm32-pic", OBJECT(dev),
-+            NULL);
-     qdev_init_nofail(dev);
-     d = SYS_BUS_DEVICE(dev);
-     sysbus_connect_irq(d, 0, cpu_irq);
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a49282704e..d02d673f7d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -406,6 +406,8 @@ check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- 
-+check-qtest-lm32-y = tests/milkymist-pfpu-test$(EXESUF)
-+
- check-qtest-generic-y += tests/machine-none-test$(EXESUF)
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-@@ -868,6 +870,8 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
- 	rm $(INITRD_WORK_DIR)/init
- 	rmdir $(INITRD_WORK_DIR)
- 
-+tests/milkymist-pfpu-test$(EXESUF): tests/milkymist-pfpu-test.o
-+
- ifeq ($(CONFIG_POSIX),y)
- LIBS += -lutil
- endif
-diff --git a/tests/milkymist-pfpu-test.c b/tests/milkymist-pfpu-test.c
-new file mode 100644
-index 0000000000..da506bbdf8
---- /dev/null
-+++ b/tests/milkymist-pfpu-test.c
-@@ -0,0 +1,193 @@
-+/*
-+ * QTest testcase for the Milkymist PFPU
-+ *
-+ * Copyright (c) 2018 Michael Walle <michael@walle.cc>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "libqtest.h"
-+
-+#define PFPU_BASE 0x60006000
-+#define PFPU_IRQ 8
-+
-+static void pfpu_load_microcode(uint32_t *insn, int len)
-+{
-+    uint32_t addr = PFPU_BASE + 0x800;
-+    while (len) {
-+        writel(addr, *insn);
-+        insn++;
-+        len--;
-+        addr += 4;
-+    }
-+}
-+
-+static void pfpu_clear_microcode(void)
-+{
-+    uint32_t addr = PFPU_BASE + 0x800;
-+    uint32_t len = 512;
-+    while (len) {
-+        writel(addr, 0);
-+        len--;
-+        addr += 4;
-+    }
-+}
-+
-+static uint32_t float_to_u32(float val)
-+{
-+    return (*((uint32_t *)&(val)));
-+}
-+
-+static void pfpu_add(void)
-+{
-+    static uint32_t ucode[] = {
-+        0x000c2080, /* FADD R3, R4 */
-+        0x00000000, /* NOP */
-+        0x00000000, /* NOP */
-+        0x00000000, /* NOP */
-+        0x00000000, /* NOP */
-+        0x00000003, /* NOP | EXIT R3 */
-+        0x000c2380  /* VECTOUT R3, R4 */
-+    };
-+
-+    /* 2x1 mesh size */
-+    writel(PFPU_BASE + 0x8, 1);
-+    writel(PFPU_BASE + 0xc, 0);
-+
-+    /* write test operands to r3 and r4 */
-+    writel(PFPU_BASE + 0x40c, float_to_u32(3.0f));
-+    writel(PFPU_BASE + 0x410, float_to_u32(9.0f));
-+
-+    pfpu_load_microcode(ucode, ARRAY_SIZE(ucode));
-+
-+    /* dma base */
-+    writel(PFPU_BASE + 0x4, 0x40000000);
-+
-+    /* start */
-+    writel(PFPU_BASE, 1);
-+
-+    /* on a successful run, the busy flag should be cleared */
-+    g_assert(readl(PFPU_BASE) == 0);
-+
-+    /* interrupt line should have been pulsed */
-+    g_assert(get_irq_latched(PFPU_IRQ) == 1);
-+    clear_irq_latch(PFPU_IRQ);
-+    g_assert(get_irq_latched(PFPU_IRQ) == 0);
-+
-+    /* resulting vertices should be written to RAM */
-+    g_assert(readl(0x40000000) == float_to_u32(12.0f));
-+    g_assert(readl(0x40000004) == float_to_u32(9.0f));
-+    g_assert(readl(0x40000008) == float_to_u32(21.0f));
-+    g_assert(readl(0x4000000c) == float_to_u32(9.0f));
-+
-+    /* count of computed vertices */
-+    g_assert(readl(PFPU_BASE + 0x14) == 2);
-+
-+    /* no collisions */
-+    g_assert(readl(PFPU_BASE + 0x18) == 0);
-+
-+    /* no stray writes */
-+    g_assert(readl(PFPU_BASE + 0x1c) == 0);
-+}
-+
-+static void pfpu_microcode_overflow(void)
-+{
-+    /* 1x1 mesh size */
-+    writel(PFPU_BASE + 0x8, 1);
-+    writel(PFPU_BASE + 0xc, 0);
-+
-+    pfpu_clear_microcode();
-+
-+    /* start */
-+    writel(PFPU_BASE, 1);
-+
-+    /* because there is no VECTOUT, the busy flag should not be cleared */
-+    g_assert(readl(PFPU_BASE) == 1);
-+
-+    /* and there should be no pending interrupt */
-+    g_assert(get_irq_latched(PFPU_IRQ) == 0);
-+}
-+
-+static void pfpu_stray_writes(void)
-+{
-+    static uint32_t ucode[] = {
-+        0x000c0600, /* COPY R3 */
-+        0x00000000, /* NOP */
-+        0x00000000, /* NOP */
-+        0x000c2380  /* VECTOUT R3, R4 */
-+    };
-+
-+    /* 1x1 mesh size */
-+    writel(PFPU_BASE + 0x8, 0);
-+    writel(PFPU_BASE + 0xc, 0);
-+
-+    /* write test operands to r3 and r4 */
-+    writel(PFPU_BASE + 0x40c, float_to_u32(1.0f));
-+    writel(PFPU_BASE + 0x410, float_to_u32(2.0f));
-+
-+    pfpu_load_microcode(ucode, ARRAY_SIZE(ucode));
-+
-+    /* dma base */
-+    writel(PFPU_BASE + 0x4, 0x40000000);
-+
-+    /* start */
-+    writel(PFPU_BASE, 1);
-+    clear_irq_latch(PFPU_IRQ);
-+
-+    /* stray writes */
-+    g_assert(readl(PFPU_BASE + 0x1c) == 1);
-+}
-+
-+static void pfpu_collision(void)
-+{
-+    static uint32_t ucode[] = {
-+        0x000c0300, /* I2F R3 */
-+        0x000c0600, /* COPY R3 */
-+        0x00000000, /* NOP */
-+        0x00000000, /* NOP */
-+        0x000c2380  /* VECTOUT R3, R4 */
-+    };
-+
-+    /* 1x1 mesh size */
-+    writel(PFPU_BASE + 0x8, 0);
-+    writel(PFPU_BASE + 0xc, 0);
-+
-+    /* write test operands to r3 and r4 */
-+    writel(PFPU_BASE + 0x40c, float_to_u32(1.0f));
-+    writel(PFPU_BASE + 0x410, float_to_u32(2.0f));
-+
-+    pfpu_load_microcode(ucode, ARRAY_SIZE(ucode));
-+
-+    /* dma base */
-+    writel(PFPU_BASE + 0x4, 0x40000000);
-+
-+    /* start */
-+    writel(PFPU_BASE, 1);
-+    clear_irq_latch(PFPU_IRQ);
-+
-+    /* collisions */
-+    g_assert(readl(PFPU_BASE + 0x18) == 1);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_start("-machine milkymist");
-+    irq_intercept_in("lm32-pic");
-+    qtest_add_func("/milkymist-pfpu/add", pfpu_add);
-+    qtest_add_func("/milkymist-pfpu/microcode-overflow", pfpu_microcode_overflow);
-+    qtest_add_func("/milkymist-pfpu/collision", pfpu_collision);
-+    qtest_add_func("/milkymist-pfpu/stray-writes", pfpu_stray_writes);
-+
-+    ret = g_test_run();
-+
-+    qtest_end();
-+
-+    return ret;
-+}
--- 
-2.11.0
+On 07/18/2018 09:40 AM, Cornelia Huck wrote:
+> On Tue, 17 Jul 2018 22:43:27 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 05.07.2018 19:25, Jason J. Herne wrote:
+> 
+>>> +*****************************************
+>>> +***** How this all pertains to Qemu *****
+>>> +*****************************************
+>>> +
+>>> +In theory we should merely have to do the following to IPL/boot a guest
+>>> +operating system from a DASD device:
+>>> +
+>>> +1. Place a "Read IPL" ccw into memory location 0x0 with chaining bit on.
+>>> +2. Execute channel program at 0x0.
+>>> +3. LPSW 0x0.
+>>> +
+>>> +However, our emulation of the machine's channel program logic is missing one key
+>>> +feature that is required for this process to work: non-prefetch of ccw data.
+>>> +
+>>> +When we start a channel program we pass the channel subsystem parameters via an
+>>> +ORB (Operation Request Block). One of those parameters is a prefetch bit. If the
+>>> +bit is on then Qemu is allowed to read the entire channel program from guest
+>>> +memory before it starts executing it. This means that any channel commands that
+>>> +read additional channel commands will not work as expected because the newly
+>>> +read commands will only exist in guest memory and NOT within Qemu's channel
+>>> +subsystem memory. Qemu's channel subsystem's implementation currently requires
+>>> +this bit to be on for all channel programs. This is a problem because the IPL
+>>> +process consists of transferring control from the "Read IPL" ccw immediately to
+>>> +the IPL1 channel program that was read by "Read IPL".
+>>> ++
+>>
+>> I have way too little insight into channel devices and how QEMU
+>> implements them, however I wonder what hinders us from implementing
+>> support for !prefetch in QEMU?
+>>
+>> What you tailored here seems impressive :) Just want to know what the
+>> technical background of this prefetch thingy in QEMU is.
+> 
+> This has to do with how vfio-ccw processes and translates channel
+> programs.
+> 
+> Currently, we hand over the chain of channel commands to the kernel to
+> be translated (guest->host addresses) and to execute ssch on the real
+> subchannel. However, this requires sending the channel program over in
+> one go, which makes it impossible for the guest to modify an in-flight
+> channel program (there are tricks like putting a suspend marker on a
+> channel command and moving that marker forward as you go which make it
+> possible to know that a channel command has not yet been processed;
+> IIRC the lcs driver in Linux does that, or at least used to do that).
+> Our implementation currently does not accommodate that (the Linux dasd
+> driver does not use that feature). It's not impossible to implement it,
+> but it would require some effort (and I don't think anybody currently
+> has spare time for that...)
+
+
+I disagree, IMHO we can not implement generic support for !prefetch in
+vfio-ccw with what we have at our disposal at the abstraction level we
+are currently working on. (If we were to abandon using IO instructions
+in the host but rely on lower level protocols like FC it may be possible,
+I don't want to make a statement about that).
+
+The problem is the address translation. If the channel program reads
+something that is going to be used as a ccw by the same (e.g. CCW-IPL)
+the address within that ccw that was read is a guest-physical address.
+
+We however need to translate the addresses in the guest ccws (and in the
+(m)idaw's) too before these get executed as a part of a host channel
+program. And because the address of the ccws themselves needs to be
+31 bit addressable in host physical we actually copy the channel program
+form guest memory to suitable host memory in the vfio-ccw driver.
+
+So to translate the new stuff we would actually have to stop the channel
+program and resubmit the rest (either by suspend+resume or by break
+chaining+ssch). The problem with that an execution of a channel program
+that is composed of four ccws A,B,C,D and an execution of a channel
+programs composed of ccws A,B immediately followed by and execution
+of a channel program composed of the ccws C,D is not the same. I.e. it
+is not generally safe to break a chain of ccws.
+
+If you still think it's possible to implement !prefetch, could you please
+explain your idea.
+
+Regards,
+Halil
