@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffo9r-0006Bv-Fr
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:14:28 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ffoBD-0007IB-P3
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffo9o-0005wL-C1
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:14:27 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:40404)
+	(envelope-from <richard.henderson@linaro.org>) id 1ffoBA-0007qA-Kw
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:15:51 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:38679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ffo9o-0005ui-5r
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:14:24 -0400
-Received: by mail-vk0-x243.google.com with SMTP id s23-v6so2683001vks.7
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 08:14:24 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <09124b32-2571-2b6f-f10f-4c542683b1e7@amsat.org>
-	<285670de-6281-4de2-54a4-78610d3d7835@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3f1c5e5e-2e72-0c0d-df29-5db8118d96dd@amsat.org>
-Date: Wed, 18 Jul 2018 12:14:18 -0300
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ffoBA-0007pz-Cl
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:15:48 -0400
+Received: by mail-pl0-x241.google.com with SMTP id b1-v6so2183349pls.5
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 08:15:48 -0700 (PDT)
+References: <1531900083-18167-1-git-send-email-junyan.he@gmx.com>
+	<1531900083-18167-6-git-send-email-junyan.he@gmx.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4ec0c65c-8e83-b2f0-19eb-3da65c148ce3@linaro.org>
+Date: Wed, 18 Jul 2018 08:15:44 -0700
 MIME-Version: 1.0
-In-Reply-To: <285670de-6281-4de2-54a4-78610d3d7835@redhat.com>
+In-Reply-To: <1531900083-18167-6-git-send-email-junyan.he@gmx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] spice/qlx: atomic-alignment error with clang-7
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/7 V11] mem/nvdimm: ensure write
+ persistence to PMEM in label emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>
+To: junyan.he@gmx.com, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, yi.z.zhang@intel.com, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-On 07/18/2018 12:12 PM, Paolo Bonzini wrote:
-> On 18/07/2018 16:56, Philippe Mathieu-Daudé wrote:
->> Using clang-7 (Debian) on x86_64 to build v3.0.0-rc1.
->>
->> Not a regression, it was probably always there:
->>
->> $ ./configure --cc=clang-7 && make hw/display/qxl.o
->> hw/display/qxl.c:1884:19: error: misaligned or large atomic operation
->> may incur significant performance penalty [-Werror,-Watomic-alignment]
->>     old_pending = atomic_fetch_or(&d->ram->int_pending, le_events);
->>                   ^
->> include/qemu/atomic.h:206:34: note: expanded from macro 'atomic_fetch_or'
->> #define atomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
->>                                  ^
->> 1 error generated.
+On 07/18/2018 12:48 AM, junyan.he@gmx.com wrote:
+> From: Junyan He <junyan.he@intel.com>
 > 
-> Hi, this is fixed in the latest SPICE git.  The upstream commit is
+> Guest writes to vNVDIMM labels are intercepted and performed on the
+> backend by QEMU. When the backend is a real persistent memort, QEMU
+> needs to take proper operations to ensure its write persistence on the
+> persistent memory. Otherwise, a host power failure may result in the
+> loss of guest label configurations.
 > 
-> https://gitlab.freedesktop.org/spice/spice-protocol/commit/beda5ec7a6848be20c0cac2a9a8ef2a41e8069c1
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/mem/nvdimm.c     |  9 ++++++++-
+>  include/qemu/pmem.h | 30 ++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+), 1 deletion(-)
+>  create mode 100644 include/qemu/pmem.h
 
-That was fast =)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Thanks!
 
-Phil.
+r~
