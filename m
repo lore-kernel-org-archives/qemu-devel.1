@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ffuz5-0004Ie-CC
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:31:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffv3u-0007NK-Em
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ffuz4-0004HR-Cg
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:31:47 -0400
-Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:38324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ffuz4-0004Gf-3A
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:31:46 -0400
-Received: by mail-lf0-x229.google.com with SMTP id a4-v6so4602149lff.5
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 15:31:45 -0700 (PDT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffv3q-0007Yg-72
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 18:36:46 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 18 Jul 2018 19:36:28 -0300
+Message-Id: <20180718223628.5062-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180718222755.9014-1-alistair.francis@wdc.com>
-References: <20180718222755.9014-1-alistair.francis@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 18 Jul 2018 15:31:14 -0700
-Message-ID: <CAKmqyKPw3eZc2pkSrRRy8wPowZWTWj-XyT_ZX3150wdyV0wAUQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] riscv-pull queue
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.1 v2] python: Use io.StringIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@wdc.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Jul 18, 2018 at 3:27 PM, Alistair Francis
-<alistair.francis@wdc.com> wrote:
-> The following changes since commit ea6abffa8a08d832feb759d359d5b935e3087cf7:
->
->   Update version for v3.0.0-rc1 release (2018-07-17 18:15:19 +0100)
->
-> are available in the Git repository at:
->
->   git@github.com:alistair23/qemu.git tags/pull-riscv-pull-20180718-2
->
-> for you to fetch changes up to 451ea962be0cbb6710737eeb90c2a801b979cad3:
->
->   spike: Fix crash when introspecting the device (2018-07-18 14:33:40 -0700)
->
-> ----------------------------------------------------------------
-> riscv: Fix introspection problems
->
-> This is based on Thomas's work fixing introspection problems [1] and
-> applied to the RISC-V port.
->
-> 1: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03261.html
->
-> ----------------------------------------------------------------
-> Alistair Francis (5):
->       sifive_e: Fix crash when introspecting the device
->       sifive_u: Fix crash when introspecting the device
->       virt: Fix crash when introspecting the device
->       riscv_hart: Fix crash when introspecting the device
->       spike: Fix crash when introspecting the device
+Both Python 2.7 and 3 support the same io.StringIO to
+handle unicode strings.
 
-Argh! I just realised I left off Michael's review. I'll have to send a v2.
+Python 2.6 requires special care, but since 7f2b55443a his
+support was removed. Stop caring, drop the ImportError check.
 
-I'll tag it as v3.0 as well.
+Use the common form to use indistinctly Python 2.7 or 3.
 
-Alistair
+http://python-future.org/compatible_idioms.html#stringio
 
->
->  hw/riscv/riscv_hart.c |  7 +++----
->  hw/riscv/sifive_e.c   | 12 ++++++------
->  hw/riscv/sifive_u.c   | 15 +++++++--------
->  hw/riscv/spike.c      | 10 ++++------
->  hw/riscv/virt.c       |  5 ++---
->  5 files changed, 22 insertions(+), 27 deletions(-)
+This fixes running tests on the Fedora Docker image,
+which uses Python3 since 356dc290f:
+
+  $ make docker-test-block@fedora
+  [...]
+  045         [failed, exit status 1] - output mismatch (see 045.out.bad)
+  --- /tmp/qemu-test/src/tests/qemu-iotests/045.out       2018-07-17 16:56:18.000000000 +0000
+  +++ /tmp/qemu-test/build/tests/qemu-iotests/045.out.bad 2018-07-17 17:19:22.448409007 +0000
+  @@ -1,5 +1,6 @@
+  -...........
+  -----------------------------------------------------------------------
+  -Ran 11 tests
+  -
+  -OK
+  +Traceback (most recent call last):
+  +  File "045", line 178, in <module>
+  +    iotests.main(supported_fmts=['raw'])
+  +  File "/tmp/qemu-test/src/tests/qemu-iotests/iotests.py", line 682, in main
+  +    import StringIO
+  +ModuleNotFoundError: No module named 'StringIO'
+  132         [failed, exit status 1] - output mismatch (see 132.out.bad)
+  152         [failed, exit status 1] - output mismatch (see 152.out.bad)
+
+  Failures: 045 132 152
+
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/docker/docker.py        | 5 +----
+ tests/image-fuzzer/runner.py  | 6 +++---
+ tests/qemu-iotests/iotests.py | 5 +++--
+ 3 files changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 69e7130db7..9d53b868db 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -26,10 +26,7 @@ import tempfile
+ import re
+ import signal
+ from tarfile import TarFile, TarInfo
+-try:
+-    from StringIO import StringIO
+-except ImportError:
+-    from io import StringIO
++from io import StringIO
+ from shutil import copy, rmtree
+ from pwd import getpwuid
+ from datetime import datetime,timedelta
+diff --git a/tests/image-fuzzer/runner.py b/tests/image-fuzzer/runner.py
+index 95d84f38f3..4462d84f45 100755
+--- a/tests/image-fuzzer/runner.py
++++ b/tests/image-fuzzer/runner.py
+@@ -28,7 +28,7 @@ import shutil
+ from itertools import count
+ import time
+ import getopt
+-import StringIO
++from io import StringIO
+ import resource
+ 
+ try:
+@@ -183,7 +183,7 @@ class TestEnv(object):
+                                            MAX_BACKING_FILE_SIZE) * (1 << 20)
+         cmd = self.qemu_img + ['create', '-f', backing_file_fmt,
+                                backing_file_name, str(backing_file_size)]
+-        temp_log = StringIO.StringIO()
++        temp_log = StringIO()
+         retcode = run_app(temp_log, cmd)
+         if retcode == 0:
+             temp_log.close()
+@@ -240,7 +240,7 @@ class TestEnv(object):
+                            "Backing file: %s\n" \
+                            % (self.seed, " ".join(current_cmd),
+                               self.current_dir, backing_file_name)
+-            temp_log = StringIO.StringIO()
++            temp_log = StringIO()
+             try:
+                 retcode = run_app(temp_log, current_cmd)
+             except OSError as e:
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 4e67fbbe96..c95dd17190 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -679,13 +679,14 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
+ 
+     # We need to filter out the time taken from the output so that qemu-iotest
+     # can reliably diff the results against master output.
+-    import StringIO
++    from io import StringIO
++
+     if debug:
+         output = sys.stdout
+         verbosity = 2
+         sys.argv.remove('-d')
+     else:
+-        output = StringIO.StringIO()
++        output = StringIO()
+ 
+     logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
+ 
+-- 
+2.18.0
