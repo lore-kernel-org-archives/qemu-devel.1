@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffqir-00059R-D4
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 13:58:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ffqmd-0006jf-5K
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 14:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ffqiq-000372-7P
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 13:58:45 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37915)
+	(envelope-from <peter.maydell@linaro.org>) id 1ffqmc-0004N8-5h
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 14:02:39 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ffqiq-00036j-0e
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 13:58:44 -0400
-Received: by mail-oi0-x241.google.com with SMTP id v8-v6so10458190oie.5
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 10:58:43 -0700 (PDT)
+	id 1ffqmb-0004Mq-Vw
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 14:02:38 -0400
+Received: by mail-oi0-x244.google.com with SMTP id i12-v6so10499811oik.2
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 11:02:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAB30WPfKKesSfvyEx9ZpSUQShnXJnH1YCXgZgp0OoY888r0K4w@mail.gmail.com>
-References: <CAB30WPccergMTSWWrwj-WhTCcaMvvW7vnAMO3qvy9b9B53N=zA@mail.gmail.com>
-	<CAFEAcA8v762p3JSQ=9Vu68-evYS5MMH467pAo8=XZWsw+x6s7Q@mail.gmail.com>
-	<CAB30WPfKKesSfvyEx9ZpSUQShnXJnH1YCXgZgp0OoY888r0K4w@mail.gmail.com>
+In-Reply-To: <1b8b53d3-721a-ab7d-bcb3-43cf97127a7a@mail.ru>
+References: <20180710153335.1232-1-jusual@mail.ru>
+	<CAFEAcA_oZtV3NQnJNPQh74BOk7eyo_A_j4smCbU+xV=QatpJeA@mail.gmail.com>
+	<1b8b53d3-721a-ab7d-bcb3-43cf97127a7a@mail.ru>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 18 Jul 2018 18:58:22 +0100
-Message-ID: <CAFEAcA-_ZiPNz7tyQy2otZ6z9rT8wszhRxBZrmNXTr9AFaBzqg@mail.gmail.com>
+Date: Wed, 18 Jul 2018 19:02:16 +0100
+Message-ID: <CAFEAcA_LiiOqOShC4q=itsN7=hy6k=JC8306T+t_yJow_tfUVw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Native Memory Virtualization in qemu-system-aarch64
+Subject: Re: [Qemu-devel] [PATCH] nvic: Change NVIC to support ARMv6-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Loughlin <kevlough@umich.edu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-discuss <qemu-discuss@nongnu.org>, "Mickens,
-	James" <mickens@g.harvard.edu>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-On 18 July 2018 at 02:34, Kevin Loughlin <kevlough@umich.edu> wrote:
-> Under my setup, the CPU's MMU translates from VAs to IPAs, and an external
-> memory controller then intercepts all memory transactions and translates
-> these IPAs to true PAs. This allows the memory controller to enforce
-> physical isolation of environments, and does not expose true PAs to the
-> CPU/system software.
-
-Ah, right, "external custom memory controller" makes sense.
-
-> My question is how best to emulate the memory controller given this desired
-> setup. I have three primary ideas, and I would love to get feedback on their
-> feasibility.
+On 18 July 2018 at 14:59, Julia Suvorova <jusual@mail.ru> wrote:
+> On 17.07.2018 15:58, Peter Maydell wrote:
+>>
+>> On 10 July 2018 at 16:33, Julia Suvorova <jusual@mail.ru> wrote:
+>>>
+>>> The differences from ARMv7-M NVIC are:
+>>>    * ARMv6-M only supports up to 32 external interrupts
+>>>     (configurable feature already). The ICTR is reserved.
+>>>    * Active Bit Register is reserved.
+>>>    * ARMv6-M supports 4 priority levels against 256 in ARMv7-M.
+>>>
+>>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>>> ---
+>>>   hw/intc/armv7m_nvic.c | 29 +++++++++++++++++++++++++----
+>>>   1 file changed, 25 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+>>> index 38aaf3dc8e..8545c87caa 100644
+>>> --- a/hw/intc/armv7m_nvic.c
+>>> +++ b/hw/intc/armv7m_nvic.c
+>>> @@ -420,6 +420,10 @@ static void set_prio(NVICState *s, unsigned irq,
+>>> bool secure, uint8_t prio)
+>>>       assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios
+>>> */
+>>>       assert(irq < s->num_irq);
+>>>
+>>> +    if (!arm_feature(&s->cpu->env, ARM_FEATURE_V7)) {
+>>> +        prio &= 0xc0;
+>>
+>>
+>> Rather than hard-coding this, I think we should have a
+>> num_prio_bits field in the NVICState struct which defines
+>> how many bits of priority are implemented. This would be
+>> 2 for v6M and 8 otherwise, and can be set in
+>> armv7m_nvic_realize. Then the mask is
+>>    MAKE_64BIT_MASK(8 - num_prio_bits, num_prio_bits);
+>> (For v8M the number of priority bits is configurable.)
 >
-> Implement the controller as an IOMMU region. I would be responsible for
-> writing the controller's operations to shift and forward the target address
-> to the appropriate subregion. Would it be possible to trigger the IOMMU
-> region on every access to system_memory? For example, even during QEMU's
-> loading process? Or would I only be able to trigger the IOMMU operations on
-> access to the subregions that represent my environments? My understanding of
-> the IOMMU regions is shaky. Nonetheless, this sounds like the most promising
-> approach, assuming I can provide the shifting and forwarding operations and
-> hide the PAs from the CPU's TLB as desired.
+>
+> Do I understand correctly that the check in armv7m_nvic_realize is for
+> Baseline, not only v6m, because Baseline has only 4 priority levels too?
+> And num_prio_bits should be just a field, not a property?
 
-I would probably go with implementing it as an IOMMU region. We recently
-added code to QEMU that allows you to put IOMMUs in the CPU's
-memory-access path, so this works now. The example we have of
-that at the moment is hw/misc/tz-mpc.c (which is a simple device
-which configurably controls access to the thing "downstream" of it
-based on a lookup table and whether the access is S or NS).
-
-As you've guessed, the way the IOMMU stuff works is that it gates
-access to the things sat behind it: the device has a MemoryRegion
-"upstream" which it exposes to the code which creates it, and a
-MemoryRegion property "downstream". The creating code (ie the board)
-passes in whatever the "downstream" is (likely a container MemoryRegion
-with RAM and so on), and maps the "upstream" end into the address
-space that the CPU sees. (You would probably have one downstream
-for each separate subregion). You could either have the IOMMU
-only "in front" of one part of the overall address space, or
-in front of the whole of the address space, as you liked.
-(Assuming you have some kind of "control register" memory mapped
-interface for programming it, it can't be behind itself; that
-would be "an interesting topological exercise", to quote nethack.)
-
-What the CPU sees is whatever is in the MemoryRegion passed to it
-via
-        object_property_set_link(cpuobj, ..., "memory",
-                                 &error_abort);
-
-The virt board happens to currently use get_system_memory()
-for that, but you can use a custom container MemoryRegion if you
-like.
-
-> Go into the target/arm code, find every instance of accesses to address
-> spaces, and shift the target physical address accordingly. This seems ugly
-> and unlikely to work.
-
-That's very fragile, and I don't recommend it.
-
-> Use overlapping subregions with differing priorities, as in done in QEMU's
-> TrustZone implementation. However, these priorities would have to change on
-> an environment context switch, and I don't know if that would lead to chaos.
-
-You can model things this way too, yes (both by changing priorities, and by
-simply enabling/disabling/mapping/unmapping memory regions). The main
-advantage that using IOMMU regions gets you are:
- * you can do things at a finer granularity, say changing
-   permissions at a page-by-page level, without creating a
-   ton of MemoryRegion objects. Swapping MRs in and out would
-   work if you only wanted to do it for big chunks of space at once
- * you can make the choice of what to do based on the memory
-   transaction attributes (eg secure/nonsecure, user/privileged)
-   rather than having to provide a single mapping only
-If you really do only want to map 4G of RAM in and out at once,
-this might be simpler.
-
-Note that for both the IOMMU approach and the MemoryRegion map/unmap
-approach, changing the mapping will blow away the emulated CPU's
-cached TLB entirely. So if you do it very often you'll see a
-performance hit. (In the IOMMU case it might in theory be possible
-to get some of that performance back by being cleverer in the core
-memory subsystem code so as to only drop the bits of the TLB that
-are affected; but if you're remapping all-of-RAM then that probably
-covers all the interesting cached TLB entries anyhow.)
+Make it for v6M -- v8M baseline doesn't specify a particular
+number of priority levels, you can do anything. You can leave
+it as a field and we'll bump it up to a property if we need it
+(probably if/when we do a v8M baseline CPU model); though
+if you want to make it a full property that's fine too.
 
 thanks
 -- PMM
