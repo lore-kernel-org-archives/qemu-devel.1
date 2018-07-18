@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <naravamudan@digitalocean.com>) id 1fftl7-0004vk-Sn
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 17:13:18 -0400
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fftlG-000502-30
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 17:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <naravamudan@digitalocean.com>) id 1fftl3-00072D-R5
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 17:13:17 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:38828)
+	(envelope-from <e.emanuelegiuseppe@gmail.com>) id 1fftlC-000764-0d
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 17:13:26 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:43358)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <naravamudan@digitalocean.com>)
-	id 1fftl3-00071g-Jt
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 17:13:13 -0400
-Received: by mail-pl0-x244.google.com with SMTP id b1-v6so2584225pls.5
-	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 14:13:13 -0700 (PDT)
-From: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Date: Wed, 18 Jul 2018 14:12:56 -0700
-Message-Id: <20180718211256.29774-1-naravamudan@digitalocean.com>
-Subject: [Qemu-devel] [PATCH] block/file-posix: add bdrv_attach_aio_context
- callback for host dev and cdrom
+	(Exim 4.71) (envelope-from <e.emanuelegiuseppe@gmail.com>)
+	id 1fftlB-00075G-Ly
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 17:13:21 -0400
+Received: by mail-ed1-x541.google.com with SMTP id b20-v6so5405727edt.10
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 14:13:21 -0700 (PDT)
+References: <20180709091136.28849-1-e.emanuelegiuseppe@gmail.com>
+	<20180709091136.28849-2-e.emanuelegiuseppe@gmail.com>
+	<20180711142819.GM31228@stefanha-x1.localdomain>
+	<bc76dd27-434f-9a75-0afd-47049cc915d6@redhat.com>
+	<20180718142357.GM21825@stefanha-x1.localdomain>
+	<00b4f8fe-b473-ac7a-4f13-9752aeef7062@redhat.com>
+From: Emanuele <e.emanuelegiuseppe@gmail.com>
+Message-ID: <8349f160-fcc8-610b-774e-b074d77f6d9f@gmail.com>
+Date: Wed, 18 Jul 2018 23:13:18 +0200
+MIME-Version: 1.0
+In-Reply-To: <00b4f8fe-b473-ac7a-4f13-9752aeef7062@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/7] tests: qgraph API for the qtest driver
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +36,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: naravamudan@digitalocean.com
-Cc: Farhan Ali <alifm@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-In ed6e2161 ("linux-aio: properly bubble up errors from initialzation"),
-I only added a bdrv_attach_aio_context callback for the bdrv_file
-driver. There are several other drivers that use the shared
-aio_plug callback, though, and they will trip the assertion added to
-aio_get_linux_aio because they did not call aio_setup_linux_aio first.
-Add the appropriate callback definition to the affected driver
-definitions.
 
-Fixes: ed6e2161 ("linux-aio: properly bubble up errors from initialization")
-Reported-by: Farhan Ali <alifm@linux.ibm.com>
-Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
----
- block/file-posix.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 60af4b3d51..ad299beb38 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -3158,6 +3158,7 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
- 
-     .bdrv_co_truncate       = raw_co_truncate,
-     .bdrv_getlength	= raw_getlength,
-@@ -3280,6 +3281,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
- 
-     .bdrv_co_truncate    = raw_co_truncate,
-     .bdrv_getlength      = raw_getlength,
-@@ -3410,6 +3412,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-+    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
- 
-     .bdrv_co_truncate    = raw_co_truncate,
-     .bdrv_getlength      = raw_getlength,
--- 
-2.17.1
+On 07/18/2018 09:28 PM, Paolo Bonzini wrote:
+> On 18/07/2018 16:23, Stefan Hajnoczi wrote:
+>>>>> +struct QOSGraphObject {
+>>>>> +    /* for produces, returns void * */
+>>>>> +    QOSGetDriver get_driver;
+>>>> Unused?
+>>>>
+>>>>> +    /* for contains, returns a QOSGraphObject * */
+>>>>> +    QOSGetDevice get_device;
+>>>> Unused?
+>>> What is unused?
+>> Neither of these fields are used in this patch.  Please introduce them
+>> in the first patch that actually uses them.  This way code review can
+>> proceed linearly and it also prevents deadcode when just part of a patch
+>> series is merged or backported.
+> So do you suggest to squash patch 6 into this one, so that a user of
+> QOSGraphObject exists already here?
+I think he's right, it makes no sense to have qos-graph as patch 6, it 
+could go as patch 2, even though by that time no object/node exist yet.
+
+Moreover, right now no file in patch 3-4-5 is actually compiled until 
+patch 6, which is easily prone to errors in case of future edits (I too 
+have this problem right now, when I need to modify sdhci.c and I'm 
+forced to return to the branch head to compile), so adding it before 
+would make things more clear.
+> Thanks,
+>
+> Paolo
