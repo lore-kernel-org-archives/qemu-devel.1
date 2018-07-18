@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoam-0003Hx-4w
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ffotE-0001bO-1z
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoag-0000Im-SR
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:16 -0400
-Received: from relay.sw.ru ([185.231.240.75]:36422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1ffoag-0000GP-K9
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:10 -0400
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Wed, 18 Jul 2018 18:42:00 +0300
-Message-Id: <20180718154200.26777-18-dplotnikov@virtuozzo.com>
-In-Reply-To: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v1 17/17] background snapshot: enable
- background snapshot
+	(envelope-from <ehabkost@redhat.com>) id 1ffotD-00024H-47
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:01:20 -0400
+Date: Wed, 18 Jul 2018 13:01:10 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180718160110.GB31657@localhost.localdomain>
+References: <20180717234015.22700-1-f4bug@amsat.org>
+	<20180718145312.GZ31657@localhost.localdomain>
+	<8fbaf02a-752c-2fec-5bbd-9b31839ce19a@amsat.org>
+	<20180718150510.GA31657@localhost.localdomain>
+	<82b3df6e-6e83-ab3a-ea64-04692fc5f40b@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <82b3df6e-6e83-ab3a-ea64-04692fc5f40b@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1] qemu-iotests: Adapt to moved
+ location of StringIO module in py3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,147 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
-The patch enables to save vmstate to a migration thread
-in the background: ram is being saved while vCPUs are running.
-This is done to reduce downtime on vm snapshotting: the majority
-of vmstate is ram, the rest of devices consumes only a few MB of
-memory on a typical vm.
-By this moment, there were no means to make a snapshot without
-full vm stopping. From now, one can save a vm state having the vm
-stopped only for a couple of seconds to save devices' states. Then
-the vm resumed and ram is written without the vm full stopping.
+On Wed, Jul 18, 2018 at 12:22:19PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> On 07/18/2018 12:05 PM, Eduardo Habkost wrote:
+> > On Wed, Jul 18, 2018 at 12:02:39PM -0300, Philippe Mathieu-Daud=E9 wr=
+ote:
+> >> Hi Eduardo,
+> >>
+> >> On 07/18/2018 11:53 AM, Eduardo Habkost wrote:
+> >>> On Tue, Jul 17, 2018 at 08:40:15PM -0300, Philippe Mathieu-Daud=E9 =
+wrote:
+> >>> [...]
+> >>>> -    import StringIO
+> >>>> +    try:
+> >>>> +        from StringIO import StringIO
+> >>>> +    except ImportError:
+> >>>> +        from io import StringIO
+> >>>
+> >>> Why do we need this?  Python 2.7 has io.StringIO.
+> >>
+> >> Python 2 works fine, the problem is the Fedora Docker image uses Pyt=
+hon
+> >> 3 and the block tests started to fail...
+> >=20
+> > My question is: why use StringIO.StringIO on Python 2 and
+> > io.StringIO on Python 3, if io.StringIO works on both Python
+> > versions?
+>=20
+> Oh I missed your question because I was not aware of this, and looked
+> how this was handled in the tree (7a5d936b6fc and 5f90af8e6b).
+>=20
+> TIL we can use "from io import StringIO" regardless the version, the
+> 2->3 conversion looks a bit less absurd, thanks!
 
-To use async vm state it's needed to enable "background-snapshot"
-migration capability and start the migration
+Note that it's not always an obvious conversion: on Python 3 you
+need to decide if you want a text file or binary file.
+io.StringIO is a text file, io.BinaryIO is a binary file.  See
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg545627.html
+for an example where io.StringIO wasn't appropriate.
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- migration/migration.c | 103 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 101 insertions(+), 2 deletions(-)
+In the case of iotests.py it looks like the code expects a text
+file, though.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 131d0904e4..935e5b6f2e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2188,6 +2188,99 @@ bool migrate_colo_enabled(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_COLO];
- }
- 
-+static void background_snapshot_sigsegv_handler(int unused0, siginfo_t *info,
-+                                                void *unused1)
-+{
-+    if (ram_process_page_fault(info->si_addr)) {
-+        assert(false);
-+    }
-+}
-+
-+static void *background_snapshot_thread(void *opaque)
-+{
-+    MigrationState *m = opaque;
-+    QIOChannelBuffer *bioc;
-+    QEMUFile *fb;
-+    int res = 0;
-+
-+    rcu_register_thread();
-+
-+    qemu_file_set_rate_limit(m->to_dst_file, INT64_MAX);
-+
-+    qemu_mutex_lock_iothread();
-+    vm_stop(RUN_STATE_PAUSED);
-+
-+    qemu_savevm_state_header(m->to_dst_file);
-+    qemu_mutex_unlock_iothread();
-+    qemu_savevm_state_setup(m->to_dst_file);
-+    qemu_mutex_lock_iothread();
-+
-+    migrate_set_state(&m->state, MIGRATION_STATUS_SETUP,
-+                      MIGRATION_STATUS_ACTIVE);
-+
-+    /* save the device state to the temporary buffer */
-+    bioc = qio_channel_buffer_new(4096);
-+    qio_channel_set_name(QIO_CHANNEL(bioc), "vmstate-buffer");
-+    fb = qemu_fopen_channel_output(QIO_CHANNEL(bioc));
-+    object_unref(OBJECT(bioc));
-+
-+    ram_block_list_create();
-+    ram_block_list_set_readonly();
-+
-+    if (global_state_store()) {
-+        goto exit;
-+    }
-+
-+    if (qemu_savevm_state_save(fb, false, true) < 0) {
-+        migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
-+                          MIGRATION_STATUS_FAILED);
-+        goto exit;
-+    }
-+
-+    sigsegv_user_handler_set(background_snapshot_sigsegv_handler);
-+
-+    vm_start();
-+    qemu_mutex_unlock_iothread();
-+
-+    while (!res) {
-+        res = qemu_savevm_state_iterate(m->to_dst_file, false);
-+
-+        if (res < 0 || qemu_file_get_error(m->to_dst_file)) {
-+            migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
-+                              MIGRATION_STATUS_FAILED);
-+            goto exit;
-+        }
-+    }
-+
-+    /*
-+     * By this moment we have RAM saved into the stream
-+     * The next step is to flush the device state right after the
-+     * RAM saved. The rest of device state is stored in
-+     * the temporary buffer. Do flush the buffer into the stream.
-+     */
-+    qemu_put_buffer(m->to_dst_file, bioc->data, bioc->usage);
-+    qemu_fflush(m->to_dst_file);
-+
-+    if (qemu_file_get_error(m->to_dst_file)) {
-+        migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
-+                          MIGRATION_STATUS_FAILED);
-+        goto exit;
-+    }
-+
-+    migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
-+                                 MIGRATION_STATUS_COMPLETED);
-+exit:
-+    ram_block_list_set_writable();
-+    ram_block_list_destroy();
-+    sigsegv_user_handler_reset();
-+    qemu_fclose(fb);
-+    qemu_mutex_lock_iothread();
-+    qemu_savevm_state_cleanup();
-+    qemu_mutex_unlock_iothread();
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
- /*
-  * Master migration thread on the source VM.
-  * It drives the migration and pumps the data down the outgoing channel.
-@@ -2402,8 +2495,14 @@ void migrate_fd_connect(MigrationState *s)
-         migrate_fd_cleanup(s);
-         return;
-     }
--    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
--                       QEMU_THREAD_JOINABLE);
-+    if (migrate_background_snapshot()) {
-+        qemu_thread_create(&s->thread, "bg_snapshot",
-+                           background_snapshot_thread, s,
-+                           QEMU_THREAD_JOINABLE);
-+    } else {
-+        qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
-+                           QEMU_THREAD_JOINABLE);
-+    }
-     s->migration_thread_running = true;
- }
- 
--- 
-2.17.0
+--=20
+Eduardo
