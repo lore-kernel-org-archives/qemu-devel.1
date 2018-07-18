@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ffpST-0006Mn-Hc
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:37:46 -0400
+	(envelope-from <sw@weilnetz.de>) id 1ffpnZ-0001wa-Pv
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ffpSQ-0001qd-Cs
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:37:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ffpSQ-0001q9-7N
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:37:42 -0400
-Date: Wed, 18 Jul 2018 10:37:36 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180718103736.2406cdc8@t450s.home>
-In-Reply-To: <20180718064015.GI20520@xz-mi>
-References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180717224737.14019.3324.stgit@gimli.home>
-	<20180718064015.GI20520@xz-mi>
+	(envelope-from <sw@weilnetz.de>) id 1ffpnW-00053x-KN
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 12:59:33 -0400
+References: <20180712192603.11599-1-sw@weilnetz.de>
+	<20180718162111.GR9812@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <255cc07f-8eb7-0839-2001-e6ead4f3d969@weilnetz.de>
+Date: Wed, 18 Jul 2018 18:59:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] balloon: Allow nested inhibits
+In-Reply-To: <20180718162111.GR9812@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Support pkg-config for zlib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: QEMU Developer <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On Wed, 18 Jul 2018 14:40:15 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Am 18.07.2018 um 18:21 schrieb Daniel P. Berrang=C3=A9:
+> On Thu, Jul 12, 2018 at 09:26:03PM +0200, Stefan Weil wrote:
+>> This is needed for builds with the mingw64-* packages from Cygwin,
+>> but also works for Linux.
+>>
+>> Move the zlib test also more to the end because users should
+>> get information on the really important missing packages
+>> (which also require zlib) first.
+>=20
+> According to the zlib Changelog file pkgconfig support was added
+> in 2006 !
+>=20
+> [quote]
+> Changes in 1.2.3.1 (16 August 2006)
+>=20
+>   - Add pkgconfig support [Weigelt]
+> [/quote]
+>=20
+> Given our target build platforms support guidelines
+>=20
+>   https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platforms
+>=20
+> we can safely say that all supported platforms will have a zlib
+> that contains pkgconfig support, so......
+>=20
+>>
+>> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+>> ---
+>>  configure | 40 +++++++++++++++++++++++-----------------
+>>  1 file changed, 23 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/configure b/configure
+>> index 2a7796ea80..dcaab01729 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2140,23 +2140,6 @@ EOF
+>>    fi
+>>  fi
+>> =20
+>> -#########################################
+>> -# zlib check
+>> -
+>> -if test "$zlib" !=3D "no" ; then
+>> -    cat > $TMPC << EOF
+>> -#include <zlib.h>
+>> -int main(void) { zlibVersion(); return 0; }
+>> -EOF
+>> -    if compile_prog "" "-lz" ; then
+>> -        :
+>> -    else
+>> -        error_exit "zlib check failed" \
+>> -            "Make sure to have the zlib libs and headers installed."
+>> -    fi
+>> -fi
+>> -LIBS=3D"$LIBS -lz"
+>> -
+>>  ##########################################
+>>  # lzo check
+>> =20
+>> @@ -3525,6 +3508,29 @@ if ! compile_prog "$glib_cflags -Werror" "$glib=
+_libs" ; then
+>>      fi
+>>  fi
+>> =20
+>> +#########################################
+>> +# zlib check
+>> +
+>> +if test "$zlib" !=3D "no" ; then
+>> +    if $pkg_config --exists zlib; then
+>> +        zlib_cflags=3D$($pkg_config --cflags zlib)
+>> +        zlib_libs=3D$($pkg_config --libs zlib)
+>> +        QEMU_CFLAGS=3D"$zlib_cflags $QEMU_CFLAGS"
+>> +        LIBS=3D"$zlib_libs $LIBS"
+>> +    else
+>> +        cat > $TMPC << EOF
+>> +#include <zlib.h>
+>> +int main(void) { zlibVersion(); return 0; }
+>> +EOF
+>> +        if compile_prog "" "-lz" ; then
+>> +            LIBS=3D"$LIBS -lz"
+>> +        else
+>> +            error_exit "zlib check failed" \
+>> +                "Make sure to have the zlib libs and headers installe=
+d."
+>> +        fi
+>> +    fi
+>=20
+> .... this fallback support for non-pkgconfig scenarios can be entirely
+> deleted, just leaving the error_exit message.=20
+>=20
+>=20
+> Regards,
+> Daniel
 
-> On Tue, Jul 17, 2018 at 04:47:37PM -0600, Alex Williamson wrote:
-> > A simple true/false internal state does not allow multiple users.  Fix
-> > this within the existing interface by converting to a counter, so long
-> > as the counter is elevated, ballooning is inhibited.
-> > 
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >  balloon.c |    7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/balloon.c b/balloon.c
-> > index 6bf0a9681377..2a6a7e1a22a0 100644
-> > --- a/balloon.c
-> > +++ b/balloon.c
-> > @@ -37,16 +37,17 @@
-> >  static QEMUBalloonEvent *balloon_event_fn;
-> >  static QEMUBalloonStatus *balloon_stat_fn;
-> >  static void *balloon_opaque;
-> > -static bool balloon_inhibited;
-> > +static int balloon_inhibited;
-> >  
-> >  bool qemu_balloon_is_inhibited(void)
-> >  {
-> > -    return balloon_inhibited;
-> > +    return balloon_inhibited > 0;
-> >  }
-> >  
-> >  void qemu_balloon_inhibit(bool state)
-> >  {
-> > -    balloon_inhibited = state;
-> > +    balloon_inhibited += (state ? 1 : -1);
-> > +    assert(balloon_inhibited >= 0);  
-> 
-> Better do it atomically?
+I have no objection. Thank you for the investigation of the zlib
+history. Removing old unneeded code is always good, but maybe that's
+something which could be done after release 3.0.
 
-I'd assumed we're protected by the BQL anywhere this is called.  Is
-that not the case?  Generally when I try to add any sort of locking to
-QEMU it's shot down because the code paths are already serialized.
-Thanks,
+Or would you suggest to do it now? Then I can either send an updated
+patch (v2), or whoever pulls that patch can make that trivial modificatio=
+n.
 
-Alex
+Cheers
+Stefan
