@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ffn8J-0003Tb-8h
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:08:50 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffnB8-0004jr-IR
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ffn8D-0002AY-W3
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:08:47 -0400
-Date: Wed, 18 Jul 2018 16:08:32 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180718160832.0d754aa4@redhat.com>
-In-Reply-To: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffnB5-0003L7-C9
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:11:42 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:46803)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ffnB5-0003Kr-5C
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 10:11:39 -0400
+Received: by mail-ua0-x243.google.com with SMTP id r18-v6so3000209ual.13
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 07:11:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1531859179.git.alistair.francis@wdc.com>
+	<0f2b0a7a0b3565525a8683ac8fe65f44f734ab19.1531859179.git.alistair.francis@wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <060ee023-8a95-86c4-f5d1-b269ccce046a@amsat.org>
+Date: Wed, 18 Jul 2018 11:11:33 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 00/15] ARM virt: PCDIMM/NVDIMM at 2TB
+In-Reply-To: <0f2b0a7a0b3565525a8683ac8fe65f44f734ab19.1531859179.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] sifive_u: Fix crash when
+ introspecting the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,159 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, david@redhat.com, dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, mjc@sifive.com
 
-On Tue,  3 Jul 2018 09:19:43 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+On 07/17/2018 05:28 PM, Alistair Francis wrote:
+> Use the new object_initialize_child() and sysbus_init_child_obj() to
+> fix the issue.
+> 
 
-> This series aims at supporting PCDIMM/NVDIMM intantiation in
-> machvirt at 2TB guest physical address.
-> 
-> This is achieved in 3 steps:
-> 1) support more than 40b IPA/GPA
-will it work for TCG as well?
-/important from make check pov and maybe in cases when there is no ARM system available to test/play with the feature/
+Suggested-by: Thomas Huth <thuth@redhat.com>
 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> 2) support PCDIMM instantiation
-> 3) support NVDIMM instantiation
+> ---
+>  hw/riscv/sifive_u.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
 > 
-> This series reuses/rebases patches initially submitted by Shameer in [1]
-> and Kwangwoo in [2].
-> 
-> I put all parts all together for consistency and due to dependencies
-> however as soon as the kernel dependency is resolved we can consider
-> upstreaming them separately.
-> 
-> Support more than 40b IPA/GPA [ patches 1 - 5 ]
-> -----------------------------------------------
-> was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
-> 
-> At the moment the guest physical address space is limited to 40b
-> due to KVM limitations. [0] bumps this limitation and allows to
-> create a VM with up to 52b GPA address space.
-> 
-> With this series, QEMU creates a virt VM with the max IPA range
-> reported by the host kernel or 40b by default.
-> 
-> This choice can be overriden by using the -machine kvm-type=<bits>
-> option with bits within [40, 52]. If <bits> are not supported by
-> the host, the legacy 40b value is used.
-> 
-> Currently the EDK2 FW also hardcodes the max number of GPA bits to
-> 40. This will need to be fixed.
-> 
-> PCDIMM Support [ patches 6 - 11 ]
-> ---------------------------------
-> was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
-> 
-> We instantiate the device_memory at 2TB. Using it obviously requires
-> at least 42b of IPA/GPA. While its max capacity is currently limited
-> to 2TB, the actual size depends on the initial guest RAM size and
-> maxmem parameter.
-> 
-> Actual hot-plug and hot-unplug of PC-DIMM is not suported due to lack
-> of support of those features in baremetal.
-> 
-> NVDIMM support [ patches 12 - 15 ]
-> ----------------------------------
-> 
-> Once the memory hotplug framework is in place it is fairly
-> straightforward to add support for NVDIMM. the machine "nvdimm" option
-> turns the capability on.
-> 
-> Best Regards
-> 
-> Eric
-> 
-> References:
-> 
-> [0] [PATCH v3 00/20] arm64: Dynamic & 52bit IPA support
-> https://www.spinics.net/lists/kernel/msg2841735.html
-> 
-> [1] [RFC v2 0/6] hw/arm: Add support for non-contiguous iova regions
-> http://patchwork.ozlabs.org/cover/914694/
-> 
-> [2] [RFC PATCH 0/3] add nvdimm support on AArch64 virt platform
-> https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg04599.html
-> 
-> Tests:
-> - On Cavium Gigabyte, a 48b VM was created.
-> - Migration tests were performed between kernel supporting the
->   feature and destination kernel not suporting it
-> - test with ACPI: to overcome the limitation of EDK2 FW, virt
->   memory map was hacked to move the device memory below 1TB.
-> 
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v2.12.0-dimm-2tb-v3
-> 
-> History:
-> 
-> v2 -> v3:
-> - fix pc_q35 and pc_piix compilation error
-> - kwangwoo's email being not valid anymore, remove his address
-> 
-> v1 -> v2:
-> - kvm_get_max_vm_phys_shift moved in arch specific file
-> - addition of NVDIMM part
-> - single series
-> - rebase on David's refactoring
-> 
-> v1:
-> - was "[RFC 0/6] KVM/ARM: Dynamic and larger GPA size"
-> - was "[RFC 0/5] ARM virt: Support PC-DIMM at 2TB"
-> 
-> Best Regards
-> 
-> Eric
-> 
-> 
-> Eric Auger (9):
->   linux-headers: header update for KVM/ARM KVM_ARM_GET_MAX_VM_PHYS_SHIFT
->   hw/boards: Add a MachineState parameter to kvm_type callback
->   kvm: add kvm_arm_get_max_vm_phys_shift
->   hw/arm/virt: support kvm_type property
->   hw/arm/virt: handle max_vm_phys_shift conflicts on migration
->   hw/arm/virt: Allocate device_memory
->   acpi: move build_srat_hotpluggable_memory to generic ACPI source
->   hw/arm/boot: Expose the pmem nodes in the DT
->   hw/arm/virt: Add nvdimm and nvdimm-persistence options
-> 
-> Kwangwoo Lee (2):
->   nvdimm: use configurable ACPI IO base and size
->   hw/arm/virt: Add nvdimm hot-plug infrastructure
-> 
-> Shameer Kolothum (4):
->   hw/arm/virt: Add memory hotplug framework
->   hw/arm/boot: introduce fdt_add_memory_node helper
->   hw/arm/boot: Expose the PC-DIMM nodes in the DT
->   hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
-> 
->  accel/kvm/kvm-all.c                            |   2 +-
->  default-configs/arm-softmmu.mak                |   4 +
->  hw/acpi/aml-build.c                            |  51 ++++
->  hw/acpi/nvdimm.c                               |  28 ++-
->  hw/arm/boot.c                                  | 123 +++++++--
->  hw/arm/virt-acpi-build.c                       |  10 +
->  hw/arm/virt.c                                  | 330 ++++++++++++++++++++++---
->  hw/i386/acpi-build.c                           |  49 ----
->  hw/i386/pc_piix.c                              |   8 +-
->  hw/i386/pc_q35.c                               |   8 +-
->  hw/ppc/mac_newworld.c                          |   2 +-
->  hw/ppc/mac_oldworld.c                          |   2 +-
->  hw/ppc/spapr.c                                 |   2 +-
->  include/hw/acpi/aml-build.h                    |   3 +
->  include/hw/arm/arm.h                           |   2 +
->  include/hw/arm/virt.h                          |   7 +
->  include/hw/boards.h                            |   2 +-
->  include/hw/mem/nvdimm.h                        |  12 +
->  include/standard-headers/linux/virtio_config.h |  16 +-
->  linux-headers/asm-mips/unistd.h                |  18 +-
->  linux-headers/asm-powerpc/kvm.h                |   1 +
->  linux-headers/linux/kvm.h                      |  16 ++
->  target/arm/kvm.c                               |   9 +
->  target/arm/kvm_arm.h                           |  16 ++
->  24 files changed, 597 insertions(+), 124 deletions(-)
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 3a6ffeb437..59ae1ce24a 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -244,9 +244,9 @@ static void riscv_sifive_u_init(MachineState *machine)
+>      int i;
+>  
+>      /* Initialize SoC */
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_U_SOC);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &s->soc,
+> +                            sizeof(s->soc), TYPE_RISCV_U_SOC,
+> +                            &error_abort, NULL);
+>      object_property_set_bool(OBJECT(&s->soc), true, "realized",
+>                              &error_abort);
+>  
+> @@ -303,16 +303,15 @@ static void riscv_sifive_u_soc_init(Object *obj)
+>  {
+>      SiFiveUSoCState *s = RISCV_U_SOC(obj);
+>  
+> -    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
+> -    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
+> -                              &error_abort);
+> +    object_initialize_child(obj, "cpus", &s->cpus, sizeof(s->cpus),
+> +                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+>      object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
+>                              &error_abort);
+>      object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
+>                              &error_abort);
+>  
+> -    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
+> -    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+> +                          TYPE_CADENCE_GEM);
+>  }
+>  
+>  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
 > 
