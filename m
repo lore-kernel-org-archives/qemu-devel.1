@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ffiA0-0007Ll-Mj
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:50:13 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1ffiBg-00088N-Ip
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:51:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ffi9x-0003bi-KY
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:50:12 -0400
-References: <20180718082425.14834-1-david@redhat.com>
-	<148539ec-691f-5822-509f-d11dbfa3f88b@de.ibm.com>
-	<873c35d4-5a5f-d095-9485-4fb7ec8b746f@redhat.com>
-	<46dcb3bc-4f7f-74cb-2351-7ad2f95ea461@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fb787a48-341a-cb53-a1ba-23bb1e4ef4ee@redhat.com>
-Date: Wed, 18 Jul 2018 10:50:01 +0200
+	(envelope-from <guangrong.xiao@gmail.com>) id 1ffiBd-0006He-Gq
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:51:56 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:51129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1ffiBd-0006G9-AQ
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 04:51:53 -0400
+Received: by mail-it0-x241.google.com with SMTP id w16-v6so3045296ita.0
+	for <qemu-devel@nongnu.org>; Wed, 18 Jul 2018 01:51:53 -0700 (PDT)
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-6-xiaoguangrong@tencent.com>
+	<20180613162508.GM2676@work-vm>
+	<b64e1091-7fe4-fe65-4b28-2597491993e1@gmail.com>
+	<20180716190122.GE2664@work-vm>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <2e9a96cc-4d94-1081-15cb-f307175fa6d7@gmail.com>
+Date: Wed, 18 Jul 2018 16:51:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <46dcb3bc-4f7f-74cb-2351-7ad2f95ea461@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180716190122.GE2664@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/cpumodel: fix
- segmentation fault when baselining models
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 05/12] migration: show the statistics of
+ compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 18.07.2018 10:44, Christian Borntraeger wrote:
-> 
-> 
-> On 07/18/2018 10:40 AM, David Hildenbrand wrote:
->> On 18.07.2018 10:39, Christian Borntraeger wrote:
->>>
->>>
->>> On 07/18/2018 10:24 AM, David Hildenbrand wrote:
->>>> Usually, when baselining two CPU models, whereby one of them has base
->>>> CPU features disabled (e.g. z14-base,msa=off), we fallback to an older
->>>> model that did not have these features in the base model. We always try to
->>>> create a "sane" CPU model (as far as possible), and one part of it is that
->>>> removing base features is no good and to be avoided.
->>>>
->>>> Now, if we disable base features that were part of a z900, we're out of
->>>> luck. We won't find a CPU model and QEMU will segfault. This is a
->>>> scenario that should never happen in real life, but it can be used to
->>>> crash QEMU.
->>>>
->>>> So let's make something like this:
->>>>
->>>> { "execute": "query-cpu-model-baseline",
->>>>   "arguments" : { "modela": { "name": "z14-base", "props": {"esan3" : false}},
->>>>                   "modelb": { "name": "z14"}} }
->>>>
->>>> Produce:
->>>>
->>>> {"return": {"model": {"name": "z900-base", "props": {"esan3": false}}}}
->>>>
->>>> Instead of segfaulting.
->>>>
->>>> This could of course be improved (e.g. to z14-base,esan3=false), however
->>>> as this ususally won't happen, let's just avoid crashes.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  target/s390x/cpu_models.c | 6 ++++++
->>>>  1 file changed, 6 insertions(+)
->>>>
->>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->>>> index cfdbccf46d..13a5d4f095 100644
->>>> --- a/target/s390x/cpu_models.c
->>>> +++ b/target/s390x/cpu_models.c
->>>> @@ -716,6 +716,12 @@ CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *infoa,
->>>>  
->>>>      model.def = s390_find_cpu_def(cpu_type, max_gen, max_gen_ga,
->>>>                                    model.features);
->>>> +
->>>> +    /* models without early base features (esan3) are bad - fallback to z900 */
->>>> +    if (!model.def) {
->>>> +        model.def = s390_find_cpu_def(0x2064, 7, 1, NULL);
->>>> +    }
->>>> +
->>>
->>> Is there a way to not even return z900 but retuning an empty model (e.g. no model that 
->>> matches) ?
+
+
+On 07/17/2018 03:01 AM, Dr. David Alan Gilbert wrote:
+> * Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
 >>
->> An error would be an alternative.
+>>
+>> On 06/14/2018 12:25 AM, Dr. David Alan Gilbert wrote:
+>>   }
+>>>>    static void migration_bitmap_sync(RAMState *rs)
+>>>> @@ -1412,6 +1441,9 @@ static void flush_compressed_data(RAMState *rs)
+>>>>            qemu_mutex_lock(&comp_param[idx].mutex);
+>>>>            if (!comp_param[idx].quit) {
+>>>>                len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
+>>>> +            /* 8 means a header with RAM_SAVE_FLAG_CONTINUE. */
+>>>> +            compression_counters.reduced_size += TARGET_PAGE_SIZE - len + 8;
+>>>
+>>> I think I'd rather save just len+8 rather than than the subtraction.
+>>>
+>> Hmmmmmm, is this what you want?
+>>        compression_counters.reduced_size += len - 8;
+>>
+>> Then calculate the real reduced size in populate_ram_info() where we return this
+>> info to the user:
+>>        info->compression->reduced_size = compression_counters.pages * PAGE_SIZE - compression_counters.reduced_size;
+>>
+>> Right?
 > 
-> As N3 means new in zarch (and backported to ESA390 mode), there is no machine without N3.
-> So I would prefer an error.
+> I mean I'd rather see the actual size presented to the user rather than
+> the saving compared to uncompressed.
 > 
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index cfdbccf46d..604898a882 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -716,6 +716,14 @@ CpuModelBaselineInfo
-*arch_query_cpu_model_baseline(CpuModelInfo *infoa,
-
-     model.def = s390_find_cpu_def(cpu_type, max_gen, max_gen_ga,
-                                   model.features);
-+
-+    /* models without early base features (esan3) are bad */
-+    if (!model.def) {
-+        error_setg(errp, "No compatible CPU model could be created as"
-+                   " important base features are disabled");
-+        return NULL;
-+    }
-+
-     /* strip off features not part of the max model */
-     bitmap_and(model.features, model.features, model.def->full_feat,
-                S390_FEAT_MAX);
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+These statistics are used to help people to see whether compression works efficiently or not,
+so maybe reduced-size is more straightforward?　:)
