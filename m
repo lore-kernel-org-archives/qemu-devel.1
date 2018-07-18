@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ffh4q-0008O2-Rl
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:40:49 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1ffhC3-0001wD-K3
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:48:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ffh4n-00014n-Mw
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:40:48 -0400
-Date: Wed, 18 Jul 2018 09:40:39 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180718094039.3271a216.cohuck@redhat.com>
-In-Reply-To: <a00e445e-f8f5-b098-bccb-7fcaf1260402@redhat.com>
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<1530811543-6881-15-git-send-email-jjherne@linux.ibm.com>
-	<a00e445e-f8f5-b098-bccb-7fcaf1260402@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 14/15] s390-bios: Support
- booting from real dasd device
+	(envelope-from <junyan.he@gmx.com>) id 1ffhC0-0003T2-Dz
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:48:15 -0400
+Received: from mga14.intel.com ([192.55.52.115]:47530)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1ffhC0-0003Oi-3U
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 03:48:12 -0400
+From: junyan.he@gmx.com
+Date: Wed, 18 Jul 2018 15:47:56 +0800
+Message-Id: <1531900083-18167-1-git-send-email-junyan.he@gmx.com>
+Subject: [Qemu-devel] [PATCH 0/7 V11] nvdimm: guarantee persistence of QEMU
+ writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +22,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, yi.z.zhang@intel.com, Junyan He <junyan.he@intel.com>
 
-On Tue, 17 Jul 2018 22:43:27 +0200
-David Hildenbrand <david@redhat.com> wrote:
+From: Junyan He <junyan.he@intel.com>
 
-> On 05.07.2018 19:25, Jason J. Herne wrote:
+QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and live migration.
+If the backend is on the persistent memory, QEMU needs to take proper operations to
+ensure its writes persistent on the persistent memory. Otherwise, a host power failure
+may result in the loss the guest data on the persistent memory.
 
-> > +*****************************************
-> > +***** How this all pertains to Qemu *****
-> > +*****************************************
-> > +
-> > +In theory we should merely have to do the following to IPL/boot a guest
-> > +operating system from a DASD device:
-> > +
-> > +1. Place a "Read IPL" ccw into memory location 0x0 with chaining bit on.
-> > +2. Execute channel program at 0x0.
-> > +3. LPSW 0x0.
-> > +
-> > +However, our emulation of the machine's channel program logic is missing one key
-> > +feature that is required for this process to work: non-prefetch of ccw data.
-> > +
-> > +When we start a channel program we pass the channel subsystem parameters via an
-> > +ORB (Operation Request Block). One of those parameters is a prefetch bit. If the
-> > +bit is on then Qemu is allowed to read the entire channel program from guest
-> > +memory before it starts executing it. This means that any channel commands that
-> > +read additional channel commands will not work as expected because the newly
-> > +read commands will only exist in guest memory and NOT within Qemu's channel
-> > +subsystem memory. Qemu's channel subsystem's implementation currently requires
-> > +this bit to be on for all channel programs. This is a problem because the IPL
-> > +process consists of transferring control from the "Read IPL" ccw immediately to
-> > +the IPL1 channel program that was read by "Read IPL".
-> > ++  
-> 
-> I have way too little insight into channel devices and how QEMU
-> implements them, however I wonder what hinders us from implementing
-> support for !prefetch in QEMU?
-> 
-> What you tailored here seems impressive :) Just want to know what the
-> technical background of this prefetch thingy in QEMU is.
+This patch series is based on Marcel's patch "mem: add share parameter to memory-backend-ram" [1]
+because of the changes in patch 1.
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
 
-This has to do with how vfio-ccw processes and translates channel
-programs.
+Previous versions of this patch series can be found at: 
+v10: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03433.html
+v9: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02361.html
+v8: https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg02279.html
+v7: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02997.html
+v6: https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg00061.html
+v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
+V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
+v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
+v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
+v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
 
-Currently, we hand over the chain of channel commands to the kernel to
-be translated (guest->host addresses) and to execute ssch on the real
-subchannel. However, this requires sending the channel program over in
-one go, which makes it impossible for the guest to modify an in-flight
-channel program (there are tricks like putting a suspend marker on a
-channel command and moving that marker forward as you go which make it
-possible to know that a channel command has not yet been processed;
-IIRC the lcs driver in Linux does that, or at least used to do that).
-Our implementation currently does not accommodate that (the Linux dasd
-driver does not use that feature). It's not impossible to implement it,
-but it would require some effort (and I don't think anybody currently
-has spare time for that...)
+Changes in v11:
+* (Patch 2) Modify the ram_flags parameter to 32bits, the same size as it in RAMBlock
+* (Patch 5 and Patch 7) Delete pmem_xxx stub functions in stubs/pmem.c. Use inline
+functions with assert to replace them, because we never come there when pmem is enabled
+but lack of libpmem support.
+
+Changes in v10:
+* (Patch 4) Fix a nit in nvdimm docs about pmem option usage in command line 
+The v10 patch set is all reviewed by Igor Mammedov <imammedo@redhat.com>
+
+Changes in v9:
+* (Patch 3 and Patch 4) Reorder these two patches to make logic right.
+Firstly add libpmem support, and then we can use libpmem's configure
+check result. Also fix some typo and grammar issues in these two patches.
+
+Changs in v8: 
+* (Patch 3) Report a error when user set 'pmem' to file-backend, while
+the qemu is lack of libpmem support. In this case, we can not ensure
+the persistence of the file-backend, so we choose to fail the build
+rather than contine and make the thing more confused.
+
+Changes in v7: 
+The v6 patch set has already reviewed by Stefan Hajnoczi <stefanha@redhat.com>
+No logic change in this v7 version, just:
+* Spelling check and some document words refined.
+* Rebase to "ram is migratable" patch set.
+
+Changes in v6: 
+* (Patch 1) Expose all ram block flags rather than redefine the flags.
+* (Patch 4) Use pkg-config rather the hard check when configure. 
+* (Patch 7) Sync and flush all the pmem data when migration completes,
+rather than sync pages one by one in previous version.
+
+Changes in v5: 
+* (Patch 9) Add post copy check and output some messages for nvdimm.
+
+Changes in v4: 
+* (Patch 2) Fix compilation errors found by patchew.
+
+Changes in v3:
+* (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
+PMEM writes in it, so we don't need the _common function.
+* (Patch 6) Expose qemu_get_buffer_common so we can remove the
+unnecessary qemu_get_buffer_to_pmem wrapper.
+* (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
+PMEM writes in it, so we can remove the unnecessary
+xbzrle_decode_buffer_{common, to_pmem}.
+* Move libpmem stubs to stubs/pmem.c and fix the compilation failures
+of test-{xbzrle,vmstate}.c.
+
+Changes in v2:
+* (Patch 1) Use a flags parameter in file ram allocation functions.
+* (Patch 2) Add a new option 'pmem' to hostmem-file.
+* (Patch 3) Use libpmem to operate on the persistent memory, rather
+than re-implementing those operations in QEMU.
+* (Patch 5-8) Consider the write persistence in the migration path.
+
+
+Junyan:
+[1/7] memory, exec: Expose all memory block related flags.
+[6/7] migration/ram: Add check and info message to nvdimm post copy.
+[7/7] migration/ram: ensure write persistence on loading all date to PMEM.
+
+Haozhong:
+[5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
+
+Haozhong & Junyan:
+[2/7] memory, exec: switch file ram allocation functions to 'flags' parameters
+[3/7] configure: add libpmem support [4/7] hostmem-file: add the 'pmem' option
+[4/7] hostmem-file: add the 'pmem' option
+
+--
+backends/hostmem-file.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+configure               | 29 +++++++++++++++++++++++++++++
+docs/nvdimm.txt         | 22 ++++++++++++++++++++++
+exec.c                  | 38 +++++++++++++-------------------------
+hw/mem/nvdimm.c         |  9 ++++++++-
+include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
+include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
+include/qemu/pmem.h     | 36 ++++++++++++++++++++++++++++++++++++
+memory.c                |  8 +++++---
+migration/ram.c         | 17 +++++++++++++++++
+numa.c                  |  2 +-
+qemu-options.hx         |  7 +++++++
+12 files changed, 235 insertions(+), 36 deletions(-)
+create mode 100644 include/qemu/pmem.h
+
+-- 
+2.7.4
