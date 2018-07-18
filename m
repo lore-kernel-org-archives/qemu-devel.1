@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoal-0003Hh-FU
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:18 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoal-0003Hi-G7
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoag-0000IB-LD
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1ffoag-0000Gk-Ay
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:15 -0400
-Received: from relay.sw.ru ([185.231.240.75]:36386)
+Received: from relay.sw.ru ([185.231.240.75]:36376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1ffoag-0000FN-8h
+	id 1ffoag-0000F8-2c
 	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 11:42:10 -0400
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Wed, 18 Jul 2018 18:41:51 +0300
-Message-Id: <20180718154200.26777-9-dplotnikov@virtuozzo.com>
+Date: Wed, 18 Jul 2018 18:41:45 +0300
+Message-Id: <20180718154200.26777-3-dplotnikov@virtuozzo.com>
 In-Reply-To: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
 References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v1 08/17] migration: add helpers to change VM
- memory protection rights
+Subject: [Qemu-devel] [PATCH v1 02/17] bitops: add some atomic versions of
+ bitmap operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +28,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org
 
+1. test bit
+2. test and set bit
+
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- migration/ram.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
- migration/ram.h |  3 +++
- 2 files changed, 57 insertions(+)
+ include/qemu/bitops.h | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 27d3403435..ce3dead932 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1555,6 +1555,60 @@ void ram_block_list_destroy(void)
-     }
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 3f0926cf40..72afcfaec5 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -94,6 +94,21 @@ static inline int test_and_set_bit(long nr, unsigned long *addr)
+     return (old & mask) != 0;
  }
  
-+static int mem_protect(void *addr, uint64_t length, int prot)
++/**
++ * test_and_set_bit_atomic - Set a bit atomically and return its old value
++ * @nr: Bit to set
++ * @addr: Address to count from
++ */
++static inline int test_and_set_bit_atomic(long nr, unsigned long *addr)
 +{
-+    int ret = mprotect(addr, length, prot);
++    unsigned long mask = BIT_MASK(nr);
++    unsigned long *p = addr + BIT_WORD(nr);
++    unsigned long old;
 +
-+    if (ret < 0) {
-+        error_report("%s: Can't change protection on ram block at %p",
-+                     __func__, addr);
-+    }
-+
-+    return ret;
++    old = atomic_fetch_or(p, mask);
++    return (old & mask) != 0;
 +}
 +
-+static int ram_set_ro(void *addr, uint64_t length)
-+{
-+    return mem_protect(addr, length, PROT_READ);
-+}
-+
-+static int ram_set_rw(void *addr, uint64_t length)
-+{
-+    return mem_protect(addr, length, PROT_READ | PROT_WRITE);
-+}
-+
-+int ram_block_list_set_readonly(void)
-+{
-+    RAMBlock *block = NULL;
-+    RamBlockList *block_list = ram_bgs_block_list_get();
-+    int ret = 0;
-+
-+    QLIST_FOREACH(block, block_list, bgs_next) {
-+        ret = ram_set_ro(block->host, block->used_length);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+int ram_block_list_set_writable(void)
-+{
-+    RAMBlock *block = NULL;
-+    RamBlockList *block_list = ram_bgs_block_list_get();
-+    int ret = 0;
-+
-+    QLIST_FOREACH(block, block_list, bgs_next) {
-+        ret = ram_set_rw(block->host, block->used_length);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
- static void ram_page_buffer_decrease_used(void)
- {
-     qemu_event_reset(&ram_state->page_buffer.used_decreased);
-diff --git a/migration/ram.h b/migration/ram.h
-index 7c802c1d7f..4c463597a5 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -71,4 +71,7 @@ RAMBlock *ram_bgs_block_find(uint8_t *address, ram_addr_t *page_offset);
- void *ram_page_buffer_get(void);
- int ram_page_buffer_free(void *buffer);
+ /**
+  * test_and_clear_bit - Clear a bit and return its old value
+  * @nr: Bit to clear
+@@ -134,6 +149,16 @@ static inline int test_bit(long nr, const unsigned long *addr)
+     return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
+ }
  
-+int ram_block_list_set_readonly(void);
-+int ram_block_list_set_writable(void);
-+
- #endif
++/**
++ * test_bit_atomic - Determine whether a bit is set atomicallly
++ * @nr: bit number to test
++ * @addr: Address to start counting from
++ */
++static inline int test_bit_atomic(long nr, const unsigned long *addr)
++{
++    long valid_nr = nr & (BITS_PER_LONG - 1);
++    return 1UL & (atomic_read(&addr[BIT_WORD(nr)]) >> valid_nr);
++}
+ /**
+  * find_last_bit - find the last set bit in a memory region
+  * @addr: The address to start the search at
 -- 
 2.17.0
