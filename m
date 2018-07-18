@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ffigM-0007tf-Cl
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:23:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ffit6-0002n1-6R
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ffigH-000871-Ff
-	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:23:38 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 18 Jul 2018 11:23:30 +0200
-Message-Id: <20180718092330.19465-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] s390x/cpumodel: fix segmentation fault when
- baselining models
+	(envelope-from <cohuck@redhat.com>) id 1ffit2-0000RF-8f
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:36:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37634 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ffit2-0000Qj-1Y
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 05:36:44 -0400
+Date: Wed, 18 Jul 2018 11:36:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180718113640.7b3b905d.cohuck@redhat.com>
+In-Reply-To: <20180718064803.GA6197@xz-mi>
+References: <20180717222721.14019.27548.stgit@gimli.home>
+	<20180718064803.GA6197@xz-mi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,51 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Chris Venteicher <cventeic@redhat.com>, Collin Walling <walling@linux.ibm.com>, David Hildenbrand <david@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Usually, when baselining two CPU models, whereby one of them has base
-CPU features disabled (e.g. z14-base,msa=off), we fallback to an older
-model that did not have these features in the base model. We always try to
-create a "sane" CPU model (as far as possible), and one part of it is that
-removing base features is no good and to be avoided.
+On Wed, 18 Jul 2018 14:48:03 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Now, if we disable base features that were part of a z900, we're out of
-luck. We won't find a CPU model and QEMU will segfault. This is a
-scenario that should never happen in real life, but it can be used to
-crash QEMU.
+> On Tue, Jul 17, 2018 at 04:47:31PM -0600, Alex Williamson wrote:
+> > Directly assigned vfio devices have never been compatible with
+> > ballooning.  Zapping MADV_DONTNEED pages happens completely
+> > independent of vfio page pinning and IOMMU mapping, leaving us with
+> > inconsistent GPA to HPA mapping between vCPUs and assigned devices
+> > when the balloon deflates.  Mediated devices can theoretically do
+> > better, if we make the assumption that the mdev vendor driver is fully
+> > synchronized to the actual working set of the guest driver.  In that
+> > case the guest balloon driver should never be able to allocate an mdev
+> > pinned page for balloon inflation.  Unfortunately, QEMU can't know the
+> > workings of the vendor driver pinning, and doesn't actually know the
+> > difference between mdev devices and directly assigned devices.  Until
+> > we can sort out how the vfio IOMMU backend can tell us if ballooning
+> > is safe, the best approach is to disabling ballooning any time a vfio
+> > devices is attached.
+> > 
+> > To do that, simply make the balloon inhibitor a counter rather than a
+> > boolean, fixup a case where KVM can then simply use the inhibit
+> > interface, and inhibit ballooning any time a vfio device is attached.
+> > I'm expecting we'll expose some sort of flag similar to
+> > KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
+> > this.  An addition we could consider here would be yet another device
+> > option for vfio, such as x-disable-balloon-inhibit, in case there are
+> > mdev devices that behave in a manner compatible with ballooning.
+> > 
+> > Please let me know if this looks like a good idea.  Thanks,  
+> 
+> IMHO patches 1-2 are good cleanup as standalone patches...
+> 
+> I totally have no idea on whether people would like to use vfio-pci
+> and the balloon device at the same time.  After all vfio-pci are
+> majorly for performance players, then I would vaguely guess that they
+> don't really care thin provisioning of memory at all, hence the usage
+> scenario might not exist much.  Is that the major reason that we'd
+> just like to disable it (which makes sense to me)?
 
-So let's properly report an error if we baseline e.g.:
+Don't people use vfio-pci as well if they want some special
+capabilities from the passed-through device? (At least that's the main
+use case for vfio-ccw, not any performance considerations.)
 
-{ "execute": "query-cpu-model-baseline",
-  "arguments" : { "modela": { "name": "z14-base", "props": {"esan3" : false}},
-                  "modelb": { "name": "z14"}} }
-
-Instead of segfaulting.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu_models.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index cfdbccf46d..604898a882 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -716,6 +716,14 @@ CpuModelBaselineInfo *arch_query_cpu_model_baseline(CpuModelInfo *infoa,
- 
-     model.def = s390_find_cpu_def(cpu_type, max_gen, max_gen_ga,
-                                   model.features);
-+
-+    /* models without early base features (esan3) are bad */
-+    if (!model.def) {
-+        error_setg(errp, "No compatible CPU model could be created as"
-+                   " important base features are disabled");
-+        return NULL;
-+    }
-+
-     /* strip off features not part of the max model */
-     bitmap_and(model.features, model.features, model.def->full_feat,
-                S390_FEAT_MAX);
--- 
-2.17.1
+> 
+> I'm wondering what if want to do that somehow some day... Whether
+> it'll work if we just let vfio-pci devices to register some guest
+> memory invalidation hook (just like the iommu notifiers, but for guest
+> memory address space instead), then we map/unmap the IOMMU pages there
+> for vfio-pci device to make sure the inflated balloon pages are not
+> mapped and also make sure new pages are remapped with correct HPA
+> after deflated.  This is a pure question out of my curiosity, and for
+> sure it makes little sense if the answer of the first question above
+> is positive.
+> 
+> Thanks,
+> 
