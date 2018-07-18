@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ffcF9-0001NQ-PH
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:31:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ffdfp-00012D-KG
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 00:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ffcF6-0008Ew-JZ
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:31:07 -0400
-Received: from ozlabs.org ([203.11.71.1]:53255)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ffcF5-00089r-O3
-	for qemu-devel@nongnu.org; Tue, 17 Jul 2018 22:31:04 -0400
-Date: Wed, 18 Jul 2018 12:30:53 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180718023053.GD2102@umbus.fritz.box>
-References: <alpine.BSF.2.21.1807151041060.88858@zero.eik.bme.hu>
-	<20180716025346.GF2599@umbus.fritz.box>
-	<alpine.BSF.2.21.1807162207210.15021@zero.eik.bme.hu>
-	<CAFEAcA_3km1OB=7kqoZ6AvW0+G9FqfgD+go_KghFLDrgj2Xk+g@mail.gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1ffdfm-0002k6-IK
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 00:02:45 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:44899)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ffdfm-0002i5-An
+	for qemu-devel@nongnu.org; Wed, 18 Jul 2018 00:02:42 -0400
+Received: by mail-pf0-x244.google.com with SMTP id k21-v6so1528221pff.11
+	for <qemu-devel@nongnu.org>; Tue, 17 Jul 2018 21:02:42 -0700 (PDT)
+References: <20180716133302.25989-1-peter.maydell@linaro.org>
+	<57aa2f3f-aa32-bcdb-f971-32709e717833@linaro.org>
+	<CAFEAcA8FnSP35scTZmLG6_qFOBsu1wRC0mLq5isz+Y_r907i5w@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1f26dbe0-9999-f9ea-103f-d5dde6c52dc0@linaro.org>
+Date: Tue, 17 Jul 2018 21:02:37 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="d9ADC0YsG2v16Js0"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_3km1OB=7kqoZ6AvW0+G9FqfgD+go_KghFLDrgj2Xk+g@mail.gmail.com>
-Subject: Re: [Qemu-devel] hw/display/sm501* status
+In-Reply-To: <CAFEAcA8FnSP35scTZmLG6_qFOBsu1wRC0mLq5isz+Y_r907i5w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.0] target/arm: Correctly handle
+ overlapping small MPU regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +34,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>, Sebastian Bauer <mail@sebastianbauer.info>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Adithya Baglody <adithya.nagaraj.baglody@intel.com>, "patches@linaro.org" <patches@linaro.org>
+
+On 07/17/2018 12:40 PM, Peter Maydell wrote:
+> On 17 July 2018 at 18:29, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> I don't understand why this is necessary in the v8m case.
+>>
+>>                AP                 APL
+>>     <----B1----|----L1-B2-A-------|---L2--->
+>>
+>>
+>> Your comment posits two regions [B1,L1] and [B2,L2], that A is not within
+>> [B1,L1] but is within [B2,L2] (otherwise we would not report a hit at all).
+>> Further, that [B1,L1] intersects [AP,APL] but does not intersect [B2,L2]
+>> (otherwise we would report a fault for overlapping regions).
+>>
+>> Surely this combination of ranges implies that [B2,L2] must itself set
+>> IS_SUBPAGE (otherwise the first region would not overlap the page of A, or
+>> would not overlap the second region).
+> 
+> (a) the overlap fault is only for addresses which are actually in the
+> overlap (ie "you asked about address X and it hits in R1 and R2"); it
+> doesn't imply that other addresses which are only in R1 fault just
+> because some part of R1 overlaps with R2.
+
+Ah, that wasn't clear from the manual.
+
+> So for instance:
+> 
+>        AP                        APL
+>    [B1                                L1]
+>                  [B2       L2]
+>              A1^     A2^
+
+Thanks for the example,
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---d9ADC0YsG2v16Js0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 16, 2018 at 09:43:05PM +0100, Peter Maydell wrote:
-> On 16 July 2018 at 21:26, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> > I could list sm501 in the sam460ex section thus formally taking
-> > sub-maintainership but this would only go as far that I'll get cc-d on
-> > changes and try to review them. I still can't (and don't want to) maint=
-ain
-> > my own tree and send pull requests directly so I'd need someone's help =
-with
-> > that who can take my patches and merge them via their tree. If it's OK =
-to
-> > continue to use the PPC tree for that I'm fine with that if David agrees
-> > (which I think he did above).
-> >
-> > So is it OK to add sm501 to sam460ex section so I claim responsibility =
-for
-> > changes and will continue sending patches cc-ing David (and maybe Gerd =
-to
-> > help spotting problems) then David could take these via the PPC tree?
->=20
-> I think that makes sense. sh4 is pretty dead and if sm501's major
-> active user is the sam460ex then listing it there seems reasonable.
-
-Sounds good to me.
-
-Zoltan, can you send a patch adding sm501 to the sam460ex section of
-the MAINTAINERS file.  That will make you the right point of contact
-for it.
-
-On the understanding that it's just about tree logistics, rather than
-review, I'll be happy to take sm501 patches from you through my tree.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---d9ADC0YsG2v16Js0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAltOpl0ACgkQbDjKyiDZ
-s5I+Uw//TFjZIWgl05g0MAm5nqXyc9EmHeGm1Hrlk3avZL4ILPFufV2aN72RniNx
-z9e5P+Hd2z7YcSlIpUjLFfzvuAOUOpaMAw/74oUe39Q+AvvtzGNttvoYxBclPHpj
-BJY7dZB96/csUhpq6GNYainfhDrJ5HZJN+NpVd1SrTO22uMdRccv1EB4Zi3Deykl
-7n8fXAiOXyoRUHTY2EX2ytuU/tPrqQz0pLlCOZevt3L4U+2DKZf+Y3fNjFUYTUIY
-FYBE69dzkw2Om8gmK8l65ORkXfF+LO63eOTperQdxgNZLdfiZGcdmLJnRA9s7olr
-5aXkitiXWF4MlnVOg+qrMuDN/hr8ObSjIySNU1+QEUR8XrGV/fXIoOGWd7fsMqxh
-keKzVW/gRz0CSVoFVLss3Z3hTox0vOTnOIXdcZhfz3bP5rljqf1bedX+frtrLoou
-rrBd7EfzM0aFK+MS5TztirFGi0yRzJUKSDKzd6yz6ogQnxTH0C6KQstWNPw8+HK2
-lo3unn0RJ5AAC2eebjqkiNe8uwVDAca6GFhHbsrBvm+DU3ZMU7bYlwAjAF8AZNa2
-V48q8U1ltfHmfw/a85GRrrW+Hr9SrSC718B5cOSqmPOI53ZVpVASUnNK1cuupQXs
-xGXCn0O0bEcZgIr6+cMeX6gS7zjddY0ysoyYRUTPPg5BI9jUjcE=
-=3faF
------END PGP SIGNATURE-----
-
---d9ADC0YsG2v16Js0--
+r~
