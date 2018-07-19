@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fg7qh-0002Bx-Kq
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:16:00 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fg7qi-0002Cz-9e
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:16:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fg7qd-0005Rb-JY
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:15:59 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43532)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fg7qh-0005Th-7G
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:16:00 -0400
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:40342)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fg7qd-0005R7-D2
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:15:55 -0400
-Received: by mail-pg1-x541.google.com with SMTP id v13-v6so3582142pgr.10
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 05:15:55 -0700 (PDT)
+	id 1fg7qh-0005TE-0u
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:15:59 -0400
+Received: by mail-pg1-x52e.google.com with SMTP id x5-v6so3581247pgp.7
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 05:15:58 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Thu, 19 Jul 2018 20:15:16 +0800
-Message-Id: <20180719121520.30026-5-xiaoguangrong@tencent.com>
+Date: Thu, 19 Jul 2018 20:15:17 +0800
+Message-Id: <20180719121520.30026-6-xiaoguangrong@tencent.com>
 In-Reply-To: <20180719121520.30026-1-xiaoguangrong@tencent.com>
 References: <20180719121520.30026-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 4/8] migration: introduce
- save_zero_page_to_file
+Subject: [Qemu-devel] [PATCH v2 5/8] migration: drop the return value of
+ do_compress_ram_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +32,70 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-It will be used by the compression threads
+It is not used and cleans the code up a little
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- migration/ram.c | 40 ++++++++++++++++++++++++++++++----------
- 1 file changed, 30 insertions(+), 10 deletions(-)
+ migration/ram.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index e68b0e6dec..ce6e69b649 100644
+index ce6e69b649..5aa624b3b9 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -1696,27 +1696,47 @@ static void migration_bitmap_sync(RAMState *rs)
- /**
-  * save_zero_page: send the zero page to the stream
-  *
-- * Returns the number of pages written.
-+ * Returns the size of data written to the file, 0 means the page is not
-+ * a zero page
-  *
-  * @rs: current RAM state
-+ * @file: the file where the data is saved
-  * @block: block that contains the page we want to send
-  * @offset: offset inside the block for the page
-  */
--static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-+static int save_zero_page_to_file(RAMState *rs, QEMUFile *file,
-+                                  RAMBlock *block, ram_addr_t offset)
+@@ -392,8 +392,8 @@ static QemuThread *decompress_threads;
+ static QemuMutex decomp_done_lock;
+ static QemuCond decomp_done_cond;
+ 
+-static int do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+-                                ram_addr_t offset, uint8_t *source_buf);
++static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
++                                 ram_addr_t offset, uint8_t *source_buf);
+ 
+ static void *do_data_compress(void *opaque)
  {
-     uint8_t *p = block->host + offset;
--    int pages = -1;
-+    int len = 0;
- 
-     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
--        ram_counters.duplicate++;
--        ram_counters.transferred +=
--            save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_ZERO);
--        qemu_put_byte(rs->f, 0);
--        ram_counters.transferred += 1;
--        pages = 1;
-+        len += save_page_header(rs, file, block, offset | RAM_SAVE_FLAG_ZERO);
-+        qemu_put_byte(file, 0);
-+        len += 1;
-     }
-+    return len;
-+}
- 
--    return pages;
-+/**
-+ * save_zero_page: send the zero page to the stream
-+ *
-+ * Returns the number of pages written.
-+ *
-+ * @rs: current RAM state
-+ * @block: block that contains the page we want to send
-+ * @offset: offset inside the block for the page
-+ */
-+static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-+{
-+    int len = save_zero_page_to_file(rs, rs->f, block, offset);
-+
-+    if (len) {
-+        ram_counters.duplicate++;
-+        ram_counters.transferred += len;
-+        return 1;
-+    }
-+    return -1;
+@@ -1871,15 +1871,14 @@ static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
+     return 1;
  }
  
- static void ram_release_pages(const char *rbname, uint64_t offset, int pages)
+-static int do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+-                                ram_addr_t offset, uint8_t *source_buf)
++static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
++                                 ram_addr_t offset, uint8_t *source_buf)
+ {
+     RAMState *rs = ram_state;
+-    int bytes_sent, blen;
+     uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
++    int ret;
+ 
+-    bytes_sent = save_page_header(rs, f, block, offset |
+-                                  RAM_SAVE_FLAG_COMPRESS_PAGE);
++    save_page_header(rs, f, block, offset | RAM_SAVE_FLAG_COMPRESS_PAGE);
+ 
+     /*
+      * copy it to a internal buffer to avoid it being modified by VM
+@@ -1887,17 +1886,14 @@ static int do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+      * decompression
+      */
+     memcpy(source_buf, p, TARGET_PAGE_SIZE);
+-    blen = qemu_put_compression_data(f, stream, source_buf, TARGET_PAGE_SIZE);
+-    if (blen < 0) {
+-        bytes_sent = 0;
+-        qemu_file_set_error(migrate_get_current()->to_dst_file, blen);
++    ret = qemu_put_compression_data(f, stream, source_buf, TARGET_PAGE_SIZE);
++    if (ret < 0) {
++        qemu_file_set_error(migrate_get_current()->to_dst_file, ret);
+         error_report("compressed data failed!");
+-    } else {
+-        bytes_sent += blen;
+-        ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
++        return;
+     }
+ 
+-    return bytes_sent;
++    ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
+ }
+ 
+ static void flush_compressed_data(RAMState *rs)
 -- 
 2.14.4
