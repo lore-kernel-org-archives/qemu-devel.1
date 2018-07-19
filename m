@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fgFTu-0008Oo-L1
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:24:59 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1fgFdc-0004JJ-SC
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fgFTt-0005qz-Hr
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:24:58 -0400
-References: <20180718211256.29774-1-naravamudan@digitalocean.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <bad5d90c-9d9f-8abf-35de-9c109b7772fd@redhat.com>
-Date: Thu, 19 Jul 2018 16:24:46 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1fgFdZ-0001ht-O3
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:35:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1fgFdZ-0001hM-D9
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 16:34:57 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w6JKTVlc067074
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 16:34:55 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2kb17xhbhx-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 16:34:55 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Thu, 19 Jul 2018 14:34:54 -0600
+References: <1532012617-16777-1-git-send-email-walling@linux.ibm.com>
+	<20180719191818.GD2462@work-vm>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Thu, 19 Jul 2018 16:34:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180718211256.29774-1-naravamudan@digitalocean.com>
+In-Reply-To: <20180719191818.GD2462@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/file-posix: add
- bdrv_attach_aio_context callback for host dev and cdrom
+Message-Id: <97bef638-4441-3367-6c64-9339cba3c33f@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: print message when using 'help'
+ with an unknown command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +43,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-
-
-On 07/18/2018 05:12 PM, Nishanth Aravamudan via Qemu-devel wrote:
-> In ed6e2161 ("linux-aio: properly bubble up errors from initialzation"),
-> I only added a bdrv_attach_aio_context callback for the bdrv_file
-> driver. There are several other drivers that use the shared
-> aio_plug callback, though, and they will trip the assertion added to
-> aio_get_linux_aio because they did not call aio_setup_linux_aio first.
-> Add the appropriate callback definition to the affected driver
-> definitions.
+On 07/19/2018 03:18 PM, Dr. David Alan Gilbert wrote:
+> * Collin Walling (walling@linux.ibm.com) wrote:
+>> When typing 'help' followed by an unknown command, QEMU will
+>> not print anything to the command line to let the user know
+>> they typed a bad command. Let's fix this by printing a message
+>> to the monitor when this happens. For example:
+>>
+>>     (qemu) help xyz
+>>     unknown command: 'xyz'
+>>
+>> Reported-by: Stefan Zimmermann <stzi@linux.ibm.com>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  monitor.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index 7af1f18..7942f9f 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -1034,9 +1034,12 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
+>>              } else {
+>>                  help_cmd_dump_one(mon, cmd, args, arg_index);
+>>              }
+>> -            break;
+>> +            return;
+>>          }
+>>      }
+>> +
+>> +    /* Entry not found */
+>> +    monitor_printf(mon, "unknown command: '%s'\n", args[arg_index]);
 > 
-> Fixes: ed6e2161 ("linux-aio: properly bubble up errors from initialization")
-> Reported-by: Farhan Ali <alifm@linux.ibm.com>
-> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Fam Zheng <famz@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: qemu-block@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  block/file-posix.c | 3 +++
->  1 file changed, 3 insertions(+)
+> Thanks, that does suffer from a similar bug to the one you fixed a
+> few months back in  317c52cc6aa0d ('monitor: report entirety of hmp
+> command on error'):
 > 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 60af4b3d51..ad299beb38 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -3158,6 +3158,7 @@ static BlockDriver bdrv_host_device = {
->      .bdrv_refresh_limits = raw_refresh_limits,
->      .bdrv_io_plug = raw_aio_plug,
->      .bdrv_io_unplug = raw_aio_unplug,
-> +    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
->  
->      .bdrv_co_truncate       = raw_co_truncate,
->      .bdrv_getlength	= raw_getlength,
-> @@ -3280,6 +3281,7 @@ static BlockDriver bdrv_host_cdrom = {
->      .bdrv_refresh_limits = raw_refresh_limits,
->      .bdrv_io_plug = raw_aio_plug,
->      .bdrv_io_unplug = raw_aio_unplug,
-> +    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
->  
->      .bdrv_co_truncate    = raw_co_truncate,
->      .bdrv_getlength      = raw_getlength,
-> @@ -3410,6 +3412,7 @@ static BlockDriver bdrv_host_cdrom = {
->      .bdrv_refresh_limits = raw_refresh_limits,
->      .bdrv_io_plug = raw_aio_plug,
->      .bdrv_io_unplug = raw_aio_unplug,
-> +    .bdrv_attach_aio_context = raw_aio_attach_aio_context,
->  
->      .bdrv_co_truncate    = raw_co_truncate,
->      .bdrv_getlength      = raw_getlength,
+> (qemu) help foo
+> unknown command: 'foo'
+> (qemu) help info foo
+> unknown command: 'foo'
+
+Yeah... my thinking was that "info" is a correct command, so let's instead only
+report to the user just the piece that was incorrect.
+
+If it makes better sense to include the whole "info foo" piece, it's certainly
+doable... whichever makes the most sense. Thoughts?
+
+> 
+> Dave
+> (And yes, please cc me, otherwise I can miss them)
 > 
 
-Seems sane to me, at a glance.
+Will do :)
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+>>  }
+>>  
+>>  static void help_cmd(Monitor *mon, const char *name)
+>> -- 
+>> 2.7.4
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
+
+-- 
+Respectfully,
+- Collin Walling
