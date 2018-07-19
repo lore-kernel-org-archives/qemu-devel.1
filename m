@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fgBfd-0005nl-Lt
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:20:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fgBii-0007XZ-Up
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fgBfZ-0001Mh-F7
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:20:49 -0400
-Received: from mail-eopbgr700117.outbound.protection.outlook.com
-	([40.107.70.117]:42592
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fgBfZ-0001Ln-4w
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:20:45 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 19 Jul 2018 16:20:38 +0000
-Message-ID: <BN7PR08MB4868DB73F3F048397F8C6312C6520@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1532004727-13778-12-git-send-email-stefan.markovic@rt-rk.com>,
-	<8541a994-5ab2-49da-cbe8-a92a53075d7c@linaro.org>
-In-Reply-To: <8541a994-5ab2-49da-cbe8-a92a53075d7c@linaro.org>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1fgBii-0003P1-7u
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:24:00 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37031)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fgBih-0003ON-Qv
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:24:00 -0400
+Received: by mail-oi0-x244.google.com with SMTP id k81-v6so16039220oib.4
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 09:23:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 11/11] linux-user: Add availability
- control to some syscalls
+In-Reply-To: <20180718095628.26442-1-jusual@mail.ru>
+References: <20180718095628.26442-1-jusual@mail.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Jul 2018 17:23:38 +0100
+Message-ID: <CAFEAcA_YsV4MYw55y8dwg2FAT40=He0NvYqJQ3mvdxS8czJJkw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] arm: Add ARMv6-M programmer's model
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "philippe.mathieu.daude@gmail.com" <philippe.mathieu.daude@gmail.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Paul Burton <pburton@wavecomp.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Thursday, July 19, 2018 5:57 PM
+On 18 July 2018 at 10:56, Julia Suvorova <jusual@mail.ru> wrote:
+> Forbid stack alignment change. (CCR)
+> Reserve FAULTMASK, BASEPRI registers.
+> Report any fault as a HardFault. Disable MemManage, BusFault and
+> UsageFault, so they always escalated to HardFault. (SHCSR)
 >
-> On 07/19/2018 05:52 AM, Stefan Markovic wrote:
-> > From: Aleksandar Rikalo <arikalo@wavecomp.com>
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> > ---
-> >  linux-user/strace.c  | 14 +++++++++++++-
-> >  linux-user/syscall.c | 25 +++++++++++++++++++++++++
-> >  2 files changed, 38 insertions(+), 1 deletion(-)
->
-> We need a (any) description of why.  Is nanoMIPS going to reset the kerne=
-l > abi
-> and do away with the "legacy" mips syscalls?
->
->
-> r~
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+> v2:
+>     * Changed CCR reset value
 
-Second that. This patch needs a proper commit message anyway, I don't know =
-how it managed to arrive to this list without one.
+Applied to target-arm.for-3.1, thanks.
 
-I do know the answer to the connection between this patch and nanoMIPS thou=
-gh. nanoMIPS supports different set of syscalls from "stat" group than mips=
-32/mips64/mipsn32 or any other platform. Without this patch, nanoMIPS QEMU =
-user-mode build would fail (but complete nanoMIPS QEMU user-mode support ha=
-ve not been sent for review to this list so far - it will be sent most like=
-ly next week).
-
-Regards,
-Aleksandar
+-- PMM
