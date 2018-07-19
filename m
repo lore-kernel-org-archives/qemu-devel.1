@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fg8Lq-0000BT-2I
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:48:11 -0400
+	(envelope-from <lcapitulino@redhat.com>) id 1fg8M9-0000Le-2F
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fg8Lp-00089E-2W
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:48:10 -0400
-References: <20180628000745.4477-1-mreitz@redhat.com>
-	<20180628000745.4477-3-mreitz@redhat.com>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <b9375698-49bd-cb9a-432a-94f139d49ec7@tuxera.com>
-Date: Thu, 19 Jul 2018 15:47:55 +0300
+	(envelope-from <lcapitulino@redhat.com>) id 1fg8M7-0008FZ-Di
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:48:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56118 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lcapitulino@redhat.com>)
+	id 1fg8M7-0008FA-1S
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:48:27 -0400
+Date: Thu, 19 Jul 2018 08:48:19 -0400
+From: Luiz Capitulino <lcapitulino@redhat.com>
+Message-ID: <20180719084819.730b7971@doriath>
+In-Reply-To: <20180719121635.GA28107@stefanha-x1.localdomain>
+References: <20180713075232.9575-1-pagupta@redhat.com>
+	<20180713075232.9575-4-pagupta@redhat.com>
+	<20180718085529.133a0a22@doriath>
+	<367397176.52317488.1531979293251.JavaMail.zimbra@redhat.com>
+	<20180719121635.GA28107@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180628000745.4477-3-mreitz@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v9 02/31] block: Use children
- list in bdrv_refresh_filename
+Subject: Re: [Qemu-devel] [RFC v3] qemu: Add virtio pmem device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +31,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, imammedo@redhat.com, mst@redhat.com, niteshnarayanlal@hotmail.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-Hi!
+On Thu, 19 Jul 2018 13:16:35 +0100
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-On 06/28/2018 03:07 AM, Max Reitz wrote:
-> bdrv_refresh_filename() should invoke itself recursively on all
-> children, not just on file.
+> On Thu, Jul 19, 2018 at 01:48:13AM -0400, Pankaj Gupta wrote:
+> >   
+> > >   
+> > > >  This patch adds virtio-pmem Qemu device.
+> > > > 
+> > > >  This device presents memory address range information to guest
+> > > >  which is backed by file backend type. It acts like persistent
+> > > >  memory device for KVM guest. Guest can perform read and persistent
+> > > >  write operations on this memory range with the help of DAX capable
+> > > >  filesystem.
+> > > > 
+> > > >  Persistent guest writes are assured with the help of virtio based
+> > > >  flushing interface. When guest userspace space performs fsync on
+> > > >  file fd on pmem device, a flush command is send to Qemu over VIRTIO
+> > > >  and host side flush/sync is done on backing image file.
+> > > > 
+> > > > Changes from RFC v2:
+> > > > - Use aio_worker() to avoid Qemu from hanging with blocking fsync
+> > > >   call - Stefan
+> > > > - Use virtio_st*_p() for endianess - Stefan
+> > > > - Correct indentation in qapi/misc.json - Eric
+> > > > 
+> > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > > > ---
+> > > >  hw/virtio/Makefile.objs                     |   3 +
+> > > >  hw/virtio/virtio-pci.c                      |  44 +++++
+> > > >  hw/virtio/virtio-pci.h                      |  14 ++
+> > > >  hw/virtio/virtio-pmem.c                     | 241
+> > > >  ++++++++++++++++++++++++++++
+> > > >  include/hw/pci/pci.h                        |   1 +
+> > > >  include/hw/virtio/virtio-pmem.h             |  42 +++++
+> > > >  include/standard-headers/linux/virtio_ids.h |   1 +
+> > > >  qapi/misc.json                              |  26 ++-
+> > > >  8 files changed, 371 insertions(+), 1 deletion(-)
+> > > >  create mode 100644 hw/virtio/virtio-pmem.c
+> > > >  create mode 100644 include/hw/virtio/virtio-pmem.h
+> > > > 
+> > > > diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> > > > index 1b2799cfd8..7f914d45d0 100644
+> > > > --- a/hw/virtio/Makefile.objs
+> > > > +++ b/hw/virtio/Makefile.objs
+> > > > @@ -10,6 +10,9 @@ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+> > > >  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) +=
+> > > >  virtio-crypto-pci.o
+> > > >  
+> > > >  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+> > > > +ifeq ($(CONFIG_MEM_HOTPLUG),y)
+> > > > +obj-$(CONFIG_LINUX) += virtio-pmem.o
+> > > > +endif
+> > > >  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+> > > >  endif
+> > > >  
+> > > > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > > > index 3a01fe90f0..93d3fc05c7 100644
+> > > > --- a/hw/virtio/virtio-pci.c
+> > > > +++ b/hw/virtio/virtio-pci.c
+> > > > @@ -2521,6 +2521,49 @@ static const TypeInfo virtio_rng_pci_info = {
+> > > >      .class_init    = virtio_rng_pci_class_init,
+> > > >  };
+> > > >  
+> > > > +/* virtio-pmem-pci */
+> > > > +
+> > > > +static void virtio_pmem_pci_realize(VirtIOPCIProxy *vpci_dev, Error
+> > > > **errp)
+> > > > +{
+> > > > +    VirtIOPMEMPCI *vpmem = VIRTIO_PMEM_PCI(vpci_dev);
+> > > > +    DeviceState *vdev = DEVICE(&vpmem->vdev);
+> > > > +
+> > > > +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> > > > +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+> > > > +}
+> > > > +
+> > > > +static void virtio_pmem_pci_class_init(ObjectClass *klass, void *data)
+> > > > +{
+> > > > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > > > +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+> > > > +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+> > > > +    k->realize = virtio_pmem_pci_realize;
+> > > > +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> > > > +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+> > > > +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_PMEM;
+> > > > +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+> > > > +    pcidev_k->class_id = PCI_CLASS_OTHERS;
+> > > > +}
+> > > > +
+> > > > +static void virtio_pmem_pci_instance_init(Object *obj)
+> > > > +{
+> > > > +    VirtIOPMEMPCI *dev = VIRTIO_PMEM_PCI(obj);
+> > > > +
+> > > > +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+> > > > +                                TYPE_VIRTIO_PMEM);
+> > > > +    object_property_add_alias(obj, "memdev", OBJECT(&dev->vdev), "memdev",
+> > > > +                              &error_abort);
+> > > > +}
+> > > > +
+> > > > +static const TypeInfo virtio_pmem_pci_info = {
+> > > > +    .name          = TYPE_VIRTIO_PMEM_PCI,
+> > > > +    .parent        = TYPE_VIRTIO_PCI,
+> > > > +    .instance_size = sizeof(VirtIOPMEMPCI),
+> > > > +    .instance_init = virtio_pmem_pci_instance_init,
+> > > > +    .class_init    = virtio_pmem_pci_class_init,
+> > > > +};
+> > > > +
+> > > > +
+> > > >  /* virtio-input-pci */
+> > > >  
+> > > >  static Property virtio_input_pci_properties[] = {
+> > > > @@ -2714,6 +2757,7 @@ static void virtio_pci_register_types(void)
+> > > >      type_register_static(&virtio_balloon_pci_info);
+> > > >      type_register_static(&virtio_serial_pci_info);
+> > > >      type_register_static(&virtio_net_pci_info);
+> > > > +    type_register_static(&virtio_pmem_pci_info);
+> > > >  #ifdef CONFIG_VHOST_SCSI
+> > > >      type_register_static(&vhost_scsi_pci_info);
+> > > >  #endif
+> > > > diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> > > > index 813082b0d7..fe74fcad3f 100644
+> > > > --- a/hw/virtio/virtio-pci.h
+> > > > +++ b/hw/virtio/virtio-pci.h
+> > > > @@ -19,6 +19,7 @@
+> > > >  #include "hw/virtio/virtio-blk.h"
+> > > >  #include "hw/virtio/virtio-net.h"
+> > > >  #include "hw/virtio/virtio-rng.h"
+> > > > +#include "hw/virtio/virtio-pmem.h"
+> > > >  #include "hw/virtio/virtio-serial.h"
+> > > >  #include "hw/virtio/virtio-scsi.h"
+> > > >  #include "hw/virtio/virtio-balloon.h"
+> > > > @@ -57,6 +58,7 @@ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+> > > >  typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+> > > >  typedef struct VHostVSockPCI VHostVSockPCI;
+> > > >  typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+> > > > +typedef struct VirtIOPMEMPCI VirtIOPMEMPCI;
+> > > >  
+> > > >  /* virtio-pci-bus */
+> > > >  
+> > > > @@ -274,6 +276,18 @@ struct VirtIOBlkPCI {
+> > > >      VirtIOBlock vdev;
+> > > >  };
+> > > >  
+> > > > +/*
+> > > > + * virtio-pmem-pci: This extends VirtioPCIProxy.
+> > > > + */
+> > > > +#define TYPE_VIRTIO_PMEM_PCI "virtio-pmem-pci"
+> > > > +#define VIRTIO_PMEM_PCI(obj) \
+> > > > +        OBJECT_CHECK(VirtIOPMEMPCI, (obj), TYPE_VIRTIO_PMEM_PCI)
+> > > > +
+> > > > +struct VirtIOPMEMPCI {
+> > > > +    VirtIOPCIProxy parent_obj;
+> > > > +    VirtIOPMEM vdev;
+> > > > +};
+> > > > +
+> > > >  /*
+> > > >   * virtio-balloon-pci: This extends VirtioPCIProxy.
+> > > >   */
+> > > > diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+> > > > new file mode 100644
+> > > > index 0000000000..08c96d7e80
+> > > > --- /dev/null
+> > > > +++ b/hw/virtio/virtio-pmem.c
+> > > > @@ -0,0 +1,241 @@
+> > > > +/*
+> > > > + * Virtio pmem device
+> > > > + *
+> > > > + * Copyright (C) 2018 Red Hat, Inc.
+> > > > + * Copyright (C) 2018 Pankaj Gupta <pagupta@redhat.com>
+> > > > + *
+> > > > + * This work is licensed under the terms of the GNU GPL, version 2.
+> > > > + * See the COPYING file in the top-level directory.
+> > > > + *
+> > > > + */
+> > > > +
+> > > > +#include "qemu/osdep.h"
+> > > > +#include "qapi/error.h"
+> > > > +#include "qemu-common.h"
+> > > > +#include "qemu/error-report.h"
+> > > > +#include "hw/virtio/virtio-access.h"
+> > > > +#include "hw/virtio/virtio-pmem.h"
+> > > > +#include "hw/mem/memory-device.h"
+> > > > +#include "block/aio.h"
+> > > > +#include "block/thread-pool.h"
+> > > > +
+> > > > +typedef struct VirtIOPMEMresp {
+> > > > +    int ret;
+> > > > +} VirtIOPMEMResp;
+> > > > +
+> > > > +typedef struct VirtIODeviceRequest {
+> > > > +    VirtQueueElement elem;
+> > > > +    int fd;
+> > > > +    VirtIOPMEM *pmem;
+> > > > +    VirtIOPMEMResp resp;
+> > > > +} VirtIODeviceRequest;
+> > > > +
+> > > > +static int worker_cb(void *opaque)
+> > > > +{
+> > > > +    VirtIODeviceRequest *req = opaque;
+> > > > +    int err = 0;
+> > > > +
+> > > > +    /* flush raw backing image */
+> > > > +    err = fsync(req->fd);
+> > > > +    if (err != 0) {
+> > > > +        err = errno;
+> > > > +    }
+> > > > +    req->resp.ret = err;  
+> > > 
+> > > Host question: are you returning the guest errno code to the host?  
+> > 
+> > No. I am returning error code from the host in-case of host fsync
+> > failure, otherwise returning zero.  
 > 
-> With that change, we can remove the manual invocations in blkverify,
-> quorum, commit, and mirror.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block.c           | 9 +++++----
->   block/blkverify.c | 3 ---
->   block/commit.c    | 1 -
->   block/mirror.c    | 1 -
->   block/quorum.c    | 1 -
->   5 files changed, 5 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block.c b/block.c
-> index e418c97423..52247062d5 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -5174,16 +5174,17 @@ static bool append_open_options(QDict *d, BlockDriverState *bs)
->   void bdrv_refresh_filename(BlockDriverState *bs)
->   {
->       BlockDriver *drv = bs->drv;
-> +    BdrvChild *child;
->       QDict *opts;
->   
->       if (!drv) {
->           return;
->       }
->   
-> -    /* This BDS's file name will most probably depend on its file's name, so
-> -     * refresh that first */
-> -    if (bs->file) {
-> -        bdrv_refresh_filename(bs->file->bs);
-> +    /* This BDS's file name may depend on any of its children's file names, so
-> +     * refresh those first */
-> +    QLIST_FOREACH(child, &bs->children, next) {
-> +        bdrv_refresh_filename(child->bs);
->       }
->   
->       if (drv->bdrv_refresh_filename) {
-> diff --git a/block/blkverify.c b/block/blkverify.c
-> index da97ee5927..4a18baaf20 100644
-> --- a/block/blkverify.c
-> +++ b/block/blkverify.c
-> @@ -285,9 +285,6 @@ static void blkverify_refresh_filename(BlockDriverState *bs, QDict *options)
->   {
->       BDRVBlkverifyState *s = bs->opaque;
->   
-> -    /* bs->file->bs has already been refreshed */
-> -    bdrv_refresh_filename(s->test_file->bs);
-> -
->       if (bs->file->bs->full_open_options
->           && s->test_file->bs->full_open_options)
->       {
-> diff --git a/block/commit.c b/block/commit.c
-> index e1814d9693..26db55d800 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -234,7 +234,6 @@ static int coroutine_fn bdrv_commit_top_preadv(BlockDriverState *bs,
->   
->   static void bdrv_commit_top_refresh_filename(BlockDriverState *bs, QDict *opts)
->   {
-> -    bdrv_refresh_filename(bs->backing->bs);
->       pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
->               bs->backing->bs->filename);
->   }
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 61bd9f3cf1..2f5ccae2b1 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -1421,7 +1421,6 @@ static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
->            * bdrv_set_backing_hd */
->           return;
->       }
-> -    bdrv_refresh_filename(bs->backing->bs);
->       pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
->               bs->backing->bs->filename);
->   }
-> diff --git a/block/quorum.c b/block/quorum.c
-> index 9152da8c58..03388590f3 100644
-> --- a/block/quorum.c
-> +++ b/block/quorum.c
-> @@ -1080,7 +1080,6 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
->       int i;
->   
->       for (i = 0; i < s->num_children; i++) {
-> -        bdrv_refresh_filename(s->children[i]->bs);
->           if (!s->children[i]->bs->full_open_options) {
->               return;
->           }
-> 
+> I think that's what Luiz meant.  errno constants are not portable
+> between operating systems and architectures.  Therefore they cannot be
+> used in external interfaces in software that expects to communicate with
+> other systems.
 
-Should blklogwrites not also receive the same treatment?
+Oh, thanks. Only saw this email now.
 
-Best regards,
-Ari Sundholm
-ari@tuxera.com
+> It will be necessary to define specific constants for virtio-pmem
+> instead of passing errno from the host to guest.
+
+Yes, defining your own constants work. But I think the only fsync()
+error that will make sense for the guest is EIO. The other errors
+only make sense for the host.
