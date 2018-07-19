@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fgByW-00086H-8L
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:40:22 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fgC4c-0000vP-4C
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fgByP-0003TF-23
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:40:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47060
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1fgByO-0003Rw-JM
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:40:12 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w6JGeAbe052498
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 12:40:11 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2kau9dgh8v-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 12:40:09 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Thu, 19 Jul 2018 10:40:01 -0600
-References: <1532012617-16777-1-git-send-email-walling@linux.ibm.com>
-	<87sh4f191h.fsf@dusky.pond.sub.org>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Thu, 19 Jul 2018 12:39:58 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fgC4b-00071B-4B
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:46:38 -0400
+References: <3390c4bf-ffac-3744-fd85-84f4ee8193bf@ilande.co.uk>
+	<85e11e69-84fd-1dc7-28cf-d4c0820c4f05@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <ece0b6f2-878c-0190-7f09-926ea64f5a4e@ilande.co.uk>
+Date: Thu, 19 Jul 2018 17:46:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <87sh4f191h.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <2dca7714-195f-1532-a907-4e43bfd9355e@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] monitor: print message when using 'help'
- with an unknown command
+In-Reply-To: <85e11e69-84fd-1dc7-28cf-d4c0820c4f05@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] How to generate custom fw paths for IDE devices?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,61 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Laszlo Ersek <lersek@redhat.com>, armbru@redhat.com, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, marcel@redhat.com, jsnow@redhat.com
 
-On 07/19/2018 12:31 PM, Markus Armbruster wrote:
-> You neglected to cc: maintainers.  Cc'ing them increases the odds your
-> patch will be noticed and picked up.  You can use
-> scripts/get_maintainer.pl to find maintainers.  You don't have to do
-> anything for this patch; it got noticed anyway.
-> 
-> David, this is yours :)
+On 19/07/18 09:10, Thomas Huth wrote:
 
-Very true. Was a minor fix that I thought I'd just toss it out there and 
-let anyone view it if they had the time. Will be more aware of who to CC
-next time around.
-
-Thanks :)
-
-> 
-> Collin Walling <walling@linux.ibm.com> writes:
-> 
->> When typing 'help' followed by an unknown command, QEMU will
->> not print anything to the command line to let the user know
->> they typed a bad command. Let's fix this by printing a message
->> to the monitor when this happens. For example:
+> On 18.07.2018 23:13, Mark Cave-Ayland wrote:
+>> Hi all,
 >>
->>     (qemu) help xyz
->>     unknown command: 'xyz'
+>> Following on from a couple of patches I've previously posted to the
+>> mailing list at
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08836.html I've
+>> made some good progress with trying to add bootindex support to OpenBIOS
+>> but I'm stuck with generating the IDE device paths from QEMU.
 >>
->> Reported-by: Stefan Zimmermann <stzi@linux.ibm.com>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> ---
->>  monitor.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
+>> According to OpenBIOS the device path for a cdrom on a sun4u machine
+>> should be:
 >>
->> diff --git a/monitor.c b/monitor.c
->> index 7af1f18..7942f9f 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -1034,9 +1034,12 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
->>              } else {
->>                  help_cmd_dump_one(mon, cmd, args, arg_index);
->>              }
->> -            break;
->> +            return;
->>          }
->>      }
->> +
->> +    /* Entry not found */
->> +    monitor_printf(mon, "unknown command: '%s'\n", args[arg_index]);
->>  }
->>  
->>  static void help_cmd(Monitor *mon, const char *name)
+>>    /pci@1fe,0/pci@1,1/ide@3/ide1@8100/cdrom@0
+>>
+>> whereas with my working patchset I'm currently generating:
+>>
+>>    /pci@1fe,0/pci@1,1/ide@3/drive@1
+>>
+>> The issue is that the drive@1 part is being generated by the IDE drive
+>> device attached to the IDE bus in hw/ide/qdev.c, and so I think I need
+>> to override idebus_get_fw_dev_path() to manually generate the remainder
+>> of the path including both the controller and the correctly named drive
+>> node.
+>>
+>> One option may be to consider subclassing IDEBus and overriding
+>> idebus_get_fw_dev_path() there, but the cmd646 device is a child of
+>> TYPE_PCI_IDE which has its own internal IDEBus and so it seems
+>> overriding it is impossible.
+>>
+>> Can anyone point me in the right direction as to how to generate the
+>> correct fw path for IDE devices in the above format for sun4u machines?
 > 
+> Not sure if it is of any help, but the pseries machine is also rewriting
+> the device paths for the device tree: See function spapr_get_fw_dev_path
+> in hw/ppc/spapr.c.
+
+Ah I see - this is very useful indeed, as it seemingly allows all the fw 
+paths to be managed in a single place without having to add Bus support. 
+Thanks for the reference!
 
 
--- 
-Respectfully,
-- Collin Walling
+ATB,
+
+Mark.
