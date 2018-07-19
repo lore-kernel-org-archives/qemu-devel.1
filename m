@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fg0sh-0000kX-A9
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 00:49:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1fg14h-0002qr-UH
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 01:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fg0sd-0003eD-Cg
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 00:49:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40818 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fg14e-0007sf-Ry
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 01:01:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39480 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fg0sd-0003e3-6G
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 00:49:31 -0400
-Date: Thu, 19 Jul 2018 12:49:23 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fg14e-0007sQ-Mf
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 01:01:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0142340711BF
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 05:01:56 +0000 (UTC)
+Date: Thu, 19 Jul 2018 13:01:45 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180719044923.GC4071@xz-mi>
-References: <20180717222721.14019.27548.stgit@gimli.home>
-	<20180718064803.GA6197@xz-mi>
-	<20180718113640.7b3b905d.cohuck@redhat.com>
+Message-ID: <20180719050145.GD4071@xz-mi>
+References: <20180620071040.28729-1-peterx@redhat.com>
+	<87y3e8lfks.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180718113640.7b3b905d.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Balloon inhibit enhancements
+In-Reply-To: <87y3e8lfks.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Wed, Jul 18, 2018 at 11:36:40AM +0200, Cornelia Huck wrote:
-> On Wed, 18 Jul 2018 14:48:03 +0800
-> Peter Xu <peterx@redhat.com> wrote:
+On Wed, Jul 18, 2018 at 05:38:11PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
 > 
-> > On Tue, Jul 17, 2018 at 04:47:31PM -0600, Alex Williamson wrote:
-> > > Directly assigned vfio devices have never been compatible with
-> > > ballooning.  Zapping MADV_DONTNEED pages happens completely
-> > > independent of vfio page pinning and IOMMU mapping, leaving us with
-> > > inconsistent GPA to HPA mapping between vCPUs and assigned devices
-> > > when the balloon deflates.  Mediated devices can theoretically do
-> > > better, if we make the assumption that the mdev vendor driver is fully
-> > > synchronized to the actual working set of the guest driver.  In that
-> > > case the guest balloon driver should never be able to allocate an mdev
-> > > pinned page for balloon inflation.  Unfortunately, QEMU can't know the
-> > > workings of the vendor driver pinning, and doesn't actually know the
-> > > difference between mdev devices and directly assigned devices.  Until
-> > > we can sort out how the vfio IOMMU backend can tell us if ballooning
-> > > is safe, the best approach is to disabling ballooning any time a vfio
-> > > devices is attached.
-> > > 
-> > > To do that, simply make the balloon inhibitor a counter rather than a
-> > > boolean, fixup a case where KVM can then simply use the inhibit
-> > > interface, and inhibit ballooning any time a vfio device is attached.
-> > > I'm expecting we'll expose some sort of flag similar to
-> > > KVM_CAP_SYNC_MMU from the vfio IOMMU for cases where we can resolve
-> > > this.  An addition we could consider here would be yet another device
-> > > option for vfio, such as x-disable-balloon-inhibit, in case there are
-> > > mdev devices that behave in a manner compatible with ballooning.
-> > > 
-> > > Please let me know if this looks like a good idea.  Thanks,  
-> > 
-> > IMHO patches 1-2 are good cleanup as standalone patches...
-> > 
-> > I totally have no idea on whether people would like to use vfio-pci
-> > and the balloon device at the same time.  After all vfio-pci are
-> > majorly for performance players, then I would vaguely guess that they
-> > don't really care thin provisioning of memory at all, hence the usage
-> > scenario might not exist much.  Is that the major reason that we'd
-> > just like to disable it (which makes sense to me)?
+> > After the Out-Of-Band work, the monitor iothread may be accessing the
+> > cur_mon as well (via monitor_qmp_dispatch_one()).  Let's convert the
+> > cur_mon variable to be a per-thread variable to make sure there won't be
+> > a race between threads when accessing the variable.
 > 
-> Don't people use vfio-pci as well if they want some special
-> capabilities from the passed-through device? (At least that's the main
-> use case for vfio-ccw, not any performance considerations.)
+> Hmm... why hasn't the OOB work created such a race already?
+> 
+> A monitor reads, parses, dispatches and executes commands, formats and
+> sends replies.
+> 
+> Before OOB, all of that ran in the main thread.  Any access of cur_mon
+> should therefore be from the main thread.  No races.
+> 
+> OOB moves read, parse, format and send to an I/O thread.  Dispatch and
+> execute remain in the main thread.  *Except* for commands executed OOB,
+> dispatch and execute move to the I/O thread, too.
+> 
+> Why is this not racy?  I guess it relies on careful non-use of cur_mon
+> in any part that may now execute in the I/O thread.  Scary...
 
-Good to know these.
+I think it's because cur_mon is not really used in out-of-band command
+executions - now we only have a few out-of-band enabled commands, and
+IIUC none of them is using cur_mon (for example, in
+qmp_migrate_recover() we don't even call error_report, and the code
+path is quite straight forward to make sure of that).  So IIUC cur_mon
+variable is still only touched by main thread for now hence we should
+be safe.  However that condition might change in the future when we
+add more out-of-band capable commands.
 
-Out of topic: could I further ask what's these capabilities, and why
-these capabilities can't be emulated (or hard to be emulated) if we
-don't care about performance?
+(not to mention that I don't even know whether there are real users of
+ out-of-band if we haven't yet started to support that for libvirt...)
 
-(Any link or keyword would be welcomed too if there is)
+> 
+> Should this go into 3.0 to reduce the risk of bugs?
+
+Yes I think it would be good to have that even for 3.0, since it still
+can be seen as a bug fix of existing code.
 
 Regards,
 
