@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fgCzc-0001cv-Lo
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:45:34 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fgDBT-00054M-Nj
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:57:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fgCzb-00056a-1s
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:45:32 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41343)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fgCza-000569-Hf
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:45:30 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j5-v6so8870428wrr.8
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 10:45:30 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fgDBS-0003Gn-Ti
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:57:47 -0400
+References: <20180719034118.27741-1-famz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6757101d-316a-79f5-1dbc-4546b054c9da@redhat.com>
+Date: Thu, 19 Jul 2018 13:57:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <87a7qpc0fo.fsf@dusky.pond.sub.org>
-References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
-	<20180706121354.2021-13-marcandre.lureau@redhat.com>
-	<87a7qpc0fo.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 19 Jul 2018 19:45:28 +0200
-Message-ID: <CAJ+F1CJvs6d8BiVSqDRsbDv6CiWamy68dBNNsSK6S1ZkGBpm1g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 12/12] RFC: qmp: rework 'id' handling
+In-Reply-To: <20180719034118.27741-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Don't lock /dev/null
+ and /dev/zero automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,283 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-
-Hi
-
-On Tue, Jul 17, 2018 at 6:05 PM, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> Copying the guest agent maintainer Michael Roth.
->
-> Patch needs a rebase.
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> Let qmp_dispatch() copy the 'id' field. That way any qmp client will
->> conform to the specification, including QGA.
->
-> Before this patch, users of the common core shared by QMP and QGA have
-> to do extra work to conform to qmp-spec.txt.  QMP does, QGA doesn't.
-> I'm inclined to consider that a bug.
->
-> Judging from your description, this patch moves that work into the
-> shared part.  The patch is therefore not just a rework of 'id' handling,
-> it's a QGA bug fix, if you're so inclined, else a QGA improvement.
->
-> Thus, 1. please rephrase the commit message accordingly, and 2. the
-> patch needs Michael's approval.
->
-
-ok
-
->>                                              Furthermore, it
->> simplifies the work for qemu monitor.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  monitor.c           | 31 ++++++++++++-------------------
->>  qapi/qmp-dispatch.c | 10 ++++++++--
->>  tests/test-qga.c    | 13 +++++--------
->>  3 files changed, 25 insertions(+), 29 deletions(-)
->>
->> diff --git a/monitor.c b/monitor.c
->> index a3efe96d1d..bf192697e4 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -249,8 +249,6 @@ QEMUBH *qmp_dispatcher_bh;
->>  struct QMPRequest {
->>      /* Owner of the request */
->>      Monitor *mon;
->> -    /* "id" field of the request */
->> -    QObject *id;
->>      /*
->>       * Request object to be handled or Error to be reported
->>       * (exactly one of them is non-null)
->> @@ -351,7 +349,6 @@ int monitor_read_password(Monitor *mon, ReadLineFunc=
- *readline_func,
->>
->>  static void qmp_request_free(QMPRequest *req)
->>  {
->> -    qobject_unref(req->id);
->>      qobject_unref(req->req);
->>      error_free(req->err);
->>      g_free(req);
->> @@ -3991,18 +3988,14 @@ static int monitor_can_read(void *opaque)
->>   * Null @rsp can only happen for commands with QCO_NO_SUCCESS_RESP.
->>   * Nothing is emitted then.
->>   */
->> -static void monitor_qmp_respond(Monitor *mon, QDict *rsp, QObject *id)
->> +static void monitor_qmp_respond(Monitor *mon, QDict *rsp)
->>  {
->>      if (rsp) {
->> -        if (id) {
->> -            qdict_put_obj(rsp, "id", qobject_ref(id));
->> -        }
->> -
->>          qmp_send_response(mon, rsp);
->>      }
->>  }
->>
->> -static void monitor_qmp_dispatch(Monitor *mon, QObject *req, QObject *i=
-d)
->> +static void monitor_qmp_dispatch(Monitor *mon, QObject *req)
->>  {
->>      Monitor *old_mon;
->>      QDict *rsp;
->> @@ -4027,7 +4020,7 @@ static void monitor_qmp_dispatch(Monitor *mon, QOb=
-ject *req, QObject *id)
->>          }
->>      }
->>
->> -    monitor_qmp_respond(mon, rsp, id);
->> +    monitor_qmp_respond(mon, rsp);
->>      qobject_unref(rsp);
->>  }
->>
->> @@ -4081,12 +4074,15 @@ static void monitor_qmp_bh_dispatcher(void *data=
-)
->>
->>      need_resume =3D !qmp_oob_enabled(req_obj->mon);
->>      if (req_obj->req) {
->> -        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) =
-?: "");
->> -        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
->> +        QDict *qdict =3D qobject_to(QDict, req_obj->req);
->> +        QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
->> +        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
->> +        monitor_qmp_dispatch(req_obj->mon, req_obj->req);
->>      } else {
->>          assert(req_obj->err);
->>          rsp =3D qmp_error_response(req_obj->err);
->> -        monitor_qmp_respond(req_obj->mon, rsp, NULL);
->> +        req_obj->err =3D NULL;
->> +        monitor_qmp_respond(req_obj->mon, rsp);
->
-> Error response without ID before and after the patch.  Okay.
->
->>          qobject_unref(rsp);
->>      }
->>
->> @@ -4115,8 +4111,7 @@ static void handle_qmp_command(JSONMessageParser *=
-parser, GQueue *tokens)
->>
->>      qdict =3D qobject_to(QDict, req);
->>      if (qdict) {
->> -        id =3D qobject_ref(qdict_get(qdict, "id"));
->> -        qdict_del(qdict, "id");
->> +        id =3D qdict_get(qdict, "id");
->>      } /* else will fail qmp_dispatch() */
->
-> Two users of @id remain: trace_monitor_qmp_cmd_out_of_band(), visible
-> below, and qapi_event_send_command_dropped().  We currently plan to kill
-> the latter.  The former is guarded by if (qdict && qmp_is_oob(qdict)),
-> and could therefore safely use qdict_get(qdict, "id").  Together, this
-> will let us delete the whole conditional here.
->
->>
->>      if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
->> @@ -4127,15 +4122,13 @@ static void handle_qmp_command(JSONMessageParser=
- *parser, GQueue *tokens)
->>
->>      if (qdict && qmp_is_oob(qdict)) {
->>          /* OOB commands are executed immediately */
->> -        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id)
->> -                                          ?: "");
->> -        monitor_qmp_dispatch(mon, req, id);
->> +        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(id) ?: ""=
-);
->> +        monitor_qmp_dispatch(mon, req);
->>          return;
->>      }
->>
->>      req_obj =3D g_new0(QMPRequest, 1);
->>      req_obj->mon =3D mon;
->> -    req_obj->id =3D id;
->>      req_obj->req =3D req;
->>      req_obj->err =3D err;
->>
->> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
->> index 90ba5e3074..acea0fcfcd 100644
->> --- a/qapi/qmp-dispatch.c
->> +++ b/qapi/qmp-dispatch.c
->> @@ -59,6 +59,8 @@ static QDict *qmp_dispatch_check_obj(const QObject *re=
-quest, bool allow_oob,
->>                             "QMP input member 'arguments' must be an obj=
-ect");
->>                  return NULL;
->>              }
->> +        } else if (!strcmp(arg_name, "id")) {
->> +            continue;
->>          } else {
->>              error_setg(errp, "QMP input member '%s' is unexpected",
->>                         arg_name);
->> @@ -166,8 +168,8 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *r=
-equest,
->>                      bool allow_oob)
->>  {
->>      Error *err =3D NULL;
->> -    QObject *ret;
->> -    QDict *rsp;
->> +    QDict *rsp, *dict =3D qobject_to(QDict, request);
->> +    QObject *ret, *id =3D dict ? qdict_get(dict, "id") : NULL;
->
-> I dislike mixing initialized and uninitialized variables in the same
-> declaration.
-
-ok
-
->
->>
->>      ret =3D do_qmp_dispatch(cmds, request, allow_oob, &err);
->>
->> @@ -181,5 +183,9 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *r=
-equest,
->>          rsp =3D NULL;
->>      }
->>
->> +    if (rsp && id) {
->> +        qdict_put_obj(rsp, "id", qobject_ref(id));
->> +    }
->> +
->>      return rsp;
->>  }
->
-> This puts the ID (if any) into the response.  Good.
->
-> The monitor sends command responses only with monitor_qmp_respond().
-> It's called on two places:
->
-> * monitor_qmp_dispatch()
->
->   Gets its response from qmp_dispatch(), which now puts the ID (if any).
->
-> * monitor_qmp_bh_dispatcher()
->
->   Error response without ID before and after the patch (see above).
->
-> Good.
->
-> Not visible in the patch: QGA.  It sends command responses only with
-> send_response().  Called only in process_event().  Two cases:
->
-> * json_parser_parse_err() sets an error
->
->   Error response without ID before and after the patch
-
-It should be the same as qemu monitor (no qdict returned by json_parser_par=
-se())
-
->
-> * qmp_dispatch()
->
->   Now puts the ID (if any).  This is the externally visible change.
->
-> Good.
->
->> diff --git a/tests/test-qga.c b/tests/test-qga.c
->> index d638b1571a..4ee8b405f4 100644
->> --- a/tests/test-qga.c
->> +++ b/tests/test-qga.c
->> @@ -227,18 +227,15 @@ static void test_qga_ping(gconstpointer fix)
->>      qobject_unref(ret);
->>  }
->>
->> -static void test_qga_invalid_id(gconstpointer fix)
->> +static void test_qga_id(gconstpointer fix)
->>  {
->>      const TestFixture *fixture =3D fix;
->> -    QDict *ret, *error;
->> -    const char *class;
->> +    QDict *ret;
->>
->>      ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-ping', 'id': 1}");
->>      g_assert_nonnull(ret);
->> -
->> -    error =3D qdict_get_qdict(ret, "error");
->> -    class =3D qdict_get_try_str(error, "class");
->> -    g_assert_cmpstr(class, =3D=3D, "GenericError");
->> +    qmp_assert_no_error(ret);
->> +    g_assert_cmpint(qdict_get_int(ret, "id"), =3D=3D, 1);
->>
->>      qobject_unref(ret);
->>  }
->> @@ -1014,7 +1011,7 @@ int main(int argc, char **argv)
->>      g_test_add_data_func("/qga/file-ops", &fix, test_qga_file_ops);
->>      g_test_add_data_func("/qga/file-write-read", &fix, test_qga_file_wr=
-ite_read);
->>      g_test_add_data_func("/qga/get-time", &fix, test_qga_get_time);
->> -    g_test_add_data_func("/qga/invalid-id", &fix, test_qga_invalid_id);
->> +    g_test_add_data_func("/qga/id", &fix, test_qga_id);
->>      g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob=
-);
->>      g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd=
-);
->>      g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_ar=
-gs);
->
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+On 07/18/2018 11:41 PM, Fam Zheng wrote:
+> On my Fedora 28, /dev/null is locked by some other process (couldn't
+> inspect it due to the current lslocks limitation), so iotests 226 fails
+> with some unexpected image locking errors because it uses qemu-io to
+> open it.
+> 
+> Actually it's safe to not use any lock on /dev/null or /dev/zero.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 60af4b3d51..8bf034108a 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -503,7 +503,12 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+>          s->use_lock = false;
+>          break;
+>      case ON_OFF_AUTO_AUTO:
+> -        s->use_lock = qemu_has_ofd_lock();
+> +        if (!strcmp(filename, "/dev/null") ||
+> +                   !strcmp(filename, "/dev/zero")) {
+> +            s->use_lock = false;
+> +        } else {
+> +            s->use_lock = qemu_has_ofd_lock();
+> +        }
+>          break;
+>      default:
+>          abort();
+> 
+
+I apparently caused a lot of failures with 226, oops!
+
+Should we instead modify the test in this case to not attempt to take a
+lock on a device we know cannot meaningfully store state, or is it your
+preference to attempt to maintain such a list in the raw driver itself?
+
+I guess we never want QEMU to try to lock things like /dev/zero, but I
+don't know if there are more such pseudo-devices we should never try to
+lock and if so, what common property unifies them such that we don't
+have to maintain a list.
