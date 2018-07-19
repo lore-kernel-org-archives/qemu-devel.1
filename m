@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8SP-0002nB-GI
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:59:34 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8US-00033i-8A
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:00:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8Qo-0002hg-Tn
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:54:57 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54343 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8TO-0004RW-6h
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:57:04 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56209 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1fg8Qo-0002gn-K5
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:53:18 -0400
+	id 1fg8TN-0004QP-Qw
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:55:58 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu, 19 Jul 2018 14:51:58 +0200
-Message-Id: <1532004727-13778-3-git-send-email-stefan.markovic@rt-rk.com>
-In-Reply-To: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
-References: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 02/11] target/mips: Workaround for
- checkpatch.pl hanging on msa_helper.c
+Date: Thu, 19 Jul 2018 14:54:37 +0200
+Message-Id: <1532004912-13899-6-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v3 05/40] target/mips: Add nanoMIPS decoding
+ and extraction utilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +28,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-If checkpatch.pl is applied (using switch "-f") on file
-target/mips/msa_helper.c, it will hang.
+Add some basic utility functions and macros for nanoMIPS decoding
+engine.
 
-This is a workaround by correcting the source file. The workaround is
-found by partial deleting and undeleting of the code in msa_helper.c
-in binary search fashion.
-
-The bug (for checkpatch.pl) is already reported to the qemu-devel list.
-
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/msa_helper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/mips/translate.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index c74e3cd..1691b70 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -2750,8 +2750,8 @@ void helper_msa_ftq_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 67a0f70..4e6ae1f 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16465,6 +16465,41 @@ enum {
+  *
+  */
  
- #define FMAXMIN_A(F, G, X, _S, _T, BITS, STATUS)                    \
-     do {                                                            \
--        uint## BITS ##_t S = _S, T = _T;                            \
--        uint## BITS ##_t as, at, xs, xt, xd;                        \
-+        uint## BITS ## _t S = _S, T = _T;                           \
-+        uint## BITS ## _t as, at, xs, xt, xd;                       \
-         if (NUMBER_QNAN_PAIR(S, T, BITS, STATUS)) {                 \
-             T = S;                                                  \
-         }                                                           \
++static int decode_gpr_gpr3(int r)
++{
++    static const int map[] = { 16, 17, 18, 19, 4, 5, 6, 7 };
++
++    return map[r & 0x7];
++}
++
++static int decode_gpr_gpr4(int r)
++{
++    static const int map[] = { 8, 9, 10, 11, 4, 5, 6, 7,
++                            16, 17, 18, 19, 20, 21, 22, 23 };
++
++    return map[r & 0xf];
++}
++
++/* Used for 16-bit store instructions.  */
++static int decode_gpr_gpr4_zero(int r)
++{
++    static const int map[] = { 8, 9, 10, 0, 4, 5, 6, 7,
++                            16, 17, 18, 19, 20, 21, 22, 23 };
++
++    return map[r & 0xf];
++}
++
++
++/* extraction utilities */
++
++#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
++#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
++#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
++#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
++#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
++#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
++
++
+ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+ {
+     return 2;
 -- 
 2.7.4
