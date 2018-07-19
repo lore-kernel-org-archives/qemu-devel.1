@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fg6Ki-0004WB-Gu
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 06:38:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fg6aC-0007Yj-M1
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 06:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fg6Kh-0007mk-I4
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 06:38:52 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42322)
+	(envelope-from <peter.maydell@linaro.org>) id 1fg6aB-0005HY-Qz
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 06:54:52 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37156)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fg6Kh-0007mM-CC
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 06:38:51 -0400
-Received: by mail-oi0-x242.google.com with SMTP id n84-v6so14601212oib.9
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 03:38:51 -0700 (PDT)
+	id 1fg6aB-0005H1-CH
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 06:54:51 -0400
+Received: by mail-oi0-x244.google.com with SMTP id k81-v6so14687379oib.4
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 03:54:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1531779837-20557-1-git-send-email-linux@roeck-us.net>
-References: <1531779837-20557-1-git-send-email-linux@roeck-us.net>
+In-Reply-To: <CAFEAcA_N0vUgGJTvDyh+aL=R4j7ozNqgJgAtHtH_Oj0tkZazuA@mail.gmail.com>
+References: <20180312091405.19610-1-kraxel@redhat.com>
+	<20180312091405.19610-14-kraxel@redhat.com>
+	<CAFEAcA8XWcJfjgeNRg4j7yMwPx2fNmjxL3qEgnkX8qJrUHQb5g@mail.gmail.com>
+	<CAFEAcA_N0vUgGJTvDyh+aL=R4j7ozNqgJgAtHtH_Oj0tkZazuA@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Jul 2018 11:38:30 +0100
-Message-ID: <CAFEAcA9dtWypzcQK-5Sw1=Fz_MCu8VOTzJgmd+cXCTuJW7fJDg@mail.gmail.com>
+Date: Thu, 19 Jul 2018 11:54:29 +0100
+Message-ID: <CAFEAcA8MtE4oD+D6GC1KDkRqM2R3WiTrhWs2heJWTKQ4JkKKTA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/sd/bcm2835_sdhost: Fix PIO mode writes
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 13/14] spice: add cursor_dmabuf support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 16 July 2018 at 23:23, Guenter Roeck <linux@roeck-us.net> wrote:
-> Writes in PIO mode have two requirements:
+On 6 July 2018 at 12:54, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 27 April 2018 at 14:16, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+>> On 12 March 2018 at 09:14, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>>> Add support for cursor dmabufs.  qemu has to render the cursor for
+>>> that, so in case a cursor is present qemu allocates a new dmabuf, blits
+>>> the scanout, blends in the pointer and passes on the new dmabuf to
+>>> spice-server.  Without cursor qemu continues to simply pass on the
+>>> scanout dmabuf as-is.
+>>>
+>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> Message-id: 20180308090618.30147-4-kraxel@redhat.com
+>>> +static void qemu_spice_gl_cursor_position(DisplayChangeListener *dcl,
+>>> +                                          uint32_t pos_x, uint32_t pos=
+_y)
+>>> +{
+>>> +    SimpleSpiceDisplay *ssd =3D container_of(dcl, SimpleSpiceDisplay, =
+dcl);
+>>> +
+>>> +    ssd->ptr_x =3D pos_x;
+>>> +    ssd->ptr_y =3D pos_y;
+>>
+>> Is it safe to write to these fields of ssd without holding
+>> ssd->lock ? Coverity thinks it might not be (CID 1390631) because
+>> we do take the lock to update them in display_mouse_set().
 >
-> - A data interrupt must be generated after a write command has been
->   issued to indicate that the chip is ready to receive data.
-> - A block interrupt must be generated after each block to indicate
->   that the chip is ready to receive the next data block.
->
-> Rearrange the code to make this happen. Tested on raspi3 (in PIO mode)
-> and raspi2 (in DMA mode).
->
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
+> Ping for opinions on this coverity issue?
 
-As you say, all still a bit guesswork, but this doesn't break
-my previously-working raspi3 kernel and it looks plausible
-(especially the separation of "is_read" and "is_write" rather
-than assuming everything not a read is a write). Applied
-to target-arm.next for the next 3.0 rc.
+Ping^2 ?
 
 thanks
 -- PMM
