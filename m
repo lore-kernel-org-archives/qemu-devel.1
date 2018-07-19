@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDrs-0001ib-Il
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:40 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDs0-0001oc-MX
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDrp-0007rR-Tc
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40732 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDry-0007vd-LT
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54796 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fgDrl-0007pE-OI
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:33 -0400
+	id 1fgDry-0007vH-GF
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:42 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 58F8E7263A
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 18:41:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0DB8281663E7
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 18:41:42 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 19 Jul 2018 20:41:00 +0200
-Message-Id: <20180719184111.5129-8-marcandre.lureau@redhat.com>
+Date: Thu, 19 Jul 2018 20:41:06 +0200
+Message-Id: <20180719184111.5129-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20180719184111.5129-1-marcandre.lureau@redhat.com>
 References: <20180719184111.5129-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 07/18] qmp: drop json_parser_parse() wrapper
+Subject: [Qemu-devel] [PATCH v2 13/18] json-parser: set an error if parsing
+ returned NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,118 +37,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Stupid wrapper that's used exactly once, in libqtest.c.  Let's use
-json_parser_parse_err() there, and drop the wrapper.  Let's rename
-json_parser_parse_err() to json_parser_parse() then.
+Let's make json_parser_parse_err() suck less, and simplify caller
+error handling.
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
+ * monitor.c handle_qmp_command(): drop workaround
+
+ * qga/main.c process_event(): improve error report, QERR_JSON_PARSING
+   case is handled by json_parser_parse_err() now.
+
+ * qobject/json-parser.c json_parser_parse(): Ignores the error.
+
+ * qobject/qjson.c qobject_from_jsonv() via parse_json()
+  - qobject_from_json()
+    ~ block.c parse_json_filename() - removed workaround
+    ~ block/rbd.c - abort (generated json - should never fail)
+    ~ qapi/qobject-input-visitor.c - removed workaround
+    ~ tests/check-qjson.c - assert or crash
+    ~ tests/test-visitor-serialization.c - assert or crash
+
+  - qobject_from_jsonf()
+    Now dies in error_handle_fatal() instead of the assertion.
+    Only used in tests, ok.
+
+  - tests/test-qobject-input-visitor.c
+  - tests/libqtest.c qmp_fd_sendv()
+    Passes &error_abort, does nothing when qobject_from_jsonv() returns
+    null.  The fix makes this catch invalid JSON instead of silently
+    ignoring it.
+
+Update the function documentation for possible return values.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/json-parser.h | 3 +--
- monitor.c                      | 4 ++--
- qga/main.c                     | 2 +-
- qobject/json-parser.c          | 7 +------
- qobject/qjson.c                | 2 +-
- tests/libqtest.c               | 2 +-
- 6 files changed, 7 insertions(+), 13 deletions(-)
+ block.c                      |  5 -----
+ monitor.c                    |  4 ----
+ qapi/qobject-input-visitor.c |  5 -----
+ qga/main.c                   |  2 +-
+ qobject/json-parser.c        | 16 +++++++++++++++-
+ 5 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parse=
-r.h
-index 102f5c0068..a34209db7a 100644
---- a/include/qapi/qmp/json-parser.h
-+++ b/include/qapi/qmp/json-parser.h
-@@ -16,7 +16,6 @@
+diff --git a/block.c b/block.c
+index a2fe05ea96..42eaa8b7dc 100644
+--- a/block.c
++++ b/block.c
+@@ -1478,11 +1478,6 @@ static QDict *parse_json_filename(const char *file=
+name, Error **errp)
 =20
- #include "qemu-common.h"
-=20
--QObject *json_parser_parse(GQueue *tokens, va_list *ap);
--QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp=
-);
-+QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
-=20
- #endif
+     options_obj =3D qobject_from_json(filename, errp);
+     if (!options_obj) {
+-        /* Work around qobject_from_json() lossage TODO fix that */
+-        if (errp && !*errp) {
+-            error_setg(errp, "Could not parse the JSON options");
+-            return NULL;
+-        }
+         error_prepend(errp, "Could not parse the JSON options: ");
+         return NULL;
+     }
 diff --git a/monitor.c b/monitor.c
-index 961779032a..2abb3c2fc7 100644
+index 2abb3c2fc7..5a41a230b9 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -4113,9 +4113,9 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
-     Error *err =3D NULL;
+@@ -4114,10 +4114,6 @@ static void handle_qmp_command(JSONMessageParser *=
+parser, GQueue *tokens)
      QMPRequest *req_obj;
 =20
--    req =3D json_parser_parse_err(tokens, NULL, &err);
-+    req =3D json_parser_parse(tokens, NULL, &err);
-     if (!req && !err) {
--        /* json_parser_parse_err() sucks: can fail without setting @err =
-*/
-+        /* json_parser_parse() sucks: can fail without setting @err */
-         error_setg(&err, QERR_JSON_PARSING);
-     }
+     req =3D json_parser_parse(tokens, NULL, &err);
+-    if (!req && !err) {
+-        /* json_parser_parse() sucks: can fail without setting @err */
+-        error_setg(&err, QERR_JSON_PARSING);
+-    }
 =20
+     qdict =3D qobject_to(QDict, req);
+     if (qdict) {
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index da57f4cc24..3e88b27f9e 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -725,11 +725,6 @@ Visitor *qobject_input_visitor_new_str(const char *s=
+tr,
+     if (is_json) {
+         obj =3D qobject_from_json(str, errp);
+         if (!obj) {
+-            /* Work around qobject_from_json() lossage TODO fix that */
+-            if (errp && !*errp) {
+-                error_setg(errp, "JSON parse error");
+-                return NULL;
+-            }
+             return NULL;
+         }
+         args =3D qobject_to(QDict, obj);
 diff --git a/qga/main.c b/qga/main.c
-index 87372d40ef..043f7c3ead 100644
+index 043f7c3ead..9032bb0c7a 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -608,7 +608,7 @@ static void process_event(JSONMessageParser *parser, =
+@@ -614,7 +614,7 @@ static void process_event(JSONMessageParser *parser, =
 GQueue *tokens)
-     g_assert(s && parser);
-=20
-     g_debug("process_event: called");
--    obj =3D json_parser_parse_err(tokens, NULL, &err);
-+    obj =3D json_parser_parse(tokens, NULL, &err);
-     if (err) {
+     }
+     req =3D qobject_to(QDict, obj);
+     if (!req) {
+-        error_setg(&err, QERR_JSON_PARSING);
++        error_setg(&err, "Input must be a JSON object");
          goto err;
      }
+     if (!qdict_haskey(req, "execute")) {
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index a5aa790d62..9a7004e680 100644
+index 0c0b478149..c3b0c216cf 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -575,12 +575,7 @@ static QObject *parse_value(JSONParserContext *ctxt,=
+@@ -24,6 +24,7 @@
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/json-lexer.h"
+ #include "qapi/qmp/json-streamer.h"
++#include "qapi/qmp/qerror.h"
+=20
+ typedef struct JSONParserContext
+ {
+@@ -548,6 +549,14 @@ static QObject *parse_value(JSONParserContext *ctxt,=
  va_list *ap)
      }
  }
 =20
--QObject *json_parser_parse(GQueue *tokens, va_list *ap)
--{
--    return json_parser_parse_err(tokens, ap, NULL);
--}
--
--QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp=
-)
-+QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
++/**
++ * json_parser_parse:
++ *
++ * If @tokens is null, return null.
++ * Else if @tokens parse okay, return the parse tree.
++ * Else set an error and return null.
++ *
++ **/
+ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
  {
-     JSONParserContext *ctxt =3D parser_context_new(tokens);
-     QObject *result;
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 2f6a590e44..ee04e61096 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -36,7 +36,7 @@ static void parse_json(JSONMessageParser *parser, GQueu=
-e *tokens)
- {
-     JSONParsingState *s =3D container_of(parser, JSONParsingState, parse=
-r);
+     JSONParserContext ctxt =3D { .buf =3D tokens };
+@@ -559,7 +568,12 @@ QObject *json_parser_parse(GQueue *tokens, va_list *=
+ap, Error **errp)
 =20
--    s->result =3D json_parser_parse_err(tokens, s->ap, &s->err);
-+    s->result =3D json_parser_parse(tokens, s->ap, &s->err);
- }
+     result =3D parse_value(&ctxt, ap);
 =20
- QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **err=
-p)
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 098af6aec4..3826b8baf3 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -432,7 +432,7 @@ static void qmp_response(JSONMessageParser *parser, G=
-Queue *tokens)
-     QMPResponseParser *qmp =3D container_of(parser, QMPResponseParser, p=
-arser);
-     QObject *obj;
+-    error_propagate(errp, ctxt.err);
++    if (!result && !ctxt.err) {
++        /* TODO: improve error reporting */
++        error_setg(errp, QERR_JSON_PARSING);
++    } else {
++        error_propagate(errp, ctxt.err);
++    }
 =20
--    obj =3D json_parser_parse(tokens, NULL);
-+    obj =3D json_parser_parse(tokens, NULL, NULL);
-     if (!obj) {
-         fprintf(stderr, "QMP JSON response parsing failed\n");
-         exit(1);
+     g_queue_free_full(ctxt.buf, g_free);
+     g_free(ctxt.current);
 --=20
 2.18.0.129.ge3331758f1
