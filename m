@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fgBjr-0008V6-KG
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:25:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fgBkl-0001I6-Ue
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fgBjl-0003uw-PM
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:25:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36108 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fgBjl-0003uN-JT
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:25:05 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 19 Jul 2018 17:25:00 +0100
-Message-Id: <20180719162501.32641-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-3.0 0/1] Tracing patches
+	(envelope-from <peter.maydell@linaro.org>) id 1fgBkl-0004d7-64
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:26:07 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41775)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fgBkl-0004cx-00
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:26:07 -0400
+Received: by mail-oi0-x244.google.com with SMTP id k12-v6so16041124oiw.8
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 09:26:06 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180719121637.24576-1-jusual@mail.ru>
+References: <20180719121637.24576-1-jusual@mail.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Jul 2018 17:25:46 +0100
+Message-ID: <CAFEAcA8_2hM0J38w0h0jfVMvLMceHnxgKKYeMcY-SO_Ywk0QpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] nvic: Change NVIC to support ARMv6-M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,36 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-The following changes since commit ea6abffa8a08d832feb759d359d5b935e3087cf7:
+On 19 July 2018 at 13:16, Julia Suvorova <jusual@mail.ru> wrote:
+> The differences from ARMv7-M NVIC are:
+>   * ARMv6-M only supports up to 32 external interrupts
+>    (configurable feature already). The ICTR is reserved.
+>   * Active Bit Register is reserved.
+>   * ARMv6-M supports 4 priority levels against 256 in ARMv7-M.
+>
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+> v2:
+>     * Added num_prio_bits field
+>     * AIRCR.PRIGROUP is set as RAZ/WI for Baseline
 
-  Update version for v3.0.0-rc1 release (2018-07-17 18:15:19 +0100)
+Applied to target-arm.for-3.1, thanks.
 
-are available in the Git repository at:
-
-  git://github.com/stefanha/qemu.git tags/tracing-pull-request
-
-for you to fetch changes up to db817b8c500a60873eba80cbf047900ae5b32766:
-
-  tracing: Use double-dash spelling for trace option (2018-07-19 13:09:04 +0100)
-
-----------------------------------------------------------------
-Pull request
-
-Contains a fix to use double-dash consistently with tracing command-line
-options in documentation and output.
-
-----------------------------------------------------------------
-
-Yaowei Bai (1):
-  tracing: Use double-dash spelling for trace option
-
- docs/devel/tracing.txt | 6 +++---
- trace/control.h        | 4 ++--
- trace/control.c        | 4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
-
--- 
-2.17.1
+-- PMM
