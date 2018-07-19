@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDs2-0001qe-Mg
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:50 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDs0-0001ob-M7
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDs1-0007xt-NB
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55282 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fgDs0-0007wC-2N
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54798 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fgDs1-0007xO-HX
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fgDrz-0007vy-Tb
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 14:41:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18FC687A76
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 18:41:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F60481663E7
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 18:41:43 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 19 Jul 2018 20:41:08 +0200
-Message-Id: <20180719184111.5129-16-marcandre.lureau@redhat.com>
+Date: Thu, 19 Jul 2018 20:41:07 +0200
+Message-Id: <20180719184111.5129-15-marcandre.lureau@redhat.com>
 In-Reply-To: <20180719184111.5129-1-marcandre.lureau@redhat.com>
 References: <20180719184111.5129-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 15/18] tests: add a few qemu-qmp tests
+Subject: [Qemu-devel] [PATCH v2 14/18] json-lexer: make it safe to call
+ multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +37,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-These 2 tests exhibited two qmp bugs that were fixed in 2.7
-(series from commit e64c75a9752c5d0fd64eb2e684c656a5ea7d03c6 to
-commit 1382d4abdf9619985e4078e37e49e487cea9935e)
+We can easily avoid the burden of checking if the lexer was
+initialized prior to calling destroy by the caller, let's do it.
+
+This allows simplification in state tracking in later patches of the
+qmp-async RFC series.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/qmp-test.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ qobject/json-lexer.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index b9774084f8..54611e587f 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -249,7 +249,40 @@ static void test_qmp_oob(void)
-     recv_cmd_id(qts, "blocks-2");
-     recv_cmd_id(qts, "err-2");
-     cleanup_blocking_cmd();
-+}
-+
-+static void test_object_add_without_props(void)
-+{
-+    QTestState *qts;
-+    QDict *ret;
-+
-+    qts =3D qtest_init(common_args);
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 980ba159d6..0eaba43a2c 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -386,5 +386,8 @@ int json_lexer_flush(JSONLexer *lexer)
 =20
-+    ret =3D qtest_qmp(qts,
-+                    "{'execute': 'object-add', 'arguments':"
-+                    " {'qom-type': 'memory-backend-ram', 'id': 'ram1' } =
-}");
-+    g_assert_nonnull(ret);
-+
-+    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
-+
-+    qobject_unref(ret);
-+    qtest_quit(qts);
-+}
-+
-+static void test_qom_set_without_value(void)
-+{
-+    QTestState *qts;
-+    QDict *ret;
-+
-+    qts =3D qtest_init(common_args);
-+
-+    ret =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
-+                    " { 'path': '/machine', 'property': 'rtc-time' } }")=
-;
-+    g_assert_nonnull(ret);
-+
-+    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
-+
-+    qobject_unref(ret);
-     qtest_quit(qts);
+ void json_lexer_destroy(JSONLexer *lexer)
+ {
+-    g_string_free(lexer->token, true);
++    if (lexer->token) {
++        g_string_free(lexer->token, true);
++        lexer->token =3D NULL;
++    }
  }
-=20
-@@ -479,8 +512,13 @@ int main(int argc, char *argv[])
-=20
-     g_test_init(&argc, &argv, NULL);
-=20
-+    qtest_add_func("qmp/object-add-without-props",
-+                   test_object_add_without_props);
-+    qtest_add_func("qmp/qom-set-without-value",
-+                   test_qom_set_without_value);
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-     qtest_add_func("qmp/oob", test_qmp_oob);
-+
-     qmp_schema_init(&schema);
-     add_query_tests(&schema);
-     qtest_add_func("qmp/preconfig", test_qmp_preconfig);
 --=20
 2.18.0.129.ge3331758f1
