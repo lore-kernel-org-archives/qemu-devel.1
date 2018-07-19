@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fg2df-0004in-Lw
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:42:12 -0400
+	(envelope-from <famz@redhat.com>) id 1fg2j2-0006X6-Dy
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fg2dc-0007E0-DF
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:42:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33862 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fg2dc-0007Ds-86
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:42:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180717195028.GA6691@localhost.localdomain>
-	<CAFEAcA-pPsvfn7ARu_pn0HH03rZh05fLP=wr+p=hx5douSf7vA@mail.gmail.com>
-Date: Thu, 19 Jul 2018 08:42:05 +0200
-In-Reply-To: <CAFEAcA-pPsvfn7ARu_pn0HH03rZh05fLP=wr+p=hx5douSf7vA@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 17 Jul 2018 21:06:31 +0100")
-Message-ID: <87a7qnk9qa.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1fg2j1-00010H-Ds
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 02:47:44 -0400
+Date: Thu, 19 Jul 2018 14:47:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180719064734.GC29900@lemon.usersys.redhat.com>
+References: <20180719043239.GA22006@bogon.didichuxing.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Why do we typedef every struct on QEMU?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180719043239.GA22006@bogon.didichuxing.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/block/nvme: add optional parameter
+ num_namespaces for nvme device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr.
-	David Alan Gilbert" <dgilbert@redhat.com>, Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <f4bug@amsat.org>
+To: Weiping Zhang <zhangweiping@didichuxing.com>
+Cc: keith.busch@intel.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Thu, 07/19 12:33, Weiping Zhang wrote:
+> Add an optional paramter num_namespaces for device, and set it
+> to 1 by default.
+> 
+> Signed-off-by: Weiping Zhang <zhangweiping@didichuxing.com>
+> ---
+>  hw/block/nvme.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 156ecf3c41..b53be4b5c0 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -19,7 +19,7 @@
+>   *      -drive file=<file>,if=none,id=<drive_id>
+>   *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
+>   *              cmb_size_mb=<cmb_size_mb[optional]>, \
+> - *              num_queues=<N[optional]>
+> + *              num_queues=<N[optional]>,num_namespaces=<N[optional]>
+>   *
+>   * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+>   * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
+> @@ -1232,7 +1232,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
+>      pcie_endpoint_cap_init(&n->parent_obj, 0x80);
+>  
+> -    n->num_namespaces = 1;
+>      n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
+>      n->ns_size = bs_size / (uint64_t)n->num_namespaces;
+>  
+> @@ -1342,6 +1341,7 @@ static Property nvme_props[] = {
+>      DEFINE_PROP_STRING("serial", NvmeCtrl, serial),
+>      DEFINE_PROP_UINT32("cmb_size_mb", NvmeCtrl, cmb_size_mb, 0),
+>      DEFINE_PROP_UINT32("num_queues", NvmeCtrl, num_queues, 64),
+> +    DEFINE_PROP_UINT32("num_namespaces", NvmeCtrl, num_namespaces, 1),
 
-> On 17 July 2018 at 20:50, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> I have been looking at patches that touch typedefs.h and
->> wondering: why do we make typedefs.h necessary at all?  Why do we
->> always add typedefs for every struct and union type in QEMU?
->>
->> Why do we prefer to write this:
->>
->> ----- qemu/typedefs.h:
->> typedef struct SomeType SomeType;
->> ----------------------
->>
->> ----- qemu/somecode.h:
->> #include <qemu/typedefs.h>
->>
->> int some_function(SomeType *a);
->> ----------------------
->>
->>
->> ...instead of simply writing this:?
->>
->> ----- qemu/somecode.h:
->> struct SomeType;
->> int some_function(struct SomeType *a);
->> ----------------------
->>
->> Is the maintenance burden of typedefs.h worth it?
->
-> Personally I don't like typing "struct " all the time
-> when I'm using the type...
+You need to verify the user provided value. At least 0xFFFFFFFF is the broadcast
+value and shouldn't be used, and 0 doesn't make much sense too, I guess.
 
-For a different point of view (which I happen to share), see
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst?id=024ddc0ce1049298bd3cae60ae45d9c5f0fb8b9c#n318
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> -- 
+> 2.14.1
+> 
+> 
 
-> Note also that most typedefed structs don't go in
-> typedefs.h -- the typedef is defined with the struct.
-> A quick rough count suggests less than 10% are in
-> typedefs.h. We only put in the ones where there's
-> a lot of code that wants to use pointers to them
-> as opaque types and isn't pulling in the header where
-> the full struct is defined.
+I think the data_offset calculations in nvme_rw need some changes too?
 
-Correct.
-
-> Also, this is one of the few bits of QEMU coding style
-> where we're pretty consistent, so I'd rather not
-> let it open to more free variation.
-
-Agree on the value of consistency.
-
-In my not particularly humble opinion, the QEMU coding style is one big
-mistake.
-
-This is the number of C source files and lines back when CODING_STYLE
-was created[*]:
-
-    $ git-checkout e68b98dc723
-    [...]
-    $ git-ls-tree -r HEAD --name-only | grep -c '\.[ch]$'
-    786
-    $ git-ls-tree -r HEAD --name-only | grep '\.[ch]$' | xargs wc -l | tail -n 1
-      480493 total
-
-They've since grown more than five-fold and three-fold, respectively:
-
-    $ git-checkout v3.0.0-rc1
-    [...]
-    $ git-ls-tree -r HEAD --name-only | grep -c '\.[ch]$'
-    4021
-    $ git-ls-tree -r HEAD --name-only | grep '\.[ch]$' | xargs wc -l | tail -n 1
-     1653607 total
-
-Let's count added and deleted lines in the diff between the two
-versions, ignoring added files:
-
-    $ git-diff --numstat --diff-filter=a -l7000 e68b98dc723 | awk '/\.[ch]}?$/ { a+=$1; d+=$2 } END { print a, d }'
-    86260 301104
-
-Of the 480k lines we had back then, 300k are gone.
-
-Thus, roughly 180k of 1654k lines still go back to e68b98dc723.  That's
-less than 11%.
-
-Had we switched to an established style (such as the kernel's) back
-then, the one time pain of reformatting and its impact on git-blame
-would've been long forgotten.
-
-Instead, we've repeatedly wasted time on debating which kind of ugly we
-hate less, and all we can show for our troubles is CODING_STYLE.  Which
-leaves a whole lot more questions open than it answers, so we can keep
-enjoying style debates.
-
-That the code shows anything resembling consistency at all is a
-testament to humanity's yearning for order within a chaotic world.
-
-
-[*] "With the help of some Limoncino".
+Fam
