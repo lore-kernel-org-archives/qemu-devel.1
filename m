@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8R1-0002GL-W3
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:55:35 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8VG-00039f-S2
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8QD-0002QG-GR
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:53:31 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:52848 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8UC-0005N5-Q1
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:57:54 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56879 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1fg8QD-0002EE-1x
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:52:41 -0400
+	id 1fg8UC-0005LM-67
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:56:48 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu, 19 Jul 2018 14:51:56 +0200
-Message-Id: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 00/11] Mips maintenance and misc fixes and
- improvements
+Date: Thu, 19 Jul 2018 14:54:43 +0200
+Message-Id: <1532004912-13899-12-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v3 11/40] target/mips: Add emulation of
+ nanoMIPS 48-bit instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,81 +28,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-v5->v6:
+Add emulation of LI48, ADDIU48, ADDIUGP48, ADDIUPC48, LWPC48, and
+SWPC48 instructions.
 
-  - patch on updating CP0 register bit definitions expanded to include
-    Config2, Config3, and Config4 registers   
-  - added 4 patches:
-      - elf: Remove duplicate preprocessor constant definition
-      - elf: Add ELF flags for MIPS machine variants
-      - linux-user: Update MIPS syscall numbers up to kernel 4.18
-      - linux-user: Add availability control to some syscalls
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
-v4->v5:
-
-  - patch 5 (Add CP0 BadInstrX) corrected to work for both 32-bit and
-    64-bit targets, and using correct tcg function
-  - patch 7 (Amend CP0 WatchHi) was removed from the series until it
-    is reimplemented in a better way
-
-v3->v4:
-
-  - accepted suggestion on better format of bit definitions in patch 3
-  - fixed build errors caused by a mistake in patch 4
-  - removed spurious comments in patch 4
-  - added setting lower 16 bits to 0 in patch 5
-  - used proper email address for a reviewer in patch 7 commit message
-
-v2->v3:
-
-  - replaced invalid @imgtec.com and @mips.com in "From:",,
-    "Signed-off-by:", "Reviewed-by:" lines with the most current
-    email addresses for a particular person
-  - fixed build errors that appeared because of a mistake during
-    integration
-
-v1->v2:
-
-  - fixed recipient's email addresses
-
-Maintenance issues, fixes, and improvements collected during recent
-development. Some of them are related to the upcoming nanoMIPS changes.
-
-Aleksandar Markovic (7):
-  target/mips: Update maintainer's email addresses
-  target/mips: Workaround for checkpatch.pl hanging on msa_helper.c
-  target/mips: Update some CP0 registers bit definitions
-  target/mips: Avoid case statements formulated by ranges
-  elf: Remove duplicate preprocessor constant definition
-  elf: Add ELF flags for MIPS machine variants
-  linux-user: Update MIPS syscall numbers up to kernel 4.18 headers
-
-Aleksandar Rikalo (1):
-  linux-user: Add availability control to some syscalls
-
-Stefan Markovic (1):
-  target/mips: Add CP0 BadInstrX register
-
-Yongbok Kim (2):
-  target/mips: Don't update BadVAddr register in Debug Mode
-  target/mips: Check ELPA flag only in some cases of MFHC0 and MTHC0
-
- .mailmap                       |   7 +-
- MAINTAINERS                    |   9 +-
- include/elf.h                  |  24 +++-
- linux-user/mips/syscall_nr.h   |   7 ++
- linux-user/mips64/syscall_nr.h |  14 +++
- linux-user/strace.c            |  14 ++-
- linux-user/syscall.c           |  25 ++++
- target/mips/cpu.h              | 158 +++++++++++++----------
- target/mips/helper.c           |   4 +-
- target/mips/machine.c          |   5 +-
- target/mips/msa_helper.c       |   4 +-
- target/mips/op_helper.c        |  12 +-
- target/mips/translate.c        | 279 +++++++++++++++++++++++++++++++++--------
- 13 files changed, 423 insertions(+), 139 deletions(-)
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 201baf1..c47ee7d 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16682,6 +16682,72 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_P48I:
++        insn = cpu_lduw_code(env, ctx->base.pc_next + 4);
++        switch ((ctx->opcode >> 16) & 0x1f) {
++        case NM_LI48:
++            if (rt != 0) {
++                tcg_gen_movi_tl(cpu_gpr[rt],
++                                extract32(ctx->opcode, 0, 16) | insn << 16);
++            }
++            break;
++        case NM_ADDIU48:
++            if (rt != 0) {
++                tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rt],
++                                extract32(ctx->opcode, 0, 16) | insn << 16);
++                tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
++            }
++            break;
++        case NM_ADDIUGP48:
++            if (rt != 0) {
++                tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[28],
++                                extract32(ctx->opcode, 0, 16) | insn << 16);
++                tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
++            }
++            break;
++        case NM_ADDIUPC48:
++            if (rt != 0) {
++                int32_t offset = extract32(ctx->opcode, 0, 16) | insn << 16;
++                target_long addr = addr_add(ctx, ctx->base.pc_next + 6, offset);
++
++                tcg_gen_movi_tl(cpu_gpr[rt], addr);
++                tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
++            }
++            break;
++        case NM_LWPC48:
++            if (rt != 0) {
++                TCGv t0;
++                t0 = tcg_temp_new();
++
++                int32_t offset = extract32(ctx->opcode, 0, 16) | insn << 16;
++                target_long addr = addr_add(ctx, ctx->base.pc_next + 6, offset);
++
++                tcg_gen_movi_tl(t0, addr);
++                tcg_gen_qemu_ld_tl(cpu_gpr[rt], t0, ctx->mem_idx, MO_TESL);
++                tcg_temp_free(t0);
++            }
++            break;
++        case NM_SWPC48:
++            {
++                TCGv t0, t1;
++                t0 = tcg_temp_new();
++                t1 = tcg_temp_new();
++
++                int32_t offset = extract32(ctx->opcode, 0, 16) | insn << 16;
++                target_long addr = addr_add(ctx, ctx->base.pc_next + 6, offset);
++
++                tcg_gen_movi_tl(t0, addr);
++                gen_load_gpr(t1, rt);
++
++                tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL);
++
++                tcg_temp_free(t0);
++                tcg_temp_free(t1);
++            }
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
+         return 6;
+     case NM_P_U12:
+         switch ((ctx->opcode >> 12) & 0x0f) {
 -- 
 2.7.4
