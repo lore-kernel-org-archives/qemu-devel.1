@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fg6m2-0001sH-5M
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:07:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fg6n4-0002Qm-QR
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fg6lz-00024f-6b
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:07:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49716 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fg6ly-00024K-VS
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:07:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9BB6D400E9A3
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 11:07:02 +0000 (UTC)
-References: <20180717120414.5852-1-quintela@redhat.com>
-	<eb90a7b9-5a02-b9f7-c989-f646a272c4f3@redhat.com>
-	<87601dztj3.fsf@secure.mitica>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2767a97a-006d-46cd-ce16-7cfedc93ef29@redhat.com>
-Date: Thu, 19 Jul 2018 13:06:59 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fg6n3-0002Mr-Oy
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:08:10 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:41317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fg6n3-0002Mb-HY
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 07:08:09 -0400
+Received: by mail-oi0-x233.google.com with SMTP id k12-v6so14743542oiw.8
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 04:08:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87601dztj3.fsf@secure.mitica>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 00/14] More patches to disable stuff
+In-Reply-To: <20180703213556.20619-14-armbru@redhat.com>
+References: <20180703213556.20619-1-armbru@redhat.com>
+	<20180703213556.20619-14-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Jul 2018 12:07:48 +0100
+Message-ID: <CAFEAcA97fm3+17jjvktAXPQOj0VrVCGXPSFi8mQvU1bnnzgWZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 13/32] qmp: Revert change to
+ handle_qmp_command tracepoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,124 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 17.07.2018 19:00, Juan Quintela wrote:
-> Thomas Huth <thuth@redhat.com> wrote:
->> On 17.07.2018 14:04, Juan Quintela wrote:
->>> Hi
->>>
->>> Notice that this is an RFC because they don't work.  As said on my
->>> previous submmision, we need <foo>-softmmu/config-devices.h to make
->>> this work.  This series just allow us to disable the devices, but not
->>> to enable it back O:-)
->>>
->>> Notice:
->>>
->>> - scsi stuff: we are testing they in cdrom-test.c, so we need to be
->>>   able to config them out.  Notice also that #ifdefs only go in tests/<...>
->>>
->>> - virtio stuff: see how we need to also change hw/virtio/virtio-pci.c
->>>   to disable it.  The problem appears in the device-instropect-test.c.
->>>   As they are defined in the binary, but not complied in.  We can
->>>   change for a registration appreach, but that is more work that what
->>>   I intended for this series.
->>>
->>> What do you think?
->>
->> I think this is the wrong way to go. If you add #ifdefs to the sources,
->> you have to make the binaries target-specific. Currently each test
->> binary can work for each target architecture. With #ifdefs, that's not
->> possible anymore. So please don't do that.
-> 
-> As the system goes now, you have something enabled if it is enabled for
-> any _configuration_, that is what config-all-devices.mak is supposed to
-> do.
+On 3 July 2018 at 22:35, Markus Armbruster <armbru@redhat.com> wrote:
+> Commit 71da4667db6 "monitor: separate QMP parser and dispatcher" moved
+> the handle_qmp_command tracepoint from handle_qmp_command() to
+> monitor_qmp_dispatch_one().  This delays tracing from enqueue time to
+> dequeue time.  Revert that.  Dequeue remains adequately visible via
+> tracepoint monitor_qmp_cmd_in_band.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Message-Id: <20180703085358.13941-14-armbru@redhat.com>
 
-We certainly need this for common, target-independent code. Using
-#ifdefs for common code will only cause confusion for people who are not
-aware of the common vs. target-specific code compilation yet.
+Hi; it looks like this revert has reintroduced(?) a coverity
+warning:
 
->> If you want to make the tests more flexible for configuration, please
->> use QOM instead to check whether the devices are available or not.
-> 
-> QOM is the problem, not the solution (TM).  Uninteresting bits deleted.
-> 
-> tests/device-instrospect-test.c
-> 
-> static void test_device_intro_concrete(void)
-> {
->     ...
->     types = device_type_list(false);
->     ...
-> }
-> 
-> static QList *device_type_list(bool abstract)
-> {
->     return qom_list_types("device", abstract);
-> }
-> 
-> static QList *qom_list_types(const char *implements, bool abstract)
-> {
->     QDict *resp;
->     QList *ret;
->     QDict *args = qdict_new();
-> 
->     qdict_put_bool(args, "abstract", abstract);
->     if (implements) {
->         qdict_put_str(args, "implements", implements);
->     }
->     resp = qmp("{'execute': 'qom-list-types',"
->                " 'arguments': %p }", args);
->     g_assert(qdict_haskey(resp, "return"));
->     ret = qdict_get_qlist(resp, "return");
->     qobject_ref(ret);
->     qobject_unref(resp);
->     return ret;
-> }
-> 
-> If I disable CONFIG_VIRTIO_RNG, then I don't compile
-> common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
-> 
-> So far so good, but look at virtio-pci.c:
-> 
-> static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> {
->    ...
-> }
-> 
-> static void virtio_rng_pci_class_init(ObjectClass *klass, void *data)
-> {
->    ....
-> }
-> 
-> static void virtio_rng_initfn(Object *obj)
-> {
->    ...
-> }
-> 
-> static const TypeInfo virtio_rng_pci_info = {
->     .name          = TYPE_VIRTIO_RNG_PCI,
->     .parent        = TYPE_VIRTIO_PCI,
->     .instance_size = sizeof(VirtIORngPCI),
->     .instance_init = virtio_rng_initfn,
->     .class_init    = virtio_rng_pci_class_init,
-> };
-> 
-> static void virtio_pci_register_types(void)
-> {
->     type_register_static(&virtio_rng_pci_info);
-> ...
-> }
-> 
-> See, we have defined the device "virtio-rng-pci", but there is no
-> implementation.  WHen I run device-intronspection-test on that qemu with
-> CONFIG_VIRTIO_RNG, it fails to run.  If we can agree that something is
-> wrong, then we can search for a solution.
+> ---
+>  monitor.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 3bf3e68bdc..3cc4b07788 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4184,12 +4184,6 @@ static void monitor_qmp_dispatch_one(QMPRequest *req_obj)
+>
+>      g_free(req_obj);
+>
+> -    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
+> -        QString *req_json = qobject_to_json(req);
+> -        trace_handle_qmp_command(mon, qstring_get_str(req_json));
+> -        qobject_unref(req_json);
+> -    }
+> -
+>      old_mon = cur_mon;
+>      cur_mon = mon;
+>
+> @@ -4283,6 +4277,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+>          qdict_del(qdict, "id");
+>      } /* else will fail qmp_dispatch() */
+>
+> +    if (trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND)) {
+> +        QString *req_json = qobject_to_json(req);
+> +        trace_handle_qmp_command(mon, qstring_get_str(req_json));
+> +        qobject_unref(req_json);
+> +    }
 
-I agree with you that the current situation with virtio-pci. c is bad. I
-think we should split it up into individual files instead
-(virtio-pci-rng.c etc.).
+Coverity CID 1394216 points out that in this function a
+little earlier we did a check on "if (!req && !err)", which
+implies that we can get here with a NULL req pointer,
+which will crash in qobject_to_json().
 
- Thomas
+> +
+>      /* Check against the request in general layout */
+>      qdict = qmp_dispatch_check_obj(req, qmp_oob_enabled(mon), &err);
+>      if (!qdict) {
+> --
+
+thanks
+-- PMM
