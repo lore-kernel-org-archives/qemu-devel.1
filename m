@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fgELN-0004bF-BQ
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:12:06 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fgEMR-00056X-IG
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fgELJ-0003iD-UL
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:12:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41908 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fgELJ-0003i9-OO
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:12:01 -0400
-Date: Thu, 19 Jul 2018 20:11:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180719191158.GC2462@work-vm>
-References: <1532012617-16777-1-git-send-email-walling@linux.ibm.com>
-	<87sh4f191h.fsf@dusky.pond.sub.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1fgEMO-0003ws-4x
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:13:11 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43497)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fgEMN-0003wf-S5
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 15:13:08 -0400
+Received: by mail-pg1-x543.google.com with SMTP id v13-v6so4599756pgr.10
+	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 12:13:07 -0700 (PDT)
+References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
+	<1532004912-13899-15-git-send-email-stefan.markovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c9a8b3f6-39da-94af-32f5-3af812f3d7d8@linaro.org>
+Date: Thu, 19 Jul 2018 12:13:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sh4f191h.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] monitor: print message when using 'help'
- with an unknown command
+In-Reply-To: <1532004912-13899-15-git-send-email-stefan.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 14/40] target/mips: Add emulation of
+ misc nanoMIPS instructions (pool32axf)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> You neglected to cc: maintainers.  Cc'ing them increases the odds your
-> patch will be noticed and picked up.  You can use
-> scripts/get_maintainer.pl to find maintainers.  You don't have to do
-> anything for this patch; it got noticed anyway.
-> 
-> David, this is yours :)
+On 07/19/2018 05:54 AM, Stefan Markovic wrote:
+> +static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
+> +{
+> +    int rt = (ctx->opcode >> 21) & 0x1f;
+> +    int rs = (ctx->opcode >> 16) & 0x1f;
+> +
+> +    switch ((ctx->opcode >> 6) & 0x07) {
 
-Thanks!
+extract32.
 
-Dave
+>          case NM_POOL32A7:
+> +        {
+> +            switch ((ctx->opcode >> 3) & 0x07) {
+> +            case NM_POOL32AXF:
+> +                gen_pool32axf_nanomips_insn(env, ctx);
+> +                break;
+> +            }
+> +        }
 
-> Collin Walling <walling@linux.ibm.com> writes:
-> 
-> > When typing 'help' followed by an unknown command, QEMU will
-> > not print anything to the command line to let the user know
-> > they typed a bad command. Let's fix this by printing a message
-> > to the monitor when this happens. For example:
-> >
-> >     (qemu) help xyz
-> >     unknown command: 'xyz'
-> >
-> > Reported-by: Stefan Zimmermann <stzi@linux.ibm.com>
-> > Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> > ---
-> >  monitor.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index 7af1f18..7942f9f 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -1034,9 +1034,12 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
-> >              } else {
-> >                  help_cmd_dump_one(mon, cmd, args, arg_index);
-> >              }
-> > -            break;
-> > +            return;
-> >          }
-> >      }
-> > +
-> > +    /* Entry not found */
-> > +    monitor_printf(mon, "unknown command: '%s'\n", args[arg_index]);
-> >  }
-> >  
-> >  static void help_cmd(Monitor *mon, const char *name)
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Bad indentation of a block that need not exist anyway.
+
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
