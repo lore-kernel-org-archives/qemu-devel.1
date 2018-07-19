@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8ax-000542-60
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 09:05:01 -0400
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8VC-00039T-V3
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8V3-00065H-7Q
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:58:47 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57262 helo=mail.rt-rk.com)
+	(envelope-from <stefan.markovic@rt-rk.com>) id 1fg8S0-0003TV-UV
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:57:50 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54788 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefan.markovic@rt-rk.com>)
-	id 1fg8V2-000649-DH
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:57:40 -0400
+	id 1fg8S0-0003Rl-Br
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 08:54:32 -0400
 From: Stefan Markovic <stefan.markovic@rt-rk.com>
-Date: Thu, 19 Jul 2018 14:54:48 +0200
-Message-Id: <1532004912-13899-17-git-send-email-stefan.markovic@rt-rk.com>
-In-Reply-To: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-References: <1532004912-13899-1-git-send-email-stefan.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 16/40] target/mips: Implement emulation of
- nanoMIPS ROTX instruction
+Date: Thu, 19 Jul 2018 14:52:07 +0200
+Message-Id: <1532004727-13778-12-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
+References: <1532004727-13778-1-git-send-email-stefan.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v6 11/11] linux-user: Add availability control
+ to some syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,165 +28,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, philippe.mathieu.daude@gmail.com, aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, pburton@wavecomp.com
 
-From: Matthew Fortune <matthew.fortune@mips.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Added a helper for ROTX based on the pseudocode from the
-architecture spec. This instraction was not present in previous
-MIPS instruction sets.
-
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/helper.h    |  2 ++
- target/mips/op_helper.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/mips/translate.c | 15 ++++++++
- 3 files changed, 111 insertions(+)
+ linux-user/strace.c  | 14 +++++++++++++-
+ linux-user/syscall.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 5f49234..b2a780a 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index bd897a3..33f4a50 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -2304,7 +2304,19 @@ print_statfs(const struct syscallname *name,
+     print_pointer(arg1, 1);
+     print_syscall_epilogue(name);
+ }
+-#define print_statfs64  print_statfs
++#endif
++
++#ifdef TARGET_NR_statfs64
++static void
++print_statfs64(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_string(arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
  #endif
  
-+DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
-+
- #ifndef CONFIG_USER_ONLY
- /* CP0 helpers */
- DEF_HELPER_1(mfc0_mvpcontrol, tl, env)
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 0b2663b..b3eef9f 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -249,6 +249,100 @@ target_ulong helper_bitswap(target_ulong rt)
-     return (int32_t)bitswap(rt);
- }
+ #ifdef TARGET_NR_symlink
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 3df3bdf..851dd77 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7996,8 +7996,15 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ {
+     CPUState *cpu = ENV_GET_CPU(cpu_env);
+     abi_long ret;
++#if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
++    || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
++    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
+     struct stat st;
++#endif
++#if defined(TARGET_NR_statfs) || defined(TARGET_NR_statfs64) \
++    || defined(TARGET_NR_fstatfs)
+     struct statfs stfs;
++#endif
+     void *p;
  
-+target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
-+                        uint32_t stripe)
-+{
-+    int i;
-+    uint64_t tmp0 = ((uint64_t)rs) << 32 | ((uint64_t)rs & 0xffffffff);
-+    uint64_t tmp1 = tmp0;
-+    for (i = 0; i <= 46; i++) {
-+        int s;
-+        if (i & 0x8) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (stripe != 0 && !(i & 0x4)) {
-+            s = ~s;
-+        }
-+        if (s & 0x10) {
-+            if (tmp0 & (1LL << (i + 16))) {
-+                tmp1 |= 1LL << i;
-+            } else {
-+                tmp1 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp2 = tmp1;
-+    for (i = 0; i <= 38; i++) {
-+        int s;
-+        if (i & 0x4) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (s & 0x8) {
-+            if (tmp1 & (1LL << (i + 8))) {
-+                tmp2 |= 1LL << i;
-+            } else {
-+                tmp2 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp3 = tmp2;
-+    for (i = 0; i <= 34; i++) {
-+        int s;
-+        if (i & 0x2) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x4) {
-+            if (tmp2 & (1LL << (i + 4))) {
-+                tmp3 |= 1LL << i;
-+            } else {
-+                tmp3 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp4 = tmp3;
-+    for (i = 0; i <= 32; i++) {
-+        int s;
-+        if (i & 0x1) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x2) {
-+            if (tmp3 & (1LL << (i + 2))) {
-+                tmp4 |= 1LL << i;
-+            } else {
-+                tmp4 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp5 = tmp4;
-+    for (i = 0; i <= 31; i++) {
-+        int s;
-+        s = shift;
-+        if (s & 0x1) {
-+            if (tmp4 & (1LL << (i + 1))) {
-+                tmp5 |= 1LL << i;
-+            } else {
-+                tmp5 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    return (int64_t)(int32_t)(uint32_t)tmp5;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- 
- static inline hwaddr do_translate_address(CPUMIPSState *env,
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f3753bb..3cff488 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -17578,6 +17578,21 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+ #if defined(DEBUG_ERESTARTSYS)
+@@ -8365,9 +8372,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_oldstat:
+         goto unimplemented;
+ #endif
++#ifdef TARGET_NR_lseek
+     case TARGET_NR_lseek:
+         ret = get_errno(lseek(arg1, arg2, arg3));
+         break;
++#endif
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+     /* Alpha specific */
+     case TARGET_NR_getxpid:
+@@ -9251,6 +9260,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         ret = get_errno(sethostname(p, arg2));
+         unlock_user(p, arg1, 0);
+         break;
++#ifdef TARGET_NR_setrlimit
+     case TARGET_NR_setrlimit:
+         {
+             int resource = target_to_host_resource(arg1);
+@@ -9264,6 +9274,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             ret = get_errno(setrlimit(resource, &rlim));
+         }
+         break;
++#endif
++#ifdef TARGET_NR_getrlimit
+     case TARGET_NR_getrlimit:
+         {
+             int resource = target_to_host_resource(arg1);
+@@ -9280,6 +9292,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
              }
-             break;
-         case NM_P_ROTX:
-+            if (rt != 0) {
-+                TCGv t0 = tcg_temp_new();
-+                TCGv_i32 shift = tcg_const_i32(extract32(ctx->opcode, 0, 5));
-+                TCGv_i32 shiftx = tcg_const_i32(extract32(ctx->opcode, 7, 4)
-+                                                << 1);
-+                TCGv_i32 stripe = tcg_const_i32((ctx->opcode >> 6) & 1);
-+
-+                gen_load_gpr(t0, rs);
-+                gen_helper_rotx(cpu_gpr[rt], t0, shift, shiftx, stripe);
-+                tcg_temp_free(t0);
-+
-+                tcg_temp_free_i32(shift);
-+                tcg_temp_free_i32(shiftx);
-+                tcg_temp_free_i32(stripe);
-+            }
-             break;
-         case NM_P_INS:
-             switch (((ctx->opcode >> 10) & 2) | ((ctx->opcode >> 5) & 1)) {
+         }
+         break;
++#endif
+     case TARGET_NR_getrusage:
+         {
+             struct rusage rusage;
+@@ -9644,15 +9657,19 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         ret = get_errno(munlockall());
+         break;
+ #endif
++#ifdef TARGET_NR_truncate
+     case TARGET_NR_truncate:
+         if (!(p = lock_user_string(arg1)))
+             goto efault;
+         ret = get_errno(truncate(p, arg2));
+         unlock_user(p, arg1, 0);
+         break;
++#endif
++#ifdef TARGET_NR_ftruncate
+     case TARGET_NR_ftruncate:
+         ret = get_errno(ftruncate(arg1, arg2));
+         break;
++#endif
+     case TARGET_NR_fchmod:
+         ret = get_errno(fchmod(arg1, arg2));
+         break;
+@@ -9688,6 +9705,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_profil:
+         goto unimplemented;
+ #endif
++#ifdef TARGET_NR_statfs
+     case TARGET_NR_statfs:
+         if (!(p = lock_user_string(arg1)))
+             goto efault;
+@@ -9719,9 +9737,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             unlock_user_struct(target_stfs, arg2, 1);
+         }
+         break;
++#endif
++#ifdef TARGET_NR_fstatfs
+     case TARGET_NR_fstatfs:
+         ret = get_errno(fstatfs(arg1, &stfs));
+         goto convert_statfs;
++#endif
+ #ifdef TARGET_NR_statfs64
+     case TARGET_NR_statfs64:
+         if (!(p = lock_user_string(arg1)))
+@@ -9969,6 +9990,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         unlock_user(p, arg1, 0);
+         goto do_stat;
+ #endif
++#ifdef TARGET_NR_fstat
+     case TARGET_NR_fstat:
+         {
+             ret = get_errno(fstat(arg1, &st));
+@@ -9998,6 +10020,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             }
+         }
+         break;
++#endif
+ #ifdef TARGET_NR_olduname
+     case TARGET_NR_olduname:
+         goto unimplemented;
+@@ -10997,6 +11020,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         break;
+ 
+ #ifdef CONFIG_SENDFILE
++#ifdef TARGET_NR_sendfile
+     case TARGET_NR_sendfile:
+     {
+         off_t *offp = NULL;
+@@ -11017,6 +11041,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         }
+         break;
+     }
++#endif
+ #ifdef TARGET_NR_sendfile64
+     case TARGET_NR_sendfile64:
+     {
 -- 
 2.7.4
