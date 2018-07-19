@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fgCHJ-0005ou-4p
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:59:46 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fgCbB-0001y9-VB
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fgCHH-0005Jl-Qa
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:59:45 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fgCHH-0005JW-HP
-	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 12:59:43 -0400
-Received: by mail-wr1-x443.google.com with SMTP id c4-v6so8743396wrs.12
-	for <qemu-devel@nongnu.org>; Thu, 19 Jul 2018 09:59:42 -0700 (PDT)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fgCbA-0000vR-CH
+	for qemu-devel@nongnu.org; Thu, 19 Jul 2018 13:20:17 -0400
+References: <3390c4bf-ffac-3744-fd85-84f4ee8193bf@ilande.co.uk>
+	<931c2e2a-1c60-5ef3-9b9e-354b8dc67e4d@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <25c1b12e-3aca-39a3-a556-56b542342270@ilande.co.uk>
+Date: Thu, 19 Jul 2018 18:19:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <87wotufijf.fsf@dusky.pond.sub.org>
-References: <20180706121354.2021-1-marcandre.lureau@redhat.com>
-	<20180706121354.2021-8-marcandre.lureau@redhat.com>
-	<87wotufijf.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 19 Jul 2018 18:59:41 +0200
-Message-ID: <CAJ+F1CLZZB4BHp99sG0DFTDWx6=S3tgaDJncwLWXkhiMxqpZRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/12] json-parser: always set an error if
- return NULL
+In-Reply-To: <931c2e2a-1c60-5ef3-9b9e-354b8dc67e4d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] How to generate custom fw paths for IDE devices?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,244 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, armbru@redhat.com, qemu-block@nongnu.org
 
-Hi
+On 19/07/18 09:29, Laszlo Ersek wrote:
 
-On Tue, Jul 17, 2018 at 9:06 AM, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> Let's make json_parser_parse_err() suck less, and simplify caller
->> error handling.
->
-> Missing:
->
->    * monitor.c handle_qmp_command(): drop workaround
->
->>  * qga/main.c process_event() doesn't need further changes after
->>    previous cleanup.
->
-> "Doesn't need further changes" yes, but I think it could use one.
-> Consider:
->
->     obj =3D json_parser_parse_err(tokens, NULL, &err);
->     if (err) {
->         goto err;
->     }
->     qdict =3D qobject_to(QDict, obj);
->     if (!qdict) {
->         error_setg(&err, QERR_JSON_PARSING);
->         goto err;
->     }
->
-> Before this patch, we get to the error_setg() when
-> json_parser_parse_err() fails without setting an error, and when it
-> succeeds but returns anything but a dictionary.  QERR_JSON_PARSING is
-> appropriate for the first case, but not the second.
->
-> This patch removes the first case.  Please improve the error message.
->
-
-ok, replaced with
-
-error_setg(&err, "Input must be a JSON object");
-
->>  * qobject/json-parser.c json_parser_parse()
->>    Ignores the error.
->
-> Stupid wrapper that's used exactly once, in libqtest.c.  Let's use
-> json_parser_parse_err() there, and drop the wrapper.  Let's rename
-> json_parser_parse_err() to json_parser_parse() then.
->
->>  * qobject/qjson.c qobject_from_jsonv() via parse_json()
->>   - qobject_from_json()
->>     ~ block.c parse_json_filename() - removed workaround
->>     ~ block/rbd.c - abort (generated json - should never fail)
->>     ~ qapi/qobject-input-visitor.c - removed workaround
->>     ~ tests/check-qjson.c - abort, ok
->
-> To be precise, we pass &error_abort and either assert or crash when it
-> returns null.  Okay.  Same for other instances of "abort, ok" below.
->
-> There are a few instances that don't abort.  First one when !utf8_out:
->
->         obj =3D qobject_from_json(json_in, utf8_out ? &error_abort : NULL=
-);
->         if (utf8_out) {
->             str =3D qobject_to(QString, obj);
->             g_assert(str);
->             g_assert_cmpstr(qstring_get_str(str), =3D=3D, utf8_out);
->         } else {
->             g_assert(!obj);
->         }
->         qobject_unref(obj);
->
-> It ignores the error.  Okay.
->
-> Next one:
->
->     static void unterminated_string(void)
->     {
->         Error *err =3D NULL;
->         QObject *obj =3D qobject_from_json("\"abc", &err);
->         g_assert(!err);             /* BUG */
->         g_assert(obj =3D=3D NULL);
->     }
->
-> This patch should fix the BUG.  We'll see at [*] below why it doens't.
->
->>     ~ tests/test-visitor-serialization.c - abort, ok
+> (updating Marcel's address to his GMail one)
+> 
+> On 07/18/18 23:13, Mark Cave-Ayland wrote:
+>> Hi all,
 >>
->>   - qobject_from_jsonf()
->
-> This is called qobject_from_jsonf_nofail() since commit f3e9cc9f7a1, and
-> became the obvious wrapper around qobject_from_vjsonf_nofail() in commit
-> 74670550ee0.  Please mention both new names.
-
-Hmm this is not upstream yet :)
-
-> I guess the commit message needs more updates for these recent changes
-> below, but I'm glossing over that now, along with much of the patch,
-> because I think I've found something more serious, explained at the end
-> of the patch.
->
->>     Now dies in error_handle_fatal() instead of the assertion.
->
-> Which assertion?  Ah, the one in qobject_from_vjsonf_nofail().
->
-> The assertion is now dead, isn't it?
-
-not upstream at least
-
->
->>     Only used in tests, ok.
+>> Following on from a couple of patches I've previously posted to the
+>> mailing list at
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08836.html I've
+>> made some good progress with trying to add bootindex support to OpenBIOS
+>> but I'm stuck with generating the IDE device paths from QEMU.
 >>
->>   - tests/test-qobject-input-visitor.c
->>   - tests/libqtest.c qmp_fd_sendv()
->>     Passes &error_abort, does nothing when qobject_from_jsonv() returns
->>     null.  The fix makes this catch invalid JSON instead of silently
->>     ignoring it.
+>> According to OpenBIOS the device path for a cdrom on a sun4u machine
+>> should be:
 >>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  block.c                      | 5 -----
->>  monitor.c                    | 4 ----
->>  qapi/qobject-input-visitor.c | 5 -----
->>  qobject/json-parser.c        | 8 +++++++-
->>  4 files changed, 7 insertions(+), 15 deletions(-)
+>>    /pci@1fe,0/pci@1,1/ide@3/ide1@8100/cdrom@0
 >>
->> diff --git a/block.c b/block.c
->> index ac8b3a3511..9046d66465 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -1478,11 +1478,6 @@ static QDict *parse_json_filename(const char *fil=
-ename, Error **errp)
+>> whereas with my working patchset I'm currently generating:
 >>
->>      options_obj =3D qobject_from_json(filename, errp);
->>      if (!options_obj) {
->> -        /* Work around qobject_from_json() lossage TODO fix that */
->> -        if (errp && !*errp) {
->> -            error_setg(errp, "Could not parse the JSON options");
->> -            return NULL;
->> -        }
->>          error_prepend(errp, "Could not parse the JSON options: ");
->>          return NULL;
->>      }
->> diff --git a/monitor.c b/monitor.c
->> index ec40a80d81..a3efe96d1d 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -4112,10 +4112,6 @@ static void handle_qmp_command(JSONMessageParser =
-*parser, GQueue *tokens)
->>      QMPRequest *req_obj;
+>>    /pci@1fe,0/pci@1,1/ide@3/drive@1
 >>
->>      req =3D json_parser_parse_err(tokens, NULL, &err);
->> -    if (!req && !err) {
->> -        /* json_parser_parse_err() sucks: can fail without setting @err=
- */
->> -        error_setg(&err, QERR_JSON_PARSING);
->> -    }
+>> The issue is that the drive@1 part is being generated by the IDE drive
+>> device attached to the IDE bus in hw/ide/qdev.c, and so I think I need
+>> to override idebus_get_fw_dev_path() to manually generate the remainder
+>> of the path including both the controller and the correctly named drive
+>> node.
 >>
->>      qdict =3D qobject_to(QDict, req);
->>      if (qdict) {
->> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
->> index da57f4cc24..3e88b27f9e 100644
->> --- a/qapi/qobject-input-visitor.c
->> +++ b/qapi/qobject-input-visitor.c
->> @@ -725,11 +725,6 @@ Visitor *qobject_input_visitor_new_str(const char *=
-str,
->>      if (is_json) {
->>          obj =3D qobject_from_json(str, errp);
->>          if (!obj) {
->> -            /* Work around qobject_from_json() lossage TODO fix that */
->> -            if (errp && !*errp) {
->> -                error_setg(errp, "JSON parse error");
->> -                return NULL;
->> -            }
->>              return NULL;
->>          }
->>          args =3D qobject_to(QDict, obj);
->> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
->> index a5aa790d62..82c3167629 100644
->> --- a/qobject/json-parser.c
->> +++ b/qobject/json-parser.c
->> @@ -24,6 +24,7 @@
->>  #include "qapi/qmp/json-parser.h"
->>  #include "qapi/qmp/json-lexer.h"
->>  #include "qapi/qmp/json-streamer.h"
->> +#include "qapi/qmp/qerror.h"
+>> One option may be to consider subclassing IDEBus and overriding
+>> idebus_get_fw_dev_path() there, but the cmd646 device is a child of
+>> TYPE_PCI_IDE which has its own internal IDEBus and so it seems
+>> overriding it is impossible.
 >>
->>  typedef struct JSONParserContext
->>  {
->> @@ -591,7 +592,12 @@ QObject *json_parser_parse_err(GQueue *tokens, va_l=
-ist *ap, Error **errp)
->    QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **er=
-rp)
->    {
->        JSONParserContext *ctxt =3D parser_context_new(tokens);
->        QObject *result;
->
->        if (!ctxt) {
->            return NULL;
->
-> [*] Still returns null without setting an error.  Two cases lumped into
-> one: "no tokens due to empty input (not an error)", and "no tokens due
-> to lexical error".  This is not the spot to distinguish the two, it
-> needs to be done in its callers.  I figure the sane contract for
+>> Can anyone point me in the right direction as to how to generate the
+>> correct fw path for IDE devices in the above format for sun4u machines?
+> 
+> What prevents you from recognizing, in the guest firmware, the
+> OpenFirmware device path that is currently generated by QEMU?
 
-I tried to tackle that in the next iteration, but it's harder than it
-looks like somehow ;)
+In a word: compatibility. With the older SPARC/PPC machines the OSs are 
+*very* picky about device names and often make assumptions about the DT 
+layout instead of parsing it properly, simply because at that time 
+no-one really thought of running the software on anything but a real 
+machine.
 
-> json_parser_parse_err() would be
->
-> * If @tokens is null, return null.
-> * Else if @tokens parse okay, return the parse tree.
-> * Else set an error and return null.
->
-> But then "always set an error if return NULL" is not possible.  Ideas?
+> I mean, the device path generated by QEMU looks technically correct; it
+> reflects how the IDE controller sits in a PCI B/D/F, and how the IDE
+> drive sits on an IDE controller. Or do you actually have an intermediate
+> IDE controller (at "address 0x8100" on the top IDE controller) in the
+> sun4u machine type? Is the address 0x8100 actually needed by the firmware?
+> 
+> If so, perhaps you could turn that intermediate IDE controller
+> ("internal IDEBus") into its own class, and chain the instance of that
+> class like the rest of the bus controllers are chained. (Just
+> speculating...)
 
-That's okay, I'll document the function that way
+In the case of the IDE device, the devices represent the 
+primary/secondary interfaces and not the separate controllers: the 
+primary lives at 0x8000 and the secondary at 0x8100.
+
+The other problem with changing this is that currently as there is no 
+bootindex support, these map to the legacy -hda and -cdrom options 
+correctly so even if I could do this, and even if all the OSs would 
+still parse the device path, it would have to be a complete cutover 
+which would likely involve me being on the receiving end of some angry 
+emails.
+
+For PPC I've been playing with the macio device because MacOS refused to 
+boot unless the nodes are named "ata-3" and "ata-4". So far I've only 
+been able to do this by implementing a "dummy" macio Bus, reworking and 
+attaching the macio-ide device to it, implementing minial Bus support, 
+and then overriding the fw path function to rewrite the device name 
+based upon its QOM type. That's a whole lot of work just to rename a 
+device from "ide" to "ata-3" in the DT.
+
+If you take a look at the function Thomas mentioned in his email 
+(https://git.qemu.org/?p=qemu.git;a=blob;f=hw/ppc/spapr.c;h=421b2dd09b515502cd11ccdd26420a8117f80cda;hb=e1ea55668ffe6ce558a063f3a9621b761738e1f2#l2866) 
+suddenly it makes sense why I had to suggest patches for naming PCI 
+devices: the SLOF/SPAPR authors decided to replace the entire 
+FwPathProvider so then all that is necessary is to rewrite the paths for 
+the relevant devices in one place; this also nicely handles the 
+difference between IDE vs. SCSI vs. USB vs. virtio DT nodes.
+
+I certainly think it's worth keeping the PCI/sysbus patches I submitted 
+to simplify the required logic, however it's clear to me that the above 
+solution from SPAPR is going to be the best way forward for PPC and 
+SPARC. Presumably this also explains why the patches didn't exist in the 
+first place because the SLOF/SPAPR folks ignored the existing 
+infrastructure and went ahead and did their own thing.
+
+ From a design perspective I can completely understand why someone would 
+come up with a design with a 1:1 correspondence between qdev and fw 
+paths, but in reality it's the details that mean this just doesn't quite 
+work in real life. In particular ISTM it's a big red flag that both 
+IEEE-1275-based BIOSes, OpenBIOS and SLOF (upon which the design is 
+heavily influenced) have to ignore the infrastructure based upon qdev 
+and provide their own implementations.
+
+Are there any other similar issues around other BIOSes, e.g. s390, 
+SeaBIOS at all?
 
 
->
->        }
->>
->>      result =3D parse_value(ctxt, ap);
->>
->> -    error_propagate(errp, ctxt->err);
->> +    if (!result && !ctxt->err) {
->> +        /* TODO: improve error reporting */
->> +        error_setg(errp, QERR_JSON_PARSING);
->> +    } else {
->> +        error_propagate(errp, ctxt->err);
->> +    }
->>
->>      parser_context_free(ctxt);
->
+ATB,
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Mark.
